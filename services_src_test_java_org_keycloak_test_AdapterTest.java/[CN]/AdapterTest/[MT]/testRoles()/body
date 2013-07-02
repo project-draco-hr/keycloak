@@ -1,0 +1,13 @@
+{
+  test1CreateRealm();
+  IdentityManager idm=realmModel.getIdm();
+  idm.add(new SimpleRole("admin"));
+  idm.add(new SimpleRole("user"));
+  List<Role> roles=realmModel.getRoles();
+  Assert.assertEquals(2,roles.size());
+  SimpleUser user=new SimpleUser("bburke");
+  idm.add(user);
+  Role role=idm.getRole("user");
+  idm.grantRole(user,role);
+  Assert.assertTrue(idm.hasRole(user,role));
+}

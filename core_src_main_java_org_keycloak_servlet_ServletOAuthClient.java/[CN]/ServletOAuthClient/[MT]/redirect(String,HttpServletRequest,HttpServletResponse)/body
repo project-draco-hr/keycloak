@@ -1,0 +1,11 @@
+{
+  String state=getStateCode();
+  URI url=UriBuilder.fromUri(authUrl).queryParam("client_id",clientId).queryParam("redirect_uri",redirectUri).queryParam("state",state).build();
+  String cookiePath=request.getContextPath();
+  if (cookiePath.equals(""))   cookiePath="/";
+  Cookie cookie=new Cookie(stateCookieName,state);
+  cookie.setSecure(true);
+  cookie.setPath(cookiePath);
+  response.addCookie(cookie);
+  response.sendRedirect(url.toString());
+}

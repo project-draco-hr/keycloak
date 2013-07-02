@@ -1,0 +1,13 @@
+{
+  if (privateKey != null)   return privateKey;
+  String pem=getPrivateKeyPem();
+  if (pem != null) {
+    try {
+      privateKey=PemUtils.decodePrivateKey(pem);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+  return privateKey;
+}

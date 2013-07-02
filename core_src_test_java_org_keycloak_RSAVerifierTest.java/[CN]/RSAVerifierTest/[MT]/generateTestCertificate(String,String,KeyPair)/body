@@ -1,0 +1,11 @@
+{
+  X509V1CertificateGenerator certGen=new X509V1CertificateGenerator();
+  certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
+  certGen.setIssuerDN(new X500Principal(issuer));
+  certGen.setNotBefore(new Date(System.currentTimeMillis() - 10000));
+  certGen.setNotAfter(new Date(System.currentTimeMillis() + 10000));
+  certGen.setSubjectDN(new X500Principal(subject));
+  certGen.setPublicKey(pair.getPublic());
+  certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
+  return certGen.generateX509Certificate(pair.getPrivate(),"BC");
+}

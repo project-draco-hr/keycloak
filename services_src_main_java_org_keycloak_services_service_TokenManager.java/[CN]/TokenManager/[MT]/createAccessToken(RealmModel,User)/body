@@ -1,0 +1,30 @@
+{
+  List<ResourceModel> resources=realm.getResources();
+  SkeletonKeyToken token=new SkeletonKeyToken();
+  token.id(adapter.generateId());
+  token.issuedNow();
+  token.principal(user.getLoginName());
+  token.audience(realm.getId());
+  if (realm.getTokenLifespan() > 0) {
+    token.expiration((System.currentTimeMillis() / 1000) + realm.getTokenLifespan());
+  }
+  Set<String> realmMapping=realm.getRoleMappings(user);
+  if (realmMapping != null && realmMapping.size() > 0) {
+    SkeletonKeyToken.Access access=new SkeletonKeyToken.Access();
+    for (    String role : realmMapping) {
+      access.addRole(role);
+    }
+    token.setRealmAccess(access);
+  }
+  if (resources != null) {
+    for (    ResourceModel resource : resources) {
+      Set<String> mapping=resource.getRoleMappings(user);
+      if (mapping == null)       continue;
+      SkeletonKeyToken.Access access=token.addAccess(resource.getName()).verifyCaller(resource.isSurrogateAuthRequired());
+      for (      String role : mapping) {
+        access.addRole(role);
+      }
+    }
+  }
+  return token;
+}

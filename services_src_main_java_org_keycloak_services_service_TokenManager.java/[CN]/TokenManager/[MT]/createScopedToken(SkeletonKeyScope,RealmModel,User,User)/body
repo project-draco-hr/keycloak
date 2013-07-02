@@ -1,0 +1,28 @@
+{
+  SkeletonKeyToken token=new SkeletonKeyToken();
+  token.id(adapter.generateId());
+  token.principal(user.getLoginName());
+  token.audience(realm.getName());
+  token.issuedNow();
+  token.issuedFor(client.getLoginName());
+  if (realm.getTokenLifespan() > 0) {
+    token.expiration((System.currentTimeMillis() / 1000) + realm.getTokenLifespan());
+  }
+  Map<String,ResourceModel> resourceMap=realm.getResourceMap();
+  for (  String res : scope.keySet()) {
+    ResourceModel resource=resourceMap.get(res);
+    Set<String> scopeMapping=resource.getScope(client);
+    Set<String> roleMapping=resource.getRoleMappings(user);
+    SkeletonKeyToken.Access access=token.addAccess(resource.getName());
+    for (    String role : scope.get(res)) {
+      if (!scopeMapping.contains("*") && !scopeMapping.contains(role)) {
+        throw new ForbiddenException(Response.status(403).entity("<h1>Security Alert</h1><p>Known client not authorized for the requested scope.</p>").type("text/html").build());
+      }
+      if (!roleMapping.contains(role)) {
+        throw new ForbiddenException(Response.status(403).entity("<h1>Security Alert</h1><p>Known client not authorized for the requested scope.</p>").type("text/html").build());
+      }
+      access.addRole(role);
+    }
+  }
+  return token;
+}

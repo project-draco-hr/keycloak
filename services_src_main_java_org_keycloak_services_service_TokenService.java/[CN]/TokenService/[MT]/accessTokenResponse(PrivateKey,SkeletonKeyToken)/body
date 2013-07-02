@@ -1,0 +1,11 @@
+{
+  byte[] tokenBytes=null;
+  try {
+    tokenBytes=JsonSerialization.toByteArray(token,false);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  String encodedToken=new JWSBuilder().content(tokenBytes).rsa256(privateKey);
+  return accessTokenResponse(token,encodedToken);
+}

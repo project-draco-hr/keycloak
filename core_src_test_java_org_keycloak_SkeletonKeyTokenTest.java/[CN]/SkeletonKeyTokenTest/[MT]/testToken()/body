@@ -1,0 +1,13 @@
+{
+  SkeletonKeyToken token=new SkeletonKeyToken();
+  token.id("111");
+  token.addAccess("foo").addRole("admin");
+  token.addAccess("bar").addRole("user");
+  String json=JsonSerialization.toString(token,true);
+  System.out.println(json);
+  token=JsonSerialization.fromString(SkeletonKeyToken.class,json);
+  Assert.assertEquals("111",token.getId());
+  SkeletonKeyToken.Access foo=token.getResourceAccess("foo");
+  Assert.assertNotNull(foo);
+  Assert.assertTrue(foo.isUserInRole("admin"));
+}

@@ -1,0 +1,23 @@
+{
+  test1CreateRealm();
+  RequiredCredentialModel creds=new RequiredCredentialModel();
+  creds.setSecret(true);
+  creds.setType(RequiredCredentialRepresentation.PASSWORD);
+  creds.setInput(true);
+  realmModel.addRequiredCredential(creds);
+  creds=new RequiredCredentialModel();
+  creds.setSecret(true);
+  creds.setType(RequiredCredentialRepresentation.TOTP);
+  creds.setInput(true);
+  realmModel.addRequiredCredential(creds);
+  List<RequiredCredentialModel> storedCreds=realmModel.getRequiredCredentials();
+  Assert.assertEquals(2,storedCreds.size());
+  boolean totp=false;
+  boolean password=false;
+  for (  RequiredCredentialModel cred : storedCreds) {
+    if (cred.getType().equals(RequiredCredentialRepresentation.PASSWORD))     password=true;
+ else     if (cred.getType().equals(RequiredCredentialRepresentation.TOTP))     totp=true;
+  }
+  Assert.assertTrue(totp);
+  Assert.assertTrue(password);
+}

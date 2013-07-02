@@ -1,0 +1,13 @@
+{
+  test1CreateRealm();
+  User user=new SimpleUser("bburke");
+  realmModel.getIdm().add(user);
+  UserCredentialModel cred=new UserCredentialModel();
+  cred.setType(RequiredCredentialRepresentation.PASSWORD);
+  cred.setValue("geheim");
+  realmModel.updateCredential(user,cred);
+  IdentityManager idm=realmModel.getIdm();
+  UsernamePasswordCredentials creds=new UsernamePasswordCredentials(user.getLoginName(),new Password("geheim"));
+  idm.validateCredentials(creds);
+  Assert.assertEquals(creds.getStatus(),Credentials.Status.VALID);
+}

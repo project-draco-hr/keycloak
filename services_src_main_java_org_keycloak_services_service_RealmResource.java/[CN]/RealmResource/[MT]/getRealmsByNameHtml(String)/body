@@ -1,0 +1,13 @@
+{
+  if (name == null)   return "<html><body><h1>No realms with that name</h1></body></html>";
+  List<RealmModel> realms=identityManager.getRealmsByName(name);
+  if (realms.size() == 0)   return "<html><body><h1>No realms with that name</h1></body></html>";
+  if (realms.size() == 1)   return realmHtml(realms.get(0));
+  StringBuffer html=new StringBuffer();
+  html.append("<html><body><h1>Realms</h1>");
+  for (  RealmModel realm : realms) {
+    html.append("<p><a href=\"").append(uriInfo.getBaseUriBuilder().path("realms").path(realm.getId() + ".html")).append("\">").append(realm.getId()).append("</a></p>");
+  }
+  html.append("</body></html>");
+  return html.toString();
+}

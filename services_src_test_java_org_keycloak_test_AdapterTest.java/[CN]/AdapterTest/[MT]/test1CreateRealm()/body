@@ -1,0 +1,20 @@
+{
+  realmModel=adapter.create("JUGGLER");
+  realmModel.setAccessCodeLifespan(100);
+  realmModel.setCookieLoginAllowed(true);
+  realmModel.setEnabled(true);
+  realmModel.setName("JUGGLER");
+  realmModel.setPrivateKeyPem("0234234");
+  realmModel.setPublicKeyPem("0234234");
+  realmModel.setTokenLifespan(1000);
+  realmModel.updateRealm();
+  System.out.println(realmModel.getId());
+  realmModel=adapter.getRealm(realmModel.getId());
+  Assert.assertNotNull(realmModel);
+  Assert.assertEquals(realmModel.getAccessCodeLifespan(),100);
+  Assert.assertEquals(realmModel.getTokenLifespan(),1000);
+  Assert.assertEquals(realmModel.isEnabled(),true);
+  Assert.assertEquals(realmModel.getName(),"JUGGLER");
+  Assert.assertEquals(realmModel.getPrivateKeyPem(),"0234234");
+  Assert.assertEquals(realmModel.getPublicKeyPem(),"0234234");
+}

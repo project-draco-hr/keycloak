@@ -1,0 +1,16 @@
+{
+  IdentityManager idm=getIdm();
+  Agent realmAgent=idm.getAgent(REALM_AGENT_ID);
+  RelationshipQuery<RequiredCredentialRelationship> query=idm.createRelationshipQuery(RequiredCredentialRelationship.class);
+  query.setParameter(RequiredCredentialRelationship.REALM_AGENT,realmAgent);
+  List<RequiredCredentialRelationship> results=query.getResultList();
+  List<RequiredCredentialModel> rtn=new ArrayList<RequiredCredentialModel>();
+  for (  RequiredCredentialRelationship relationship : results) {
+    RequiredCredentialModel model=new RequiredCredentialModel();
+    model.setInput(relationship.isInput());
+    model.setSecret(relationship.isSecret());
+    model.setType(relationship.getCredentialType());
+    rtn.add(model);
+  }
+  return rtn;
+}

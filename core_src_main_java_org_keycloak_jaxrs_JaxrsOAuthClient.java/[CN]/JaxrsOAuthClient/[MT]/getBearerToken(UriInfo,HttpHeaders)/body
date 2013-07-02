@@ -1,0 +1,15 @@
+{
+  String error=uriInfo.getQueryParameters().getFirst("error");
+  if (error != null)   throw new BadRequestException(new Exception("OAuth error: " + error));
+  Cookie stateCookie=headers.getCookies().get(stateCookieName);
+  if (stateCookie == null)   throw new BadRequestException(new Exception("state cookie not set"));
+  ;
+  String state=uriInfo.getQueryParameters().getFirst("state");
+  if (state == null)   throw new BadRequestException(new Exception("state parameter was null"));
+  if (!state.equals(stateCookie.getValue())) {
+    throw new BadRequestException(new Exception("state parameter invalid"));
+  }
+  String code=uriInfo.getQueryParameters().getFirst("code");
+  if (code == null)   throw new BadRequestException(new Exception("code parameter was null"));
+  return resolveBearerToken(uriInfo.getRequestUri().toString(),code);
+}

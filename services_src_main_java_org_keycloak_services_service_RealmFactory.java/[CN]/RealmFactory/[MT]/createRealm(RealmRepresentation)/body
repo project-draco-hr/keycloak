@@ -1,0 +1,20 @@
+{
+  RealmModel realm=adapter.create(rep.getRealm());
+  KeyPair keyPair=null;
+  try {
+    keyPair=KeyPairGenerator.getInstance("RSA").generateKeyPair();
+  }
+ catch (  NoSuchAlgorithmException e) {
+    throw new RuntimeException(e);
+  }
+  realm.setPrivateKey(keyPair.getPrivate());
+  realm.setPublicKey(keyPair.getPublic());
+  realm.setName(rep.getRealm());
+  realm.setEnabled(rep.isEnabled());
+  realm.setTokenLifespan(rep.getTokenLifespan());
+  realm.setAccessCodeLifespan(rep.getAccessCodeLifespan());
+  realm.setSslNotRequired(rep.isSslNotRequired());
+  realm.updateRealm();
+  Map<String,User> userMap=new HashMap<String,User>();
+  return null;
+}

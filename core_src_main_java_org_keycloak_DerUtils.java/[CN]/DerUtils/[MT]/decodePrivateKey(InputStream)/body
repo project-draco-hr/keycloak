@@ -1,0 +1,9 @@
+{
+  DataInputStream dis=new DataInputStream(is);
+  byte[] keyBytes=new byte[dis.available()];
+  dis.readFully(keyBytes);
+  dis.close();
+  PKCS8EncodedKeySpec spec=new PKCS8EncodedKeySpec(keyBytes);
+  KeyFactory kf=KeyFactory.getInstance("RSA","BC");
+  return kf.generatePrivate(spec);
+}

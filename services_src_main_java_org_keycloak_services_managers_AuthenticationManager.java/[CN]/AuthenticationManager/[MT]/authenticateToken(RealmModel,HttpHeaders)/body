@@ -1,0 +1,28 @@
+{
+  String tokenString=null;
+  String authHeader=headers.getHeaderString(HttpHeaders.AUTHORIZATION);
+  if (authHeader == null) {
+    throw new NotAuthorizedException("Bearer");
+  }
+ else {
+    String[] split=authHeader.trim().split("\\s+");
+    if (split == null || split.length != 2)     throw new NotAuthorizedException("Bearer");
+    if (!split[0].equalsIgnoreCase("Bearer"))     throw new NotAuthorizedException("Bearer");
+    tokenString=split[1];
+  }
+  try {
+    SkeletonKeyToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),realm.getId());
+    if (!token.isActive()) {
+      throw new NotAuthorizedException("token_expired");
+    }
+    User user=realm.getIdm().getUser(token.getPrincipal());
+    if (user == null || !user.isEnabled()) {
+      throw new NotAuthorizedException("invalid_user");
+    }
+    return user;
+  }
+ catch (  VerificationException e) {
+    logger.error("Failed to verify token",e);
+    throw new NotAuthorizedException("invalid_token");
+  }
+}

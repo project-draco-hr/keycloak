@@ -1,0 +1,14 @@
+{
+  IdentitySession.getTransaction().begin();
+  RealmModel realm;
+  try {
+    realm=createRealm(rep);
+    IdentitySession.getTransaction().commit();
+  }
+ catch (  RuntimeException re) {
+    IdentitySession.getTransaction().rollback();
+    throw re;
+  }
+  UriBuilder builder=uriInfo.getRequestUriBuilder().path(realm.getId());
+  return Response.created(builder.build()).entity(RealmSubResource.realmRep(realm,uriInfo)).type(MediaType.APPLICATION_JSON_TYPE).build();
+}

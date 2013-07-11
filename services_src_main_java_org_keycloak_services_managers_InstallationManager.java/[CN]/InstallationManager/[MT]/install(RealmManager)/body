@@ -1,0 +1,13 @@
+{
+  RealmModel defaultRealm=manager.createRealm(Realm.DEFAULT_REALM,Realm.DEFAULT_REALM);
+  defaultRealm.setName(Realm.DEFAULT_REALM);
+  defaultRealm.setEnabled(true);
+  defaultRealm.setTokenLifespan(300);
+  defaultRealm.setAccessCodeLifespan(60);
+  defaultRealm.setSslNotRequired(false);
+  defaultRealm.setCookieLoginAllowed(true);
+  manager.generateRealmKeys(defaultRealm);
+  defaultRealm.updateRealm();
+  defaultRealm.addRequiredCredential(RequiredCredentialModel.PASSWORD);
+  defaultRealm.getIdm().add(new SimpleRole(RegistrationService.REALM_CREATOR_ROLE));
+}

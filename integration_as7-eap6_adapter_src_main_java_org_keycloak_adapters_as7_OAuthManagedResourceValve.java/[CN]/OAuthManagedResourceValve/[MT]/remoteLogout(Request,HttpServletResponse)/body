@@ -1,0 +1,26 @@
+{
+  try {
+    log.debug("->> remoteLogout: ");
+    if (!bearer(true,request,response)) {
+      log.debug("remoteLogout: bearer auth failed");
+      return;
+    }
+    GenericPrincipal gp=(GenericPrincipal)request.getPrincipal();
+    if (!gp.hasRole(remoteSkeletonKeyConfig.getAdminRole())) {
+      log.debug("remoteLogout: role failure");
+      response.sendError(403);
+      return;
+    }
+    String user=request.getParameter("user");
+    if (user != null) {
+      userSessionManagement.logout(user);
+    }
+ else {
+      userSessionManagement.logoutAll();
+    }
+  }
+ catch (  Exception e) {
+    log.error("failed to logout",e);
+  }
+  response.setStatus(204);
+}

@@ -1,0 +1,20 @@
+{
+  String authHeader=request.getHeader(HttpHeaders.AUTHORIZATION);
+  if (authHeader == null) {
+    basicAuthError(response);
+    return null;
+  }
+  String[] creds=BasicAuthHelper.parseHeader(authHeader);
+  if (creds == null) {
+    basicAuthError(response);
+    return null;
+  }
+  String username=creds[0];
+  String password=creds[1];
+  GenericPrincipal gp=(GenericPrincipal)context.getRealm().authenticate(username,password);
+  if (gp == null) {
+    basicAuthError(response);
+    return null;
+  }
+  return gp;
+}

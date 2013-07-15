@@ -1,0 +1,14 @@
+{
+  Map<String,Session> map=userSessionMap.get(username);
+  if (map == null) {
+    final Map<String,Session> value=new HashMap<String,Session>();
+    map=userSessionMap.putIfAbsent(username,value);
+    if (map == null) {
+      map=value;
+    }
+  }
+synchronized (map) {
+    map.put(session.getId(),session);
+  }
+  session.addSessionListener(this);
+}

@@ -1,0 +1,49 @@
+{
+  for (  ResourceRepresentation resourceRep : rep.getResources()) {
+    ResourceModel resource=realm.addResource(resourceRep.getName());
+    resource.setSurrogateAuthRequired(resourceRep.isSurrogateAuthRequired());
+    resource.updateResource();
+    Map<String,Role> roles=new HashMap<String,Role>();
+    if (resourceRep.getRoles() != null) {
+      for (      String roleString : resourceRep.getRoles()) {
+        SimpleRole role=new SimpleRole(roleString.trim());
+        resource.getIdm().add(role);
+        roles.put(role.getName(),role);
+      }
+    }
+    if (resourceRep.getRoleMappings() != null) {
+      for (      RoleMappingRepresentation mapping : resourceRep.getRoleMappings()) {
+        User user=userMap.get(mapping.getUsername());
+        for (        String roleString : mapping.getRoles()) {
+          Role role=roles.get(roleString.trim());
+          if (role == null) {
+            role=new SimpleRole(roleString.trim());
+            resource.getIdm().add(role);
+            roles.put(role.getName(),role);
+          }
+          Role role1=resource.getIdm().getRole(role.getName());
+          realm.getIdm().grantRole(user,role1);
+        }
+      }
+    }
+    if (resourceRep.getScopeMappings() != null) {
+      for (      ScopeMappingRepresentation mapping : resourceRep.getScopeMappings()) {
+        User user=userMap.get(mapping.getUsername());
+        for (        String roleString : mapping.getRoles()) {
+          Role role=roles.get(roleString.trim());
+          if (role == null) {
+            role=new SimpleRole(roleString.trim());
+            resource.getIdm().add(role);
+            roles.put(role.getName(),role);
+          }
+          resource.addScope(user,role.getName());
+        }
+      }
+    }
+    if (!roles.containsKey("*")) {
+      SimpleRole wildcard=new SimpleRole("*");
+      resource.getIdm().add(wildcard);
+      roles.put("*",wildcard);
+    }
+  }
+}

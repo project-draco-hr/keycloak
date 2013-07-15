@@ -1,0 +1,41 @@
+{
+  ServletOAuthLogin oauth=new ServletOAuthLogin(realmConfiguration,request,response,request.getConnector().getRedirectPort());
+  String code=oauth.getCode();
+  if (code == null) {
+    String error=oauth.getError();
+    if (error != null) {
+      response.sendError(400,"OAuth " + error);
+      return;
+    }
+ else {
+      saveRequest(request,request.getSessionInternal(true));
+      oauth.loginRedirect();
+    }
+    return;
+  }
+ else {
+    if (!oauth.resolveCode(code))     return;
+    SkeletonKeyToken token=oauth.getToken();
+    Set<String> roles=null;
+    if (resourceMetadata.getResourceName() != null) {
+      SkeletonKeyToken.Access access=token.getResourceAccess(resourceMetadata.getResourceName());
+      if (access != null)       roles=access.getRoles();
+    }
+ else {
+      SkeletonKeyToken.Access access=token.getRealmAccess();
+      if (access != null)       roles=access.getRoles();
+    }
+    SkeletonKeyPrincipal skp=new SkeletonKeyPrincipal(token.getPrincipal(),null);
+    GenericPrincipal principal=new CatalinaSecurityContextHelper().createPrincipal(context.getRealm(),skp,roles);
+    Session session=request.getSessionInternal(true);
+    session.setPrincipal(principal);
+    session.setAuthType("OAUTH");
+    if (!remoteSkeletonKeyConfig.isCancelPropagation()) {
+      SkeletonKeySession skSession=new SkeletonKeySession(oauth.getTokenString(),realmConfiguration.getMetadata());
+      session.setNote(SkeletonKeySession.class.getName(),skSession);
+    }
+    String username=token.getPrincipal();
+    log.debug("userSessionManage.login: " + username);
+    userSessionManagement.login(session,username);
+  }
+}

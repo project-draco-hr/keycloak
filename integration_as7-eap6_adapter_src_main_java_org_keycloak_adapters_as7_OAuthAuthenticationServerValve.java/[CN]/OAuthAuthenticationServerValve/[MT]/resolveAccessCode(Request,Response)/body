@@ -1,0 +1,132 @@
+{
+  if (!request.isSecure()) {
+    response.sendError(400);
+    return;
+  }
+  String code=request.getParameter("code");
+  JWSInput input=new JWSInput(code,providers);
+  boolean verifiedCode=false;
+  try {
+    verifiedCode=RSAProvider.verify(input,realmPublicKey);
+  }
+ catch (  Exception ignored) {
+    log.error("Failed to verify signature",ignored);
+  }
+  if (!verifiedCode) {
+    Map<String,String> res=new HashMap<String,String>();
+    res.put("error","invalid_grant");
+    res.put("error_description","Unable to verify code signature");
+    response.sendError(400);
+    response.setContentType("application/json");
+    mapWriter.writeValue(response.getOutputStream(),res);
+    response.getOutputStream().flush();
+    return;
+  }
+  String key=input.readContent(String.class);
+  AccessCode accessCode=accessCodeMap.remove(key);
+  String redirect=request.getParameter("redirect_uri");
+  GenericPrincipal gp=basicAuth(request,response);
+  if (gp == null) {
+    log.error("Failed to authenticate client_id");
+    return;
+  }
+  if (accessCode == null) {
+    log.error("No access code: " + code);
+    response.sendError(400);
+    return;
+  }
+  if (accessCode.isExpired()) {
+    log.debug("Access code expired");
+    Map<String,String> res=new HashMap<String,String>();
+    res.put("error","invalid_grant");
+    res.put("error_description","Code is expired");
+    response.setStatus(400);
+    response.setContentType("application/json");
+    mapWriter.writeValue(response.getOutputStream(),res);
+    response.getOutputStream().flush();
+    return;
+  }
+  if (!accessCode.getToken().isActive()) {
+    log.debug("token not active");
+    Map<String,String> res=new HashMap<String,String>();
+    res.put("error","invalid_grant");
+    res.put("error_description","Token expired");
+    response.setStatus(400);
+    response.setContentType("application/json");
+    mapWriter.writeValue(response.getOutputStream(),res);
+    response.getOutputStream().flush();
+    return;
+  }
+  if (!gp.getName().equals(accessCode.getClient())) {
+    log.debug("not equal client");
+    Map<String,String> res=new HashMap<String,String>();
+    res.put("error","invalid_grant");
+    res.put("error_description","Auth error");
+    response.setStatus(400);
+    response.setContentType("application/json");
+    mapWriter.writeValue(response.getOutputStream(),res);
+    response.getOutputStream().flush();
+    return;
+  }
+  if (!accessCode.getRedirect().equals(redirect)) {
+    log.debug("not equal redirect");
+    Map<String,String> res=new HashMap<String,String>();
+    res.put("error","invalid_grant");
+    res.put("error_description","Auth error");
+    response.setStatus(400);
+    response.setContentType("application/json");
+    mapWriter.writeValue(response.getOutputStream(),res);
+    response.getOutputStream().flush();
+    return;
+  }
+  if (accessCode.isSso() && !gp.hasRole(skeletonKeyConfig.getLoginRole())) {
+    log.debug("does not have login permission");
+    Map<String,String> res=new HashMap<String,String>();
+    res.put("error","invalid_grant");
+    res.put("error_description","Auth error");
+    response.setStatus(400);
+    response.setContentType("application/json");
+    mapWriter.writeValue(response.getOutputStream(),res);
+    response.getOutputStream().flush();
+    return;
+  }
+ else   if (!gp.hasRole(skeletonKeyConfig.getClientRole()) && !gp.hasRole(skeletonKeyConfig.getLoginRole())) {
+    log.debug("does not have login or client role permission for access token request");
+    Map<String,String> res=new HashMap<String,String>();
+    res.put("error","invalid_grant");
+    res.put("error_description","Auth error");
+    response.setStatus(400);
+    response.setContentType("application/json");
+    mapWriter.writeValue(response.getOutputStream(),res);
+    response.getOutputStream().flush();
+    return;
+  }
+  String wildcard=skeletonKeyConfig.getWildcardRole() == null ? "*" : skeletonKeyConfig.getWildcardRole();
+  Set<String> codeRoles=accessCode.getToken().getRealmAccess().getRoles();
+  if (codeRoles != null && (codeRoles.contains(skeletonKeyConfig.getClientRole()) || codeRoles.contains(skeletonKeyConfig.getLoginRole()))) {
+    Set<String> newRoles=new HashSet<String>();
+    if (codeRoles.contains(skeletonKeyConfig.getClientRole()))     newRoles.add(skeletonKeyConfig.getClientRole());
+    if (codeRoles.contains(skeletonKeyConfig.getLoginRole()))     newRoles.add(skeletonKeyConfig.getLoginRole());
+    if (codeRoles.contains(wildcard))     newRoles.add(wildcard);
+    codeRoles.clear();
+    codeRoles.addAll(newRoles);
+  }
+  if (codeRoles != null && !gp.hasRole(wildcard) && !gp.hasRole(skeletonKeyConfig.getLoginRole())) {
+    Set<String> clientAllowed=new HashSet<String>();
+    for (    String role : gp.getRoles()) {
+      clientAllowed.add(role);
+    }
+    Set<String> newRoles=new HashSet<String>();
+    newRoles.addAll(codeRoles);
+    for (    String role : newRoles) {
+      if (!clientAllowed.contains(role)) {
+        codeRoles.remove(role);
+      }
+    }
+  }
+  AccessTokenResponse res=accessTokenResponse(realmPrivateKey,accessCode.getToken());
+  response.setStatus(200);
+  response.setContentType("application/json");
+  accessTokenResponseWriter.writeValue(response.getOutputStream(),res);
+  response.getOutputStream().flush();
+}

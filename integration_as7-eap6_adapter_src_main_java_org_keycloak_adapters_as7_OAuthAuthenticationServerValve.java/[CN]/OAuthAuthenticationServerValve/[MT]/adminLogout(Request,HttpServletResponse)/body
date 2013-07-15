@@ -1,0 +1,39 @@
+{
+  log.debug("<< adminLogout");
+  GenericPrincipal gp=checkLoggedIn(request,response);
+  if (gp == null) {
+    if (bearer(request,response,false)) {
+      gp=(GenericPrincipal)request.getPrincipal();
+    }
+ else {
+      response.sendError(403);
+      return;
+    }
+  }
+  if (!gp.hasRole(skeletonKeyConfig.getAdminRole())) {
+    response.sendError(403);
+    return;
+  }
+  String logoutUser=request.getParameter("user");
+  if (logoutUser != null) {
+    userSessionManagement.logout(logoutUser);
+    logoutResources(logoutUser,gp.getName());
+  }
+ else {
+    userSessionManagement.logoutAllBut(gp.getName());
+    logoutResources(null,gp.getName());
+  }
+  String forwardTo=request.getParameter("forward");
+  if (forwardTo == null) {
+    response.setStatus(204);
+    return;
+  }
+  RequestDispatcher disp=context.getServletContext().getRequestDispatcher(forwardTo);
+  try {
+    disp.forward(request.getRequest(),response);
+  }
+ catch (  Throwable t) {
+    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION,t);
+    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"failed to forward");
+  }
+}

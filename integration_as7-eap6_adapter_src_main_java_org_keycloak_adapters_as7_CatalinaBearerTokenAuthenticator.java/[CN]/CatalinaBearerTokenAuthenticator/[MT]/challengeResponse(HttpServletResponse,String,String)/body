@@ -1,0 +1,18 @@
+{
+  StringBuilder header=new StringBuilder("Bearer realm=\"");
+  header.append(resourceMetadata.getRealm()).append("\"");
+  if (error != null) {
+    header.append(", error=\"").append(error).append("\"");
+  }
+  if (description != null) {
+    header.append(", error_description=\"").append(description).append("\"");
+  }
+  response.setHeader("WWW-Authenticate",header.toString());
+  try {
+    response.sendError(401);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  throw new LoginException("Challenged");
+}

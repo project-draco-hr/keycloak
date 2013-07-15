@@ -1,0 +1,13 @@
+{
+  String url=getRequestUrl();
+  if (!isRequestSecure() && realmInfo.isSslRequired()) {
+    int port=redirectPort;
+    if (port < 0) {
+      return null;
+    }
+    UriBuilder secureUrl=UriBuilder.fromUri(url).scheme("https").port(-1);
+    if (port != 443)     secureUrl.port(port);
+    url=secureUrl.build().toString();
+  }
+  return realmInfo.getAuthUrl().clone().queryParam("client_id",realmInfo.getClientId()).queryParam("redirect_uri",url).queryParam("state",state).queryParam("login","true").build().toString();
+}

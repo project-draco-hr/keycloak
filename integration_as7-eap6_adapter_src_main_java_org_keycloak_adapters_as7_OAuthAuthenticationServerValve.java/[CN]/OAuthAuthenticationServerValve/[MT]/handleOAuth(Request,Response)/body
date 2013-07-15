@@ -1,0 +1,20 @@
+{
+  log.debug("<--- Begin oauthAuthenticate");
+  String redirect_uri=request.getParameter("redirect_uri");
+  String client_id=request.getParameter("client_id");
+  String state=request.getParameter("state");
+  String username=request.getParameter(Constants.FORM_USERNAME);
+  String password=request.getParameter(Constants.FORM_PASSWORD);
+  Principal principal=context.getRealm().authenticate(username,password);
+  if (principal == null) {
+    UriBuilder builder=UriBuilder.fromUri(redirect_uri).queryParam("error","unauthorized_client");
+    if (state != null)     builder.queryParam("state",state);
+    response.sendRedirect(builder.toTemplate());
+    return;
+  }
+  GenericPrincipal gp=(GenericPrincipal)principal;
+  register(request,response,principal,HttpServletRequest.FORM_AUTH,username,password);
+  userSessionManagement.login(request.getSessionInternal(),username);
+  redirectAccessCode(false,response,redirect_uri,client_id,state,gp);
+  return;
+}

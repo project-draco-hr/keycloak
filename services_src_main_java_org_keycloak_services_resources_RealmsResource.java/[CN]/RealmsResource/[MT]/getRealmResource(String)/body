@@ -1,0 +1,11 @@
+{
+  RealmManager realmManager=new RealmManager(IdentitySession);
+  RealmModel realm=realmManager.getRealm(id);
+  if (realm == null) {
+    logger.debug("realm not found");
+    throw new NotFoundException();
+  }
+  RealmSubResource realmResource=new RealmSubResource(realm);
+  resourceContext.initResource(realmResource);
+  return realmResource;
+}

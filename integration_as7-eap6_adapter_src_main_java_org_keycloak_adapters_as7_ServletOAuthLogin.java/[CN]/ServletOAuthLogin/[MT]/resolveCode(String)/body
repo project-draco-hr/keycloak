@@ -1,0 +1,41 @@
+{
+  if (realmInfo.isSslRequired() && !isRequestSecure()) {
+    log.error("SSL is required");
+    sendError(Response.Status.FORBIDDEN.getStatusCode());
+    return false;
+  }
+  if (!checkStateCookie())   return false;
+  String client_id=realmInfo.getClientId();
+  String password=realmInfo.getCredentials().asMap().getFirst("password");
+  String authHeader=BasicAuthHelper.createHeader(client_id,password);
+  String redirectUri=stripOauthParametersFromRedirect();
+  Form form=new Form();
+  form.param("grant_type","authorization_code").param("code",code).param("redirect_uri",redirectUri);
+  Response res=realmInfo.getCodeUrl().request().header(HttpHeaders.AUTHORIZATION,authHeader).post(Entity.form(form));
+  AccessTokenResponse tokenResponse;
+  try {
+    if (res.getStatus() != 200) {
+      log.error("failed to turn code into token");
+      sendError(Response.Status.FORBIDDEN.getStatusCode());
+      return false;
+    }
+    log.debug("media type: " + res.getMediaType());
+    log.debug("Content-Type header: " + res.getHeaderString("Content-Type"));
+    tokenResponse=res.readEntity(AccessTokenResponse.class);
+  }
+  finally {
+    res.close();
+  }
+  tokenString=tokenResponse.getToken();
+  try {
+    token=RSATokenVerifier.verifyToken(tokenString,realmInfo.getMetadata());
+    log.debug("Verification succeeded!");
+  }
+ catch (  VerificationException e) {
+    log.error("failed verification of token");
+    sendError(Response.Status.FORBIDDEN.getStatusCode());
+    return false;
+  }
+  sendRedirect(redirectUri);
+  return true;
+}

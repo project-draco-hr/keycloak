@@ -1,13 +1,10 @@
 {
-  Tier newTier=factory.createTier(RealmManager.generateId());
-  IdentityManager idm=factory.createIdentityManager(newTier);
-  SimpleAgent resourceAgent=new SimpleAgent(ResourceModel.RESOURCE_AGENT_ID);
-  resourceAgent.setAttribute(new Attribute<String>(ResourceModel.RESOURCE_NAME,name));
-  idm.add(resourceAgent);
-  idm=getIdm();
-  RealmResourceRelationship relationship=new RealmResourceRelationship();
+  Tier newTier=identitySession.createTier(RealmManager.generateId());
+  IdentityManager idm=getIdm();
+  ResourceRelationship relationship=new ResourceRelationship();
+  relationship.setResourceName(name);
   relationship.setRealmAgent(realmAgent);
-  relationship.setResourceAgent(resourceAgent);
+  relationship.setResourceId(newTier.getId());
   idm.add(relationship);
-  return new ResourceModel(newTier,resourceAgent,this,factory);
+  return new ResourceModel(newTier,relationship,this,identitySession);
 }

@@ -1,0 +1,14 @@
+{
+  if (!request.isSecure()) {
+    response.sendError(400);
+    return;
+  }
+  GenericPrincipal gp=basicAuth(request,response);
+  if (gp == null)   return;
+  SkeletonKeyToken token=buildToken(gp);
+  AccessTokenResponse res=accessTokenResponse(realmPrivateKey,token);
+  response.setStatus(200);
+  response.setContentType("application/json");
+  accessTokenResponseWriter.writeValue(response.getOutputStream(),res);
+  response.getOutputStream().flush();
+}

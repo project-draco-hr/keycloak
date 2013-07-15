@@ -1,0 +1,10 @@
+{
+  String state=getStateCode();
+  String redirect=getRedirectUri(state);
+  if (redirect == null) {
+    sendError(Response.Status.FORBIDDEN.getStatusCode());
+    return;
+  }
+  setCookie(realmInfo.getStateCookieName(),state,null,getDefaultCookiePath(),realmInfo.isSslRequired());
+  sendRedirect(redirect);
+}

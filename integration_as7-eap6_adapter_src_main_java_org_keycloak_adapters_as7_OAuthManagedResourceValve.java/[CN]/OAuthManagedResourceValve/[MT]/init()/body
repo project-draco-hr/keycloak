@@ -1,0 +1,41 @@
+{
+  ManagedResourceConfigLoader managedResourceConfigLoader=new ManagedResourceConfigLoader(context);
+  resourceMetadata=managedResourceConfigLoader.getResourceMetadata();
+  remoteSkeletonKeyConfig=managedResourceConfigLoader.getRemoteSkeletonKeyConfig();
+  String client_id=remoteSkeletonKeyConfig.getClientId();
+  if (client_id == null) {
+    throw new IllegalArgumentException("Must set client-id to use with auth server");
+  }
+  realmConfiguration=new RealmConfiguration();
+  String authUrl=remoteSkeletonKeyConfig.getAuthUrl();
+  if (authUrl == null) {
+    throw new RuntimeException("You must specify auth-url");
+  }
+  String tokenUrl=remoteSkeletonKeyConfig.getCodeUrl();
+  if (tokenUrl == null) {
+    throw new RuntimeException("You mut specify code-url");
+  }
+  realmConfiguration.setMetadata(resourceMetadata);
+  realmConfiguration.setClientId(client_id);
+  for (  Map.Entry<String,String> entry : managedResourceConfigLoader.getRemoteSkeletonKeyConfig().getClientCredentials().entrySet()) {
+    realmConfiguration.getCredentials().param(entry.getKey(),entry.getValue());
+  }
+  int size=10;
+  if (managedResourceConfigLoader.getRemoteSkeletonKeyConfig().getConnectionPoolSize() > 0)   size=managedResourceConfigLoader.getRemoteSkeletonKeyConfig().getConnectionPoolSize();
+  ResteasyClientBuilder.HostnameVerificationPolicy policy=ResteasyClientBuilder.HostnameVerificationPolicy.WILDCARD;
+  if (managedResourceConfigLoader.getRemoteSkeletonKeyConfig().isAllowAnyHostname())   policy=ResteasyClientBuilder.HostnameVerificationPolicy.ANY;
+  ResteasyProviderFactory providerFactory=new ResteasyProviderFactory();
+  ClassLoader old=Thread.currentThread().getContextClassLoader();
+  Thread.currentThread().setContextClassLoader(OAuthManagedResourceValve.class.getClassLoader());
+  try {
+    ResteasyProviderFactory.getInstance();
+    RegisterBuiltin.register(providerFactory);
+  }
+  finally {
+    Thread.currentThread().setContextClassLoader(old);
+  }
+  ResteasyClient client=new ResteasyClientBuilder().providerFactory(providerFactory).connectionPoolSize(size).hostnameVerification(policy).trustStore(resourceMetadata.getTruststore()).keyStore(resourceMetadata.getClientKeystore(),resourceMetadata.getClientKeyPassword()).build();
+  realmConfiguration.setClient(client);
+  realmConfiguration.setAuthUrl(UriBuilder.fromUri(authUrl).queryParam("client_id",client_id));
+  realmConfiguration.setCodeUrl(client.target(tokenUrl));
+}

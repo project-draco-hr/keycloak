@@ -1,0 +1,31 @@
+{
+  if (skeletonKeyConfig.getResources().size() != 0) {
+    SkeletonKeyToken token=new SkeletonKeyToken();
+    token.id(generateId());
+    token.principal(admin);
+    token.audience(skeletonKeyConfig.getRealm());
+    SkeletonKeyToken.Access realmAccess=new SkeletonKeyToken.Access();
+    realmAccess.addRole(skeletonKeyConfig.getAdminRole());
+    token.setRealmAccess(realmAccess);
+    String tokenString=buildTokenString(realmPrivateKey,token);
+    ResteasyClient client=new ResteasyClientBuilder().providerFactory(providers).hostnameVerification(ResteasyClientBuilder.HostnameVerificationPolicy.ANY).trustStore(resourceMetadata.getTruststore()).keyStore(resourceMetadata.getClientKeystore(),resourceMetadata.getClientKeyPassword()).build();
+    try {
+      for (      String resource : skeletonKeyConfig.getResources()) {
+        try {
+          log.debug("logging out: " + resource);
+          WebTarget target=client.target(resource).path(Actions.J_OAUTH_REMOTE_LOGOUT);
+          if (username != null)           target=target.queryParam("user",username);
+          javax.ws.rs.core.Response response=target.request().header("Authorization","Bearer " + tokenString).put(null);
+          if (response.getStatus() != 204)           log.error("Failed to log out");
+          response.close();
+        }
+ catch (        Exception ignored) {
+          log.error("Failed to log out",ignored);
+        }
+      }
+    }
+  finally {
+      client.close();
+    }
+  }
+}

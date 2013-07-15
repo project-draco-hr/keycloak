@@ -1,0 +1,15 @@
+{
+  if (!Session.SESSION_DESTROYED_EVENT.equals(event.getType()) && (!Session.SESSION_PASSIVATED_EVENT.equals(event.getType())))   return;
+  Session session=event.getSession();
+  GenericPrincipal principal=(GenericPrincipal)session.getPrincipal();
+  if (principal == null)   return;
+  session.setPrincipal(null);
+  session.setAuthType(null);
+  String username=principal.getUserPrincipal().getName();
+  Map<String,Session> map=userSessionMap.get(username);
+  if (map == null)   return;
+synchronized (map) {
+    map.remove(session.getId());
+    if (map.isEmpty())     userSessionMap.remove(username);
+  }
+}

@@ -1,0 +1,11 @@
+{
+  String encodedToken=buildTokenString(privateKey,token);
+  AccessTokenResponse res=new AccessTokenResponse();
+  res.setToken(encodedToken);
+  res.setTokenType("bearer");
+  if (token.getExpiration() != 0) {
+    long time=token.getExpiration() - (System.currentTimeMillis() / 1000);
+    res.setExpiresIn(time);
+  }
+  return res;
+}

@@ -1,0 +1,23 @@
+{
+  String client_id=request.getParameter("client_id");
+  if (client_id == null)   return false;
+  String redirect_uri=request.getParameter("redirect_uri");
+  String state=request.getParameter("state");
+  if (redirect_uri == null) {
+    response.sendError(400,"No oauth redirect query parameter set");
+    return true;
+  }
+ else   if (!skeletonKeyConfig.isSsoDisabled() && request.getSessionInternal() != null && request.getSessionInternal().getPrincipal() != null && request.getParameter("login") != null) {
+    log.debug("We're ALREADY LOGGED IN!!!");
+    GenericPrincipal gp=(GenericPrincipal)request.getSessionInternal().getPrincipal();
+    redirectAccessCode(true,response,redirect_uri,client_id,state,gp);
+  }
+ else {
+    UriBuilder builder=UriBuilder.fromUri("j_security_check").queryParam("redirect_uri",redirect_uri).queryParam("client_id",client_id);
+    if (state != null)     builder.queryParam("state",state);
+    String loginAction=builder.build().toString();
+    request.setAttribute("OAUTH_FORM_ACTION",loginAction);
+    getNext().invoke(request,response);
+  }
+  return true;
+}

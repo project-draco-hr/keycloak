@@ -1,0 +1,16 @@
+{
+  if (request.getSessionInternal() == null || request.getSessionInternal().getPrincipal() == null)   return false;
+  log.debug("remote logged in already");
+  GenericPrincipal principal=(GenericPrincipal)request.getSessionInternal().getPrincipal();
+  request.setUserPrincipal(principal);
+  request.setAuthType("OAUTH");
+  Session session=request.getSessionInternal();
+  if (session != null && !remoteSkeletonKeyConfig.isCancelPropagation()) {
+    SkeletonKeySession skSession=(SkeletonKeySession)session.getNote(SkeletonKeySession.class.getName());
+    if (skSession != null) {
+      request.setAttribute(SkeletonKeySession.class.getName(),skSession);
+      ResteasyProviderFactory.pushContext(SkeletonKeySession.class,skSession);
+    }
+  }
+  return true;
+}

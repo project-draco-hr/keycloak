@@ -1,0 +1,122 @@
+{
+  mapper=new ObjectMapper();
+  mapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_DEFAULT);
+  accessTokenResponseWriter=mapper.writerWithType(AccessTokenResponse.class);
+  mapWriter=mapper.writerWithType(mapper.getTypeFactory().constructMapType(Map.class,String.class,String.class));
+  InputStream is=null;
+  String path=context.getServletContext().getInitParameter("skeleton.key.config.file");
+  if (path == null) {
+    is=context.getServletContext().getResourceAsStream("/WEB-INF/resteasy-oauth.json");
+  }
+ else {
+    try {
+      is=new FileInputStream(path);
+    }
+ catch (    FileNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+  }
+  try {
+    skeletonKeyConfig=mapper.readValue(is,AuthServerConfig.class);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  if (skeletonKeyConfig.getLoginRole() == null) {
+    throw new RuntimeException("You must define the login-role in your config file");
+  }
+  if (skeletonKeyConfig.getClientRole() == null) {
+    throw new RuntimeException("You must define the oauth-client-role in your config file");
+  }
+  if (skeletonKeyConfig.getRealmPrivateKey() != null) {
+    try {
+      realmPrivateKey=PemUtils.decodePrivateKey(skeletonKeyConfig.getRealmPrivateKey());
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+  if (skeletonKeyConfig.getRealmPublicKey() != null) {
+    try {
+      realmPublicKey=PemUtils.decodePublicKey(skeletonKeyConfig.getRealmPublicKey());
+      realmPublicKeyPem=skeletonKeyConfig.getRealmPublicKey();
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+  if (skeletonKeyConfig.getRealmKeyStore() != null) {
+    if (skeletonKeyConfig.getRealmKeyAlias() == null)     throw new RuntimeException("Must define realm-key-alias");
+    String keystorePath=EnvUtil.replace(skeletonKeyConfig.getRealmKeyStore());
+    try {
+      KeyStore ks=loadKeyStore(keystorePath,skeletonKeyConfig.getRealmKeystorePassword());
+      if (realmPrivateKey == null) {
+        realmPrivateKey=(PrivateKey)ks.getKey(skeletonKeyConfig.getRealmKeyAlias(),skeletonKeyConfig.getRealmPrivateKeyPassword().toCharArray());
+      }
+      if (realmPublicKey == null) {
+        Certificate cert=ks.getCertificate(skeletonKeyConfig.getRealmKeyAlias());
+        realmPublicKey=cert.getPublicKey();
+      }
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+  if (realmPublicKey == null)   throw new RuntimeException("You have not declared a keystore or public key");
+  if (realmPrivateKey == null)   throw new RuntimeException("You have not declared a keystore or private key");
+  if (realmPublicKeyPem == null) {
+    StringWriter sw=new StringWriter();
+    PEMWriter writer=new PEMWriter(sw);
+    try {
+      writer.writeObject(realmPublicKey);
+      writer.flush();
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+    realmPublicKeyPem=sw.toString();
+    realmPublicKeyPem=PemUtils.removeBeginEnd(realmPublicKeyPem);
+  }
+  providers=new ResteasyProviderFactory();
+  ClassLoader old=Thread.currentThread().getContextClassLoader();
+  Thread.currentThread().setContextClassLoader(OAuthAuthenticationServerValve.class.getClassLoader());
+  try {
+    ResteasyProviderFactory.getInstance();
+    RegisterBuiltin.register(providers);
+  }
+  finally {
+    Thread.currentThread().setContextClassLoader(old);
+  }
+  resourceMetadata=new ResourceMetadata();
+  resourceMetadata.setRealm(skeletonKeyConfig.getRealm());
+  resourceMetadata.setRealmKey(realmPublicKey);
+  String truststore=skeletonKeyConfig.getTruststore();
+  if (truststore != null) {
+    truststore=EnvUtil.replace(truststore);
+    String truststorePassword=skeletonKeyConfig.getTruststorePassword();
+    KeyStore trust=null;
+    try {
+      trust=loadKeyStore(truststore,truststorePassword);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to load truststore",e);
+    }
+    resourceMetadata.setTruststore(trust);
+  }
+  String clientKeystore=skeletonKeyConfig.getClientKeystore();
+  String clientKeyPassword=null;
+  if (clientKeystore != null) {
+    clientKeystore=EnvUtil.replace(clientKeystore);
+    String clientKeystorePassword=skeletonKeyConfig.getClientKeystorePassword();
+    KeyStore serverKS=null;
+    try {
+      serverKS=loadKeyStore(clientKeystore,clientKeystorePassword);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to load keystore",e);
+    }
+    resourceMetadata.setClientKeystore(serverKS);
+    clientKeyPassword=skeletonKeyConfig.getClientKeyPassword();
+    resourceMetadata.setClientKeyPassword(clientKeyPassword);
+  }
+}

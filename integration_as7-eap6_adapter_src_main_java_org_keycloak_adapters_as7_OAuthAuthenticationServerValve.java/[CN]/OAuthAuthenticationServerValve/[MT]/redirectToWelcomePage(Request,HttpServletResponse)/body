@@ -1,0 +1,11 @@
+{
+  ResteasyUriInfo uriInfo=ServletUtil.extractUriInfo(request,null);
+  String[] welcomes=context.findWelcomeFiles();
+  if (welcomes.length > 0) {
+    UriBuilder welcome=uriInfo.getBaseUriBuilder().path(welcomes[0]);
+    response.sendRedirect(welcome.toTemplate());
+  }
+ else {
+    response.setStatus(204);
+  }
+}

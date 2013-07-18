@@ -1,15 +1,7 @@
 {
-  RealmManager realmManager=new RealmManager(identitySession);
-  RealmModel defaultRealm=realmManager.getRealm(Realm.DEFAULT_REALM);
-  User realmCreator=new AuthenticationManager().authenticateToken(defaultRealm,headers);
-  Role creatorRole=defaultRealm.getIdm().getRole(RegistrationService.REALM_CREATOR_ROLE);
-  if (!defaultRealm.getIdm().hasRole(realmCreator,creatorRole)) {
-    logger.warn("not a realm creator");
-    throw new NotAuthorizedException("Bearer");
-  }
   verifyRealmRepresentation(rep);
-  RealmModel realm=realmManager.createRealm(rep.getRealm());
-  realmManager.generateRealmKeys(realm);
+  RealmModel realm=createRealm(rep.getRealm());
+  generateRealmKeys(realm);
   realm.addRealmAdmin(realmCreator);
   realm.setName(rep.getRealm());
   realm.setEnabled(rep.isEnabled());

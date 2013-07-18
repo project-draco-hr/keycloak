@@ -54,10 +54,7 @@
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   String key=input.readContent(String.class);
-  AccessCodeEntry accessCode=null;
-synchronized (accessCodeMap) {
-    accessCode=accessCodeMap.remove(key);
-  }
+  AccessCodeEntry accessCode=tokenManager.pullAccessCode(key);
   if (accessCode == null) {
     Map<String,String> res=new HashMap<String,String>();
     res.put("error","invalid_grant");

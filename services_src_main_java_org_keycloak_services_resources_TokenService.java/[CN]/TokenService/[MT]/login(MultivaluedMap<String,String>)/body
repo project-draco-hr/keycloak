@@ -24,23 +24,7 @@
   }
   boolean authenticated=authManager.authenticateForm(realm,user,formData);
   if (!authenticated)   return loginForm("Unable to authenticate, try again",redirect,clientId,scopeParam,state,realm,client);
-  SkeletonKeyToken token=null;
-  if (scopeParam != null)   token=tokenManager.createScopedToken(scopeParam,realm,client,user);
- else   token=tokenManager.createLoginToken(realm,client,user);
-  AccessCodeEntry code=new AccessCodeEntry();
-  code.setExpiration((System.currentTimeMillis() / 1000) + realm.getAccessCodeLifespan());
-  code.setToken(token);
-  code.setClient(client);
-synchronized (accessCodeMap) {
-    accessCodeMap.put(code.getId(),code);
-  }
-  String accessCode=null;
-  try {
-    accessCode=new JWSBuilder().content(code.getId().getBytes("UTF-8")).rsa256(realm.getPrivateKey());
-  }
- catch (  UnsupportedEncodingException e) {
-    throw new RuntimeException(e);
-  }
+  String accessCode=tokenManager.createAccessCode(scopeParam,realm,client,user);
   UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam("code",accessCode);
   if (state != null)   redirectUri.queryParam("state",state);
   return Response.status(302).location(redirectUri.build()).build();

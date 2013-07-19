@@ -2,7 +2,15 @@
   identitySession.getTransaction().begin();
   RealmModel realm;
   try {
-    realm=createRealm(rep);
+    RealmManager realmManager=new RealmManager(identitySession);
+    RealmModel defaultRealm=realmManager.getRealm(Realm.DEFAULT_REALM);
+    User realmCreator=new AuthenticationManager().authenticateToken(defaultRealm,headers);
+    Role creatorRole=defaultRealm.getIdm().getRole(RegistrationService.REALM_CREATOR_ROLE);
+    if (!defaultRealm.getIdm().hasRole(realmCreator,creatorRole)) {
+      logger.warn("not a realm creator");
+      throw new NotAuthorizedException("Bearer");
+    }
+    realm=realmManager.importRealm(rep,realmCreator);
     identitySession.getTransaction().commit();
   }
  catch (  RuntimeException re) {

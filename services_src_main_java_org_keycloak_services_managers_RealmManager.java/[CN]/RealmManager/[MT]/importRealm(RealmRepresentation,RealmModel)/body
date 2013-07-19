@@ -1,0 +1,81 @@
+{
+  generateRealmKeys(newRealm);
+  newRealm.setName(rep.getRealm());
+  newRealm.setEnabled(rep.isEnabled());
+  newRealm.setTokenLifespan(rep.getTokenLifespan());
+  newRealm.setAccessCodeLifespan(rep.getAccessCodeLifespan());
+  newRealm.setSslNotRequired(rep.isSslNotRequired());
+  newRealm.setCookieLoginAllowed(rep.isCookieLoginAllowed());
+  newRealm.updateRealm();
+  Map<String,User> userMap=new HashMap<String,User>();
+  for (  RequiredCredentialRepresentation requiredCred : rep.getRequiredCredentials()) {
+    RequiredCredentialModel credential=new RequiredCredentialModel();
+    credential.setType(requiredCred.getType());
+    credential.setInput(requiredCred.isInput());
+    credential.setSecret(requiredCred.isSecret());
+    newRealm.addRequiredCredential(credential);
+  }
+  for (  UserRepresentation userRep : rep.getUsers()) {
+    User user=new SimpleUser(userRep.getUsername());
+    user.setEnabled(userRep.isEnabled());
+    if (userRep.getAttributes() != null) {
+      for (      Map.Entry<String,String> entry : userRep.getAttributes().entrySet()) {
+        user.setAttribute(new Attribute<String>(entry.getKey(),entry.getValue()));
+      }
+    }
+    newRealm.getIdm().add(user);
+    if (userRep.getCredentials() != null) {
+      for (      UserRepresentation.Credential cred : userRep.getCredentials()) {
+        UserCredentialModel credential=new UserCredentialModel();
+        credential.setType(cred.getType());
+        credential.setValue(cred.getValue());
+        newRealm.updateCredential(user,credential);
+      }
+    }
+    userMap.put(user.getLoginName(),user);
+  }
+  Map<String,Role> roles=new HashMap<String,Role>();
+  if (rep.getRoles() != null) {
+    for (    String roleString : rep.getRoles()) {
+      SimpleRole role=new SimpleRole(roleString.trim());
+      newRealm.getIdm().add(role);
+      roles.put(role.getName(),role);
+    }
+  }
+  if (rep.getRoleMappings() != null) {
+    for (    RoleMappingRepresentation mapping : rep.getRoleMappings()) {
+      User user=userMap.get(mapping.getUsername());
+      for (      String roleString : mapping.getRoles()) {
+        Role role=roles.get(roleString.trim());
+        if (role == null) {
+          role=new SimpleRole(roleString.trim());
+          newRealm.getIdm().add(role);
+          roles.put(role.getName(),role);
+        }
+        newRealm.getIdm().grantRole(user,role);
+      }
+    }
+  }
+  if (rep.getScopeMappings() != null) {
+    for (    ScopeMappingRepresentation scope : rep.getScopeMappings()) {
+      for (      String roleString : scope.getRoles()) {
+        Role role=roles.get(roleString.trim());
+        if (role == null) {
+          role=new SimpleRole(roleString.trim());
+          newRealm.getIdm().add(role);
+          roles.put(role.getName(),role);
+        }
+        User user=userMap.get(scope.getUsername());
+        newRealm.addScope(user,role.getName());
+      }
+    }
+  }
+  if (!roles.containsKey("*")) {
+    SimpleRole wildcard=new SimpleRole("*");
+    newRealm.getIdm().add(wildcard);
+    roles.put("*",wildcard);
+  }
+  if (rep.getResources() != null) {
+    createResources(rep,newRealm,userMap);
+  }
+}

@@ -1,3 +1,10 @@
 {
   super();
+  IdentitySession session=factory.createIdentitySession();
+  session.getTransaction().begin();
+  RealmManager realmManager=new RealmManager(session);
+  if (realmManager.defaultRealm() == null) {
+    install(realmManager);
+  }
+  session.getTransaction().commit();
 }

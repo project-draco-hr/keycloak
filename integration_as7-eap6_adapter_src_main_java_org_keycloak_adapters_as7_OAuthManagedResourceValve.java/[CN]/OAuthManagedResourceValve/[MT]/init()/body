@@ -1,5 +1,6 @@
 {
   ManagedResourceConfigLoader managedResourceConfigLoader=new ManagedResourceConfigLoader(context);
+  managedResourceConfigLoader.init(true);
   resourceMetadata=managedResourceConfigLoader.getResourceMetadata();
   remoteSkeletonKeyConfig=managedResourceConfigLoader.getRemoteSkeletonKeyConfig();
   String client_id=remoteSkeletonKeyConfig.getClientId();
@@ -20,21 +21,7 @@
   for (  Map.Entry<String,String> entry : managedResourceConfigLoader.getRemoteSkeletonKeyConfig().getClientCredentials().entrySet()) {
     realmConfiguration.getCredentials().param(entry.getKey(),entry.getValue());
   }
-  int size=10;
-  if (managedResourceConfigLoader.getRemoteSkeletonKeyConfig().getConnectionPoolSize() > 0)   size=managedResourceConfigLoader.getRemoteSkeletonKeyConfig().getConnectionPoolSize();
-  ResteasyClientBuilder.HostnameVerificationPolicy policy=ResteasyClientBuilder.HostnameVerificationPolicy.WILDCARD;
-  if (managedResourceConfigLoader.getRemoteSkeletonKeyConfig().isAllowAnyHostname())   policy=ResteasyClientBuilder.HostnameVerificationPolicy.ANY;
-  ResteasyProviderFactory providerFactory=new ResteasyProviderFactory();
-  ClassLoader old=Thread.currentThread().getContextClassLoader();
-  Thread.currentThread().setContextClassLoader(OAuthManagedResourceValve.class.getClassLoader());
-  try {
-    ResteasyProviderFactory.getInstance();
-    RegisterBuiltin.register(providerFactory);
-  }
-  finally {
-    Thread.currentThread().setContextClassLoader(old);
-  }
-  ResteasyClient client=new ResteasyClientBuilder().providerFactory(providerFactory).connectionPoolSize(size).hostnameVerification(policy).trustStore(resourceMetadata.getTruststore()).keyStore(resourceMetadata.getClientKeystore(),resourceMetadata.getClientKeyPassword()).build();
+  ResteasyClient client=managedResourceConfigLoader.getClient();
   realmConfiguration.setClient(client);
   realmConfiguration.setAuthUrl(UriBuilder.fromUri(authUrl).queryParam("client_id",client_id));
   realmConfiguration.setCodeUrl(client.target(tokenUrl));

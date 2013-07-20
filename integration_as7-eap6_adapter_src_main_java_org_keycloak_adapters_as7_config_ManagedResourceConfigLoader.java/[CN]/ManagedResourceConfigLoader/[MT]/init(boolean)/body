@@ -1,0 +1,66 @@
+{
+  String truststorePath=remoteSkeletonKeyConfig.getTruststore();
+  if (truststorePath != null) {
+    truststorePath=EnvUtil.replace(truststorePath);
+    String truststorePassword=remoteSkeletonKeyConfig.getTruststorePassword();
+    truststorePath=null;
+    try {
+      this.truststore=loadKeyStore(truststorePath,truststorePassword);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to load truststore",e);
+    }
+  }
+  String clientKeystore=remoteSkeletonKeyConfig.getClientKeystore();
+  String clientKeyPassword=null;
+  if (clientKeystore != null) {
+    clientKeystore=EnvUtil.replace(clientKeystore);
+    String clientKeystorePassword=remoteSkeletonKeyConfig.getClientKeystorePassword();
+    clientCertKeystore=null;
+    try {
+      clientCertKeystore=loadKeyStore(clientKeystore,clientKeystorePassword);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to load keystore",e);
+    }
+  }
+  initClient();
+  String realm=remoteSkeletonKeyConfig.getRealm();
+  if (remoteSkeletonKeyConfig.getRealmUrl() != null) {
+    PublishedRealmRepresentation rep=null;
+    try {
+      rep=client.target(remoteSkeletonKeyConfig.getRealmUrl()).request().get(PublishedRealmRepresentation.class);
+    }
+  finally {
+      if (!setupClient) {
+        client.close();
+      }
+    }
+    remoteSkeletonKeyConfig.setRealm(rep.getRealm());
+    remoteSkeletonKeyConfig.setAuthUrl(rep.getAuthorizationUrl());
+    remoteSkeletonKeyConfig.setCodeUrl(rep.getCodeUrl());
+    remoteSkeletonKeyConfig.setRealmKey(rep.getPublicKeyPem());
+    remoteSkeletonKeyConfig.setAdminRole(rep.getAdminRole());
+  }
+  String resource=remoteSkeletonKeyConfig.getResource();
+  if (realm == null)   throw new RuntimeException("Must set 'realm' in config");
+  String realmKeyPem=remoteSkeletonKeyConfig.getRealmKey();
+  if (realmKeyPem == null) {
+    throw new IllegalArgumentException("You must set the realm-public-key");
+  }
+  PublicKey realmKey=null;
+  try {
+    realmKey=PemUtils.decodePublicKey(realmKeyPem);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  resourceMetadata=new ResourceMetadata();
+  resourceMetadata.setRealm(realm);
+  resourceMetadata.setResourceName(resource);
+  resourceMetadata.setRealmKey(realmKey);
+  resourceMetadata.setClientKeystore(clientCertKeystore);
+  clientKeyPassword=remoteSkeletonKeyConfig.getClientKeyPassword();
+  resourceMetadata.setClientKeyPassword(clientKeyPassword);
+  resourceMetadata.setTruststore(this.truststore);
+}

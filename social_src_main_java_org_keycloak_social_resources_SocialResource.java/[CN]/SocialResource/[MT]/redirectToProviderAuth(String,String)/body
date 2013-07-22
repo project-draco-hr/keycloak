@@ -1,0 +1,22 @@
+{
+  Iterator<IdentityProvider> itr=ServiceRegistry.lookupProviders(IdentityProvider.class);
+  IdentityProvider provider;
+  for (provider=itr.next(); itr.hasNext() && !provider.getId().equals(providerId); ) {
+  }
+  if (provider == null) {
+    return redirectToLogin(application,"invalid_provider");
+  }
+  IdentityProviderCallback callback=new IdentityProviderCallback();
+  callback.setApplication(application);
+  callback.setHeaders(headers);
+  callback.setUriInfo(uriInfo);
+  callback.setProviderKey(null);
+  callback.setProviderSecret(null);
+  URI authUrl=provider.getAuthUrl(callback);
+  if (authUrl != null) {
+    return Response.seeOther(authUrl).build();
+  }
+ else {
+    return redirectToLogin(application,"invalid_provider");
+  }
+}

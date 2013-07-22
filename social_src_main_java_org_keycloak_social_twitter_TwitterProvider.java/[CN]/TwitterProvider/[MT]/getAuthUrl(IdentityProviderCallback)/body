@@ -1,0 +1,13 @@
+{
+  try {
+    Twitter twitter=new TwitterFactory().getInstance();
+    twitter.setOAuthConsumer(callback.getProviderKey(),callback.getProviderSecret());
+    RequestToken requestToken=twitter.getOAuthRequestToken();
+    callback.putState(requestToken.getToken(),requestToken);
+    return callback.createUri(requestToken.getAuthenticationURL()).build();
+  }
+ catch (  Exception e) {
+    log.error("Failed to retrieve login url",e);
+    return null;
+  }
+}

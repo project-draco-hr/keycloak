@@ -4,7 +4,8 @@
   for (provider=itr.next(); itr.hasNext() && !provider.getId().equals(providerId); ) {
   }
   if (provider == null) {
-    return redirectToLogin(application,"invalid_provider");
+    log.warn("Failed to redirect to provider auth: " + providerId + " not found");
+    return redirectToLogin(application,IdentityProviderErrors.INVALID_PROVIDER);
   }
   IdentityProviderCallback callback=new IdentityProviderCallback();
   callback.setApplication(application);
@@ -12,11 +13,12 @@
   callback.setUriInfo(uriInfo);
   callback.setProviderKey(null);
   callback.setProviderSecret(null);
-  URI authUrl=provider.getAuthUrl(callback);
-  if (authUrl != null) {
-    return Response.seeOther(authUrl).build();
+  callback.setProviderState(getProviderState(provider));
+  try {
+    return Response.seeOther(provider.getAuthUrl(callback)).build();
   }
- else {
-    return redirectToLogin(application,"invalid_provider");
+ catch (  Throwable t) {
+    log.warn("Failed to redirect to provider auth",t);
+    return redirectToLogin(application,IdentityProviderErrors.PROVIDER_ERROR);
   }
 }

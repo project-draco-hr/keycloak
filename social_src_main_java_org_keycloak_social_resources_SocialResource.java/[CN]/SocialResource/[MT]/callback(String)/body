@@ -8,9 +8,13 @@
   for (IdentityProvider provider=itr.next(); itr.hasNext(); ) {
     callback.setProviderState(getProviderState(provider));
     if (provider.isCallbackHandler(callback)) {
-      User user=provider.processCallback(callback);
-      if (user == null) {
-        break;
+      User user=null;
+      try {
+        user=provider.processCallback(callback);
+      }
+ catch (      IdentityProviderException e) {
+        log.warn("Failed to process callback",e);
+        redirectToLogin(application,IdentityProviderErrors.PROVIDER_ERROR);
       }
       String providerUsername=user.getLoginName();
       String providerUsernameKey=provider.getId() + ".username";

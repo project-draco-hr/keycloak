@@ -36,8 +36,5 @@
     forwardToLoginForm(redirect,clientId,scopeParam,state);
     return null;
   }
-  String accessCode=tokenManager.createAccessCode(scopeParam,realm,client,user);
-  UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam("code",accessCode);
-  if (state != null)   redirectUri.queryParam("state",state);
-  return Response.status(302).location(redirectUri.build()).build();
+  return redirectAccessCode(scopeParam,state,redirect,client,user);
 }

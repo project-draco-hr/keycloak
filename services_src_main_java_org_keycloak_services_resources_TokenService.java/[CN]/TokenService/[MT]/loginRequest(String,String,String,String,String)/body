@@ -13,6 +13,10 @@
     identitySession.close();
     return null;
   }
+  User user=authManager.authenticateIdentityCookie(realm,headers);
+  if (user != null) {
+    return redirectAccessCode(scopeParam,state,redirect,client,user);
+  }
   forwardToLoginForm(redirect,clientId,scopeParam,state);
   return null;
 }

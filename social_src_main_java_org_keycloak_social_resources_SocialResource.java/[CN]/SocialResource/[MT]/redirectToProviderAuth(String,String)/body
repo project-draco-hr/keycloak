@@ -1,0 +1,24 @@
+{
+  Iterator<IdentityProvider> itr=ServiceRegistry.lookupProviders(IdentityProvider.class);
+  IdentityProvider provider;
+  for (provider=itr.next(); itr.hasNext() && !provider.getId().equals(providerId); ) {
+  }
+  if (provider == null) {
+    log.warn("Failed to redirect to provider auth: " + providerId + " not found");
+    return redirectToLogin(application,IdentityProviderErrors.INVALID_PROVIDER);
+  }
+  IdentityProviderCallback callback=new IdentityProviderCallback();
+  callback.setApplication(application);
+  callback.setHeaders(headers);
+  callback.setUriInfo(uriInfo);
+  callback.setProviderKey(null);
+  callback.setProviderSecret(null);
+  callback.setProviderState(getProviderState(provider));
+  try {
+    return Response.seeOther(provider.getAuthUrl(callback)).build();
+  }
+ catch (  Throwable t) {
+    log.warn("Failed to redirect to provider auth",t);
+    return redirectToLogin(application,IdentityProviderErrors.PROVIDER_ERROR);
+  }
+}

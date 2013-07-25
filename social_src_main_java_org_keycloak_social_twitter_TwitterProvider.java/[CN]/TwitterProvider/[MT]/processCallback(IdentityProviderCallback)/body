@@ -1,0 +1,16 @@
+{
+  try {
+    Twitter twitter=new TwitterFactory().getInstance();
+    twitter.setOAuthConsumer(callback.getProviderKey(),callback.getProviderSecret());
+    String verifier=callback.getQueryParam("oauth_verifier");
+    RequestToken requestToken=callback.getState(callback.getQueryParam("oauth_token"));
+    twitter.getOAuthAccessToken(requestToken,verifier);
+    twitter4j.User twitterUser=twitter.verifyCredentials();
+    User user=new SimpleUser(String.valueOf(twitterUser.getScreenName()));
+    user.setFirstName(twitterUser.getName());
+    return user;
+  }
+ catch (  Exception e) {
+    throw new IdentityProviderException(e);
+  }
+}

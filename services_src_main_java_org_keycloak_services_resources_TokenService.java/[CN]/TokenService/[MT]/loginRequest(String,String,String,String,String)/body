@@ -1,0 +1,18 @@
+{
+  if (!realm.isEnabled()) {
+    securityFailureForward("Realm not enabled");
+    return null;
+  }
+  User client=realm.getIdm().getUser(clientId);
+  if (client == null) {
+    securityFailureForward("Unknown login requester.");
+    return null;
+  }
+  if (!client.isEnabled()) {
+    securityFailureForward("Login requester not enabled.");
+    identitySession.close();
+    return null;
+  }
+  forwardToLoginForm(redirect,clientId,scopeParam,state);
+  return null;
+}

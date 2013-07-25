@@ -4,26 +4,38 @@
   String state=formData.getFirst("state");
   String redirect=formData.getFirst("redirect_uri");
   if (!realm.isEnabled()) {
-    return Response.ok("Realm not enabled").type("text/html").build();
+    securityFailureForward("Realm not enabled.");
+    return null;
   }
   User client=realm.getIdm().getUser(clientId);
   if (client == null) {
-    throw new NotAuthorizedException("No client");
+    securityFailureForward("Unknown login requester.");
+    return null;
   }
   if (!client.isEnabled()) {
-    return Response.ok("Requester not enabled").type("text/html").build();
+    securityFailureForward("Login requester not enabled.");
+    return null;
   }
   String username=formData.getFirst("username");
   User user=realm.getIdm().getUser(username);
   if (user == null) {
-    logger.debug("user not found");
-    return loginForm("Not valid user",redirect,clientId,scopeParam,state,realm,client);
+    logger.error("Incorrect user name.");
+    request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Incorrect user name.");
+    forwardToLoginForm(redirect,clientId,scopeParam,state);
+    return null;
   }
   if (!user.isEnabled()) {
-    return Response.ok("Your account is not enabled").type("text/html").build();
+    securityFailureForward("Your account is not enabled.");
+    return null;
   }
   boolean authenticated=authManager.authenticateForm(realm,user,formData);
-  if (!authenticated)   return loginForm("Unable to authenticate, try again",redirect,clientId,scopeParam,state,realm,client);
+  if (!authenticated) {
+    logger.error("Authentication failed");
+    request.setAttribute("username",username);
+    request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Invalid credentials.");
+    forwardToLoginForm(redirect,clientId,scopeParam,state);
+    return null;
+  }
   String accessCode=tokenManager.createAccessCode(scopeParam,realm,client,user);
   UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam("code",accessCode);
   if (state != null)   redirectUri.queryParam("state",state);

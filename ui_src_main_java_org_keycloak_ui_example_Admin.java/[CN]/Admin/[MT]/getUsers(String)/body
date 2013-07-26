@@ -1,9 +1,8 @@
 {
-  LinkedList<User> list=new LinkedList<User>();
-  for (  Entry<UserId,User> e : users.entrySet()) {
-    if (e.getKey().getRealm().equals(realm)) {
-      list.add(e.getValue());
-    }
+  List<User> l=users.get(realm);
+  if (l == null) {
+    l=new LinkedList<User>();
+    users.put(realm,l);
   }
-  return list;
+  return l;
 }

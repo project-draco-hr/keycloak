@@ -31,7 +31,7 @@
     }
     newRealm.getIdm().add(user);
     if (userRep.getCredentials() != null) {
-      for (      UserRepresentation.Credential cred : userRep.getCredentials()) {
+      for (      CredentialRepresentation cred : userRep.getCredentials()) {
         UserCredentialModel credential=new UserCredentialModel();
         credential.setType(cred.getType());
         credential.setValue(cred.getValue());
@@ -40,23 +40,23 @@
     }
     userMap.put(user.getLoginName(),user);
   }
-  Map<String,Role> roles=new HashMap<String,Role>();
   if (rep.getRoles() != null) {
     for (    String roleString : rep.getRoles()) {
       SimpleRole role=new SimpleRole(roleString.trim());
       newRealm.getIdm().add(role);
-      roles.put(role.getName(),role);
     }
+  }
+  if (rep.getResources() != null) {
+    createResources(rep,newRealm,userMap);
   }
   if (rep.getRoleMappings() != null) {
     for (    RoleMappingRepresentation mapping : rep.getRoleMappings()) {
       User user=userMap.get(mapping.getUsername());
       for (      String roleString : mapping.getRoles()) {
-        Role role=roles.get(roleString.trim());
+        Role role=newRealm.getIdm().getRole(roleString.trim());
         if (role == null) {
           role=new SimpleRole(roleString.trim());
           newRealm.getIdm().add(role);
-          roles.put(role.getName(),role);
         }
         newRealm.getIdm().grantRole(user,role);
       }
@@ -65,23 +65,14 @@
   if (rep.getScopeMappings() != null) {
     for (    ScopeMappingRepresentation scope : rep.getScopeMappings()) {
       for (      String roleString : scope.getRoles()) {
-        Role role=roles.get(roleString.trim());
+        Role role=newRealm.getIdm().getRole(roleString.trim());
         if (role == null) {
           role=new SimpleRole(roleString.trim());
           newRealm.getIdm().add(role);
-          roles.put(role.getName(),role);
         }
         User user=userMap.get(scope.getUsername());
         newRealm.addScope(user,role.getName());
       }
     }
-  }
-  if (!roles.containsKey("*")) {
-    SimpleRole wildcard=new SimpleRole("*");
-    newRealm.getIdm().add(wildcard);
-    roles.put("*",wildcard);
-  }
-  if (rep.getResources() != null) {
-    createResources(rep,newRealm,userMap);
   }
 }

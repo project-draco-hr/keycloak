@@ -1,0 +1,23 @@
+{
+  SkeletonKeyToken token=initToken(realm,client,user);
+  Set<String> realmMapping=realm.getRoleMappings(user);
+  if (realmMapping != null && realmMapping.size() > 0) {
+    Set<String> scope=realm.getScope(client);
+    SkeletonKeyToken.Access access=new SkeletonKeyToken.Access();
+    for (    String role : realmMapping) {
+      if (scope.contains("*") || scope.contains(role))       access.addRole(role);
+    }
+    token.setRealmAccess(access);
+  }
+  List<ResourceModel> resources=realm.getResources();
+  for (  ResourceModel resource : resources) {
+    Set<String> scope=resource.getScope(client);
+    Set<String> mapping=resource.getRoleMappings(user);
+    if (mapping.size() == 0 || scope.size() == 0)     continue;
+    SkeletonKeyToken.Access access=token.addAccess(resource.getName()).verifyCaller(resource.isSurrogateAuthRequired());
+    for (    String role : mapping) {
+      if (scope.contains("*") || scope.contains(role))       access.addRole(role);
+    }
+  }
+  return token;
+}

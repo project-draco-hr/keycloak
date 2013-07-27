@@ -1,0 +1,10 @@
+{
+  LogoutAction adminAction=new LogoutAction(TokenIdGenerator.generateId(),System.currentTimeMillis() / 1000 + 30,resource.getName(),user);
+  String token=new TokenManager().encodeToken(realm,adminAction);
+  Form form=new Form();
+  form.param("token",token);
+  Response response=client.target(resource.getManagementUrl()).queryParam("action","logout").request().post(Entity.form(form));
+  boolean success=response.getStatus() == 204;
+  response.close();
+  return success;
+}

@@ -1,0 +1,35 @@
+{
+  try {
+    log.debug("->> remoteLogout: ");
+    LogoutAction action=JsonSerialization.fromBytes(LogoutAction.class,token.getContent());
+    if (action.isExpired()) {
+      log.warn("admin request failed, expired token");
+      response.sendError(400,"Expired token");
+      return;
+    }
+    if (!LogoutAction.LOGOUT_ACTION.equals(action.getAction())) {
+      log.warn("Action doesn't match");
+      response.sendError(400,"Action does not match");
+      return;
+    }
+    if (!resourceMetadata.getResourceName().equals(action.getResource())) {
+      log.warn("Resource name does not match");
+      response.sendError(400,"Resource name does not match");
+      return;
+    }
+    String user=action.getUser();
+    if (user != null) {
+      log.info("logout of session for: " + user);
+      userSessionManagement.logout(user);
+    }
+ else {
+      log.info("logout of all sessions");
+      userSessionManagement.logoutAll();
+    }
+  }
+ catch (  Exception e) {
+    log.warn("failed to logout",e);
+    response.sendError(500,"Failed to logout");
+  }
+  response.setStatus(204);
+}

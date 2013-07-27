@@ -1,0 +1,9 @@
+{
+  User user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
+  if (user != null) {
+    logger.info("Logging out: " + user.getLoginName());
+    authManager.expireIdentityCookie(realm,uriInfo);
+    resourceAdminManager.singleLogOut(realm,user.getLoginName());
+  }
+  return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
+}

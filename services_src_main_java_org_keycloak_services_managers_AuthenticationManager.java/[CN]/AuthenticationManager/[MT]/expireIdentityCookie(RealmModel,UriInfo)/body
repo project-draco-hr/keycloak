@@ -1,0 +1,11 @@
+{
+  URI uri=RealmsResource.realmBaseUrl(uriInfo).build(realm.getId());
+  HttpResponse response=ResteasyProviderFactory.getContextData(HttpResponse.class);
+  if (response == null) {
+    logger.info("can't expire identity cookie, no HttpResponse");
+    return;
+  }
+  logger.info("Expiring identity cookie");
+  NewCookie expireIt=new NewCookie(TokenManager.KEYCLOAK_IDENTITY_COOKIE,"",uri.getPath(),null,"Expiring cookie",0,false);
+  response.addNewCookie(expireIt);
+}

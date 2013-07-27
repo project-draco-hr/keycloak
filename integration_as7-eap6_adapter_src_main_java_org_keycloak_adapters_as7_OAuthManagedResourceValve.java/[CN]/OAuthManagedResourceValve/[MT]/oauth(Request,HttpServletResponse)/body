@@ -16,14 +16,14 @@
  else {
     if (!oauth.resolveCode(code))     return;
     SkeletonKeyToken token=oauth.getToken();
-    Set<String> roles=null;
-    if (resourceMetadata.getResourceName() != null) {
+    Set<String> roles=new HashSet<String>();
+    if (remoteSkeletonKeyConfig.isUseResourceRoleMappings()) {
       SkeletonKeyToken.Access access=token.getResourceAccess(resourceMetadata.getResourceName());
-      if (access != null)       roles=access.getRoles();
+      if (access != null)       roles.addAll(access.getRoles());
     }
  else {
       SkeletonKeyToken.Access access=token.getRealmAccess();
-      if (access != null)       roles=access.getRoles();
+      if (access != null)       roles.addAll(access.getRoles());
     }
     SkeletonKeyPrincipal skp=new SkeletonKeyPrincipal(token.getPrincipal(),null);
     GenericPrincipal principal=new CatalinaSecurityContextHelper().createPrincipal(context.getRealm(),skp,roles);

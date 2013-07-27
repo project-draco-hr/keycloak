@@ -3,10 +3,6 @@
   managedResourceConfigLoader.init(true);
   resourceMetadata=managedResourceConfigLoader.getResourceMetadata();
   remoteSkeletonKeyConfig=managedResourceConfigLoader.getRemoteSkeletonKeyConfig();
-  String client_id=remoteSkeletonKeyConfig.getClientId();
-  if (client_id == null) {
-    throw new IllegalArgumentException("Must set client-id to use with auth server");
-  }
   realmConfiguration=new RealmConfiguration();
   String authUrl=remoteSkeletonKeyConfig.getAuthUrl();
   if (authUrl == null) {
@@ -17,13 +13,12 @@
     throw new RuntimeException("You mut specify code-url");
   }
   realmConfiguration.setMetadata(resourceMetadata);
-  realmConfiguration.setClientId(client_id);
   realmConfiguration.setSslRequired(!remoteSkeletonKeyConfig.isSslNotRequired());
-  for (  Map.Entry<String,String> entry : managedResourceConfigLoader.getRemoteSkeletonKeyConfig().getClientCredentials().entrySet()) {
-    realmConfiguration.getCredentials().param(entry.getKey(),entry.getValue());
+  for (  Map.Entry<String,String> entry : managedResourceConfigLoader.getRemoteSkeletonKeyConfig().getCredentials().entrySet()) {
+    realmConfiguration.getResourceCredentials().param(entry.getKey(),entry.getValue());
   }
   ResteasyClient client=managedResourceConfigLoader.getClient();
   realmConfiguration.setClient(client);
-  realmConfiguration.setAuthUrl(UriBuilder.fromUri(authUrl).queryParam("client_id",client_id));
+  realmConfiguration.setAuthUrl(UriBuilder.fromUri(authUrl).queryParam("client_id",resourceMetadata.getResourceName()));
   realmConfiguration.setCodeUrl(client.target(tokenUrl));
 }

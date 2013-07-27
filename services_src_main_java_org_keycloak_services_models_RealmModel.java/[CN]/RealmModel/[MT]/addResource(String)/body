@@ -5,6 +5,13 @@
   relationship.setResourceName(name);
   relationship.setRealmAgent(realmAgent);
   relationship.setResourceId(newTier.getId());
+  relationship.setManagementUrl("");
+  User resourceUser=new SimpleUser(name);
+  idm.add(resourceUser);
+  relationship.setResourceUser(resourceUser);
   idm.add(relationship);
-  return new ResourceModel(newTier,relationship,this,identitySession);
+  ResourceModel resource=new ResourceModel(newTier,relationship,this,identitySession);
+  resource.getIdm().add(new SimpleRole("*"));
+  resource.addScope(resourceUser,"*");
+  return resource;
 }

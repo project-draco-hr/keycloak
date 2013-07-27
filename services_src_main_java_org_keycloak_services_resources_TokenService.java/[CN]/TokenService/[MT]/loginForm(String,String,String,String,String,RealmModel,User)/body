@@ -30,7 +30,7 @@
     html.append("</table><p>To Authorize, please login below</p>");
   }
  else {
-    Set<String> scopeMapping=realm.getScopes(client);
+    Set<String> scopeMapping=realm.getScope(client);
     if (scopeMapping.contains("*")) {
       html.append("<h1>Login For ").append(realm.getName()).append(" Realm</h1>");
       if (validationError != null) {
@@ -85,7 +85,7 @@
       }
     }
   }
-  UriBuilder formActionUri=logainActionUrl(uriInfo);
+  UriBuilder formActionUri=processLoginUrl(uriInfo);
   String action=formActionUri.build(realm.getId()).toString();
   html.append("<form action=\"").append(action).append("\" method=\"POST\">");
   html.append("Username: <input type=\"text\" name=\"username\" size=\"20\"><br>");

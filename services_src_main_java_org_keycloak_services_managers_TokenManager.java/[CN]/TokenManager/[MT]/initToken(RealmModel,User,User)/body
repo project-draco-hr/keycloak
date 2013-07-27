@@ -1,0 +1,12 @@
+{
+  SkeletonKeyToken token=new SkeletonKeyToken();
+  token.id(RealmManager.generateId());
+  token.principal(user.getLoginName());
+  token.audience(realm.getName());
+  token.issuedNow();
+  token.issuedFor(client.getLoginName());
+  if (realm.getTokenLifespan() > 0) {
+    token.expiration((System.currentTimeMillis() / 1000) + realm.getTokenLifespan());
+  }
+  return token;
+}

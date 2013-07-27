@@ -21,8 +21,8 @@
     challengeResponse(response,"invalid_token",e.getMessage());
   }
   boolean verifyCaller=false;
-  Set<String> roles=null;
-  if (resourceMetadata.getResourceName() != null) {
+  Set<String> roles=new HashSet<String>();
+  if (useResourceRoleMappings) {
     SkeletonKeyToken.Access access=token.getResourceAccess(resourceMetadata.getResourceName());
     if (access != null)     roles=access.getRoles();
     verifyCaller=token.isVerifyCaller(resourceMetadata.getResourceName());

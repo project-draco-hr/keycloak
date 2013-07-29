@@ -15,14 +15,15 @@
   }
   Role resourceRole=realm.getIdm().getRole(RealmManager.RESOURCE_ROLE);
   Role oauthClientRole=realm.getIdm().getRole(RealmManager.OAUTH_CLIENT_ROLE);
-  if (!realm.getIdm().hasRole(client,resourceRole) && !realm.getIdm().hasRole(client,oauthClientRole)) {
+  boolean isResource=realm.getIdm().hasRole(client,resourceRole);
+  if (!isResource && !realm.getIdm().hasRole(client,oauthClientRole)) {
     securityFailureForward("Login requester not allowed to request login.");
     identitySession.close();
     return null;
   }
   User user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
   if (user != null) {
-    return redirectAccessCode(scopeParam,state,redirect,client,user);
+    return processAccessCode(scopeParam,state,redirect,client,user);
   }
   forwardToLoginForm(redirect,clientId,scopeParam,state);
   return null;

@@ -1,4 +1,5 @@
 {
+  Role loginRole=realm.getIdm().getRole(RealmManager.RESOURCE_ROLE);
   for (  ResourceRepresentation resourceRep : rep.getResources()) {
     ResourceModel resource=realm.addResource(resourceRep.getName());
     resource.setManagementUrl(resourceRep.getAdminUrl());
@@ -14,9 +15,11 @@
       }
     }
     userMap.put(resourceUser.getLoginName(),resourceUser);
+    realm.getIdm().grantRole(resourceUser,loginRole);
     if (resourceRep.getRoles() != null) {
-      for (      String roleString : resourceRep.getRoles()) {
-        SimpleRole role=new SimpleRole(roleString.trim());
+      for (      RoleRepresentation roleRep : resourceRep.getRoles()) {
+        SimpleRole role=new SimpleRole(roleRep.getName());
+        if (roleRep.getDescription() != null)         role.setAttribute(new Attribute<String>("description",roleRep.getDescription()));
         resource.getIdm().add(role);
       }
     }

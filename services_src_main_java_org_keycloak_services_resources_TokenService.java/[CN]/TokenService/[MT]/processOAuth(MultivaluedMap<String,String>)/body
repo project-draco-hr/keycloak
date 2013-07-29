@@ -1,0 +1,29 @@
+{
+  String code=formData.getFirst("code");
+  JWSInput input=new JWSInput(code,providers);
+  boolean verifiedCode=false;
+  try {
+    verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
+  }
+ catch (  Exception ignored) {
+    logger.debug("Failed to verify signature",ignored);
+  }
+  if (!verifiedCode) {
+    securityFailureForward("Illegal access code.");
+    identitySession.close();
+    return null;
+  }
+  String key=input.readContent(String.class);
+  AccessCodeEntry accessCodeEntry=tokenManager.getAccessCode(key);
+  if (accessCodeEntry == null) {
+    securityFailureForward("Unknown access code.");
+    identitySession.close();
+    return null;
+  }
+  String redirect=accessCodeEntry.getRedirectUri();
+  String state=accessCodeEntry.getState();
+  if (formData.containsKey("cancel")) {
+    return redirectAccessDenied(redirect,state);
+  }
+  return redirectAccessCode(accessCodeEntry,state,redirect);
+}

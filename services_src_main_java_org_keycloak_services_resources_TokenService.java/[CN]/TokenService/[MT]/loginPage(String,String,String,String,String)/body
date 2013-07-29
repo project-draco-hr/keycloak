@@ -13,9 +13,18 @@
     identitySession.close();
     return null;
   }
+  Role resourceRole=realm.getIdm().getRole(RealmManager.RESOURCE_ROLE);
+  Role identityRequestRole=realm.getIdm().getRole(RealmManager.IDENTITY_REQUESTER_ROLE);
+  boolean isResource=realm.getIdm().hasRole(client,resourceRole);
+  if (!isResource && !realm.getIdm().hasRole(client,identityRequestRole)) {
+    securityFailureForward("Login requester not allowed to request login.");
+    identitySession.close();
+    return null;
+  }
   User user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
   if (user != null) {
-    return redirectAccessCode(scopeParam,state,redirect,client,user);
+    logger.info(user.getLoginName() + " already logged in.");
+    return processAccessCode(scopeParam,state,redirect,client,user);
   }
   forwardToLoginForm(redirect,clientId,scopeParam,state);
   return null;

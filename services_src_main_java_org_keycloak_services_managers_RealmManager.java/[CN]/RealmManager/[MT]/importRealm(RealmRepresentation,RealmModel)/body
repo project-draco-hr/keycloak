@@ -41,8 +41,9 @@
     userMap.put(user.getLoginName(),user);
   }
   if (rep.getRoles() != null) {
-    for (    String roleString : rep.getRoles()) {
-      SimpleRole role=new SimpleRole(roleString.trim());
+    for (    RoleRepresentation roleRep : rep.getRoles()) {
+      SimpleRole role=new SimpleRole(roleRep.getName());
+      if (roleRep.getDescription() != null)       role.setAttribute(new Attribute<String>("description",roleRep.getDescription()));
       newRealm.getIdm().add(role);
     }
   }

@@ -12,8 +12,7 @@
     newRealm.setPrivateKeyPem(rep.getPrivateKey());
     newRealm.setPublicKeyPem(rep.getPublicKey());
   }
-  newRealm.updateRealm();
-  Map<String,User> userMap=new HashMap<String,User>();
+  Map<String,UserModel> userMap=new HashMap<String,UserModel>();
   for (  RequiredCredentialRepresentation requiredCred : rep.getRequiredCredentials()) {
     RequiredCredentialModel credential=new RequiredCredentialModel();
     credential.setType(requiredCred.getType());
@@ -22,14 +21,13 @@
     newRealm.addRequiredCredential(credential);
   }
   for (  UserRepresentation userRep : rep.getUsers()) {
-    User user=new SimpleUser(userRep.getUsername());
+    UserModel user=newRealm.addUser(userRep.getUsername());
     user.setEnabled(userRep.isEnabled());
     if (userRep.getAttributes() != null) {
       for (      Map.Entry<String,String> entry : userRep.getAttributes().entrySet()) {
-        user.setAttribute(new Attribute<String>(entry.getKey(),entry.getValue()));
+        user.setAttribute(entry.getKey(),entry.getValue());
       }
     }
-    newRealm.addUser(user);
     if (userRep.getCredentials() != null) {
       for (      CredentialRepresentation cred : userRep.getCredentials()) {
         UserCredentialModel credential=new UserCredentialModel();
@@ -42,9 +40,8 @@
   }
   if (rep.getRoles() != null) {
     for (    RoleRepresentation roleRep : rep.getRoles()) {
-      SimpleRole role=new SimpleRole(roleRep.getName());
-      if (roleRep.getDescription() != null)       role.setAttribute(new Attribute<String>("description",roleRep.getDescription()));
-      newRealm.addRole(role);
+      RoleModel role=newRealm.addRole(roleRep.getName());
+      if (roleRep.getDescription() != null)       role.setDescription(roleRep.getDescription());
     }
   }
   if (rep.getResources() != null) {
@@ -52,12 +49,11 @@
   }
   if (rep.getRoleMappings() != null) {
     for (    RoleMappingRepresentation mapping : rep.getRoleMappings()) {
-      User user=userMap.get(mapping.getUsername());
+      UserModel user=userMap.get(mapping.getUsername());
       for (      String roleString : mapping.getRoles()) {
-        Role role=newRealm.getRole(roleString.trim());
+        RoleModel role=newRealm.getRole(roleString.trim());
         if (role == null) {
-          role=new SimpleRole(roleString.trim());
-          newRealm.addRole(role);
+          role=newRealm.addRole(roleString.trim());
         }
         newRealm.grantRole(user,role);
       }
@@ -66,12 +62,11 @@
   if (rep.getScopeMappings() != null) {
     for (    ScopeMappingRepresentation scope : rep.getScopeMappings()) {
       for (      String roleString : scope.getRoles()) {
-        Role role=newRealm.getRole(roleString.trim());
+        RoleModel role=newRealm.getRole(roleString.trim());
         if (role == null) {
-          role=new SimpleRole(roleString.trim());
-          newRealm.addRole(role);
+          role=newRealm.addRole(roleString.trim());
         }
-        User user=userMap.get(scope.getUsername());
+        UserModel user=userMap.get(scope.getUsername());
         newRealm.addScope(user,role.getName());
       }
     }

@@ -3,7 +3,7 @@
     securityFailureForward("Realm not enabled");
     return null;
   }
-  User client=realm.getUser(clientId);
+  UserModel client=realm.getUser(clientId);
   if (client == null) {
     securityFailureForward("Unknown login requester.");
     return null;
@@ -13,15 +13,15 @@
     identitySession.close();
     return null;
   }
-  Role resourceRole=realm.getRole(RealmManager.RESOURCE_ROLE);
-  Role identityRequestRole=realm.getRole(RealmManager.IDENTITY_REQUESTER_ROLE);
+  RoleModel resourceRole=realm.getRole(RealmManager.RESOURCE_ROLE);
+  RoleModel identityRequestRole=realm.getRole(RealmManager.IDENTITY_REQUESTER_ROLE);
   boolean isResource=realm.hasRole(client,resourceRole);
   if (!isResource && !realm.hasRole(client,identityRequestRole)) {
     securityFailureForward("Login requester not allowed to request login.");
     identitySession.close();
     return null;
   }
-  User user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
+  UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
   if (user != null) {
     logger.info(user.getLoginName() + " already logged in.");
     return processAccessCode(scopeParam,state,redirect,client,user);

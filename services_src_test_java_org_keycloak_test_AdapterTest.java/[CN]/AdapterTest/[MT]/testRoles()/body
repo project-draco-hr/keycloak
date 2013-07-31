@@ -1,12 +1,11 @@
 {
   test1CreateRealm();
-  realmModel.addRole(new SimpleRole("admin"));
-  realmModel.addRole(new SimpleRole("user"));
-  List<Role> roles=realmModel.getRoles();
+  realmModel.addRole("admin");
+  realmModel.addRole("user");
+  List<RoleModel> roles=realmModel.getRoles();
   Assert.assertEquals(5,roles.size());
-  SimpleUser user=new SimpleUser("bburke");
-  realmModel.addUser(user);
-  Role role=realmModel.getRole("user");
+  UserModel user=realmModel.addUser("bburke");
+  RoleModel role=realmModel.getRole("user");
   realmModel.grantRole(user,role);
   Assert.assertTrue(realmModel.hasRole(user,role));
 }

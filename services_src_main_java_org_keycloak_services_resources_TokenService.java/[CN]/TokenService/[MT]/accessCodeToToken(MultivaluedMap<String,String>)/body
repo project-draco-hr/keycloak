@@ -19,7 +19,7 @@
     error.put("error_description","client_id not specified");
     return Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build();
   }
-  User client=realm.getUser(client_id);
+  UserModel client=realm.getUser(client_id);
   if (client == null) {
     logger.debug("Could not find user");
     Map<String,String> error=new HashMap<String,String>();
@@ -74,7 +74,7 @@
     res.put("error_description","Token expired");
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  if (!client.getId().equals(accessCode.getClient().getId())) {
+  if (!client.getLoginName().equals(accessCode.getClient().getLoginName())) {
     Map<String,String> res=new HashMap<String,String>();
     res.put("error","invalid_grant");
     res.put("error_description","Auth error");

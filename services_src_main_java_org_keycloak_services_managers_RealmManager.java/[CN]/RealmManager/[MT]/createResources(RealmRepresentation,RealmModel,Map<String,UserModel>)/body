@@ -1,0 +1,51 @@
+{
+  RoleModel loginRole=realm.getRole(RealmManager.RESOURCE_ROLE);
+  for (  ResourceRepresentation resourceRep : rep.getResources()) {
+    ResourceModel resource=realm.addResource(resourceRep.getName());
+    resource.setManagementUrl(resourceRep.getAdminUrl());
+    resource.setSurrogateAuthRequired(resourceRep.isSurrogateAuthRequired());
+    resource.updateResource();
+    UserModel resourceUser=resource.getResourceUser();
+    if (resourceRep.getCredentials() != null) {
+      for (      CredentialRepresentation cred : resourceRep.getCredentials()) {
+        UserCredentialModel credential=new UserCredentialModel();
+        credential.setType(cred.getType());
+        credential.setValue(cred.getValue());
+        realm.updateCredential(resourceUser,credential);
+      }
+    }
+    userMap.put(resourceUser.getLoginName(),resourceUser);
+    realm.grantRole(resourceUser,loginRole);
+    if (resourceRep.getRoles() != null) {
+      for (      RoleRepresentation roleRep : resourceRep.getRoles()) {
+        RoleModel role=resource.addRole(roleRep.getName());
+        if (roleRep.getDescription() != null)         role.setDescription(roleRep.getDescription());
+      }
+    }
+    if (resourceRep.getRoleMappings() != null) {
+      for (      RoleMappingRepresentation mapping : resourceRep.getRoleMappings()) {
+        UserModel user=userMap.get(mapping.getUsername());
+        for (        String roleString : mapping.getRoles()) {
+          RoleModel role=resource.getRole(roleString.trim());
+          if (role == null) {
+            role=resource.addRole(roleString.trim());
+          }
+          realm.grantRole(user,role);
+        }
+      }
+    }
+    if (resourceRep.getScopeMappings() != null) {
+      for (      ScopeMappingRepresentation mapping : resourceRep.getScopeMappings()) {
+        UserModel user=userMap.get(mapping.getUsername());
+        for (        String roleString : mapping.getRoles()) {
+          RoleModel role=resource.getRole(roleString.trim());
+          if (role == null) {
+            role=resource.addRole(roleString.trim());
+          }
+          resource.addScope(user,role.getName());
+        }
+      }
+    }
+    if (resourceRep.isUseRealmMappings())     realm.addScope(resource.getResourceUser(),"*");
+  }
+}

@@ -1,0 +1,10 @@
+{
+  RelationshipQuery<ScopeRelationship> query=getIdm().createRelationshipQuery(ScopeRelationship.class);
+  query.setParameter(ScopeRelationship.CLIENT,((UserAdapter)agent).getUser());
+  List<ScopeRelationship> scope=query.getResultList();
+  HashSet<String> set=new HashSet<String>();
+  for (  ScopeRelationship rel : scope) {
+    if (rel.getScope().getPartition().getId().equals(tier.getId()))     set.add(rel.getScope().getName());
+  }
+  return set;
+}

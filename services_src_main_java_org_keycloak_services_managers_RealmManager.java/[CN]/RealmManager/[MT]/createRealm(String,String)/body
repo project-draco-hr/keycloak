@@ -1,11 +1,8 @@
 {
-  Realm newRealm=identitySession.createRealm(id);
-  IdentityManager idm=identitySession.createIdentityManager(newRealm);
-  SimpleAgent agent=new SimpleAgent(RealmModel.REALM_AGENT_ID);
-  idm.add(agent);
-  RealmModel realm=new RealmModel(newRealm,identitySession);
-  idm.add(new SimpleRole(WILDCARD_ROLE));
-  idm.add(new SimpleRole(RESOURCE_ROLE));
-  idm.add(new SimpleRole(IDENTITY_REQUESTER_ROLE));
+  RealmModel realm=identitySession.createRealm(id,name);
+  realm.setName(name);
+  realm.addRole(WILDCARD_ROLE);
+  realm.addRole(RESOURCE_ROLE);
+  realm.addRole(IDENTITY_REQUESTER_ROLE);
   return realm;
 }

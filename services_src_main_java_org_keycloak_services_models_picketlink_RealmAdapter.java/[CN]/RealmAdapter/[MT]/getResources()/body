@@ -1,0 +1,13 @@
+{
+  IdentityManager idm=getIdm();
+  RelationshipQuery<ResourceRelationship> query=idm.createRelationshipQuery(ResourceRelationship.class);
+  query.setParameter(ResourceRelationship.REALM_AGENT,realmAgent);
+  List<ResourceRelationship> results=query.getResultList();
+  List<ResourceModel> resources=new ArrayList<ResourceModel>();
+  for (  ResourceRelationship relationship : results) {
+    Tier resourceTier=identitySession.findTier(relationship.getResourceId());
+    ResourceModel model=new ResourceAdapter(resourceTier,relationship,this,identitySession);
+    resources.add(model);
+  }
+  return resources;
+}

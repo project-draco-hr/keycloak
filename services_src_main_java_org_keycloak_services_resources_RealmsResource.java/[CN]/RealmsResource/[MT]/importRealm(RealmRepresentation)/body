@@ -3,9 +3,9 @@
   RealmModel realm;
   try {
     RealmManager realmManager=new RealmManager(identitySession);
-    RealmModel defaultRealm=realmManager.getRealm(Realm.DEFAULT_REALM);
-    User realmCreator=new AuthenticationManager().authenticateBearerToken(defaultRealm,headers);
-    Role creatorRole=defaultRealm.getRole(RegistrationService.REALM_CREATOR_ROLE);
+    RealmModel defaultRealm=realmManager.getRealm(RealmModel.DEFAULT_REALM);
+    UserModel realmCreator=new AuthenticationManager().authenticateBearerToken(defaultRealm,headers);
+    RoleModel creatorRole=defaultRealm.getRole(RegistrationService.REALM_CREATOR_ROLE);
     if (!defaultRealm.hasRole(realmCreator,creatorRole)) {
       logger.warn("not a realm creator");
       throw new NotAuthorizedException("Bearer");

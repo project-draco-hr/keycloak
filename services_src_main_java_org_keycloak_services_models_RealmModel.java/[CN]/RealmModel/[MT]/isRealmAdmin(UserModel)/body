@@ -1,0 +1,8 @@
+{
+  IdentityManager idm=new RealmManager(identitySession).defaultRealm().getIdm();
+  RelationshipQuery<RealmAdminRelationship> query=idm.createRelationshipQuery(RealmAdminRelationship.class);
+  query.setParameter(RealmAdminRelationship.REALM,realm.getId());
+  query.setParameter(RealmAdminRelationship.ADMIN,agent.getUser());
+  List<RealmAdminRelationship> results=query.getResultList();
+  return results.size() > 0;
+}

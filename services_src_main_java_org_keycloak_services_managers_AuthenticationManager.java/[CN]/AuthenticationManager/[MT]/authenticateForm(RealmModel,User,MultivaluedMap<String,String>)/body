@@ -16,26 +16,14 @@
         logger.warn("TOTP token not provided");
         return false;
       }
-      TOTPCredentials creds=new TOTPCredentials();
-      creds.setToken(token);
-      creds.setUsername(username);
-      creds.setPassword(new Password(password));
-      realm.getIdm().validateCredentials(creds);
-      if (creds.getStatus() != Credentials.Status.VALID) {
-        return false;
-      }
+      return realm.validateTOTP(user,password,token);
     }
  else {
-      UsernamePasswordCredentials creds=new UsernamePasswordCredentials(username,new Password(password));
-      realm.getIdm().validateCredentials(creds);
-      if (creds.getStatus() != Credentials.Status.VALID) {
-        return false;
-      }
+      return realm.validatePassword(user,password);
     }
   }
  else {
     logger.warn("Do not know how to authenticate user");
     return false;
   }
-  return true;
 }

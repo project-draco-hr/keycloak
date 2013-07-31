@@ -1,8 +1,8 @@
 {
-  Role resourceRole=realm.getIdm().getRole(RealmManager.RESOURCE_ROLE);
-  Role identityRequestRole=realm.getIdm().getRole(RealmManager.IDENTITY_REQUESTER_ROLE);
-  boolean isResource=realm.getIdm().hasRole(client,resourceRole);
-  if (!isResource && !realm.getIdm().hasRole(client,identityRequestRole)) {
+  Role resourceRole=realm.getRole(RealmManager.RESOURCE_ROLE);
+  Role identityRequestRole=realm.getRole(RealmManager.IDENTITY_REQUESTER_ROLE);
+  boolean isResource=realm.hasRole(client,resourceRole);
+  if (!isResource && !realm.hasRole(client,identityRequestRole)) {
     securityFailureForward("Login requester not allowed to request login.");
     identitySession.close();
     return null;

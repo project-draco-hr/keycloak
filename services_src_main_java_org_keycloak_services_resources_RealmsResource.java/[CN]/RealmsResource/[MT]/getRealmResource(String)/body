@@ -1,11 +1,16 @@
 {
-  RealmManager realmManager=new RealmManager(identitySession);
-  RealmModel realm=realmManager.getRealm(id);
-  if (realm == null) {
-    logger.debug("realm not found");
-    throw new NotFoundException();
+  return new Transaction(false){
+    @Override protected RealmSubResource callImpl(){
+      RealmManager realmManager=new RealmManager(session);
+      RealmModel realm=realmManager.getRealm(id);
+      if (realm == null) {
+        logger.debug("realm not found");
+        throw new NotFoundException();
+      }
+      RealmSubResource realmResource=new RealmSubResource(realm);
+      resourceContext.initResource(realmResource);
+      return realmResource;
+    }
   }
-  RealmSubResource realmResource=new RealmSubResource(realm);
-  resourceContext.initResource(realmResource);
-  return realmResource;
+.call();
 }

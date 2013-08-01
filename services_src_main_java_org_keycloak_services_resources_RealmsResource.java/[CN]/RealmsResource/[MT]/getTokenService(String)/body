@@ -1,11 +1,16 @@
 {
-  RealmManager realmManager=new RealmManager(identitySession);
-  RealmModel realm=realmManager.getRealm(id);
-  if (realm == null) {
-    logger.debug("realm not found");
-    throw new NotFoundException();
+  return new Transaction(false){
+    @Override protected TokenService callImpl(){
+      RealmManager realmManager=new RealmManager(session);
+      RealmModel realm=realmManager.getRealm(id);
+      if (realm == null) {
+        logger.debug("realm not found");
+        throw new NotFoundException();
+      }
+      TokenService tokenService=new TokenService(realm,tokenManager);
+      resourceContext.initResource(tokenService);
+      return tokenService;
+    }
   }
-  TokenService tokenService=new TokenService(realm,tokenManager);
-  resourceContext.initResource(tokenService);
-  return tokenService;
+.call();
 }

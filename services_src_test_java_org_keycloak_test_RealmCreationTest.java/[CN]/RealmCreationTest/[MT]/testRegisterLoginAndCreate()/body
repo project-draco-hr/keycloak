@@ -11,7 +11,7 @@
     Form form=new Form();
     form.param(AuthenticationManager.FORM_USERNAME,"bburke");
     form.param(RequiredCredentialRepresentation.PASSWORD,"badpassword");
-    tokenResponse=target.path("realms").path(Realm.DEFAULT_REALM).path("tokens/grants/identity-token").request().post(Entity.form(form),AccessTokenResponse.class);
+    tokenResponse=target.path("realms").path(RealmModel.DEFAULT_REALM).path("tokens/grants/identity-token").request().post(Entity.form(form),AccessTokenResponse.class);
     Assert.fail();
   }
  catch (  NotAuthorizedException e) {
@@ -19,7 +19,7 @@
   Form form=new Form();
   form.param(AuthenticationManager.FORM_USERNAME,"bburke");
   form.param(RequiredCredentialRepresentation.PASSWORD,"geheim");
-  tokenResponse=target.path("realms").path(Realm.DEFAULT_REALM).path("tokens/grants/identity-token").request().post(Entity.form(form),AccessTokenResponse.class);
+  tokenResponse=target.path("realms").path(RealmModel.DEFAULT_REALM).path("tokens/grants/identity-token").request().post(Entity.form(form),AccessTokenResponse.class);
   Assert.assertNotNull(tokenResponse);
   System.out.println(tokenResponse.getToken());
   RealmRepresentation realm=KeycloakTestBase.loadJson("testrealm.json");

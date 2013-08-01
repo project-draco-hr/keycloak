@@ -1,8 +1,8 @@
 {
-  Realm newRealm=session.createRealm(id);
-  IdentityManager idm=session.createIdentityManager(newRealm);
-  SimpleAgent agent=new SimpleAgent(RealmAdapter.REALM_AGENT_ID);
-  idm.add(agent);
-  RealmAdapter realm=new RealmAdapter(newRealm,session);
+  RealmData newRealm=new RealmData(id);
+  newRealm.setId(id);
+  newRealm.setRealmName(name);
+  partitionManager.add(newRealm);
+  RealmAdapter realm=new RealmAdapter(this,newRealm,partitionManager);
   return realm;
 }

@@ -1,40 +1,45 @@
 {
-  String clientId=formData.getFirst("client_id");
-  String scopeParam=formData.getFirst("scope");
-  String state=formData.getFirst("state");
-  String redirect=formData.getFirst("redirect_uri");
-  if (!realm.isEnabled()) {
-    securityFailureForward("Realm not enabled.");
-    return null;
+  return new Transaction(){
+    protected Response callImpl(){
+      String clientId=formData.getFirst("client_id");
+      String scopeParam=formData.getFirst("scope");
+      String state=formData.getFirst("state");
+      String redirect=formData.getFirst("redirect_uri");
+      if (!realm.isEnabled()) {
+        securityFailureForward("Realm not enabled.");
+        return null;
+      }
+      UserModel client=realm.getUser(clientId);
+      if (client == null) {
+        securityFailureForward("Unknown login requester.");
+        return null;
+      }
+      if (!client.isEnabled()) {
+        securityFailureForward("Login requester not enabled.");
+        return null;
+      }
+      String username=formData.getFirst("username");
+      UserModel user=realm.getUser(username);
+      if (user == null) {
+        logger.error("Incorrect user name.");
+        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Incorrect user name.");
+        forwardToLoginForm(redirect,clientId,scopeParam,state);
+        return null;
+      }
+      if (!user.isEnabled()) {
+        securityFailureForward("Your account is not enabled.");
+        return null;
+      }
+      boolean authenticated=authManager.authenticateForm(realm,user,formData);
+      if (!authenticated) {
+        logger.error("Authentication failed");
+        request.setAttribute("username",username);
+        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Invalid credentials.");
+        forwardToLoginForm(redirect,clientId,scopeParam,state);
+        return null;
+      }
+      return processAccessCode(scopeParam,state,redirect,client,user);
+    }
   }
-  UserModel client=realm.getUser(clientId);
-  if (client == null) {
-    securityFailureForward("Unknown login requester.");
-    return null;
-  }
-  if (!client.isEnabled()) {
-    securityFailureForward("Login requester not enabled.");
-    return null;
-  }
-  String username=formData.getFirst("username");
-  UserModel user=realm.getUser(username);
-  if (user == null) {
-    logger.error("Incorrect user name.");
-    request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Incorrect user name.");
-    forwardToLoginForm(redirect,clientId,scopeParam,state);
-    return null;
-  }
-  if (!user.isEnabled()) {
-    securityFailureForward("Your account is not enabled.");
-    return null;
-  }
-  boolean authenticated=authManager.authenticateForm(realm,user,formData);
-  if (!authenticated) {
-    logger.error("Authentication failed");
-    request.setAttribute("username",username);
-    request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Invalid credentials.");
-    forwardToLoginForm(redirect,clientId,scopeParam,state);
-    return null;
-  }
-  return processAccessCode(scopeParam,state,redirect,client,user);
+.call();
 }

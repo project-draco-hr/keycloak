@@ -1,8 +1,10 @@
 {
-  this.factory=new PicketlinkKeycloakSessionFactory(createFactory());
-  KeycloakSessionFilter filter=new KeycloakSessionFilter(factory);
+  KeycloakSessionFactory f=createSessionFactory();
+  this.factory=f;
+  KeycloakSessionRequestFilter filter=new KeycloakSessionRequestFilter(factory);
   singletons.add(new RealmsResource(new TokenManager()));
   singletons.add(filter);
+  classes.add(KeycloakSessionResponseFilter.class);
   classes.add(SkeletonKeyContextResolver.class);
   classes.add(RegistrationService.class);
 }

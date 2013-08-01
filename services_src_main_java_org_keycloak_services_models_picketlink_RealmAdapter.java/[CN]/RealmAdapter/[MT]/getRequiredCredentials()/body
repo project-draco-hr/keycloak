@@ -1,8 +1,6 @@
 {
-  IdentityManager idm=getIdm();
-  Agent realmAgent=idm.getAgent(REALM_AGENT_ID);
-  RelationshipQuery<RequiredCredentialRelationship> query=idm.createRelationshipQuery(RequiredCredentialRelationship.class);
-  query.setParameter(RequiredCredentialRelationship.REALM_AGENT,realmAgent);
+  RelationshipQuery<RequiredCredentialRelationship> query=getRelationshipManager().createRelationshipQuery(RequiredCredentialRelationship.class);
+  query.setParameter(RequiredCredentialRelationship.REALM,realm.getName());
   List<RequiredCredentialRelationship> results=query.getResultList();
   List<RequiredCredentialModel> rtn=new ArrayList<RequiredCredentialModel>();
   for (  RequiredCredentialRelationship relationship : results) {

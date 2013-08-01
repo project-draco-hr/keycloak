@@ -1,9 +1,14 @@
 {
-  UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
-  if (user != null) {
-    logger.info("Logging out: " + user.getLoginName());
-    authManager.expireIdentityCookie(realm,uriInfo);
-    resourceAdminManager.singleLogOut(realm,user.getLoginName());
+  return new Transaction(){
+    protected Response callImpl(){
+      UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
+      if (user != null) {
+        logger.info("Logging out: " + user.getLoginName());
+        authManager.expireIdentityCookie(realm,uriInfo);
+        resourceAdminManager.singleLogOut(realm,user.getLoginName());
+      }
+      return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
+    }
   }
-  return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
+.call();
 }

@@ -1,3 +1,6 @@
 {
-  session.close();
+  if (entityManager.getTransaction().isActive())   entityManager.getTransaction().rollback();
+  setWhere.set(null);
+  currentEntityManager.set(null);
+  if (entityManager.isOpen())   entityManager.close();
 }

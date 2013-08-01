@@ -1,0 +1,15 @@
+{
+  boolean wasActive=transaction.isActive();
+  if (!wasActive)   transaction.begin();
+  try {
+    runImpl();
+    if (!wasActive && transaction.isActive())     transaction.commit();
+  }
+ catch (  RuntimeException e) {
+    if (!wasActive && transaction.isActive())     transaction.rollback();
+    throw e;
+  }
+ finally {
+    if (!wasActive && closeSession)     session.close();
+  }
+}

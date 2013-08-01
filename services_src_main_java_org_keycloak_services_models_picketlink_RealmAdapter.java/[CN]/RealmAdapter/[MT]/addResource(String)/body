@@ -1,16 +1,10 @@
 {
-  Tier newTier=identitySession.createTier(RealmManager.generateId());
-  IdentityManager idm=getIdm();
-  ResourceRelationship relationship=new ResourceRelationship();
-  relationship.setResourceName(name);
-  relationship.setRealmAgent(realmAgent);
-  relationship.setResourceId(newTier.getId());
-  relationship.setManagementUrl("");
-  User resourceUser=new SimpleUser(name);
+  ResourceData resourceData=new ResourceData(name);
+  User resourceUser=new User(name);
   idm.add(resourceUser);
-  relationship.setResourceUser(resourceUser);
-  idm.add(relationship);
-  ResourceModel resource=new ResourceAdapter(newTier,relationship,this,identitySession);
+  resourceData.setResourceUser(resourceUser);
+  partitionManager.add(resourceData);
+  ResourceModel resource=new ResourceAdapter(resourceData,this,partitionManager);
   resource.addRole("*");
   resource.addScope(new UserAdapter(resourceUser,idm),"*");
   return resource;

@@ -4,7 +4,6 @@
   boolean isResource=realm.hasRole(client,resourceRole);
   if (!isResource && !realm.hasRole(client,identityRequestRole)) {
     securityFailureForward("Login requester not allowed to request login.");
-    identitySession.close();
     return null;
   }
   AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,realm,client,user);
@@ -12,7 +11,6 @@
   logger.info("processAccessCode: go to oauth page?: " + (!isResource && (accessCode.getRealmRolesRequested().size() > 0 || accessCode.getResourceRolesRequested().size() > 0)));
   if (!isResource && (accessCode.getRealmRolesRequested().size() > 0 || accessCode.getResourceRolesRequested().size() > 0)) {
     oauthGrantPage(accessCode,client);
-    identitySession.close();
     return null;
   }
   return redirectAccessCode(accessCode,state,redirect);

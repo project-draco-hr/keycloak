@@ -1,0 +1,13 @@
+{
+  Iterator<SocialProvider> itr=ServiceRegistry.lookupProviders(SocialProvider.class);
+  while (itr.hasNext()) {
+    SocialProvider provider=itr.next();
+    if (queryParams.containsKey(provider.getRequestIdParamName())) {
+      String requestId=queryParams.get(provider.getRequestIdParamName())[0];
+      if (socialRequestManager.isRequestId(requestId)) {
+        return socialRequestManager.retrieveData(requestId);
+      }
+    }
+  }
+  return null;
+}

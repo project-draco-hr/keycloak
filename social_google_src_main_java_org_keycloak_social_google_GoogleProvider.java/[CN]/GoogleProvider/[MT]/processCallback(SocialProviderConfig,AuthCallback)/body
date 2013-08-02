@@ -1,0 +1,24 @@
+{
+  String code=callback.getQueryParam(DEFAULT_RESPONSE_TYPE);
+  try {
+    if (!callback.getQueryParam("state").equals(callback.getAttribute("state"))) {
+      throw new SocialProviderException("Invalid state");
+    }
+    GoogleTokenResponse tokenResponse=new GoogleAuthorizationCodeTokenRequest(TRANSPORT,JSON_FACTORY,config.getKey(),config.getSecret(),code,config.getCallbackUrl().toString()).execute();
+    GoogleCredential credential=new GoogleCredential.Builder().setJsonFactory(JSON_FACTORY).setTransport(TRANSPORT).setClientSecrets(config.getKey(),config.getSecret()).build().setFromTokenResponse(tokenResponse);
+    Oauth2 oauth2=new Oauth2.Builder(TRANSPORT,JSON_FACTORY,credential).build();
+    Tokeninfo tokenInfo=oauth2.tokeninfo().setAccessToken(credential.getAccessToken()).execute();
+    if (tokenInfo.containsKey("error")) {
+      throw new SocialProviderException((String)tokenInfo.get("error"));
+    }
+    Userinfo userInfo=oauth2.userinfo().get().execute();
+    SocialUser user=new SocialUser(userInfo.getId());
+    user.setFirstName(userInfo.getGivenName());
+    user.setLastName(userInfo.getFamilyName());
+    user.setEmail(userInfo.getEmail());
+    return user;
+  }
+ catch (  Exception e) {
+    throw new SocialProviderException(e);
+  }
+}

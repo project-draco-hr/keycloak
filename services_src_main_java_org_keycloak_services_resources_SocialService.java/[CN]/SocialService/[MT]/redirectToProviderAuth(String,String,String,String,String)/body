@@ -1,0 +1,27 @@
+{
+  return new Transaction(){
+    protected Response callImpl(){
+      SocialProvider provider=getProvider(providerId);
+      if (provider == null) {
+        securityFailureForward("Social provider not found");
+        return null;
+      }
+      String key=System.getProperty("keycloak.social." + providerId + ".key");
+      String secret=System.getProperty("keycloak.social." + providerId + ".secret");
+      String callbackUri=callbackUrl(uriInfo).build(realm.getId()).toString();
+      SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
+      try {
+        AuthRequest authRequest=provider.getAuthUrl(config);
+        RequestDetails socialRequest=RequestDetailsBuilder.create(providerId).putSocialAttributes(authRequest.getAttributes()).putClientAttribute("clientId",clientId).putClientAttribute("scope",scope).putClientAttribute("state",state).putClientAttribute("redirectUri",redirectUri).build();
+        socialRequestManager.addRequest(authRequest.getId(),socialRequest);
+        return Response.status(Status.FOUND).location(authRequest.getAuthUri()).build();
+      }
+ catch (      Throwable t) {
+        logger.error("Failed to redirect to social auth",t);
+        securityFailureForward("Failed to redirect to social auth");
+        return null;
+      }
+    }
+  }
+.call();
+}

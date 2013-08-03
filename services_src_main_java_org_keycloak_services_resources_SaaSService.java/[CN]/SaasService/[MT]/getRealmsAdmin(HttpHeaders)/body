@@ -1,0 +1,20 @@
+{
+  return new Transaction(false){
+    @Override protected RealmsAdminResource callImpl(){
+      RealmManager realmManager=new RealmManager(session);
+      RealmModel saasRealm=realmManager.defaultRealm();
+      if (saasRealm == null)       throw new NotFoundException();
+      UserModel admin=authManager.authenticateSaasIdentity(saasRealm,uriInfo,headers);
+      if (admin == null) {
+        throw new NotAuthorizedException("Bearer");
+      }
+      RoleModel creatorRole=saasRealm.getRole(SaasService.REALM_CREATOR_ROLE);
+      if (!saasRealm.hasRole(admin,creatorRole)) {
+        logger.warn("not a Realm creator");
+        throw new NotAuthorizedException("Bearer");
+      }
+      return new RealmsAdminResource(admin);
+    }
+  }
+.call();
+}

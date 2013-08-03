@@ -1,0 +1,18 @@
+{
+  RelationshipManager relationshipManager=partitionManager.createRelationshipManager();
+  RelationshipQuery<RealmAdminRelationship> query=relationshipManager.createRelationshipQuery(RealmAdminRelationship.class);
+  query.setParameter(RealmAdminRelationship.ADMIN,((UserAdapter)admin).getUser());
+  List<RealmAdminRelationship> results=query.getResultList();
+  List<RealmModel> realmModels=new ArrayList<RealmModel>();
+  for (  RealmAdminRelationship relationship : results) {
+    String realmName=relationship.getRealm();
+    RealmModel model=getRealm(realmName);
+    if (model == null) {
+      relationshipManager.remove(relationship);
+    }
+ else {
+      realmModels.add(model);
+    }
+  }
+  return realmModels;
+}

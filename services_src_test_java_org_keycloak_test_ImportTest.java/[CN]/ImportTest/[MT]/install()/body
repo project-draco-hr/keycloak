@@ -9,10 +9,13 @@
   defaultRealm.setRegistrationAllowed(true);
   manager.generateRealmKeys(defaultRealm);
   defaultRealm.addRequiredCredential(RequiredCredentialModel.PASSWORD);
-  defaultRealm.addRole(SaasService.REALM_CREATOR_ROLE);
+  RoleModel role=defaultRealm.addRole(SaasService.REALM_CREATOR_ROLE);
+  UserModel admin=defaultRealm.addUser("admin");
+  defaultRealm.grantRole(admin,role);
   RealmRepresentation rep=KeycloakTestBase.loadJson("testrealm.json");
   RealmModel realm=manager.createRealm("demo",rep.getRealm());
   manager.importRealm(rep,realm);
+  realm.addRealmAdmin(admin);
   List<RequiredCredentialModel> creds=realm.getRequiredCredentials();
   Assert.assertEquals(1,creds.size());
   UserModel user=realm.getUser("loginclient");
@@ -22,4 +25,6 @@
   Assert.assertTrue(scopes.contains("*"));
   List<ResourceModel> resources=realm.getResources();
   Assert.assertEquals(2,resources.size());
+  List<RealmModel> realms=identitySession.getRealms(admin);
+  Assert.assertEquals(1,realms.size());
 }

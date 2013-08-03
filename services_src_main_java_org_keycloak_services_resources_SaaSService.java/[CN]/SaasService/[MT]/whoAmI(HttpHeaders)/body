@@ -1,0 +1,17 @@
+{
+  return new Transaction(){
+    @Override public Response callImpl(){
+      logger.info("WHOAMI start.");
+      RealmManager realmManager=new RealmManager(session);
+      RealmModel realm=realmManager.defaultRealm();
+      if (realm == null)       throw new NotFoundException();
+      UserModel user=authManager.authenticateSaasIdentityCookie(realm,uriInfo,headers);
+      if (user == null) {
+        return Response.status(404).build();
+      }
+      logger.info("WHOAMI: " + user.getLoginName());
+      return Response.ok(new WhoAmI(user.getLoginName(),user.getLoginName())).build();
+    }
+  }
+.call();
+}

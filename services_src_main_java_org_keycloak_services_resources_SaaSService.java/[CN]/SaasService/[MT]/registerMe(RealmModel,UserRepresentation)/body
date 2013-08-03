@@ -1,0 +1,22 @@
+{
+  if (!defaultRealm.isEnabled()) {
+    throw new ForbiddenException();
+  }
+  if (!defaultRealm.isRegistrationAllowed()) {
+    throw new ForbiddenException();
+  }
+  UserModel user=defaultRealm.getUser(newUser.getUsername());
+  if (user != null) {
+    return null;
+  }
+  user=defaultRealm.addUser(newUser.getUsername());
+  for (  CredentialRepresentation cred : newUser.getCredentials()) {
+    UserCredentialModel credModel=new UserCredentialModel();
+    credModel.setType(cred.getType());
+    credModel.setValue(cred.getValue());
+    defaultRealm.updateCredential(user,credModel);
+  }
+  RoleModel realmCreator=defaultRealm.getRole(REALM_CREATOR_ROLE);
+  defaultRealm.grantRole(user,realmCreator);
+  return user;
+}

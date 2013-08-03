@@ -1,0 +1,25 @@
+{
+  if (!password.equals(confirm)) {
+    request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Password confirmation doesn't match.");
+    request.forward(saasRegisterPath);
+    return null;
+  }
+  return new Transaction(){
+    @Override protected Response callImpl(){
+      RealmManager realmManager=new RealmManager(session);
+      RealmModel defaultRealm=realmManager.defaultRealm();
+      UserRepresentation newUser=new UserRepresentation();
+      newUser.setUsername(username);
+      newUser.credential(RequiredCredentialRepresentation.PASSWORD,password,false);
+      UserModel user=registerMe(defaultRealm,newUser);
+      if (user == null) {
+        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Username already exists.");
+        request.forward(saasRegisterPath);
+        return null;
+      }
+      NewCookie cookie=authManager.createSaasIdentityCookie(defaultRealm,user,uriInfo);
+      return Response.status(302).location(contextRoot(uriInfo).path(adminPath).build()).cookie(cookie).build();
+    }
+  }
+.call();
+}

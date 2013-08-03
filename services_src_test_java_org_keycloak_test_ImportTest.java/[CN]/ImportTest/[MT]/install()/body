@@ -9,13 +9,17 @@
   defaultRealm.setRegistrationAllowed(true);
   manager.generateRealmKeys(defaultRealm);
   defaultRealm.addRequiredCredential(RequiredCredentialModel.PASSWORD);
-  defaultRealm.addRole(RegistrationService.REALM_CREATOR_ROLE);
+  defaultRealm.addRole(SaasService.REALM_CREATOR_ROLE);
   RealmRepresentation rep=KeycloakTestBase.loadJson("testrealm.json");
   RealmModel realm=manager.createRealm("demo",rep.getRealm());
   manager.importRealm(rep,realm);
+  List<RequiredCredentialModel> creds=realm.getRequiredCredentials();
+  Assert.assertEquals(1,creds.size());
   UserModel user=realm.getUser("loginclient");
   Assert.assertNotNull(user);
   Set<String> scopes=realm.getScope(user);
   System.out.println("Scopes size: " + scopes.size());
   Assert.assertTrue(scopes.contains("*"));
+  List<ResourceModel> resources=realm.getResources();
+  Assert.assertEquals(2,resources.size());
 }

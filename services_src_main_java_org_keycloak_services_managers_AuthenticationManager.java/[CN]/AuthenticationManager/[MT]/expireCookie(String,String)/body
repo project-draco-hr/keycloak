@@ -1,0 +1,10 @@
+{
+  HttpResponse response=ResteasyProviderFactory.getContextData(HttpResponse.class);
+  if (response == null) {
+    logger.info("can't expire identity cookie, no HttpResponse");
+    return;
+  }
+  logger.info("Expiring cookie: " + cookieName + " path: "+ path);
+  NewCookie expireIt=new NewCookie(cookieName,"",path,null,"Expiring cookie",0,false);
+  response.addNewCookie(expireIt);
+}

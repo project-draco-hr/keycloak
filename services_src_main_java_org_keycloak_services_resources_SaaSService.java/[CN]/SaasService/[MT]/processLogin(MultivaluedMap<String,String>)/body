@@ -1,0 +1,38 @@
+{
+  logger.info("processLogin start");
+  new Transaction(){
+    @Override protected void runImpl(){
+      RealmManager realmManager=new RealmManager(session);
+      RealmModel realm=realmManager.defaultRealm();
+      if (realm == null)       throw new NotFoundException();
+      if (!realm.isEnabled()) {
+        throw new NotImplementedYetException();
+      }
+      String username=formData.getFirst("username");
+      UserModel user=realm.getUser(username);
+      if (user == null) {
+        logger.info("Not Authenticated! Incorrect user name");
+        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Incorrect user name.");
+        request.forward(saasLoginPath);
+        return;
+      }
+      if (!user.isEnabled()) {
+        logger.info("NAccount is disabled, contact admin.");
+        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Account is disabled, contact admin.");
+        request.forward(saasLoginPath);
+        return;
+      }
+      boolean authenticated=authManager.authenticateForm(realm,user,formData);
+      if (!authenticated) {
+        logger.info("Not Authenticated! Invalid credentials");
+        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Invalid credentials.");
+        request.forward(saasLoginPath);
+        return;
+      }
+      NewCookie cookie=authManager.createSaasIdentityCookie(realm,user,uriInfo);
+      response.addNewCookie(cookie);
+      request.forward(adminPath);
+    }
+  }
+.run();
+}

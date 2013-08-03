@@ -8,6 +8,7 @@
   }
  catch (  RuntimeException e) {
     if (!wasActive && transaction.isActive())     transaction.rollback();
+    if (created)     closeSession=true;
     throw e;
   }
  finally {

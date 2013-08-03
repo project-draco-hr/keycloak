@@ -13,39 +13,24 @@
     newRealm.setPublicKeyPem(rep.getPublicKey());
   }
   Map<String,UserModel> userMap=new HashMap<String,UserModel>();
-  for (  RequiredCredentialRepresentation requiredCred : rep.getRequiredCredentials()) {
-    RequiredCredentialModel credential=new RequiredCredentialModel();
-    credential.setType(requiredCred.getType());
-    credential.setInput(requiredCred.isInput());
-    credential.setSecret(requiredCred.isSecret());
-    newRealm.addRequiredCredential(credential);
+  if (rep.getRequiredCredentials() != null) {
+    for (    RequiredCredentialRepresentation requiredCred : rep.getRequiredCredentials()) {
+      addRequiredCredential(newRealm,requiredCred);
+    }
   }
-  for (  UserRepresentation userRep : rep.getUsers()) {
-    UserModel user=newRealm.addUser(userRep.getUsername());
-    user.setEnabled(userRep.isEnabled());
-    if (userRep.getAttributes() != null) {
-      for (      Map.Entry<String,String> entry : userRep.getAttributes().entrySet()) {
-        user.setAttribute(entry.getKey(),entry.getValue());
-      }
+  if (rep.getUsers() != null) {
+    for (    UserRepresentation userRep : rep.getUsers()) {
+      UserModel user=createUser(newRealm,userRep);
+      userMap.put(user.getLoginName(),user);
     }
-    if (userRep.getCredentials() != null) {
-      for (      CredentialRepresentation cred : userRep.getCredentials()) {
-        UserCredentialModel credential=new UserCredentialModel();
-        credential.setType(cred.getType());
-        credential.setValue(cred.getValue());
-        newRealm.updateCredential(user,credential);
-      }
-    }
-    userMap.put(user.getLoginName(),user);
   }
   if (rep.getRoles() != null) {
     for (    RoleRepresentation roleRep : rep.getRoles()) {
-      RoleModel role=newRealm.addRole(roleRep.getName());
-      if (roleRep.getDescription() != null)       role.setDescription(roleRep.getDescription());
+      createRole(newRealm,roleRep);
     }
   }
   if (rep.getResources() != null) {
-    createResources(rep,newRealm,userMap);
+    createResources(rep,newRealm);
   }
   if (rep.getRoleMappings() != null) {
     for (    RoleMappingRepresentation mapping : rep.getRoleMappings()) {

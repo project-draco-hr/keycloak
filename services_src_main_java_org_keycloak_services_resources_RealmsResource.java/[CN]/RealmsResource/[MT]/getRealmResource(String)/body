@@ -1,13 +1,13 @@
 {
   return new Transaction(false){
-    @Override protected RealmSubResource callImpl(){
+    @Override protected PublicRealmResource callImpl(){
       RealmManager realmManager=new RealmManager(session);
       RealmModel realm=realmManager.getRealm(id);
       if (realm == null) {
         logger.debug("realm not found");
         throw new NotFoundException();
       }
-      RealmSubResource realmResource=new RealmSubResource(realm);
+      PublicRealmResource realmResource=new PublicRealmResource(realm);
       resourceContext.initResource(realmResource);
       return realmResource;
     }

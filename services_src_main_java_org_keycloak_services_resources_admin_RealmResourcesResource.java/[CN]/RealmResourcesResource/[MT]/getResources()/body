@@ -1,0 +1,14 @@
+{
+  return new Transaction(){
+    @Override protected List<ResourceRepresentation> callImpl(){
+      List<ResourceRepresentation> rep=new ArrayList<ResourceRepresentation>();
+      List<ResourceModel> resourceModels=realm.getResources();
+      ResourceManager resourceManager=new ResourceManager(new RealmManager(session));
+      for (      ResourceModel resourceModel : resourceModels) {
+        rep.add(resourceManager.toRepresentation(resourceModel));
+      }
+      return rep;
+    }
+  }
+.call();
+}

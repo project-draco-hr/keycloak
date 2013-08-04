@@ -2,13 +2,5 @@
   RelationshipQuery<RequiredCredentialRelationship> query=getRelationshipManager().createRelationshipQuery(RequiredCredentialRelationship.class);
   query.setParameter(RequiredCredentialRelationship.REALM,realm.getName());
   List<RequiredCredentialRelationship> results=query.getResultList();
-  List<RequiredCredentialModel> rtn=new ArrayList<RequiredCredentialModel>();
-  for (  RequiredCredentialRelationship relationship : results) {
-    RequiredCredentialModel model=new RequiredCredentialModel();
-    model.setInput(relationship.isInput());
-    model.setSecret(relationship.isSecret());
-    model.setType(relationship.getCredentialType());
-    rtn.add(model);
-  }
-  return rtn;
+  return getRequiredCredentialModels(results);
 }

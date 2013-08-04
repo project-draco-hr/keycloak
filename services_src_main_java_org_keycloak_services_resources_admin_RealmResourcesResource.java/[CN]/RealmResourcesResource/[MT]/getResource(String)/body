@@ -1,12 +1,11 @@
 {
   return new Transaction(){
-    @Override protected ResourceRepresentation callImpl(){
+    @Override protected RealmResourceResource callImpl(){
       ResourceModel resourceModel=realm.getResourceById(id);
       if (resourceModel == null) {
         throw new NotFoundException();
       }
-      ResourceManager resourceManager=new ResourceManager(new RealmManager(session));
-      return resourceManager.toRepresentation(resourceModel);
+      return new RealmResourceResource(admin,realm,resourceModel);
     }
   }
 .call();

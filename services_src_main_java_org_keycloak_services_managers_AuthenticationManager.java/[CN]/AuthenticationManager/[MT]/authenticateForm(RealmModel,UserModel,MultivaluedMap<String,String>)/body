@@ -1,6 +1,16 @@
 {
   Set<String> types=new HashSet<String>();
-  for (  RequiredCredentialModel credential : realm.getRequiredCredentials()) {
+  List<RequiredCredentialModel> requiredCredentials=null;
+  if (realm.hasRole(user,RealmManager.RESOURCE_ROLE)) {
+    requiredCredentials=realm.getResourceRequiredCredentials();
+  }
+ else   if (realm.hasRole(user,RealmManager.IDENTITY_REQUESTER_ROLE)) {
+    requiredCredentials=realm.getOAuthClientRequiredCredentials();
+  }
+ else {
+    requiredCredentials=realm.getRequiredCredentials();
+  }
+  for (  RequiredCredentialModel credential : requiredCredentials) {
     types.add(credential.getType());
   }
   if (types.contains(RequiredCredentialRepresentation.PASSWORD)) {

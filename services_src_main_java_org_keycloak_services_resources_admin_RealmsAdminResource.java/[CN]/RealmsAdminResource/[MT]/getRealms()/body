@@ -1,12 +1,15 @@
 {
   return new Transaction(){
-    @Override protected Map<String,String> callImpl(){
+    @Override protected Response callImpl(){
+      logger.info(("getRealms()"));
       List<RealmModel> realms=session.getRealms(admin);
       Map<String,String> map=new HashMap<String,String>();
       for (      RealmModel realm : realms) {
         map.put(realm.getId(),realm.getName());
       }
-      return map;
+      return Response.ok(new GenericEntity<Map<String,String>>(map){
+      }
+).cacheControl(noCache).build();
     }
   }
 .call();

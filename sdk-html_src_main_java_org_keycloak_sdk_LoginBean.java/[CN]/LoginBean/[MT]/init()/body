@@ -1,24 +1,27 @@
 {
-  HttpServletRequest request=(HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
+  FacesContext ctx=FacesContext.getCurrentInstance();
+  HttpServletRequest request=(HttpServletRequest)ctx.getExternalContext().getRequest();
   realm=(RealmModel)request.getAttribute(RealmModel.class.getName());
-  clientId=(String)request.getAttribute("client_id");
-  scope=(String)request.getAttribute("scope");
-  state=(String)request.getAttribute("state");
-  redirectUri=(String)request.getAttribute("redirect_uri");
   loginAction=((URI)request.getAttribute("KEYCLOAK_LOGIN_ACTION")).toString();
   socialLoginUrl=((URI)request.getAttribute("KEYCLOAK_SOCIAL_LOGIN")).toString();
   username=(String)request.getAttribute("username");
-  providers=new LinkedList<SocialProvider>();
-  for (Iterator<org.keycloak.social.SocialProvider> itr=ServiceRegistry.lookupProviders(org.keycloak.social.SocialProvider.class); itr.hasNext(); ) {
-    org.keycloak.social.SocialProvider p=itr.next();
-    providers.add(new SocialProvider(p.getId(),p.getName()));
+  if (request.getAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE") != null) {
+    FacesMessage message=new FacesMessage(FacesMessage.SEVERITY_ERROR,(String)request.getAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE"),null);
+    ctx.addMessage(null,message);
   }
-  requiredCredentials=new LinkedList<RequiredCredential>();
-  for (  RequiredCredentialModel m : realm.getRequiredCredentials()) {
-    if (m.isInput()) {
-      requiredCredentials.add(new RequiredCredential(m.getType(),m.isSecret()));
-    }
+  addRequiredCredentials();
+  addHiddenProperties(request,"client_id","scope","state","redirect_uri");
+  addSocialProviders();
+  theme="saas";
+  themeUrl=FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + "/sdk/theme/" + theme;
+  themeConfig=new HashMap<String,Object>();
+  themeConfig.put("styles",themeUrl + "/styles.css");
+  if (RealmModel.DEFAULT_REALM.equals(realm.getName())) {
+    themeConfig.put("logo",themeUrl + "/img/red-hat-logo.png");
+    themeConfig.put("background",themeUrl + "/img/login-screen-background.jpg");
   }
-  baseUrl=FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + "/sdk";
-  themeUrl=baseUrl + "/theme/" + style;
+ else {
+    themeConfig.put("background",themeUrl + "/img/customer-login-screen-bg2.jpg");
+    themeConfig.put("displayPoweredBy",true);
+  }
 }

@@ -2,13 +2,8 @@
   StringBuilder sb=new StringBuilder();
   sb.append(socialLoginUrl);
   sb.append("?provider_id=" + id);
-  sb.append("&client_id=" + clientId);
-  if (scope != null) {
-    sb.append("&scope=" + scope);
+  for (  Property p : hiddenProperties) {
+    sb.append("&" + p.getName() + "="+ p.getValue());
   }
-  if (state != null) {
-    sb.append("&state=" + state);
-  }
-  sb.append("&redirect_uri=" + redirectUri);
   return sb.toString();
 }

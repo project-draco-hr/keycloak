@@ -1,4 +1,5 @@
 {
+  logger.info("keepalive");
   return new Transaction(){
     @Override public Response callImpl(){
       RealmManager realmManager=new RealmManager(session);
@@ -8,7 +9,8 @@
       if (user == null) {
         return Response.status(401).build();
       }
-      return Response.ok(new WhoAmI(user.getLoginName(),user.getLoginName())).build();
+      NewCookie refreshCookie=authManager.createSaasIdentityCookie(realm,user,uriInfo);
+      return Response.noContent().cookie(refreshCookie).build();
     }
   }
 .call();

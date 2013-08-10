@@ -10,7 +10,31 @@
       RealmModel defaultRealm=realmManager.defaultRealm();
       UserRepresentation newUser=new UserRepresentation();
       newUser.setUsername(username);
-      newUser.credential(RequiredCredentialRepresentation.PASSWORD,password,false);
+      newUser.setEmail(email);
+      if (fullname != null) {
+        StringTokenizer tokenizer=new StringTokenizer(fullname," ");
+        StringBuffer first=null;
+        String last="";
+        while (tokenizer.hasMoreTokens()) {
+          String token=tokenizer.nextToken();
+          if (tokenizer.hasMoreTokens()) {
+            if (first == null) {
+              first=new StringBuffer();
+            }
+ else {
+              first.append(" ");
+            }
+            first.append(token);
+          }
+ else {
+            last=token;
+          }
+        }
+        if (first == null)         first=new StringBuffer();
+        newUser.setFirstName(first.toString());
+        newUser.setLastName(last);
+      }
+      newUser.credential(CredentialRepresentation.PASSWORD,password);
       UserModel user=registerMe(defaultRealm,newUser);
       if (user == null) {
         request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Username already exists.");

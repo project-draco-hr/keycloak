@@ -1,14 +1,15 @@
 {
   IdentityManager idm=getIdm();
-  if (cred.getType().equals(RequiredCredentialRepresentation.PASSWORD)) {
+  if (cred.getType().equals(CredentialRepresentation.PASSWORD)) {
     Password password=new Password(cred.getValue());
     idm.updateCredential(((UserAdapter)user).getUser(),password);
   }
- else   if (cred.getType().equals(RequiredCredentialRepresentation.TOTP)) {
+ else   if (cred.getType().equals(CredentialRepresentation.TOTP)) {
     TOTPCredential totp=new TOTPCredential(cred.getValue());
+    totp.setDevice(cred.getDevice());
     idm.updateCredential(((UserAdapter)user).getUser(),totp);
   }
- else   if (cred.getType().equals(RequiredCredentialRepresentation.CLIENT_CERT)) {
+ else   if (cred.getType().equals(CredentialRepresentation.CLIENT_CERT)) {
     X509Certificate cert=null;
     try {
       cert=org.keycloak.PemUtils.decodeCertificate(cred.getValue());

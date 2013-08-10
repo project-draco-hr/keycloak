@@ -1,0 +1,18 @@
+{
+  List<RequiredApplicationCredentialRelationship> relationships=getResourceRequiredCredentialRelationships();
+  RelationshipManager rm=getRelationshipManager();
+  Set<String> already=new HashSet<String>();
+  for (  RequiredCredentialRelationship rel : relationships) {
+    if (!creds.contains(rel.getCredentialType())) {
+      rm.remove(rel);
+    }
+ else {
+      already.add(rel.getCredentialType());
+    }
+  }
+  for (  String cred : creds) {
+    if (!already.contains(cred)) {
+      addRequiredResourceCredential(cred);
+    }
+  }
+}

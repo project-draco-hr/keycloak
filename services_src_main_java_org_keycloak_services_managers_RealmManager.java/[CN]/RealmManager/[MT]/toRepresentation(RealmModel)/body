@@ -1,0 +1,34 @@
+{
+  RealmRepresentation rep=new RealmRepresentation();
+  rep.setId(realm.getId());
+  rep.setRealm(realm.getName());
+  rep.setEnabled(realm.isEnabled());
+  rep.setSocial(realm.isSocial());
+  rep.setSslNotRequired(realm.isSslNotRequired());
+  rep.setCookieLoginAllowed(realm.isCookieLoginAllowed());
+  rep.setPublicKey(realm.getPublicKeyPem());
+  rep.setTokenLifespan(realm.getTokenLifespan());
+  rep.setAccessCodeLifespan(realm.getAccessCodeLifespan());
+  List<RequiredCredentialModel> requiredCredentialModels=realm.getRequiredCredentials();
+  if (requiredCredentialModels.size() > 0) {
+    rep.setRequiredCredentials(new HashSet<String>());
+    for (    RequiredCredentialModel cred : requiredCredentialModels) {
+      rep.getRequiredCredentials().add(cred.getType());
+    }
+  }
+  List<RequiredCredentialModel> requiredResourceCredentialModels=realm.getRequiredApplicationCredentials();
+  if (requiredResourceCredentialModels.size() > 0) {
+    rep.setRequiredApplicationCredentials(new HashSet<String>());
+    for (    RequiredCredentialModel cred : requiredResourceCredentialModels) {
+      rep.getRequiredApplicationCredentials().add(cred.getType());
+    }
+  }
+  List<RequiredCredentialModel> requiredOAuthCredentialModels=realm.getRequiredOAuthClientCredentials();
+  if (requiredOAuthCredentialModels.size() > 0) {
+    rep.setRequiredOAuthClientCredentials(new HashSet<String>());
+    for (    RequiredCredentialModel cred : requiredOAuthCredentialModels) {
+      rep.getRequiredOAuthClientCredentials().add(cred.getType());
+    }
+  }
+  return rep;
+}

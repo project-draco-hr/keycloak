@@ -1,0 +1,12 @@
+{
+  return new Transaction(false){
+    @Override protected ApplicationResource callImpl(){
+      ApplicationModel applicationModel=realm.getApplicationById(id);
+      if (applicationModel == null) {
+        throw new NotFoundException();
+      }
+      return new ApplicationResource(admin,realm,applicationModel);
+    }
+  }
+.call();
+}

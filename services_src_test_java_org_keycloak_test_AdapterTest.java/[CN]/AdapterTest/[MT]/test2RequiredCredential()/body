@@ -1,24 +1,26 @@
 {
   test1CreateRealm();
-  RequiredCredentialModel creds=new RequiredCredentialModel();
-  creds.setSecret(true);
-  creds.setType(RequiredCredentialRepresentation.PASSWORD);
-  creds.setInput(true);
-  realmModel.addRequiredCredential(creds);
-  creds=new RequiredCredentialModel();
-  creds.setSecret(true);
-  creds.setType(RequiredCredentialRepresentation.TOTP);
-  creds.setInput(true);
-  realmModel.addRequiredCredential(creds);
+  realmModel.addRequiredCredential(CredentialRepresentation.PASSWORD);
   List<RequiredCredentialModel> storedCreds=realmModel.getRequiredCredentials();
+  Assert.assertEquals(1,storedCreds.size());
+  Set<String> creds=new HashSet<String>();
+  creds.add(CredentialRepresentation.PASSWORD);
+  creds.add(CredentialRepresentation.TOTP);
+  realmModel.updateRequiredCredentials(creds);
+  storedCreds=realmModel.getRequiredCredentials();
   Assert.assertEquals(2,storedCreds.size());
   boolean totp=false;
   boolean password=false;
   for (  RequiredCredentialModel cred : storedCreds) {
-    if (cred.getType().equals(RequiredCredentialRepresentation.PASSWORD))     password=true;
- else     if (cred.getType().equals(RequiredCredentialRepresentation.TOTP))     totp=true;
     Assert.assertTrue(cred.isInput());
-    Assert.assertTrue(cred.isSecret());
+    if (cred.getType().equals(CredentialRepresentation.PASSWORD)) {
+      password=true;
+      Assert.assertTrue(cred.isSecret());
+    }
+ else     if (cred.getType().equals(CredentialRepresentation.TOTP)) {
+      totp=true;
+      Assert.assertFalse(cred.isSecret());
+    }
   }
   Assert.assertTrue(totp);
   Assert.assertTrue(password);

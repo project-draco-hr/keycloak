@@ -8,9 +8,9 @@
     token.setRealmAccess(access);
   }
   if (accessCodeEntry.getResourceRolesRequested().size() > 0) {
-    Map<String,ResourceModel> resourceMap=realm.getResourceNameMap();
+    Map<String,ApplicationModel> resourceMap=realm.getResourceNameMap();
     for (    String resourceName : accessCodeEntry.getResourceRolesRequested().keySet()) {
-      ResourceModel resource=resourceMap.get(resourceName);
+      ApplicationModel resource=resourceMap.get(resourceName);
       SkeletonKeyToken.Access access=token.addAccess(resourceName).verifyCaller(resource.isSurrogateAuthRequired());
       for (      RoleModel role : accessCodeEntry.getResourceRolesRequested().get(resourceName)) {
         access.addRole(role.getName());

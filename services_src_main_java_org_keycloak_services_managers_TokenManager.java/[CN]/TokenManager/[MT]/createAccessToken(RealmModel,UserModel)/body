@@ -1,5 +1,5 @@
 {
-  List<ResourceModel> resources=realm.getResources();
+  List<ApplicationModel> resources=realm.getApplications();
   SkeletonKeyToken token=new SkeletonKeyToken();
   token.id(RealmManager.generateId());
   token.issuedNow();
@@ -17,7 +17,7 @@
     token.setRealmAccess(access);
   }
   if (resources != null) {
-    for (    ResourceModel resource : resources) {
+    for (    ApplicationModel resource : resources) {
       Set<String> mapping=resource.getRoleMappings(user);
       if (mapping == null)       continue;
       SkeletonKeyToken.Access access=token.addAccess(resource.getName()).verifyCaller(resource.isSurrogateAuthRequired());

@@ -1,0 +1,10 @@
+{
+  return new Transaction(){
+    @Override protected Response callImpl(){
+      ResourceManager resourceManager=new ResourceManager(new RealmManager(session));
+      ApplicationModel applicationModel=resourceManager.createResource(realm,rep);
+      return Response.created(uriInfo.getAbsolutePathBuilder().path(applicationModel.getId()).build()).build();
+    }
+  }
+.call();
+}

@@ -8,7 +8,7 @@
   defaultRealm.setCookieLoginAllowed(true);
   defaultRealm.setRegistrationAllowed(true);
   manager.generateRealmKeys(defaultRealm);
-  defaultRealm.addRequiredCredential(RequiredCredentialModel.PASSWORD);
+  defaultRealm.addRequiredCredential(CredentialRepresentation.PASSWORD);
   RoleModel role=defaultRealm.addRole(SaasService.REALM_CREATOR_ROLE);
   UserModel admin=defaultRealm.addUser("admin");
   defaultRealm.grantRole(admin,role);
@@ -25,7 +25,7 @@
   Set<String> scopes=realm.getScope(user);
   System.out.println("Scopes size: " + scopes.size());
   Assert.assertTrue(scopes.contains("*"));
-  List<ResourceModel> resources=realm.getResources();
+  List<ApplicationModel> resources=realm.getApplications();
   Assert.assertEquals(2,resources.size());
   List<RealmModel> realms=identitySession.getRealms(admin);
   Assert.assertEquals(1,realms.size());

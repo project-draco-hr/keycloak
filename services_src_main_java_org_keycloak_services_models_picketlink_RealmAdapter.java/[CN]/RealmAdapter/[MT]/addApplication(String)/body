@@ -1,0 +1,17 @@
+{
+  ApplicationData applicationData=new ApplicationData(RealmManager.generateId());
+  User resourceUser=new User(name);
+  idm.add(resourceUser);
+  applicationData.setResourceUser(resourceUser);
+  applicationData.setResourceName(name);
+  applicationData.setResourceUser(resourceUser);
+  partitionManager.add(applicationData);
+  ResourceRelationship resourceRelationship=new ResourceRelationship();
+  resourceRelationship.setRealm(realm.getName());
+  resourceRelationship.setResource(applicationData.getName());
+  getRelationshipManager().add(resourceRelationship);
+  ApplicationModel resource=new ApplicationAdapter(applicationData,this,partitionManager);
+  resource.addRole("*");
+  resource.addScope(new UserAdapter(resourceUser,idm),"*");
+  return resource;
+}

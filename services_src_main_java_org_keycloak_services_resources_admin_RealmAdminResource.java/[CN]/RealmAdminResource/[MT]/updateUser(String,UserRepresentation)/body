@@ -1,0 +1,13 @@
+{
+  new Transaction(){
+    @Override protected void runImpl(){
+      UserModel userModel=realm.getUser(loginName);
+      if (userModel == null) {
+        throw new NotFoundException();
+      }
+      UserManager userManager=new UserManager();
+      userManager.updateUserAsAdmin(userModel,rep);
+    }
+  }
+.run();
+}

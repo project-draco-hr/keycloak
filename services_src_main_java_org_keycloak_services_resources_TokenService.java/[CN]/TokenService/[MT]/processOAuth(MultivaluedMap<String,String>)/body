@@ -11,14 +11,14 @@
         logger.debug("Failed to verify signature",ignored);
       }
       if (!verifiedCode) {
-        securityFailureForward("Illegal access code.");
+        OAuthUtil.securityFailureForward(request,"Illegal access code.");
         session.close();
         return null;
       }
       String key=input.readContent(String.class);
       AccessCodeEntry accessCodeEntry=tokenManager.getAccessCode(key);
       if (accessCodeEntry == null) {
-        securityFailureForward("Unknown access code.");
+        OAuthUtil.securityFailureForward(request,"Unknown access code.");
         session.close();
         return null;
       }
@@ -27,7 +27,7 @@
       if (formData.containsKey("cancel")) {
         return redirectAccessDenied(redirect,state);
       }
-      return redirectAccessCode(accessCodeEntry,state,redirect);
+      return OAuthUtil.redirectAccessCode(realm,authManager,uriInfo,accessCodeEntry,state,redirect);
     }
   }
 .call();

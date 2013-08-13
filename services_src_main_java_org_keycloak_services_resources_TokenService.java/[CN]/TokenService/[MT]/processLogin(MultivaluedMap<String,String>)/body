@@ -6,16 +6,16 @@
       String state=formData.getFirst("state");
       String redirect=formData.getFirst("redirect_uri");
       if (!realm.isEnabled()) {
-        securityFailureForward("Realm not enabled.");
+        OAuthUtil.securityFailureForward(request,"Realm not enabled.");
         return null;
       }
       UserModel client=realm.getUser(clientId);
       if (client == null) {
-        securityFailureForward("Unknown login requester.");
+        OAuthUtil.securityFailureForward(request,"Unknown login requester.");
         return null;
       }
       if (!client.isEnabled()) {
-        securityFailureForward("Login requester not enabled.");
+        OAuthUtil.securityFailureForward(request,"Login requester not enabled.");
         return null;
       }
       String username=formData.getFirst("username");
@@ -23,11 +23,11 @@
       if (user == null) {
         logger.error("Incorrect user name.");
         request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Incorrect user name.");
-        forwardToLoginForm(redirect,clientId,scopeParam,state);
+        OAuthUtil.forwardToLoginForm(realm,request,uriInfo,redirect,clientId,scopeParam,state);
         return null;
       }
       if (!user.isEnabled()) {
-        securityFailureForward("Your account is not enabled.");
+        OAuthUtil.securityFailureForward(request,"Your account is not enabled.");
         return null;
       }
       boolean authenticated=authManager.authenticateForm(realm,user,formData);
@@ -35,10 +35,10 @@
         logger.error("Authentication failed");
         request.setAttribute("username",username);
         request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Invalid credentials.");
-        forwardToLoginForm(redirect,clientId,scopeParam,state);
+        OAuthUtil.forwardToLoginForm(realm,request,uriInfo,redirect,clientId,scopeParam,state);
         return null;
       }
-      return processAccessCode(scopeParam,state,redirect,client,user);
+      return OAuthUtil.processAccessCode(realm,tokenManager,authManager,request,uriInfo,scopeParam,state,redirect,client,user);
     }
   }
 .call();

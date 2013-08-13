@@ -1,0 +1,55 @@
+{
+  return new Transaction(){
+    protected Response callImpl(){
+      Map<String,String[]> queryParams=getQueryParams();
+      RequestDetails requestData=getRequestDetails(queryParams);
+      SocialProvider provider=getProvider(requestData.getProviderId());
+      String realmId=requestData.getClientAttribute("realmId");
+      String key=System.getProperty("keycloak.social." + requestData.getProviderId() + ".key");
+      String secret=System.getProperty("keycloak.social." + requestData.getProviderId() + ".secret");
+      String callbackUri=callbackUrl(uriInfo).build().toString();
+      SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
+      AuthCallback callback=new AuthCallback(requestData.getSocialAttributes(),queryParams);
+      SocialUser socialUser=null;
+      try {
+        socialUser=provider.processCallback(config,callback);
+      }
+ catch (      SocialProviderException e) {
+        logger.warn("Failed to process social callback",e);
+        OAuthUtil.securityFailureForward(request,"Failed to process social callback");
+        return null;
+      }
+      RealmManager realmManager=new RealmManager(session);
+      RealmModel realm=realmManager.getRealm(realmId);
+      if (!realm.isEnabled()) {
+        OAuthUtil.securityFailureForward(request,"Realm not enabled.");
+        return null;
+      }
+      String clientId=requestData.getClientAttributes().get("clientId");
+      UserModel client=realm.getUser(clientId);
+      if (client == null) {
+        OAuthUtil.securityFailureForward(request,"Unknown login requester.");
+        return null;
+      }
+      if (!client.isEnabled()) {
+        OAuthUtil.securityFailureForward(request,"Login requester not enabled.");
+        return null;
+      }
+      UserModel user=realm.getUser(provider.getId() + "." + socialUser.getId());
+      if (user == null) {
+        user=realm.addUser(provider.getId() + "." + socialUser.getId());
+        user.setAttribute(provider.getId() + ".id",socialUser.getId());
+        realm.grantRole(user,realm.getRole("user"));
+      }
+      if (!user.isEnabled()) {
+        OAuthUtil.securityFailureForward(request,"Your account is not enabled.");
+        return null;
+      }
+      String scope=requestData.getClientAttributes().get("scope");
+      String state=requestData.getClientAttributes().get("state");
+      String redirectUri=requestData.getClientAttributes().get("redirectUri");
+      return OAuthUtil.processAccessCode(realm,tokenManager,authManager,request,uriInfo,scope,state,redirectUri,client,user);
+    }
+  }
+.call();
+}

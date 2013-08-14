@@ -1,11 +1,13 @@
 {
   request.setAttribute(RealmModel.class.getName(),realm);
-  request.setAttribute("KEYCLOAK_LOGIN_ACTION",TokenService.processLoginUrl(uriInfo).build(realm.getId()));
-  request.setAttribute("KEYCLOAK_SOCIAL_LOGIN",SocialResource.redirectToProviderAuthUrl(uriInfo).build(realm.getId()));
-  request.setAttribute("KEYCLOAK_REGISTRATION_PAGE",URI.create("not-implemented-yet"));
+  request.setAttribute("KEYCLOAK_LOGIN_PAGE",Urls.realmLoginPage(uriInfo,realm.getId()));
+  request.setAttribute("KEYCLOAK_LOGIN_ACTION",Urls.realmLoginAction(uriInfo,realm.getId()));
+  request.setAttribute("KEYCLOAK_REGISTRATION_PAGE",Urls.realmRegisterPage(uriInfo,realm.getId()));
+  request.setAttribute("KEYCLOAK_REGISTRATION_ACTION",Urls.realmRegisterAction(uriInfo,realm.getId()));
+  request.setAttribute("KEYCLOAK_SOCIAL_LOGIN",Urls.socialRedirectToProviderAuth(uriInfo,realm.getId()));
   request.setAttribute("redirect_uri",redirect);
   request.setAttribute("client_id",clientId);
   request.setAttribute("scope",scopeParam);
   request.setAttribute("state",state);
-  request.forward(loginFormPath);
+  request.forward(Pages.loginForm);
 }

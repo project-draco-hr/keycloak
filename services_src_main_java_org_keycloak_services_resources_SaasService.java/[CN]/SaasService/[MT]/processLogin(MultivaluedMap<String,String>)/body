@@ -12,21 +12,18 @@
       UserModel user=realm.getUser(username);
       if (user == null) {
         logger.info("Not Authenticated! Incorrect user name");
-        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Incorrect user name.");
-        forwardToLoginForm(realm);
+        forwardToLoginForm(realm,"Invalid username or password",formData);
         return null;
       }
       if (!user.isEnabled()) {
         logger.info("NAccount is disabled, contact admin.");
-        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Account is disabled, contact admin.");
-        forwardToLoginForm(realm);
+        forwardToLoginForm(realm,"Account is disabled, contact admin.",formData);
         return null;
       }
       boolean authenticated=authManager.authenticateForm(realm,user,formData);
       if (!authenticated) {
         logger.info("Not Authenticated! Invalid credentials");
-        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Invalid credentials.");
-        forwardToLoginForm(realm);
+        forwardToLoginForm(realm,"Invalid username or password",formData);
         return null;
       }
       NewCookie cookie=authManager.createSaasIdentityCookie(realm,user,uriInfo);

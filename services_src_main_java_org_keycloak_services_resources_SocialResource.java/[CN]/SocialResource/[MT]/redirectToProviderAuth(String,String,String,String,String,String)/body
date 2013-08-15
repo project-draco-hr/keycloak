@@ -1,12 +1,11 @@
 {
   SocialProvider provider=getProvider(providerId);
   if (provider == null) {
-    OAuthUtil.securityFailureForward(request,"Social provider not found");
-    return null;
+    return Flows.pages(request).forwardToSecurityFailure("Social provider not found");
   }
   String key=System.getProperty("keycloak.social." + providerId + ".key");
   String secret=System.getProperty("keycloak.social." + providerId + ".secret");
-  String callbackUri=callbackUrl(uriInfo).build().toString();
+  String callbackUri=Urls.socialCallback(uriInfo.getBaseUri()).toString();
   SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
   try {
     AuthRequest authRequest=provider.getAuthUrl(config);
@@ -15,8 +14,6 @@
     return Response.status(Status.FOUND).location(authRequest.getAuthUri()).build();
   }
  catch (  Throwable t) {
-    logger.error("Failed to redirect to social auth",t);
-    OAuthUtil.securityFailureForward(request,"Failed to redirect to social auth");
-    return null;
+    return Flows.pages(request).forwardToSecurityFailure("Failed to redirect to social auth");
   }
 }

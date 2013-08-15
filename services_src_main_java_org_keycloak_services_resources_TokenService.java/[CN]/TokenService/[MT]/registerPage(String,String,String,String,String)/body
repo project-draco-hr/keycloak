@@ -1,0 +1,23 @@
+{
+  return new Transaction(){
+    protected Response callImpl(){
+      OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
+      if (!realm.isEnabled()) {
+        return oauth.forwardToSecurityFailure("Realm not enabled");
+      }
+      UserModel client=realm.getUser(clientId);
+      if (client == null) {
+        return oauth.forwardToSecurityFailure("Unknown login requester.");
+      }
+      if (!client.isEnabled()) {
+        return oauth.forwardToSecurityFailure("Login requester not enabled.");
+      }
+      if (!realm.isRegistrationAllowed()) {
+        return oauth.forwardToSecurityFailure("Registration not allowed");
+      }
+      authManager.expireIdentityCookie(realm,uriInfo);
+      return Flows.forms(realm,request).forwardToRegistration();
+    }
+  }
+.call();
+}

@@ -1,18 +1,19 @@
 {
   return new Transaction(){
     protected Response callImpl(){
+      OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
       if (!realm.isEnabled()) {
-        OAuthUtil.securityFailureForward(request,"Realm not enabled");
+        oauth.forwardToSecurityFailure("Realm not enabled");
         return null;
       }
       UserModel client=realm.getUser(clientId);
       if (client == null) {
-        OAuthUtil.securityFailureForward(request,"Unknown login requester.");
+        oauth.forwardToSecurityFailure("Unknown login requester.");
         transaction.rollback();
         return null;
       }
       if (!client.isEnabled()) {
-        OAuthUtil.securityFailureForward(request,"Login requester not enabled.");
+        oauth.forwardToSecurityFailure("Login requester not enabled.");
         transaction.rollback();
         session.close();
         return null;
@@ -21,7 +22,7 @@
       RoleModel identityRequestRole=realm.getRole(RealmManager.IDENTITY_REQUESTER_ROLE);
       boolean isResource=realm.hasRole(client,resourceRole);
       if (!isResource && !realm.hasRole(client,identityRequestRole)) {
-        OAuthUtil.securityFailureForward(request,"Login requester not allowed to request login.");
+        oauth.forwardToSecurityFailure("Login requester not allowed to request login.");
         transaction.rollback();
         session.close();
         return null;
@@ -29,10 +30,9 @@
       UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
       if (user != null) {
         logger.info(user.getLoginName() + " already logged in.");
-        return OAuthUtil.processAccessCode(realm,tokenManager,authManager,request,uriInfo,scopeParam,state,redirect,client,user);
+        return oauth.processAccessCode(scopeParam,state,redirect,client,user);
       }
-      OAuthUtil.forwardToLoginForm(realm,request,uriInfo,redirect,clientId,scopeParam,state);
-      return null;
+      return Flows.forms(realm,request).forwardToLogin();
     }
   }
 .call();

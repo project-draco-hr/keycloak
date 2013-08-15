@@ -12,19 +12,16 @@
       UserModel user=realm.getUser(username);
       if (user == null) {
         logger.info("Not Authenticated! Incorrect user name");
-        forwardToLoginForm(realm,"Invalid username or password",formData);
-        return null;
+        return Flows.forms(realm,request).setError("Invalid username or password").setFormData(formData).forwardToLogin();
       }
       if (!user.isEnabled()) {
         logger.info("NAccount is disabled, contact admin.");
-        forwardToLoginForm(realm,"Account is disabled, contact admin.",formData);
-        return null;
+        return Flows.forms(realm,request).setError("Invalid username or password").setFormData(formData).forwardToLogin();
       }
       boolean authenticated=authManager.authenticateForm(realm,user,formData);
       if (!authenticated) {
         logger.info("Not Authenticated! Invalid credentials");
-        forwardToLoginForm(realm,"Invalid username or password",formData);
-        return null;
+        return Flows.forms(realm,request).setError("Invalid username or password").setFormData(formData).forwardToLogin();
       }
       NewCookie cookie=authManager.createSaasIdentityCookie(realm,user,uriInfo);
       return Response.status(302).cookie(cookie).location(contextRoot(uriInfo).path(adminPath).build()).build();

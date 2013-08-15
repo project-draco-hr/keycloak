@@ -1,0 +1,45 @@
+{
+  FacesContext ctx=FacesContext.getCurrentInstance();
+  HttpServletRequest request=(HttpServletRequest)ctx.getExternalContext().getRequest();
+  realm=(RealmModel)request.getAttribute(FormFlows.REALM);
+  boolean saas=RealmModel.DEFAULT_REALM.equals(realm.getName());
+  if (saas) {
+    name="Keycloak";
+  }
+ else {
+    name=realm.getName();
+  }
+  view=ctx.getViewRoot().getViewId();
+  view=view.substring(view.lastIndexOf('/') + 1,view.lastIndexOf('.'));
+  UriBuilder b=UriBuilder.fromUri(request.getRequestURI()).replaceQuery(request.getQueryString()).replacePath(request.getContextPath()).path("rest");
+  URI baseURI=b.build();
+  if (saas) {
+    loginUrl=Urls.saasLoginPage(baseURI).toString();
+    loginAction=Urls.saasLoginAction(baseURI).toString();
+    registrationUrl=Urls.saasRegisterPage(baseURI).toString();
+    registrationAction=Urls.saasRegisterAction(baseURI).toString();
+  }
+ else {
+    loginUrl=Urls.realmLoginPage(baseURI,realm.getId()).toString();
+    loginAction=Urls.realmLoginAction(baseURI,realm.getId()).toString();
+    registrationUrl=Urls.realmRegisterPage(baseURI,realm.getId()).toString();
+    registrationAction=Urls.realmRegisterAction(baseURI,realm.getId()).toString();
+  }
+  socialLoginUrlBuilder=UriBuilder.fromUri(Urls.socialRedirectToProviderAuth(baseURI,realm.getId()));
+  addRequiredCredentials();
+  addFormData(request);
+  addSocialProviders();
+  addErrors(request);
+  theme="default";
+  themeUrl=FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + "/sdk/theme/" + theme;
+  themeConfig=new HashMap<String,Object>();
+  themeConfig.put("styles",themeUrl + "/styles.css");
+  if (RealmModel.DEFAULT_REALM.equals(realm.getName())) {
+    themeConfig.put("logo",themeUrl + "/img/red-hat-logo.png");
+    themeConfig.put("background",themeUrl + "/img/login-screen-background.jpg");
+  }
+ else {
+    themeConfig.put("background",themeUrl + "/img/customer-login-screen-bg2.jpg");
+    themeConfig.put("displayPoweredBy",true);
+  }
+}

@@ -1,6 +1,6 @@
 {
   logger.info("processLogin start");
-  return new Transaction(){
+  return new Transaction<Response>(){
     @Override protected Response callImpl(){
       RealmManager realmManager=new RealmManager(session);
       RealmModel realm=realmManager.defaultRealm();
@@ -12,22 +12,16 @@
       UserModel user=realm.getUser(username);
       if (user == null) {
         logger.info("Not Authenticated! Incorrect user name");
-        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Incorrect user name.");
-        forwardToLoginForm(realm);
-        return null;
+        return Flows.forms(realm,request).setError(Messages.INVALID_USER).setFormData(formData).forwardToLogin();
       }
       if (!user.isEnabled()) {
-        logger.info("NAccount is disabled, contact admin.");
-        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Account is disabled, contact admin.");
-        forwardToLoginForm(realm);
-        return null;
+        logger.info("Account is disabled, contact admin.");
+        return Flows.forms(realm,request).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).forwardToLogin();
       }
       boolean authenticated=authManager.authenticateForm(realm,user,formData);
       if (!authenticated) {
         logger.info("Not Authenticated! Invalid credentials");
-        request.setAttribute("KEYCLOAK_LOGIN_ERROR_MESSAGE","Invalid credentials.");
-        forwardToLoginForm(realm);
-        return null;
+        return Flows.forms(realm,request).setError(Messages.INVALID_PASSWORD).setFormData(formData).forwardToLogin();
       }
       NewCookie cookie=authManager.createSaasIdentityCookie(realm,user,uriInfo);
       return Response.status(302).cookie(cookie).location(contextRoot(uriInfo).path(adminPath).build()).build();

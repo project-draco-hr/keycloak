@@ -1,0 +1,9 @@
+{
+  URI userDetailsUri=UriBuilder.fromUri(PROFILE_ENDPOINT_URL).queryParam("access_token",accessToken).queryParam("fields","id,name,username,first_name,last_name,email").build();
+  Response response=client.target(userDetailsUri).request().header(HttpHeaders.ACCEPT,MediaType.APPLICATION_JSON).get();
+  if (response.getStatus() != 200) {
+    String errorTokenResponse=response.readEntity(String.class);
+    throw new SocialProviderException("Request to Facebook for obtaining user failed. Status: " + response.getStatus() + ", response: "+ errorTokenResponse);
+  }
+  return response.readEntity(FacebookUser.class);
+}

@@ -1,8 +1,9 @@
 {
   FacesContext ctx=FacesContext.getCurrentInstance();
   HttpServletRequest request=(HttpServletRequest)ctx.getExternalContext().getRequest();
-  realm=(RealmModel)request.getAttribute(RealmModel.class.getName());
-  if (RealmModel.DEFAULT_REALM.equals(realm.getName())) {
+  realm=(RealmModel)request.getAttribute(FormFlows.REALM);
+  boolean saas=RealmModel.DEFAULT_REALM.equals(realm.getName());
+  if (saas) {
     name="Keycloak";
   }
  else {
@@ -10,14 +11,23 @@
   }
   view=ctx.getViewRoot().getViewId();
   view=view.substring(view.lastIndexOf('/') + 1,view.lastIndexOf('.'));
-  loginUrl=((URI)request.getAttribute("KEYCLOAK_LOGIN_PAGE")).toString();
-  loginAction=((URI)request.getAttribute("KEYCLOAK_LOGIN_ACTION")).toString();
-  registrationUrl=((URI)request.getAttribute("KEYCLOAK_REGISTRATION_PAGE")).toString();
-  registrationAction=((URI)request.getAttribute("KEYCLOAK_REGISTRATION_ACTION")).toString();
-  socialLoginUrl=((URI)request.getAttribute("KEYCLOAK_SOCIAL_LOGIN")).toString();
+  UriBuilder b=UriBuilder.fromUri(request.getRequestURI()).replaceQuery(request.getQueryString()).replacePath(request.getContextPath()).path("rest");
+  URI baseURI=b.build();
+  if (saas) {
+    loginUrl=Urls.saasLoginPage(baseURI).toString();
+    loginAction=Urls.saasLoginAction(baseURI).toString();
+    registrationUrl=Urls.saasRegisterPage(baseURI).toString();
+    registrationAction=Urls.saasRegisterAction(baseURI).toString();
+  }
+ else {
+    loginUrl=Urls.realmLoginPage(baseURI,realm.getId()).toString();
+    loginAction=Urls.realmLoginAction(baseURI,realm.getId()).toString();
+    registrationUrl=Urls.realmRegisterPage(baseURI,realm.getId()).toString();
+    registrationAction=Urls.realmRegisterAction(baseURI,realm.getId()).toString();
+  }
+  socialLoginUrlBuilder=UriBuilder.fromUri(Urls.socialRedirectToProviderAuth(baseURI,realm.getId()));
   addRequiredCredentials();
   addFormData(request);
-  addHiddenProperties(request,"client_id","scope","state","redirect_uri");
   addSocialProviders();
   addErrors(request);
   theme="default";

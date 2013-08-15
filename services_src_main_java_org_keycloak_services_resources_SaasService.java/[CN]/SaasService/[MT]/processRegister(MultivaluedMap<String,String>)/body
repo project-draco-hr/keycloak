@@ -37,7 +37,7 @@
       newUser.credential(CredentialRepresentation.PASSWORD,formData.getFirst("password"));
       UserModel user=registerMe(defaultRealm,newUser);
       if (user == null) {
-        return Flows.forms(defaultRealm,request).setError("Username already exists.").setFormData(formData).forwardToRegistration();
+        return Flows.forms(defaultRealm,request).setError(Messages.USERNAME_EXISTS).setFormData(formData).forwardToRegistration();
       }
       NewCookie cookie=authManager.createSaasIdentityCookie(defaultRealm,user,uriInfo);
       return Response.status(302).location(contextRoot(uriInfo).path(adminPath).build()).cookie(cookie).build();

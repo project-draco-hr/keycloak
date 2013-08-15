@@ -16,7 +16,7 @@
       UserModel user=realm.getUser(username);
       if (user == null) {
         logger.error("Incorrect user name.");
-        return Flows.forms(realm,request).setError("Invalid username or password").setFormData(formData).forwardToLogin();
+        return Flows.forms(realm,request).setError(Messages.INVALID_USER).setFormData(formData).forwardToLogin();
       }
       if (!user.isEnabled()) {
         return oauth.forwardToSecurityFailure("Your account is not enabled.");
@@ -24,7 +24,7 @@
       boolean authenticated=authManager.authenticateForm(realm,user,formData);
       if (!authenticated) {
         logger.error("Authentication failed");
-        return Flows.forms(realm,request).setError("Invalid username or password").setFormData(formData).forwardToLogin();
+        return Flows.forms(realm,request).setError(Messages.INVALID_PASSWORD).setFormData(formData).forwardToLogin();
       }
       return oauth.processAccessCode(scopeParam,state,redirect,client,user);
     }

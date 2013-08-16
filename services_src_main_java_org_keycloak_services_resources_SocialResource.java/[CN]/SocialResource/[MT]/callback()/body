@@ -37,10 +37,14 @@
       }
       UserModel user=realm.getUser(provider.getId() + "." + socialUser.getId());
       if (user == null) {
+        if (!realm.isRegistrationAllowed()) {
+          return oauth.forwardToSecurityFailure("Registration not allowed");
+        }
         user=realm.addUser(provider.getId() + "." + socialUser.getId());
         user.setAttribute(provider.getId() + ".id",socialUser.getId());
-        RoleModel defaultRole=realm.getRole("user");
-        realm.grantRole(user,defaultRole);
+        for (        RoleModel role : realm.getDefaultRoles()) {
+          realm.grantRole(user,role);
+        }
       }
       if (!user.isEnabled()) {
         return oauth.forwardToSecurityFailure("Your account is not enabled.");

@@ -7,6 +7,7 @@
   realmModel.setPrivateKeyPem("0234234");
   realmModel.setPublicKeyPem("0234234");
   realmModel.setTokenLifespan(1000);
+  realmModel.addDefaultRole("foo");
   System.out.println(realmModel.getId());
   realmModel=adapter.getRealm(realmModel.getId());
   Assert.assertNotNull(realmModel);
@@ -16,4 +17,6 @@
   Assert.assertEquals(realmModel.getName(),"JUGGLER");
   Assert.assertEquals(realmModel.getPrivateKeyPem(),"0234234");
   Assert.assertEquals(realmModel.getPublicKeyPem(),"0234234");
+  Assert.assertEquals(1,realmModel.getDefaultRoles().size());
+  Assert.assertEquals("foo",realmModel.getDefaultRoles().get(0).getName());
 }

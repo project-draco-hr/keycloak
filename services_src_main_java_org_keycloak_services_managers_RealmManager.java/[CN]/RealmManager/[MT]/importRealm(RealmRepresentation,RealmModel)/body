@@ -30,16 +30,20 @@
       addOAuthClientRequiredCredential(newRealm,requiredCred);
     }
   }
-  UserManager userManager=new UserManager();
   if (rep.getUsers() != null) {
     for (    UserRepresentation userRep : rep.getUsers()) {
-      UserModel user=userManager.createUser(newRealm,userRep);
+      UserModel user=createUser(newRealm,userRep);
       userMap.put(user.getLoginName(),user);
     }
   }
   if (rep.getRoles() != null) {
     for (    RoleRepresentation roleRep : rep.getRoles()) {
       createRole(newRealm,roleRep);
+    }
+  }
+  if (rep.getDefaultRoles() != null) {
+    for (    String roleString : rep.getDefaultRoles()) {
+      newRealm.addDefaultRole(roleString.trim());
     }
   }
   if (rep.getApplications() != null) {

@@ -3,6 +3,14 @@
   for (  RequiredCredentialModel m : realm.getRequiredCredentials()) {
     if (m.isInput()) {
       requiredCredentials.add(new RequiredCredential(m.getType(),m.isSecret(),m.getFormLabel()));
+      if (m.getType().equals(CredentialRepresentation.TOTP)) {
+        if (formData != null) {
+          totpSecret=formData.get("totpSecret");
+        }
+        if (totpSecret == null) {
+          totpSecret=UUID.randomUUID().toString();
+        }
+      }
     }
   }
 }

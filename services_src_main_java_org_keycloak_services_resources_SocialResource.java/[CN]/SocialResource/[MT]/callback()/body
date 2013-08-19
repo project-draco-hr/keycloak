@@ -32,15 +32,25 @@
         logger.warn("Failed to process social callback",e);
         return oauth.forwardToSecurityFailure("Failed to process social callback");
       }
-      UserModel user=realm.getUser(provider.getId() + "." + socialUser.getId());
+      SocialLinkModel socialLink=new SocialLinkModel(provider.getId(),socialUser.getUsername());
+      UserModel user=realm.getUserBySocialLink(socialLink);
       if (user == null) {
         if (!realm.isRegistrationAllowed()) {
           return oauth.forwardToSecurityFailure("Registration not allowed");
         }
-        user=realm.addUser(provider.getId() + "." + socialUser.getId());
-        user.setAttribute(provider.getId() + ".id",socialUser.getId());
-        for (        RoleModel role : realm.getDefaultRoles()) {
-          realm.grantRole(user,role);
+        if (realm.isAutomaticRegistrationAfterSocialLogin()) {
+          if (realm.getUser(socialUser.getUsername()) != null) {
+            throw new IllegalStateException("Username " + socialUser.getUsername() + " already registered in the realm. TODO: bind accounts...");
+          }
+ else {
+            user=realm.addUser(socialUser.getUsername());
+          }
+          realm.addSocialLink(user,socialLink);
+          for (          RoleModel role : realm.getDefaultRoles()) {
+            realm.grantRole(user,role);
+          }
+        }
+ else {
         }
       }
       if (!user.isEnabled()) {

@@ -1,0 +1,16 @@
+{
+  RelationshipQuery<SocialLinkRelationship> query=getRelationshipManager().createRelationshipQuery(SocialLinkRelationship.class);
+  query.setParameter(SocialLinkRelationship.SOCIAL_PROVIDER,socialLink.getSocialProvider());
+  query.setParameter(SocialLinkRelationship.SOCIAL_USERNAME,socialLink.getSocialUsername());
+  List<SocialLinkRelationship> results=query.getResultList();
+  if (results.isEmpty()) {
+    return null;
+  }
+ else   if (results.size() > 1) {
+    throw new IllegalStateException("More results found for socialProvider=" + socialLink.getSocialProvider() + ", socialUsername="+ socialLink.getSocialUsername()+ ", results="+ results);
+  }
+ else {
+    User user=results.get(0).getUser();
+    return new UserAdapter(user,getIdm());
+  }
+}

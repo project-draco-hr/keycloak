@@ -7,6 +7,7 @@
   defaultRealm.setSslNotRequired(false);
   defaultRealm.setCookieLoginAllowed(true);
   defaultRealm.setRegistrationAllowed(true);
+  defaultRealm.setAutomaticRegistrationAfterSocialLogin(false);
   manager.generateRealmKeys(defaultRealm);
   defaultRealm.addRequiredCredential(CredentialRepresentation.PASSWORD);
   RoleModel role=defaultRealm.addRole(SaasService.REALM_CREATOR_ROLE);
@@ -16,6 +17,7 @@
   RealmModel realm=manager.createRealm("demo",rep.getRealm());
   manager.importRealm(rep,realm);
   realm.addRealmAdmin(admin);
+  Assert.assertTrue(realm.isAutomaticRegistrationAfterSocialLogin());
   verifyRequiredCredentials(realm.getRequiredCredentials(),"password");
   verifyRequiredCredentials(realm.getRequiredApplicationCredentials(),"totp");
   verifyRequiredCredentials(realm.getRequiredOAuthClientCredentials(),"cert");

@@ -60,12 +60,6 @@
         credentials.setValue(formData.getFirst("password"));
         realm.updateCredential(user,credentials);
       }
-      if (requiredCredentialTypes.contains(CredentialRepresentation.TOTP)) {
-        UserCredentialModel credentials=new UserCredentialModel();
-        credentials.setType(CredentialRepresentation.TOTP);
-        credentials.setValue(formData.getFirst("totpSecret"));
-        realm.updateCredential(user,credentials);
-      }
       for (      RoleModel role : realm.getDefaultRoles()) {
         realm.grantRole(user,role);
       }

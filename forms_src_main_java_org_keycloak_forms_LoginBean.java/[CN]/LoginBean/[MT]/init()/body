@@ -1,0 +1,14 @@
+{
+  FacesContext ctx=FacesContext.getCurrentInstance();
+  HttpServletRequest request=(HttpServletRequest)ctx.getExternalContext().getRequest();
+  @SuppressWarnings("unchecked") MultivaluedMap<String,String> formData=(MultivaluedMap<String,String>)request.getAttribute(FormFlows.DATA);
+  if (formData != null) {
+    username=formData.getFirst("username");
+  }
+  requiredCredentials=new LinkedList<RequiredCredential>();
+  for (  org.keycloak.services.models.RequiredCredentialModel c : realm.getRealm().getRequiredCredentials()) {
+    if (c.isInput()) {
+      requiredCredentials.add(new RequiredCredential(c.getType(),c.isSecret(),c.getFormLabel()));
+    }
+  }
+}

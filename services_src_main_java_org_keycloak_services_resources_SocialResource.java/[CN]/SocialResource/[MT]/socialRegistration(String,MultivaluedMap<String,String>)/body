@@ -1,0 +1,46 @@
+{
+  return new Transaction<Response>(){
+    protected Response callImpl(){
+      PageFlows pageFlows=Flows.pages(request);
+      Cookie cookie=headers.getCookies().get(SocialConstants.SOCIAL_REGISTRATION_COOKIE);
+      if (cookie == null) {
+        return pageFlows.forwardToSecurityFailure("Social registration cookie not found");
+      }
+      String requestId=cookie.getValue();
+      if (!socialRequestManager.isRequestId(requestId)) {
+        logger.error("Unknown requestId found in cookie. Maybe it's expired. requestId=" + requestId);
+        return pageFlows.forwardToSecurityFailure("Unknown requestId found in cookie. Maybe it's expired.");
+      }
+      RequestDetails requestData=socialRequestManager.getData(requestId);
+      RealmManager realmManager=new RealmManager(session);
+      RealmModel realm=realmManager.getRealm(realmId);
+      if (realm == null || !realm.isEnabled()) {
+        return pageFlows.forwardToSecurityFailure("Realm doesn't exists or is not enabled.");
+      }
+      TokenService tokenService=new TokenService(realm,tokenManager);
+      resourceContext.initResource(tokenService);
+      String clientId=requestData.getClientAttribute("clientId");
+      String scope=requestData.getClientAttribute("scope");
+      String state=requestData.getClientAttribute("state");
+      String redirectUri=requestData.getClientAttribute("redirectUri");
+      SocialLinkModel socialLink=(SocialLinkModel)requestData.getSocialAttribute(SocialConstants.ATTR_SOCIAL_LINK);
+      Response response1=tokenService.processRegisterImpl(clientId,scope,state,redirectUri,formData,true);
+      if (response1 == null) {
+        return null;
+      }
+      String username=formData.getFirst("username");
+      UserModel user=realm.getUser(username);
+      if (user == null) {
+        throw new IllegalStateException("User " + username + " not found in the realm");
+      }
+      realm.addSocialLink(user,socialLink);
+      String cookiePath=Urls.socialBase(uriInfo.getBaseUri()).build().getPath();
+      NewCookie newCookie=new NewCookie(SocialConstants.SOCIAL_REGISTRATION_COOKIE,"",cookiePath,null,"Expire social cookie",0,false);
+      logger.info("Expiring social registration cookie: " + SocialConstants.SOCIAL_REGISTRATION_COOKIE + ", path: "+ cookiePath);
+      response.addNewCookie(newCookie);
+      socialRequestManager.retrieveData(requestId);
+      return response1;
+    }
+  }
+.call();
+}

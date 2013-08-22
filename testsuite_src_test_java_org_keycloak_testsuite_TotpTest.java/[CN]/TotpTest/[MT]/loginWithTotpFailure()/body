@@ -1,0 +1,14 @@
+{
+  registerUser("loginWithTotpFailure","password");
+  configureTotp();
+  logout();
+  selenium.type("id=username","loginWithTotpFailure");
+  selenium.type("id=password","password");
+  selenium.click("css=input[type=\"submit\"]");
+  selenium.waitForPageToLoad(DEFAULT_WAIT);
+  Assert.assertEquals("Log in to demo",selenium.getTitle());
+  selenium.type("id=totp","123456");
+  selenium.click("css=input[type=\"submit\"]");
+  selenium.waitForPageToLoad(DEFAULT_WAIT);
+  Assert.assertTrue(selenium.isTextPresent("Invalid username or password"));
+}

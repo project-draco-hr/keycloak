@@ -1,0 +1,14 @@
+{
+  registerUser("loginWithTotpSuccess","password");
+  configureTotp();
+  logout();
+  selenium.type("id=username","loginWithTotpSuccess");
+  selenium.type("id=password","password");
+  selenium.click("css=input[type=\"submit\"]");
+  selenium.waitForPageToLoad(DEFAULT_WAIT);
+  Assert.assertEquals("Log in to demo",selenium.getTitle());
+  selenium.type("id=totp",totp.generate(totpSecret));
+  selenium.click("css=input[type=\"submit\"]");
+  selenium.waitForPageToLoad(DEFAULT_WAIT);
+  Assert.assertEquals("loginWithTotpSuccess",selenium.getText("id=user"));
+}

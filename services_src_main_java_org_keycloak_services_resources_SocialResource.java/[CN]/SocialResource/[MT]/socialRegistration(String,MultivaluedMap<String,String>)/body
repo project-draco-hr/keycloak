@@ -25,8 +25,9 @@
       String redirectUri=requestData.getClientAttribute("redirectUri");
       SocialLinkModel socialLink=(SocialLinkModel)requestData.getSocialAttribute(SocialConstants.ATTR_SOCIAL_LINK);
       Response response1=tokenService.processRegisterImpl(clientId,scope,state,redirectUri,formData,true);
-      if (response1 == null) {
-        return null;
+      if (response1 != null || request.wasForwarded()) {
+        logger.warn("Registration attempt wasn't successful. Request already forwarded or redirected.");
+        return response1;
       }
       String username=formData.getFirst("username");
       UserModel user=realm.getUser(username);
@@ -39,7 +40,7 @@
       logger.info("Expiring social registration cookie: " + SocialConstants.SOCIAL_REGISTRATION_COOKIE + ", path: "+ cookiePath);
       response.addNewCookie(newCookie);
       socialRequestManager.retrieveData(requestId);
-      return response1;
+      return tokenService.processLogin(clientId,scope,state,redirectUri,formData);
     }
   }
 .call();

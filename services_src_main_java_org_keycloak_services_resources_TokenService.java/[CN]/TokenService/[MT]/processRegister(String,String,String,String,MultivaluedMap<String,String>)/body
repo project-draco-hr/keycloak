@@ -1,7 +1,14 @@
 {
   return new Transaction<Response>(){
     @Override protected Response callImpl(){
-      return processRegisterImpl(clientId,scopeParam,state,redirect,formData,false);
+      Response registrationResponse=processRegisterImpl(clientId,scopeParam,state,redirect,formData,false);
+      if (registrationResponse != null || request.wasForwarded()) {
+        logger.warn("Registration attempt wasn't successful. Request already forwarded or redirected.");
+        return registrationResponse;
+      }
+ else {
+        return processLogin(clientId,scopeParam,state,redirect,formData);
+      }
     }
   }
 .call();

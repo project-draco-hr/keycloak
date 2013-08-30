@@ -1,0 +1,10 @@
+{
+  ObjectInfo<T> objectInfo=getObjectInfo(type);
+  DBCollection dbCollection=database.getCollection(objectInfo.getDbCollectionName());
+  BasicDBObject query=new BasicDBObject();
+  for (  Map.Entry<String,Object> queryAttr : queryAttributes.entrySet()) {
+    query.append(queryAttr.getKey(),queryAttr.getValue());
+  }
+  DBCursor cursor=dbCollection.find(query);
+  return convertCursor(type,cursor);
+}

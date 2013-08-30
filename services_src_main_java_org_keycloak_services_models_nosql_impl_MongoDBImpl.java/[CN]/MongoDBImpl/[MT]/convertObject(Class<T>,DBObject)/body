@@ -15,7 +15,17 @@
       idProperty.setValue(object,value.toString());
     }
  else     if ((property=objectInfo.getPropertyByName(key)) != null) {
-      property.setValue(object,value);
+      Class<?> expectedType=property.getJavaClass();
+      Class actualType=value != null ? value.getClass() : expectedType;
+      expectedType=Types.boxedClass(expectedType);
+      actualType=Types.boxedClass(actualType);
+      if (actualType.isAssignableFrom(expectedType)) {
+        property.setValue(object,value);
+      }
+ else {
+        Object convertedValue=typeConverter.convertDBObjectToApplicationObject(value,expectedType,actualType);
+        property.setValue(object,convertedValue);
+      }
     }
  else     if (object instanceof AttributedNoSQLObject) {
       ((AttributedNoSQLObject)object).setAttribute(key,value.toString());

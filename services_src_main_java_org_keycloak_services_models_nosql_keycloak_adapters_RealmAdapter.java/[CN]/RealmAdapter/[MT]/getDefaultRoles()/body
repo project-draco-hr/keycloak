@@ -1,0 +1,10 @@
+{
+  String[] defaultRoles=realm.getDefaultRoles();
+  NoSQLQuery query=NoSQLQueryBuilder.create(MongoDBQueryBuilder.class).inCondition("_id",defaultRoles).build();
+  List<RoleData> defaultRolesData=noSQL.loadObjects(RoleData.class,query);
+  List<RoleModel> defaultRoleModels=new ArrayList<RoleModel>();
+  for (  RoleData roleData : defaultRolesData) {
+    defaultRoleModels.add(new RoleAdapter(roleData,noSQL));
+  }
+  return defaultRoleModels;
+}

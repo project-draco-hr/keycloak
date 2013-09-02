@@ -1,0 +1,13 @@
+{
+  UserData userData=((UserAdapter)user).getUser();
+  String[] roleIds=userData.getRoleIds();
+  Set<String> result=new HashSet<String>();
+  NoSQLQuery query=NoSQLQueryBuilder.create(MongoDBQueryBuilder.class).inCondition("_id",roleIds).build();
+  List<RoleData> roles=noSQL.loadObjects(RoleData.class,query);
+  for (  RoleData role : roles) {
+    if (getId().equals(role.getApplicationId())) {
+      result.add(role.getName());
+    }
+  }
+  return result;
+}

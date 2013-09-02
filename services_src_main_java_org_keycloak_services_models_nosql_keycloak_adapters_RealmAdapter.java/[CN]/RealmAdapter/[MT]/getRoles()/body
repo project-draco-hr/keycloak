@@ -1,0 +1,9 @@
+{
+  NoSQLQuery query=NoSQLQueryBuilder.create(MongoDBQueryBuilder.class).andCondition("realmId",getOid()).build();
+  List<RoleData> roles=noSQL.loadObjects(RoleData.class,query);
+  List<RoleModel> result=new ArrayList<RoleModel>();
+  for (  RoleData role : roles) {
+    result.add(new RoleAdapter(role,noSQL));
+  }
+  return result;
+}

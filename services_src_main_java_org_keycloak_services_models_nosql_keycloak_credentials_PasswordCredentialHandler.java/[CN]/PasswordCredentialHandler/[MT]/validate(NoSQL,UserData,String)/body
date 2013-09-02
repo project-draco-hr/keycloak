@@ -1,0 +1,25 @@
+{
+  Credentials.Status status=Credentials.Status.INVALID;
+  user=noSQL.loadObject(UserData.class,user.getId());
+  if (user != null) {
+    if (user.isEnabled()) {
+      NoSQLQuery query=NoSQLQueryBuilder.create(MongoDBQueryBuilder.class).andCondition("userId",user.getId()).build();
+      PasswordData passwordData=noSQL.loadSingleObject(PasswordData.class,query);
+      if (passwordData != null) {
+        if (!isCredentialExpired(passwordData.getExpiryDate())) {
+          boolean matches=this.passwordEncoder.verify(saltPassword(passwordToValidate,passwordData.getSalt()),passwordData.getEncodedHash());
+          if (matches) {
+            status=Credentials.Status.VALID;
+          }
+        }
+ else {
+          status=Credentials.Status.EXPIRED;
+        }
+      }
+    }
+ else {
+      status=Credentials.Status.ACCOUNT_DISABLED;
+    }
+  }
+  return status;
+}

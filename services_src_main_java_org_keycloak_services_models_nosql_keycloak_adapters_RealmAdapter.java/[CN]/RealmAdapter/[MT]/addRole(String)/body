@@ -1,0 +1,10 @@
+{
+  if (getRole(name) != null) {
+    throw new IllegalArgumentException("Role " + name + " already exists");
+  }
+  RoleData roleData=new RoleData();
+  roleData.setName(name);
+  roleData.setRealmId(getOid());
+  noSQL.saveObject(roleData);
+  return new RoleAdapter(roleData,noSQL);
+}

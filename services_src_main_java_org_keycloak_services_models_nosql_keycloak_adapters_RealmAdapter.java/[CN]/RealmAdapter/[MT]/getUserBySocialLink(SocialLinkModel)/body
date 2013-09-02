@@ -1,0 +1,11 @@
+{
+  NoSQLQuery query=NoSQLQueryBuilder.create(MongoDBQueryBuilder.class).andCondition("socialProvider",socialLink.getSocialProvider()).andCondition("socialUsername",socialLink.getSocialUsername()).build();
+  SocialLinkData socialLinkData=noSQL.loadSingleObject(SocialLinkData.class,query);
+  if (socialLinkData == null) {
+    return null;
+  }
+ else {
+    UserData userData=noSQL.loadObject(UserData.class,socialLinkData.getUserId());
+    return new UserAdapter(userData,noSQL);
+  }
+}

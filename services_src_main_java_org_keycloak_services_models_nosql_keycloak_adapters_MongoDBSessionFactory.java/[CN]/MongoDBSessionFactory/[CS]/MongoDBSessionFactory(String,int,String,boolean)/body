@@ -1,0 +1,17 @@
+{
+  try {
+    mongoClient=new MongoClient(host,port);
+    DB db=mongoClient.getDB(dbName);
+    mongoDB=new MongoDBImpl(db);
+  }
+ catch (  UnknownHostException e) {
+    throw new RuntimeException(e);
+  }
+  if (removeAllObjectsAtStartup) {
+    NoSQLQuery emptyQuery=NoSQLQueryBuilder.create(MongoDBQueryBuilder.class).build();
+    for (    Class<?> type : MANAGED_DATA_TYPES) {
+      mongoDB.removeObjects((Class<? extends NoSQLObject>)type,emptyQuery);
+    }
+    System.out.println("All objects successfully removed from DB");
+  }
+}

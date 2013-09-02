@@ -1,0 +1,9 @@
+{
+  NoSQLQuery query=NoSQLQueryBuilder.create(MongoDBQueryBuilder.class).andCondition("realmId",getOid()).build();
+  List<ApplicationData> appDatas=noSQL.loadObjects(ApplicationData.class,query);
+  List<ApplicationModel> result=new ArrayList<ApplicationModel>();
+  for (  ApplicationData appData : appDatas) {
+    result.add(new ApplicationAdapter(appData,noSQL));
+  }
+  return result;
+}

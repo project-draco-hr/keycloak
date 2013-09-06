@@ -1,3 +1,9 @@
 {
-  return new MongoDBSessionFactory("localhost",27017,"keycloak",true);
+  String sessionFactoryType=System.getProperty("keycloak.sessionFactory","picketlink");
+  if ("mongo".equals(sessionFactoryType)) {
+    return buildMongoDBSessionFactory();
+  }
+ else {
+    return buildPicketlinkSessionFactory();
+  }
 }

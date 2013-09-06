@@ -1,0 +1,21 @@
+{
+  ObjectInfo objectInfo=mongoDBImpl.getObjectInfo(applicationObject.getClass());
+  BasicDBObject dbObject=new BasicDBObject();
+  List<Property<Object>> props=objectInfo.getProperties();
+  for (  Property<Object> property : props) {
+    String propName=property.getName();
+    Object propValue=property.getValue(applicationObject);
+    if (propValue instanceof NoSQLObject) {
+      propValue=typeConverter.convertApplicationObjectToDBObject(propValue,BasicDBObject.class);
+    }
+    dbObject.append(propName,propValue);
+  }
+  if (applicationObject instanceof AttributedNoSQLObject) {
+    AttributedNoSQLObject attributedObject=(AttributedNoSQLObject)applicationObject;
+    Map<String,String> attributes=attributedObject.getAttributes();
+    for (    Map.Entry<String,String> attribute : attributes.entrySet()) {
+      dbObject.append(attribute.getKey(),attribute.getValue());
+    }
+  }
+  return dbObject;
+}

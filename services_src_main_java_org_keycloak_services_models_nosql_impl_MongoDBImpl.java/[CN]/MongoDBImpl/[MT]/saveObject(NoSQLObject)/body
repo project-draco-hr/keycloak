@@ -1,26 +1,15 @@
 {
-  Class<?> clazz=object.getClass();
+  Class<? extends NoSQLObject> clazz=object.getClass();
   ObjectInfo objectInfo=getObjectInfo(clazz);
-  BasicDBObject dbObject=new BasicDBObject();
-  List<Property<Object>> props=objectInfo.getProperties();
-  for (  Property<Object> property : props) {
-    String propName=property.getName();
-    Object propValue=property.getValue(object);
-    dbObject.append(propName,propValue);
-  }
-  if (object instanceof AttributedNoSQLObject) {
-    AttributedNoSQLObject attributedObject=(AttributedNoSQLObject)object;
-    Map<String,String> attributes=attributedObject.getAttributes();
-    for (    Map.Entry<String,String> attribute : attributes.entrySet()) {
-      dbObject.append(attribute.getKey(),attribute.getValue());
-    }
-  }
+  BasicDBObject dbObject=typeConverter.convertApplicationObjectToDBObject(object,BasicDBObject.class);
   DBCollection dbCollection=database.getCollection(objectInfo.getDbCollectionName());
   Property<String> oidProperty=objectInfo.getOidProperty();
-  String currentId=oidProperty.getValue(object);
+  String currentId=oidProperty == null ? null : oidProperty.getValue(object);
   if (currentId == null) {
     dbCollection.insert(dbObject);
-    oidProperty.setValue(object,dbObject.getString("_id"));
+    if (oidProperty != null) {
+      oidProperty.setValue(object,dbObject.getString("_id"));
+    }
   }
  else {
     BasicDBObject setCommand=new BasicDBObject("$set",dbObject);

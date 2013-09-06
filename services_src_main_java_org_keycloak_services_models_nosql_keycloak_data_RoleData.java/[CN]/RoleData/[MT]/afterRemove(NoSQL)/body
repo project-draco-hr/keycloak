@@ -1,0 +1,20 @@
+{
+  NoSQLQuery query=noSQL.createQueryBuilder().andCondition("roleIds",id).build();
+  List<UserData> users=noSQL.loadObjects(UserData.class,query);
+  for (  UserData user : users) {
+    logger.info("Removing role " + getName() + " from user "+ user.getLoginName());
+    String[] roleIds=user.getRoleIds();
+    String[] newRoleIds=Utils.removeItemFromArray(roleIds,getId());
+    user.setRoleIds(newRoleIds);
+    noSQL.saveObject(user);
+  }
+  query=noSQL.createQueryBuilder().andCondition("scopeIds",id).build();
+  users=noSQL.loadObjects(UserData.class,query);
+  for (  UserData user : users) {
+    logger.info("Removing scope " + getName() + " from user "+ user.getLoginName());
+    String[] scopeIds=user.getScopeIds();
+    String[] newScopeIds=Utils.removeItemFromArray(scopeIds,getId());
+    user.setScopeIds(newScopeIds);
+    noSQL.saveObject(user);
+  }
+}

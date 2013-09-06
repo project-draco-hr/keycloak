@@ -2,7 +2,7 @@
   UserData userData=((UserAdapter)agent).getUser();
   String[] scopeIds=userData.getScopeIds();
   Set<String> result=new HashSet<String>();
-  NoSQLQuery query=NoSQLQueryBuilder.create(MongoDBQueryBuilder.class).inCondition("_id",scopeIds).build();
+  NoSQLQuery query=noSQL.createQueryBuilder().inCondition("_id",scopeIds).build();
   List<RoleData> roles=noSQL.loadObjects(RoleData.class,query);
   for (  RoleData role : roles) {
     if (getId().equals(role.getApplicationId())) {

@@ -1,5 +1,13 @@
 {
-  DBCollection dbCollection=getDBCollectionForType(type);
-  BasicDBObject dbQuery=new BasicDBObject("_id",new ObjectId(oid));
-  dbCollection.remove(dbQuery);
+  NoSQLObject found=loadObject(type,oid);
+  if (found == null) {
+    logger.warn("Object of type: " + type + ", oid: "+ oid+ " doesn't exist in MongoDB. Skip removal");
+  }
+ else {
+    DBCollection dbCollection=getDBCollectionForType(type);
+    BasicDBObject dbQuery=new BasicDBObject("_id",new ObjectId(oid));
+    dbCollection.remove(dbQuery);
+    logger.info("Object of type: " + type + ", oid: "+ oid+ " removed from MongoDB.");
+    found.afterRemove(this);
+  }
 }

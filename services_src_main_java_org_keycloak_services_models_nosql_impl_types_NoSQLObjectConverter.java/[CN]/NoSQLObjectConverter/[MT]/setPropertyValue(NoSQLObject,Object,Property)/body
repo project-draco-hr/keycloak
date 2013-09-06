@@ -1,0 +1,13 @@
+{
+  Class<?> expectedType=property.getJavaClass();
+  Class actualType=valueFromDB != null ? valueFromDB.getClass() : expectedType;
+  expectedType=Types.boxedClass(expectedType);
+  actualType=Types.boxedClass(actualType);
+  if (actualType.isAssignableFrom(expectedType)) {
+    property.setValue(object,valueFromDB);
+  }
+ else {
+    Object convertedValue=typeConverter.convertDBObjectToApplicationObject(valueFromDB,expectedType);
+    property.setValue(object,convertedValue);
+  }
+}

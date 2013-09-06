@@ -1,17 +1,11 @@
 {
+  logger.info(String.format("Going to use MongoDB database. host: %s, port: %d, databaseName: %s, removeAllObjectsAtStartup: %b",host,port,dbName,removeAllObjectsAtStartup));
   try {
     mongoClient=new MongoClient(host,port);
     DB db=mongoClient.getDB(dbName);
-    mongoDB=new MongoDBImpl(db);
+    mongoDB=new MongoDBImpl(db,removeAllObjectsAtStartup,MANAGED_DATA_TYPES);
   }
  catch (  UnknownHostException e) {
     throw new RuntimeException(e);
-  }
-  if (removeAllObjectsAtStartup) {
-    NoSQLQuery emptyQuery=NoSQLQueryBuilder.create(MongoDBQueryBuilder.class).build();
-    for (    Class<?> type : MANAGED_DATA_TYPES) {
-      mongoDB.removeObjects((Class<? extends NoSQLObject>)type,emptyQuery);
-    }
-    System.out.println("All objects successfully removed from DB");
   }
 }

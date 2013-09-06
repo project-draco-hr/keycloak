@@ -1,0 +1,24 @@
+{
+  this.database=database;
+  typeConverter=new TypeConverter();
+  typeConverter.addConverter(new BasicDBListToStringArrayConverter());
+  for (  Class<? extends NoSQLObject> type : managedDataTypes) {
+    typeConverter.addConverter(new NoSQLObjectConverter(this,typeConverter,type));
+    getObjectInfo(type);
+  }
+  if (removeAllObjectsAtStartup) {
+    for (    Class<? extends NoSQLObject> type : managedDataTypes) {
+      ObjectInfo objectInfo=getObjectInfo(type);
+      String collectionName=objectInfo.getDbCollectionName();
+      if (collectionName != null) {
+        logger.debug("Removing all objects of type " + type);
+        DBCollection dbCollection=this.database.getCollection(collectionName);
+        dbCollection.remove(new BasicDBObject());
+      }
+ else {
+        logger.debug("Skip removing objects of type " + type + " as it doesn't have it's own collection");
+      }
+    }
+    logger.info("All objects successfully removed from MongoDB");
+  }
+}

@@ -1,0 +1,19 @@
+{
+  selenium.open(appUrl.toString());
+  selenium.waitForPageToLoad(DEFAULT_WAIT);
+  Assert.assertEquals("Log in to demo",selenium.getTitle());
+  if (username != null) {
+    selenium.type("id=username",username);
+  }
+  if (password != null) {
+    selenium.type("id=password",password);
+  }
+  selenium.click("css=input[type=\"submit\"]");
+  selenium.waitForPageToLoad(DEFAULT_WAIT);
+  if (expectErrorMessage == null) {
+    Assert.assertEquals(username,selenium.getText("id=user"));
+  }
+ else {
+    Assert.assertTrue(selenium.isTextPresent(expectErrorMessage));
+  }
+}

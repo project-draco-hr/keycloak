@@ -1,0 +1,16 @@
+{
+  String[] size=req.getParameter("size").split("x");
+  int width=Integer.parseInt(size[0]);
+  int height=Integer.parseInt(size[1]);
+  String contents=req.getParameter("contents");
+  try {
+    QRCodeWriter writer=new QRCodeWriter();
+    BitMatrix bitMatrix=writer.encode(contents,BarcodeFormat.QR_CODE,width,height);
+    MatrixToImageWriter.writeToStream(bitMatrix,"png",resp.getOutputStream());
+    resp.setContentType("image/png");
+  }
+ catch (  Exception e) {
+    log.warn("Failed to generate qr code",e);
+    resp.sendError(500);
+  }
+}

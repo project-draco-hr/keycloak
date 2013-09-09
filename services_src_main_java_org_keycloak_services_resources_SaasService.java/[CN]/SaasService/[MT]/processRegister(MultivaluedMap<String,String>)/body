@@ -3,7 +3,11 @@
     @Override protected Response callImpl(){
       RealmManager realmManager=new RealmManager(session);
       RealmModel defaultRealm=realmManager.defaultRealm();
-      String error=validateRegistrationForm(formData);
+      List<String> requiredCredentialTypes=new LinkedList<String>();
+      for (      RequiredCredentialModel m : defaultRealm.getRequiredCredentials()) {
+        requiredCredentialTypes.add(m.getType());
+      }
+      String error=Validation.validateRegistrationForm(formData,requiredCredentialTypes);
       if (error != null) {
         return Flows.forms(defaultRealm,request).setError(error).setFormData(formData).forwardToRegistration();
       }
@@ -34,7 +38,12 @@
         newUser.setFirstName(first.toString());
         newUser.setLastName(last);
       }
-      newUser.credential(CredentialRepresentation.PASSWORD,formData.getFirst("password"));
+      if (requiredCredentialTypes.contains(CredentialRepresentation.PASSWORD)) {
+        newUser.credential(CredentialRepresentation.PASSWORD,formData.getFirst("password"));
+      }
+      if (requiredCredentialTypes.contains(CredentialRepresentation.TOTP)) {
+        newUser.credential(CredentialRepresentation.TOTP,formData.getFirst("password"));
+      }
       UserModel user=registerMe(defaultRealm,newUser);
       if (user == null) {
         return Flows.forms(defaultRealm,request).setError(Messages.USERNAME_EXISTS).setFormData(formData).forwardToRegistration();

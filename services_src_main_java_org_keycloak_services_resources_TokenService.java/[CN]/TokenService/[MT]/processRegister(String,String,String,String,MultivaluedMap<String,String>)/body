@@ -15,7 +15,11 @@
       if (!realm.isRegistrationAllowed()) {
         return oauth.forwardToSecurityFailure("Registration not allowed");
       }
-      String error=validateRegistrationForm(formData);
+      List<String> requiredCredentialTypes=new LinkedList<String>();
+      for (      RequiredCredentialModel m : realm.getRequiredCredentials()) {
+        requiredCredentialTypes.add(m.getType());
+      }
+      String error=Validation.validateRegistrationForm(formData,requiredCredentialTypes);
       if (error != null) {
         return Flows.forms(realm,request).setError(error).setFormData(formData).forwardToRegistration();
       }
@@ -50,10 +54,12 @@
         user.setLastName(last);
       }
       user.setEmail(formData.getFirst("email"));
-      UserCredentialModel credentials=new UserCredentialModel();
-      credentials.setType(CredentialRepresentation.PASSWORD);
-      credentials.setValue(formData.getFirst("password"));
-      realm.updateCredential(user,credentials);
+      if (requiredCredentialTypes.contains(CredentialRepresentation.PASSWORD)) {
+        UserCredentialModel credentials=new UserCredentialModel();
+        credentials.setType(CredentialRepresentation.PASSWORD);
+        credentials.setValue(formData.getFirst("password"));
+        realm.updateCredential(user,credentials);
+      }
       for (      RoleModel role : realm.getDefaultRoles()) {
         realm.grantRole(user,role);
       }

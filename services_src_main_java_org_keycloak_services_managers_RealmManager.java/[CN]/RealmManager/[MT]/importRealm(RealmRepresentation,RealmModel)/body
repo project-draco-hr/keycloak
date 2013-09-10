@@ -7,6 +7,7 @@
   newRealm.setSslNotRequired(rep.isSslNotRequired());
   newRealm.setCookieLoginAllowed(rep.isCookieLoginAllowed());
   newRealm.setRegistrationAllowed(rep.isRegistrationAllowed());
+  newRealm.setAutomaticRegistrationAfterSocialLogin(rep.isAutomaticRegistrationAfterSocialLogin());
   if (rep.getPrivateKey() == null || rep.getPublicKey() == null) {
     generateRealmKeys(newRealm);
   }
@@ -70,6 +71,15 @@
         }
         UserModel user=userMap.get(scope.getUsername());
         newRealm.addScope(user,role.getName());
+      }
+    }
+  }
+  if (rep.getSocialMappings() != null) {
+    for (    SocialMappingRepresentation socialMapping : rep.getSocialMappings()) {
+      UserModel user=userMap.get(socialMapping.getUsername());
+      for (      SocialLinkRepresentation link : socialMapping.getSocialLinks()) {
+        SocialLinkModel mappingModel=new SocialLinkModel(link.getSocialProvider(),link.getSocialUsername());
+        newRealm.addSocialLink(user,mappingModel);
       }
     }
   }

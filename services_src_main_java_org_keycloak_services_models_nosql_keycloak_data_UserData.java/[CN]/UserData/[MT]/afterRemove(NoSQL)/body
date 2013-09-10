@@ -2,4 +2,10 @@
   NoSQLQuery query=noSQL.createQueryBuilder().andCondition("userId",id).build();
   noSQL.removeObjects(SocialLinkData.class,query);
   noSQL.removeObjects(PasswordData.class,query);
+  NoSQLQuery realmQuery=noSQL.createQueryBuilder().andCondition("realmAdmins",id).build();
+  List<RealmData> realms=noSQL.loadObjects(RealmData.class,realmQuery);
+  for (  RealmData realm : realms) {
+    logger.info("Removing admin user " + getLoginName() + " from realm "+ realm.getId());
+    noSQL.pullItemFromList(realm,"realmAdmins",getId());
+  }
 }

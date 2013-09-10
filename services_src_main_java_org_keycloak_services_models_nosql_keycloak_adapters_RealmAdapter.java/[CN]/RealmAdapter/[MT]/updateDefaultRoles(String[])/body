@@ -1,12 +1,11 @@
 {
-  String[] roleIds=new String[defaultRoles.length];
-  for (int i=0; i < defaultRoles.length; i++) {
-    String roleName=defaultRoles[i];
+  List<String> roleIds=new ArrayList<String>();
+  for (  String roleName : defaultRoles) {
     RoleModel role=getRole(roleName);
     if (role == null) {
       role=addRole(roleName);
     }
-    roleIds[i]=role.getId();
+    roleIds.add(role.getId());
   }
   realm.setDefaultRoles(roleIds);
   updateRealm();

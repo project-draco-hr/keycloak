@@ -4,9 +4,5 @@
   if (role == null) {
     throw new RuntimeException("Role not found");
   }
-  RoleData roleData=role.getRole();
-  String[] scopeIds=userData.getScopeIds();
-  scopeIds=Utils.addItemToArray(scopeIds,roleData.getId());
-  userData.setScopeIds(scopeIds);
-  noSQL.saveObject(userData);
+  noSQL.pushItemToList(userData,"scopeIds",role.getId());
 }

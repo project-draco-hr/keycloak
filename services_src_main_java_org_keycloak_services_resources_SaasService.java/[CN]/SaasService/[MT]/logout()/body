@@ -1,11 +1,6 @@
 {
-  new Transaction(){
-    @Override protected void runImpl(){
-      RealmManager realmManager=new RealmManager(session);
-      RealmModel realm=realmManager.defaultRealm();
-      authManager.expireSaasIdentityCookie(uriInfo);
-      Flows.forms(realm,request).forwardToLogin();
-    }
-  }
-.run();
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.defaultRealm();
+  authManager.expireSaasIdentityCookie(uriInfo);
+  Flows.forms(realm,request).forwardToLogin();
 }

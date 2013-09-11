@@ -1,35 +1,30 @@
 {
-  return new Transaction<Response>(){
-    protected Response callImpl(){
-      UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
-      if (user != null) {
-        FormFlows forms=Flows.forms(realm,request);
-        String totp=formData.getFirst("totp");
-        String totpSecret=formData.getFirst("totpSecret");
-        String error=null;
-        if (Validation.isEmpty(totp)) {
-          error=Messages.MISSING_TOTP;
-        }
- else         if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
-          error=Messages.INVALID_TOTP;
-        }
-        if (error != null) {
-          return forms.setError(error).forwardToTotp();
-        }
-        UserCredentialModel credentials=new UserCredentialModel();
-        credentials.setType(CredentialRepresentation.TOTP);
-        credentials.setValue(formData.getFirst("totpSecret"));
-        realm.updateCredential(user,credentials);
-        if (!user.isEnabled() && "REQUIRED".equals(user.getAttribute("KEYCLOAK_TOTP"))) {
-          user.setEnabled(true);
-        }
-        user.setAttribute("KEYCLOAK_TOTP","ENABLED");
-        return Flows.forms(realm,request).setUser(user).forwardToTotp();
-      }
- else {
-        return Response.status(Status.FORBIDDEN).build();
-      }
+  UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
+  if (user != null) {
+    FormFlows forms=Flows.forms(realm,request);
+    String totp=formData.getFirst("totp");
+    String totpSecret=formData.getFirst("totpSecret");
+    String error=null;
+    if (Validation.isEmpty(totp)) {
+      error=Messages.MISSING_TOTP;
     }
+ else     if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
+      error=Messages.INVALID_TOTP;
+    }
+    if (error != null) {
+      return forms.setError(error).forwardToTotp();
+    }
+    UserCredentialModel credentials=new UserCredentialModel();
+    credentials.setType(CredentialRepresentation.TOTP);
+    credentials.setValue(formData.getFirst("totpSecret"));
+    realm.updateCredential(user,credentials);
+    if (!user.isEnabled() && "REQUIRED".equals(user.getAttribute("KEYCLOAK_TOTP"))) {
+      user.setEnabled(true);
+    }
+    user.setAttribute("KEYCLOAK_TOTP","ENABLED");
+    return Flows.forms(realm,request).setUser(user).forwardToTotp();
   }
-.call();
+ else {
+    return Response.status(Status.FORBIDDEN).build();
+  }
 }

@@ -1,16 +1,11 @@
 {
-  return new Transaction<Response>(){
-    @Override protected Response callImpl(){
-      if (realm.getRole(rep.getName()) != null) {
-        throw new InternalServerErrorException();
-      }
-      RoleModel role=realm.addRole(rep.getName());
-      if (role == null) {
-        throw new NotFoundException();
-      }
-      role.setDescription(rep.getDescription());
-      return Response.created(uriInfo.getAbsolutePathBuilder().path(role.getId()).build()).build();
-    }
+  if (realm.getRole(rep.getName()) != null) {
+    throw new InternalServerErrorException();
   }
-.call();
+  RoleModel role=realm.addRole(rep.getName());
+  if (role == null) {
+    throw new NotFoundException();
+  }
+  role.setDescription(rep.getDescription());
+  return Response.created(uriInfo.getAbsolutePathBuilder().path(role.getId()).build()).build();
 }

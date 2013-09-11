@@ -1,0 +1,32 @@
+{
+  KeycloakSessionFactory factory=(KeycloakSessionFactory)servletRequest.getServletContext().getAttribute(KeycloakSessionFactory.class.getName());
+  if (factory == null)   throw new ServletException("Factory was null");
+  KeycloakSession session=factory.createSession();
+  ResteasyProviderFactory.pushContext(KeycloakSession.class,session);
+  KeycloakTransaction tx=session.getTransaction();
+  ResteasyProviderFactory.pushContext(KeycloakTransaction.class,tx);
+  tx.begin();
+  try {
+    filterChain.doFilter(servletRequest,servletResponse);
+    if (tx.isActive()) {
+      if (tx.getRollbackOnly())       tx.rollback();
+ else       tx.commit();
+    }
+  }
+ catch (  IOException ex) {
+    if (tx.isActive())     tx.rollback();
+    throw ex;
+  }
+catch (  ServletException ex) {
+    if (tx.isActive())     tx.rollback();
+    throw ex;
+  }
+catch (  RuntimeException ex) {
+    if (tx.isActive())     tx.rollback();
+    throw ex;
+  }
+ finally {
+    session.close();
+    ResteasyProviderFactory.clearContextData();
+  }
+}

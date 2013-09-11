@@ -1,13 +1,8 @@
 {
   logger.info("importRealm: " + rep.getRealm());
-  return new Transaction<Response>(){
-    @Override protected Response callImpl(){
-      RealmManager realmManager=new RealmManager(session);
-      RealmModel realm=realmManager.importRealm(rep,admin);
-      URI location=realmUrl(uriInfo).build(realm.getId());
-      logger.info("imported realm success, sending back: " + location.toString());
-      return Response.created(location).build();
-    }
-  }
-.call();
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.importRealm(rep,admin);
+  URI location=realmUrl(uriInfo).build(realm.getId());
+  logger.info("imported realm success, sending back: " + location.toString());
+  return Response.created(location).build();
 }

@@ -1,31 +1,26 @@
 {
-  return new Transaction<Response>(){
-    protected Response callImpl(){
-      OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
-      String code=formData.getFirst("code");
-      JWSInput input=new JWSInput(code,providers);
-      boolean verifiedCode=false;
-      try {
-        verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
-      }
- catch (      Exception ignored) {
-        logger.debug("Failed to verify signature",ignored);
-      }
-      if (!verifiedCode) {
-        return oauth.forwardToSecurityFailure("Illegal access code.");
-      }
-      String key=input.readContent(String.class);
-      AccessCodeEntry accessCodeEntry=tokenManager.getAccessCode(key);
-      if (accessCodeEntry == null) {
-        return oauth.forwardToSecurityFailure("Unknown access code.");
-      }
-      String redirect=accessCodeEntry.getRedirectUri();
-      String state=accessCodeEntry.getState();
-      if (formData.containsKey("cancel")) {
-        return redirectAccessDenied(redirect,state);
-      }
-      return oauth.redirectAccessCode(accessCodeEntry,state,redirect);
-    }
+  OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
+  String code=formData.getFirst("code");
+  JWSInput input=new JWSInput(code,providers);
+  boolean verifiedCode=false;
+  try {
+    verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
   }
-.call();
+ catch (  Exception ignored) {
+    logger.debug("Failed to verify signature",ignored);
+  }
+  if (!verifiedCode) {
+    return oauth.forwardToSecurityFailure("Illegal access code.");
+  }
+  String key=input.readContent(String.class);
+  AccessCodeEntry accessCodeEntry=tokenManager.getAccessCode(key);
+  if (accessCodeEntry == null) {
+    return oauth.forwardToSecurityFailure("Unknown access code.");
+  }
+  String redirect=accessCodeEntry.getRedirectUri();
+  String state=accessCodeEntry.getState();
+  if (formData.containsKey("cancel")) {
+    return redirectAccessDenied(redirect,state);
+  }
+  return oauth.redirectAccessCode(accessCodeEntry,state,redirect);
 }

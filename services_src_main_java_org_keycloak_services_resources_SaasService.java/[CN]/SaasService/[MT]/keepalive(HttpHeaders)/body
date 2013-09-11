@@ -1,17 +1,12 @@
 {
-  logger.info("keepalive");
-  return new Transaction<Response>(){
-    @Override public Response callImpl(){
-      RealmManager realmManager=new RealmManager(session);
-      RealmModel realm=realmManager.defaultRealm();
-      if (realm == null)       throw new NotFoundException();
-      UserModel user=authManager.authenticateSaasIdentityCookie(realm,uriInfo,headers);
-      if (user == null) {
-        return Response.status(401).build();
-      }
-      NewCookie refreshCookie=authManager.createSaasIdentityCookie(realm,user,uriInfo);
-      return Response.noContent().cookie(refreshCookie).build();
-    }
+  logger.debug("keepalive");
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.defaultRealm();
+  if (realm == null)   throw new NotFoundException();
+  UserModel user=authManager.authenticateSaasIdentityCookie(realm,uriInfo,headers);
+  if (user == null) {
+    return Response.status(401).build();
   }
-.call();
+  NewCookie refreshCookie=authManager.createSaasIdentityCookie(realm,user,uriInfo);
+  return Response.noContent().cookie(refreshCookie).build();
 }

@@ -1,14 +1,11 @@
 {
-  return new Transaction<RealmAdminResource>(false){
-    @Override protected RealmAdminResource callImpl(){
-      RealmManager realmManager=new RealmManager(session);
-      RealmModel realm=realmManager.getRealm(id);
-      if (realm == null)       throw new NotFoundException();
-      if (!realm.isRealmAdmin(admin)) {
-        throw new ForbiddenException();
-      }
-      return new RealmAdminResource(admin,realm);
-    }
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.getRealm(id);
+  if (realm == null)   throw new NotFoundException();
+  if (!realm.isRealmAdmin(admin)) {
+    throw new ForbiddenException();
   }
-.call();
+  RealmAdminResource adminResource=new RealmAdminResource(admin,realm);
+  resourceContext.initResource(adminResource);
+  return adminResource;
 }

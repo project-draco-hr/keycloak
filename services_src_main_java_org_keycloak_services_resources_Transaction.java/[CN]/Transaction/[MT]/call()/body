@@ -1,17 +1,4 @@
 {
-  boolean wasActive=transaction.isActive();
-  if (!wasActive)   transaction.begin();
-  try {
-    T rtn=callImpl();
-    if (!wasActive && transaction.isActive())     transaction.commit();
-    return rtn;
-  }
- catch (  RuntimeException e) {
-    if (!wasActive && transaction.isActive())     transaction.rollback();
-    if (created)     closeSession=true;
-    throw e;
-  }
- finally {
-    if (!wasActive && closeSession)     session.close();
-  }
+  T rtn=callImpl();
+  return rtn;
 }

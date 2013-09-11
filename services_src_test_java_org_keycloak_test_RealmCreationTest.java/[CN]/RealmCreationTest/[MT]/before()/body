@@ -1,14 +1,8 @@
 {
-  deployment=new ResteasyDeployment();
-  deployment.setApplicationClass(KeycloakApplication.class.getName());
-  EmbeddedContainer.start(deployment);
-  KeycloakApplication application=(KeycloakApplication)deployment.getApplication();
   KeycloakSession session=application.getFactory().createSession();
   session.getTransaction().begin();
   RealmManager manager=new RealmManager(session);
   new InstallationManager().install(manager);
   session.getTransaction().commit();
   session.close();
-  client=new ResteasyClientBuilder().build();
-  client.register(SkeletonKeyContextResolver.class);
 }

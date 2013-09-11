@@ -1,15 +1,10 @@
 {
-  return new Transaction<List<RealmRepresentation>>(){
-    @Override protected List<RealmRepresentation> callImpl(){
-      logger.info(("getRealms()"));
-      RealmManager realmManager=new RealmManager(session);
-      List<RealmModel> realms=session.getRealms(admin);
-      List<RealmRepresentation> reps=new ArrayList<RealmRepresentation>();
-      for (      RealmModel realm : realms) {
-        reps.add(realmManager.toRepresentation(realm));
-      }
-      return reps;
-    }
+  logger.info(("getRealms()"));
+  RealmManager realmManager=new RealmManager(session);
+  List<RealmModel> realms=session.getRealms(admin);
+  List<RealmRepresentation> reps=new ArrayList<RealmRepresentation>();
+  for (  RealmModel realm : realms) {
+    reps.add(realmManager.toRepresentation(realm));
   }
-.call();
+  return reps;
 }

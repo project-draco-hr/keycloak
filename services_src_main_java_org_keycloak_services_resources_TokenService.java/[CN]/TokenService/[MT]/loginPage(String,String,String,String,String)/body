@@ -1,39 +1,34 @@
 {
-  return new Transaction<Response>(){
-    protected Response callImpl(){
-      OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
-      if (!realm.isEnabled()) {
-        oauth.forwardToSecurityFailure("Realm not enabled");
-        return null;
-      }
-      UserModel client=realm.getUser(clientId);
-      if (client == null) {
-        oauth.forwardToSecurityFailure("Unknown login requester.");
-        transaction.rollback();
-        return null;
-      }
-      if (!client.isEnabled()) {
-        oauth.forwardToSecurityFailure("Login requester not enabled.");
-        transaction.rollback();
-        session.close();
-        return null;
-      }
-      RoleModel resourceRole=realm.getRole(RealmManager.RESOURCE_ROLE);
-      RoleModel identityRequestRole=realm.getRole(RealmManager.IDENTITY_REQUESTER_ROLE);
-      boolean isResource=realm.hasRole(client,resourceRole);
-      if (!isResource && !realm.hasRole(client,identityRequestRole)) {
-        oauth.forwardToSecurityFailure("Login requester not allowed to request login.");
-        transaction.rollback();
-        session.close();
-        return null;
-      }
-      UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
-      if (user != null) {
-        logger.info(user.getLoginName() + " already logged in.");
-        return oauth.processAccessCode(scopeParam,state,redirect,client,user);
-      }
-      return Flows.forms(realm,request).forwardToLogin();
-    }
+  OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
+  if (!realm.isEnabled()) {
+    oauth.forwardToSecurityFailure("Realm not enabled");
+    return null;
   }
-.call();
+  UserModel client=realm.getUser(clientId);
+  if (client == null) {
+    oauth.forwardToSecurityFailure("Unknown login requester.");
+    transaction.rollback();
+    return null;
+  }
+  if (!client.isEnabled()) {
+    oauth.forwardToSecurityFailure("Login requester not enabled.");
+    transaction.rollback();
+    session.close();
+    return null;
+  }
+  RoleModel resourceRole=realm.getRole(RealmManager.RESOURCE_ROLE);
+  RoleModel identityRequestRole=realm.getRole(RealmManager.IDENTITY_REQUESTER_ROLE);
+  boolean isResource=realm.hasRole(client,resourceRole);
+  if (!isResource && !realm.hasRole(client,identityRequestRole)) {
+    oauth.forwardToSecurityFailure("Login requester not allowed to request login.");
+    transaction.rollback();
+    session.close();
+    return null;
+  }
+  UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
+  if (user != null) {
+    logger.info(user.getLoginName() + " already logged in.");
+    return oauth.processAccessCode(scopeParam,state,redirect,client,user);
+  }
+  return Flows.forms(realm,request).forwardToLogin();
 }

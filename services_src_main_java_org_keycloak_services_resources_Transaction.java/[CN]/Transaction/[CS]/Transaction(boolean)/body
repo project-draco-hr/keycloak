@@ -1,11 +1,4 @@
 {
   this.session=ResteasyProviderFactory.getContextData(KeycloakSession.class);
-  if (session == null) {
-    KeycloakApplication app=(KeycloakApplication)ResteasyProviderFactory.getContextData(Application.class);
-    session=app.getFactory().createSession();
-    created=true;
-    ResteasyProviderFactory.pushContext(KeycloakSession.class,session);
-  }
-  transaction=session.getTransaction();
-  closeSession=close;
+  this.transaction=session.getTransaction();
 }

@@ -1,14 +1,9 @@
 {
-  return new Transaction<Response>(){
-    protected Response callImpl(){
-      UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
-      if (user != null) {
-        return Flows.forms(realm,request).setUser(user).forwardToAccess();
-      }
- else {
-        return Response.status(Status.FORBIDDEN).build();
-      }
-    }
+  UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
+  if (user != null) {
+    return Flows.forms(realm,request).setUser(user).forwardToAccess();
   }
-.call();
+ else {
+    return Response.status(Status.FORBIDDEN).build();
+  }
 }

@@ -1,19 +1,14 @@
 {
-  return new Transaction<String>(){
-    @Override public String callImpl(){
-      logger.info("WHOAMI Javascript start.");
-      RealmManager realmManager=new RealmManager(session);
-      RealmModel realm=realmManager.defaultRealm();
-      if (realm == null) {
-        return "var keycloakCookieLoggedIn = false;";
-      }
-      UserModel user=authManager.authenticateSaasIdentityCookie(realm,uriInfo,headers);
-      if (user == null) {
-        return "var keycloakCookieLoggedIn = false;";
-      }
-      logger.info("WHOAMI: " + user.getLoginName());
-      return "var keycloakCookieLoggedIn = true;";
-    }
+  logger.debug("WHOAMI Javascript start.");
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.defaultRealm();
+  if (realm == null) {
+    return "var keycloakCookieLoggedIn = false;";
   }
-.call();
+  UserModel user=authManager.authenticateSaasIdentityCookie(realm,uriInfo,headers);
+  if (user == null) {
+    return "var keycloakCookieLoggedIn = false;";
+  }
+  logger.debug("WHOAMI: " + user.getLoginName());
+  return "var keycloakCookieLoggedIn = true;";
 }

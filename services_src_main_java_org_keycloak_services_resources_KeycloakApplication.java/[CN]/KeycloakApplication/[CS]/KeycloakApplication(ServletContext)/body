@@ -1,7 +1,7 @@
 {
   KeycloakSessionFactory f=createSessionFactory();
   this.factory=f;
-  classes.add(KeycloakSessionCleanupFilter.class);
+  context.setAttribute(KeycloakSessionFactory.class.getName(),factory);
   TokenManager tokenManager=new TokenManager();
   singletons.add(new RealmsResource(tokenManager));
   singletons.add(new SocialResource(tokenManager,new SocialRequestManager()));

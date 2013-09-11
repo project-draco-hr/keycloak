@@ -22,7 +22,7 @@
   tokenResponse=target.path("realms").path(RealmModel.DEFAULT_REALM).path("tokens/grants/identity-token").request().post(Entity.form(form),AccessTokenResponse.class);
   Assert.assertNotNull(tokenResponse);
   System.out.println(tokenResponse.getToken());
-  RealmRepresentation realm=KeycloakTestBase.loadJson("testrealm.json");
+  RealmRepresentation realm=loadJson("testrealm.json");
   response=target.path("saas/admin/realms").request().header(HttpHeaders.AUTHORIZATION,"Bearer " + tokenResponse.getToken()).post(Entity.json(realm));
   Assert.assertEquals(201,response.getStatus());
   response.close();

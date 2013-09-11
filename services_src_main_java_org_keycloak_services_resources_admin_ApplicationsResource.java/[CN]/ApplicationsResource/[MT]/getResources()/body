@@ -1,14 +1,9 @@
 {
-  return new Transaction<List<ApplicationRepresentation>>(){
-    @Override protected List<ApplicationRepresentation> callImpl(){
-      List<ApplicationRepresentation> rep=new ArrayList<ApplicationRepresentation>();
-      List<ApplicationModel> applicationModels=realm.getApplications();
-      ResourceManager resourceManager=new ResourceManager(new RealmManager(session));
-      for (      ApplicationModel applicationModel : applicationModels) {
-        rep.add(resourceManager.toRepresentation(applicationModel));
-      }
-      return rep;
-    }
+  List<ApplicationRepresentation> rep=new ArrayList<ApplicationRepresentation>();
+  List<ApplicationModel> applicationModels=realm.getApplications();
+  ResourceManager resourceManager=new ResourceManager(new RealmManager(session));
+  for (  ApplicationModel applicationModel : applicationModels) {
+    rep.add(resourceManager.toRepresentation(applicationModel));
   }
-.call();
+  return rep;
 }

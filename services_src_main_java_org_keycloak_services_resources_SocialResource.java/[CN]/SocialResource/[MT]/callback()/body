@@ -1,59 +1,54 @@
 {
-  return new Transaction<Response>(){
-    protected Response callImpl(){
-      Map<String,String[]> queryParams=getQueryParams();
-      RequestDetails requestData=getRequestDetails(queryParams);
-      SocialProvider provider=getProvider(requestData.getProviderId());
-      String realmId=requestData.getClientAttribute("realmId");
-      RealmManager realmManager=new RealmManager(session);
-      RealmModel realm=realmManager.getRealm(realmId);
-      OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
-      if (!realm.isEnabled()) {
-        return oauth.forwardToSecurityFailure("Realm not enabled.");
-      }
-      if (!realm.isEnabled()) {
-        return oauth.forwardToSecurityFailure("Realm not enabled.");
-      }
-      String clientId=requestData.getClientAttributes().get("clientId");
-      UserModel client=realm.getUser(clientId);
-      if (client == null) {
-        return oauth.forwardToSecurityFailure("Unknown login requester.");
-      }
-      if (!client.isEnabled()) {
-        return oauth.forwardToSecurityFailure("Login requester not enabled.");
-      }
-      String key=System.getProperty("keycloak.social." + requestData.getProviderId() + ".key");
-      String secret=System.getProperty("keycloak.social." + requestData.getProviderId() + ".secret");
-      String callbackUri=Urls.socialCallback(uriInfo.getBaseUri()).toString();
-      SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
-      AuthCallback callback=new AuthCallback(requestData.getSocialAttributes(),queryParams);
-      SocialUser socialUser=null;
-      try {
-        socialUser=provider.processCallback(config,callback);
-      }
- catch (      SocialProviderException e) {
-        logger.warn("Failed to process social callback",e);
-        return oauth.forwardToSecurityFailure("Failed to process social callback");
-      }
-      UserModel user=realm.getUser(provider.getId() + "." + socialUser.getId());
-      if (user == null) {
-        if (!realm.isRegistrationAllowed()) {
-          return oauth.forwardToSecurityFailure("Registration not allowed");
-        }
-        user=realm.addUser(provider.getId() + "." + socialUser.getId());
-        user.setAttribute(provider.getId() + ".id",socialUser.getId());
-        for (        RoleModel role : realm.getDefaultRoles()) {
-          realm.grantRole(user,role);
-        }
-      }
-      if (!user.isEnabled()) {
-        return oauth.forwardToSecurityFailure("Your account is not enabled.");
-      }
-      String scope=requestData.getClientAttributes().get("scope");
-      String state=requestData.getClientAttributes().get("state");
-      String redirectUri=requestData.getClientAttributes().get("redirectUri");
-      return oauth.processAccessCode(scope,state,redirectUri,client,user);
+  Map<String,String[]> queryParams=getQueryParams();
+  RequestDetails requestData=getRequestDetails(queryParams);
+  SocialProvider provider=getProvider(requestData.getProviderId());
+  String realmId=requestData.getClientAttribute("realmId");
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.getRealm(realmId);
+  OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
+  if (!realm.isEnabled()) {
+    return oauth.forwardToSecurityFailure("Realm not enabled.");
+  }
+  if (!realm.isEnabled()) {
+    return oauth.forwardToSecurityFailure("Realm not enabled.");
+  }
+  String clientId=requestData.getClientAttributes().get("clientId");
+  UserModel client=realm.getUser(clientId);
+  if (client == null) {
+    return oauth.forwardToSecurityFailure("Unknown login requester.");
+  }
+  if (!client.isEnabled()) {
+    return oauth.forwardToSecurityFailure("Login requester not enabled.");
+  }
+  String key=System.getProperty("keycloak.social." + requestData.getProviderId() + ".key");
+  String secret=System.getProperty("keycloak.social." + requestData.getProviderId() + ".secret");
+  String callbackUri=Urls.socialCallback(uriInfo.getBaseUri()).toString();
+  SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
+  AuthCallback callback=new AuthCallback(requestData.getSocialAttributes(),queryParams);
+  SocialUser socialUser=null;
+  try {
+    socialUser=provider.processCallback(config,callback);
+  }
+ catch (  SocialProviderException e) {
+    logger.warn("Failed to process social callback",e);
+    return oauth.forwardToSecurityFailure("Failed to process social callback");
+  }
+  UserModel user=realm.getUser(provider.getId() + "." + socialUser.getId());
+  if (user == null) {
+    if (!realm.isRegistrationAllowed()) {
+      return oauth.forwardToSecurityFailure("Registration not allowed");
+    }
+    user=realm.addUser(provider.getId() + "." + socialUser.getId());
+    user.setAttribute(provider.getId() + ".id",socialUser.getId());
+    for (    RoleModel role : realm.getDefaultRoles()) {
+      realm.grantRole(user,role);
     }
   }
-.call();
+  if (!user.isEnabled()) {
+    return oauth.forwardToSecurityFailure("Your account is not enabled.");
+  }
+  String scope=requestData.getClientAttributes().get("scope");
+  String state=requestData.getClientAttributes().get("state");
+  String redirectUri=requestData.getClientAttributes().get("redirectUri");
+  return oauth.processAccessCode(scope,state,redirectUri,client,user);
 }

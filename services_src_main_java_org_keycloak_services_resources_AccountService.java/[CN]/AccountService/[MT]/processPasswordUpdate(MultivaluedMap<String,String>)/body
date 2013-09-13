@@ -1,5 +1,5 @@
 {
-  UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
+  UserModel user=getUser(RequiredAction.RESET_PASSWORD);
   if (user != null) {
     FormFlows forms=Flows.forms(realm,request).setUser(user);
     String password=formData.getFirst("password");
@@ -25,7 +25,13 @@
     credentials.setType(CredentialRepresentation.PASSWORD);
     credentials.setValue(passwordNew);
     realm.updateCredential(user,credentials);
-    return Flows.forms(realm,request).setUser(user).forwardToPassword();
+    Response response=redirectOauth();
+    if (response != null) {
+      return response;
+    }
+ else {
+      return Flows.forms(realm,request).setUser(user).forwardToPassword();
+    }
   }
  else {
     return Response.status(Status.FORBIDDEN).build();

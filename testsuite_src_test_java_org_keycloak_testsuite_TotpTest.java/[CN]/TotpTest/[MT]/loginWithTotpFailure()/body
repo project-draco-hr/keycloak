@@ -1,14 +1,15 @@
 {
-  registerUser("loginWithTotpFailure","password");
-  configureTotp();
-  logout();
-  selenium.type("id=username","loginWithTotpFailure");
-  selenium.type("id=password","password");
-  selenium.click("css=input[type=\"submit\"]");
-  selenium.waitForPageToLoad(DEFAULT_WAIT);
-  Assert.assertEquals("Log in to demo",selenium.getTitle());
-  selenium.type("id=totp","123456");
-  selenium.click("css=input[type=\"submit\"]");
-  selenium.waitForPageToLoad(DEFAULT_WAIT);
-  Assert.assertTrue(selenium.isTextPresent("Invalid username or password"));
+  appPage.open();
+  loginPage.register();
+  registerPage.register("name","email","loginWithTotpFailure","password","password");
+  totpPage.open();
+  String totpSecret=totpPage.getTotpSecret();
+  totpPage.configure(totp.generate(totpSecret));
+  appPage.open();
+  appPage.logout();
+  loginPage.login("loginWithTotpSuccess","password");
+  Assert.assertFalse(appPage.isCurrent());
+  loginTotpPage.login("123456");
+  Assert.assertTrue(loginTotpPage.isCurrent());
+  Assert.assertEquals("Invalid username or password",loginTotpPage.getError());
 }

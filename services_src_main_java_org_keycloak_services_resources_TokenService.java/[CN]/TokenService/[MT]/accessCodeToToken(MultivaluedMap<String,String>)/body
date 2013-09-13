@@ -34,8 +34,8 @@
     error.put("error_description","User is not enabled");
     return Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build();
   }
-  boolean authenticated=authManager.authenticateForm(realm,client,formData);
-  if (!authenticated) {
+  AuthenticationStatus status=authManager.authenticateForm(realm,client,formData);
+  if (status != AuthenticationStatus.SUCCESS) {
     Map<String,String> error=new HashMap<String,String>();
     error.put("error","unauthorized_client");
     return Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build();

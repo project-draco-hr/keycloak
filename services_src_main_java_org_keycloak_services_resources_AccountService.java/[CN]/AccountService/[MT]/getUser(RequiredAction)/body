@@ -1,0 +1,17 @@
+{
+  if (uriInfo.getQueryParameters().containsKey(FormFlows.CODE)) {
+    AccessCodeEntry accessCodeEntry=getAccessCodeEntry();
+    if (accessCodeEntry == null) {
+      return null;
+    }
+    String loginName=accessCodeEntry.getUser().getLoginName();
+    UserModel user=realm.getUser(loginName);
+    if (!user.getRequiredActions().contains(action)) {
+      return null;
+    }
+    return user;
+  }
+ else {
+    return getUserFromAuthManager();
+  }
+}

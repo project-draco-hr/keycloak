@@ -1,0 +1,22 @@
+{
+  super.setupTest(context);
+  worker=getWorker();
+  factory=getFactory();
+  KeycloakSession identitySession=factory.createSession();
+  KeycloakTransaction transaction=identitySession.getTransaction();
+  transaction.begin();
+  int workerId=counter.getAndIncrement();
+  try {
+    worker.setup(workerId,identitySession);
+    setupSuccess=true;
+  }
+  finally {
+    if (setupSuccess) {
+      transaction.commit();
+    }
+ else {
+      transaction.rollback();
+    }
+    identitySession.close();
+  }
+}

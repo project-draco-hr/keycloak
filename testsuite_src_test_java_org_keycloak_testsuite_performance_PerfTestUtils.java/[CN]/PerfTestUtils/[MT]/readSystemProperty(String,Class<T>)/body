@@ -1,0 +1,15 @@
+{
+  String propAsString=System.getProperty(propertyName);
+  if (propAsString == null || propAsString.length() == 0) {
+    throw new IllegalArgumentException("Property '" + propertyName + "' not specified");
+  }
+  if (Integer.class.equals(expectedClass)) {
+    return expectedClass.cast(Integer.parseInt(propAsString));
+  }
+ else   if (Boolean.class.equals(expectedClass)) {
+    return expectedClass.cast(Boolean.valueOf(propAsString));
+  }
+ else {
+    throw new IllegalArgumentException("Not supported type " + expectedClass);
+  }
+}

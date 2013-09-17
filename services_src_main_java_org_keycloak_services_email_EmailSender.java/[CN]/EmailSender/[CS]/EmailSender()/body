@@ -1,0 +1,10 @@
+{
+  properties=new Properties();
+  for (  Entry<Object,Object> e : System.getProperties().entrySet()) {
+    String key=(String)e.getKey();
+    if (key.startsWith("keycloak.mail.smtp.")) {
+      key=key.replace("keycloak.mail.smtp.","mail.smtp.");
+      properties.put(key,e.getValue());
+    }
+  }
+}

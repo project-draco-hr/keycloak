@@ -1,0 +1,11 @@
+{
+  Session session=Session.getDefaultInstance(properties);
+  Message msg=new MimeMessage(session);
+  msg.setFrom(new InternetAddress(properties.getProperty("mail.smtp.from")));
+  msg.setSubject(subject);
+  msg.setText(body);
+  msg.saveChanges();
+  Transport transport=session.getTransport("smtp");
+  transport.connect(properties.getProperty("mail.smtp.user"),properties.getProperty("mail.smtp.password"));
+  transport.sendMessage(msg,new InternetAddress[]{new InternetAddress(address)});
+}

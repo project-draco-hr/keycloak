@@ -1,7 +1,7 @@
 {
   UserModel user=getUser(RequiredAction.RESET_PASSWORD);
   if (user != null) {
-    FormFlows forms=Flows.forms(realm,request).setUser(user);
+    FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(user);
     String password=formData.getFirst("password");
     String passwordNew=formData.getFirst("password-new");
     String passwordConfirm=formData.getFirst("password-confirm");
@@ -30,7 +30,7 @@
       return response;
     }
  else {
-      return Flows.forms(realm,request).setUser(user).forwardToPassword();
+      return Flows.forms(realm,request,uriInfo).setUser(user).forwardToPassword();
     }
   }
  else {

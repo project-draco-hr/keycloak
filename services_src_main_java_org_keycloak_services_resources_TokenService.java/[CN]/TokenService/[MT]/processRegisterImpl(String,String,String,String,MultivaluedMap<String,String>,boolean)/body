@@ -19,12 +19,12 @@
   }
   String error=Validation.validateRegistrationForm(formData,requiredCredentialTypes);
   if (error != null) {
-    return Flows.forms(realm,request).setError(error).setFormData(formData).setSocialRegistration(isSocialRegistration).forwardToRegistration();
+    return Flows.forms(realm,request,uriInfo).setError(error).setFormData(formData).setSocialRegistration(isSocialRegistration).forwardToRegistration();
   }
   String username=formData.getFirst("username");
   UserModel user=realm.getUser(username);
   if (user != null) {
-    return Flows.forms(realm,request).setError(Messages.USERNAME_EXISTS).setFormData(formData).setSocialRegistration(isSocialRegistration).forwardToRegistration();
+    return Flows.forms(realm,request,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).setSocialRegistration(isSocialRegistration).forwardToRegistration();
   }
   user=realm.addUser(username);
   String fullname=formData.getFirst("name");

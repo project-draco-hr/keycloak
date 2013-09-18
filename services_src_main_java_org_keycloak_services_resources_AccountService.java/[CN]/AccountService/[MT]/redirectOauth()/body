@@ -1,7 +1,7 @@
 {
   String redirect=uriInfo.getQueryParameters().getFirst("redirect_uri");
   if (redirect != null) {
-    AccessCodeEntry accessCode=getAccessCodeEntry();
+    AccessCodeEntry accessCode=getAccessCodeEntry(uriInfo.getQueryParameters().getFirst(FormFlows.CODE));
     String state=uriInfo.getQueryParameters().getFirst("state");
     return Flows.oauth(realm,request,uriInfo,authManager,tokenManager).redirectAccessCode(accessCode,state,redirect);
   }

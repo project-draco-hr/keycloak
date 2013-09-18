@@ -1,7 +1,7 @@
 {
   UserModel user=getUser(RequiredAction.CONFIGURE_TOTP);
   if (user != null) {
-    FormFlows forms=Flows.forms(realm,request);
+    FormFlows forms=Flows.forms(realm,request,uriInfo);
     String totp=formData.getFirst("totp");
     String totpSecret=formData.getFirst("totpSecret");
     String error=null;
@@ -25,7 +25,7 @@
       return response;
     }
  else {
-      return Flows.forms(realm,request).setUser(user).forwardToTotp();
+      return Flows.forms(realm,request,uriInfo).setUser(user).forwardToTotp();
     }
   }
  else {

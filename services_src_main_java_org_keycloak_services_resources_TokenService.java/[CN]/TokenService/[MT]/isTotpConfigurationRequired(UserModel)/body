@@ -1,0 +1,9 @@
+{
+  for (  RequiredCredentialModel c : realm.getRequiredCredentials()) {
+    if (c.getType().equals(CredentialRepresentation.TOTP) && !user.isTotp()) {
+      user.addRequiredAction(RequiredAction.CONFIGURE_TOTP);
+      user.setStatus(Status.ACTIONS_REQUIRED);
+      logger.info("User is required to configure totp");
+    }
+  }
+}

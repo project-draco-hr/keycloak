@@ -10,14 +10,11 @@
       converter=(Converter<Object,S>)appObjects.values().iterator().next();
     }
  else {
-      converter=(Converter<Object,S>)appObjects.get(expectedApplicationObjectType);
+      converter=(Converter<Object,S>)getAppConverterForType(expectedApplicationObjectType,appObjects);
     }
   }
   if (converter == null) {
     throw new IllegalArgumentException("Can't found converter for type " + dbObjectType + " and expectedApplicationType "+ expectedApplicationObjectType);
-  }
-  if (!expectedApplicationObjectType.isAssignableFrom(converter.getExpectedReturnType())) {
-    throw new IllegalArgumentException("Converter " + converter + " has return type "+ converter.getExpectedReturnType()+ " but we need type "+ expectedApplicationObjectType);
   }
   return converter.convertObject(dbObject);
 }

@@ -9,6 +9,8 @@
   typeConverter.addAppObjectConverter(new ListConverter(typeConverter,ArrayList.class));
   typeConverter.addAppObjectConverter(new ListConverter(typeConverter,List.class));
   typeConverter.addDBObjectConverter(new BasicDBListConverter(typeConverter));
+  typeConverter.addAppObjectConverter(new EnumToStringConverter());
+  typeConverter.addDBObjectConverter(new StringToEnumConverter());
   for (  Class<? extends NoSQLObject> type : managedDataTypes) {
     getObjectInfo(type);
     typeConverter.addAppObjectConverter(new NoSQLObjectConverter(this,typeConverter,type));

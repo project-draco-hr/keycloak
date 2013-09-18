@@ -1,0 +1,10 @@
+{
+  int index=objectToConvert.indexOf(ClassCache.SPLIT);
+  if (index == -1) {
+    throw new IllegalStateException("Can't convert enum type with value " + objectToConvert);
+  }
+  String className=objectToConvert.substring(0,index);
+  String enumValue=objectToConvert.substring(index + 3);
+  Class<? extends Enum> clazz=(Class<? extends Enum>)ClassCache.getInstance().getOrLoadClass(className);
+  return Enum.valueOf(clazz,enumValue);
+}

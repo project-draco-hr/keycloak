@@ -14,6 +14,13 @@
     }
   }
  else {
-    return Object.class;
+    if (String.class.equals(dbObject.getClass())) {
+      String dbObjString=(String)dbObject;
+      if (dbObjString.contains(ClassCache.SPLIT)) {
+        String className=dbObjString.substring(0,dbObjString.indexOf(ClassCache.SPLIT));
+        return ClassCache.getInstance().getOrLoadClass(className);
+      }
+    }
+    return dbObject.getClass();
   }
 }

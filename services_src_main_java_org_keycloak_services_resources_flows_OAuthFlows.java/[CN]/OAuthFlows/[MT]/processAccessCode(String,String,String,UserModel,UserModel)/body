@@ -9,6 +9,7 @@
   log.info("processAccessCode: isResource: " + isResource);
   log.info("processAccessCode: go to oauth page?: " + (!isResource && (accessCode.getRealmRolesRequested().size() > 0 || accessCode.getResourceRolesRequested().size() > 0)));
   if (!isResource && (accessCode.getRealmRolesRequested().size() > 0 || accessCode.getResourceRolesRequested().size() > 0)) {
+    accessCode.setExpiration(System.currentTimeMillis() / 1000 + realm.getAccessCodeLifespanUserAction());
     return oauthGrantPage(accessCode,client);
   }
   if (user.getRequiredActions() != null) {

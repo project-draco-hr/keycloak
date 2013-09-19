@@ -1,0 +1,19 @@
+{
+  if (realm.getUser(rep.getUsername()) != null) {
+    throw new InternalServerErrorException();
+  }
+  UserModel user=realm.addUser(rep.getUsername());
+  if (user == null) {
+    throw new NotFoundException();
+  }
+  user.setEmail(rep.getEmail());
+  user.setEnabled(rep.isEnabled());
+  user.setFirstName(rep.getFirstName());
+  user.setLastName(rep.getLastName());
+  if (rep.getAttributes() != null) {
+    for (    Map.Entry<String,String> attr : rep.getAttributes().entrySet()) {
+      user.setAttribute(attr.getKey(),attr.getValue());
+    }
+  }
+  return Response.created(uriInfo.getAbsolutePathBuilder().path(user.getLoginName()).build()).build();
+}

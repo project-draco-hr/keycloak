@@ -1,2 +1,14 @@
 {
+  appPage.open();
+  loginPage.register();
+  registerPage.register("name","email","changePassword","password","password");
+  changePasswordPage.open();
+  changePasswordPage.changePassword("password","new-password","new-password");
+  appPage.open();
+  Assert.assertTrue(loginPage.isCurrent());
+  loginPage.login("changePassword","password");
+  Assert.assertEquals("Invalid username or password",loginPage.getError());
+  loginPage.login("changePassword","new-password");
+  Assert.assertTrue(appPage.isCurrent());
+  Assert.assertEquals("changePassword",appPage.getUser());
 }

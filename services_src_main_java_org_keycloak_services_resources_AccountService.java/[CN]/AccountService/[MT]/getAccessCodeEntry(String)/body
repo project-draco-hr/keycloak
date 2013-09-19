@@ -1,0 +1,22 @@
+{
+  JWSInput input=new JWSInput(code,providers);
+  boolean verifiedCode=false;
+  try {
+    verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
+  }
+ catch (  Exception ignored) {
+    return null;
+  }
+  if (!verifiedCode) {
+    return null;
+  }
+  String key=input.readContent(String.class);
+  AccessCodeEntry accessCodeEntry=tokenManager.getAccessCode(key);
+  if (accessCodeEntry == null) {
+    return null;
+  }
+  if (accessCodeEntry.isExpired()) {
+    return null;
+  }
+  return accessCodeEntry;
+}

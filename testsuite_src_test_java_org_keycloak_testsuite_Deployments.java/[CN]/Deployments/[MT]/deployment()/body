@@ -1,0 +1,5 @@
+{
+  File[] libs=Maven.resolver().loadPomFromFile("pom.xml").importRuntimeDependencies().resolve().withTransitivity().asFile();
+  WebArchive archive=ShrinkWrap.create(WebArchive.class,"auth-server.war").addClasses(TestApplication.class).addAsLibraries(libs).addAsWebInfResource("jboss-deployment-structure.xml").addAsWebInfResource("web.xml").addAsResource("persistence.xml","META-INF/persistence.xml").addAsResource("testrealm.json","META-INF/testrealm.json");
+  return archive;
+}

@@ -1,10 +1,16 @@
 {
-  UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
+  UserModel user=getUser(RequiredAction.UPDATE_PROFILE);
   if (user != null) {
     user.setFirstName(formData.getFirst("firstName"));
     user.setLastName(formData.getFirst("lastName"));
     user.setEmail(formData.getFirst("email"));
-    return Flows.forms(realm,request).setUser(user).forwardToAccount();
+    Response response=redirectOauth();
+    if (response != null) {
+      return response;
+    }
+ else {
+      return Flows.forms(realm,request,uriInfo).setUser(user).forwardToAccount();
+    }
   }
  else {
     return Response.status(Status.FORBIDDEN).build();

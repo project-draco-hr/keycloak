@@ -13,7 +13,7 @@
   if (!user.isEnabled()) {
     throw new NotAuthorizedException("Disabled user.");
   }
-  if (authManager.authenticateForm(realm,user,form)) {
+  if (authManager.authenticateForm(realm,user,form) != AuthenticationStatus.SUCCESS) {
     throw new NotAuthorizedException("Auth failed");
   }
   SkeletonKeyToken token=tokenManager.createAccessToken(realm,user);

@@ -1,13 +1,13 @@
 {
-  registerUser("changeProfile","password");
-  selenium.open(authServerUrl + "/rest/realms/demo/account");
-  selenium.waitForPageToLoad(DEFAULT_WAIT);
-  selenium.type("id=firstName","Newfirst");
-  selenium.type("id=lastName","Newlast");
-  selenium.type("id=email","new@email.com");
-  selenium.click("css=input[type=\"submit\"]");
-  selenium.waitForPageToLoad(DEFAULT_WAIT);
-  Assert.assertEquals("Newfirst",selenium.getValue("id=firstName"));
-  Assert.assertEquals("Newlast",selenium.getValue("id=lastName"));
-  Assert.assertEquals("new@email.com",selenium.getValue("id=email"));
+  appPage.open();
+  loginPage.register();
+  registerPage.register("first last","old@email.com","changeProfile","password","password");
+  profilePage.open();
+  Assert.assertEquals("first",profilePage.getFirstName());
+  Assert.assertEquals("last",profilePage.getLastName());
+  Assert.assertEquals("old@email.com",profilePage.getEmail());
+  profilePage.updateProfile("New first","New last","new@email.com");
+  Assert.assertEquals("New first",profilePage.getFirstName());
+  Assert.assertEquals("New last",profilePage.getLastName());
+  Assert.assertEquals("new@email.com",profilePage.getEmail());
 }

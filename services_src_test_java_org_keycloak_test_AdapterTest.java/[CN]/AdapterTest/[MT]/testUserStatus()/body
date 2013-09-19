@@ -1,0 +1,14 @@
+{
+  test1CreateRealm();
+  UserModel user=realmModel.addUser("bburke");
+  Assert.assertTrue(user.isEnabled());
+  Assert.assertEquals(UserModel.Status.ENABLED,user.getStatus());
+  user.setStatus(UserModel.Status.DISABLED);
+  user=realmModel.getUser("bburke");
+  Assert.assertFalse(user.isEnabled());
+  Assert.assertEquals(UserModel.Status.DISABLED,user.getStatus());
+  user.setStatus(UserModel.Status.ACTIONS_REQUIRED);
+  user=realmModel.getUser("bburke");
+  Assert.assertTrue(user.isEnabled());
+  Assert.assertEquals(UserModel.Status.ACTIONS_REQUIRED,user.getStatus());
+}

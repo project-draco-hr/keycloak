@@ -1,0 +1,24 @@
+{
+  factory=KeycloakApplication.buildSessionFactory();
+  identitySession=factory.createSession();
+  identitySession.getTransaction().begin();
+  adapter=new RealmManager(identitySession);
+  realm=adapter.createRealm("Test");
+  realm.setAccessCodeLifespan(100);
+  realm.setCookieLoginAllowed(true);
+  realm.setEnabled(true);
+  realm.setName("Test");
+  realm.setPrivateKeyPem("0234234");
+  realm.setPublicKeyPem("0234234");
+  realm.setTokenLifespan(1000);
+  realm.addRequiredCredential(CredentialRepresentation.PASSWORD);
+  am=new AuthenticationManager();
+  user=realm.addUser("test");
+  UserCredentialModel credential=new UserCredentialModel();
+  credential.setType(CredentialRepresentation.PASSWORD);
+  credential.setValue("password");
+  realm.updateCredential(user,credential);
+  formData=new MultivaluedHashMap<String,String>();
+  formData.add(CredentialRepresentation.PASSWORD,"password");
+  otp=new TimeBasedOTP();
+}

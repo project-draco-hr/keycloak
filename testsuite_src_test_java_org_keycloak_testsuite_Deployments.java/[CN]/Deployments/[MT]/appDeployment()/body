@@ -1,0 +1,5 @@
+{
+  File[] libs=Maven.resolver().loadPomFromFile("pom.xml").resolve("org.keycloak:keycloak-core","org.keycloak:keycloak-as7-adapter").withoutTransitivity().asFile();
+  WebArchive archive=ShrinkWrap.create(WebArchive.class,"app.war").addClasses(TestApplication.class).addAsLibraries(libs).addAsWebInfResource("jboss-deployment-structure.xml").addAsWebInfResource("app-web.xml","web.xml").addAsWebInfResource("app-jboss-web.xml","jboss-web.xml").addAsWebInfResource("app-resteasy-oauth.json","resteasy-oauth.json").addAsWebResource("user.jsp");
+  return archive;
+}

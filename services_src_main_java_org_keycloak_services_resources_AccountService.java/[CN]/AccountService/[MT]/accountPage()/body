@@ -1,7 +1,7 @@
 {
-  UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
+  UserModel user=getUserFromAuthManager();
   if (user != null) {
-    return Flows.forms(realm,request).setUser(user).forwardToAccount();
+    return Flows.forms(realm,request,uriInfo).setUser(user).forwardToAccount();
   }
  else {
     return Response.status(Status.FORBIDDEN).build();

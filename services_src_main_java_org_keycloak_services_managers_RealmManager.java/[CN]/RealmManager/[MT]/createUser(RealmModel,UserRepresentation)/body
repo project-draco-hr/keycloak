@@ -1,9 +1,15 @@
 {
   UserModel user=newRealm.addUser(userRep.getUsername());
-  user.setEnabled(userRep.isEnabled());
+  user.setStatus(UserModel.Status.valueOf(userRep.getStatus()));
+  user.setEmail(userRep.getEmail());
   if (userRep.getAttributes() != null) {
     for (    Map.Entry<String,String> entry : userRep.getAttributes().entrySet()) {
       user.setAttribute(entry.getKey(),entry.getValue());
+    }
+  }
+  if (userRep.getRequiredActions() != null) {
+    for (    String requiredAction : userRep.getRequiredActions()) {
+      user.addRequiredAction(RequiredAction.valueOf(requiredAction));
     }
   }
   if (userRep.getCredentials() != null) {

@@ -1,0 +1,16 @@
+{
+  RequiredAction[] actions=getRequiredActionsArray();
+  if (actions != null) {
+    if (Arrays.binarySearch(actions,action) >= 0) {
+      actions=ArrayUtils.remove(actions,action);
+      if (actions.length == 0) {
+        user.removeAttribute(REQUIRED_ACTIONS_ATTR);
+      }
+ else {
+        Attribute<RequiredAction[]> a=new Attribute<RequiredAction[]>(REQUIRED_ACTIONS_ATTR,actions);
+        user.setAttribute(a);
+      }
+      idm.update(user);
+    }
+  }
+}

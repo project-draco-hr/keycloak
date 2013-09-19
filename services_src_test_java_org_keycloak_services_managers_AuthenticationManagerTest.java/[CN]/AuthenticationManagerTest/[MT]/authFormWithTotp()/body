@@ -1,0 +1,13 @@
+{
+  realm.addRequiredCredential(CredentialRepresentation.TOTP);
+  String totpSecret=UUID.randomUUID().toString();
+  UserCredentialModel credential=new UserCredentialModel();
+  credential.setType(CredentialRepresentation.TOTP);
+  credential.setValue(totpSecret);
+  realm.updateCredential(user,credential);
+  user.setTotp(true);
+  String token=otp.generate(totpSecret);
+  formData.add(CredentialRepresentation.TOTP,token);
+  AuthenticationStatus status=am.authenticateForm(realm,user,formData);
+  Assert.assertEquals(AuthenticationStatus.SUCCESS,status);
+}

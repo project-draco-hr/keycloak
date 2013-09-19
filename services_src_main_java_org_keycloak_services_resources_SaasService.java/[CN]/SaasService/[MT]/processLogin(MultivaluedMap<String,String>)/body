@@ -8,19 +8,16 @@
   }
   String username=formData.getFirst("username");
   UserModel user=realm.getUser(username);
-  if (user == null) {
-    logger.info("Not Authenticated! Incorrect user name");
-    return Flows.forms(realm,request).setError(Messages.INVALID_USER).setFormData(formData).forwardToLogin();
-  }
-  if (!user.isEnabled()) {
-    logger.info("Account is disabled, contact admin.");
-    return Flows.forms(realm,request).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).forwardToLogin();
-  }
-  boolean authenticated=authManager.authenticateForm(realm,user,formData);
-  if (!authenticated) {
-    logger.info("Not Authenticated! Invalid credentials");
-    return Flows.forms(realm,request).setError(Messages.INVALID_PASSWORD).setFormData(formData).forwardToLogin();
-  }
-  NewCookie cookie=authManager.createSaasIdentityCookie(realm,user,uriInfo);
+  AuthenticationStatus status=authManager.authenticateForm(realm,user,formData);
+switch (status) {
+case SUCCESS:
+    NewCookie cookie=authManager.createSaasIdentityCookie(realm,user,uriInfo);
   return Response.status(302).cookie(cookie).location(contextRoot(uriInfo).path(adminPath).build()).build();
+case ACCOUNT_DISABLED:
+return Flows.forms(realm,request,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).forwardToLogin();
+case ACTIONS_REQUIRED:
+return Flows.forms(realm,request,uriInfo).forwardToAction(user.getRequiredActions().get(0));
+default :
+return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).forwardToLogin();
+}
 }

@@ -1,0 +1,19 @@
+{
+  AccessCodeEntry accessCodeEntry=getAccessCodeEntry(code);
+  String loginName=accessCodeEntry.getUser().getLoginName();
+  UserModel user=realm.getUser(loginName);
+  if (user != null) {
+    user.setEmailVerified(true);
+    user.removeRequiredAction(UserModel.RequiredAction.VERIFY_EMAIL);
+    Response response=redirectOauth();
+    if (response != null) {
+      return response;
+    }
+ else {
+      return Flows.forms(realm,request,uriInfo).setUser(user).forwardToVerifyEmail();
+    }
+  }
+ else {
+    return Response.status(Status.FORBIDDEN).build();
+  }
+}

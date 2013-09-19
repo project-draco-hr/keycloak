@@ -12,27 +12,18 @@
   }
   String username=formData.getFirst("username");
   UserModel user=realm.getUser(username);
-  if (user == null) {
-    logger.error("Incorrect user name.");
-    return Flows.forms(realm,request).setError(Messages.INVALID_USER).setFormData(formData).forwardToLogin();
-  }
-  if (!user.isEnabled()) {
-    return oauth.forwardToSecurityFailure("Your account is not enabled.");
-  }
-  if ("ENABLED".equals(user.getAttribute("KEYCLOAK_TOTP")) && Validation.isEmpty(formData.getFirst("totp"))) {
-    return Flows.forms(realm,request).setFormData(formData).forwardToLoginTotp();
-  }
- else {
-    for (    RequiredCredentialModel c : realm.getRequiredCredentials()) {
-      if (c.getType().equals(CredentialRepresentation.TOTP)) {
-        return Flows.forms(realm,request).forwardToTotp();
-      }
-    }
-  }
-  boolean authenticated=authManager.authenticateForm(realm,user,formData);
-  if (!authenticated) {
-    logger.error("Authentication failed");
-    return Flows.forms(realm,request).setError(Messages.INVALID_PASSWORD).setFormData(formData).forwardToLogin();
-  }
-  return oauth.processAccessCode(scopeParam,state,redirect,client,user);
+  isTotpConfigurationRequired(user);
+  isEmailVerificationRequired(user);
+  AuthenticationStatus status=authManager.authenticateForm(realm,user,formData);
+switch (status) {
+case SUCCESS:
+case ACTIONS_REQUIRED:
+    return oauth.processAccessCode(scopeParam,state,redirect,client,user);
+case ACCOUNT_DISABLED:
+  return Flows.forms(realm,request,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).forwardToLogin();
+case MISSING_TOTP:
+return Flows.forms(realm,request,uriInfo).setFormData(formData).forwardToLoginTotp();
+default :
+return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).forwardToLogin();
+}
 }

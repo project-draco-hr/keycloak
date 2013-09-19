@@ -1,0 +1,30 @@
+{
+  RealmManager manager=new RealmManager(session);
+  List<UserRepresentation> results=new ArrayList<UserRepresentation>();
+  if (search != null) {
+    List<UserModel> userModels=manager.searchUsers(search,realm);
+    for (    UserModel user : userModels) {
+      results.add(manager.toRepresentation(user));
+    }
+  }
+ else {
+    Map<String,String> attributes=new HashMap<String,String>();
+    if (last != null) {
+      attributes.put(UserModel.LAST_NAME,last);
+    }
+    if (first != null) {
+      attributes.put(UserModel.FIRST_NAME,first);
+    }
+    if (email != null) {
+      attributes.put(UserModel.EMAIL,email);
+    }
+    if (username != null) {
+      attributes.put(UserModel.LOGIN_NAME,username);
+    }
+    List<UserModel> userModels=realm.searchForUserByAttributes(attributes);
+    for (    UserModel user : userModels) {
+      results.add(manager.toRepresentation(user));
+    }
+  }
+  return results;
+}

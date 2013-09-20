@@ -5,6 +5,7 @@
   url=url.replace("tokens/login","account/password-reset");
   url=url + "&username=bburke@redhat.com";
   browser.navigate().to(url);
+  Assert.assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];
   String body=(String)message.getContent();
   String changePasswordUrl=body.split("\n")[0];

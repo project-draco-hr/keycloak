@@ -1,0 +1,19 @@
+{
+  RealmModel realm=manager.createRealm("original");
+  realm.setCookieLoginAllowed(true);
+  realm.setRegistrationAllowed(true);
+  realm.setResetPasswordAllowed(true);
+  realm.setSocial(true);
+  realm.setSslNotRequired(true);
+  realm.setVerifyEmail(true);
+  realm.setTokenLifespan(1000);
+  realm.setAccessCodeLifespan(1001);
+  realm.setAccessCodeLifespanUserAction(1002);
+  realm.setPublicKeyPem("0234234");
+  realm.setPrivateKeyPem("1234234");
+  realm.addDefaultRole("default-role");
+  RealmModel peristed=manager.getRealm(realm.getId());
+  assertEquals(realm,peristed);
+  RealmModel copy=importExport(realm,"copy");
+  assertEquals(realm,copy);
+}

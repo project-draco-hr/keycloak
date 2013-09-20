@@ -8,11 +8,21 @@
   rep.setSslNotRequired(realm.isSslNotRequired());
   rep.setCookieLoginAllowed(realm.isCookieLoginAllowed());
   rep.setPublicKey(realm.getPublicKeyPem());
+  rep.setPrivateKey(realm.getPrivateKeyPem());
   rep.setRegistrationAllowed(realm.isRegistrationAllowed());
   rep.setVerifyEmail(realm.isVerifyEmail());
+  rep.setResetPasswordAllowed(realm.isResetPasswordAllowed());
   rep.setTokenLifespan(realm.getTokenLifespan());
   rep.setAccessCodeLifespan(realm.getAccessCodeLifespan());
   rep.setAccessCodeLifespanUserAction(realm.getAccessCodeLifespanUserAction());
+  List<RoleModel> defaultRoles=realm.getDefaultRoles();
+  if (defaultRoles.size() > 0) {
+    String[] d=new String[defaultRoles.size()];
+    for (int i=0; i < d.length; i++) {
+      d[i]=defaultRoles.get(i).getName();
+    }
+    rep.setDefaultRoles(d);
+  }
   List<RequiredCredentialModel> requiredCredentialModels=realm.getRequiredCredentials();
   if (requiredCredentialModels.size() > 0) {
     rep.setRequiredCredentials(new HashSet<String>());

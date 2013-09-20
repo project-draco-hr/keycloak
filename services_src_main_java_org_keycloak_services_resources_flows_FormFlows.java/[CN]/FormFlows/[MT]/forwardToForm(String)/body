@@ -1,18 +1,23 @@
 {
-  request.setAttribute(REALM,realm);
-  if (error != null) {
-    request.setAttribute(ERROR_MESSAGE,error);
-  }
-  if (formData != null) {
-    request.setAttribute(DATA,formData);
-  }
-  if (userModel != null) {
-    request.setAttribute(USER,userModel);
+  FormService.FormServiceDataBean formDataBean=new FormService.FormServiceDataBean(realm,userModel,formData,error);
+  ResteasyUriInfo uriInfo=request.getUri();
+  MultivaluedMap<String,String> queryParameterMap=uriInfo.getQueryParameters();
+  String requestURI=uriInfo.getBaseUri().getPath();
+  UriBuilder uriBuilder=UriBuilder.fromUri(requestURI);
+  for (  String k : queryParameterMap.keySet()) {
+    uriBuilder.replaceQueryParam(k,queryParameterMap.get(k).toArray());
   }
   if (code != null) {
-    request.setAttribute(CODE,code);
+    uriBuilder.queryParam(CODE,code);
   }
-  request.setAttribute(SOCIAL_REGISTRATION,socialRegistration);
-  request.forward(form);
-  return null;
+  URI baseURI=uriBuilder.build();
+  formDataBean.setBaseURI(baseURI);
+  formDataBean.setContextPath(requestURI.substring(0,requestURI.length() - 5));
+  formDataBean.setSocialRegistration(socialRegistration);
+  Iterator<FormService> itr=ServiceRegistry.lookupProviders(FormService.class);
+  while (itr.hasNext()) {
+    FormService provider=itr.next();
+    if (provider.getId().equals("FormServiceId"))     return Response.status(200).entity(provider.process(template,formDataBean)).build();
+  }
+  return Response.status(200).entity("form provider not found").build();
 }

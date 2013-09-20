@@ -1,0 +1,13 @@
+{
+  this.realm=realm;
+  if (formData != null) {
+    username=formData.getFirst("username");
+    password=formData.getFirst("password");
+  }
+  requiredCredentials=new LinkedList<RequiredCredential>();
+  for (  org.keycloak.services.models.RequiredCredentialModel c : realm.getRealm().getRequiredCredentials()) {
+    if (c.isInput()) {
+      requiredCredentials.add(new RequiredCredential(c.getType(),c.isSecret(),c.getFormLabel()));
+    }
+  }
+}

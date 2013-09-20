@@ -1,0 +1,13 @@
+{
+  this.realm=realm;
+  this.registerBean=registerBean;
+  this.url=url;
+  URI baseURI=url.getBaseURI();
+  UriBuilder socialLoginUrlBuilder=UriBuilder.fromUri(Urls.socialRedirectToProviderAuth(baseURI,realm.getId()));
+  providers=new LinkedList<SocialProvider>();
+  for (Iterator<org.keycloak.social.SocialProvider> itr=ServiceRegistry.lookupProviders(org.keycloak.social.SocialProvider.class); itr.hasNext(); ) {
+    org.keycloak.social.SocialProvider p=itr.next();
+    String loginUrl=socialLoginUrlBuilder.replaceQueryParam("provider_id",p.getId()).build().toString();
+    providers.add(new SocialProvider(p.getId(),p.getName(),loginUrl));
+  }
+}

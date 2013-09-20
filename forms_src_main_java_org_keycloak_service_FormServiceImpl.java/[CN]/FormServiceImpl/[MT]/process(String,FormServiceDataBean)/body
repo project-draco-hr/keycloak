@@ -1,0 +1,11 @@
+{
+  Map<String,Object> attributes=new HashMap<String,Object>();
+  RealmBean realm=new RealmBean(dataBean.getRealm());
+  attributes.put("template",new TemplateBean(realm,dataBean.getContextPath()));
+  ResourceBundle rb=ResourceBundle.getBundle(BUNDLE);
+  attributes.put("rb",rb);
+  if (commandMap.containsKey(pageId)) {
+    commandMap.get(pageId).exec(attributes,dataBean);
+  }
+  return processFmTemplate(pageId,attributes);
+}

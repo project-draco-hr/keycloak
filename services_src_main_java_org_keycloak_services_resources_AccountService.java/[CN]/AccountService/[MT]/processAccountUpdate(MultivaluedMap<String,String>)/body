@@ -1,18 +1,21 @@
 {
-  UserModel user=getUser(RequiredAction.UPDATE_PROFILE);
-  if (user != null) {
-    user.setFirstName(formData.getFirst("firstName"));
-    user.setLastName(formData.getFirst("lastName"));
-    user.setEmail(formData.getFirst("email"));
-    Response response=redirectOauth();
-    if (response != null) {
-      return response;
-    }
- else {
-      return Flows.forms(realm,request,uriInfo).setUser(user).forwardToAccount();
-    }
+  AccessCodeEntry accessCodeEntry=getAccessCodeEntry(RequiredAction.UPDATE_PROFILE);
+  UserModel user=accessCodeEntry != null ? getUserFromAccessCode(accessCodeEntry) : getUserFromAuthManager();
+  if (user == null) {
+    return Response.status(Status.FORBIDDEN).build();
+  }
+  user.setFirstName(formData.getFirst("firstName"));
+  user.setLastName(formData.getFirst("lastName"));
+  user.setEmail(formData.getFirst("email"));
+  user.removeRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE);
+  if (accessCodeEntry != null) {
+    accessCodeEntry.getRequiredActions().remove(UserModel.RequiredAction.UPDATE_PROFILE);
+  }
+  Response response=redirectOauth(accessCodeEntry);
+  if (response != null) {
+    return response;
   }
  else {
-    return Response.status(Status.FORBIDDEN).build();
+    return Flows.forms(realm,request,uriInfo).setUser(user).forwardToAccount();
   }
 }

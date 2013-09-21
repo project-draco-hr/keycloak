@@ -1,34 +1,36 @@
 {
-  UserModel user=getUser(RequiredAction.CONFIGURE_TOTP);
-  if (user != null) {
-    FormFlows forms=Flows.forms(realm,request,uriInfo);
-    String totp=formData.getFirst("totp");
-    String totpSecret=formData.getFirst("totpSecret");
-    String error=null;
-    if (Validation.isEmpty(totp)) {
-      error=Messages.MISSING_TOTP;
-    }
- else     if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
-      error=Messages.INVALID_TOTP;
-    }
-    if (error != null) {
-      return forms.setError(error).setUser(user).forwardToTotp();
-    }
-    UserCredentialModel credentials=new UserCredentialModel();
-    credentials.setType(CredentialRepresentation.TOTP);
-    credentials.setValue(formData.getFirst("totpSecret"));
-    realm.updateCredential(user,credentials);
-    user.removeRequiredAction(UserModel.RequiredAction.CONFIGURE_TOTP);
-    user.setTotp(true);
-    Response response=redirectOauth();
-    if (response != null) {
-      return response;
-    }
- else {
-      return Flows.forms(realm,request,uriInfo).setUser(user).forwardToTotp();
-    }
+  AccessCodeEntry accessCodeEntry=getAccessCodeEntry(RequiredAction.CONFIGURE_TOTP);
+  UserModel user=accessCodeEntry != null ? getUserFromAccessCode(accessCodeEntry) : getUserFromAuthManager();
+  if (user == null) {
+    return Response.status(Status.FORBIDDEN).build();
+  }
+  FormFlows forms=Flows.forms(realm,request,uriInfo);
+  String totp=formData.getFirst("totp");
+  String totpSecret=formData.getFirst("totpSecret");
+  String error=null;
+  if (Validation.isEmpty(totp)) {
+    error=Messages.MISSING_TOTP;
+  }
+ else   if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
+    error=Messages.INVALID_TOTP;
+  }
+  if (error != null) {
+    return forms.setError(error).setUser(user).forwardToTotp();
+  }
+  UserCredentialModel credentials=new UserCredentialModel();
+  credentials.setType(CredentialRepresentation.TOTP);
+  credentials.setValue(formData.getFirst("totpSecret"));
+  realm.updateCredential(user,credentials);
+  user.removeRequiredAction(UserModel.RequiredAction.CONFIGURE_TOTP);
+  if (accessCodeEntry != null) {
+    accessCodeEntry.getRequiredActions().remove(UserModel.RequiredAction.CONFIGURE_TOTP);
+  }
+  user.setTotp(true);
+  Response response=redirectOauth(accessCodeEntry);
+  if (response != null) {
+    return response;
   }
  else {
-    return Response.status(Status.FORBIDDEN).build();
+    return Flows.forms(realm,request,uriInfo).setUser(user).forwardToTotp();
   }
 }

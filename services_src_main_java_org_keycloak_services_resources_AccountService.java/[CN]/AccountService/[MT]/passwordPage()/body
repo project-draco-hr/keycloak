@@ -1,5 +1,9 @@
 {
-  UserModel user=getUser(RequiredAction.RESET_PASSWORD);
+  UserModel user=getUserFromAuthManager();
+  if (user == null) {
+    AccessCodeEntry accessCodeEntry=getAccessCodeEntry(RequiredAction.RESET_PASSWORD);
+    user=accessCodeEntry != null ? getUserFromAccessCode(accessCodeEntry) : null;
+  }
   if (user != null) {
     return Flows.forms(realm,request,uriInfo).setUser(user).forwardToPassword();
   }

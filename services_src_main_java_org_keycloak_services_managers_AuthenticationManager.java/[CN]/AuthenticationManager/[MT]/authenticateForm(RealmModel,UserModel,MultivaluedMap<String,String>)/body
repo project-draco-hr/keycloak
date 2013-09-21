@@ -3,7 +3,7 @@
     logger.info("Not Authenticated! Incorrect user name");
     return AuthenticationStatus.INVALID_USER;
   }
-  if (!user.isEnabled() && user.getStatus() == Status.DISABLED) {
+  if (!user.isEnabled()) {
     logger.info("Account is disabled, contact admin.");
     return AuthenticationStatus.ACCOUNT_DISABLED;
   }
@@ -44,7 +44,7 @@
         return AuthenticationStatus.INVALID_CREDENTIALS;
       }
     }
-    if (user.getStatus() == Status.ACTIONS_REQUIRED) {
+    if (!user.getRequiredActions().isEmpty()) {
       return AuthenticationStatus.ACTIONS_REQUIRED;
     }
  else {

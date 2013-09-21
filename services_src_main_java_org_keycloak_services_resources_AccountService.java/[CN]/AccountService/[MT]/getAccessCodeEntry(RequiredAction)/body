@@ -1,4 +1,8 @@
 {
+  String code=uriInfo.getQueryParameters().getFirst(FormFlows.CODE);
+  if (code == null) {
+    return null;
+  }
   JWSInput input=new JWSInput(code,providers);
   boolean verifiedCode=false;
   try {
@@ -16,6 +20,9 @@
     return null;
   }
   if (accessCodeEntry.isExpired()) {
+    return null;
+  }
+  if (accessCodeEntry.getRequiredActions() == null || !accessCodeEntry.getRequiredActions().contains(requiredAction)) {
     return null;
   }
   return accessCodeEntry;

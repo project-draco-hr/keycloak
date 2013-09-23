@@ -2,10 +2,13 @@
   appPage.open();
   loginPage.register();
   registerPage.register("name","email","verifyEmail","password","password");
-  Assert.assertTrue(browser.getPageSource().contains("Please verify your email address"));
+  Assert.assertTrue(browser.getPageSource().contains("Verify email"));
   MimeMessage message=greenMail.getReceivedMessages()[0];
   String body=(String)message.getContent();
-  String verificationUrl=body.split("\n")[0];
+  Pattern p=Pattern.compile("(?s).*(http://[^\\s]*).*");
+  Matcher m=p.matcher(body);
+  m.matches();
+  String verificationUrl=m.group(1);
   browser.navigate().to(verificationUrl.trim());
   Assert.assertTrue(appPage.isCurrent());
   Assert.assertEquals("verifyEmail",appPage.getUser());

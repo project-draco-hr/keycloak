@@ -26,9 +26,8 @@
     accessCodeEntry.getRequiredActions().remove(UserModel.RequiredAction.CONFIGURE_TOTP);
   }
   user.setTotp(true);
-  Response response=redirectOauth(user,accessCodeEntry);
-  if (response != null) {
-    return response;
+  if (accessCodeEntry != null) {
+    return redirectOauth(user,accessCodeEntry);
   }
  else {
     return Flows.forms(realm,request,uriInfo).setUser(user).forwardToTotp();

@@ -4,16 +4,9 @@
   }
   Set<RequiredAction> requiredActions=user.getRequiredActions();
   if (!requiredActions.isEmpty()) {
-    return Flows.forms(realm,request,uriInfo).setCode(accessCode.getCode()).setUser(user).forwardToAction(requiredActions.iterator().next());
+    return Flows.forms(realm,request,uriInfo).setAccessCode(accessCode).setUser(user).forwardToAction(requiredActions.iterator().next());
   }
  else {
-    String redirect=uriInfo.getQueryParameters().getFirst("redirect_uri");
-    if (redirect != null) {
-      String state=uriInfo.getQueryParameters().getFirst("state");
-      return Flows.oauth(realm,request,uriInfo,authManager,tokenManager).redirectAccessCode(accessCode,state,redirect);
-    }
- else {
-      return null;
-    }
+    return Flows.oauth(realm,request,uriInfo,authManager,tokenManager).redirectAccessCode(accessCode,accessCode.getState(),accessCode.getRedirectUri());
   }
 }

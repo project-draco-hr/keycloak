@@ -1,9 +1,10 @@
 {
-  AccessCodeEntry accessCodeEntry=getAccessCodeEntry(RequiredAction.RESET_PASSWORD);
-  UserModel user=accessCodeEntry != null ? getUserFromAccessCode(accessCodeEntry) : getUserFromAuthManager();
+  AccessCodeEntry accessCode=getAccessCodeEntry(RequiredAction.UPDATE_PASSWORD);
+  UserModel user=accessCode != null ? getUserFromAccessCode(accessCode) : getUserFromAuthManager();
   if (user == null) {
     return Response.status(Status.FORBIDDEN).build();
   }
+  boolean loginAction=accessCode != null;
   FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(user);
   String password=formData.getFirst("password");
   String passwordNew=formData.getFirst("password-new");
@@ -15,7 +16,7 @@
  else   if (!passwordNew.equals(passwordConfirm)) {
     error=Messages.INVALID_PASSWORD_CONFIRM;
   }
-  if (accessCodeEntry == null) {
+  if (!loginAction) {
     if (Validation.isEmpty(password)) {
       error=Messages.MISSING_PASSWORD;
     }
@@ -30,11 +31,14 @@
   credentials.setType(CredentialRepresentation.PASSWORD);
   credentials.setValue(passwordNew);
   realm.updateCredential(user,credentials);
-  user.removeRequiredAction(RequiredAction.RESET_PASSWORD);
-  if (accessCodeEntry != null) {
-    accessCodeEntry.getRequiredActions().remove(UserModel.RequiredAction.RESET_PASSWORD);
+  user.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
+  if (accessCode != null) {
+    accessCode.getRequiredActions().remove(UserModel.RequiredAction.UPDATE_PASSWORD);
   }
-  authManager.expireIdentityCookie(realm,uriInfo);
-  new ResourceAdminManager().singleLogOut(realm,user.getLoginName());
-  return Flows.forms(realm,request,uriInfo).forwardToLogin();
+  if (accessCode != null) {
+    return redirectOauth(user,accessCode);
+  }
+ else {
+    return Flows.forms(realm,request,uriInfo).setUser(user).forwardToPassword();
+  }
 }

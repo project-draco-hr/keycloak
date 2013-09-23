@@ -1,14 +1,15 @@
 {
 switch (action) {
 case CONFIGURE_TOTP:
-    return forwardToTotp();
+    return forwardToForm(Pages.LOGIN_CONFIG_TOTP);
 case UPDATE_PROFILE:
-  return forwardToAccount();
-case RESET_PASSWORD:
-return forwardToPassword();
+  return forwardToForm(Pages.LOGIN_UPDATE_PROFILE);
+case UPDATE_PASSWORD:
+return forwardToForm(Pages.LOGIN_UPDATE_PASSWORD);
 case VERIFY_EMAIL:
-return forwardToVerifyEmail();
+new EmailSender().sendEmailVerification(userModel,realm,accessCode,uriInfo);
+return forwardToForm(Pages.LOGIN_VERIFY_EMAIL);
 default :
-return null;
+return Response.serverError().build();
 }
 }

@@ -1,0 +1,11 @@
+{
+  Class<?> c=o.getClass();
+  while (c != null) {
+    for (    Field f : c.getDeclaredFields()) {
+      if (f.getAnnotation(Page.class) != null) {
+        set(f,o,getPage(f.getType()));
+      }
+    }
+    c=c.getSuperclass();
+  }
+}

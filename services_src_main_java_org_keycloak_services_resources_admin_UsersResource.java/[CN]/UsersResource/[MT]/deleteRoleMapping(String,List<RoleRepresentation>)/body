@@ -1,0 +1,21 @@
+{
+  UserModel user=realm.getUser(username);
+  if (user == null) {
+    throw new NotFoundException();
+  }
+  if (roles == null) {
+    List<RoleModel> roleModels=realm.getRoleMappings(user);
+    for (    RoleModel roleModel : roleModels) {
+      realm.deleteRoleMapping(user,roleModel);
+    }
+  }
+ else {
+    for (    RoleRepresentation role : roles) {
+      RoleModel roleModel=realm.getRoleById(role.getId());
+      if (roleModel == null) {
+        throw new NotFoundException();
+      }
+      realm.deleteRoleMapping(user,roleModel);
+    }
+  }
+}

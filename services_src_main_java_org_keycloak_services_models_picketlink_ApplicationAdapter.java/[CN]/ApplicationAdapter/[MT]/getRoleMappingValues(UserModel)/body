@@ -2,9 +2,9 @@
   RelationshipQuery<Grant> query=getRelationshipManager().createRelationshipQuery(Grant.class);
   query.setParameter(Grant.ASSIGNEE,((UserAdapter)user).getUser());
   List<Grant> grants=query.getResultList();
-  List<RoleModel> set=new ArrayList<RoleModel>();
+  HashSet<String> set=new HashSet<String>();
   for (  Grant grant : grants) {
-    if (grant.getRole().getPartition().getId().equals(resource.getId()))     set.add(new RoleAdapter(grant.getRole(),getIdm()));
+    if (grant.getRole().getPartition().getId().equals(resource.getId()))     set.add(grant.getRole().getName());
   }
   return set;
 }

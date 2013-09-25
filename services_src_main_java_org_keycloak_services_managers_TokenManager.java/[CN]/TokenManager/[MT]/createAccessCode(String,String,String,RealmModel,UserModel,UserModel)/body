@@ -4,7 +4,7 @@
   if (scopeParam != null)   scopeMap=decodeScope(scopeParam);
   List<RoleModel> realmRolesRequested=code.getRealmRolesRequested();
   MultivaluedMap<String,RoleModel> resourceRolesRequested=code.getResourceRolesRequested();
-  Set<String> realmMapping=realm.getRoleMappings(user);
+  Set<String> realmMapping=realm.getRoleMappingValues(user);
   if (realmMapping != null && realmMapping.size() > 0 && (scopeMap == null || scopeMap.containsKey("realm"))) {
     Set<String> scope=realm.getScope(client);
     if (scope.size() > 0) {
@@ -19,7 +19,7 @@
     }
   }
   for (  ApplicationModel resource : realm.getApplications()) {
-    Set<String> mapping=resource.getRoleMappings(user);
+    Set<String> mapping=resource.getRoleMappingValues(user);
     if (mapping != null && mapping.size() > 0 && (scopeMap == null || scopeMap.containsKey(resource.getName()))) {
       Set<String> scope=resource.getScope(client);
       if (scope.size() > 0) {

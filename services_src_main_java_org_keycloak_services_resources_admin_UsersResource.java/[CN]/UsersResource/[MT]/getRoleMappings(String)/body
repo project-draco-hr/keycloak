@@ -1,0 +1,40 @@
+{
+  UserModel user=realm.getUser(username);
+  if (user == null) {
+    throw new NotFoundException();
+  }
+  AllRoleMappingsRepresentation all=new AllRoleMappingsRepresentation();
+  all.setRealmId(realm.getId());
+  all.setRealmName(realm.getName());
+  all.setUsername(username);
+  List<RoleModel> realmMappings=realm.getRoleMappings(user);
+  RealmManager manager=new RealmManager(session);
+  if (realmMappings.size() > 0) {
+    List<RoleRepresentation> realmRep=new ArrayList<RoleRepresentation>();
+    for (    RoleModel roleModel : realmMappings) {
+      realmRep.add(manager.toRepresentation(roleModel));
+    }
+    all.setRealmMappings(realmRep);
+  }
+  List<ApplicationModel> applications=realm.getApplications();
+  if (applications.size() > 0) {
+    Map<String,ApplicationRoleMappings> appMappings=new HashMap<String,ApplicationRoleMappings>();
+    for (    ApplicationModel application : applications) {
+      List<RoleModel> roleMappings=application.getRoleMappings(user);
+      if (roleMappings.size() > 0) {
+        ApplicationRoleMappings mappings=new ApplicationRoleMappings();
+        mappings.setUsername(user.getLoginName());
+        mappings.setApplicationId(application.getId());
+        mappings.setApplication(application.getName());
+        List<RoleRepresentation> roles=new ArrayList<RoleRepresentation>();
+        mappings.setMappings(roles);
+        for (        RoleModel role : roleMappings) {
+          roles.add(manager.toRepresentation(role));
+        }
+        appMappings.put(application.getName(),mappings);
+        all.setApplicationMappings(appMappings);
+      }
+    }
+  }
+  return all;
+}

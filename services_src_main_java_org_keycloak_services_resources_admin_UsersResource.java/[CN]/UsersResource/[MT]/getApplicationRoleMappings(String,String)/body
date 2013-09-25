@@ -1,0 +1,21 @@
+{
+  UserModel user=realm.getUser(username);
+  if (user == null) {
+    throw new NotFoundException();
+  }
+  ApplicationModel application=realm.getApplicationById(appId);
+  if (application == null) {
+    throw new NotFoundException();
+  }
+  ApplicationRoleMappings rep=new ApplicationRoleMappings();
+  List<RoleModel> mappings=application.getRoleMappings(user);
+  if (mappings.size() > 0) {
+    RealmManager manager=new RealmManager(session);
+    List<RoleRepresentation> mapRep=new ArrayList<RoleRepresentation>();
+    for (    RoleModel roleModel : mappings) {
+      mapRep.add(manager.toRepresentation(roleModel));
+    }
+    rep.setMappings(mapRep);
+  }
+  return rep;
+}

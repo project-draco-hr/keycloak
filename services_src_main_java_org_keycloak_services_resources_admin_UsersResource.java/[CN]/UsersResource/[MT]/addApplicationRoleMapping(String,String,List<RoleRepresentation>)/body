@@ -1,4 +1,5 @@
 {
+  logger.info("addApplicationRoleMapping");
   UserModel user=realm.getUser(username);
   if (user == null) {
     throw new NotFoundException();
@@ -6,5 +7,12 @@
   ApplicationModel application=realm.getApplicationById(appId);
   if (application == null) {
     throw new NotFoundException();
+  }
+  for (  RoleRepresentation role : roles) {
+    RoleModel roleModel=application.getRoleById(role.getId());
+    if (roleModel == null) {
+      throw new NotFoundException();
+    }
+    application.grantRole(user,roleModel);
   }
 }

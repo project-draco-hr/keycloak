@@ -1,4 +1,5 @@
 {
+  logger.info("getApplicationRoleMappings");
   UserModel user=realm.getUser(username);
   if (user == null) {
     throw new NotFoundException();
@@ -10,9 +11,9 @@
   ApplicationRoleMappings rep=new ApplicationRoleMappings();
   List<RoleModel> mappings=application.getRoleMappings(user);
   List<RoleRepresentation> mapRep=new ArrayList<RoleRepresentation>();
-  RealmManager manager=new RealmManager(session);
   for (  RoleModel roleModel : mappings) {
-    mapRep.add(manager.toRepresentation(roleModel));
+    mapRep.add(RealmManager.toRepresentation(roleModel));
   }
+  logger.info("getApplicationRoleMappings.size() = " + mapRep.size());
   return mapRep;
 }

@@ -1,0 +1,8 @@
+{
+  loginPage.open();
+  loginPage.clickRegister();
+  registerPage.register("name","email","setupTotp","password","password");
+  totpPage.assertCurrent();
+  totpPage.configure(totp.generate(totpPage.getTotpSecret()));
+  Assert.assertTrue("Expected authorization response",oauth.isAuthorizationResponse());
+}

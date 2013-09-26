@@ -1,0 +1,13 @@
+{
+  KeycloakSession session=createSession();
+  session.getTransaction().begin();
+  RealmManager manager=new RealmManager(session);
+  RealmModel defaultRealm=manager.getRealm(RealmModel.DEFAULT_REALM);
+  UserModel admin=defaultRealm.getUser("admin");
+  RealmRepresentation rep=loadJson(name);
+  RealmModel realm=manager.createRealm("test",rep.getRealm());
+  manager.importRealm(rep,realm);
+  realm.addRealmAdmin(admin);
+  session.getTransaction().commit();
+  session.close();
+}

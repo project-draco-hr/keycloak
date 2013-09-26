@@ -5,7 +5,7 @@
   }
   if (browser.equals("htmlunit")) {
     HtmlUnitDriver d=new HtmlUnitDriver();
-    d.getWebClient().setCssEnabled(false);
+    d.getWebClient().getOptions().setCssEnabled(false);
     driver=d;
   }
  else   if (browser.equals("chrome")) {
@@ -17,6 +17,6 @@
  else {
     throw new RuntimeException("Unsupported browser " + browser);
   }
-  initDriver(test);
-  initPages(test);
+  oauth=new OAuthClient(driver);
+  initWebResources(test);
 }

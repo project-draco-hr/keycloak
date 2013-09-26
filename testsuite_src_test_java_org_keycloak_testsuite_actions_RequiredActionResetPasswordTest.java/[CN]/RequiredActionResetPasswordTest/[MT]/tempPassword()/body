@@ -1,0 +1,10 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  changePasswordPage.assertCurrent();
+  changePasswordPage.changePassword("new-password","new-password");
+  Assert.assertTrue("Expected authorization response",oauth.isAuthorizationResponse());
+  oauth.openLogout();
+  loginPage.open();
+  loginPage.login("test-user@localhost","new-password");
+}

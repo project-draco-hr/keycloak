@@ -1,0 +1,28 @@
+{
+  ResteasyDeployment deployment=new ResteasyDeployment();
+  deployment.setApplicationClass(KeycloakApplication.class.getName());
+  server=new UndertowJaxrsServer().start();
+  DeploymentInfo di=server.undertowDeployment(deployment,"rest");
+  di.setClassLoader(getClass().getClassLoader());
+  di.setContextPath("/auth-server");
+  di.setDeploymentName("Keycloak");
+  di.setResourceManager(new ClassPathResourceManager(getClass().getClassLoader(),"META-INF/resources"));
+  FilterInfo filter=Servlets.filter("SessionFilter",KeycloakSessionServletFilter.class);
+  di.addFilter(filter);
+  di.addFilterUrlMapping("SessionFilter","/rest/*",DispatcherType.REQUEST);
+  server.deploy(di);
+  factory=KeycloakApplication.buildSessionFactory();
+  setupDefaultRealm();
+  importRealm(testRealm);
+  if (setup != null) {
+    configure(setup);
+  }
+  DeploymentInfo deploymentInfo=new DeploymentInfo();
+  deploymentInfo.setClassLoader(getClass().getClassLoader());
+  deploymentInfo.setDeploymentName("app");
+  deploymentInfo.setContextPath("/app");
+  ServletInfo servlet=new ServletInfo(ApplicationServlet.class.getSimpleName(),ApplicationServlet.class);
+  servlet.addMapping("/*");
+  deploymentInfo.addServlet(servlet);
+  server.deploy(deploymentInfo);
+}

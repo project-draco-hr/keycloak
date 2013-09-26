@@ -1,0 +1,23 @@
+{
+  Class<?> c=o.getClass();
+  while (c != null) {
+    for (    Field f : c.getDeclaredFields()) {
+      if (f.getAnnotation(WebResource.class) != null) {
+        Class<?> type=f.getType();
+        if (type.equals(WebDriver.class)) {
+          set(f,o,driver);
+        }
+ else         if (Page.class.isAssignableFrom(type)) {
+          set(f,o,getPage(f.getType()));
+        }
+ else         if (type.equals(OAuthClient.class)) {
+          set(f,o,oauth);
+        }
+ else {
+          throw new RuntimeException("Unsupported type " + f);
+        }
+      }
+    }
+    c=c.getSuperclass();
+  }
+}

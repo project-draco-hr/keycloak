@@ -1,0 +1,18 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  if (changePasswordPage.isCurrent()) {
+    updatePassword();
+    updateProfilePage.assertCurrent();
+    updateProfile();
+  }
+ else   if (updateProfilePage.isCurrent()) {
+    updateProfile();
+    changePasswordPage.assertCurrent();
+    updatePassword();
+  }
+ else {
+    Assert.fail("Expected to update password and profile before login");
+  }
+  Assert.assertTrue("Expected authorization response",oauth.isAuthorizationResponse());
+}

@@ -1,0 +1,14 @@
+{
+  loginPage.open();
+  loginPage.clickRegister();
+  registerPage.register("name","email","verifyEmail","password","password");
+  Assert.assertTrue(driver.getPageSource().contains("Verify email"));
+  MimeMessage message=greenMail.getReceivedMessages()[0];
+  String body=(String)message.getContent();
+  Pattern p=Pattern.compile("(?s).*(http://[^\\s]*).*");
+  Matcher m=p.matcher(body);
+  m.matches();
+  String verificationUrl=m.group(1);
+  driver.navigate().to(verificationUrl.trim());
+  Assert.assertTrue("Expected authorization response",oauth.isAuthorizationResponse());
+}

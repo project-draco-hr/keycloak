@@ -1,0 +1,18 @@
+{
+  statusCode=response.getStatusLine().getStatusCode();
+  if (!"application/json".equals(response.getHeaders("Content-Type")[0].getValue())) {
+    Assert.fail("Invalid content type");
+  }
+  JSONObject responseJson=new JSONObject(IOUtils.toString(response.getEntity().getContent()));
+  if (statusCode == 200) {
+    accessToken=responseJson.getString("access_token");
+    tokenType=responseJson.getString("token_type");
+    expiresIn=responseJson.getInt("expires_in");
+    if (responseJson.has("refresh_token")) {
+      refreshToken=responseJson.getString("refresh_token");
+    }
+  }
+ else {
+    error=responseJson.getString("error");
+  }
+}

@@ -1,10 +1,12 @@
 {
   loginPage.open();
   loginPage.clickRegister();
-  registerPage.register("firstName","lastName","email","verifyEmail","password","password");
+  registerPage.register("firstName2","lastName2","email2","verifyEmail2","password2","password2");
   Assert.assertTrue(verifyEmailPage.isCurrent());
   Assert.assertEquals(1,greenMail.getReceivedMessages().length);
-  MimeMessage message=greenMail.getReceivedMessages()[0];
+  verifyEmailPage.clickResendEmail();
+  Assert.assertEquals(2,greenMail.getReceivedMessages().length);
+  MimeMessage message=greenMail.getReceivedMessages()[1];
   String body=(String)message.getContent();
   Pattern p=Pattern.compile("(?s).*(http://[^\\s]*).*");
   Matcher m=p.matcher(body);

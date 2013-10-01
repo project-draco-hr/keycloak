@@ -1,7 +1,8 @@
 {
   loginPage.open();
   loginPage.login("test-user@localhost","password");
-  Assert.assertTrue(driver.getPageSource().contains("Verify email"));
+  Assert.assertTrue(verifyEmailPage.isCurrent());
+  Assert.assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];
   String body=(String)message.getContent();
   Pattern p=Pattern.compile("(?s).*(http://[^\\s]*).*");

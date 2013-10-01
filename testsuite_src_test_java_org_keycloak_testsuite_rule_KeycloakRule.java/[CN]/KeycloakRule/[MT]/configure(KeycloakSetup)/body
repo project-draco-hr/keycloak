@@ -1,10 +1,14 @@
 {
-  KeycloakSession session=createSession();
+  KeycloakSession session=server.getKeycloakSessionFactory().createSession();
   session.getTransaction().begin();
-  RealmManager manager=new RealmManager(session);
-  RealmModel defaultRealm=manager.getRealm(RealmModel.DEFAULT_REALM);
-  RealmModel appRealm=manager.getRealm("test");
-  configurer.config(manager,defaultRealm,appRealm);
-  session.getTransaction().commit();
-  session.close();
+  try {
+    RealmManager manager=new RealmManager(session);
+    RealmModel defaultRealm=manager.getRealm(RealmModel.DEFAULT_REALM);
+    RealmModel appRealm=manager.getRealm("test");
+    configurer.config(manager,defaultRealm,appRealm);
+    session.getTransaction().commit();
+  }
+  finally {
+    session.close();
+  }
 }

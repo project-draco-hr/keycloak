@@ -1,0 +1,14 @@
+{
+  try {
+    ByteArrayOutputStream os=new ByteArrayOutputStream();
+    int c;
+    while ((c=is.read()) != -1) {
+      os.write(c);
+    }
+    byte[] bytes=os.toByteArray();
+    return JsonSerialization.fromBytes(type,bytes);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Failed to parse json",e);
+  }
+}

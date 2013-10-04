@@ -1,7 +1,9 @@
 {
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.getRealm(realmId);
   SocialProvider provider=getProvider(providerId);
   if (provider == null) {
-    return Flows.pages(request).forwardToSecurityFailure("Social provider not found");
+    return Flows.forms(realm,request,uriInfo).setError("Social provider not found").forwardToErrorPage();
   }
   String key=System.getProperty("keycloak.social." + providerId + ".key");
   String secret=System.getProperty("keycloak.social." + providerId + ".secret");
@@ -14,6 +16,6 @@
     return Response.status(Status.FOUND).location(authRequest.getAuthUri()).build();
   }
  catch (  Throwable t) {
-    return Flows.pages(request).forwardToSecurityFailure("Failed to redirect to social auth");
+    return Flows.forms(realm,request,uriInfo).setError("Failed to redirect to social auth").forwardToErrorPage();
   }
 }

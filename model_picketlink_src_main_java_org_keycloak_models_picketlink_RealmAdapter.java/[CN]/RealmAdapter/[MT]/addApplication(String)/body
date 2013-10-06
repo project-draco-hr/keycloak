@@ -6,12 +6,12 @@
   applicationData.setResourceName(name);
   applicationData.setResourceUser(resourceUser);
   partitionManager.add(applicationData);
-  ResourceRelationship resourceRelationship=new ResourceRelationship();
+  ApplicationRelationship resourceRelationship=new ApplicationRelationship();
   resourceRelationship.setRealm(realm.getName());
-  resourceRelationship.setResource(applicationData.getName());
+  resourceRelationship.setApplication(applicationData.getName());
   getRelationshipManager().add(resourceRelationship);
   ApplicationModel resource=new ApplicationAdapter(applicationData,this,partitionManager);
   resource.addRole("*");
-  resource.addScope(new UserAdapter(resourceUser,idm),"*");
+  resource.addScopeMapping(new UserAdapter(resourceUser,idm),"*");
   return resource;
 }

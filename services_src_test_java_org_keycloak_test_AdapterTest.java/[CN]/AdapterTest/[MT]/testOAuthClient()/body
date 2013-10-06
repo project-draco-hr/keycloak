@@ -1,0 +1,8 @@
+{
+  test1CreateRealm();
+  OAuthClientModel oauth=new OAuthClientManager(realmModel).createOAuthClient("oauth-client");
+  oauth.setBaseUrl("/foo/bar");
+  oauth=realmModel.getOAuthClient("oauth-client");
+  Assert.assertEquals("/foo/bar",oauth.getBaseUrl());
+  Assert.assertTrue(realmModel.hasRole(oauth.getOAuthAgent(),RealmManager.IDENTITY_REQUESTER_ROLE));
+}

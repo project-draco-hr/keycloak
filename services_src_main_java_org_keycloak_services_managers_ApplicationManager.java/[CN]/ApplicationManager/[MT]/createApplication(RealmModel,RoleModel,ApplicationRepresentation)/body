@@ -1,0 +1,50 @@
+{
+  ApplicationModel applicationModel=realm.addApplication(resourceRep.getName());
+  applicationModel.setEnabled(resourceRep.isEnabled());
+  applicationModel.setManagementUrl(resourceRep.getAdminUrl());
+  applicationModel.setSurrogateAuthRequired(resourceRep.isSurrogateAuthRequired());
+  applicationModel.setBaseUrl(resourceRep.getBaseUrl());
+  applicationModel.updateApplication();
+  UserModel resourceUser=applicationModel.getApplicationUser();
+  if (resourceRep.getCredentials() != null) {
+    for (    CredentialRepresentation cred : resourceRep.getCredentials()) {
+      UserCredentialModel credential=new UserCredentialModel();
+      credential.setType(cred.getType());
+      credential.setValue(cred.getValue());
+      realm.updateCredential(resourceUser,credential);
+    }
+  }
+  realm.grantRole(resourceUser,loginRole);
+  if (resourceRep.getRoles() != null) {
+    for (    RoleRepresentation roleRep : resourceRep.getRoles()) {
+      RoleModel role=applicationModel.addRole(roleRep.getName());
+      if (roleRep.getDescription() != null)       role.setDescription(roleRep.getDescription());
+    }
+  }
+  if (resourceRep.getRoleMappings() != null) {
+    for (    RoleMappingRepresentation mapping : resourceRep.getRoleMappings()) {
+      UserModel user=realm.getUser(mapping.getUsername());
+      for (      String roleString : mapping.getRoles()) {
+        RoleModel role=applicationModel.getRole(roleString.trim());
+        if (role == null) {
+          role=applicationModel.addRole(roleString.trim());
+        }
+        realm.grantRole(user,role);
+      }
+    }
+  }
+  if (resourceRep.getScopeMappings() != null) {
+    for (    ScopeMappingRepresentation mapping : resourceRep.getScopeMappings()) {
+      UserModel user=realm.getUser(mapping.getUsername());
+      for (      String roleString : mapping.getRoles()) {
+        RoleModel role=applicationModel.getRole(roleString.trim());
+        if (role == null) {
+          role=applicationModel.addRole(roleString.trim());
+        }
+        applicationModel.addScopeMapping(user,role.getName());
+      }
+    }
+  }
+  if (resourceRep.isUseRealmMappings())   realm.addScopeMapping(applicationModel.getApplicationUser(),"*");
+  return applicationModel;
+}

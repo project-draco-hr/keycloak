@@ -6,7 +6,7 @@
   MultivaluedMap<String,RoleModel> resourceRolesRequested=code.getResourceRolesRequested();
   Set<String> realmMapping=realm.getRoleMappingValues(user);
   if (realmMapping != null && realmMapping.size() > 0 && (scopeMap == null || scopeMap.containsKey("realm"))) {
-    Set<String> scope=realm.getScope(client);
+    Set<String> scope=realm.getScopeMapping(client);
     if (scope.size() > 0) {
       Set<String> scopeRequest=null;
       if (scopeMap != null) {
@@ -21,7 +21,7 @@
   for (  ApplicationModel resource : realm.getApplications()) {
     Set<String> mapping=resource.getRoleMappingValues(user);
     if (mapping != null && mapping.size() > 0 && (scopeMap == null || scopeMap.containsKey(resource.getName()))) {
-      Set<String> scope=resource.getScope(client);
+      Set<String> scope=resource.getScopeMapping(client);
       if (scope.size() > 0) {
         Set<String> scopeRequest=null;
         if (scopeMap != null) {

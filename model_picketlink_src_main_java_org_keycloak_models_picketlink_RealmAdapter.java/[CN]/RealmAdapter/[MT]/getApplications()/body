@@ -1,10 +1,10 @@
 {
-  RelationshipQuery<ResourceRelationship> query=getRelationshipManager().createRelationshipQuery(ResourceRelationship.class);
-  query.setParameter(ResourceRelationship.REALM,realm.getName());
-  List<ResourceRelationship> results=query.getResultList();
+  RelationshipQuery<ApplicationRelationship> query=getRelationshipManager().createRelationshipQuery(ApplicationRelationship.class);
+  query.setParameter(ApplicationRelationship.REALM,realm.getName());
+  List<ApplicationRelationship> results=query.getResultList();
   List<ApplicationModel> resources=new ArrayList<ApplicationModel>();
-  for (  ResourceRelationship relationship : results) {
-    ApplicationData resource=partitionManager.getPartition(ApplicationData.class,relationship.getResource());
+  for (  ApplicationRelationship relationship : results) {
+    ApplicationData resource=partitionManager.getPartition(ApplicationData.class,relationship.getApplication());
     ApplicationModel model=new ApplicationAdapter(resource,this,partitionManager);
     resources.add(model);
   }

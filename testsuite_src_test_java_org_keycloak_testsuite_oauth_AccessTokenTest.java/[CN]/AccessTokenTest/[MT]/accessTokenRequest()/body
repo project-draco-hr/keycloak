@@ -5,7 +5,7 @@
   Assert.assertEquals(200,response.getStatusCode());
   Assert.assertTrue(response.getExpiresIn() <= 300 && response.getExpiresIn() >= 250);
   Assert.assertEquals("bearer",response.getTokenType());
-  SkeletonKeyToken token=RSATokenVerifier.verifyToken(response.getAccessToken(),realmPublicKey,oauth.getRealm());
+  SkeletonKeyToken token=oauth.verifyToken(response.getAccessToken());
   Assert.assertEquals("test-user@localhost",token.getPrincipal());
   Assert.assertEquals(1,token.getRealmAccess().getRoles().size());
   Assert.assertTrue(token.getRealmAccess().isUserInRole("user"));

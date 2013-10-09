@@ -1,19 +1,18 @@
 {
-  PageFlows pageFlows=Flows.pages(request);
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.getRealm(realmId);
   Cookie cookie=headers.getCookies().get(SocialConstants.SOCIAL_REGISTRATION_COOKIE);
   if (cookie == null) {
-    return pageFlows.forwardToSecurityFailure("Social registration cookie not found");
+    return Flows.forms(realm,request,uriInfo).setError("Social registration cookie not found").forwardToErrorPage();
   }
   String requestId=cookie.getValue();
   if (!socialRequestManager.isRequestId(requestId)) {
     logger.error("Unknown requestId found in cookie. Maybe it's expired. requestId=" + requestId);
-    return pageFlows.forwardToSecurityFailure("Unknown requestId found in cookie. Maybe it's expired.");
+    return Flows.forms(realm,request,uriInfo).setError("Unknown requestId found in cookie. Maybe it's expired.").forwardToErrorPage();
   }
   RequestDetails requestData=socialRequestManager.getData(requestId);
-  RealmManager realmManager=new RealmManager(session);
-  RealmModel realm=realmManager.getRealm(realmId);
   if (realm == null || !realm.isEnabled()) {
-    return pageFlows.forwardToSecurityFailure("Realm doesn't exists or is not enabled.");
+    return Flows.forms(realm,request,uriInfo).setError("Realm doesn't exists or is not enabled.").forwardToErrorPage();
   }
   TokenService tokenService=new TokenService(realm,tokenManager);
   resourceContext.initResource(tokenService);

@@ -1,0 +1,25 @@
+{
+  KeycloakServerConfig config=new KeycloakServerConfig();
+  for (int i=0; i < args.length; i++) {
+    if (args[i].equals("-b")) {
+      config.setHost(args[++i]);
+    }
+    if (args[i].equals("-p")) {
+      config.setPort(Integer.valueOf(args[++i]));
+    }
+  }
+  final KeycloakServer keycloak=new KeycloakServer(config);
+  keycloak.sysout=true;
+  keycloak.start();
+  for (int i=0; i < args.length; i++) {
+    if (args[i].equals("-import")) {
+      keycloak.importRealm(new FileInputStream(args[++i]));
+    }
+  }
+  Runtime.getRuntime().addShutdownHook(new Thread(){
+    @Override public void run(){
+      keycloak.stop();
+    }
+  }
+);
+}

@@ -1,0 +1,21 @@
+{
+  KeycloakSession session=factory.createSession();
+  session.getTransaction().begin();
+  try {
+    RealmManager manager=new RealmManager(session);
+    if (rep.getId() == null) {
+      throw new RuntimeException("Realm id not specified");
+    }
+    if (manager.getRealm(rep.getId()) != null) {
+      info("Not importing realm " + rep.getRealm() + " realm already exists");
+      return;
+    }
+    RealmModel realm=manager.createRealm(rep.getId(),rep.getRealm());
+    manager.importRealm(rep,realm);
+    info("Imported realm " + realm.getName());
+    session.getTransaction().commit();
+  }
+  finally {
+    session.close();
+  }
+}

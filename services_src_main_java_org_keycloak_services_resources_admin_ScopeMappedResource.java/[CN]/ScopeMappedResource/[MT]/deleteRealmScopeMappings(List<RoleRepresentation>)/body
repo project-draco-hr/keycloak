@@ -1,0 +1,17 @@
+{
+  if (roles == null) {
+    List<RoleModel> roleModels=realm.getScopeMappings(agent);
+    for (    RoleModel roleModel : roleModels) {
+      realm.deleteScopeMapping(agent,roleModel);
+    }
+  }
+ else {
+    for (    RoleRepresentation role : roles) {
+      RoleModel roleModel=realm.getRoleById(role.getId());
+      if (roleModel == null) {
+        throw new NotFoundException();
+      }
+      realm.deleteScopeMapping(agent,roleModel);
+    }
+  }
+}

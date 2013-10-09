@@ -1,0 +1,9 @@
+{
+  RelationshipQuery<ScopeRelationship> query=getRelationshipManager().createRelationshipQuery(ScopeRelationship.class);
+  query.setParameter(ScopeRelationship.CLIENT,((UserAdapter)user).getUser());
+  query.setParameter(ScopeRelationship.SCOPE,((RoleAdapter)role).getRole());
+  List<ScopeRelationship> grants=query.getResultList();
+  for (  ScopeRelationship grant : grants) {
+    getRelationshipManager().remove(grant);
+  }
+}

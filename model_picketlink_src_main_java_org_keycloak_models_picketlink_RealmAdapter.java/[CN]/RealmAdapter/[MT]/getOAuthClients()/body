@@ -1,0 +1,10 @@
+{
+  RelationshipQuery<OAuthClientRelationship> query=getRelationshipManager().createRelationshipQuery(OAuthClientRelationship.class);
+  query.setParameter(OAuthClientRelationship.REALM,realm.getName());
+  List<OAuthClientRelationship> results=query.getResultList();
+  List<OAuthClientModel> list=new ArrayList<OAuthClientModel>();
+  for (  OAuthClientRelationship rel : results) {
+    list.add(new OAuthClientAdapter(rel,getIdm(),getRelationshipManager()));
+  }
+  return list;
+}

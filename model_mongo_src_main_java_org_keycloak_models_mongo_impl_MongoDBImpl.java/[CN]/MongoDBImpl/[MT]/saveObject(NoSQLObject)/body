@@ -1,0 +1,18 @@
+{
+  Class<? extends NoSQLObject> clazz=object.getClass();
+  ObjectInfo objectInfo=getObjectInfo(clazz);
+  BasicDBObject dbObject=typeConverter.convertApplicationObjectToDBObject(object,BasicDBObject.class);
+  DBCollection dbCollection=database.getCollection(objectInfo.getDbCollectionName());
+  Property<String> oidProperty=objectInfo.getOidProperty();
+  String currentId=oidProperty == null ? null : oidProperty.getValue(object);
+  if (currentId == null) {
+    dbCollection.insert(dbObject);
+    if (oidProperty != null) {
+      oidProperty.setValue(object,dbObject.getString("_id"));
+    }
+  }
+ else {
+    BasicDBObject query=new BasicDBObject("_id",new ObjectId(currentId));
+    dbCollection.update(query,dbObject);
+  }
+}

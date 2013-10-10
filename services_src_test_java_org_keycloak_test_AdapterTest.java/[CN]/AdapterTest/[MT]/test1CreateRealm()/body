@@ -1,5 +1,5 @@
 {
-  realmModel=adapter.createRealm("JUGGLER");
+  realmModel=getRealmManager().createRealm("JUGGLER");
   realmModel.setAccessCodeLifespan(100);
   realmModel.setAccessCodeLifespanUserAction(600);
   realmModel.setCookieLoginAllowed(true);
@@ -11,7 +11,7 @@
   realmModel.setAutomaticRegistrationAfterSocialLogin(true);
   realmModel.addDefaultRole("foo");
   System.out.println(realmModel.getId());
-  realmModel=adapter.getRealm(realmModel.getId());
+  realmModel=getRealmManager().getRealm(realmModel.getId());
   Assert.assertNotNull(realmModel);
   Assert.assertEquals(realmModel.getAccessCodeLifespan(),100);
   Assert.assertEquals(600,realmModel.getAccessCodeLifespanUserAction());

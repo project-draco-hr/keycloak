@@ -1,0 +1,36 @@
+{
+  RealmModel realm=identitySession.getRealm(realmId);
+  if (realm == null) {
+    throw new IllegalStateException("Realm '" + realmId + "' not found");
+  }
+  int totalIterationNumber=totalIterationCounter.incrementAndGet();
+  String lastUsername=null;
+  for (int i=0; i < readUsersPerIteration; i++) {
+    ++userCounterInRealm;
+    if (userCounterInRealm > countOfUsersPerRealm) {
+      userCounterInRealm=1;
+    }
+    String username=PerfTestUtils.getUsername(userCounterInRealm);
+    lastUsername=username;
+    UserModel user=realm.getUser(username);
+    if (readRoles) {
+      realm.getRoleMappings(user);
+    }
+    if (readScopes) {
+      realm.getScopeMappings(user);
+    }
+    if (readPassword) {
+      realm.validatePassword(user,username);
+    }
+    if (readSocialLinks) {
+      realm.getSocialLinks(user);
+    }
+    if (searchBySocialLinks) {
+      SocialLinkModel socialLink=new SocialLinkModel("facebook",username);
+      realm.getUserBySocialLink(socialLink);
+    }
+  }
+  log.info("Finished iteration " + ++iterationNumber + " in ReadUsers test for "+ realmId+ " worker. Last read user "+ lastUsername+ " in realm: "+ realmId);
+  int labelC=((totalIterationNumber - 1) / NUMBER_OF_ITERATIONS_IN_EACH_REPORT) * NUMBER_OF_ITERATIONS_IN_EACH_REPORT;
+  result.setSampleLabel("ReadUsers " + (labelC + 1) + "-"+ (labelC + NUMBER_OF_ITERATIONS_IN_EACH_REPORT));
+}

@@ -1,4 +1,11 @@
 {
-  EntityManagerFactory emf=Persistence.createEntityManagerFactory("keycloak-identity-store");
-  return new PicketlinkKeycloakSessionFactory(emf,buildPartitionManager());
+  if (PropertiesManager.isMongoSessionFactory()) {
+    return buildMongoDBSessionFactory();
+  }
+ else   if (PropertiesManager.isPicketlinkSessionFactory()) {
+    return buildPicketlinkSessionFactory();
+  }
+ else {
+    throw new IllegalStateException("Unknown session factory type: " + PropertiesManager.getSessionFactoryType());
+  }
 }

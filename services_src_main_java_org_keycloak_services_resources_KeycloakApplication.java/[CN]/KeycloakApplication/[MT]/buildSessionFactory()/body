@@ -1,9 +1,11 @@
 {
-  String sessionFactoryType=System.getProperty(SESSION_FACTORY,SESSION_FACTORY_PICKETLINK);
-  if (SESSION_FACTORY_MONGO.equals(sessionFactoryType)) {
+  if (PropertiesManager.isMongoSessionFactory()) {
     return buildMongoDBSessionFactory();
   }
- else {
+ else   if (PropertiesManager.isPicketlinkSessionFactory()) {
     return buildPicketlinkSessionFactory();
+  }
+ else {
+    throw new IllegalStateException("Unknown session factory type: " + PropertiesManager.getSessionFactoryType());
   }
 }

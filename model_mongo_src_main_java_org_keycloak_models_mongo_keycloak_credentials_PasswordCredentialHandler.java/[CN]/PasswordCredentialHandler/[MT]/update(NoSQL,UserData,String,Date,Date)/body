@@ -1,9 +1,7 @@
 {
   NoSQLQuery query=noSQL.createQueryBuilder().andCondition("userId",user.getId()).build();
-  PasswordData passwordData=noSQL.loadSingleObject(PasswordData.class,query);
-  if (passwordData == null) {
-    passwordData=new PasswordData();
-  }
+  noSQL.removeObjects(PasswordData.class,query);
+  PasswordData passwordData=new PasswordData();
   String passwordSalt=generateSalt();
   passwordData.setSalt(passwordSalt);
   passwordData.setEncodedHash(this.passwordEncoder.encode(saltPassword(password,passwordSalt)));

@@ -1,0 +1,24 @@
+{
+  loginPage.open();
+  loginPage.clickRegister();
+  registerPage.register("firstName2","lastName2","email2","setupTotp2","password2","password2");
+  totpPage.assertCurrent();
+  String totpCode=totpPage.getTotpSecret();
+  totpPage.configure(totp.generate(totpCode));
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  oauth.openLogout();
+  loginPage.open();
+  loginPage.login("setupTotp2","password2");
+  Assert.assertTrue(loginPage.isCurrent());
+  Assert.assertFalse(totpPage.isCurrent());
+  loginPage.loginTotp("setupTotp2","password2",totp.generate(totpCode));
+  accountTotpPage.open();
+  accountTotpPage.assertCurrent();
+  accountTotpPage.removeTotp();
+  oauth.openLogout();
+  loginPage.open();
+  loginPage.login("setupTotp2","password2");
+  totpPage.assertCurrent();
+  totpPage.configure(totp.generate(totpPage.getTotpSecret()));
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+}

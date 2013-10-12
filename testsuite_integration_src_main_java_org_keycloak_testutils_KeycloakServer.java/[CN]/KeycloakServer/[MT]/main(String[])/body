@@ -8,6 +8,19 @@
       config.setPort(Integer.valueOf(args[++i]));
     }
   }
+  if (System.getProperties().containsKey("resources")) {
+    String resources=System.getProperty("resources");
+    if (resources == null || resources.equals("")) {
+      for (      String c : System.getProperty("java.class.path").split(File.pathSeparator)) {
+        if (c.contains("keycloak" + File.separator + "testsuite"+ File.separator+ "integration")) {
+          config.setResourcesHome(c.replaceFirst("testsuite.integration.*",""));
+        }
+      }
+    }
+ else {
+      config.setResourcesHome(resources);
+    }
+  }
   final KeycloakServer keycloak=new KeycloakServer(config);
   keycloak.sysout=true;
   keycloak.start();

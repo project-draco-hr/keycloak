@@ -1,9 +1,6 @@
 {
-  factory=KeycloakApplication.buildSessionFactory();
-  identitySession=factory.createSession();
-  identitySession.getTransaction().begin();
-  adapter=new RealmManager(identitySession);
-  realm=adapter.createRealm("Test");
+  super.before();
+  realm=getRealmManager().createRealm("Test");
   realm.setAccessCodeLifespan(100);
   realm.setCookieLoginAllowed(true);
   realm.setEnabled(true);

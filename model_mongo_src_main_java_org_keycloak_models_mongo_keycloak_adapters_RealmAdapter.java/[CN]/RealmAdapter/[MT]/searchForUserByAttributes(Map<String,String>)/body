@@ -1,0 +1,23 @@
+{
+  NoSQLQueryBuilder queryBuilder=noSQL.createQueryBuilder();
+  for (  Map.Entry<String,String> entry : attributes.entrySet()) {
+    if (entry.getKey().equals(UserModel.LOGIN_NAME)) {
+      queryBuilder.andCondition("loginName",entry.getValue());
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.FIRST_NAME)) {
+      queryBuilder.andCondition(UserModel.FIRST_NAME,entry.getValue());
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.LAST_NAME)) {
+      queryBuilder.andCondition(UserModel.LAST_NAME,entry.getValue());
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.EMAIL)) {
+      queryBuilder.andCondition(UserModel.EMAIL,entry.getValue());
+    }
+  }
+  List<UserData> users=noSQL.loadObjects(UserData.class,queryBuilder.build());
+  List<UserModel> userModels=new ArrayList<UserModel>();
+  for (  UserData user : users) {
+    userModels.add(new UserAdapter(user,noSQL));
+  }
+  return userModels;
+}

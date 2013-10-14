@@ -1,0 +1,26 @@
+{
+  if (resourcesHome == null) {
+    String realPath="META-INF/resources" + path;
+    if (realPath.endsWith("/admin/")) {
+      realPath+="index.html";
+    }
+    URL url=getClass().getClassLoader().getResource(realPath);
+    return new URLResource(url,url.openConnection(),path);
+  }
+ else {
+    File file;
+    if (path.startsWith("/forms")) {
+      file=file(resourcesHome,"forms","src","main","resources","META-INF","resources",path.replace('/',File.separatorChar));
+    }
+ else     if (path.startsWith("/admin")) {
+      file=file(resourcesHome,"admin-ui","src","main","resources","META-INF","resources",path.replace('/',File.separatorChar));
+      if (!file.isFile()) {
+        file=file(resourcesHome,"admin-ui-styles","src","main","resources","META-INF","resources",path.replace('/',File.separatorChar));
+      }
+    }
+ else {
+      throw new IOException("Unknown resource " + path);
+    }
+    return new FileResource(file,new FileResourceManager(file.getParentFile(),1),path);
+  }
+}

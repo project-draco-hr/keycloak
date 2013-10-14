@@ -1,0 +1,13 @@
+{
+  String workerClass=System.getProperty("keycloak.perf.workerClass");
+  if (workerClass == null) {
+    throw new IllegalArgumentException("System property keycloak.perf.workerClass needs to be provided");
+  }
+  try {
+    Class workerClazz=Class.forName(workerClass);
+    return (Worker)workerClazz.newInstance();
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

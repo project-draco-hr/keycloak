@@ -1,0 +1,14 @@
+{
+  String host=PropertiesManager.getMongoHost();
+  int port=PropertiesManager.getMongoPort();
+  String dbName=PropertiesManager.getMongoDbName();
+  boolean dropDatabaseOnStartup=PropertiesManager.dropDatabaseOnStartup();
+  try {
+    Class<? extends KeycloakSessionFactory> mongoDBSessionFactoryClass=(Class<? extends KeycloakSessionFactory>)Class.forName("org.keycloak.models.mongo.keycloak.adapters.MongoDBSessionFactory");
+    Constructor<? extends KeycloakSessionFactory> constr=mongoDBSessionFactoryClass.getConstructor(String.class,int.class,String.class,boolean.class);
+    return constr.newInstance(host,port,dbName,dropDatabaseOnStartup);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

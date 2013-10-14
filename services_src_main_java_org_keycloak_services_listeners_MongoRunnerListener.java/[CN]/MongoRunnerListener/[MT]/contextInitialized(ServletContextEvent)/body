@@ -1,0 +1,16 @@
+{
+  if (PropertiesManager.bootstrapEmbeddedMongoAtContextInit()) {
+    int port=PropertiesManager.getMongoPort();
+    logger.info("Going to start embedded MongoDB on port=" + port);
+    try {
+      mongodExe=MongodStarter.getDefaultInstance().prepare(new MongodConfig(Version.V2_0_5,port,Network.localhostIsIPv6()));
+      mongod=mongodExe.start();
+    }
+ catch (    Exception e) {
+      logger.warn("Couldn't start Embedded Mongo on port " + port + ". Maybe it's already started? Cause: "+ e.getClass()+ " "+ e.getMessage());
+      if (logger.isDebugEnabled()) {
+        logger.debug("Failed to start MongoDB",e);
+      }
+    }
+  }
+}

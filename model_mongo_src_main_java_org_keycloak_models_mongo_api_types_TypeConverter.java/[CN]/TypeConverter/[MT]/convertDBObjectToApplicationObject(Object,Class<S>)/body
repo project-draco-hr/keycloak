@@ -1,0 +1,20 @@
+{
+  Class<?> dbObjectType=dbObject.getClass();
+  Converter<Object,S> converter;
+  Map<Class<?>,Converter<?,?>> appObjects=dbObjectConverters.get(dbObjectType);
+  if (appObjects == null) {
+    throw new IllegalArgumentException("Not found any converters for type " + dbObjectType);
+  }
+ else {
+    if (appObjects.size() == 1) {
+      converter=(Converter<Object,S>)appObjects.values().iterator().next();
+    }
+ else {
+      converter=(Converter<Object,S>)getAppConverterForType(expectedApplicationObjectType,appObjects);
+    }
+  }
+  if (converter == null) {
+    throw new IllegalArgumentException("Can't found converter for type " + dbObjectType + " and expectedApplicationType "+ expectedApplicationObjectType);
+  }
+  return converter.convertObject(dbObject);
+}

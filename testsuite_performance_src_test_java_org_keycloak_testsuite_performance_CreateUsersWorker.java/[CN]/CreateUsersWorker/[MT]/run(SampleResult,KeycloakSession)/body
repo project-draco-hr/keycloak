@@ -1,0 +1,47 @@
+{
+  RealmModel realm=identitySession.getRealm(realmId);
+  if (realm == null) {
+    throw new IllegalStateException("Realm '" + realmId + "' not found");
+  }
+  int userNumber=++userCounterInRealm;
+  int totalUserNumber=totalUserCounter.incrementAndGet();
+  String username=PerfTestUtils.getUsername(userNumber);
+  UserModel user=realm.addUser(username);
+  if (addBasicUserAttributes) {
+    user.setFirstName(username + "FN");
+    user.setLastName(username + "LN");
+    user.setEmail(username + "@email.com");
+  }
+  if (addDefaultRoles) {
+    for (    RoleModel role : realm.getDefaultRoles()) {
+      realm.grantRole(user,role);
+    }
+  }
+  if (addPassword) {
+    UserCredentialModel password=new UserCredentialModel();
+    password.setType(CredentialRepresentation.PASSWORD);
+    password.setValue(username);
+    realm.updateCredential(user,password);
+  }
+  for (int i=0; i < socialLinksPerUserCount; i++) {
+    String socialProvider;
+switch (i) {
+case 0:
+      socialProvider="facebook";
+    break;
+case 1:
+  socialProvider="twitter";
+break;
+case 2:
+socialProvider="google";
+break;
+default :
+throw new IllegalArgumentException("Total number of socialLinksPerUserCount is " + socialLinksPerUserCount + " which is too big.");
+}
+SocialLinkModel socialLink=new SocialLinkModel(socialProvider,username);
+realm.addSocialLink(user,socialLink);
+}
+log.info("Finished creation of user " + username + " in realm: "+ realm.getId());
+int labelC=((totalUserNumber - 1) / NUMBER_OF_USERS_IN_EACH_REPORT) * NUMBER_OF_USERS_IN_EACH_REPORT;
+result.setSampleLabel("CreateUsers " + (labelC + 1) + "-"+ (labelC + NUMBER_OF_USERS_IN_EACH_REPORT));
+}

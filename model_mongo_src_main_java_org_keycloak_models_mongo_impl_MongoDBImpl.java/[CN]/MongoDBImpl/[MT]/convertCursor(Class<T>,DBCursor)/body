@@ -1,0 +1,13 @@
+{
+  List<T> result=new ArrayList<T>();
+  try {
+    for (    DBObject dbObject : cursor) {
+      T converted=typeConverter.convertDBObjectToApplicationObject(dbObject,type);
+      result.add(converted);
+    }
+  }
+  finally {
+    cursor.close();
+  }
+  return result;
+}

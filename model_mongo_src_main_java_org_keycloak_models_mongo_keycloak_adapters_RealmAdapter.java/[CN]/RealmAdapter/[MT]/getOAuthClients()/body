@@ -1,0 +1,9 @@
+{
+  NoSQLQuery query=noSQL.createQueryBuilder().andCondition("realmId",getOid()).build();
+  List<OAuthClientData> results=noSQL.loadObjects(OAuthClientData.class,query);
+  List<OAuthClientModel> list=new ArrayList<OAuthClientModel>();
+  for (  OAuthClientData data : results) {
+    list.add(new OAuthClientAdapter(data,noSQL));
+  }
+  return list;
+}

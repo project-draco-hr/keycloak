@@ -1,0 +1,17 @@
+{
+  Set<String> already=new HashSet<String>();
+  for (  RequiredCredentialData data : credsData) {
+    if (!creds.contains(data.getType())) {
+      noSQL.removeObject(data);
+    }
+ else {
+      already.add(data.getType());
+    }
+  }
+  for (  String cred : creds) {
+    System.out.println("updating cred: " + cred);
+    if (!already.contains(cred)) {
+      addRequiredCredential(cred);
+    }
+  }
+}

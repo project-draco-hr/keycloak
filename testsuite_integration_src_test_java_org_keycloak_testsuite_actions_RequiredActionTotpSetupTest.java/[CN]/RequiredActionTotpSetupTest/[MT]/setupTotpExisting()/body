@@ -2,6 +2,11 @@
   loginPage.open();
   loginPage.login("test-user@localhost","password");
   totpPage.assertCurrent();
-  totpPage.configure(totp.generate(totpPage.getTotpSecret()));
+  String totpSecret=totpPage.getTotpSecret();
+  totpPage.configure(totp.generate(totpSecret));
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  oauth.openLogout();
+  loginPage.open();
+  loginPage.loginTotp("test-user@localhost","password",totp.generate(totpSecret));
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
 }

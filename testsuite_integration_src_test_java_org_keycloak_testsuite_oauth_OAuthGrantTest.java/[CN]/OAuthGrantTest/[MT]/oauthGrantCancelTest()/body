@@ -1,0 +1,13 @@
+{
+  driver.navigate().to(GRANT_APP_URL);
+  Assert.assertFalse(driver.getPageSource().contains(ACCESS_GRANTED));
+  Assert.assertFalse(driver.getPageSource().contains(ACCESS_NOT_GRANTED));
+  loginPage.isCurrent();
+  loginPage.login("test-user@localhost","password");
+  grantPage.assertCurrent();
+  Assert.assertTrue(driver.getPageSource().contains(ROLE_USER));
+  Assert.assertTrue(driver.getPageSource().contains(ROLE_CUSTOMER));
+  grantPage.cancel();
+  Assert.assertFalse(driver.getPageSource().contains(ACCESS_GRANTED));
+  Assert.assertTrue(driver.getPageSource().contains(ACCESS_NOT_GRANTED));
+}

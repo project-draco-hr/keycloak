@@ -1,0 +1,24 @@
+{
+  AccessCodeEntry accessCode=getAccessCodeEntry(RequiredAction.CONFIGURE_TOTP);
+  if (accessCode == null) {
+    return forwardToErrorPage();
+  }
+  UserModel user=getUser(accessCode);
+  String totp=formData.getFirst("totp");
+  String totpSecret=formData.getFirst("totpSecret");
+  FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(user);
+  if (Validation.isEmpty(totp)) {
+    return forms.setError(Messages.MISSING_TOTP).forwardToAction(RequiredAction.CONFIGURE_TOTP);
+  }
+ else   if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
+    return forms.setError(Messages.INVALID_TOTP).forwardToAction(RequiredAction.CONFIGURE_TOTP);
+  }
+  UserCredentialModel credentials=new UserCredentialModel();
+  credentials.setType(CredentialRepresentation.TOTP);
+  credentials.setValue(formData.getFirst("totpSecret"));
+  realm.updateCredential(user,credentials);
+  user.setTotp(true);
+  user.removeRequiredAction(RequiredAction.CONFIGURE_TOTP);
+  accessCode.getRequiredActions().remove(RequiredAction.CONFIGURE_TOTP);
+  return redirectOauth(user,accessCode);
+}

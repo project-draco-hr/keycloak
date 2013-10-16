@@ -1,0 +1,13 @@
+{
+  AccessCodeEntry accessCode=getAccessCodeEntry(RequiredAction.UPDATE_PROFILE);
+  if (accessCode == null) {
+    return forwardToErrorPage();
+  }
+  UserModel user=getUser(accessCode);
+  user.setFirstName(formData.getFirst("firstName"));
+  user.setLastName(formData.getFirst("lastName"));
+  user.setEmail(formData.getFirst("email"));
+  user.removeRequiredAction(RequiredAction.UPDATE_PROFILE);
+  accessCode.getRequiredActions().remove(RequiredAction.UPDATE_PROFILE);
+  return redirectOauth(user,accessCode);
+}

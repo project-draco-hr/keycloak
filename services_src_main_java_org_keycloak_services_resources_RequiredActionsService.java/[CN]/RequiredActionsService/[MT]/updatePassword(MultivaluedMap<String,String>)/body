@@ -1,0 +1,31 @@
+{
+  AccessCodeEntry accessCode=getAccessCodeEntry(RequiredAction.UPDATE_PASSWORD);
+  if (accessCode == null) {
+    return forwardToErrorPage();
+  }
+  UserModel user=getUser(accessCode);
+  String password=formData.getFirst("password");
+  String passwordNew=formData.getFirst("password-new");
+  String passwordConfirm=formData.getFirst("password-confirm");
+  FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(user);
+  if (Validation.isEmpty(passwordNew)) {
+    forms.setError(Messages.MISSING_PASSWORD).forwardToAction(RequiredAction.UPDATE_PASSWORD);
+  }
+ else   if (!passwordNew.equals(passwordConfirm)) {
+    forms.setError(Messages.MISSING_PASSWORD).forwardToAction(RequiredAction.UPDATE_PASSWORD);
+  }
+  UserCredentialModel credentials=new UserCredentialModel();
+  credentials.setType(CredentialRepresentation.PASSWORD);
+  credentials.setValue(passwordNew);
+  realm.updateCredential(user,credentials);
+  user.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
+  if (accessCode != null) {
+    accessCode.getRequiredActions().remove(RequiredAction.UPDATE_PASSWORD);
+  }
+  if (accessCode != null) {
+    return redirectOauth(user,accessCode);
+  }
+ else {
+    return Flows.forms(realm,request,uriInfo).setUser(user).forwardToPassword();
+  }
+}

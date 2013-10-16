@@ -1,0 +1,20 @@
+{
+  if (uriInfo.getQueryParameters().containsKey("key")) {
+    AccessCodeEntry accessCode=tokenManager.getAccessCode(uriInfo.getQueryParameters().getFirst("key"));
+    if (accessCode == null || accessCode.isExpired() || !accessCode.getRequiredActions().contains(RequiredAction.VERIFY_EMAIL)) {
+      return forwardToErrorPage();
+    }
+    UserModel user=getUser(accessCode);
+    user.setEmailVerified(true);
+    user.removeRequiredAction(RequiredAction.VERIFY_EMAIL);
+    accessCode.getRequiredActions().remove(RequiredAction.VERIFY_EMAIL);
+    return redirectOauth(user,accessCode);
+  }
+ else {
+    AccessCodeEntry accessCode=getAccessCodeEntry(RequiredAction.VERIFY_EMAIL);
+    if (accessCode == null) {
+      return forwardToErrorPage();
+    }
+    return Flows.forms(realm,request,uriInfo).setAccessCode(accessCode).setUser(accessCode.getUser()).forwardToAction(RequiredAction.VERIFY_EMAIL);
+  }
+}

@@ -1,20 +1,10 @@
 {
-  AccessCodeEntry accessCodeEntry=getAccessCodeEntry(RequiredAction.UPDATE_PROFILE);
-  UserModel user=accessCodeEntry != null ? getUserFromAccessCode(accessCodeEntry) : getUserFromAuthManager();
+  UserModel user=getUserFromAuthManager();
   if (user == null) {
     return Response.status(Status.FORBIDDEN).build();
   }
   user.setFirstName(formData.getFirst("firstName"));
   user.setLastName(formData.getFirst("lastName"));
   user.setEmail(formData.getFirst("email"));
-  user.removeRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE);
-  if (accessCodeEntry != null) {
-    accessCodeEntry.getRequiredActions().remove(UserModel.RequiredAction.UPDATE_PROFILE);
-  }
-  if (accessCodeEntry != null) {
-    return redirectOauth(user,accessCodeEntry);
-  }
- else {
-    return Flows.forms(realm,request,uriInfo).setUser(user).forwardToAccount();
-  }
+  return Flows.forms(realm,request,uriInfo).setUser(user).forwardToAccount();
 }

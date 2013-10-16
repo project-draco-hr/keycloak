@@ -1,0 +1,12 @@
+{
+  if (uriInfo.getQueryParameters().containsKey("key")) {
+    AccessCodeEntry accessCode=tokenManager.getAccessCode(uriInfo.getQueryParameters().getFirst("key"));
+    if (accessCode == null || accessCode.isExpired() || !accessCode.getRequiredActions().contains(RequiredAction.UPDATE_PASSWORD)) {
+      return forwardToErrorPage();
+    }
+    return Flows.forms(realm,request,uriInfo).setAccessCode(accessCode).forwardToAction(RequiredAction.UPDATE_PASSWORD);
+  }
+ else {
+    return Flows.forms(realm,request,uriInfo).forwardToPasswordReset();
+  }
+}

@@ -3,22 +3,10 @@
   session.getTransaction().begin();
   try {
     RealmManager manager=new RealmManager(session);
-    if (manager.getRealm(RealmModel.DEFAULT_REALM) != null) {
+    if (manager.getRealm(Constants.ADMIN_REALM) != null) {
       return;
     }
-    RealmModel defaultRealm=manager.createRealm(RealmModel.DEFAULT_REALM,RealmModel.DEFAULT_REALM);
-    defaultRealm.setName(RealmModel.DEFAULT_REALM);
-    defaultRealm.setEnabled(true);
-    defaultRealm.setTokenLifespan(300);
-    defaultRealm.setAccessCodeLifespan(60);
-    defaultRealm.setAccessCodeLifespanUserAction(600);
-    defaultRealm.setSslNotRequired(true);
-    defaultRealm.setCookieLoginAllowed(true);
-    defaultRealm.setRegistrationAllowed(true);
-    manager.generateRealmKeys(defaultRealm);
-    defaultRealm.addRequiredCredential(CredentialRepresentation.PASSWORD);
-    defaultRealm.addRole(SaasService.REALM_CREATOR_ROLE);
-    defaultRealm.addDefaultRole(SaasService.REALM_CREATOR_ROLE);
+    new ApplianceBootstrap().bootstrap(session);
     session.getTransaction().commit();
   }
   finally {

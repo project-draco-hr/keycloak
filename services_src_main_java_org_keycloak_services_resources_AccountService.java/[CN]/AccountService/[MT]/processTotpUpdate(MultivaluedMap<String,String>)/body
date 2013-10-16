@@ -1,6 +1,5 @@
 {
-  AccessCodeEntry accessCodeEntry=getAccessCodeEntry(RequiredAction.CONFIGURE_TOTP);
-  UserModel user=accessCodeEntry != null ? getUserFromAccessCode(accessCodeEntry) : getUserFromAuthManager();
+  UserModel user=getUserFromAuthManager();
   if (user == null) {
     return Response.status(Status.FORBIDDEN).build();
   }
@@ -21,15 +20,6 @@
   credentials.setType(CredentialRepresentation.TOTP);
   credentials.setValue(formData.getFirst("totpSecret"));
   realm.updateCredential(user,credentials);
-  user.removeRequiredAction(UserModel.RequiredAction.CONFIGURE_TOTP);
-  if (accessCodeEntry != null) {
-    accessCodeEntry.getRequiredActions().remove(UserModel.RequiredAction.CONFIGURE_TOTP);
-  }
   user.setTotp(true);
-  if (accessCodeEntry != null) {
-    return redirectOauth(user,accessCodeEntry);
-  }
- else {
-    return Flows.forms(realm,request,uriInfo).setError("successTotp").setErrorType(FormFlows.ErrorType.SUCCESS).setUser(user).forwardToTotp();
-  }
+  return Flows.forms(realm,request,uriInfo).setError("successTotp").setErrorType(FormFlows.ErrorType.SUCCESS).setUser(user).forwardToTotp();
 }

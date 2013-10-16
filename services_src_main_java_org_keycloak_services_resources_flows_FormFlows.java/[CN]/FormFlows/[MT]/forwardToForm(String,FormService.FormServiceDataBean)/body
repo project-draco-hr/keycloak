@@ -1,0 +1,23 @@
+{
+  formDataBean.setErrorType(errorType == null ? ErrorType.ERROR : errorType);
+  ResteasyUriInfo uriInfo=request.getUri();
+  MultivaluedMap<String,String> queryParameterMap=uriInfo.getQueryParameters();
+  String requestURI=uriInfo.getBaseUri().getPath();
+  UriBuilder uriBuilder=UriBuilder.fromUri(requestURI);
+  for (  String k : queryParameterMap.keySet()) {
+    uriBuilder.replaceQueryParam(k,queryParameterMap.get(k).toArray());
+  }
+  if (accessCode != null) {
+    uriBuilder.queryParam(CODE,accessCode.getCode());
+  }
+  URI baseURI=uriBuilder.build();
+  formDataBean.setBaseURI(baseURI);
+  formDataBean.setContextPath(requestURI.substring(0,requestURI.length() - 6));
+  formDataBean.setSocialRegistration(socialRegistration);
+  Iterator<FormService> itr=ServiceRegistry.lookupProviders(FormService.class);
+  while (itr.hasNext()) {
+    FormService provider=itr.next();
+    if (provider.getId().equals("FormServiceId"))     return Response.status(200).type(MediaType.TEXT_HTML).entity(provider.process(template,formDataBean)).build();
+  }
+  return Response.status(200).entity("form provider not found").build();
+}

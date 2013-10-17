@@ -3,12 +3,15 @@
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=getAdminstrationRealm(realmManager);
   if (realm == null)   throw new NotFoundException();
+  ApplicationModel adminConsole=realm.getApplicationNameMap().get(Constants.ADMIN_CONSOLE_APPLICATION);
+  UserModel adminConsoleUser=adminConsole.getApplicationUser();
   if (!realm.isEnabled()) {
     throw new NotImplementedYetException();
   }
   String username=formData.getFirst("username");
   UserModel user=realm.getUser(username);
   AuthenticationStatus status=authManager.authenticateForm(realm,user,formData);
+  OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
 switch (status) {
 case SUCCESS:
     NewCookie cookie=authManager.createSaasIdentityCookie(realm,user,uriInfo);
@@ -16,7 +19,7 @@ case SUCCESS:
 case ACCOUNT_DISABLED:
 return Flows.forms(realm,request,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).forwardToLogin();
 case ACTIONS_REQUIRED:
-return Flows.forms(realm,request,uriInfo).forwardToAction(user.getRequiredActions().iterator().next());
+return oauth.processAccessCode(null,"n",contextRoot(uriInfo).path(adminPath).build().toString(),adminConsoleUser,user);
 default :
 return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).forwardToLogin();
 }

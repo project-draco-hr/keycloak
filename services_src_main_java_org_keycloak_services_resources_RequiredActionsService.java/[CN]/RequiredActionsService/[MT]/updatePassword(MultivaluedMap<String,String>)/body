@@ -1,8 +1,11 @@
 {
+  logger.info("updatePassword");
   AccessCodeEntry accessCode=getAccessCodeEntry(RequiredAction.UPDATE_PASSWORD);
   if (accessCode == null) {
+    logger.info("updatePassword access code is null");
     return forwardToErrorPage();
   }
+  logger.info("updatePassword has access code");
   UserModel user=getUser(accessCode);
   String password=formData.getFirst("password");
   String passwordNew=formData.getFirst("password-new");
@@ -18,6 +21,7 @@
   credentials.setType(CredentialRepresentation.PASSWORD);
   credentials.setValue(passwordNew);
   realm.updateCredential(user,credentials);
+  logger.info("updatePassword updated credential");
   user.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
   if (accessCode != null) {
     accessCode.getRequiredActions().remove(RequiredAction.UPDATE_PASSWORD);

@@ -1,0 +1,74 @@
+{
+  try {
+    logger.info("loginRedirect ********************** <---");
+    if (error != null) {
+      logger.debug("error from oauth");
+      throw new ForbiddenException("error");
+    }
+    RealmManager realmManager=new RealmManager(session);
+    RealmModel realm=getAdminstrationRealm(realmManager);
+    if (!realm.isEnabled()) {
+      logger.debug("realm not enabled");
+      throw new ForbiddenException();
+    }
+    ApplicationModel adminConsole=realm.getApplicationNameMap().get(Constants.ADMIN_CONSOLE_APPLICATION);
+    UserModel adminConsoleUser=adminConsole.getApplicationUser();
+    if (!adminConsole.isEnabled() || !adminConsoleUser.isEnabled()) {
+      logger.debug("admin app not enabled");
+      throw new ForbiddenException();
+    }
+    if (code == null) {
+      logger.debug("code not specified");
+      throw new BadRequestException();
+    }
+    if (state == null) {
+      logger.debug("state not specified");
+      throw new BadRequestException();
+    }
+    new JaxrsOAuthClient().checkStateCookie(uriInfo,headers);
+    JWSInput input=new JWSInput(code,providers);
+    boolean verifiedCode=false;
+    try {
+      verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
+    }
+ catch (    Exception ignored) {
+      logger.debug("Failed to verify signature",ignored);
+    }
+    if (!verifiedCode) {
+      logger.debug("unverified access code");
+      throw new BadRequestException();
+    }
+    String key=input.readContent(String.class);
+    AccessCodeEntry accessCode=tokenManager.pullAccessCode(key);
+    if (accessCode == null) {
+      logger.debug("bad access code");
+      throw new BadRequestException();
+    }
+    if (accessCode.isExpired()) {
+      logger.debug("access code expired");
+      throw new BadRequestException();
+    }
+    if (!accessCode.getToken().isActive()) {
+      logger.debug("access token expired");
+      throw new BadRequestException();
+    }
+    if (!accessCode.getRealm().getId().equals(realm.getId())) {
+      logger.debug("bad realm");
+      throw new BadRequestException();
+    }
+    if (!adminConsoleUser.getLoginName().equals(accessCode.getClient().getLoginName())) {
+      logger.debug("bad client");
+      throw new BadRequestException();
+    }
+    if (!adminConsole.hasRole(accessCode.getUser(),Constants.ADMIN_CONSOLE_ADMIN_ROLE)) {
+      logger.debug("not allowed");
+      throw new ForbiddenException();
+    }
+    logger.info("loginRedirect SUCCESS");
+    NewCookie cookie=authManager.createSaasIdentityCookie(realm,accessCode.getUser(),uriInfo);
+    return Response.status(302).cookie(cookie).location(contextRoot(uriInfo).path(adminPath).build()).build();
+  }
+  finally {
+    authManager.expireCookie(AbstractOAuthClient.OAUTH_TOKEN_REQUEST_STATE,uriInfo.getAbsolutePath().getPath());
+  }
+}

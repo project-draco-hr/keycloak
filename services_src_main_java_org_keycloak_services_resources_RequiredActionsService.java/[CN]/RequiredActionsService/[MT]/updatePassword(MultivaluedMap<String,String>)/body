@@ -7,15 +7,14 @@
   }
   logger.info("updatePassword has access code");
   UserModel user=getUser(accessCode);
-  String password=formData.getFirst("password");
   String passwordNew=formData.getFirst("password-new");
   String passwordConfirm=formData.getFirst("password-confirm");
   FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(user);
   if (Validation.isEmpty(passwordNew)) {
-    forms.setError(Messages.MISSING_PASSWORD).forwardToAction(RequiredAction.UPDATE_PASSWORD);
+    return forms.setError(Messages.MISSING_PASSWORD).forwardToAction(RequiredAction.UPDATE_PASSWORD);
   }
  else   if (!passwordNew.equals(passwordConfirm)) {
-    forms.setError(Messages.MISSING_PASSWORD).forwardToAction(RequiredAction.UPDATE_PASSWORD);
+    return forms.setError(Messages.NOTMATCH_PASSWORD).forwardToAction(RequiredAction.UPDATE_PASSWORD);
   }
   UserCredentialModel credentials=new UserCredentialModel();
   credentials.setType(CredentialRepresentation.PASSWORD);

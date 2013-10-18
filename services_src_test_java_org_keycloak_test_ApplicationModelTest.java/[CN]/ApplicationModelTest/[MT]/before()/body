@@ -1,0 +1,17 @@
+{
+  factory=KeycloakApplication.buildSessionFactory();
+  identitySession=factory.createSession();
+  identitySession.getTransaction().begin();
+  manager=new RealmManager(identitySession);
+  appManager=new ApplicationManager(manager);
+  realm=manager.createRealm("original");
+  application=realm.addApplication("application");
+  application.setBaseUrl("http://base");
+  application.setManagementUrl("http://management");
+  application.setName("app-name");
+  application.addRole("role-1");
+  application.addRole("role-2");
+  application.getApplicationUser().addRedirectUri("redirect-1");
+  application.getApplicationUser().addRedirectUri("redirect-2");
+  application.updateApplication();
+}

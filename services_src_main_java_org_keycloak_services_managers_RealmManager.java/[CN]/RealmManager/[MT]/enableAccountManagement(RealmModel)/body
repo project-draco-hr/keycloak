@@ -1,0 +1,13 @@
+{
+  ApplicationModel application=realm.getApplicationById(Constants.ACCOUNT_MANAGEMENT_APPLICATION);
+  if (application == null) {
+    application=realm.addApplication(Constants.ACCOUNT_MANAGEMENT_APPLICATION);
+    UserCredentialModel password=new UserCredentialModel();
+    password.setType(UserCredentialModel.PASSWORD);
+    password.setValue(UUID.randomUUID().toString());
+    realm.updateCredential(application.getApplicationUser(),password);
+    RoleModel applicationRole=realm.getRole(Constants.APPLICATION_ROLE);
+    realm.grantRole(application.getApplicationUser(),applicationRole);
+  }
+  application.setEnabled(true);
+}

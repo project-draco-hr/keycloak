@@ -4,6 +4,10 @@
     return forwardToErrorPage();
   }
   UserModel user=getUser(accessCode);
+  String error=Validation.validateUpdateProfileForm(formData);
+  if (error != null) {
+    return Flows.forms(realm,request,uriInfo).setError(error).forwardToAction(RequiredAction.UPDATE_PROFILE);
+  }
   user.setFirstName(formData.getFirst("firstName"));
   user.setLastName(formData.getFirst("lastName"));
   user.setEmail(formData.getFirst("email"));

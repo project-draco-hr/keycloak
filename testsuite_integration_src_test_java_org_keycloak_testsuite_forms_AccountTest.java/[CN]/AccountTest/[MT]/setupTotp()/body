@@ -3,6 +3,9 @@
   loginPage.login("test-user@localhost","password");
   Assert.assertTrue(totpPage.isCurrent());
   Assert.assertFalse(driver.getPageSource().contains("Remove Google"));
+  totpPage.configure(totp.generate(totpPage.getTotpSecret() + "123"));
+  Assert.assertTrue(profilePage.isError());
   totpPage.configure(totp.generate(totpPage.getTotpSecret()));
+  Assert.assertTrue(profilePage.isSuccess());
   Assert.assertTrue(driver.getPageSource().contains("Remove Google"));
 }

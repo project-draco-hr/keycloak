@@ -1,0 +1,70 @@
+{
+  try {
+    if (error != null) {
+      logger.debug("error from oauth");
+      throw new ForbiddenException("error");
+    }
+    if (!realm.isEnabled()) {
+      logger.debug("realm not enabled");
+      throw new ForbiddenException();
+    }
+    UserModel client=application.getApplicationUser();
+    if (!client.isEnabled() || !application.isEnabled()) {
+      logger.debug("account management app not enabled");
+      throw new ForbiddenException();
+    }
+    if (code == null) {
+      logger.debug("code not specified");
+      throw new BadRequestException();
+    }
+    if (state == null) {
+      logger.debug("state not specified");
+      throw new BadRequestException();
+    }
+    String path=new JaxrsOAuthClient().checkStateCookie(uriInfo,headers);
+    JWSInput input=new JWSInput(code,providers);
+    boolean verifiedCode=false;
+    try {
+      verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
+    }
+ catch (    Exception ignored) {
+      logger.debug("Failed to verify signature",ignored);
+    }
+    if (!verifiedCode) {
+      logger.debug("unverified access code");
+      throw new BadRequestException();
+    }
+    String key=input.readContent(String.class);
+    AccessCodeEntry accessCode=tokenManager.pullAccessCode(key);
+    if (accessCode == null) {
+      logger.debug("bad access code");
+      throw new BadRequestException();
+    }
+    if (accessCode.isExpired()) {
+      logger.debug("access code expired");
+      throw new BadRequestException();
+    }
+    if (!accessCode.getToken().isActive()) {
+      logger.debug("access token expired");
+      throw new BadRequestException();
+    }
+    if (!accessCode.getRealm().getId().equals(realm.getId())) {
+      logger.debug("bad realm");
+      throw new BadRequestException();
+    }
+    if (!client.getLoginName().equals(accessCode.getClient().getLoginName())) {
+      logger.debug("bad client");
+      throw new BadRequestException();
+    }
+    UriBuilder redirectBuilder=Urls.accountBase(uriInfo.getBaseUri());
+    if (path != null) {
+      redirectBuilder.path(path);
+    }
+    URI redirectUri=redirectBuilder.build(realm.getId());
+    NewCookie cookie=authManager.createAccountIdentityCookie(realm,accessCode.getUser(),Urls.accountBase(uriInfo.getBaseUri()).build(realm.getId()));
+    return Response.status(302).cookie(cookie).location(redirectUri).build();
+  }
+  finally {
+    authManager.expireCookie(AbstractOAuthClient.OAUTH_TOKEN_REQUEST_STATE,uriInfo.getAbsolutePath().getPath());
+  }
+}

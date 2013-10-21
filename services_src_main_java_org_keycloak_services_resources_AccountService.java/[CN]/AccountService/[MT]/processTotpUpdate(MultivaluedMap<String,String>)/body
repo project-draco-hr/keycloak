@@ -1,25 +1,18 @@
 {
-  UserModel user=getUserFromAuthManager();
-  if (user == null) {
-    return Response.status(Status.FORBIDDEN).build();
-  }
-  FormFlows forms=Flows.forms(realm,request,uriInfo);
+  UserModel user=getUser(true);
   String totp=formData.getFirst("totp");
   String totpSecret=formData.getFirst("totpSecret");
-  String error=null;
+  FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(user);
   if (Validation.isEmpty(totp)) {
-    error=Messages.MISSING_TOTP;
+    return forms.setError(Messages.MISSING_TOTP).forwardToTotp();
   }
  else   if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
-    error=Messages.INVALID_TOTP;
-  }
-  if (error != null) {
-    return forms.setError(error).setUser(user).forwardToTotp();
+    return forms.setError(Messages.INVALID_TOTP).forwardToTotp();
   }
   UserCredentialModel credentials=new UserCredentialModel();
   credentials.setType(CredentialRepresentation.TOTP);
-  credentials.setValue(formData.getFirst("totpSecret"));
+  credentials.setValue(totpSecret);
   realm.updateCredential(user,credentials);
   user.setTotp(true);
-  return Flows.forms(realm,request,uriInfo).setError("successTotp").setErrorType(FormFlows.ErrorType.SUCCESS).setUser(user).forwardToTotp();
+  return Flows.forms(realm,request,uriInfo).setError("successTotp").setErrorType(FormFlows.MessageType.SUCCESS).setUser(user).forwardToTotp();
 }

@@ -1,0 +1,21 @@
+{
+  int width=256;
+  int height=256;
+  if (size != null) {
+    String[] s=size.split("x");
+    width=Integer.parseInt(s[0]);
+    height=Integer.parseInt(s[1]);
+  }
+  if (contents == null) {
+    return Response.status(Response.Status.BAD_REQUEST).build();
+  }
+  QRCodeWriter writer=new QRCodeWriter();
+  final BitMatrix bitMatrix=writer.encode(contents,BarcodeFormat.QR_CODE,width,height);
+  StreamingOutput stream=new StreamingOutput(){
+    @Override public void write(    OutputStream os) throws IOException, WebApplicationException {
+      MatrixToImageWriter.writeToStream(bitMatrix,"png",os);
+    }
+  }
+;
+  return Response.ok(stream).build();
+}

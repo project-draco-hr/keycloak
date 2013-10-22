@@ -5,8 +5,8 @@
   if (provider == null) {
     return Flows.forms(realm,request,uriInfo).setError("Social provider not found").forwardToErrorPage();
   }
-  String key=System.getProperty("keycloak.social." + providerId + ".key");
-  String secret=System.getProperty("keycloak.social." + providerId + ".secret");
+  String key=realm.getSocialConfig().get(providerId + ".key");
+  String secret=realm.getSocialConfig().get(providerId + ".secret");
   String callbackUri=Urls.socialCallback(uriInfo.getBaseUri()).toString();
   SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
   try {

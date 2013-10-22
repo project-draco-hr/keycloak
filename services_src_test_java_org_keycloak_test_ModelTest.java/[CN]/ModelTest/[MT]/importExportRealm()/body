@@ -12,6 +12,14 @@
   realm.setPublicKeyPem("0234234");
   realm.setPrivateKeyPem("1234234");
   realm.addDefaultRole("default-role");
+  HashMap<String,String> smtp=new HashMap<String,String>();
+  smtp.put("from","auto@keycloak");
+  smtp.put("hostname","localhost");
+  realm.setSmtpConfig(smtp);
+  HashMap<String,String> social=new HashMap<String,String>();
+  social.put("google.key","1234");
+  social.put("google.secret","5678");
+  realm.setSmtpConfig(social);
   RealmModel peristed=manager.getRealm(realm.getId());
   assertEquals(realm,peristed);
   RealmModel copy=importExport(realm,"copy");

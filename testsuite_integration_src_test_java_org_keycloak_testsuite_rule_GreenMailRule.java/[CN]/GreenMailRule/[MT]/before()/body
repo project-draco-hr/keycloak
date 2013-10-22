@@ -1,15 +1,4 @@
 {
-  Iterator<Entry<Object,Object>> itr=System.getProperties().entrySet().iterator();
-  while (itr.hasNext()) {
-    Entry<Object,Object> e=itr.next();
-    if (((String)e.getKey()).startsWith("keycloak.mail")) {
-      originalProperties.put(e.getKey(),e.getValue());
-      itr.remove();
-    }
-  }
-  System.setProperty("keycloak.mail.smtp.from","auto@keycloak.org");
-  System.setProperty("keycloak.mail.smtp.host","localhost");
-  System.setProperty("keycloak.mail.smtp.port","3025");
   ServerSetup setup=new ServerSetup(3025,"localhost","smtp");
   greenMail=new GreenMail(setup);
   greenMail.start();

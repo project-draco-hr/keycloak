@@ -30,5 +30,8 @@
     logger.info(user.getLoginName() + " already logged in.");
     return oauth.processAccessCode(scopeParam,state,redirect,client,user);
   }
+  if (prompt != null && prompt.equals("none")) {
+    return oauth.redirectError(client,"access_denied",state,redirect);
+  }
   return Flows.forms(realm,request,uriInfo).forwardToLogin();
 }

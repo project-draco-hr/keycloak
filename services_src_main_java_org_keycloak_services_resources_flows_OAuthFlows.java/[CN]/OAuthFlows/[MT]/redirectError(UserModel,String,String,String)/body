@@ -1,0 +1,11 @@
+{
+  Set<String> redirectUris=client.getRedirectUris();
+  if (!redirectUris.isEmpty() && !redirectUris.contains(redirect)) {
+    return forwardToSecurityFailure("Invalid redirect_uri " + redirect);
+  }
+  UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam("error",error);
+  if (state != null) {
+    redirectUri.queryParam("state",state);
+  }
+  return Response.status(302).location(redirectUri.build()).build();
+}

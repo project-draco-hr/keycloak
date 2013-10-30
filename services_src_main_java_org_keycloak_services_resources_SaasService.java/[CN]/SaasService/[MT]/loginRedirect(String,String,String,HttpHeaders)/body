@@ -1,6 +1,6 @@
 {
   try {
-    logger.info("loginRedirect ********************** <---");
+    logger.debug("loginRedirect ********************** <---");
     if (error != null) {
       logger.debug("error from oauth");
       throw new ForbiddenException("error");
@@ -64,7 +64,7 @@
       logger.debug("not allowed");
       throw new ForbiddenException();
     }
-    logger.info("loginRedirect SUCCESS");
+    logger.debug("loginRedirect SUCCESS");
     NewCookie cookie=authManager.createSaasIdentityCookie(realm,accessCode.getUser(),uriInfo);
     return Response.status(302).cookie(cookie).location(contextRoot(uriInfo).path(adminPath).build()).build();
   }

@@ -1,10 +1,10 @@
 {
   if (user == null) {
-    logger.info("Not Authenticated! Incorrect user name");
+    logger.debug("Not Authenticated! Incorrect user name");
     return AuthenticationStatus.INVALID_USER;
   }
   if (!user.isEnabled()) {
-    logger.info("Account is disabled, contact admin.");
+    logger.debug("Account is disabled, contact admin.");
     return AuthenticationStatus.ACCOUNT_DISABLED;
   }
   Set<String> types=new HashSet<String>();
@@ -33,13 +33,13 @@
         logger.warn("TOTP token not provided");
         return AuthenticationStatus.MISSING_TOTP;
       }
-      logger.info("validating TOTP");
+      logger.debug("validating TOTP");
       if (!realm.validateTOTP(user,password,token)) {
         return AuthenticationStatus.INVALID_CREDENTIALS;
       }
     }
  else {
-      logger.info("validating password for user: " + user.getLoginName());
+      logger.debug("validating password for user: " + user.getLoginName());
       if (!realm.validatePassword(user,password)) {
         return AuthenticationStatus.INVALID_CREDENTIALS;
       }

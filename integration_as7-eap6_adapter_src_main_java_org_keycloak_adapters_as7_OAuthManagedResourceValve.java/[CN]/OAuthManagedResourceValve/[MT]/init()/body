@@ -21,4 +21,6 @@
   realmConfiguration.setClient(client);
   realmConfiguration.setAuthUrl(UriBuilder.fromUri(authUrl).queryParam("client_id",resourceMetadata.getResourceName()));
   realmConfiguration.setCodeUrl(client.target(tokenUrl));
+  AuthenticatedActionsValve actions=new AuthenticatedActionsValve(remoteSkeletonKeyConfig,getNext(),getContainer(),getController());
+  setNext(actions);
 }

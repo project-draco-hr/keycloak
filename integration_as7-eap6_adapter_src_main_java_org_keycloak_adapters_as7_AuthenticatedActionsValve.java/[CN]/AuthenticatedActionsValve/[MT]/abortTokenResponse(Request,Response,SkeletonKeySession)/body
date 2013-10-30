@@ -1,0 +1,16 @@
+{
+  if (session == null) {
+    log.debugv("session was null, sending back 401: {0}",request.getRequestURI());
+    response.sendError(401);
+    return true;
+  }
+  if (!config.isExposeToken()) {
+    response.setStatus(200);
+    return true;
+  }
+  if (!config.isCors() && request.getHeader("Origin") != null) {
+    response.setStatus(200);
+    return true;
+  }
+  return false;
+}

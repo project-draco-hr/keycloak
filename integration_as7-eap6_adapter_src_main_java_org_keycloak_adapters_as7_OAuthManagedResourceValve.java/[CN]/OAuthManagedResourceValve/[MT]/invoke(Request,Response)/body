@@ -1,5 +1,8 @@
 {
   try {
+    if (remoteSkeletonKeyConfig.isCors() && new CorsPreflightChecker(remoteSkeletonKeyConfig).checkCorsPreflight(request,response)) {
+      return;
+    }
     String requestURI=request.getDecodedRequestURI();
     if (requestURI.endsWith("j_admin_request")) {
       adminRequest(request,response);

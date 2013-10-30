@@ -1,5 +1,5 @@
 {
-  logger.info("accessRequest <---");
+  logger.debug("accessRequest <---");
   if (!realm.isEnabled()) {
     throw new NotAuthorizedException("Realm not enabled");
   }
@@ -80,7 +80,7 @@
     res.put("error_description","Auth error");
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  logger.info("accessRequest SUCCESS");
+  logger.debug("accessRequest SUCCESS");
   AccessTokenResponse res=accessTokenResponse(realm.getPrivateKey(),accessCode.getToken());
   return Cors.add(request,Response.ok(res)).allowedOrigins(client.getWebOrigins()).build();
 }

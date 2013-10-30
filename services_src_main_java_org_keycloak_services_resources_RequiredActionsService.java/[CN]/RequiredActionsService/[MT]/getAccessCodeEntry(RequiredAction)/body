@@ -1,7 +1,7 @@
 {
   String code=uriInfo.getQueryParameters().getFirst(FormFlows.CODE);
   if (code == null) {
-    logger.info("getAccessCodeEntry code as not in query param");
+    logger.debug("getAccessCodeEntry code as not in query param");
     return null;
   }
   JWSInput input=new JWSInput(code,providers);
@@ -10,27 +10,27 @@
     verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
   }
  catch (  Exception ignored) {
-    logger.info("getAccessCodeEntry code failed verification");
+    logger.debug("getAccessCodeEntry code failed verification");
     return null;
   }
   if (!verifiedCode) {
-    logger.info("getAccessCodeEntry code failed verification2");
+    logger.debug("getAccessCodeEntry code failed verification2");
     return null;
   }
   String key=input.readContent(String.class);
   AccessCodeEntry accessCodeEntry=tokenManager.getAccessCode(key);
   if (accessCodeEntry == null) {
-    logger.info("getAccessCodeEntry access code entry null");
+    logger.debug("getAccessCodeEntry access code entry null");
     return null;
   }
   if (accessCodeEntry.isExpired()) {
-    logger.info("getAccessCodeEntry: access code id: " + accessCodeEntry.getId());
-    logger.info("getAccessCodeEntry access code entry expired: " + accessCodeEntry.getExpiration());
-    logger.info("getAccessCodeEntry current time: " + (System.currentTimeMillis() / 1000));
+    logger.debug("getAccessCodeEntry: access code id: {0}",accessCodeEntry.getId());
+    logger.debug("getAccessCodeEntry access code entry expired: {0}",accessCodeEntry.getExpiration());
+    logger.debug("getAccessCodeEntry current time: {0}",(System.currentTimeMillis() / 1000));
     return null;
   }
   if (accessCodeEntry.getRequiredActions() == null || !accessCodeEntry.getRequiredActions().contains(requiredAction)) {
-    logger.info("getAccessCodeEntry required actions null || entry does not contain required action: " + (accessCodeEntry.getRequiredActions() == null) + "|"+ !accessCodeEntry.getRequiredActions().contains(requiredAction));
+    logger.debug("getAccessCodeEntry required actions null || entry does not contain required action: {0}|{1}",(accessCodeEntry.getRequiredActions() == null),!accessCodeEntry.getRequiredActions().contains(requiredAction));
     return null;
   }
   return accessCodeEntry;

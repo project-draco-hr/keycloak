@@ -30,10 +30,8 @@
     Session session=request.getSessionInternal(true);
     session.setPrincipal(principal);
     session.setAuthType("OAUTH");
-    if (!remoteSkeletonKeyConfig.isCancelPropagation()) {
-      SkeletonKeySession skSession=new SkeletonKeySession(oauth.getTokenString(),realmConfiguration.getMetadata());
-      session.setNote(SkeletonKeySession.class.getName(),skSession);
-    }
+    SkeletonKeySession skSession=new SkeletonKeySession(oauth.getTokenString(),token,realmConfiguration.getMetadata());
+    session.setNote(SkeletonKeySession.class.getName(),skSession);
     String username=token.getPrincipal();
     log.debug("userSessionManage.login: " + username);
     userSessionManagement.login(session,username);

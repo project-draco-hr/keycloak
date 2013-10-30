@@ -8,5 +8,9 @@
   if (realm.getTokenLifespan() > 0) {
     token.expiration((System.currentTimeMillis() / 1000) + realm.getTokenLifespan());
   }
+  Set<String> allowedOrigins=client.getWebOrigins();
+  if (allowedOrigins != null) {
+    token.setAllowedOrigins(allowedOrigins);
+  }
   return token;
 }

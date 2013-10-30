@@ -4,11 +4,11 @@
   authManager.expireSaasIdentityCookie(uriInfo);
   JaxrsOAuthClient oauth=new JaxrsOAuthClient();
   String authUrl=TokenService.loginPageUrl(uriInfo).build(Constants.ADMIN_REALM).toString();
-  logger.info("authUrl: " + authUrl);
+  logger.debug("authUrl: {0}",authUrl);
   oauth.setAuthUrl(authUrl);
   oauth.setClientId(Constants.ADMIN_CONSOLE_APPLICATION);
   URI redirectUri=uriInfo.getBaseUriBuilder().path(SaasService.class).path(SaasService.class,"loginRedirect").build();
-  logger.info("redirectUri: " + redirectUri.toString());
+  logger.debug("redirectUri: {0}",redirectUri.toString());
   oauth.setStateCookiePath(redirectUri.getPath());
   return oauth.redirect(uriInfo,redirectUri.toString());
 }

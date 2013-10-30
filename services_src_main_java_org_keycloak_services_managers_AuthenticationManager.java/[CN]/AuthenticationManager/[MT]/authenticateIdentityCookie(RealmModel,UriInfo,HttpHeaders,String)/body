@@ -1,27 +1,27 @@
 {
   Cookie cookie=headers.getCookies().get(cookieName);
   if (cookie == null) {
-    logger.info("authenticateCookie could not find cookie: " + cookieName);
+    logger.debug("authenticateCookie could not find cookie: {0}",cookieName);
     return null;
   }
   String tokenString=cookie.getValue();
   try {
     SkeletonKeyToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),realm.getId());
     if (!token.isActive()) {
-      logger.info("identity cookie expired");
+      logger.debug("identity cookie expired");
       expireIdentityCookie(realm,uriInfo);
       return null;
     }
     UserModel user=realm.getUser(token.getPrincipal());
     if (user == null || !user.isEnabled()) {
-      logger.info("Unknown user in identity cookie");
+      logger.debug("Unknown user in identity cookie");
       expireIdentityCookie(realm,uriInfo);
       return null;
     }
     return user;
   }
  catch (  VerificationException e) {
-    logger.info("Failed to verify identity cookie",e);
+    logger.debug("Failed to verify identity cookie",e);
     expireIdentityCookie(realm,uriInfo);
   }
   return null;

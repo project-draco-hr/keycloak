@@ -49,10 +49,8 @@
   principal=new CatalinaSecurityContextHelper().createPrincipal(request.getContext().getRealm(),skeletonKeyPrincipal,roles);
   request.setUserPrincipal(principal);
   request.setAuthType("OAUTH_BEARER");
-  if (propagateToken) {
-    SkeletonKeySession skSession=new SkeletonKeySession(tokenString,resourceMetadata);
-    request.setAttribute(SkeletonKeySession.class.getName(),skSession);
-    ResteasyProviderFactory.pushContext(SkeletonKeySession.class,skSession);
-  }
+  SkeletonKeySession skSession=new SkeletonKeySession(tokenString,token,resourceMetadata);
+  request.setAttribute(SkeletonKeySession.class.getName(),skSession);
+  ResteasyProviderFactory.pushContext(SkeletonKeySession.class,skSession);
   return true;
 }

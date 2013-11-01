@@ -3,7 +3,7 @@
     Twitter twitter=new TwitterFactory().getInstance();
     twitter.setOAuthConsumer(request.getKey(),request.getSecret());
     RequestToken requestToken=twitter.getOAuthRequestToken(request.getCallbackUrl());
-    return AuthRequestBuilder.create(requestToken.getToken(),requestToken.getAuthenticationURL()).setAttribute("token",requestToken.getToken()).setAttribute("tokenSecret",requestToken.getTokenSecret()).build();
+    return AuthRequest.create(requestToken.getToken(),requestToken.getAuthenticationURL()).setAttribute("token",requestToken.getToken()).setAttribute("tokenSecret",requestToken.getTokenSecret()).build();
   }
  catch (  Exception e) {
     throw new SocialProviderException(e);

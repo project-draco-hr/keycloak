@@ -1,0 +1,14 @@
+{
+  StringBuilder sb=new StringBuilder();
+  sb.append("var req = new XMLHttpRequest();\n");
+  sb.append("req.open('GET', '" + getAccountURI().toString() + "', false);\n");
+  if (token != null) {
+    sb.append("req.setRequestHeader('Authorization', 'Bearer " + token + "');\n");
+  }
+  sb.append("req.setRequestHeader('Accept', 'application/json');\n");
+  sb.append("req.send(null);\n");
+  sb.append("return req.status + '///' + req.responseText;\n");
+  JavascriptExecutor js=(JavascriptExecutor)driver;
+  String response=(String)js.executeScript(sb.toString());
+  return response.split("///");
+}

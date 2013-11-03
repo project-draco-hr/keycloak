@@ -12,13 +12,24 @@
       expireIdentityCookie(realm,uriInfo);
       return null;
     }
+    Auth auth=new Auth();
     UserModel user=realm.getUser(token.getPrincipal());
     if (user == null || !user.isEnabled()) {
       logger.debug("Unknown user in identity cookie");
       expireIdentityCookie(realm,uriInfo);
       return null;
     }
-    return user;
+    auth.setUser(user);
+    if (token.getIssuedFor() != null) {
+      UserModel client=realm.getUser(token.getIssuedFor());
+      if (client == null || !client.isEnabled()) {
+        logger.debug("Unknown client in identity cookie");
+        expireIdentityCookie(realm,uriInfo);
+        return null;
+      }
+      auth.setClient(client);
+    }
+    return auth;
   }
  catch (  VerificationException e) {
     logger.debug("Failed to verify identity cookie",e);

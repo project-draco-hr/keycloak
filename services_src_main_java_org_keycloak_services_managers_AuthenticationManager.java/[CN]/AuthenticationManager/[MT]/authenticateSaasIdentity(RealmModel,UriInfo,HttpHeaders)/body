@@ -1,5 +1,6 @@
 {
   UserModel user=authenticateSaasIdentityCookie(realm,uriInfo,headers);
   if (user != null)   return user;
-  return authenticateBearerToken(realm,headers);
+  Auth auth=authenticateBearerToken(realm,headers);
+  return auth != null ? auth.getUser() : null;
 }

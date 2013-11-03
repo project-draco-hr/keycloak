@@ -1,7 +1,7 @@
 {
-  UserModel user=getUser(false);
-  if (user != null) {
-    return Flows.forms(realm,request,uriInfo).setUser(user).forwardToForm(template);
+  AuthenticationManager.Auth auth=getAuth(false);
+  if (auth != null) {
+    return Flows.forms(realm,request,uriInfo).setUser(auth.getUser()).forwardToForm(template);
   }
  else {
     return login(path);

@@ -1,8 +1,29 @@
 {
-  String origin=request.getHttpHeaders().getHeaderString("Origin");
-  if (origin == null || allowedOrigins == null || (!allowedOrigins.contains(origin))) {
+  String origin=request.getHttpHeaders().getHeaderString(ORIGIN);
+  if (origin == null) {
     return response.build();
   }
-  response.header("Access-Control-Allow-Origin",origin);
+  if (!preflight && (allowedOrigins == null || !allowedOrigins.contains(origin))) {
+    return response.build();
+  }
+  response.header(ACCESS_CONTROL_ALLOW_ORIGIN,origin);
+  if (allowedMethods != null) {
+    StringBuilder sb=new StringBuilder();
+    for (int i=0; i < allowedMethods.length; i++) {
+      if (i > 0) {
+        sb.append(", ");
+      }
+      sb.append(allowedMethods[i]);
+    }
+    response.header(ACCESS_CONTROL_ALLOW_METHODS,sb.toString());
+  }
+ else {
+    response.header(ACCESS_CONTROL_ALLOW_METHODS,DEFAULT_ALLOW_METHODS);
+  }
+  response.header(ACCESS_CONTROL_ALLOW_CREDENTIALS,Boolean.toString(auth));
+  if (auth) {
+    response.header(ACCESS_CONTROL_ALLOW_HEADERS,"Authorization");
+  }
+  response.header(ACCESS_CONTROL_MAX_AGE,DEFAULT_MAX_AGE);
   return response.build();
 }

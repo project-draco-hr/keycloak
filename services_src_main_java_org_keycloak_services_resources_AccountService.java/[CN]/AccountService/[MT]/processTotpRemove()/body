@@ -1,5 +1,6 @@
 {
-  UserModel user=getUser(true);
+  AuthenticationManager.Auth auth=getAuth(true);
+  UserModel user=auth.getUser();
   user.setTotp(false);
   return Flows.forms(realm,request,uriInfo).setError("successTotpRemoved").setErrorType(FormFlows.MessageType.SUCCESS).setUser(user).forwardToTotp();
 }

@@ -1,5 +1,6 @@
 {
-  UserModel user=getUser(true);
+  AuthenticationManager.Auth auth=getAuth(true);
+  UserModel user=auth.getUser();
   String error=Validation.validateUpdateProfileForm(formData);
   if (error != null) {
     return Flows.forms(realm,request,uriInfo).setUser(user).setError(error).forwardToAccount();

@@ -1,16 +1,15 @@
 {
+  oauth.addScope("test-app","customer-user");
   oauth.clientId("third-party");
   oauth.doLoginGrant("test-user@localhost","password");
   grantPage.assertCurrent();
-  Assert.assertTrue(driver.getPageSource().contains(ROLE_USER));
   Assert.assertTrue(driver.getPageSource().contains(ROLE_CUSTOMER));
   grantPage.accept();
   Assert.assertTrue(oauth.getCurrentQuery().containsKey("code"));
   OAuthClient.AccessTokenResponse accessToken=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get("code"),"password");
   SkeletonKeyToken token=oauth.verifyToken(accessToken.getAccessToken());
   SkeletonKeyToken.Access realmAccess=token.getRealmAccess();
-  Assert.assertEquals(1,realmAccess.getRoles().size());
-  Assert.assertTrue(realmAccess.isUserInRole("user"));
+  Assert.assertNull(realmAccess);
   Map<String,SkeletonKeyToken.Access> resourceAccess=token.getResourceAccess();
   Assert.assertEquals(1,resourceAccess.size());
   Assert.assertEquals(1,resourceAccess.get("test-app").getRoles().size());

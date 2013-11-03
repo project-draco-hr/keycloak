@@ -5,6 +5,9 @@
   }
  else   if (types.contains(MediaType.APPLICATION_JSON_TYPE)) {
     AuthenticationManager.Auth auth=getAuth(true);
+    if (!hasAccess(auth,Constants.ACCOUNT_PROFILE_ROLE)) {
+      throw new ForbiddenException();
+    }
     return Cors.add(request,Response.ok(RealmManager.toRepresentation(auth.getUser()))).auth().allowedOrigins(auth.getClient()).build();
   }
  else {

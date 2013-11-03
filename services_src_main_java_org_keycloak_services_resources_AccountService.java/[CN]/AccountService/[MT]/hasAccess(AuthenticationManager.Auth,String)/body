@@ -1,0 +1,17 @@
+{
+  UserModel client=auth.getClient();
+  if (realm.hasRole(client,Constants.APPLICATION_ROLE)) {
+    return true;
+  }
+  SkeletonKeyToken token=auth.getToken();
+  SkeletonKeyToken.Access access=token.getResourceAccess(application.getName());
+  if (access != null) {
+    if (access.isUserInRole(Constants.ACCOUNT_MANAGE_ROLE)) {
+      return true;
+    }
+    if (access.isUserInRole(Constants.ACCOUNT_PROFILE_ROLE)) {
+      return true;
+    }
+  }
+  return false;
+}

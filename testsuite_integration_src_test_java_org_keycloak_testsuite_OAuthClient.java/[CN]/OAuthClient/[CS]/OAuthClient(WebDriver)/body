@@ -1,5 +1,10 @@
 {
   this.driver=driver;
-  JSONObject realmJson=new JSONObject(IOUtils.toString(getClass().getResourceAsStream("/testrealm.json")));
-  realmPublicKey=PemUtils.decodePublicKey(realmJson.getString("publicKey"));
+  try {
+    JSONObject realmJson=new JSONObject(IOUtils.toString(getClass().getResourceAsStream("/testrealm.json")));
+    realmPublicKey=PemUtils.decodePublicKey(realmJson.getString("publicKey"));
+  }
+ catch (  Exception e) {
+    throw new AssertionError("Failed to retrieve realm public key",e);
+  }
 }

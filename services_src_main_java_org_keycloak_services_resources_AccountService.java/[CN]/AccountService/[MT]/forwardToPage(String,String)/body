@@ -1,6 +1,9 @@
 {
   AuthenticationManager.Auth auth=getAuth(false);
   if (auth != null) {
+    if (!hasAccess(auth)) {
+      return noAccess();
+    }
     return Flows.forms(realm,request,uriInfo).setUser(auth.getUser()).forwardToForm(template);
   }
  else {

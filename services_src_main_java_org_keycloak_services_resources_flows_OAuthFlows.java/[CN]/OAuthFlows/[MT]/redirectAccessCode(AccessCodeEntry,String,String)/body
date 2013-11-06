@@ -1,5 +1,6 @@
 {
-  Set<String> redirectUris=accessCode.getClient().getRedirectUris();
+  UserModel client=realm.getUser(accessCode.getClient().getLoginName());
+  Set<String> redirectUris=client.getRedirectUris();
   if (!redirectUris.isEmpty() && !redirectUris.contains(redirect)) {
     return forwardToSecurityFailure("Invalid redirect_uri " + redirect);
   }

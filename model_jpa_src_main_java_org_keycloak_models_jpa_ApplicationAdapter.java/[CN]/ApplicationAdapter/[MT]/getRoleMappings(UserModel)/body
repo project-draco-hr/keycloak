@@ -1,0 +1,11 @@
+{
+  TypedQuery<ApplicationUserRoleMappingEntity> query=em.createNamedQuery("userApplicationMappings",ApplicationUserRoleMappingEntity.class);
+  query.setParameter("user",((UserAdapter)user).getUser());
+  query.setParameter("application",application);
+  List<ApplicationUserRoleMappingEntity> entities=query.getResultList();
+  List<RoleModel> roles=new ArrayList<RoleModel>();
+  for (  ApplicationUserRoleMappingEntity entity : entities) {
+    roles.add(new RoleAdapter(entity.getRole()));
+  }
+  return roles;
+}

@@ -1,0 +1,18 @@
+{
+  ApplicationEntity applicationData=new ApplicationEntity();
+  UserEntity user=new UserEntity();
+  user.setLoginName(name);
+  user.setRealm(realm);
+  user.setEnabled(true);
+  em.persist(user);
+  applicationData.setApplicationUser(user);
+  applicationData.setName(name);
+  realm.getApplications().add(applicationData);
+  em.persist(applicationData);
+  em.flush();
+  ApplicationModel resource=new ApplicationAdapter(em,applicationData);
+  resource.addRole("*");
+  resource.addScopeMapping(new UserAdapter(user),"*");
+  em.flush();
+  return resource;
+}

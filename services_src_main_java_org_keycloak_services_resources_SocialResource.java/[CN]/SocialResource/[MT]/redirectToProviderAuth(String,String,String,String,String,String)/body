@@ -11,7 +11,7 @@
   SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
   try {
     AuthRequest authRequest=provider.getAuthUrl(config);
-    RequestDetails socialRequest=RequestDetailsBuilder.create(providerId).putSocialAttributes(authRequest.getAttributes()).putClientAttribute("realmId",realmId).putClientAttribute("clientId",clientId).putClientAttribute("scope",scope).putClientAttribute("state",state).putClientAttribute("redirectUri",redirectUri).build();
+    RequestDetails socialRequest=RequestDetails.create(providerId).putSocialAttributes(authRequest.getAttributes()).putClientAttribute("realmId",realmId).putClientAttribute("clientId",clientId).putClientAttribute("scope",scope).putClientAttribute("state",state).putClientAttribute("redirectUri",redirectUri).build();
     socialRequestManager.addRequest(authRequest.getId(),socialRequest);
     return Response.status(Status.FOUND).location(authRequest.getAuthUri()).build();
   }

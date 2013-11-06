@@ -17,15 +17,13 @@
   rep.setAccessCodeLifespanUserAction(realm.getAccessCodeLifespanUserAction());
   rep.setSmtpServer(realm.getSmtpConfig());
   rep.setSocialProviders(realm.getSocialConfig());
-  ApplicationModel accountManagementApplication=realm.getApplicationNameMap().get(Constants.ACCOUNT_MANAGEMENT_APPLICATION);
+  ApplicationModel accountManagementApplication=realm.getApplicationNameMap().get(Constants.ACCOUNT_APPLICATION);
   rep.setAccountManagement(accountManagementApplication != null && accountManagementApplication.isEnabled());
-  List<RoleModel> defaultRoles=realm.getDefaultRoles();
-  if (defaultRoles.size() > 0) {
-    String[] d=new String[defaultRoles.size()];
-    for (int i=0; i < d.length; i++) {
-      d[i]=defaultRoles.get(i).getName();
-    }
-    rep.setDefaultRoles(d);
+  List<String> defaultRoles=realm.getDefaultRoles();
+  if (!defaultRoles.isEmpty()) {
+    List<String> roleStrings=new ArrayList<String>();
+    roleStrings.addAll(defaultRoles);
+    rep.setDefaultRoles(roleStrings);
   }
   List<RequiredCredentialModel> requiredCredentialModels=realm.getRequiredCredentials();
   if (requiredCredentialModels.size() > 0) {

@@ -1,5 +1,9 @@
 {
-  UserModel user=getUser(true);
+  AuthenticationManager.Auth auth=getAuth(true);
+  if (!hasAccess(auth)) {
+    return noAccess();
+  }
+  UserModel user=auth.getUser();
   FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(user);
   String password=formData.getFirst("password");
   String passwordNew=formData.getFirst("password-new");

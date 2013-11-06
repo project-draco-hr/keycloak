@@ -1,0 +1,8 @@
+{
+  oauth.addScope(org.keycloak.models.Constants.ACCOUNT_APPLICATION);
+  oauth.clientId("third-party");
+  oauth.doLoginGrant("test-user@localhost","password");
+  String token=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get("code"),"password").getAccessToken();
+  HttpResponse response=doGetProfile(token,null);
+  assertEquals(403,response.getStatusLine().getStatusCode());
+}

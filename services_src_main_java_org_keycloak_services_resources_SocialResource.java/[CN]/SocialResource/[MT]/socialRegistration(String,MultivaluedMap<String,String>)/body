@@ -20,7 +20,6 @@
   String scope=requestData.getClientAttribute("scope");
   String state=requestData.getClientAttribute("state");
   String redirectUri=requestData.getClientAttribute("redirectUri");
-  SocialLinkModel socialLink=(SocialLinkModel)requestData.getSocialAttribute(SocialConstants.ATTR_SOCIAL_LINK);
   Response response1=tokenService.processRegisterImpl(clientId,scope,state,redirectUri,formData,true);
   if (response1 != null || request.wasForwarded()) {
     logger.warn("Registration attempt wasn't successful. Request already forwarded or redirected.");
@@ -31,7 +30,7 @@
   if (user == null) {
     throw new IllegalStateException("User " + username + " not found in the realm");
   }
-  realm.addSocialLink(user,socialLink);
+  realm.addSocialLink(user,new SocialLinkModel(requestData.getProviderId(),username));
   String cookiePath=Urls.socialBase(uriInfo.getBaseUri()).build().getPath();
   NewCookie newCookie=new NewCookie(SocialConstants.SOCIAL_REGISTRATION_COOKIE,"",cookiePath,null,"Expire social cookie",0,false);
   logger.debug("Expiring social registration cookie: {0}, path: {1}",SocialConstants.SOCIAL_REGISTRATION_COOKIE,cookiePath);

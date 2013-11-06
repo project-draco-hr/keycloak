@@ -1,3 +1,8 @@
 {
-  return RSATokenVerifier.verifyToken(token,realmPublicKey,realm);
+  try {
+    return RSATokenVerifier.verifyToken(token,realmPublicKey,realm);
+  }
+ catch (  VerificationException e) {
+    throw new RuntimeException("Failed to verify token",e);
+  }
 }

@@ -1,3 +1,16 @@
 {
-  return forwardToPage(null,Pages.ACCOUNT);
+  List<MediaType> types=headers.getAcceptableMediaTypes();
+  if (types.contains(MediaType.WILDCARD_TYPE) || (types.contains(MediaType.TEXT_HTML_TYPE))) {
+    return forwardToPage(null,Pages.ACCOUNT);
+  }
+ else   if (types.contains(MediaType.APPLICATION_JSON_TYPE)) {
+    AuthenticationManager.Auth auth=getAuth(true);
+    if (!hasAccess(auth,Constants.ACCOUNT_PROFILE_ROLE)) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
+    return Cors.add(request,Response.ok(RealmManager.toRepresentation(auth.getUser()))).auth().allowedOrigins(auth.getClient()).build();
+  }
+ else {
+    return Response.notAcceptable(Variant.VariantListBuilder.newInstance().mediaTypes(MediaType.TEXT_HTML_TYPE,MediaType.APPLICATION_JSON_TYPE).build()).build();
+  }
 }

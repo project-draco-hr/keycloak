@@ -1,12 +1,10 @@
 {
-  List<RoleModel> defaultRoleModels=new ArrayList<RoleModel>();
-  if (realm.getDefaultRoles() != null) {
-    for (    String name : realm.getDefaultRoles()) {
-      RoleAdapter role=getRole(name);
-      if (role != null) {
-        defaultRoleModels.add(role);
-      }
-    }
+  if (realm.getDefaultRoles() == null)   return Collections.emptyList();
+  List<String> list=new ArrayList<String>();
+  for (  String role : realm.getDefaultRoles()) {
+    RoleModel model=getRole(role);
+    if (model == null)     throw new RuntimeException("default role missing");
+    list.add(role);
   }
-  return defaultRoleModels;
+  return list;
 }

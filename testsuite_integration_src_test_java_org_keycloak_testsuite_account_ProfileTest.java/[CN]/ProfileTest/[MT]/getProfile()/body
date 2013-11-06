@@ -1,0 +1,16 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  String code=oauth.getCurrentQuery().get("code");
+  String token=oauth.doAccessTokenRequest(code,"password").getAccessToken();
+  HttpResponse response=doGetProfile(token,null);
+  assertEquals(200,response.getStatusLine().getStatusCode());
+  JSONObject profile=new JSONObject(IOUtils.toString(response.getEntity().getContent()));
+  assertEquals("test-user@localhost",profile.getString("username"));
+  assertEquals("test-user@localhost",profile.getString("email"));
+  assertEquals("First",profile.getString("firstName"));
+  assertEquals("Last",profile.getString("lastName"));
+  JSONObject attributes=profile.getJSONObject("attributes");
+  assertEquals(2,attributes.length());
+  assertEquals("value1",attributes.getString("key1"));
+  assertEquals("value2",attributes.getString("key2"));
+}

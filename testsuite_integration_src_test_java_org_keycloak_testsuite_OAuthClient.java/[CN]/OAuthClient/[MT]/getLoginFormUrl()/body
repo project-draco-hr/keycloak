@@ -10,7 +10,12 @@
     b.queryParam("redirect_uri",redirectUri);
   }
   if (scope != null) {
-    b.queryParam("scope",scope);
+    try {
+      b.queryParam("scope",Base64Url.encode(JsonSerialization.toByteArray(scope,false)));
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to serialize scope",e);
+    }
   }
   if (state != null) {
     b.queryParam("state",state);

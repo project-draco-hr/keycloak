@@ -2,7 +2,7 @@
   String tokenString=null;
   String authHeader=headers.getHeaderString(HttpHeaders.AUTHORIZATION);
   if (authHeader == null) {
-    throw new NotAuthorizedException("Bearer");
+    return null;
   }
  else {
     String[] split=authHeader.trim().split("\\s+");
@@ -15,11 +15,20 @@
     if (!token.isActive()) {
       throw new NotAuthorizedException("token_expired");
     }
+    Auth auth=new Auth(token);
     UserModel user=realm.getUser(token.getPrincipal());
     if (user == null || !user.isEnabled()) {
       throw new NotAuthorizedException("invalid_user");
     }
-    return user;
+    auth.setUser(user);
+    if (token.getIssuedFor() != null) {
+      UserModel client=realm.getUser(token.getIssuedFor());
+      if (client == null || !client.isEnabled()) {
+        throw new NotAuthorizedException("invalid_user");
+      }
+      auth.setClient(client);
+    }
+    return auth;
   }
  catch (  VerificationException e) {
     logger.error("Failed to verify token",e);

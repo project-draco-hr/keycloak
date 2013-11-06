@@ -1,0 +1,12 @@
+{
+  HttpClient client=new DefaultHttpClient();
+  HttpGet get=new HttpGet(UriBuilder.fromUri(getAccountURI()).build());
+  if (token != null) {
+    get.setHeader(HttpHeaders.AUTHORIZATION,"bearer " + token);
+  }
+  if (origin != null) {
+    get.setHeader("Origin",origin);
+  }
+  get.setHeader(HttpHeaders.ACCEPT,MediaType.APPLICATION_JSON);
+  return client.execute(get);
+}

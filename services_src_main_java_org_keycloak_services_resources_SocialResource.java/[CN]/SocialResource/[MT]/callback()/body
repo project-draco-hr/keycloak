@@ -48,16 +48,11 @@
         user.setEmail(socialUser.getEmail());
       }
       realm.addSocialLink(user,socialLink);
-      for (      RoleModel role : realm.getDefaultRoles()) {
-        realm.grantRole(user,role);
-      }
     }
  else {
       MultivaluedMap<String,String> formData=fillRegistrationFormWithSocialData(socialUser);
-      RequestDetailsBuilder reqDetailsBuilder=RequestDetailsBuilder.createFromRequestDetails(requestData);
-      reqDetailsBuilder.putSocialAttribute(SocialConstants.ATTR_SOCIAL_LINK,socialLink);
       String requestId=UUID.randomUUID().toString();
-      socialRequestManager.addRequest(requestId,reqDetailsBuilder.build());
+      socialRequestManager.addRequest(requestId,RequestDetails.create(requestData).build());
       boolean secureOnly=!realm.isSslNotRequired();
       String cookiePath=Urls.socialBase(uriInfo.getBaseUri()).build().getPath();
       logger.debug("creating cookie for social registration - name: {0} path: {1}",SocialConstants.SOCIAL_REGISTRATION_COOKIE,cookiePath);

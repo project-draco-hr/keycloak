@@ -19,5 +19,10 @@
   }
   UrlEncodedFormEntity formEntity=new UrlEncodedFormEntity(parameters,Charset.forName("UTF-8"));
   post.setEntity(formEntity);
-  return new AccessTokenResponse(client.execute(post));
+  try {
+    return new AccessTokenResponse(client.execute(post));
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Failed to retrieve access token",e);
+  }
 }

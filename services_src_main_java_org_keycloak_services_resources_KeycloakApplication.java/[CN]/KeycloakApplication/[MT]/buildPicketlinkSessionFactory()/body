@@ -1,4 +1,10 @@
 {
-  EntityManagerFactory emf=Persistence.createEntityManagerFactory("keycloak-identity-store");
-  return new PicketlinkKeycloakSessionFactory(emf,buildPartitionManager());
+  ModelProvider provider=null;
+  try {
+    provider=(ModelProvider)Class.forName("org.keycloak.models.picketlink.PicketlinkModelProvider").newInstance();
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  return provider.createFactory();
 }

@@ -1,0 +1,33 @@
+{
+  StringBuilder builder=new StringBuilder("select u from UserEntity u");
+  boolean first=true;
+  for (  Map.Entry<String,String> entry : attributes.entrySet()) {
+    String attribute=null;
+    if (entry.getKey().equals(UserModel.LOGIN_NAME)) {
+      attribute="loginName";
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.FIRST_NAME)) {
+      attribute="firstName";
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.LAST_NAME)) {
+      attribute="lastName";
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.EMAIL)) {
+      attribute="email";
+    }
+    if (attribute == null)     continue;
+    if (first) {
+      first=false;
+      builder.append(" where ");
+    }
+ else {
+      builder.append(" and ");
+    }
+    builder.append(attribute).append("='").append(entry.getValue()).append("'");
+  }
+  TypedQuery<UserEntity> query=em.createQuery(builder.toString(),UserEntity.class);
+  List<UserEntity> results=query.getResultList();
+  List<UserModel> users=new ArrayList<UserModel>();
+  for (  UserEntity entity : results)   users.add(new UserAdapter(entity));
+  return users;
+}

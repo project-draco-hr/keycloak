@@ -39,12 +39,15 @@
   if (resourceRep.getRoleMappings() != null) {
     for (    UserRoleMappingRepresentation mapping : resourceRep.getRoleMappings()) {
       UserModel user=realm.getUser(mapping.getUsername());
+      if (user == null) {
+        throw new RuntimeException("User not found");
+      }
       for (      String roleString : mapping.getRoles()) {
         RoleModel role=applicationModel.getRole(roleString.trim());
         if (role == null) {
           role=applicationModel.addRole(roleString.trim());
         }
-        realm.grantRole(user,role);
+        applicationModel.grantRole(user,role);
       }
     }
   }

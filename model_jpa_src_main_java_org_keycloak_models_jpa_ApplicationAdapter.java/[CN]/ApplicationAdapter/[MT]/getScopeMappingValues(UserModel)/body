@@ -1,0 +1,11 @@
+{
+  TypedQuery<ApplicationScopeMappingEntity> query=em.createNamedQuery("userApplicationScopeMappings",ApplicationScopeMappingEntity.class);
+  query.setParameter("user",((UserAdapter)agent).getUser());
+  query.setParameter("application",application);
+  List<ApplicationScopeMappingEntity> entities=query.getResultList();
+  Set<String> roles=new HashSet<String>();
+  for (  ApplicationScopeMappingEntity entity : entities) {
+    roles.add(entity.getRole().getName());
+  }
+  return roles;
+}

@@ -1,0 +1,14 @@
+{
+  OAuthClientEntity data=new OAuthClientEntity();
+  UserEntity user=new UserEntity();
+  user.setLoginName(name);
+  user.setRealm(realm);
+  user.setEnabled(true);
+  em.persist(user);
+  data.setAgent(user);
+  data.setName(name);
+  data.setRealm(realm);
+  em.persist(data);
+  em.flush();
+  return new OAuthClientAdapter(data);
+}

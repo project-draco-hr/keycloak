@@ -1,0 +1,25 @@
+{
+  CredentialEntity credentialEntity=null;
+  UserEntity userEntity=((UserAdapter)user).getUser();
+  for (  CredentialEntity entity : userEntity.getCredentials()) {
+    if (entity.getType().equals(cred.getType())) {
+      credentialEntity=entity;
+    }
+  }
+  if (credentialEntity == null) {
+    credentialEntity=new CredentialEntity();
+    credentialEntity.setType(cred.getType());
+    credentialEntity.setDevice(cred.getDevice());
+    credentialEntity.setUser(userEntity);
+    em.persist(credentialEntity);
+    userEntity.getCredentials().add(credentialEntity);
+  }
+  if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
+    credentialEntity.setValue(new SHAPasswordEncoder(512).encode(cred.getValue()));
+  }
+ else {
+    credentialEntity.setValue(cred.getValue());
+  }
+  credentialEntity.setDevice(cred.getDevice());
+  em.flush();
+}

@@ -1,0 +1,11 @@
+{
+  TypedQuery<RealmScopeMappingEntity> query=em.createNamedQuery("userRealmScopeMappings",RealmScopeMappingEntity.class);
+  query.setParameter("user",((UserAdapter)agent).getUser());
+  query.setParameter("realm",realm);
+  List<RealmScopeMappingEntity> entities=query.getResultList();
+  List<RoleModel> roles=new ArrayList<RoleModel>();
+  for (  RealmScopeMappingEntity entity : entities) {
+    roles.add(new RoleAdapter(entity.getRole()));
+  }
+  return roles;
+}

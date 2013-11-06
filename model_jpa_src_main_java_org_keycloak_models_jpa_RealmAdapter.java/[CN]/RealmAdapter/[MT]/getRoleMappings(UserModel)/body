@@ -1,0 +1,11 @@
+{
+  TypedQuery<RealmUserRoleMappingEntity> query=em.createNamedQuery("userRealmMappings",RealmUserRoleMappingEntity.class);
+  query.setParameter("user",((UserAdapter)user).getUser());
+  query.setParameter("realm",realm);
+  List<RealmUserRoleMappingEntity> entities=query.getResultList();
+  List<RoleModel> roles=new ArrayList<RoleModel>();
+  for (  RealmUserRoleMappingEntity entity : entities) {
+    roles.add(new RoleAdapter(entity.getRole()));
+  }
+  return roles;
+}

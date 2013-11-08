@@ -1,24 +1,6 @@
 {
-  try {
-    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
-      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
-        ApplicationModel app=appRealm.getApplicationNameMap().get(Constants.ACCOUNT_APPLICATION);
-        defaultRoles=app.getDefaultRoles();
-        app.updateDefaultRoles(new String[0]);
-      }
-    }
-);
-    profilePage.open();
-    loginPage.login("test-user@localhost","password");
-    Assert.assertTrue(errorPage.isCurrent());
-    Assert.assertEquals("No access",errorPage.getError());
-  }
-  finally {
-    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
-      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
-        appRealm.getApplicationNameMap().get(org.keycloak.models.Constants.ACCOUNT_APPLICATION).updateDefaultRoles((String[])defaultRoles.toArray(new String[0]));
-      }
-    }
-);
-  }
+  profilePage.open();
+  loginPage.login("test-user-no-access@localhost","password");
+  Assert.assertTrue(errorPage.isCurrent());
+  Assert.assertEquals("No access",errorPage.getError());
 }

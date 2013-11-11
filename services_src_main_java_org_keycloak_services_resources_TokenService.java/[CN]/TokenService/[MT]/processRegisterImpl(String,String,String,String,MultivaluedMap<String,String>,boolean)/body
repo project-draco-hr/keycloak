@@ -1,16 +1,20 @@
 {
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
   if (!realm.isEnabled()) {
+    logger.warn("Realm not enabled");
     return oauth.forwardToSecurityFailure("Realm not enabled");
   }
   UserModel client=realm.getUser(clientId);
   if (client == null) {
+    logger.warn("Unknown login requester.");
     return oauth.forwardToSecurityFailure("Unknown login requester.");
   }
   if (!client.isEnabled()) {
+    logger.warn("Login requester not enabled.");
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
   if (!realm.isRegistrationAllowed()) {
+    logger.warn("Registration not allowed");
     return oauth.forwardToSecurityFailure("Registration not allowed");
   }
   List<String> requiredCredentialTypes=new LinkedList<String>();
@@ -27,6 +31,7 @@
     return Flows.forms(realm,request,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).setSocialRegistration(isSocialRegistration).forwardToRegistration();
   }
   user=realm.addUser(username);
+  user.setEnabled(true);
   user.setFirstName(formData.getFirst("firstName"));
   user.setLastName(formData.getFirst("lastName"));
   user.setEmail(formData.getFirst("email"));
@@ -35,6 +40,14 @@
     credentials.setType(CredentialRepresentation.PASSWORD);
     credentials.setValue(formData.getFirst("password"));
     realm.updateCredential(user,credentials);
+  }
+  for (  String r : realm.getDefaultRoles()) {
+    realm.grantRole(user,realm.getRole(r));
+  }
+  for (  ApplicationModel application : realm.getApplications()) {
+    for (    String r : application.getDefaultRoles()) {
+      application.grantRole(user,application.getRole(r));
+    }
   }
   return null;
 }

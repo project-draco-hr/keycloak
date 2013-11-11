@@ -1,0 +1,10 @@
+{
+  RoleModel role=getRole(name);
+  if (role != null)   return role;
+  RoleEntity entity=new RoleEntity();
+  entity.setName(name);
+  em.persist(entity);
+  application.getRoles().add(entity);
+  em.flush();
+  return new RoleAdapter(entity);
+}

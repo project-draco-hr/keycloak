@@ -1,0 +1,12 @@
+{
+  MessageDigest messageDigest=getMessageDigest();
+  String encodedPassword=null;
+  try {
+    byte[] digest=messageDigest.digest(rawPassword.getBytes("UTF-8"));
+    encodedPassword=Base64.encodeBytes(digest);
+  }
+ catch (  UnsupportedEncodingException e) {
+    throw new RuntimeException("Credential could not be encoded");
+  }
+  return encodedPassword;
+}

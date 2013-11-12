@@ -1,3 +1,12 @@
 {
-  return null;
+  String host=PropertiesManager.getMongoHost();
+  int port=PropertiesManager.getMongoPort();
+  String dbName=PropertiesManager.getMongoDbName();
+  boolean dropDatabaseOnStartup=PropertiesManager.dropDatabaseOnStartup();
+  try {
+    return new MongoDBSessionFactory(host,port,dbName,dropDatabaseOnStartup);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
 }

@@ -70,7 +70,10 @@
     }
   }
   if (rep.getApplications() != null) {
-    createApplications(rep,newRealm);
+    Map<String,ApplicationModel> appMap=createApplications(rep,newRealm);
+    for (    ApplicationModel app : appMap.values()) {
+      userMap.put(app.getApplicationUser().getLoginName(),app.getApplicationUser());
+    }
   }
   if (rep.getRoleMappings() != null) {
     for (    UserRoleMappingRepresentation mapping : rep.getRoleMappings()) {

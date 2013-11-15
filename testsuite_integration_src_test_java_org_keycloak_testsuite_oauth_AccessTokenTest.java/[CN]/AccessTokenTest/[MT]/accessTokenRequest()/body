@@ -3,10 +3,12 @@
   String code=oauth.getCurrentQuery().get("code");
   AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(200,response.getStatusCode());
-  Assert.assertTrue(response.getExpiresIn() <= 300 && response.getExpiresIn() >= 250);
+  Assert.assertTrue(response.getExpiresIn() <= 600 && response.getExpiresIn() >= 550);
   Assert.assertEquals("bearer",response.getTokenType());
   SkeletonKeyToken token=oauth.verifyToken(response.getAccessToken());
   Assert.assertEquals("test-user@localhost",token.getPrincipal());
   Assert.assertEquals(1,token.getRealmAccess().getRoles().size());
   Assert.assertTrue(token.getRealmAccess().isUserInRole("user"));
+  Assert.assertEquals(1,token.getResourceAccess(oauth.getClientId()).getRoles().size());
+  Assert.assertTrue(token.getResourceAccess(oauth.getClientId()).isUserInRole("customer-user"));
 }

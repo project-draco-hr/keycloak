@@ -1,0 +1,13 @@
+{
+  SkeletonKeySession session=(SkeletonKeySession)request.getAttribute(SkeletonKeySession.class.getName());
+  ResteasyClient client=new ResteasyClientBuilder().trustStore(session.getMetadata().getTruststore()).hostnameVerification(ResteasyClientBuilder.HostnameVerificationPolicy.ANY).build();
+  try {
+    Response response=client.target("http://localhost:8080/database/customers").request().header(HttpHeaders.AUTHORIZATION,"Bearer " + session.getTokenString()).get();
+    return response.readEntity(new GenericType<List<String>>(){
+    }
+);
+  }
+  finally {
+    client.close();
+  }
+}

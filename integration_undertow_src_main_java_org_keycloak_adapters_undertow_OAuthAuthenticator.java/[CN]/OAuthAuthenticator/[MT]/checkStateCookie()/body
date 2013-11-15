@@ -1,0 +1,25 @@
+{
+  Cookie stateCookie=getCookie(realmInfo.getStateCookieName());
+  if (stateCookie == null) {
+    log.warn("No state cookie");
+    return challenge(400);
+  }
+  log.info("** reseting application state cookie");
+  Cookie reset=new CookieImpl(realmInfo.getStateCookieName(),"");
+  reset.setPath(stateCookie.getPath());
+  reset.setMaxAge(0);
+  exchange.setResponseCookie(reset);
+  String stateCookieValue=getCookieValue(realmInfo.getStateCookieName());
+  String state=getQueryParamValue("state");
+  if (state == null) {
+    log.warn("state parameter was null");
+    return challenge(400);
+  }
+  if (!state.equals(stateCookieValue)) {
+    log.warn("state parameter invalid");
+    log.warn("cookie: " + stateCookieValue);
+    log.warn("queryParam: " + state);
+    return challenge(400);
+  }
+  return null;
+}

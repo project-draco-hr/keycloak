@@ -1,0 +1,27 @@
+{
+  log.info("handleRequest");
+  final ServletRequestContext servletRequestContext=exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+  HttpServletRequest req=(HttpServletRequest)servletRequestContext.getServletRequest();
+  SkeletonKeySession skSession=(SkeletonKeySession)req.getAttribute(SkeletonKeySession.class.getName());
+  if (skSession != null) {
+    log.info("skSession is in request");
+    next.handleRequest(exchange);
+    return;
+  }
+  HttpSession session=req.getSession(false);
+  if (session == null) {
+    log.info("http session was null, nothing to propagate");
+    next.handleRequest(exchange);
+    return;
+  }
+  skSession=(SkeletonKeySession)session.getAttribute(SkeletonKeySession.class.getName());
+  if (skSession == null) {
+    log.info("skSession not in http session, nothing to propagate");
+    next.handleRequest(exchange);
+    return;
+  }
+  log.info("propagating");
+  req.setAttribute(SkeletonKeySession.class.getName(),skSession);
+  exchange.putAttachment(KeycloakAuthenticationMechanism.SKELETON_KEY_SESSION_ATTACHMENT_KEY,skSession);
+  next.handleRequest(exchange);
+}

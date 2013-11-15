@@ -1,0 +1,24 @@
+{
+  final SkeletonKeyPrincipal skeletonKeyPrincipal=new SkeletonKeyPrincipal(token.getPrincipal(),surrogate);
+  Set<String> roles=null;
+  if (config.isUseResourceRoleMappings()) {
+    SkeletonKeyToken.Access access=token.getResourceAccess(resourceMetadata.getResourceName());
+    if (access != null)     roles=access.getRoles();
+  }
+ else {
+    SkeletonKeyToken.Access access=token.getRealmAccess();
+    if (access != null)     roles=access.getRoles();
+  }
+  if (roles == null)   roles=Collections.emptySet();
+  final Set<String> accountRoles=roles;
+  Account account=new Account(){
+    @Override public Principal getPrincipal(){
+      return skeletonKeyPrincipal;
+    }
+    @Override public Set<String> getRoles(){
+      return accountRoles;
+    }
+  }
+;
+  securityContext.authenticationComplete(account,"FORM");
+}

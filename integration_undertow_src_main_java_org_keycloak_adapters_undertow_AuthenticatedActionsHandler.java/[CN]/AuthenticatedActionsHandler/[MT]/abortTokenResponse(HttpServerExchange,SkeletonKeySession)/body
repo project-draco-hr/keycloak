@@ -1,0 +1,19 @@
+{
+  if (session == null) {
+    log.debugv("session was null, sending back 401: {0}",exchange.getRequestURI());
+    exchange.setResponseCode(200);
+    exchange.endExchange();
+    return true;
+  }
+  if (!config.isExposeToken()) {
+    exchange.setResponseCode(200);
+    exchange.endExchange();
+    return true;
+  }
+  if (!config.isCors() && exchange.getRequestHeaders().getFirst(Headers.ORIGIN) != null) {
+    exchange.setResponseCode(200);
+    exchange.endExchange();
+    return true;
+  }
+  return false;
+}

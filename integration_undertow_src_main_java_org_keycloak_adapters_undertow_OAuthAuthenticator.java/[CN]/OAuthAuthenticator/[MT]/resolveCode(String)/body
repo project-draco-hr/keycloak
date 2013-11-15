@@ -1,0 +1,43 @@
+{
+  if (realmInfo.isSslRequired() && !isRequestSecure()) {
+    log.error("SSL is required");
+    return challenge(403);
+  }
+  log.info("checking state cookie for after code");
+  KeycloakChallenge challenge=checkStateCookie();
+  if (challenge != null)   return challenge;
+  String client_id=realmInfo.getMetadata().getResourceName();
+  String password=realmInfo.getResourceCredentials().asMap().getFirst("password");
+  redirectUri=stripOauthParametersFromRedirect();
+  Form form=new Form();
+  form.param("grant_type","authorization_code").param("code",code).param("client_id",client_id).param(CredentialRepresentation.PASSWORD,password).param("redirect_uri",redirectUri);
+  Response res=realmInfo.getCodeUrl().request().post(Entity.form(form));
+  AccessTokenResponse tokenResponse;
+  try {
+    if (res.getStatus() != 200) {
+      log.error("failed to turn code into token");
+      log.error("status from server: " + res.getStatus());
+      if (res.getStatus() == 400 && res.getMediaType() != null) {
+        log.error("   " + res.readEntity(String.class));
+      }
+      return challenge(403);
+    }
+    log.debug("media type: " + res.getMediaType());
+    log.debug("Content-Type header: " + res.getHeaderString("Content-Type"));
+    tokenResponse=res.readEntity(AccessTokenResponse.class);
+  }
+  finally {
+    res.close();
+  }
+  tokenString=tokenResponse.getToken();
+  try {
+    token=RSATokenVerifier.verifyToken(tokenString,realmInfo.getMetadata());
+    log.debug("Token Verification succeeded!");
+  }
+ catch (  VerificationException e) {
+    log.error("failed verification of token");
+    return challenge(403);
+  }
+  log.info("successful authenticated");
+  return null;
+}

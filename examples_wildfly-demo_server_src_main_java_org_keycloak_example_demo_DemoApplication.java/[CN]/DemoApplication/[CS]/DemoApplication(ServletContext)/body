@@ -1,0 +1,9 @@
+{
+  super(servletContext);
+  KeycloakSession session=factory.createSession();
+  session.getTransaction().begin();
+  ApplianceBootstrap bootstrap=new ApplianceBootstrap();
+  bootstrap.bootstrap(session);
+  install(new RealmManager(session));
+  session.getTransaction().commit();
+}

@@ -1,0 +1,39 @@
+{
+  if (deploymentInfo.getLoginConfig() == null || !deploymentInfo.getLoginConfig().getAuthMethod().equalsIgnoreCase("keycloak")) {
+    log.info("auth-method is not keycloak!");
+    return;
+  }
+  log.info("KeycloakServletException initialization");
+  deploymentInfo.setIgnoreStandardAuthenticationMechanism(true);
+  InputStream is=servletContext.getResourceAsStream("/WEB-INF/keycloak.json");
+  if (is == null)   throw new RuntimeException("Unable to find /WEB-INF/keycloak.json configuration file");
+  ManagedResourceConfigLoader loader=new ManagedResourceConfigLoader(is);
+  loader.init(true);
+  ManagedResourceConfig keycloakConfig=loader.getRemoteSkeletonKeyConfig();
+  PreflightCorsHandler.Wrapper preflight=new PreflightCorsHandler.Wrapper(keycloakConfig);
+  ServletKeycloakAuthenticationMechanism auth=new ServletKeycloakAuthenticationMechanism(loader.getResourceMetadata(),keycloakConfig,loader.getRealmConfiguration(),deploymentInfo.getConfidentialPortManager());
+  ServletAuthenticatedActionsHandler.Wrapper actions=new ServletAuthenticatedActionsHandler.Wrapper(keycloakConfig);
+  deploymentInfo.addInitialHandlerChainWrapper(preflight);
+  deploymentInfo.addAuthenticationMechanism(auth);
+  deploymentInfo.addInnerHandlerChainWrapper(ServletPropagateSessionHandler.WRAPPER);
+  deploymentInfo.addInnerHandlerChainWrapper(actions);
+  deploymentInfo.setIdentityManager(new IdentityManager(){
+    @Override public Account verify(    Account account){
+      log.info("Verifying account in IdentityManager");
+      return account;
+    }
+    @Override public Account verify(    String id,    Credential credential){
+      log.warn("Shouldn't call verify!!!");
+      throw new IllegalStateException("Not allowed");
+    }
+    @Override public Account verify(    Credential credential){
+      log.warn("Shouldn't call verify!!!");
+      throw new IllegalStateException("Not allowed");
+    }
+  }
+);
+  log.info("Setting jsession cookie path to: " + deploymentInfo.getContextPath());
+  ServletSessionConfig cookieConfig=new ServletSessionConfig();
+  cookieConfig.setPath(deploymentInfo.getContextPath());
+  deploymentInfo.setServletSessionConfig(cookieConfig);
+}

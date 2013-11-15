@@ -1,0 +1,11 @@
+{
+  log.debugv("AuthenticatedActionsValve.invoke {0}",exchange.getRequestURI());
+  SkeletonKeySession session=getSkeletonKeySession(exchange);
+  if (corsRequest(exchange,session))   return;
+  String requestUri=exchange.getRequestURI();
+  if (requestUri.endsWith("K_QUERY_BEARER_TOKEN")) {
+    queryBearerToken(exchange,session);
+    return;
+  }
+  next.handleRequest(exchange);
+}

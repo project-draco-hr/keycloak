@@ -1,0 +1,55 @@
+{
+  List<String> authHeaders=exchange.getRequestHeaders().get(AUTHORIZATION);
+  if (authHeaders == null || authHeaders.size() == 0) {
+    challenge=challengeResponse(exchange,null,null);
+    return AuthenticationMechanism.AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  }
+  tokenString=null;
+  for (  String authHeader : authHeaders) {
+    String[] split=authHeader.trim().split("\\s+");
+    if (split == null || split.length != 2)     continue;
+    if (!split[0].equalsIgnoreCase("Bearer"))     continue;
+    tokenString=split[1];
+  }
+  if (tokenString == null) {
+    challenge=challengeResponse(exchange,null,null);
+    return AuthenticationMechanism.AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  }
+  try {
+    token=RSATokenVerifier.verifyToken(tokenString,resourceMetadata);
+  }
+ catch (  VerificationException e) {
+    log.error("Failed to verify token",e);
+    challenge=challengeResponse(exchange,"invalid_token",e.getMessage());
+    return AuthenticationMechanism.AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
+  }
+  boolean verifyCaller=false;
+  Set<String> roles=new HashSet<String>();
+  if (useResourceRoleMappings) {
+    verifyCaller=token.isVerifyCaller(resourceMetadata.getResourceName());
+  }
+ else {
+    verifyCaller=token.isVerifyCaller();
+  }
+  surrogate=null;
+  if (verifyCaller) {
+    if (token.getTrustedCertificates() == null || token.getTrustedCertificates().size() == 0) {
+      log.warn("No trusted certificates in token");
+      challenge=clientCertChallenge();
+      return AuthenticationMechanism.AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
+    }
+    X509Certificate[] chain=new X509Certificate[0];
+    try {
+      chain=exchange.getConnection().getSslSessionInfo().getPeerCertificateChain();
+    }
+ catch (    SSLPeerUnverifiedException ignore) {
+    }
+    if (chain == null || chain.length == 0) {
+      log.warn("No certificates provided by undertow to verify the caller");
+      challenge=clientCertChallenge();
+      return AuthenticationMechanism.AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
+    }
+    surrogate=chain[0].getSubjectDN().getName();
+  }
+  return AuthenticationMechanism.AuthenticationMechanismOutcome.AUTHENTICATED;
+}

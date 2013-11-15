@@ -1,0 +1,35 @@
+{
+  BearerTokenAuthenticator bearer=createBearerTokenAuthenticator();
+  AuthenticationMechanismOutcome outcome=bearer.authenticate(exchange);
+  if (outcome == AuthenticationMechanismOutcome.NOT_AUTHENTICATED) {
+    exchange.putAttachment(KEYCLOAK_CHALLENGE_ATTACHMENT_KEY,bearer.getChallenge());
+    return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
+  }
+ else   if (outcome == AuthenticationMechanismOutcome.AUTHENTICATED) {
+    final SkeletonKeyToken token=bearer.getToken();
+    String surrogate=bearer.getSurrogate();
+    SkeletonKeySession session=new SkeletonKeySession(bearer.getTokenString(),token,resourceMetadata);
+    propagateBearer(exchange,session);
+    completeAuthentication(exchange,securityContext,token,surrogate);
+    return AuthenticationMechanismOutcome.AUTHENTICATED;
+  }
+ else   if (config.isBearerOnly()) {
+    exchange.putAttachment(KEYCLOAK_CHALLENGE_ATTACHMENT_KEY,bearer.getChallenge());
+    return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  }
+  OAuthAuthenticator oauth=createOAuthAuthenticator(exchange);
+  outcome=oauth.authenticate();
+  if (outcome == AuthenticationMechanismOutcome.NOT_AUTHENTICATED) {
+    exchange.putAttachment(KEYCLOAK_CHALLENGE_ATTACHMENT_KEY,oauth.getChallenge());
+    return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
+  }
+ else   if (outcome == AuthenticationMechanismOutcome.NOT_ATTEMPTED) {
+    exchange.putAttachment(KEYCLOAK_CHALLENGE_ATTACHMENT_KEY,oauth.getChallenge());
+    return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  }
+  SkeletonKeySession session=new SkeletonKeySession(oauth.getTokenString(),oauth.getToken(),resourceMetadata);
+  propagateOauth(exchange,session);
+  completeAuthentication(exchange,securityContext,oauth.getToken(),null);
+  log.info("AUTHENTICATED");
+  return AuthenticationMechanismOutcome.AUTHENTICATED;
+}

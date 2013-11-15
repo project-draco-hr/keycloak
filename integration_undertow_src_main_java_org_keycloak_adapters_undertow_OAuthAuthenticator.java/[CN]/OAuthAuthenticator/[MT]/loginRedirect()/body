@@ -1,0 +1,17 @@
+{
+  final String state=getStateCode();
+  final String redirect=getRedirectUri(state);
+  return new KeycloakChallenge(){
+    @Override public AuthenticationMechanism.ChallengeResult sendChallenge(    HttpServerExchange exchange,    SecurityContext securityContext){
+      if (redirect == null) {
+        return new AuthenticationMechanism.ChallengeResult(true,403);
+      }
+      CookieImpl cookie=new CookieImpl(realmInfo.getStateCookieName(),state);
+      cookie.setSecure(realmInfo.isSslRequired());
+      exchange.setResponseCookie(cookie);
+      exchange.getResponseHeaders().put(Headers.LOCATION,redirect);
+      return new AuthenticationMechanism.ChallengeResult(true,302);
+    }
+  }
+;
+}

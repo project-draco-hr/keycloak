@@ -25,7 +25,7 @@
       logger.debug("state not specified");
       throw new BadRequestException();
     }
-    new JaxrsOAuthClient().checkStateCookie(uriInfo,headers);
+    String path=new JaxrsOAuthClient().checkStateCookie(uriInfo,headers);
     JWSInput input=new JWSInput(code,providers);
     boolean verifiedCode=false;
     try {
@@ -66,7 +66,11 @@
     }
     logger.debug("loginRedirect SUCCESS");
     NewCookie cookie=authManager.createSaasIdentityCookie(realm,accessCode.getUser(),uriInfo);
-    return Response.status(302).cookie(cookie).location(contextRoot(uriInfo).path(adminPath).build()).build();
+    URI redirectUri=contextRoot(uriInfo).path(adminPath).build();
+    if (path != null) {
+      redirectUri=redirectUri.resolve("#" + path);
+    }
+    return Response.status(302).cookie(cookie).location(redirectUri).build();
   }
   finally {
     authManager.expireCookie(AbstractOAuthClient.OAUTH_TOKEN_REQUEST_STATE,uriInfo.getAbsolutePath().getPath());

@@ -1,0 +1,17 @@
+{
+  ApplicationEntity application=null;
+  for (  ApplicationEntity a : realm.getApplications()) {
+    if (a.getId().equals(id)) {
+      application=a;
+    }
+  }
+  if (application == null) {
+    return false;
+  }
+  realm.getApplications().remove(application);
+  removeUser(application.getApplicationUser());
+  em.createQuery("delete from " + ApplicationScopeMappingEntity.class.getSimpleName() + " where application = :application").setParameter("application",application).executeUpdate();
+  em.createQuery("delete from " + ApplicationUserRoleMappingEntity.class.getSimpleName() + " where application = :application").setParameter("application",application).executeUpdate();
+  em.remove(application);
+  return true;
+}

@@ -4,5 +4,10 @@
   session.getTransaction().begin();
   ApplianceBootstrap bootstrap=new ApplianceBootstrap();
   bootstrap.bootstrap(session);
+  String importRealm=System.getProperty("keycloak.import");
+  if (importRealm != null) {
+    RealmRepresentation rep=loadJson(new FileInputStream(importRealm),RealmRepresentation.class);
+    importRealm(session,rep);
+  }
   session.getTransaction().commit();
 }

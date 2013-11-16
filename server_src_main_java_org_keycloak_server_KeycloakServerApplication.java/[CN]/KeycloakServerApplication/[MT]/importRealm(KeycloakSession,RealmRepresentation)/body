@@ -1,0 +1,19 @@
+{
+  try {
+    RealmManager manager=new RealmManager(session);
+    if (rep.getId() == null) {
+      throw new RuntimeException("Realm id not specified");
+    }
+    if (manager.getRealm(rep.getId()) != null) {
+      log.info("Not importing realm " + rep.getRealm() + " realm already exists");
+      return;
+    }
+    RealmModel realm=manager.createRealm(rep.getId(),rep.getRealm());
+    manager.importRealm(rep,realm);
+    log.info("Imported realm " + realm.getName());
+    session.getTransaction().commit();
+  }
+  finally {
+    session.close();
+  }
+}

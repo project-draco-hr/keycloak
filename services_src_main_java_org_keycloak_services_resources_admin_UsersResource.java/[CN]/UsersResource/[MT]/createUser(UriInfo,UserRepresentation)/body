@@ -1,6 +1,6 @@
 {
   if (realm.getUser(rep.getUsername()) != null) {
-    throw new InternalServerErrorException();
+    return Flows.errors().exists("User with username " + rep.getUsername() + " already exists");
   }
   UserModel user=realm.addUser(rep.getUsername());
   if (user == null) {

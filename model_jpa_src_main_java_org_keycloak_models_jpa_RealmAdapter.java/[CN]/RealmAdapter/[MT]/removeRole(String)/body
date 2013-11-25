@@ -1,0 +1,14 @@
+{
+  RoleEntity role=em.find(RoleEntity.class,id);
+  if (role == null) {
+    return false;
+  }
+  realm.getRoles().remove(role);
+  realm.getDefaultRoles().remove(role);
+  em.createQuery("delete from " + ApplicationScopeMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",role).executeUpdate();
+  em.createQuery("delete from " + ApplicationUserRoleMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",role).executeUpdate();
+  em.createQuery("delete from " + RealmScopeMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",role).executeUpdate();
+  em.createQuery("delete from " + RealmUserRoleMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",role).executeUpdate();
+  em.remove(role);
+  return true;
+}

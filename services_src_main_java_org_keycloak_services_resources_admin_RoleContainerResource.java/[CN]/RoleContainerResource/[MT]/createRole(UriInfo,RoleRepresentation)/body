@@ -1,6 +1,6 @@
 {
   if (roleContainer.getRole(rep.getName()) != null || rep.getName().startsWith(Constants.INTERNAL_ROLE)) {
-    throw new InternalServerErrorException();
+    return Flows.errors().exists("Role with name " + rep.getName() + " already exists");
   }
   RoleModel role=roleContainer.addRole(rep.getName());
   if (role == null) {

@@ -1,0 +1,16 @@
+{
+  ApplicationInstallationRepresentation rep=new ApplicationInstallationRepresentation();
+  rep.setRealm(realmModel.getId());
+  rep.setRealmPublicKey(realmModel.getPublicKeyPem());
+  rep.setSslNotRequired(realmModel.isSslNotRequired());
+  rep.setAuthUrl(Urls.realmLoginPage(baseUri,realmModel.getId()).toString());
+  rep.setCodeUrl(Urls.realmCode(baseUri,realmModel.getId()).toString());
+  rep.setResource(applicationModel.getId());
+  Map<String,String> creds=new HashMap<String,String>();
+  creds.put(CredentialRepresentation.PASSWORD,"INSERT APPLICATION PASSWORD");
+  if (applicationModel.getApplicationUser().isTotp()) {
+    creds.put(CredentialRepresentation.TOTP,"INSERT APPLICATION TOTP");
+  }
+  rep.setCredentials(creds);
+  return rep;
+}

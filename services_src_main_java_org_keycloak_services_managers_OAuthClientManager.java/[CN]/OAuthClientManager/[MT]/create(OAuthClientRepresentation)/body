@@ -1,5 +1,14 @@
 {
   OAuthClientModel model=create(rep.getName());
-  model.getOAuthAgent().setEnabled(rep.isEnabled());
+  update(rep,model);
+  UserModel resourceUser=model.getOAuthAgent();
+  if (rep.getCredentials() != null) {
+    for (    CredentialRepresentation cred : rep.getCredentials()) {
+      UserCredentialModel credential=new UserCredentialModel();
+      credential.setType(cred.getType());
+      credential.setValue(cred.getValue());
+      realm.updateCredential(resourceUser,credential);
+    }
+  }
   return model;
 }

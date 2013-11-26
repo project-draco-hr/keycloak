@@ -52,13 +52,6 @@
       userMap.put(user.getLoginName(),user);
     }
   }
-  if (rep.getClients() != null) {
-    for (    UserRepresentation clientRep : rep.getClients()) {
-      UserModel client=createUser(newRealm,clientRep);
-      newRealm.grantRole(client,newRealm.getRole(Constants.IDENTITY_REQUESTER_ROLE));
-      userMap.put(client.getLoginName(),client);
-    }
-  }
   if (rep.getRoles() != null) {
     for (    RoleRepresentation roleRep : rep.getRoles()) {
       createRole(newRealm,roleRep);
@@ -69,10 +62,24 @@
       newRealm.addDefaultRole(roleString.trim());
     }
   }
+  Map<String,ApplicationModel> appMap=null;
   if (rep.getApplications() != null) {
-    Map<String,ApplicationModel> appMap=createApplications(rep,newRealm);
+    appMap=createApplications(rep,newRealm);
     for (    ApplicationModel app : appMap.values()) {
       userMap.put(app.getApplicationUser().getLoginName(),app.getApplicationUser());
+    }
+  }
+  if (rep.getOauthClients() != null) {
+    Map<String,OAuthClientModel> oauthMap=createOAuthClients(rep,newRealm);
+    for (    OAuthClientModel app : oauthMap.values()) {
+      userMap.put(app.getOAuthAgent().getLoginName(),app.getOAuthAgent());
+    }
+  }
+  if (rep.getApplications() != null) {
+    ApplicationManager manager=new ApplicationManager(this);
+    for (    ApplicationRepresentation appRep : rep.getApplications()) {
+      ApplicationModel model=appMap.get(appRep.getName());
+      manager.createMappings(newRealm,appRep,model);
     }
   }
   if (rep.getRoleMappings() != null) {

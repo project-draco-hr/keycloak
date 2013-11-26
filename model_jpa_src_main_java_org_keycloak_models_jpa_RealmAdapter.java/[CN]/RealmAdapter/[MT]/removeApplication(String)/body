@@ -9,9 +9,13 @@
     return false;
   }
   realm.getApplications().remove(application);
-  removeUser(application.getApplicationUser());
   em.createQuery("delete from " + ApplicationScopeMappingEntity.class.getSimpleName() + " where application = :application").setParameter("application",application).executeUpdate();
   em.createQuery("delete from " + ApplicationUserRoleMappingEntity.class.getSimpleName() + " where application = :application").setParameter("application",application).executeUpdate();
+  em.createQuery("delete from " + ApplicationScopeMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",application.getApplicationUser()).executeUpdate();
+  em.createQuery("delete from " + RealmScopeMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",application.getApplicationUser()).executeUpdate();
+  em.createQuery("delete from " + ApplicationUserRoleMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",application.getApplicationUser()).executeUpdate();
+  em.createQuery("delete from " + RealmUserRoleMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",application.getApplicationUser()).executeUpdate();
+  removeUser(application.getApplicationUser());
   em.remove(application);
   return true;
 }

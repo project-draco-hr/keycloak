@@ -3,5 +3,13 @@
   rep.setId(model.getId());
   rep.setName(model.getOAuthAgent().getLoginName());
   rep.setEnabled(model.getOAuthAgent().isEnabled());
+  Set<String> redirectUris=model.getOAuthAgent().getRedirectUris();
+  if (redirectUris != null) {
+    rep.setRedirectUris(new LinkedList<String>(redirectUris));
+  }
+  Set<String> webOrigins=model.getOAuthAgent().getWebOrigins();
+  if (webOrigins != null) {
+    rep.setWebOrigins(new LinkedList<String>(webOrigins));
+  }
   return rep;
 }

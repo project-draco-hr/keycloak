@@ -1,16 +1,14 @@
 {
-  String totp="";
-  for (  String a : args) {
-    totp+=a.trim();
-  }
-  totp=totp.replace(" ","");
-  final String google=new String(Base32.decode(totp));
-  final TimeBasedOTP otp=new TimeBasedOTP();
-  Timer t=new Timer();
-  t.schedule(new TimerTask(){
-    @Override public void run(){
-      System.out.println(otp.generate(google));
+  Timer timer=new Timer();
+  TotpTask task=null;
+  BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+  System.out.print("Insert secret: ");
+  for (String l=br.readLine(); true; l=br.readLine()) {
+    if (task != null) {
+      task.cancel();
     }
+    System.out.println("Secret: " + l);
+    task=new TotpTask(l);
+    timer.schedule(task,0,TimeUnit.SECONDS.toMillis(TimeBasedOTP.DEFAULT_INTERVAL_SECONDS));
   }
-,0,TimeUnit.SECONDS.toMillis(TimeBasedOTP.DEFAULT_INTERVAL_SECONDS));
 }

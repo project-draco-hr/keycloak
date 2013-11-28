@@ -4,6 +4,10 @@
   oauth.setAuthUrl(authUrl);
   oauth.setClientId(Constants.ACCOUNT_APPLICATION);
   URI accountUri=Urls.accountPageBuilder(uriInfo.getBaseUri()).path(AccountService.class,"loginRedirect").build(realm.getId());
+  String referrer=getReferrer();
+  if (referrer != null) {
+    path=(path != null ? path : "") + "?referrer=" + referrer;
+  }
   oauth.setStateCookiePath(accountUri.getPath());
   return oauth.redirect(uriInfo,accountUri.toString(),path);
 }

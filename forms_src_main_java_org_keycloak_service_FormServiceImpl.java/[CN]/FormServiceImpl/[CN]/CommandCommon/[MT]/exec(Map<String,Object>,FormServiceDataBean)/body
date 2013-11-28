@@ -1,0 +1,21 @@
+{
+  realm=new RealmBean(dataBean.getRealm());
+  String referrer=dataBean.getQueryParam("referrer");
+  String referrerUri=null;
+  if (referrer != null) {
+    for (    ApplicationModel a : dataBean.getRealm().getApplications()) {
+      if (a.getName().equals(referrer)) {
+        referrerUri=a.getBaseUrl();
+        break;
+      }
+    }
+  }
+  url=new UrlBean(realm,dataBean.getBaseURI(),referrerUri);
+  url.setSocialRegistration(dataBean.getSocialRegistration());
+  user=new UserBean(dataBean.getUserModel());
+  login=new LoginBean(realm,dataBean.getFormData());
+  attributes.put("realm",realm);
+  attributes.put("url",url);
+  attributes.put("user",user);
+  attributes.put("login",login);
+}

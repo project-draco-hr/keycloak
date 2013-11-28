@@ -1,0 +1,16 @@
+{
+  String referrer=uriInfo.getQueryParameters().getFirst("referrer");
+  if (referrer != null) {
+    return referrer;
+  }
+  String referrerUrl=headers.getHeaderString("Referer");
+  if (referrerUrl != null) {
+    for (    ApplicationModel a : realm.getApplications()) {
+      if (a.getBaseUrl() != null && referrerUrl.startsWith(a.getBaseUrl())) {
+        return a.getName();
+      }
+    }
+    return null;
+  }
+  return null;
+}

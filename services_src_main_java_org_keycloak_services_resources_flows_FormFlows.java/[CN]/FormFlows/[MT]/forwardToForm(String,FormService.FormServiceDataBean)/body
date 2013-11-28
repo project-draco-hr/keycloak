@@ -9,6 +9,11 @@
   if (accessCode != null) {
     uriBuilder.queryParam(CODE,accessCode.getCode());
   }
+  if (queryParams != null) {
+    for (    Map.Entry<String,String> q : queryParams.entrySet()) {
+      uriBuilder.replaceQueryParam(q.getKey(),q.getValue());
+    }
+  }
   URI baseURI=uriBuilder.build();
   formDataBean.setBaseURI(baseURI);
   formDataBean.setContextPath(requestURI.substring(0,requestURI.length() - 6));

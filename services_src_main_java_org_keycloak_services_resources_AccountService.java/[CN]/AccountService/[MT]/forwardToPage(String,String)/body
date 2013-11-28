@@ -4,7 +4,12 @@
     if (!hasAccess(auth)) {
       return noAccess();
     }
-    return Flows.forms(realm,request,uriInfo).setUser(auth.getUser()).forwardToForm(template);
+    FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(auth.getUser());
+    String referrer=getReferrer();
+    if (referrer != null) {
+      forms.setQueryParam("referrer",referrer);
+    }
+    return forms.forwardToForm(template);
   }
  else {
     return login(path);

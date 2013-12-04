@@ -1,9 +1,4 @@
 {
-  UserModel client=realm.getUser(accessCode.getClient().getLoginName());
-  Set<String> redirectUris=client.getRedirectUris();
-  if (!redirectUris.isEmpty() && !redirectUris.contains(redirect)) {
-    return forwardToSecurityFailure("Invalid redirect_uri " + redirect);
-  }
   String code=accessCode.getCode();
   UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam("code",code);
   log.debug("redirectAccessCode: state: {0}",state);

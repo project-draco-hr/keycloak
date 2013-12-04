@@ -13,6 +13,10 @@
     logger.warn("Login requester not enabled.");
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
+  redirect=verifyRedirectUri(redirect,client);
+  if (redirect == null) {
+    return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
+  }
   if (!realm.isRegistrationAllowed()) {
     logger.warn("Registration not allowed");
     return oauth.forwardToSecurityFailure("Registration not allowed");

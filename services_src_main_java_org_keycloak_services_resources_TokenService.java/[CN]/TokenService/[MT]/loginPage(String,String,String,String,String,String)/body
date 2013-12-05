@@ -20,6 +20,10 @@
     session.close();
     return null;
   }
+  redirect=verifyRedirectUri(redirect,client);
+  if (redirect == null) {
+    return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
+  }
   logger.info("Checking roles...");
   RoleModel resourceRole=realm.getRole(Constants.APPLICATION_ROLE);
   RoleModel identityRequestRole=realm.getRole(Constants.IDENTITY_REQUESTER_ROLE);

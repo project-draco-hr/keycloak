@@ -1,0 +1,21 @@
+{
+  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.getApplicationNameMap().get("test-app").getApplicationUser().removeRedirectUri("http://localhost:8081/app");
+    }
+  }
+);
+  try {
+    OAuthClient.AuthorizationCodeResponse response=oauth.doLogin("test-user@localhost","password");
+    Assert.assertNotNull(response.getCode());
+    Assert.assertEquals(oauth.getCurrentRequest(),"http://localhost:8081/app/auth");
+  }
+  finally {
+    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        appRealm.getApplicationNameMap().get("test-app").getApplicationUser().addRedirectUri("http://localhost:8081/app");
+      }
+    }
+);
+  }
+}

@@ -1,0 +1,12 @@
+{
+  if (redirectUri == null) {
+    return client.getRedirectUris().size() == 1 ? client.getRedirectUris().iterator().next() : null;
+  }
+ else   if (client.getRedirectUris().isEmpty()) {
+    return redirectUri;
+  }
+ else {
+    String r=redirectUri.indexOf('?') != -1 ? redirectUri.substring(0,redirectUri.indexOf('?')) : redirectUri;
+    return client.getRedirectUris().contains(r) ? redirectUri : null;
+  }
+}

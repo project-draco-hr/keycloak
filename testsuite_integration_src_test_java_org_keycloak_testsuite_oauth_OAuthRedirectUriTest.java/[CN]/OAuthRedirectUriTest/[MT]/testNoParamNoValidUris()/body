@@ -1,0 +1,22 @@
+{
+  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.getApplicationNameMap().get("test-app").getApplicationUser().removeRedirectUri("http://localhost:8081/app");
+    }
+  }
+);
+  try {
+    oauth.redirectUri(null);
+    oauth.openLoginForm();
+    Assert.assertTrue(errorPage.isCurrent());
+    Assert.assertEquals("Invalid redirect_uri.",errorPage.getError());
+  }
+  finally {
+    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        appRealm.getApplicationNameMap().get("test-app").getApplicationUser().addRedirectUri("http://localhost:8081/app");
+      }
+    }
+);
+  }
+}

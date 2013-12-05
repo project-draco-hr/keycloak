@@ -17,6 +17,9 @@
   rep.setAccessCodeLifespanUserAction(realm.getAccessCodeLifespanUserAction());
   rep.setSmtpServer(realm.getSmtpConfig());
   rep.setSocialProviders(realm.getSocialConfig());
+  if (realm.getPasswordPolicy() != null) {
+    rep.setPasswordPolicy(realm.getPasswordPolicy().toString());
+  }
   ApplicationModel accountManagementApplication=realm.getApplicationNameMap().get(Constants.ACCOUNT_APPLICATION);
   rep.setAccountManagement(accountManagementApplication != null && accountManagementApplication.isEnabled());
   List<String> defaultRoles=realm.getDefaultRoles();

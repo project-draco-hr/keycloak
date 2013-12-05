@@ -11,6 +11,13 @@
   if (!client.isEnabled()) {
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
+  redirect=verifyRedirectUri(redirect,client);
+  if (redirect == null) {
+    return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
+  }
+  if (formData.containsKey("cancel")) {
+    return oauth.redirectError(client,"access_denied",state,redirect);
+  }
   String username=formData.getFirst("username");
   UserModel user=realm.getUser(username);
   if (user == null) {

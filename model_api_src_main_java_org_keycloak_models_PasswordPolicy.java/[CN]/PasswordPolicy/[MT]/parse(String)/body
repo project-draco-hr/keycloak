@@ -1,0 +1,36 @@
+{
+  List<Policy> list=new LinkedList<Policy>();
+  String[] policies=policyString.split(" and ");
+  for (  String policy : policies) {
+    policy=policy.trim();
+    String name;
+    String[] args=null;
+    int i=policy.indexOf('(');
+    if (i == -1) {
+      name=policy.trim();
+    }
+ else {
+      name=policy.substring(0,i).trim();
+      args=policy.substring(i + 1,policy.length() - 1).split(",");
+      for (int j=0; j < args.length; j++) {
+        args[j]=args[j].trim();
+      }
+    }
+    if (name.equals(Length.NAME)) {
+      list.add(new Length(args));
+    }
+ else     if (name.equals(Digits.NAME)) {
+      list.add(new Digits(args));
+    }
+ else     if (name.equals(LowerCase.NAME)) {
+      list.add(new LowerCase(args));
+    }
+ else     if (name.equals(UpperCase.NAME)) {
+      list.add(new UpperCase(args));
+    }
+ else     if (name.equals(SpecialChars.NAME)) {
+      list.add(new SpecialChars(args));
+    }
+  }
+  return list;
+}

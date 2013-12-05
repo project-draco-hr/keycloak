@@ -13,6 +13,10 @@
     logger.warn("Login requester not enabled.");
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
+  redirect=verifyRedirectUri(redirect,client);
+  if (redirect == null) {
+    return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
+  }
   if (!realm.isRegistrationAllowed()) {
     logger.warn("Registration not allowed");
     return oauth.forwardToSecurityFailure("Registration not allowed");
@@ -22,6 +26,9 @@
     requiredCredentialTypes.add(m.getType());
   }
   String error=Validation.validateRegistrationForm(formData,requiredCredentialTypes);
+  if (error == null) {
+    error=Validation.validatePassword(formData,realm.getPasswordPolicy());
+  }
   if (error != null) {
     return Flows.forms(realm,request,uriInfo).setError(error).setFormData(formData).setSocialRegistration(isSocialRegistration).forwardToRegistration();
   }

@@ -1,6 +1,9 @@
 {
   logger.debug("importRealm: {0}",rep.getRealm());
   RealmManager realmManager=new RealmManager(session);
+  if (realmManager.getRealm(rep.getRealm()) != null) {
+    return Flows.errors().exists("Realm " + rep.getRealm() + " already exists");
+  }
   RealmModel realm=realmManager.importRealm(rep,admin);
   URI location=realmUrl(uriInfo).build(realm.getId());
   logger.debug("imported realm success, sending back: {0}",location.toString());

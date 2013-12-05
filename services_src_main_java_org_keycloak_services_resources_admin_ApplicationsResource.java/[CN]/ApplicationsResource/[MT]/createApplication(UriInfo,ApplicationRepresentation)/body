@@ -1,4 +1,7 @@
 {
+  if (realm.getApplicationNameMap().containsKey(rep.getName())) {
+    return Flows.errors().exists("Application " + rep.getName() + " already exists");
+  }
   ApplicationManager resourceManager=new ApplicationManager(new RealmManager(session));
   ApplicationModel applicationModel=resourceManager.createApplication(realm,rep);
   return Response.created(uriInfo.getAbsolutePathBuilder().path(applicationModel.getId()).build()).build();

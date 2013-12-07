@@ -18,18 +18,23 @@
     props.put("mail.smtp.starttls.enable","true");
   }
   String from=config.get("from");
-  Session session=Session.getInstance(props);
-  Message msg=new MimeMessage(session);
-  msg.setFrom(new InternetAddress(from));
-  msg.setSubject(subject);
-  msg.setText(body);
-  msg.saveChanges();
-  Transport transport=session.getTransport("smtp");
-  if (auth) {
-    transport.connect(config.get("user"),config.get("password"));
-  }
+  try {
+    Session session=Session.getInstance(props);
+    Message msg=new MimeMessage(session);
+    msg.setFrom(new InternetAddress(from));
+    msg.setSubject(subject);
+    msg.setText(body);
+    msg.saveChanges();
+    Transport transport=session.getTransport("smtp");
+    if (auth) {
+      transport.connect(config.get("user"),config.get("password"));
+    }
  else {
-    transport.connect();
+      transport.connect();
+    }
+    transport.sendMessage(msg,new InternetAddress[]{new InternetAddress(address)});
   }
-  transport.sendMessage(msg,new InternetAddress[]{new InternetAddress(address)});
+ catch (  Exception e) {
+    throw new EmailException(e);
+  }
 }

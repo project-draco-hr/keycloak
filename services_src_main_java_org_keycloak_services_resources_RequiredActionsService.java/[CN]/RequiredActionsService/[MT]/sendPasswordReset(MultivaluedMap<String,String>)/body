@@ -21,6 +21,12 @@
   AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,realm,client,user);
   accessCode.setRequiredActions(requiredActions);
   accessCode.setExpiration(System.currentTimeMillis() / 1000 + realm.getAccessCodeLifespanUserAction());
-  new EmailSender(realm.getSmtpConfig()).sendPasswordReset(user,realm,accessCode,uriInfo);
-  return Flows.forms(realm,request,uriInfo).setError("emailSent").setErrorType(FormFlows.MessageType.SUCCESS).forwardToPasswordReset();
+  try {
+    new EmailSender(realm.getSmtpConfig()).sendPasswordReset(user,realm,accessCode,uriInfo);
+  }
+ catch (  EmailException e) {
+    logger.error("Failed to send password reset email",e);
+    return Flows.forms(realm,request,uriInfo).setError("emailSendError").forwardToErrorPage();
+  }
+  return Flows.forms(realm,request,uriInfo).setSuccess("emailSent").forwardToPasswordReset();
 }

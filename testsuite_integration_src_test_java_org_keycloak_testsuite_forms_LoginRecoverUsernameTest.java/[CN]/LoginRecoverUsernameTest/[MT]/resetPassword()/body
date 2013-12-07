@@ -1,0 +1,12 @@
+{
+  loginPage.open();
+  loginPage.recoverUsername();
+  recoverUsernamePage.assertCurrent();
+  recoverUsernamePage.recoverUsername("test-user@localhost");
+  loginPage.assertCurrent();
+  Assert.assertTrue(driver.getPageSource().contains("You should receive an email shortly with your username"));
+  Assert.assertEquals(1,greenMail.getReceivedMessages().length);
+  MimeMessage message=greenMail.getReceivedMessages()[0];
+  String body=(String)message.getContent();
+  Assert.assertTrue(body.contains("The username for your Keycloak account is test-user@localhost"));
+}

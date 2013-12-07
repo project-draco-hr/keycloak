@@ -2,7 +2,7 @@
   if (uriInfo.getQueryParameters().containsKey("key")) {
     AccessCodeEntry accessCode=tokenManager.getAccessCode(uriInfo.getQueryParameters().getFirst("key"));
     if (accessCode == null || accessCode.isExpired() || !accessCode.getRequiredActions().contains(RequiredAction.VERIFY_EMAIL)) {
-      return forwardToErrorPage();
+      return unauthorized();
     }
     UserModel user=getUser(accessCode);
     user.setEmailVerified(true);
@@ -13,7 +13,7 @@
  else {
     AccessCodeEntry accessCode=getAccessCodeEntry(RequiredAction.VERIFY_EMAIL);
     if (accessCode == null) {
-      return forwardToErrorPage();
+      return unauthorized();
     }
     return Flows.forms(realm,request,uriInfo).setAccessCode(accessCode).setUser(accessCode.getUser()).forwardToAction(RequiredAction.VERIFY_EMAIL);
   }

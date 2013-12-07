@@ -1,5 +1,4 @@
 {
-  String username=formData.getFirst("username");
   String email=formData.getFirst("email");
   String scopeParam=uriInfo.getQueryParameters().getFirst("scope");
   String state=uriInfo.getQueryParameters().getFirst("state");
@@ -12,8 +11,8 @@
   if (!client.isEnabled()) {
     return Flows.oauth(realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
   }
-  UserModel user=realm.getUser(username);
-  if (user == null || !email.equals(user.getEmail())) {
+  UserModel user=realm.getUserByEmail(email);
+  if (user == null) {
     return Flows.forms(realm,request,uriInfo).setError("emailError").forwardToPasswordReset();
   }
   Set<RequiredAction> requiredActions=new HashSet<RequiredAction>(user.getRequiredActions());

@@ -18,7 +18,7 @@
   formDataBean.setBaseURI(baseURI);
   formDataBean.setContextPath(requestURI.substring(0,requestURI.length() - 6));
   formDataBean.setSocialRegistration(socialRegistration);
-  Iterator<FormService> itr=ServiceRegistry.lookupProviders(FormService.class);
+  Iterator<FormService> itr=ServiceLoader.load(FormService.class).iterator();
   while (itr.hasNext()) {
     FormService provider=itr.next();
     if (provider.getId().equals("FormServiceId"))     return Response.status(status).type(MediaType.TEXT_HTML).entity(provider.process(template,formDataBean)).build();

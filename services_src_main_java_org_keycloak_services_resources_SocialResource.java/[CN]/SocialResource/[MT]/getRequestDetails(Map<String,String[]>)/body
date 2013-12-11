@@ -1,7 +1,5 @@
 {
-  Iterator<SocialProvider> itr=ServiceLoader.load(SocialProvider.class).iterator();
-  while (itr.hasNext()) {
-    SocialProvider provider=itr.next();
+  for (  SocialProvider provider : SocialLoader.load()) {
     if (queryParams.containsKey(provider.getRequestIdParamName())) {
       String requestId=queryParams.get(provider.getRequestIdParamName())[0];
       if (socialRequestManager.isRequestId(requestId)) {

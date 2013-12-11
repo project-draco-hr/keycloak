@@ -1,7 +1,7 @@
 {
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=realmManager.getRealm(realmId);
-  SocialProvider provider=getProvider(providerId);
+  SocialProvider provider=SocialLoader.load(providerId);
   if (provider == null) {
     return Flows.forms(realm,request,uriInfo).setError("Social provider not found").forwardToErrorPage();
   }

@@ -17,20 +17,20 @@
   exchange.getResponseHeaders().put(ACCESS_CONTROL_ALLOW_CREDENTIALS,"true");
   String requestMethods=exchange.getRequestHeaders().getFirst("Access-Control-Request-Method");
   if (requestMethods != null) {
-    if (config.getCorsAllowedMethods() != null) {
-      requestMethods=config.getCorsAllowedMethods();
+    if (adapterConfig.getCorsAllowedMethods() != null) {
+      requestMethods=adapterConfig.getCorsAllowedMethods();
     }
     exchange.getResponseHeaders().put(ACCESS_CONTROL_ALLOW_METHODS,requestMethods);
   }
   String allowHeaders=exchange.getRequestHeaders().getFirst("Access-Control-Request-Headers");
   if (allowHeaders != null) {
-    if (config.getCorsAllowedHeaders() != null) {
-      allowHeaders=config.getCorsAllowedHeaders();
+    if (adapterConfig.getCorsAllowedHeaders() != null) {
+      allowHeaders=adapterConfig.getCorsAllowedHeaders();
     }
     exchange.getResponseHeaders().put(ACCESS_CONTROL_ALLOW_HEADERS,allowHeaders);
   }
-  if (config.getCorsMaxAge() > -1) {
-    exchange.getResponseHeaders().put(ACCESS_CONTROL_MAX_AGE,Integer.toString(config.getCorsMaxAge()));
+  if (adapterConfig.getCorsMaxAge() > -1) {
+    exchange.getResponseHeaders().put(ACCESS_CONTROL_MAX_AGE,Integer.toString(adapterConfig.getCorsMaxAge()));
   }
   exchange.endExchange();
 }

@@ -1,9 +1,9 @@
 {
-  ManagedResourceConfigLoader managedResourceConfigLoader=new CatalinaManagedResourceConfigLoader(context);
-  managedResourceConfigLoader.init(true);
-  resourceMetadata=managedResourceConfigLoader.getResourceMetadata();
-  remoteSkeletonKeyConfig=managedResourceConfigLoader.getRemoteSkeletonKeyConfig();
-  realmConfiguration=managedResourceConfigLoader.getRealmConfiguration();
-  AuthenticatedActionsValve actions=new AuthenticatedActionsValve(remoteSkeletonKeyConfig,getNext(),getContainer(),getController());
+  RealmConfigurationLoader configLoader=new CatalinaAdapterConfigLoader(context);
+  configLoader.init(true);
+  resourceMetadata=configLoader.getResourceMetadata();
+  adapterConfig=configLoader.getAdapterConfig();
+  realmConfiguration=configLoader.getRealmConfiguration();
+  AuthenticatedActionsValve actions=new AuthenticatedActionsValve(adapterConfig,getNext(),getContainer(),getController());
   setNext(actions);
 }

@@ -7,9 +7,9 @@
   deploymentInfo.setIgnoreStandardAuthenticationMechanism(true);
   InputStream is=servletContext.getResourceAsStream("/WEB-INF/keycloak.json");
   if (is == null)   throw new RuntimeException("Unable to find /WEB-INF/keycloak.json configuration file");
-  ManagedResourceConfigLoader loader=new ManagedResourceConfigLoader(is);
+  RealmConfigurationLoader loader=new RealmConfigurationLoader(is);
   loader.init(true);
-  ManagedResourceConfig keycloakConfig=loader.getRemoteSkeletonKeyConfig();
+  AdapterConfig keycloakConfig=loader.getAdapterConfig();
   PreflightCorsHandler.Wrapper preflight=new PreflightCorsHandler.Wrapper(keycloakConfig);
   ServletKeycloakAuthenticationMechanism auth=new ServletKeycloakAuthenticationMechanism(loader.getResourceMetadata(),keycloakConfig,loader.getRealmConfiguration(),deploymentInfo.getConfidentialPortManager());
   ServletAuthenticatedActionsHandler.Wrapper actions=new ServletAuthenticatedActionsHandler.Wrapper(keycloakConfig);

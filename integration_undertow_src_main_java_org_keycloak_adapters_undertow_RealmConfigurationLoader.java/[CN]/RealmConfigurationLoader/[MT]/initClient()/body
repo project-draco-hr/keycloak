@@ -1,0 +1,24 @@
+{
+  int size=10;
+  if (adapterConfig.getConnectionPoolSize() > 0)   size=adapterConfig.getConnectionPoolSize();
+  ResteasyClientBuilder.HostnameVerificationPolicy policy=ResteasyClientBuilder.HostnameVerificationPolicy.WILDCARD;
+  if (adapterConfig.isAllowAnyHostname())   policy=ResteasyClientBuilder.HostnameVerificationPolicy.ANY;
+  ResteasyProviderFactory providerFactory=new ResteasyProviderFactory();
+  ClassLoader old=Thread.currentThread().getContextClassLoader();
+  Thread.currentThread().setContextClassLoader(RealmConfigurationLoader.class.getClassLoader());
+  try {
+    ResteasyProviderFactory.getInstance();
+    RegisterBuiltin.register(providerFactory);
+  }
+  finally {
+    Thread.currentThread().setContextClassLoader(old);
+  }
+  ResteasyClientBuilder builder=new ResteasyClientBuilder().providerFactory(providerFactory).connectionPoolSize(size).hostnameVerification(policy).keyStore(clientCertKeystore,adapterConfig.getClientKeyPassword());
+  if (adapterConfig.isDisableTrustManager()) {
+    builder.disableTrustManager();
+  }
+ else {
+    builder.trustStore(truststore);
+  }
+  client=builder.build();
+}

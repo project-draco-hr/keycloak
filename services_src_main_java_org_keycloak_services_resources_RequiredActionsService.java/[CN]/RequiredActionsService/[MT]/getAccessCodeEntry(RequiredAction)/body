@@ -4,7 +4,7 @@
     logger.debug("getAccessCodeEntry code as not in query param");
     return null;
   }
-  JWSInput input=new JWSInput(code,providers);
+  JWSInput input=new JWSInput(code);
   boolean verifiedCode=false;
   try {
     verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
@@ -17,7 +17,7 @@
     logger.debug("getAccessCodeEntry code failed verification2");
     return null;
   }
-  String key=input.readContent(String.class);
+  String key=input.readContentAsString();
   AccessCodeEntry accessCodeEntry=tokenManager.getAccessCode(key);
   if (accessCodeEntry == null) {
     logger.debug("getAccessCodeEntry access code entry null");

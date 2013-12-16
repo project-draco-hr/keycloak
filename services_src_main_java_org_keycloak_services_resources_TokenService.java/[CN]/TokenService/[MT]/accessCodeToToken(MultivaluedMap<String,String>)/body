@@ -40,7 +40,7 @@
     error.put("error","unauthorized_client");
     return Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build();
   }
-  JWSInput input=new JWSInput(code,providers);
+  JWSInput input=new JWSInput(code);
   boolean verifiedCode=false;
   try {
     verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
@@ -54,7 +54,7 @@
     res.put("error_description","Unable to verify code signature");
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  String key=input.readContent(String.class);
+  String key=input.readContentAsString();
   AccessCodeEntry accessCode=tokenManager.pullAccessCode(key);
   if (accessCode == null) {
     Map<String,String> res=new HashMap<String,String>();

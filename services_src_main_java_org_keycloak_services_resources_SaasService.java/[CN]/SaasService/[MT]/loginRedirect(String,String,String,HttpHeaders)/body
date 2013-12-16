@@ -26,7 +26,7 @@
       throw new BadRequestException();
     }
     String path=new JaxrsOAuthClient().checkStateCookie(uriInfo,headers);
-    JWSInput input=new JWSInput(code,providers);
+    JWSInput input=new JWSInput(code);
     boolean verifiedCode=false;
     try {
       verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
@@ -38,7 +38,7 @@
       logger.debug("unverified access code");
       throw new BadRequestException();
     }
-    String key=input.readContent(String.class);
+    String key=input.readContentAsString();
     AccessCodeEntry accessCode=tokenManager.pullAccessCode(key);
     if (accessCode == null) {
       logger.debug("bad access code");

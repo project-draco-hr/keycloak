@@ -4,12 +4,10 @@
   token.addAccess("foo").addRole("admin");
   token.addAccess("bar").addRole("user");
   KeyPair keyPair=KeyPairGenerator.getInstance("RSA").generateKeyPair();
-  byte[] tokenBytes=JsonSerialization.toByteArray(token,true);
-  String encoded=new JWSBuilder().content(tokenBytes).rsa256(keyPair.getPrivate());
+  String encoded=new JWSBuilder().jsonContent(token).rsa256(keyPair.getPrivate());
   System.out.println(encoded);
   JWSInput input=new JWSInput(encoded);
-  byte[] content=input.getContent();
-  token=JsonSerialization.fromBytes(SkeletonKeyToken.class,content);
+  token=input.readJsonContent(SkeletonKeyToken.class);
   Assert.assertEquals("111",token.getId());
   Assert.assertTrue(RSAProvider.verify(input,keyPair.getPublic()));
 }

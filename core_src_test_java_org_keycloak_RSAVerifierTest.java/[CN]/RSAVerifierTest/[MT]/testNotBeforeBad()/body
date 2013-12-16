@@ -1,10 +1,9 @@
 {
   token.notBefore((System.currentTimeMillis() / 1000) + 100);
-  byte[] tokenBytes=JsonSerialization.toByteArray(token,false);
-  String encoded=new JWSBuilder().content(tokenBytes).rsa256(idpPair.getPrivate());
+  String encoded=new JWSBuilder().jsonContent(token).rsa256(idpPair.getPrivate());
   SkeletonKeyToken v=null;
   try {
-    v=RSATokenVerifier.verifyToken(encoded,metadata);
+    v=verifySkeletonKeyToken(encoded);
     Assert.fail();
   }
  catch (  VerificationException ignored) {

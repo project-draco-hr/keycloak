@@ -1,7 +1,7 @@
 {
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
   String code=formData.getFirst("code");
-  JWSInput input=new JWSInput(code,providers);
+  JWSInput input=new JWSInput(code);
   boolean verifiedCode=false;
   try {
     verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
@@ -12,7 +12,7 @@
   if (!verifiedCode) {
     return oauth.forwardToSecurityFailure("Illegal access code.");
   }
-  String key=input.readContent(String.class);
+  String key=input.readContentAsString();
   AccessCodeEntry accessCodeEntry=tokenManager.getAccessCode(key);
   if (accessCodeEntry == null) {
     return oauth.forwardToSecurityFailure("Unknown access code.");

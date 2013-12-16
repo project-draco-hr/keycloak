@@ -1,7 +1,7 @@
 {
   try {
     log.debug("->> remoteLogout: ");
-    LogoutAction action=JsonSerialization.fromBytes(LogoutAction.class,token.getContent());
+    LogoutAction action=JsonSerialization.readValue(token.getContent(),LogoutAction.class);
     if (action.isExpired()) {
       log.warn("admin request failed, expired token");
       response.sendError(400,"Expired token");

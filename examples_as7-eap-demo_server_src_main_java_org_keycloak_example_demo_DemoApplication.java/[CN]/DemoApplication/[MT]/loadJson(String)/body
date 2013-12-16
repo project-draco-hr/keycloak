@@ -1,13 +1,7 @@
 {
   InputStream is=Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-  ByteArrayOutputStream os=new ByteArrayOutputStream();
-  int c;
   try {
-    while ((c=is.read()) != -1) {
-      os.write(c);
-    }
-    byte[] bytes=os.toByteArray();
-    return JsonSerialization.fromBytes(RealmRepresentation.class,bytes);
+    return JsonSerialization.readValue(is,RealmRepresentation.class);
   }
  catch (  IOException e) {
     throw new RuntimeException(e);

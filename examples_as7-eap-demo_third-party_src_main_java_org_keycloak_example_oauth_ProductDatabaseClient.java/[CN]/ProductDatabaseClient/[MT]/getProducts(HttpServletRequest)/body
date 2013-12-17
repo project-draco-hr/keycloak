@@ -1,0 +1,30 @@
+{
+  ServletOAuthClient oAuthClient=(ServletOAuthClient)request.getServletContext().getAttribute(ServletOAuthClient.class.getName());
+  String token=null;
+  try {
+    token=oAuthClient.getBearerToken(request);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+catch (  TokenGrantRequest.HttpFailure failure) {
+    throw new RuntimeException(failure);
+  }
+  HttpClient client=oAuthClient.getClient();
+  HttpGet get=new HttpGet("http://localhost:8080/database/products");
+  get.addHeader("Authorization","Bearer " + token);
+  try {
+    HttpResponse response=client.execute(get);
+    HttpEntity entity=response.getEntity();
+    InputStream is=entity.getContent();
+    try {
+      return JsonSerialization.readValue(is,TypedList.class);
+    }
+  finally {
+      is.close();
+    }
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+}

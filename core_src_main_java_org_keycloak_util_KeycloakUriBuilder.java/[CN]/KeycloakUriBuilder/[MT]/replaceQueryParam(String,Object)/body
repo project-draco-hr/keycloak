@@ -1,0 +1,26 @@
+{
+  if (name == null)   throw new IllegalArgumentException("name parameter is null");
+  if (query == null || query.equals("")) {
+    if (values != null)     return queryParam(name,values);
+    return this;
+  }
+  String[] params=query.split("&");
+  query=null;
+  String replacedName=Encode.encodeQueryParam(name);
+  for (  String param : params) {
+    int pos=param.indexOf('=');
+    if (pos >= 0) {
+      String paramName=param.substring(0,pos);
+      if (paramName.equals(replacedName))       continue;
+    }
+ else {
+      if (param.equals(replacedName))       continue;
+    }
+    if (query == null)     query="";
+ else     query+="&";
+    query+=param;
+  }
+  if (values == null)   return this;
+  if (values == null)   return this;
+  return queryParam(name,values);
+}

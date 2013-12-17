@@ -1,0 +1,15 @@
+{
+  MultivaluedHashMap<String,String> decoded=new MultivaluedHashMap<String,String>();
+  for (  Map.Entry<String,List<String>> entry : map.entrySet()) {
+    List<String> values=entry.getValue();
+    for (    String value : values) {
+      try {
+        decoded.add(URLEncoder.encode(entry.getKey(),UTF_8),URLEncoder.encode(value,UTF_8));
+      }
+ catch (      UnsupportedEncodingException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  return decoded;
+}

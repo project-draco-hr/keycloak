@@ -17,7 +17,13 @@
   if (password != null) {
     parameters.add(new BasicNameValuePair("password",password));
   }
-  UrlEncodedFormEntity formEntity=new UrlEncodedFormEntity(parameters,Charset.forName("UTF-8"));
+  UrlEncodedFormEntity formEntity=null;
+  try {
+    formEntity=new UrlEncodedFormEntity(parameters,"UTF-8");
+  }
+ catch (  UnsupportedEncodingException e) {
+    throw new RuntimeException(e);
+  }
   post.setEntity(formEntity);
   try {
     return new AccessTokenResponse(client.execute(post));

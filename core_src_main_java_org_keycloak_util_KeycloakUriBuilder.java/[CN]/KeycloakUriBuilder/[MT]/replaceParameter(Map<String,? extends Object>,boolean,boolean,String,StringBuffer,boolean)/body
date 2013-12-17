@@ -1,0 +1,31 @@
+{
+  Matcher matcher=createUriParamMatcher(string);
+  while (matcher.find()) {
+    String param=matcher.group(1);
+    Object valObj=paramMap.get(param);
+    if (valObj == null && !isTemplate) {
+      throw new IllegalArgumentException("NULL value for template parameter: " + param);
+    }
+ else     if (valObj == null && isTemplate) {
+      matcher.appendReplacement(buffer,matcher.group());
+      continue;
+    }
+    String value=valObj.toString();
+    if (value != null) {
+      if (!fromEncodedMap) {
+        if (encodeSlash)         value=Encode.encodePathSegmentAsIs(value);
+ else         value=Encode.encodePathAsIs(value);
+      }
+ else {
+        if (encodeSlash)         value=Encode.encodePathSegmentSaveEncodings(value);
+ else         value=Encode.encodePathSaveEncodings(value);
+      }
+      matcher.appendReplacement(buffer,Matcher.quoteReplacement(value));
+    }
+ else {
+      throw new IllegalArgumentException("path param " + param + " has not been provided by the parameter map");
+    }
+  }
+  matcher.appendTail(buffer);
+  return buffer;
+}

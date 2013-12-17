@@ -1,0 +1,19 @@
+{
+  String body=null;
+  if (entity != null) {
+    InputStream is=entity.getContent();
+    try {
+      body=readString(is);
+    }
+ catch (    IOException e) {
+    }
+ finally {
+      try {
+        is.close();
+      }
+ catch (      IOException ignored) {
+      }
+    }
+  }
+  throw new HttpFailure(status,body);
+}

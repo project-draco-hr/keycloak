@@ -6,28 +6,21 @@
   log.info("checking state cookie for after code");
   KeycloakChallenge challenge=checkStateCookie();
   if (challenge != null)   return challenge;
-  String client_id=realmInfo.getMetadata().getResourceName();
-  String password=realmInfo.getResourceCredentials().asMap().getFirst("password");
-  redirectUri=stripOauthParametersFromRedirect();
-  Form form=new Form();
-  form.param("grant_type","authorization_code").param("code",code).param("client_id",client_id).param(CredentialRepresentation.PASSWORD,password).param("redirect_uri",redirectUri);
-  Response res=realmInfo.getCodeUrl().request().post(Entity.form(form));
-  AccessTokenResponse tokenResponse;
+  AccessTokenResponse tokenResponse=null;
   try {
-    if (res.getStatus() != 200) {
-      log.error("failed to turn code into token");
-      log.error("status from server: " + res.getStatus());
-      if (res.getStatus() == 400 && res.getMediaType() != null) {
-        log.error("   " + res.readEntity(String.class));
-      }
-      return challenge(403);
-    }
-    log.debug("media type: " + res.getMediaType());
-    log.debug("Content-Type header: " + res.getHeaderString("Content-Type"));
-    tokenResponse=res.readEntity(AccessTokenResponse.class);
+    tokenResponse=TokenGrantRequest.invoke(realmInfo,code,redirectUri);
   }
-  finally {
-    res.close();
+ catch (  TokenGrantRequest.HttpFailure failure) {
+    log.error("failed to turn code into token");
+    log.error("status from server: " + failure.getStatus());
+    if (failure.getStatus() == 400 && failure.getError() != null) {
+      log.error("   " + failure.getError());
+    }
+    return challenge(403);
+  }
+catch (  IOException e) {
+    log.error("failed to turn code into token");
+    return challenge(403);
   }
   tokenString=tokenResponse.getToken();
   try {

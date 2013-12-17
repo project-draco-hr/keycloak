@@ -1,33 +1,27 @@
 {
   if (realmInfo.isSslRequired() && !isRequestSecure()) {
     log.error("SSL is required");
-    sendError(Response.Status.FORBIDDEN.getStatusCode());
+    sendError(HttpServletResponse.SC_FORBIDDEN);
     return false;
   }
   if (!checkStateCookie())   return false;
-  String client_id=realmInfo.getMetadata().getResourceName();
-  String password=realmInfo.getResourceCredentials().asMap().getFirst("password");
   String redirectUri=stripOauthParametersFromRedirect();
-  Form form=new Form();
-  form.param("grant_type","authorization_code").param("code",code).param("client_id",client_id).param(CredentialRepresentation.PASSWORD,password).param("redirect_uri",redirectUri);
-  Response res=realmInfo.getCodeUrl().request().post(Entity.form(form));
-  AccessTokenResponse tokenResponse;
+  AccessTokenResponse tokenResponse=null;
   try {
-    if (res.getStatus() != 200) {
-      log.error("failed to turn code into token");
-      log.error("status from server: " + res.getStatus());
-      if (res.getStatus() == 400 && res.getMediaType() != null) {
-        log.error("   " + res.readEntity(String.class));
-      }
-      sendError(Response.Status.FORBIDDEN.getStatusCode());
-      return false;
-    }
-    log.debug("media type: " + res.getMediaType());
-    log.debug("Content-Type header: " + res.getHeaderString("Content-Type"));
-    tokenResponse=res.readEntity(AccessTokenResponse.class);
+    tokenResponse=TokenGrantRequest.invoke(realmInfo,code,redirectUri);
   }
-  finally {
-    res.close();
+ catch (  TokenGrantRequest.HttpFailure failure) {
+    log.error("failed to turn code into token");
+    log.error("status from server: " + failure.getStatus());
+    if (failure.getStatus() == 400 && failure.getError() != null) {
+      log.error("   " + failure.getError());
+    }
+    sendError(HttpServletResponse.SC_FORBIDDEN);
+    return false;
+  }
+catch (  IOException e) {
+    log.error("failed to turn code into token");
+    sendError(HttpServletResponse.SC_FORBIDDEN);
   }
   tokenString=tokenResponse.getToken();
   try {
@@ -36,7 +30,7 @@
   }
  catch (  VerificationException e) {
     log.error("failed verification of token");
-    sendError(Response.Status.FORBIDDEN.getStatusCode());
+    sendError(HttpServletResponse.SC_FORBIDDEN);
     return false;
   }
   sendRedirect(redirectUri);

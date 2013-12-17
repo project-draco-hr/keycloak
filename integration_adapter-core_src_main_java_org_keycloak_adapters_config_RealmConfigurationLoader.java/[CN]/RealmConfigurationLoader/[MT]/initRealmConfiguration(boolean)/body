@@ -1,0 +1,20 @@
+{
+  if (!setupClient || adapterConfig.isBearerOnly())   return;
+  initClient();
+  realmConfiguration=new RealmConfiguration();
+  String authUrl=adapterConfig.getAuthUrl();
+  if (authUrl == null) {
+    throw new RuntimeException("You must specify auth-url");
+  }
+  String tokenUrl=adapterConfig.getCodeUrl();
+  if (tokenUrl == null) {
+    throw new RuntimeException("You mut specify code-url");
+  }
+  realmConfiguration.setMetadata(resourceMetadata);
+  realmConfiguration.setSslRequired(!adapterConfig.isSslNotRequired());
+  realmConfiguration.setResourceCredentials(adapterConfig.getCredentials());
+  HttpClient client=getClient();
+  realmConfiguration.setClient(client);
+  realmConfiguration.setAuthUrl(KeycloakUriBuilder.fromUri(authUrl).queryParam("client_id",resourceMetadata.getResourceName()));
+  realmConfiguration.setCodeUrl(tokenUrl);
+}

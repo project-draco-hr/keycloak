@@ -1,0 +1,37 @@
+{
+  boolean scheme=match.group(2) != null;
+  if (scheme)   this.scheme=match.group(2);
+  String authority=match.group(4);
+  if (authority != null) {
+    this.authority=null;
+    String host=match.group(4);
+    int at=host.indexOf('@');
+    if (at > -1) {
+      String user=host.substring(0,at);
+      host=host.substring(at + 1);
+      this.userInfo=user;
+    }
+    Matcher hostPortMatch=hostPortPattern.matcher(host);
+    if (hostPortMatch.matches()) {
+      this.host=hostPortMatch.group(1);
+      int val=0;
+      try {
+        this.port=Integer.parseInt(hostPortMatch.group(2));
+      }
+ catch (      NumberFormatException e) {
+        throw new IllegalArgumentException("Illegal uri template: " + uriTemplate,e);
+      }
+    }
+ else {
+      this.host=host;
+    }
+  }
+  if (match.group(5) != null) {
+    String group=match.group(5);
+    if (!scheme && !"".equals(group) && !group.startsWith("/")&& group.indexOf(':') > -1)     throw new IllegalArgumentException("Illegal uri template: " + uriTemplate);
+    if (!"".equals(group))     replacePath(group);
+  }
+  if (match.group(7) != null)   replaceQuery(match.group(7));
+  if (match.group(9) != null)   fragment(match.group(9));
+  return this;
+}

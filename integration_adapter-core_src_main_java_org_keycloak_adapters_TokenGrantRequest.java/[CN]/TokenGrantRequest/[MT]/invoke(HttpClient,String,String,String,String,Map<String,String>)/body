@@ -1,0 +1,34 @@
+{
+  List<NameValuePair> formparams=new ArrayList<NameValuePair>();
+  redirectUri=stripOauthParametersFromRedirect(redirectUri);
+  String password=credentials.get("password");
+  formparams.add(new BasicNameValuePair("grant_type","authorization_code"));
+  formparams.add(new BasicNameValuePair("code",code));
+  formparams.add(new BasicNameValuePair("client_id",client_id));
+  formparams.add(new BasicNameValuePair(CredentialRepresentation.PASSWORD,password));
+  formparams.add(new BasicNameValuePair("redirect_uri",redirectUri));
+  HttpResponse response=null;
+  UrlEncodedFormEntity form=new UrlEncodedFormEntity(formparams,"UTF-8");
+  HttpPost post=new HttpPost(codeUrl);
+  post.setEntity(form);
+  response=client.execute(post);
+  int status=response.getStatusLine().getStatusCode();
+  HttpEntity entity=response.getEntity();
+  if (status != 200) {
+    error(status,entity);
+  }
+  if (entity == null) {
+    throw new HttpFailure(status,null);
+  }
+  InputStream is=entity.getContent();
+  try {
+    return JsonSerialization.readValue(is,AccessTokenResponse.class);
+  }
+  finally {
+    try {
+      is.close();
+    }
+ catch (    IOException ignored) {
+    }
+  }
+}

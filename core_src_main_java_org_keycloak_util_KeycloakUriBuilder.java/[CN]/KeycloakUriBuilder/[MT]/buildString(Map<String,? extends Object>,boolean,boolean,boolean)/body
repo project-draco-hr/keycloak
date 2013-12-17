@@ -1,0 +1,42 @@
+{
+  for (  Map.Entry<String,? extends Object> entry : paramMap.entrySet()) {
+    if (entry.getKey() == null)     throw new IllegalArgumentException("map key is null");
+    if (entry.getValue() == null)     throw new IllegalArgumentException("map value is null");
+  }
+  StringBuffer buffer=new StringBuffer();
+  if (scheme != null)   replaceParameter(paramMap,fromEncodedMap,isTemplate,scheme,buffer,encodeSlash).append(":");
+  if (ssp != null) {
+    buffer.append(ssp);
+  }
+ else   if (userInfo != null || host != null || port != -1) {
+    buffer.append("//");
+    if (userInfo != null)     replaceParameter(paramMap,fromEncodedMap,isTemplate,userInfo,buffer,encodeSlash).append("@");
+    if (host != null) {
+      if ("".equals(host))       throw new RuntimeException("empty host name");
+      replaceParameter(paramMap,fromEncodedMap,isTemplate,host,buffer,encodeSlash);
+    }
+    if (port != -1)     buffer.append(":").append(Integer.toString(port));
+  }
+ else   if (authority != null) {
+    buffer.append("//");
+    replaceParameter(paramMap,fromEncodedMap,isTemplate,authority,buffer,encodeSlash);
+  }
+  if (path != null) {
+    StringBuffer tmp=new StringBuffer();
+    replaceParameter(paramMap,fromEncodedMap,isTemplate,path,tmp,encodeSlash);
+    String tmpPath=tmp.toString();
+    if (userInfo != null || host != null) {
+      if (!tmpPath.startsWith("/"))       buffer.append("/");
+    }
+    buffer.append(tmpPath);
+  }
+  if (query != null) {
+    buffer.append("?");
+    replaceQueryStringParameter(paramMap,fromEncodedMap,isTemplate,query,buffer);
+  }
+  if (fragment != null) {
+    buffer.append("#");
+    replaceParameter(paramMap,fromEncodedMap,isTemplate,fragment,buffer,encodeSlash);
+  }
+  return buffer.toString();
+}

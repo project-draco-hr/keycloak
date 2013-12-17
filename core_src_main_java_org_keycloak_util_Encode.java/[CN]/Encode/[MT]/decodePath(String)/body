@@ -1,0 +1,14 @@
+{
+  Matcher matcher=encodedCharsMulti.matcher(path);
+  StringBuffer buf=new StringBuffer();
+  CharsetDecoder decoder=Charset.forName(UTF_8).newDecoder();
+  while (matcher.find()) {
+    decoder.reset();
+    String decoded=decodeBytes(matcher.group(1),decoder);
+    decoded=decoded.replace("\\","\\\\");
+    decoded=decoded.replace("$","\\$");
+    matcher.appendReplacement(buf,decoded);
+  }
+  matcher.appendTail(buf);
+  return buf.toString();
+}

@@ -1,0 +1,16 @@
+{
+  ArrayList<String> params=new ArrayList<String>();
+  boolean foundParam=false;
+  StringBuffer newSegment=new StringBuffer();
+  if (savePathParams(segment,newSegment,params)) {
+    foundParam=true;
+    segment=newSegment.toString();
+  }
+  String result=encodeFromArray(segment,encoding,false);
+  result=encodeNonCodes(result);
+  segment=result;
+  if (foundParam) {
+    segment=pathParamReplacement(segment,params);
+  }
+  return segment;
+}

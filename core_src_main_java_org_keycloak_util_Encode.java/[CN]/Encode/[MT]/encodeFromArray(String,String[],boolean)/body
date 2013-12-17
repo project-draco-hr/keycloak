@@ -1,0 +1,18 @@
+{
+  StringBuffer result=new StringBuffer();
+  for (int i=0; i < segment.length(); i++) {
+    if (!encodePercent && segment.charAt(i) == '%') {
+      result.append(segment.charAt(i));
+      continue;
+    }
+    int idx=segment.charAt(i);
+    String encoding=encode(idx,encodingMap);
+    if (encoding == null) {
+      result.append(segment.charAt(i));
+    }
+ else {
+      result.append(encoding);
+    }
+  }
+  return result.toString();
+}

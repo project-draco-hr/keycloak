@@ -1,0 +1,18 @@
+{
+  Matcher matcher=createUriParamMatcher(string);
+  while (matcher.find()) {
+    String param=matcher.group(1);
+    if (!param.equals(name))     continue;
+    if (!isEncoded) {
+      if (encodeSlash)       value=Encode.encodePath(value);
+ else       value=Encode.encodePathSegment(value);
+    }
+ else {
+      value=Encode.encodeNonCodes(value);
+    }
+    value=value.replace("$","\\$");
+    matcher.appendReplacement(buffer,value);
+  }
+  matcher.appendTail(buffer);
+  return buffer;
+}

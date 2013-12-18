@@ -1,0 +1,25 @@
+{
+  SkeletonKeySession session=(SkeletonKeySession)req.getAttribute(SkeletonKeySession.class.getName());
+  HttpClient client=new HttpClientBuilder().trustStore(session.getMetadata().getTruststore()).hostnameVerification(HttpClientBuilder.HostnameVerificationPolicy.ANY).build();
+  try {
+    HttpGet get=new HttpGet("http://localhost:8080/database/customers");
+    get.addHeader("Authorization","Bearer " + session.getTokenString());
+    try {
+      HttpResponse response=client.execute(get);
+      HttpEntity entity=response.getEntity();
+      InputStream is=entity.getContent();
+      try {
+        return JsonSerialization.readValue(is,TypedList.class);
+      }
+  finally {
+        is.close();
+      }
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+  finally {
+    client.getConnectionManager().shutdown();
+  }
+}

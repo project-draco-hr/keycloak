@@ -1,0 +1,30 @@
+{
+  try {
+    log.debug("->> remoteLogout: ");
+    LogoutAction action=JsonSerialization.readValue(token.getContent(),LogoutAction.class);
+    if (action.isExpired()) {
+      log.warn("admin request failed, expired token");
+      response.sendError(400,"Expired token");
+      return;
+    }
+    if (!realmInfo.getMetadata().getResourceName().equals(action.getResource())) {
+      log.warn("Resource name does not match");
+      response.sendError(400,"Resource name does not match");
+      return;
+    }
+    String user=action.getUser();
+    if (user != null) {
+      log.debug("logout of session for: " + user);
+      logout(manager,user);
+    }
+ else {
+      log.debug("logout of all sessions");
+      logoutAll(manager);
+    }
+  }
+ catch (  Exception e) {
+    log.warn("failed to logout",e);
+    response.sendError(500,"Failed to logout");
+  }
+  response.setStatus(204);
+}

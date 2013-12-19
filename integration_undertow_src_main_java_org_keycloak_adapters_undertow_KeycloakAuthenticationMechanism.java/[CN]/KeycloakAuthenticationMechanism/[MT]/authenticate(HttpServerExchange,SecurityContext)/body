@@ -9,8 +9,8 @@
     final SkeletonKeyToken token=bearer.getToken();
     String surrogate=bearer.getSurrogate();
     SkeletonKeySession session=new SkeletonKeySession(bearer.getTokenString(),token,resourceMetadata);
-    propagateBearer(exchange,session);
-    completeAuthentication(exchange,securityContext,token,surrogate);
+    SkeletonKeyPrincipal principal=completeAuthentication(securityContext,token,surrogate);
+    propagateBearer(exchange,session,principal);
     return AuthenticationMechanismOutcome.AUTHENTICATED;
   }
  else   if (adapterConfig.isBearerOnly()) {
@@ -28,8 +28,8 @@
     return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
   }
   SkeletonKeySession session=new SkeletonKeySession(oauth.getTokenString(),oauth.getToken(),resourceMetadata);
-  propagateOauth(exchange,session);
-  completeAuthentication(exchange,securityContext,oauth.getToken(),null);
+  SkeletonKeyPrincipal principal=completeAuthentication(securityContext,oauth.getToken(),null);
+  propagateOauth(exchange,session,principal);
   log.info("AUTHENTICATED");
   return AuthenticationMechanismOutcome.AUTHENTICATED;
 }

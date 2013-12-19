@@ -4,8 +4,12 @@
       return;
     }
     String requestURI=request.getDecodedRequestURI();
-    if (requestURI.endsWith("j_admin_request")) {
-      adminRequest(request,response);
+    if (requestURI.endsWith(AdapterAdminResourceConstants.LOGOUT)) {
+      JWSInput input=verifyAdminRequest(request,response);
+      if (input == null) {
+        return;
+      }
+      remoteLogout(input,response);
       return;
     }
     super.invoke(request,response);

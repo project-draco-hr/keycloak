@@ -1,0 +1,10 @@
+{
+synchronized (userSessionMap) {
+    Set<String> map=userSessionMap.get(username);
+    if (map == null)     return;
+synchronized (map) {
+      map.remove(sessionId);
+      if (map.isEmpty())       userSessionMap.remove(username);
+    }
+  }
+}

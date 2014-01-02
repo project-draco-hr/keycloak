@@ -1,0 +1,13 @@
+{
+  String truststorePath=adapterConfig.getTruststore();
+  if (truststorePath != null) {
+    truststorePath=EnvUtil.replace(truststorePath);
+    String truststorePassword=adapterConfig.getTruststorePassword();
+    try {
+      this.truststore=loadKeyStore(truststorePath,truststorePassword);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to load truststore",e);
+    }
+  }
+}

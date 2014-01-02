@@ -3,7 +3,11 @@
   if (path != null) {
     state+="#" + path;
   }
-  URI url=UriBuilder.fromUri(authUrl).queryParam("client_id",clientId).queryParam("redirect_uri",redirectUri).queryParam("state",state).build();
+  UriBuilder uriBuilder=UriBuilder.fromUri(authUrl).queryParam("client_id",clientId).queryParam("redirect_uri",redirectUri).queryParam("state",state);
+  if (scope != null) {
+    uriBuilder.queryParam("scope",scope);
+  }
+  URI url=uriBuilder.build();
   NewCookie cookie=new NewCookie(getStateCookieName(),state,getStateCookiePath(uriInfo),null,null,-1,isSecure,true);
   logger.debug("NewCookie: " + cookie.toString());
   logger.debug("Oauth Redirect to: " + url);

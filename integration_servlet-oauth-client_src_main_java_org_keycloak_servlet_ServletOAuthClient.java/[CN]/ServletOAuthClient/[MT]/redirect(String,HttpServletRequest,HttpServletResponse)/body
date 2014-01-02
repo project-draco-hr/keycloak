@@ -1,6 +1,10 @@
 {
   String state=getStateCode();
-  URI url=KeycloakUriBuilder.fromUri(authUrl).queryParam("client_id",clientId).queryParam("redirect_uri",redirectUri).queryParam("state",state).build();
+  KeycloakUriBuilder uriBuilder=KeycloakUriBuilder.fromUri(authUrl).queryParam("client_id",clientId).queryParam("redirect_uri",redirectUri).queryParam("state",state);
+  if (scope != null) {
+    uriBuilder.queryParam("scope",scope);
+  }
+  URI url=uriBuilder.build();
   String stateCookiePath=this.stateCookiePath;
   if (stateCookiePath == null)   stateCookiePath=request.getContextPath();
   if (stateCookiePath.equals(""))   stateCookiePath="/";

@@ -1,6 +1,9 @@
 {
   logger.info("**********registerPage()");
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
+  if (!checkSsl()) {
+    return oauth.forwardToSecurityFailure("HTTPS required");
+  }
   if (!realm.isEnabled()) {
     logger.warn("Realm not enabled");
     return oauth.forwardToSecurityFailure("Realm not enabled");

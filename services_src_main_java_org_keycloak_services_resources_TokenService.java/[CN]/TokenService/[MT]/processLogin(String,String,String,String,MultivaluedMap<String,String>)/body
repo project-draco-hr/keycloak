@@ -1,6 +1,9 @@
 {
   logger.debug("TokenService.processLogin");
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
+  if (!checkSsl()) {
+    return oauth.forwardToSecurityFailure("HTTPS required");
+  }
   if (!realm.isEnabled()) {
     return oauth.forwardToSecurityFailure("Realm not enabled.");
   }

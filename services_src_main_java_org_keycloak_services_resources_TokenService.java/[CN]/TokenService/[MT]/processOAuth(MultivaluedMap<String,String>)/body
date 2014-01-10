@@ -1,5 +1,8 @@
 {
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
+  if (!checkSsl()) {
+    return oauth.forwardToSecurityFailure("HTTPS required");
+  }
   String code=formData.getFirst("code");
   JWSInput input=new JWSInput(code);
   boolean verifiedCode=false;

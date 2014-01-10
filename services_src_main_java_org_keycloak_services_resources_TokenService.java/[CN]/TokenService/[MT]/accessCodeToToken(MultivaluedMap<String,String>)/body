@@ -1,5 +1,8 @@
 {
   logger.debug("accessRequest <---");
+  if (!checkSsl()) {
+    throw new NotAcceptableException("HTTPS required");
+  }
   if (!realm.isEnabled()) {
     throw new NotAuthorizedException("Realm not enabled");
   }

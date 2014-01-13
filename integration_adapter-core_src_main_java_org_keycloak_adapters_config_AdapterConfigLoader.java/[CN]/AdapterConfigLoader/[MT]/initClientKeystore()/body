@@ -1,0 +1,14 @@
+{
+  String clientKeystore=adapterConfig.getClientKeystore();
+  if (clientKeystore != null) {
+    clientKeystore=EnvUtil.replace(clientKeystore);
+    String clientKeystorePassword=adapterConfig.getClientKeystorePassword();
+    clientCertKeystore=null;
+    try {
+      clientCertKeystore=loadKeyStore(clientKeystore,clientKeystorePassword);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to load keystore",e);
+    }
+  }
+}

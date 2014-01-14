@@ -1,10 +1,6 @@
 {
   RealmManager realmManager=new RealmManager(session);
-  RealmModel realm=realmManager.getRealm(id);
-  if (realm == null) {
-    logger.debug("realm not found");
-    throw new NotFoundException();
-  }
+  RealmModel realm=locateRealm(name,realmManager);
   TokenService tokenService=new TokenService(realm,tokenManager);
   resourceContext.initResource(tokenService);
   return tokenService;

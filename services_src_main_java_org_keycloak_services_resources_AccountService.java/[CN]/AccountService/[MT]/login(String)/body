@@ -1,9 +1,9 @@
 {
   JaxrsOAuthClient oauth=new JaxrsOAuthClient();
-  String authUrl=Urls.realmLoginPage(uriInfo.getBaseUri(),realm.getId()).toString();
+  String authUrl=Urls.realmLoginPage(uriInfo.getBaseUri(),realm.getName()).toString();
   oauth.setAuthUrl(authUrl);
   oauth.setClientId(Constants.ACCOUNT_APPLICATION);
-  URI accountUri=Urls.accountPageBuilder(uriInfo.getBaseUri()).path(AccountService.class,"loginRedirect").build(realm.getId());
+  URI accountUri=Urls.accountPageBuilder(uriInfo.getBaseUri()).path(AccountService.class,"loginRedirect").build(realm.getName());
   String referrer=getReferrer();
   if (referrer != null) {
     path=(path != null ? path : "") + "?referrer=" + referrer;

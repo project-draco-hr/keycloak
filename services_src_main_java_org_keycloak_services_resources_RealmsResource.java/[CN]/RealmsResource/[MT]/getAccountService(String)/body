@@ -1,10 +1,6 @@
 {
   RealmManager realmManager=new RealmManager(session);
-  RealmModel realm=realmManager.getRealm(id);
-  if (realm == null) {
-    logger.debug("realm not found");
-    throw new NotFoundException();
-  }
+  RealmModel realm=locateRealm(name,realmManager);
   ApplicationModel application=realm.getApplicationNameMap().get(Constants.ACCOUNT_APPLICATION);
   if (application == null || !application.isEnabled()) {
     logger.debug("account management not enabled");

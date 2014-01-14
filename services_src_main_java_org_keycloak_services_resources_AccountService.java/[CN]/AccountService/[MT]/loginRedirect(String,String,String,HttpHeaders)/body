@@ -56,9 +56,9 @@
       logger.debug("bad client");
       throw new BadRequestException();
     }
-    URI accountUri=Urls.accountBase(uriInfo.getBaseUri()).path("/").build(realm.getId());
+    URI accountUri=Urls.accountBase(uriInfo.getBaseUri()).path("/").build(realm.getName());
     URI redirectUri=path != null ? accountUri.resolve(path) : accountUri;
-    NewCookie cookie=authManager.createAccountIdentityCookie(realm,accessCode.getUser(),client,Urls.accountBase(uriInfo.getBaseUri()).build(realm.getId()));
+    NewCookie cookie=authManager.createAccountIdentityCookie(realm,accessCode.getUser(),client,Urls.accountBase(uriInfo.getBaseUri()).build(realm.getName()));
     return Response.status(302).cookie(cookie).location(redirectUri).build();
   }
   finally {

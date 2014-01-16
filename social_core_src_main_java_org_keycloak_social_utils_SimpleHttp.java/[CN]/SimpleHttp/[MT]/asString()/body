@@ -1,0 +1,61 @@
+{
+  boolean get=method.equals("GET");
+  boolean post=method.equals("POST");
+  StringBuilder sb=new StringBuilder();
+  if (get) {
+    sb.append(url);
+  }
+  if (params != null) {
+    boolean f=true;
+    for (    Map.Entry<String,String> p : params.entrySet()) {
+      if (f) {
+        f=false;
+        if (get) {
+          sb.append("?");
+        }
+      }
+ else {
+        sb.append("&");
+      }
+      sb.append(URLEncoder.encode(p.getKey(),"UTF-8"));
+      sb.append("=");
+      sb.append(URLEncoder.encode(p.getValue(),"UTF-8"));
+    }
+  }
+  if (get) {
+    url=sb.toString();
+  }
+  HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();
+  OutputStream os=null;
+  InputStream is=null;
+  try {
+    connection.setRequestMethod(method);
+    if (headers != null) {
+      for (      Map.Entry<String,String> h : headers.entrySet()) {
+        connection.setRequestProperty(h.getKey(),h.getValue());
+      }
+    }
+    if (post) {
+      String data=sb.toString();
+      connection.setDoOutput(true);
+      connection.setRequestMethod("POST");
+      connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+      connection.setRequestProperty("Content-Length",String.valueOf(data.length()));
+      os=connection.getOutputStream();
+      os.write(data.getBytes());
+    }
+ else {
+      connection.setDoOutput(false);
+    }
+    is=connection.getInputStream();
+    return toString(is);
+  }
+  finally {
+    if (os != null) {
+      os.close();
+    }
+    if (is != null) {
+      is.close();
+    }
+  }
+}

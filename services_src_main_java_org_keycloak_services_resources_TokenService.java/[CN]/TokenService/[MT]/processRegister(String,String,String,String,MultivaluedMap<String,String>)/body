@@ -1,10 +1,60 @@
 {
-  Response registrationResponse=processRegisterImpl(clientId,scopeParam,state,redirect,formData,false);
-  if (registrationResponse != null || request.wasForwarded()) {
-    logger.warn("Registration attempt wasn't successful. Request already forwarded or redirected.");
-    return registrationResponse;
+  OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
+  if (!realm.isEnabled()) {
+    logger.warn("Realm not enabled");
+    return oauth.forwardToSecurityFailure("Realm not enabled");
   }
- else {
-    return processLogin(clientId,scopeParam,state,redirect,formData);
+  UserModel client=realm.getUser(clientId);
+  if (client == null) {
+    logger.warn("Unknown login requester.");
+    return oauth.forwardToSecurityFailure("Unknown login requester.");
   }
+  if (!client.isEnabled()) {
+    logger.warn("Login requester not enabled.");
+    return oauth.forwardToSecurityFailure("Login requester not enabled.");
+  }
+  redirect=verifyRedirectUri(redirect,client);
+  if (redirect == null) {
+    return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
+  }
+  if (!realm.isRegistrationAllowed()) {
+    logger.warn("Registration not allowed");
+    return oauth.forwardToSecurityFailure("Registration not allowed");
+  }
+  List<String> requiredCredentialTypes=new LinkedList<String>();
+  for (  RequiredCredentialModel m : realm.getRequiredCredentials()) {
+    requiredCredentialTypes.add(m.getType());
+  }
+  String error=Validation.validateRegistrationForm(formData,requiredCredentialTypes);
+  if (error == null) {
+    error=Validation.validatePassword(formData,realm.getPasswordPolicy());
+  }
+  if (error != null) {
+    return Flows.forms(realm,request,uriInfo).setError(error).setFormData(formData).forwardToRegistration();
+  }
+  String username=formData.getFirst("username");
+  UserModel user=realm.getUser(username);
+  if (user != null) {
+    return Flows.forms(realm,request,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).forwardToRegistration();
+  }
+  user=realm.addUser(username);
+  user.setEnabled(true);
+  user.setFirstName(formData.getFirst("firstName"));
+  user.setLastName(formData.getFirst("lastName"));
+  user.setEmail(formData.getFirst("email"));
+  if (requiredCredentialTypes.contains(CredentialRepresentation.PASSWORD)) {
+    UserCredentialModel credentials=new UserCredentialModel();
+    credentials.setType(CredentialRepresentation.PASSWORD);
+    credentials.setValue(formData.getFirst("password"));
+    realm.updateCredential(user,credentials);
+  }
+  for (  String r : realm.getDefaultRoles()) {
+    realm.grantRole(user,realm.getRole(r));
+  }
+  for (  ApplicationModel application : realm.getApplications()) {
+    for (    String r : application.getDefaultRoles()) {
+      application.grantRole(user,application.getRole(r));
+    }
+  }
+  return processLogin(clientId,scopeParam,state,redirect,formData);
 }

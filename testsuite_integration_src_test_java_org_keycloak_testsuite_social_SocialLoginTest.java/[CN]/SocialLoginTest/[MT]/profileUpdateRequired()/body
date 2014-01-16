@@ -1,0 +1,28 @@
+{
+  keycloakRule.configure(new KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.setUpdateProfileOnInitialSocialLogin(true);
+    }
+  }
+);
+  try {
+    loginPage.open();
+    loginPage.clickSocial("dummy");
+    driver.findElement(By.id("username")).sendKeys("dummy-user-reg");
+    driver.findElement(By.id("submit")).click();
+    profilePage.isCurrent();
+    Assert.assertEquals("",profilePage.getFirstName());
+    Assert.assertEquals("",profilePage.getLastName());
+    Assert.assertEquals("dummy-user-reg@dummy-social",profilePage.getEmail());
+    profilePage.update("Dummy","User","dummy-user-reg@dummy-social");
+    Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  }
+  finally {
+    keycloakRule.configure(new KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        appRealm.setUpdateProfileOnInitialSocialLogin(false);
+      }
+    }
+);
+  }
+}

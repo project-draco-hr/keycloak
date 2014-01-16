@@ -4,19 +4,14 @@
     if (!callback.getQueryParam("state").equals(callback.getAttribute("state"))) {
       throw new SocialProviderException("Invalid state");
     }
-    GoogleTokenResponse tokenResponse=new GoogleAuthorizationCodeTokenRequest(TRANSPORT,JSON_FACTORY,config.getKey(),config.getSecret(),code,config.getCallbackUrl().toString()).execute();
-    GoogleCredential credential=new GoogleCredential.Builder().setJsonFactory(JSON_FACTORY).setTransport(TRANSPORT).setClientSecrets(config.getKey(),config.getSecret()).build().setFromTokenResponse(tokenResponse);
-    Oauth2 oauth2=new Oauth2.Builder(TRANSPORT,JSON_FACTORY,credential).build();
-    Tokeninfo tokenInfo=oauth2.tokeninfo().setAccessToken(credential.getAccessToken()).execute();
-    if (tokenInfo.containsKey("error")) {
-      throw new SocialProviderException((String)tokenInfo.get("error"));
-    }
-    Userinfo userInfo=oauth2.userinfo().get().execute();
-    SocialUser user=new SocialUser(userInfo.getId());
-    user.setUsername(userInfo.getEmail());
-    user.setFirstName(userInfo.getGivenName());
-    user.setLastName(userInfo.getFamilyName());
-    user.setEmail(userInfo.getEmail());
+    JSONObject token=SimpleHttp.doPost(TOKEN_PATH).param("code",code).param("client_id",config.getKey()).param("client_secret",config.getSecret()).param("redirect_uri",config.getCallbackUrl()).param("grant_type","authorization_code").asJson();
+    String accessToken=token.getString("access_token");
+    JSONObject profile=SimpleHttp.doGet(PROFILE_PATH).header("Authorization","Bearer " + accessToken).asJson();
+    SocialUser user=new SocialUser(profile.getString("sub"));
+    user.setUsername(profile.getString("email"));
+    user.setFirstName(profile.optString("given_name"));
+    user.setLastName(profile.optString("family_name"));
+    user.setEmail(profile.optString("email"));
     return user;
   }
  catch (  Exception e) {

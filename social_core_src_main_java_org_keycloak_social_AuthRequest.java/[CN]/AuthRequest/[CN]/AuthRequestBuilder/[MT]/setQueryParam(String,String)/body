@@ -1,4 +1,18 @@
 {
-  b.queryParam(name,value);
-  return this;
+  try {
+    if (sep == '?') {
+      b.append(sep);
+      sep='&';
+    }
+ else {
+      b.append(sep);
+    }
+    b.append(URLEncoder.encode(name,"UTF-8"));
+    b.append("=");
+    b.append(URLEncoder.encode(value,"UTF-8"));
+    return this;
+  }
+ catch (  UnsupportedEncodingException e) {
+    throw new IllegalStateException(e);
+  }
 }

@@ -1,5 +1,9 @@
 {
-  if (!roleContainer.removeRole(id)) {
+  RoleModel role=roleContainer.getRole(roleName);
+  if (role == null) {
+    throw new NotFoundException("Could not find role: " + roleName);
+  }
+  if (!roleContainer.removeRoleById(role.getId())) {
     throw new NotFoundException();
   }
 }

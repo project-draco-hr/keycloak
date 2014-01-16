@@ -1,7 +1,7 @@
 {
-  RoleModel roleModel=roleContainer.getRoleById(id);
+  RoleModel roleModel=roleContainer.getRole(roleName);
   if (roleModel == null || roleModel.getName().startsWith(Constants.INTERNAL_ROLE)) {
-    throw new NotFoundException();
+    throw new NotFoundException("Could not find role: " + roleName);
   }
   RoleRepresentation rep=new RoleRepresentation(roleModel.getName(),roleModel.getDescription());
   rep.setId(roleModel.getId());

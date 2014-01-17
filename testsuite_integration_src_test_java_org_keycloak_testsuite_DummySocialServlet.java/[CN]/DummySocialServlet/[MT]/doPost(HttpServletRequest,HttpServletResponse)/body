@@ -1,5 +1,4 @@
 {
-  String accessToken=req.getParameter("username");
   String state=null;
   String redirectUri=null;
   List<NameValuePair> query=null;
@@ -18,6 +17,6 @@
       redirectUri=p.getValue();
     }
   }
-  String redirect=redirectUri + "?access_token=" + accessToken+ "&token_type=bearer&state="+ state;
+  String redirect=redirectUri + "?username=" + req.getParameter("username")+ "&state="+ state+ "&code="+ UUID.randomUUID().toString();
   resp.sendRedirect(redirect);
 }

@@ -3,5 +3,14 @@
   if (user != null)   throw new IllegalStateException("User already exists");
   user=new User(username);
   getIdm().add(user);
-  return new UserAdapter(user,getIdm());
+  UserAdapter userModel=new UserAdapter(user,getIdm());
+  for (  String r : getDefaultRoles()) {
+    grantRole(userModel,getRole(r));
+  }
+  for (  ApplicationModel application : getApplications()) {
+    for (    String r : application.getDefaultRoles()) {
+      application.grantRole(userModel,application.getRole(r));
+    }
+  }
+  return userModel;
 }

@@ -12,7 +12,7 @@
   if (rep.isRegistrationAllowed() != null)   newRealm.setRegistrationAllowed(rep.isRegistrationAllowed());
   if (rep.isVerifyEmail() != null)   newRealm.setVerifyEmail(rep.isVerifyEmail());
   if (rep.isResetPasswordAllowed() != null)   newRealm.setResetPasswordAllowed(rep.isResetPasswordAllowed());
-  if (rep.isAutomaticRegistrationAfterSocialLogin() != null)   newRealm.setAutomaticRegistrationAfterSocialLogin(rep.isAutomaticRegistrationAfterSocialLogin());
+  if (rep.isUpdateProfileOnInitialSocialLogin() != null)   newRealm.setUpdateProfileOnInitialSocialLogin(rep.isUpdateProfileOnInitialSocialLogin());
   if (rep.getPrivateKey() == null || rep.getPublicKey() == null) {
     generateRealmKeys(newRealm);
   }
@@ -73,9 +73,6 @@
     for (    OAuthClientModel app : oauthMap.values()) {
       userMap.put(app.getOAuthAgent().getLoginName(),app.getOAuthAgent());
     }
-  }
-  if (rep.getAccountManagement() != null && rep.getAccountManagement()) {
-    enableAccountManagement(newRealm);
   }
   Map<String,ApplicationModel> appMap=newRealm.getApplicationNameMap();
   if (rep.getApplicationRoleMappings() != null) {

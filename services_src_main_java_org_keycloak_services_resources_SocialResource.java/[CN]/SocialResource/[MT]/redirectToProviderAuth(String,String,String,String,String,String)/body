@@ -9,6 +9,19 @@
   String secret=realm.getSocialConfig().get(providerId + ".secret");
   String callbackUri=Urls.socialCallback(uriInfo.getBaseUri()).toString();
   SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
+  UserModel client=realm.getUser(clientId);
+  if (client == null) {
+    logger.warn("Unknown login requester: " + clientId);
+    return Flows.forms(realm,request,uriInfo).setError("Unknown login requester.").forwardToErrorPage();
+  }
+  if (!client.isEnabled()) {
+    logger.warn("Login requester not enabled.");
+    return Flows.forms(realm,request,uriInfo).setError("Login requester not enabled.").forwardToErrorPage();
+  }
+  redirectUri=TokenService.verifyRedirectUri(redirectUri,client);
+  if (redirectUri == null) {
+    return Flows.forms(realm,request,uriInfo).setError("Invalid redirect_uri.").forwardToErrorPage();
+  }
   try {
     AuthRequest authRequest=provider.getAuthUrl(config);
     RequestDetails socialRequest=RequestDetails.create(providerId).putSocialAttributes(authRequest.getAttributes()).putClientAttribute("realmId",realmId).putClientAttribute("clientId",clientId).putClientAttribute("scope",scope).putClientAttribute("state",state).putClientAttribute("redirectUri",redirectUri).build();

@@ -1,0 +1,11 @@
+{
+  server=new UndertowServer("localhost",8081);
+  DeploymentInfo deploymentInfo=new DeploymentInfo();
+  deploymentInfo.setClassLoader(getClass().getClassLoader());
+  deploymentInfo.setDeploymentName("test");
+  deploymentInfo.setContextPath("/");
+  ServletInfo servlet=servlet("ToJsonServlet",ToJsonServlet.class).addMapping("/tojson");
+  deploymentInfo.addServlet(servlet);
+  server.deploy(deploymentInfo);
+  server.start();
+}

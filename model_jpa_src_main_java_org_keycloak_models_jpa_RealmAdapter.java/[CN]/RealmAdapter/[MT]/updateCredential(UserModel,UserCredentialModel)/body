@@ -15,7 +15,9 @@
     userEntity.getCredentials().add(credentialEntity);
   }
   if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
-    credentialEntity.setValue(new SHAPasswordEncoder(512).encode(cred.getValue()));
+    byte[] salt=getSalt();
+    credentialEntity.setValue(new Pbkdf2PasswordEncoder(salt).encode(cred.getValue()));
+    credentialEntity.setSalt(salt);
   }
  else {
     credentialEntity.setValue(cred.getValue());

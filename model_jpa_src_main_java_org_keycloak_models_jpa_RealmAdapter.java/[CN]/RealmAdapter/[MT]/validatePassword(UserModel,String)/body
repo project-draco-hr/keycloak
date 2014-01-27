@@ -1,7 +1,7 @@
 {
   for (  CredentialEntity cred : ((UserAdapter)user).getUser().getCredentials()) {
     if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
-      return new SHAPasswordEncoder(512).verify(password,cred.getValue());
+      return new Pbkdf2PasswordEncoder(cred.getSalt()).verify(password,cred.getValue());
     }
   }
   return false;

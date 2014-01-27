@@ -2,7 +2,7 @@
   Cookie stateCookie=getCookie(realmInfo.getStateCookieName());
   if (stateCookie == null) {
     log.warn("No state cookie");
-    return challenge(400);
+    return challenge(StatusCodes.BAD_REQUEST);
   }
   log.info("** reseting application state cookie");
   Cookie reset=new CookieImpl(realmInfo.getStateCookieName(),"");
@@ -13,13 +13,13 @@
   String state=getQueryParamValue("state");
   if (state == null) {
     log.warn("state parameter was null");
-    return challenge(400);
+    return challenge(StatusCodes.BAD_REQUEST);
   }
   if (!state.equals(stateCookieValue)) {
     log.warn("state parameter invalid");
     log.warn("cookie: " + stateCookieValue);
     log.warn("queryParam: " + state);
-    return challenge(400);
+    return challenge(StatusCodes.BAD_REQUEST);
   }
   return null;
 }

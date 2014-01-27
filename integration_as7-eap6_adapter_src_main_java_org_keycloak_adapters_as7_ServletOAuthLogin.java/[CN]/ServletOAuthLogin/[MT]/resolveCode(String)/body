@@ -13,7 +13,7 @@
  catch (  TokenGrantRequest.HttpFailure failure) {
     log.error("failed to turn code into token");
     log.error("status from server: " + failure.getStatus());
-    if (failure.getStatus() == 400 && failure.getError() != null) {
+    if (failure.getStatus() == HttpServletResponse.SC_BAD_REQUEST && failure.getError() != null) {
       log.error("   " + failure.getError());
     }
     sendError(HttpServletResponse.SC_FORBIDDEN);

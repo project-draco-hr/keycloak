@@ -1,7 +1,7 @@
 {
   if (realmInfo.isSslRequired() && !isRequestSecure()) {
     log.error("SSL is required");
-    return challenge(403);
+    return challenge(StatusCodes.FORBIDDEN);
   }
   log.info("checking state cookie for after code");
   KeycloakChallenge challenge=checkStateCookie();
@@ -14,14 +14,14 @@
  catch (  TokenGrantRequest.HttpFailure failure) {
     log.error("failed to turn code into token");
     log.error("status from server: " + failure.getStatus());
-    if (failure.getStatus() == 400 && failure.getError() != null) {
+    if (failure.getStatus() == StatusCodes.BAD_REQUEST && failure.getError() != null) {
       log.error("   " + failure.getError());
     }
-    return challenge(403);
+    return challenge(StatusCodes.FORBIDDEN);
   }
 catch (  IOException e) {
     log.error("failed to turn code into token");
-    return challenge(403);
+    return challenge(StatusCodes.FORBIDDEN);
   }
   tokenString=tokenResponse.getToken();
   try {
@@ -30,7 +30,7 @@ catch (  IOException e) {
   }
  catch (  VerificationException e) {
     log.error("failed verification of token");
-    return challenge(403);
+    return challenge(StatusCodes.FORBIDDEN);
   }
   log.info("successful authenticated");
   return null;

@@ -4,12 +4,12 @@
     LogoutAction action=JsonSerialization.readValue(token.getContent(),LogoutAction.class);
     if (action.isExpired()) {
       log.warn("admin request failed, expired token");
-      response.sendError(400,"Expired token");
+      response.sendError(StatusCodes.BAD_REQUEST,"Expired token");
       return;
     }
     if (!realmInfo.getMetadata().getResourceName().equals(action.getResource())) {
       log.warn("Resource name does not match");
-      response.sendError(400,"Resource name does not match");
+      response.sendError(StatusCodes.BAD_REQUEST,"Resource name does not match");
       return;
     }
     String user=action.getUser();
@@ -24,7 +24,7 @@
   }
  catch (  Exception e) {
     log.warn("failed to logout",e);
-    response.sendError(500,"Failed to logout");
+    response.sendError(StatusCodes.INTERNAL_SERVER_ERROR,"Failed to logout");
   }
-  response.setStatus(204);
+  response.setStatus(StatusCodes.NO_CONTENT);
 }

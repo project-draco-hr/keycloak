@@ -35,12 +35,12 @@
   String surrogate=null;
   if (verifyCaller) {
     if (token.getTrustedCertificates() == null || token.getTrustedCertificates().size() == 0) {
-      response.sendError(400);
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST);
       throw new LoginException("No trusted certificates in token");
     }
     X509Certificate[] chain=request.getCertificateChain();
     if (chain == null || chain.length == 0) {
-      response.sendError(400);
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST);
       throw new LoginException("No certificates provided by jboss web to verify the caller");
     }
     surrogate=chain[0].getSubjectX500Principal().getName();

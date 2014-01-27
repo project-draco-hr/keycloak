@@ -2,7 +2,7 @@
   String token=StreamUtil.readString(request.getInputStream());
   if (token == null) {
     log.warn("admin request failed, no token");
-    response.sendError(403,"no token");
+    response.sendError(HttpServletResponse.SC_FORBIDDEN,"no token");
     return null;
   }
   JWSInput input=new JWSInput(token);
@@ -14,7 +14,7 @@
   }
   if (!verified) {
     log.warn("admin request failed, unable to verify token");
-    response.sendError(403,"verification failed");
+    response.sendError(HttpServletResponse.SC_FORBIDDEN,"verification failed");
     return null;
   }
   return input;

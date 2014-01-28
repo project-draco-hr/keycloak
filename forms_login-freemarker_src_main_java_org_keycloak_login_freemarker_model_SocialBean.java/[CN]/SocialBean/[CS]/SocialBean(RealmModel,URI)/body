@@ -1,0 +1,14 @@
+{
+  Map<String,String> socialConfig=realm.getSocialConfig();
+  if (realm.isSocial() && !socialConfig.isEmpty()) {
+    displaySocial=true;
+    providers=new LinkedList<SocialProvider>();
+    UriBuilder socialLoginUrlBuilder=UriBuilder.fromUri(Urls.socialRedirectToProviderAuth(baseURI,realm.getName()));
+    for (    org.keycloak.social.SocialProvider p : SocialLoader.load()) {
+      if (socialConfig.containsKey(p.getId() + ".key") && socialConfig.containsKey(p.getId() + ".secret")) {
+        String loginUrl=socialLoginUrlBuilder.replaceQueryParam("provider_id",p.getId()).build().toString();
+        providers.add(new SocialProvider(p.getId(),p.getName(),loginUrl));
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  AuthenticationManager.Auth auth=getAuth(false);
+  if (auth != null) {
+    if (!hasAccess(auth)) {
+      return noAccess();
+    }
+    Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
+    String referrer=getReferrer();
+    if (referrer != null) {
+      account.setReferrer(referrer);
+    }
+    return account.createResponse(page);
+  }
+ else {
+    return login(path);
+  }
+}

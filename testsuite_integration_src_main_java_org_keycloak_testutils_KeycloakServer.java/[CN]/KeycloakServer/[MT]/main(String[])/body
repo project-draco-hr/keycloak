@@ -26,6 +26,10 @@
     if (!dir.isDirectory() || !new File(dir,"admin-ui").isDirectory()) {
       throw new RuntimeException("Invalid resources directory");
     }
+    if (!System.getProperties().containsKey("keycloak.theme.dir")) {
+      System.setProperty(DefaultLoginThemeProvider.class.getName() + ".disabled","");
+      System.setProperty("keycloak.theme.dir",file(dir.getAbsolutePath(),"forms","common-themes","src","main","resources","theme").getAbsolutePath());
+    }
     config.setResourcesHome(dir.getAbsolutePath());
   }
   final KeycloakServer keycloak=new KeycloakServer(config);

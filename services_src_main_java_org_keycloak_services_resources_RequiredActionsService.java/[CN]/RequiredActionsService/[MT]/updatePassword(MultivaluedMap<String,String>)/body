@@ -9,16 +9,16 @@
   UserModel user=getUser(accessCode);
   String passwordNew=formData.getFirst("password-new");
   String passwordConfirm=formData.getFirst("password-confirm");
-  FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(user);
+  LoginForms loginForms=Flows.forms(realm,request,uriInfo).setUser(user);
   if (Validation.isEmpty(passwordNew)) {
-    return forms.setError(Messages.MISSING_PASSWORD).forwardToAction(RequiredAction.UPDATE_PASSWORD);
+    return loginForms.setError(Messages.MISSING_PASSWORD).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
  else   if (!passwordNew.equals(passwordConfirm)) {
-    return forms.setError(Messages.NOTMATCH_PASSWORD).forwardToAction(RequiredAction.UPDATE_PASSWORD);
+    return loginForms.setError(Messages.NOTMATCH_PASSWORD).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
   String error=realm.getPasswordPolicy().validate(passwordNew);
   if (error != null) {
-    return forms.setError(error).forwardToAction(RequiredAction.UPDATE_PASSWORD);
+    return loginForms.setError(error).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
   UserCredentialModel credentials=new UserCredentialModel();
   credentials.setType(CredentialRepresentation.PASSWORD);
@@ -29,10 +29,5 @@
   if (accessCode != null) {
     accessCode.getRequiredActions().remove(RequiredAction.UPDATE_PASSWORD);
   }
-  if (accessCode != null) {
-    return redirectOauth(user,accessCode);
-  }
- else {
-    return Flows.forms(realm,request,uriInfo).setUser(user).forwardToPassword();
-  }
+  return redirectOauth(user,accessCode);
 }

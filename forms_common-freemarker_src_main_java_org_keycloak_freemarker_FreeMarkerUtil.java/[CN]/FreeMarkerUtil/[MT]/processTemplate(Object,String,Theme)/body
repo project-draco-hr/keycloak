@@ -1,0 +1,13 @@
+{
+  Writer out=new StringWriter();
+  Configuration cfg=new Configuration();
+  try {
+    cfg.setTemplateLoader(new ThemeTemplateLoader(theme));
+    Template template=cfg.getTemplate(templateName);
+    template.process(data,out);
+  }
+ catch (  Exception e) {
+    throw new FreeMarkerException("Failed to process template " + templateName,e);
+  }
+  return out.toString();
+}

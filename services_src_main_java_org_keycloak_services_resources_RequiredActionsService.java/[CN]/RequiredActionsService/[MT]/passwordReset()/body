@@ -4,9 +4,9 @@
     if (accessCode == null || accessCode.isExpired() || !accessCode.getRequiredActions().contains(RequiredAction.UPDATE_PASSWORD)) {
       return unauthorized();
     }
-    return Flows.forms(realm,request,uriInfo).setAccessCode(accessCode).forwardToAction(RequiredAction.UPDATE_PASSWORD);
+    return Flows.forms(realm,request,uriInfo).setAccessCode(accessCode.getId(),accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
  else {
-    return Flows.forms(realm,request,uriInfo).forwardToPasswordReset();
+    return Flows.forms(realm,request,uriInfo).createPasswordReset();
   }
 }

@@ -6,17 +6,17 @@
   UserModel user=auth.getUser();
   String totp=formData.getFirst("totp");
   String totpSecret=formData.getFirst("totpSecret");
-  FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(user);
+  Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
   if (Validation.isEmpty(totp)) {
-    return forms.setError(Messages.MISSING_TOTP).forwardToTotp();
+    return account.setError(Messages.MISSING_TOTP).createResponse(AccountPages.TOTP);
   }
  else   if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
-    return forms.setError(Messages.INVALID_TOTP).forwardToTotp();
+    return account.setError(Messages.INVALID_TOTP).createResponse(AccountPages.TOTP);
   }
   UserCredentialModel credentials=new UserCredentialModel();
   credentials.setType(CredentialRepresentation.TOTP);
   credentials.setValue(totpSecret);
   realm.updateCredential(user,credentials);
   user.setTotp(true);
-  return Flows.forms(realm,request,uriInfo).setSuccess("successTotp").setUser(user).forwardToTotp();
+  return account.setSuccess("successTotp").createResponse(AccountPages.TOTP);
 }

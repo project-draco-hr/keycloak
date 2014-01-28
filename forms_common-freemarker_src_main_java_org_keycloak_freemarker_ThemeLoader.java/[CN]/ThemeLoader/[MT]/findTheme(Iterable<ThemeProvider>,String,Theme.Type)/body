@@ -1,0 +1,25 @@
+{
+  for (  ThemeProvider p : providers) {
+    if (p.hasTheme(name,type)) {
+      try {
+        return p.createTheme(name,type);
+      }
+ catch (      IOException e) {
+        if (name.equals(BASE)) {
+          throw new FreeMarkerException("Failed to create " + type.toString().toLowerCase() + " theme",e);
+        }
+ else {
+          logger.error("Failed to create " + type.toString().toLowerCase() + " theme",e);
+          return findTheme(providers,BASE,type);
+        }
+      }
+    }
+  }
+  if (name.equals(BASE)) {
+    throw new FreeMarkerException(type.toString().toLowerCase() + " theme '" + name+ "' not found");
+  }
+ else {
+    logger.error(type.toString().toLowerCase() + " theme '" + name+ "' not found");
+    return findTheme(providers,BASE,type);
+  }
+}

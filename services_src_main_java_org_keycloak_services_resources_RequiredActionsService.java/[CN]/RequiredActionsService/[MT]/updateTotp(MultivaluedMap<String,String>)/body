@@ -6,12 +6,12 @@
   UserModel user=getUser(accessCode);
   String totp=formData.getFirst("totp");
   String totpSecret=formData.getFirst("totpSecret");
-  FormFlows forms=Flows.forms(realm,request,uriInfo).setUser(user);
+  LoginForms loginForms=Flows.forms(realm,request,uriInfo).setUser(user);
   if (Validation.isEmpty(totp)) {
-    return forms.setError(Messages.MISSING_TOTP).forwardToAction(RequiredAction.CONFIGURE_TOTP);
+    return loginForms.setError(Messages.MISSING_TOTP).createResponse(RequiredAction.CONFIGURE_TOTP);
   }
  else   if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
-    return forms.setError(Messages.INVALID_TOTP).forwardToAction(RequiredAction.CONFIGURE_TOTP);
+    return loginForms.setError(Messages.INVALID_TOTP).createResponse(RequiredAction.CONFIGURE_TOTP);
   }
   UserCredentialModel credentials=new UserCredentialModel();
   credentials.setType(CredentialRepresentation.TOTP);

@@ -4,12 +4,13 @@
     return noAccess();
   }
   UserModel user=auth.getUser();
+  Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
   String error=Validation.validateUpdateProfileForm(formData);
   if (error != null) {
-    return Flows.forms(realm,request,uriInfo).setUser(user).setError(error).forwardToAccount();
+    return account.setError(error).createResponse(AccountPages.ACCOUNT);
   }
   user.setFirstName(formData.getFirst("firstName"));
   user.setLastName(formData.getFirst("lastName"));
   user.setEmail(formData.getFirst("email"));
-  return Flows.forms(realm,request,uriInfo).setUser(user).setSuccess("accountUpdated").forwardToAccount();
+  return account.setSuccess("accountUpdated").createResponse(AccountPages.ACCOUNT);
 }

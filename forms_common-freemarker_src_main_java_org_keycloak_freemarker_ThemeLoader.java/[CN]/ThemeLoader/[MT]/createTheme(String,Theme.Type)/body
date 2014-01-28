@@ -1,0 +1,19 @@
+{
+  if (name == null) {
+    name=DEFAULT;
+  }
+  Iterable<ThemeProvider> providers=ProviderLoader.load(ThemeProvider.class);
+  Theme theme=findTheme(providers,name,type);
+  if (theme.getParentName() != null) {
+    List<Theme> themes=new LinkedList<Theme>();
+    themes.add(theme);
+    for (String parentName=theme.getParentName(); parentName != null; parentName=theme.getParentName()) {
+      theme=findTheme(providers,parentName,type);
+      themes.add(theme);
+    }
+    return new ExtendingTheme(themes);
+  }
+ else {
+    return theme;
+  }
+}

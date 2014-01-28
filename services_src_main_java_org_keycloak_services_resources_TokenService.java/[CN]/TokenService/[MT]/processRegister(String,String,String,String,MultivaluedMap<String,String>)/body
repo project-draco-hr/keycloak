@@ -30,12 +30,12 @@
     error=Validation.validatePassword(formData,realm.getPasswordPolicy());
   }
   if (error != null) {
-    return Flows.forms(realm,request,uriInfo).setError(error).setFormData(formData).forwardToRegistration();
+    return Flows.forms(realm,request,uriInfo).setError(error).setFormData(formData).createRegistration();
   }
   String username=formData.getFirst("username");
   UserModel user=realm.getUser(username);
   if (user != null) {
-    return Flows.forms(realm,request,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).forwardToRegistration();
+    return Flows.forms(realm,request,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).createRegistration();
   }
   user=realm.addUser(username);
   user.setEnabled(true);

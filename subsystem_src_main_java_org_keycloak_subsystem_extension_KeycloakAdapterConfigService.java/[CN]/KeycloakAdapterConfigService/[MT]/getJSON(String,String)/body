@@ -1,0 +1,11 @@
+{
+  ModelNode deployment=this.deployments.get(deploymentName);
+  String realmName=deployment.get(RealmDefinition.TAG_NAME).asString();
+  ModelNode realm=this.realms.get(realmName);
+  ModelNode json=new ModelNode();
+  json.get(RealmDefinition.TAG_NAME).set(realmName);
+  json.get("resource").set(resourceName);
+  setJSONValues(json,realm);
+  setJSONValues(json,deployment);
+  return json.toJSONString(false);
+}

@@ -1,0 +1,11 @@
+{
+  ParseUtils.requireNoAttributes(reader);
+  ModelNode addKeycloakSub=Util.createAddOperation(PathAddress.pathAddress(KeycloakExtension.PATH_SUBSYSTEM));
+  list.add(addKeycloakSub);
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    if (!reader.getLocalName().equals("realm")) {
+      throw ParseUtils.unexpectedElement(reader);
+    }
+    readRealm(reader,list);
+  }
+}

@@ -1,10 +1,8 @@
 {
   Set<RoleModel> roles=getRoleMappings(user);
   if (roles.contains(role))   return true;
-  Set<RoleModel> visited=new HashSet<RoleModel>();
   for (  RoleModel mapping : roles) {
-    if (!mapping.isComposite())     continue;
-    if (searchCompositeFor(role,mapping,visited))     return true;
+    if (mapping.hasRole(role))     return true;
   }
   return false;
 }

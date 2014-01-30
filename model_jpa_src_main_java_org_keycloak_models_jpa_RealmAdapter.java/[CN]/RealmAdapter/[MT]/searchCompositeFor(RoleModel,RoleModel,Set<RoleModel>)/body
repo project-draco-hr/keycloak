@@ -1,0 +1,11 @@
+{
+  if (visited.contains(composite))   return false;
+  visited.add(composite);
+  Set<RoleModel> composites=composite.getComposites();
+  if (composites.contains(role))   return true;
+  for (  RoleModel contained : composites) {
+    if (!contained.isComposite())     continue;
+    if (searchCompositeFor(role,contained,visited))     return true;
+  }
+  return false;
+}

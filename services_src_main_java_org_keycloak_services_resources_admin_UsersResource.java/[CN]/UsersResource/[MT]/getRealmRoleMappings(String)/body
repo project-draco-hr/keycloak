@@ -3,11 +3,11 @@
   if (user == null) {
     throw new NotFoundException();
   }
-  List<RoleModel> realmMappings=realm.getRoleMappings(user);
+  Set<RoleModel> realmMappings=realm.getRealmRoleMappings(user);
   List<RoleRepresentation> realmMappingsRep=new ArrayList<RoleRepresentation>();
   RealmManager manager=new RealmManager(session);
   for (  RoleModel roleModel : realmMappings) {
-    realmMappingsRep.add(manager.toRepresentation(roleModel));
+    realmMappingsRep.add(ModelToRepresentation.toRepresentation(roleModel));
   }
   return realmMappingsRep;
 }

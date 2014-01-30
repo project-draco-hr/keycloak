@@ -1,0 +1,21 @@
+{
+  ApplicationModel app=realm.getApplicationByName(appName);
+  if (app == null) {
+    throw new NotFoundException();
+  }
+  if (roles == null) {
+    Set<RoleModel> roleModels=app.getApplicationScopeMappings(agent);
+    for (    RoleModel roleModel : roleModels) {
+      realm.deleteScopeMapping(agent,roleModel);
+    }
+  }
+ else {
+    for (    RoleRepresentation role : roles) {
+      RoleModel roleModel=app.getRoleById(role.getId());
+      if (roleModel == null) {
+        throw new NotFoundException();
+      }
+      realm.deleteScopeMapping(agent,roleModel);
+    }
+  }
+}

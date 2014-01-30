@@ -1,10 +1,11 @@
 {
   RoleModel role=getRole(name);
   if (role != null)   return role;
-  RoleEntity entity=new RoleEntity();
+  ApplicationRoleEntity entity=new ApplicationRoleEntity();
   entity.setName(name);
+  entity.setApplication(application);
   em.persist(entity);
   application.getRoles().add(entity);
   em.flush();
-  return new RoleAdapter(entity);
+  return new RoleAdapter(realm,em,entity);
 }

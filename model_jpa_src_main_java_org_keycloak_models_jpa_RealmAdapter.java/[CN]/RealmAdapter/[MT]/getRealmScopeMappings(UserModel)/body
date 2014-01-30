@@ -1,0 +1,13 @@
+{
+  Set<RoleModel> roleMappings=getScopeMappings(user);
+  Set<RoleModel> appRoles=new HashSet<RoleModel>();
+  for (  RoleModel role : roleMappings) {
+    RoleContainerModel container=role.getContainer();
+    if (container instanceof RealmModel) {
+      if (((RealmModel)container).getId().equals(getId())) {
+        appRoles.add(role);
+      }
+    }
+  }
+  return appRoles;
+}

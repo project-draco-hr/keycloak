@@ -14,7 +14,7 @@
   Assert.assertNotNull(realm.getRole("bar"));
   UserModel user=realm.getUser("loginclient");
   Assert.assertNotNull(user);
-  Set<String> scopes=realm.getScopeMappingValues(user);
+  Set<RoleModel> scopes=realm.getRealmScopeMappings(user);
   Assert.assertEquals(0,scopes.size());
   Assert.assertEquals(0,realm.getSocialLinks(user).size());
   List<ApplicationModel> resources=realm.getApplications();
@@ -23,8 +23,9 @@
   UserModel oauthClient=realm.getUser("oauthclient");
   Assert.assertNotNull(application);
   Assert.assertNotNull(oauthClient);
-  Set<String> appScopes=application.getScopeMappingValues(oauthClient);
-  Assert.assertTrue(appScopes.contains("user"));
+  Set<RoleModel> appScopes=application.getApplicationScopeMappings(oauthClient);
+  RoleModel appUserRole=application.getRole("user");
+  Assert.assertTrue(appScopes.contains(appUserRole));
   UserModel socialUser=realm.getUser("mySocialUser");
   Set<SocialLinkModel> socialLinks=realm.getSocialLinks(socialUser);
   Assert.assertEquals(3,socialLinks.size());

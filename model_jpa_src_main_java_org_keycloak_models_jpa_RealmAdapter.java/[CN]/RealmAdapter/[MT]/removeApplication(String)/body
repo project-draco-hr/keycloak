@@ -1,21 +1,29 @@
 {
-  ApplicationEntity application=null;
+  if (id == null)   return false;
+  ApplicationModel application=getApplicationById(id);
+  if (application == null)   return false;
+  for (  RoleModel role : application.getRoles()) {
+    application.removeRoleById(role.getId());
+  }
+  ApplicationEntity applicationEntity=null;
+  Iterator<ApplicationEntity> it=realm.getApplications().iterator();
+  while (it.hasNext()) {
+    ApplicationEntity ae=it.next();
+    if (ae.getId().equals(id)) {
+      applicationEntity=ae;
+      it.remove();
+      break;
+    }
+  }
   for (  ApplicationEntity a : realm.getApplications()) {
     if (a.getId().equals(id)) {
-      application=a;
+      applicationEntity=a;
     }
   }
   if (application == null) {
     return false;
   }
-  realm.getApplications().remove(application);
-  em.createQuery("delete from " + ApplicationScopeMappingEntity.class.getSimpleName() + " where application = :application").setParameter("application",application).executeUpdate();
-  em.createQuery("delete from " + ApplicationUserRoleMappingEntity.class.getSimpleName() + " where application = :application").setParameter("application",application).executeUpdate();
-  em.createQuery("delete from " + ApplicationScopeMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",application.getApplicationUser()).executeUpdate();
-  em.createQuery("delete from " + RealmScopeMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",application.getApplicationUser()).executeUpdate();
-  em.createQuery("delete from " + ApplicationUserRoleMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",application.getApplicationUser()).executeUpdate();
-  em.createQuery("delete from " + RealmUserRoleMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",application.getApplicationUser()).executeUpdate();
-  removeUser(application.getApplicationUser());
-  em.remove(application);
+  em.remove(applicationEntity);
+  removeUser(applicationEntity.getApplicationUser());
   return true;
 }

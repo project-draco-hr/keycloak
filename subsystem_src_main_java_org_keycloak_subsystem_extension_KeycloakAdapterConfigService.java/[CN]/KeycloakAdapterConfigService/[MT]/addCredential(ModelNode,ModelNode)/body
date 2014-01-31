@@ -1,0 +1,10 @@
+{
+  ModelNode credentials=credentialsFromOp(operation);
+  if (!credentials.isDefined()) {
+    credentials=new ModelNode();
+  }
+  String credentialName=credentialNameFromOp(operation);
+  credentials.get(credentialName).set(model.get("value").asString());
+  ModelNode deployment=this.deployments.get(deploymentNameFromOp(operation));
+  deployment.get(CREDENTIALS_JSON_NAME).set(credentials);
+}

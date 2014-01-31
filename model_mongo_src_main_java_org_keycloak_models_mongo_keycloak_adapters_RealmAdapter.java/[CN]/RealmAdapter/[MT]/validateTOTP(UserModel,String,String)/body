@@ -1,4 +1,9 @@
 {
-  Credentials.Status status=totpCredentialHandler.validate(noSQL,((UserAdapter)user).getUser(),password,token,null);
-  return status == Credentials.Status.VALID;
+  if (!validatePassword(user,password))   return false;
+  for (  CredentialEntity cred : ((UserAdapter)user).getUser().getCredentials()) {
+    if (cred.getType().equals(UserCredentialModel.TOTP)) {
+      return new TimeBasedOTP().validate(token,cred.getValue().getBytes());
+    }
+  }
+  return false;
 }

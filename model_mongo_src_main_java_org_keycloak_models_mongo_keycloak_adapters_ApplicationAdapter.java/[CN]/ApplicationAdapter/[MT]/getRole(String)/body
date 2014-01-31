@@ -1,10 +1,10 @@
 {
-  NoSQLQuery query=noSQL.createQueryBuilder().andCondition("name",name).andCondition("applicationId",getId()).build();
-  RoleData role=noSQL.loadSingleObject(RoleData.class,query);
+  DBObject query=new QueryBuilder().and("name").is(name).and("applicationId").is(getId()).get();
+  RoleEntity role=mongoStore.loadSingleObject(RoleEntity.class,query);
   if (role == null) {
     return null;
   }
  else {
-    return new RoleAdapter(role,noSQL);
+    return new RoleAdapter(role,this,mongoStore);
   }
 }

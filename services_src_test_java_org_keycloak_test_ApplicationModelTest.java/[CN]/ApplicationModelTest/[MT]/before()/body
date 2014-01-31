@@ -1,10 +1,7 @@
 {
-  factory=KeycloakApplication.createSessionFactory();
-  identitySession=factory.createSession();
-  identitySession.getTransaction().begin();
-  manager=new RealmManager(identitySession);
-  appManager=new ApplicationManager(manager);
-  realm=manager.createRealm("original");
+  super.before();
+  appManager=new ApplicationManager(realmManager);
+  realm=realmManager.createRealm("original");
   application=realm.addApplication("application");
   application.setBaseUrl("http://base");
   application.setManagementUrl("http://management");

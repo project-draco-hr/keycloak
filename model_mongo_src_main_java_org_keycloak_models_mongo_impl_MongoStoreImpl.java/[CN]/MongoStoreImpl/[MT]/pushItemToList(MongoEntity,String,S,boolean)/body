@@ -1,0 +1,27 @@
+{
+  Class<? extends MongoEntity> type=object.getClass();
+  ObjectInfo objectInfo=getObjectInfo(type);
+  Property<String> oidProperty=getObjectInfo(type).getOidProperty();
+  if (oidProperty == null) {
+    throw new IllegalArgumentException("List pushes not supported for properties without oid");
+  }
+  Property<Object> listProperty=objectInfo.getPropertyByName(listPropertyName);
+  if (listProperty == null) {
+    throw new IllegalArgumentException("Property " + listPropertyName + " doesn't exist on object "+ object);
+  }
+  List<S> list=(List<S>)listProperty.getValue(object);
+  if (list == null) {
+    list=new ArrayList<S>();
+    listProperty.setValue(object,list);
+  }
+  if (skipIfAlreadyPresent && list.contains(itemToPush)) {
+    return false;
+  }
+  list.add(itemToPush);
+  BasicDBList dbList=typeConverter.convertApplicationObjectToDBObject(list,BasicDBList.class);
+  BasicDBObject query=new BasicDBObject("_id",getObjectId(oidProperty.getValue(object)));
+  BasicDBObject listObject=new BasicDBObject(listPropertyName,dbList);
+  BasicDBObject setCommand=new BasicDBObject("$set",listObject);
+  getDBCollectionForType(type).update(query,setCommand);
+  return true;
+}

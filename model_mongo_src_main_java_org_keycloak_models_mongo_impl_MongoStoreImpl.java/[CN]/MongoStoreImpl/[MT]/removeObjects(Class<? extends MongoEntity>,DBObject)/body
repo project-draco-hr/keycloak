@@ -1,0 +1,15 @@
+{
+  List<? extends MongoEntity> foundObjects=loadObjects(type,query);
+  if (foundObjects.size() == 0) {
+    return false;
+  }
+ else {
+    DBCollection dbCollection=getDBCollectionForType(type);
+    dbCollection.remove(query);
+    logger.info("Removed " + foundObjects.size() + " objects of type: "+ type+ ", query: "+ query);
+    for (    MongoEntity found : foundObjects) {
+      found.afterRemove(this);
+    }
+    return true;
+  }
+}

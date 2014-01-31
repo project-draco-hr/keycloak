@@ -1,0 +1,8 @@
+{
+  DBCollection dbCollection=getDBCollectionForType(type);
+  BasicDBObject idQuery=new BasicDBObject("_id",getObjectId(oid));
+  DBObject dbObject=dbCollection.findOne(idQuery);
+  if (dbObject == null)   return null;
+  ConverterContext<Object> converterContext=new ConverterContext<Object>(dbObject,type,null);
+  return (T)typeConverter.convertDBObjectToApplicationObject(converterContext);
+}

@@ -1,0 +1,18 @@
+{
+  logger.info(String.format("Configuring MongoStore with: " + config));
+  if (config.isStartEmbedded()) {
+    embeddedMongo=new EmbeddedMongo();
+    embeddedMongo.startEmbeddedMongo(config.getPort());
+  }
+ else {
+    embeddedMongo=null;
+  }
+  try {
+    mongoClient=new MongoClient(config.getHost(),config.getPort());
+    DB db=mongoClient.getDB(config.getDbName());
+    mongoStore=new MongoStoreImpl(db,config.isClearCollectionsOnStartup(),MANAGED_ENTITY_TYPES);
+  }
+ catch (  UnknownHostException e) {
+    throw new RuntimeException(e);
+  }
+}

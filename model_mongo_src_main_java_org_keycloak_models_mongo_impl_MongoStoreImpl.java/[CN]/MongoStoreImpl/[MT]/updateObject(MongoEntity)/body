@@ -1,0 +1,15 @@
+{
+  Class<? extends MongoEntity> clazz=object.getClass();
+  ObjectInfo objectInfo=getObjectInfo(clazz);
+  BasicDBObject dbObject=typeConverter.convertApplicationObjectToDBObject(object,BasicDBObject.class);
+  DBCollection dbCollection=database.getCollection(objectInfo.getDbCollectionName());
+  Property<String> oidProperty=objectInfo.getOidProperty();
+  String currentId=oidProperty == null ? null : oidProperty.getValue(object);
+  if (currentId == null) {
+    throw new IllegalStateException("Can't update object without id: " + object);
+  }
+ else {
+    BasicDBObject query=new BasicDBObject("_id",getObjectId(currentId));
+    dbCollection.update(query,dbObject);
+  }
+}

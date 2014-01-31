@@ -1,6 +1,10 @@
 {
   if (resourceUser == null) {
-    resourceUser=noSQL.loadObject(UserData.class,application.getResourceUserId());
+    UserEntity userEntity=mongoStore.loadObject(UserEntity.class,application.getResourceUserId());
+    if (userEntity == null) {
+      throw new IllegalStateException("User " + application.getResourceUserId() + " not found");
+    }
+    resourceUser=new UserAdapter(userEntity,mongoStore);
   }
-  return resourceUser != null ? new UserAdapter(resourceUser,noSQL) : null;
+  return resourceUser;
 }

@@ -1,0 +1,12 @@
+{
+  if (role.getCompositeRoleIds() == null || role.getCompositeRoleIds().isEmpty()) {
+    return Collections.EMPTY_SET;
+  }
+  DBObject query=new QueryBuilder().and("_id").in(MongoModelUtils.convertStringsToObjectIds(role.getCompositeRoleIds())).get();
+  List<RoleEntity> childRoles=mongoStore.loadObjects(RoleEntity.class,query);
+  Set<RoleModel> set=new HashSet<RoleModel>();
+  for (  RoleEntity childRole : childRoles) {
+    set.add(new RoleAdapter(childRole,roleContainer,mongoStore));
+  }
+  return set;
+}

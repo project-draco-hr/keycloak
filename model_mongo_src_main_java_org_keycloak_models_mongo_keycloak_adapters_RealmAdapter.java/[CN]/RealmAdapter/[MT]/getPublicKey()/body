@@ -1,13 +1,5 @@
 {
   if (publicKey != null)   return publicKey;
-  String pem=getPublicKeyPem();
-  if (pem != null) {
-    try {
-      publicKey=PemUtils.decodePublicKey(pem);
-    }
- catch (    Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
+  publicKey=KeycloakModelUtils.getPublicKey(getPublicKeyPem());
   return publicKey;
 }

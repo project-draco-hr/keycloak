@@ -1,11 +1,11 @@
 {
-  RealmModel realm=manager.createRealm("original");
+  RealmModel realm=realmManager.createRealm("original");
   UserModel user=realm.addUser("user");
   Assert.assertTrue(user.getRequiredActions().isEmpty());
   user.addRequiredAction(UserModel.RequiredAction.CONFIGURE_TOTP);
   String id=realm.getId();
   commit();
-  realm=manager.getRealm(id);
+  realm=realmManager.getRealm(id);
   user=realm.getUser("user");
   Assert.assertEquals(1,user.getRequiredActions().size());
   Assert.assertTrue(user.getRequiredActions().contains(RequiredAction.CONFIGURE_TOTP));

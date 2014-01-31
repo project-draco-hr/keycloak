@@ -1,7 +1,7 @@
 {
   UserAdapter user=getUser(name);
   if (user == null)   return null;
-  NoSQLQuery query=noSQL.createQueryBuilder().andCondition("realmId",getOid()).andCondition("oauthAgentId",user.getUser().getId()).build();
-  OAuthClientData oauthClient=noSQL.loadSingleObject(OAuthClientData.class,query);
-  return oauthClient == null ? null : new OAuthClientAdapter(oauthClient,user,noSQL);
+  DBObject query=new QueryBuilder().and("realmId").is(getId()).and("oauthAgentId").is(user.getUser().getId()).get();
+  OAuthClientEntity oauthClient=mongoStore.loadSingleObject(OAuthClientEntity.class,query);
+  return oauthClient == null ? null : new OAuthClientAdapter(oauthClient,user,mongoStore);
 }

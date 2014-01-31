@@ -1,0 +1,10 @@
+{
+  Set<RoleModel> result=new HashSet<RoleModel>();
+  List<RoleEntity> roles=MongoModelUtils.getAllRolesOfUser(user,mongoStore);
+  for (  RoleEntity role : roles) {
+    if (getId().equals(role.getApplicationId())) {
+      result.add(new RoleAdapter(role,this,mongoStore));
+    }
+  }
+  return result;
+}

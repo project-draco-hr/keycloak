@@ -1,0 +1,14 @@
+{
+  MongoEntity found=loadObject(type,oid);
+  if (found == null) {
+    return false;
+  }
+ else {
+    DBCollection dbCollection=getDBCollectionForType(type);
+    BasicDBObject dbQuery=new BasicDBObject("_id",getObjectId(oid));
+    dbCollection.remove(dbQuery);
+    logger.info("Object of type: " + type + ", oid: "+ oid+ " removed from MongoDB.");
+    found.afterRemove(this);
+    return true;
+  }
+}

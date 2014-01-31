@@ -1,0 +1,11 @@
+{
+  if (getUser(username) != null) {
+    throw new IllegalArgumentException("User " + username + " already exists");
+  }
+  UserEntity userEntity=new UserEntity();
+  userEntity.setLoginName(username);
+  userEntity.setEnabled(true);
+  userEntity.setRealmId(getId());
+  mongoStore.insertObject(userEntity);
+  return new UserAdapter(userEntity,mongoStore);
+}

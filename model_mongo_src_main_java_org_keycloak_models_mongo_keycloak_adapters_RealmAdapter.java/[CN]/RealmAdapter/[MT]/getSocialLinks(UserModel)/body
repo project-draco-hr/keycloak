@@ -1,11 +1,11 @@
 {
-  UserData userData=((UserAdapter)user).getUser();
-  String userId=userData.getId();
-  NoSQLQuery query=noSQL.createQueryBuilder().andCondition("userId",userId).build();
-  List<SocialLinkData> dbSocialLinks=noSQL.loadObjects(SocialLinkData.class,query);
+  UserEntity userEntity=((UserAdapter)user).getUser();
+  String userId=userEntity.getId();
+  DBObject query=new QueryBuilder().and("userId").is(userId).get();
+  List<SocialLinkEntity> dbSocialLinks=mongoStore.loadObjects(SocialLinkEntity.class,query);
   Set<SocialLinkModel> result=new HashSet<SocialLinkModel>();
-  for (  SocialLinkData socialLinkData : dbSocialLinks) {
-    SocialLinkModel model=new SocialLinkModel(socialLinkData.getSocialProvider(),socialLinkData.getSocialUsername());
+  for (  SocialLinkEntity socialLinkEntity : dbSocialLinks) {
+    SocialLinkModel model=new SocialLinkModel(socialLinkEntity.getSocialProvider(),socialLinkEntity.getSocialUsername());
     result.add(model);
   }
   return result;

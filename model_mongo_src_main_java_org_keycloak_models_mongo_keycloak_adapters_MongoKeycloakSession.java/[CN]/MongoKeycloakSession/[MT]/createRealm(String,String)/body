@@ -1,0 +1,11 @@
+{
+  if (getRealm(id) != null) {
+    throw new IllegalStateException("Realm with id '" + id + "' already exists");
+  }
+  RealmEntity newRealm=new RealmEntity();
+  newRealm.setId(id);
+  newRealm.setName(name);
+  mongoStore.insertObject(newRealm);
+  RealmAdapter realm=new RealmAdapter(newRealm,mongoStore);
+  return realm;
+}

@@ -1,5 +1,5 @@
 {
-  RealmModel realm=manager.createRealm("original");
+  RealmModel realm=realmManager.createRealm("original");
   realm.setRegistrationAllowed(true);
   realm.setResetPasswordAllowed(true);
   realm.setSocial(true);
@@ -19,9 +19,9 @@
   HashMap<String,String> social=new HashMap<String,String>();
   social.put("google.key","1234");
   social.put("google.secret","5678");
-  realm.setSmtpConfig(social);
-  RealmModel peristed=manager.getRealm(realm.getId());
-  assertEquals(realm,peristed);
+  realm.setSocialConfig(social);
+  RealmModel persisted=realmManager.getRealm(realm.getId());
+  assertEquals(realm,persisted);
   RealmModel copy=importExport(realm,"copy");
   assertEquals(realm,copy);
 }

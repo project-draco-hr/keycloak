@@ -1,0 +1,13 @@
+{
+  BasicDBObject objectToConvert=context.getObjectToConvert();
+  HashMap<String,String> result=new HashMap<String,String>();
+  for (  Map.Entry<String,Object> entry : objectToConvert.entrySet()) {
+    String key=entry.getKey();
+    String value=(String)entry.getValue();
+    if (key.contains(MapConverter.DOT_PLACEHOLDER)) {
+      key=key.replaceAll(MapConverter.DOT_PLACEHOLDER,".");
+    }
+    result.put(key,value);
+  }
+  return result;
+}

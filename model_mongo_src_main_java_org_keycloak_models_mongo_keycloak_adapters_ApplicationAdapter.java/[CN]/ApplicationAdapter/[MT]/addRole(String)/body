@@ -1,10 +1,11 @@
 {
-  if (getRole(name) != null) {
-    throw new IllegalArgumentException("Role " + name + " already exists");
+  RoleAdapter existing=getRole(name);
+  if (existing != null) {
+    return existing;
   }
-  RoleData roleData=new RoleData();
-  roleData.setName(name);
-  roleData.setApplicationId(getId());
-  noSQL.saveObject(roleData);
-  return new RoleAdapter(roleData,noSQL);
+  RoleEntity roleEntity=new RoleEntity();
+  roleEntity.setName(name);
+  roleEntity.setApplicationId(getId());
+  mongoStore.insertObject(roleEntity);
+  return new RoleAdapter(roleEntity,this,mongoStore);
 }

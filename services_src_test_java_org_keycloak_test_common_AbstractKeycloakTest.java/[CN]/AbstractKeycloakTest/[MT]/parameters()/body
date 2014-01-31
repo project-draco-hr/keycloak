@@ -1,7 +1,17 @@
 {
+  Iterable<ModelProvider> modelProviders;
+  String configuredProvider=System.getProperty(ModelProviderUtils.MODEL_PROVIDER);
+  if ("all".equalsIgnoreCase(configuredProvider)) {
+    modelProviders=ModelProviderUtils.getRegisteredProviders();
+  }
+ else {
+    ModelProvider provider=ModelProviderUtils.getConfiguredModelProvider();
+    modelProviders=Arrays.asList(provider);
+  }
+  log.debug("Will use model providers: " + modelProviders);
   List<Object[]> params=new ArrayList<Object[]>();
-  for (  SessionFactoryTestContext testContext : TEST_CONTEXTS) {
-    params.add(new Object[]{testContext});
+  for (  ModelProvider provider : modelProviders) {
+    params.add(new Object[]{provider.getId()});
   }
   return params;
 }

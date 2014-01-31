@@ -1,11 +1,11 @@
 {
   MappingsRepresentation all=new MappingsRepresentation();
-  List<RoleModel> realmMappings=realm.getScopeMappings(agent);
+  Set<RoleModel> realmMappings=realm.getRealmScopeMappings(agent);
   RealmManager manager=new RealmManager(session);
   if (realmMappings.size() > 0) {
     List<RoleRepresentation> realmRep=new ArrayList<RoleRepresentation>();
     for (    RoleModel roleModel : realmMappings) {
-      realmRep.add(manager.toRepresentation(roleModel));
+      realmRep.add(ModelToRepresentation.toRepresentation(roleModel));
     }
     all.setRealmMappings(realmRep);
   }
@@ -13,7 +13,7 @@
   if (applications.size() > 0) {
     Map<String,ApplicationMappingsRepresentation> appMappings=new HashMap<String,ApplicationMappingsRepresentation>();
     for (    ApplicationModel app : applications) {
-      List<RoleModel> roleMappings=app.getScopeMappings(agent);
+      Set<RoleModel> roleMappings=app.getApplicationScopeMappings(agent);
       if (roleMappings.size() > 0) {
         ApplicationMappingsRepresentation mappings=new ApplicationMappingsRepresentation();
         mappings.setApplicationId(app.getId());
@@ -21,7 +21,7 @@
         List<RoleRepresentation> roles=new ArrayList<RoleRepresentation>();
         mappings.setMappings(roles);
         for (        RoleModel role : roleMappings) {
-          roles.add(manager.toRepresentation(role));
+          roles.add(ModelToRepresentation.toRepresentation(role));
         }
         appMappings.put(app.getName(),mappings);
         all.setApplicationMappings(appMappings);

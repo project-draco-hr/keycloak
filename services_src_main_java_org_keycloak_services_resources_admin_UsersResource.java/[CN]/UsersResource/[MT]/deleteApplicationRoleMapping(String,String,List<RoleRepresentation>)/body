@@ -8,9 +8,13 @@
     throw new NotFoundException();
   }
   if (roles == null) {
-    List<RoleModel> roleModels=application.getRoleMappings(user);
+    Set<RoleModel> roleModels=application.getApplicationRoleMappings(user);
     for (    RoleModel roleModel : roleModels) {
-      application.deleteRoleMapping(user,roleModel);
+      if (!(roleModel.getContainer() instanceof ApplicationModel)) {
+        ApplicationModel app=(ApplicationModel)roleModel.getContainer();
+        if (!app.getId().equals(application.getId()))         continue;
+      }
+      realm.deleteRoleMapping(user,roleModel);
     }
   }
  else {
@@ -19,7 +23,7 @@
       if (roleModel == null) {
         throw new NotFoundException();
       }
-      application.deleteRoleMapping(user,roleModel);
+      realm.deleteRoleMapping(user,roleModel);
     }
   }
 }

@@ -1,19 +1,14 @@
 {
   SkeletonKeyToken token=initToken(realm,client,user);
   if (accessCodeEntry.getRealmRolesRequested().size() > 0) {
-    SkeletonKeyToken.Access access=new SkeletonKeyToken.Access();
     for (    RoleModel role : accessCodeEntry.getRealmRolesRequested()) {
-      access.addRole(role.getName());
+      addComposites(token,role);
     }
-    token.setRealmAccess(access);
   }
   if (accessCodeEntry.getResourceRolesRequested().size() > 0) {
-    Map<String,ApplicationModel> resourceMap=realm.getApplicationNameMap();
-    for (    String resourceName : accessCodeEntry.getResourceRolesRequested().keySet()) {
-      ApplicationModel resource=resourceMap.get(resourceName);
-      SkeletonKeyToken.Access access=token.addAccess(resourceName).verifyCaller(resource.isSurrogateAuthRequired());
-      for (      RoleModel role : accessCodeEntry.getResourceRolesRequested().get(resourceName)) {
-        access.addRole(role.getName());
+    for (    List<RoleModel> roles : accessCodeEntry.getResourceRolesRequested().values()) {
+      for (      RoleModel role : roles) {
+        addComposites(token,role);
       }
     }
   }

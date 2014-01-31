@@ -1,9 +1,7 @@
 {
   OAuthClientEntity client=em.find(OAuthClientEntity.class,id);
-  em.createQuery("delete from " + ApplicationScopeMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",client.getAgent()).executeUpdate();
-  em.createQuery("delete from " + RealmScopeMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",client.getAgent()).executeUpdate();
-  em.createQuery("delete from " + ApplicationUserRoleMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",client.getAgent()).executeUpdate();
-  em.createQuery("delete from " + RealmUserRoleMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",client.getAgent()).executeUpdate();
+  em.createQuery("delete from " + UserScopeMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",client.getAgent()).executeUpdate();
+  em.createQuery("delete from " + UserRoleMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",client.getAgent()).executeUpdate();
   removeUser(client.getAgent());
   em.remove(client);
   return true;

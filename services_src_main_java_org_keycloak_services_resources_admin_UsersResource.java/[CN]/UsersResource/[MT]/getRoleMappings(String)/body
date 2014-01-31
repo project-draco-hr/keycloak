@@ -4,12 +4,12 @@
     throw new NotFoundException();
   }
   MappingsRepresentation all=new MappingsRepresentation();
-  List<RoleModel> realmMappings=realm.getRoleMappings(user);
+  Set<RoleModel> realmMappings=realm.getRoleMappings(user);
   RealmManager manager=new RealmManager(session);
   if (realmMappings.size() > 0) {
     List<RoleRepresentation> realmRep=new ArrayList<RoleRepresentation>();
     for (    RoleModel roleModel : realmMappings) {
-      realmRep.add(manager.toRepresentation(roleModel));
+      realmRep.add(ModelToRepresentation.toRepresentation(roleModel));
     }
     all.setRealmMappings(realmRep);
   }
@@ -17,7 +17,7 @@
   if (applications.size() > 0) {
     Map<String,ApplicationMappingsRepresentation> appMappings=new HashMap<String,ApplicationMappingsRepresentation>();
     for (    ApplicationModel application : applications) {
-      List<RoleModel> roleMappings=application.getRoleMappings(user);
+      Set<RoleModel> roleMappings=application.getApplicationRoleMappings(user);
       if (roleMappings.size() > 0) {
         ApplicationMappingsRepresentation mappings=new ApplicationMappingsRepresentation();
         mappings.setApplicationId(application.getId());
@@ -25,7 +25,7 @@
         List<RoleRepresentation> roles=new ArrayList<RoleRepresentation>();
         mappings.setMappings(roles);
         for (        RoleModel role : roleMappings) {
-          roles.add(manager.toRepresentation(role));
+          roles.add(ModelToRepresentation.toRepresentation(role));
         }
         appMappings.put(application.getName(),mappings);
         all.setApplicationMappings(appMappings);

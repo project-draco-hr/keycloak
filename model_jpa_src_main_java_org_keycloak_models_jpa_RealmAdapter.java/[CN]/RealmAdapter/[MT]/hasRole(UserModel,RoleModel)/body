@@ -1,4 +1,8 @@
 {
-  TypedQuery<RealmUserRoleMappingEntity> query=getRealmUserRoleMappingEntityTypedQuery((UserAdapter)user,(RoleAdapter)role);
-  return query.getResultList().size() > 0;
+  Set<RoleModel> roles=getRoleMappings(user);
+  if (roles.contains(role))   return true;
+  for (  RoleModel mapping : roles) {
+    if (mapping.hasRole(role))     return true;
+  }
+  return false;
 }

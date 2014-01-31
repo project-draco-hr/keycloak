@@ -1,0 +1,13 @@
+{
+  KeycloakSession session=server.getKeycloakSessionFactory().createSession();
+  session.getTransaction().begin();
+  try {
+    RealmManager manager=new RealmManager(session);
+    RealmModel adminstrationRealm=manager.getRealm(Constants.ADMIN_REALM);
+    configure(manager,adminstrationRealm);
+    session.getTransaction().commit();
+  }
+  finally {
+    session.close();
+  }
+}

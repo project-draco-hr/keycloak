@@ -8,10 +8,10 @@
   if (application == null) {
     throw new NotFoundException();
   }
-  List<RoleModel> mappings=application.getRoleMappings(user);
+  Set<RoleModel> mappings=application.getApplicationRoleMappings(user);
   List<RoleRepresentation> mapRep=new ArrayList<RoleRepresentation>();
   for (  RoleModel roleModel : mappings) {
-    mapRep.add(RealmManager.toRepresentation(roleModel));
+    mapRep.add(ModelToRepresentation.toRepresentation(roleModel));
   }
   logger.debug("getApplicationRoleMappings.size() = {0}",mapRep.size());
   return mapRep;

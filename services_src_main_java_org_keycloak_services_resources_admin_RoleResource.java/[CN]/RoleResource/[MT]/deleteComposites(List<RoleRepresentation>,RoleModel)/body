@@ -1,0 +1,10 @@
+{
+  for (  RoleRepresentation rep : roles) {
+    RoleModel composite=realm.getRoleById(rep.getId());
+    if (composite == null) {
+      throw new NotFoundException("Could not find composite role: " + rep.getName());
+    }
+    role.removeCompositeRole(composite);
+  }
+  if (role.getComposites().size() == 0)   role.setComposite(false);
+}

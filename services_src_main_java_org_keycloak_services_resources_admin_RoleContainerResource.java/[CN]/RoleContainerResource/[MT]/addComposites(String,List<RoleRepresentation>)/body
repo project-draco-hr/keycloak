@@ -3,12 +3,5 @@
   if (role == null || role.getName().startsWith(Constants.INTERNAL_ROLE)) {
     throw new NotFoundException("Could not find role: " + roleName);
   }
-  for (  RoleRepresentation rep : roles) {
-    RoleModel composite=roleContainer.getRole(rep.getName());
-    if (role == null || role.getName().startsWith(Constants.INTERNAL_ROLE)) {
-      throw new NotFoundException("Could not find composite role: " + rep.getName());
-    }
-    if (!role.isComposite())     role.setComposite(true);
-    role.addCompositeRole(composite);
-  }
+  addComposites(roles,role);
 }

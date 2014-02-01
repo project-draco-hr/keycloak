@@ -1,0 +1,8 @@
+{
+  if (!role.isComposite() || role.getComposites().size() == 0)   return Collections.emptySet();
+  Set<RoleRepresentation> composites=new HashSet<RoleRepresentation>(role.getComposites().size());
+  for (  RoleModel composite : role.getComposites()) {
+    if (composite.getContainer() instanceof RealmModel)     composites.add(ModelToRepresentation.toRepresentation(composite));
+  }
+  return composites;
+}

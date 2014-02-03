@@ -1,0 +1,23 @@
+{
+  if (!roleRep.isComposite() || roleRep.getComposites() == null)   return;
+  if (roleRep.getComposites().getRealm() != null) {
+    for (    String roleStr : roleRep.getComposites().getRealm()) {
+      RoleModel realmRole=realm.getRole(roleStr);
+      if (realmRole == null)       throw new RuntimeException("Unable to find composite realm role: " + roleStr);
+      role.addCompositeRole(realmRole);
+    }
+  }
+  if (roleRep.getComposites().getApplication() != null) {
+    for (    Map.Entry<String,List<String>> entry : roleRep.getComposites().getApplication().entrySet()) {
+      ApplicationModel app=realm.getApplicationByName(entry.getKey());
+      if (app == null) {
+        throw new RuntimeException("App doesn't exist in role definitions: " + roleRep.getName());
+      }
+      for (      String roleStr : entry.getValue()) {
+        RoleModel appRole=app.getRole(roleStr);
+        if (appRole == null)         throw new RuntimeException("Unable to find composite app role: " + roleStr);
+        role.addCompositeRole(appRole);
+      }
+    }
+  }
+}

@@ -24,7 +24,7 @@
   String username=formData.getFirst("username");
   UserModel user=realm.getUser(username);
   if (user == null) {
-    return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).forwardToLogin();
+    return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).createLogin();
   }
   isTotpConfigurationRequired(user);
   isEmailVerificationRequired(user);
@@ -34,10 +34,10 @@ case SUCCESS:
 case ACTIONS_REQUIRED:
     return oauth.processAccessCode(scopeParam,state,redirect,client,user);
 case ACCOUNT_DISABLED:
-  return Flows.forms(realm,request,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).forwardToLogin();
+  return Flows.forms(realm,request,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).createLogin();
 case MISSING_TOTP:
-return Flows.forms(realm,request,uriInfo).setFormData(formData).forwardToLoginTotp();
+return Flows.forms(realm,request,uriInfo).setFormData(formData).createLoginTotp();
 default :
-return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).forwardToLogin();
+return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).createLogin();
 }
 }

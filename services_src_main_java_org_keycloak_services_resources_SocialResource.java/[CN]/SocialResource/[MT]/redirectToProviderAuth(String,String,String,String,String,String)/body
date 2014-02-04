@@ -3,7 +3,7 @@
   RealmModel realm=realmManager.getRealm(realmId);
   SocialProvider provider=SocialLoader.load(providerId);
   if (provider == null) {
-    return Flows.forms(realm,request,uriInfo).setError("Social provider not found").forwardToErrorPage();
+    return Flows.forms(realm,request,uriInfo).setError("Social provider not found").createErrorPage();
   }
   String key=realm.getSocialConfig().get(providerId + ".key");
   String secret=realm.getSocialConfig().get(providerId + ".secret");
@@ -12,15 +12,15 @@
   UserModel client=realm.getUser(clientId);
   if (client == null) {
     logger.warn("Unknown login requester: " + clientId);
-    return Flows.forms(realm,request,uriInfo).setError("Unknown login requester.").forwardToErrorPage();
+    return Flows.forms(realm,request,uriInfo).setError("Unknown login requester.").createErrorPage();
   }
   if (!client.isEnabled()) {
     logger.warn("Login requester not enabled.");
-    return Flows.forms(realm,request,uriInfo).setError("Login requester not enabled.").forwardToErrorPage();
+    return Flows.forms(realm,request,uriInfo).setError("Login requester not enabled.").createErrorPage();
   }
   redirectUri=TokenService.verifyRedirectUri(redirectUri,client);
   if (redirectUri == null) {
-    return Flows.forms(realm,request,uriInfo).setError("Invalid redirect_uri.").forwardToErrorPage();
+    return Flows.forms(realm,request,uriInfo).setError("Invalid redirect_uri.").createErrorPage();
   }
   try {
     AuthRequest authRequest=provider.getAuthUrl(config);
@@ -29,6 +29,6 @@
     return Response.status(Status.FOUND).location(authRequest.getAuthUri()).build();
   }
  catch (  Throwable t) {
-    return Flows.forms(realm,request,uriInfo).setError("Failed to redirect to social auth").forwardToErrorPage();
+    return Flows.forms(realm,request,uriInfo).setError("Failed to redirect to social auth").createErrorPage();
   }
 }

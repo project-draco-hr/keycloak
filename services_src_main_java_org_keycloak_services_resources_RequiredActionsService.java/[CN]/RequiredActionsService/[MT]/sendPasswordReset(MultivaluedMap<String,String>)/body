@@ -13,7 +13,7 @@
   }
   UserModel user=realm.getUserByEmail(email);
   if (user == null) {
-    return Flows.forms(realm,request,uriInfo).setError("emailError").forwardToPasswordReset();
+    return Flows.forms(realm,request,uriInfo).setError("emailError").createPasswordReset();
   }
   Set<RequiredAction> requiredActions=new HashSet<RequiredAction>(user.getRequiredActions());
   requiredActions.add(RequiredAction.UPDATE_PASSWORD);
@@ -25,7 +25,7 @@
   }
  catch (  EmailException e) {
     logger.error("Failed to send password reset email",e);
-    return Flows.forms(realm,request,uriInfo).setError("emailSendError").forwardToErrorPage();
+    return Flows.forms(realm,request,uriInfo).setError("emailSendError").createErrorPage();
   }
-  return Flows.forms(realm,request,uriInfo).setSuccess("emailSent").forwardToPasswordReset();
+  return Flows.forms(realm,request,uriInfo).setSuccess("emailSent").createPasswordReset();
 }

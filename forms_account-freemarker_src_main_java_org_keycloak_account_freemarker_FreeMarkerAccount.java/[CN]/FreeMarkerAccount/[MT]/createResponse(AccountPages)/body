@@ -1,0 +1,47 @@
+{
+  Map<String,Object> attributes=new HashMap<String,Object>();
+  Theme theme;
+  try {
+    theme=ThemeLoader.createTheme(realm.getAccountTheme(),Theme.Type.ACCOUNT);
+  }
+ catch (  FreeMarkerException e) {
+    logger.error("Failed to create theme",e);
+    return Response.serverError().build();
+  }
+  try {
+    attributes.put("properties",theme.getProperties());
+  }
+ catch (  IOException e) {
+    logger.warn("Failed to load properties",e);
+  }
+  Properties messages;
+  try {
+    messages=theme.getMessages();
+    attributes.put("rb",messages);
+  }
+ catch (  IOException e) {
+    logger.warn("Failed to load messages",e);
+    messages=new Properties();
+  }
+  URI baseUri=uriInfo.getBaseUri();
+  if (message != null) {
+    attributes.put("message",new MessageBean(messages.containsKey(message) ? messages.getProperty(message) : message,messageType));
+  }
+  attributes.put("url",new UrlBean(realm,theme,baseUri,getReferrerUri()));
+switch (page) {
+case ACCOUNT:
+    attributes.put("account",new AccountBean(user));
+  break;
+case TOTP:
+attributes.put("totp",new TotpBean(user,baseUri));
+break;
+}
+try {
+String result=FreeMarkerUtil.processTemplate(attributes,Templates.getTemplate(page),theme);
+return Response.status(status).type(MediaType.TEXT_HTML).entity(result).build();
+}
+ catch (FreeMarkerException e) {
+logger.error("Failed to process template",e);
+return Response.serverError().build();
+}
+}

@@ -1,0 +1,12 @@
+{
+  Iterable<ThemeProvider> providers=ProviderLoader.load(ThemeProvider.class);
+  info.themes=new HashMap<String,List<String>>();
+  for (  Theme.Type type : Theme.Type.values()) {
+    List<String> themes=new LinkedList<String>();
+    for (    ThemeProvider p : providers) {
+      themes.addAll(p.nameSet(type));
+    }
+    Collections.sort(themes);
+    info.themes.put(type.toString().toLowerCase(),themes);
+  }
+}

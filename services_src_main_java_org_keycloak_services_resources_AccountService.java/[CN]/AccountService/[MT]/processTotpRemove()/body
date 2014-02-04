@@ -5,5 +5,6 @@
   }
   UserModel user=auth.getUser();
   user.setTotp(false);
-  return Flows.forms(realm,request,uriInfo).setSuccess("successTotpRemoved").setUser(user).forwardToTotp();
+  Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
+  return account.setSuccess("successTotpRemoved").createResponse(AccountPages.TOTP);
 }

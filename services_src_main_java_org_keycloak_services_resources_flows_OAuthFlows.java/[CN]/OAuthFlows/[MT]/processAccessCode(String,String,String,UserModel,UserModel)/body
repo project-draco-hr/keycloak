@@ -12,11 +12,11 @@
   if (!requiredActions.isEmpty()) {
     accessCode.setRequiredActions(new HashSet<UserModel.RequiredAction>(requiredActions));
     accessCode.setExpiration(System.currentTimeMillis() / 1000 + realm.getAccessCodeLifespanUserAction());
-    return Flows.forms(realm,request,uriInfo).setAccessCode(accessCode).setUser(user).forwardToAction(user.getRequiredActions().iterator().next());
+    return Flows.forms(realm,request,uriInfo).setAccessCode(accessCode.getId(),accessCode.getCode()).setUser(user).createResponse(user.getRequiredActions().iterator().next());
   }
   if (!isResource && (accessCode.getRealmRolesRequested().size() > 0 || accessCode.getResourceRolesRequested().size() > 0)) {
     accessCode.setExpiration(System.currentTimeMillis() / 1000 + realm.getAccessCodeLifespanUserAction());
-    return oauthGrantPage(accessCode,client);
+    return Flows.forms(realm,request,uriInfo).setAccessCode(accessCode.getId(),accessCode.getCode()).setAccessRequest(accessCode.getRealmRolesRequested(),accessCode.getResourceRolesRequested()).setClient(client).createOAuthGrant();
   }
   if (redirect != null) {
     return redirectAccessCode(accessCode,state,redirect);

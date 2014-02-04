@@ -1,0 +1,16 @@
+{
+  oauth.realm("Test");
+  oauth.realmPublicKey(realmPublicKey);
+  oauth.clientId("APP_COMPOSITE_APPLICATION");
+  oauth.doLogin("APP_COMPOSITE_USER","password");
+  String code=oauth.getCurrentQuery().get("code");
+  AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
+  Assert.assertEquals(200,response.getStatusCode());
+  Assert.assertEquals("bearer",response.getTokenType());
+  SkeletonKeyToken token=oauth.verifyToken(response.getAccessToken());
+  Assert.assertEquals("APP_COMPOSITE_USER",token.getSubject());
+  Assert.assertEquals(1,token.getResourceAccess("APP_ROLE_APPLICATION").getRoles().size());
+  Assert.assertEquals(1,token.getRealmAccess().getRoles().size());
+  Assert.assertTrue(token.getResourceAccess("APP_ROLE_APPLICATION").isUserInRole("APP_ROLE_1"));
+  Assert.assertTrue(token.getRealmAccess().isUserInRole("REALM_ROLE_1"));
+}

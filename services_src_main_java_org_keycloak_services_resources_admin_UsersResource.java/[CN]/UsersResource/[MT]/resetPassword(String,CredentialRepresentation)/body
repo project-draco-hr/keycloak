@@ -1,0 +1,12 @@
+{
+  UserModel user=realm.getUser(username);
+  if (user == null) {
+    throw new NotFoundException();
+  }
+  if (pass == null || pass.getValue() == null || !CredentialRepresentation.PASSWORD.equals(pass.getType())) {
+    throw new BadRequestException();
+  }
+  UserCredentialModel cred=RealmManager.fromRepresentation(pass);
+  realm.updateCredential(user,cred);
+  user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+}

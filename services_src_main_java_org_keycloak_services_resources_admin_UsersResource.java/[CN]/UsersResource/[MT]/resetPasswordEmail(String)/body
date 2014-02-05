@@ -1,0 +1,30 @@
+{
+  UserModel user=realm.getUser(username);
+  if (user == null) {
+    throw new NotFoundException();
+  }
+  if (user.getEmail() == null) {
+    return Flows.errors().error("User email missing",Response.Status.BAD_REQUEST);
+  }
+  String redirect=Urls.accountBase(uriInfo.getBaseUri()).path("/").build(realm.getName()).toString();
+  String clientId=Constants.ACCOUNT_APPLICATION;
+  String state=null;
+  String scope=null;
+  UserModel client=realm.getUser(clientId);
+  if (client == null || !client.isEnabled()) {
+    return Flows.errors().error("Account management not enabled",Response.Status.INTERNAL_SERVER_ERROR);
+  }
+  Set<UserModel.RequiredAction> requiredActions=new HashSet<UserModel.RequiredAction>(user.getRequiredActions());
+  requiredActions.add(UserModel.RequiredAction.UPDATE_PASSWORD);
+  AccessCodeEntry accessCode=tokenManager.createAccessCode(scope,state,redirect,realm,client,user);
+  accessCode.setRequiredActions(requiredActions);
+  accessCode.setExpiration(System.currentTimeMillis() / 1000 + realm.getAccessCodeLifespanUserAction());
+  try {
+    new EmailSender(realm.getSmtpConfig()).sendPasswordReset(user,realm,accessCode,uriInfo);
+    return Response.ok().build();
+  }
+ catch (  EmailException e) {
+    logger.error("Failed to send password reset email",e);
+    return Flows.errors().error("Failed to send email",Response.Status.INTERNAL_SERVER_ERROR);
+  }
+}

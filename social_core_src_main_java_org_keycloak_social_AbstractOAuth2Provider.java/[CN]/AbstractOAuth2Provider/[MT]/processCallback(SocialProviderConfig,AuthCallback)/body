@@ -1,0 +1,26 @@
+{
+  try {
+    String code=callback.getQueryParam(CODE);
+    if (!callback.getQueryParam(STATE).equals(callback.getAttribute(STATE))) {
+      throw new SocialProviderException("Invalid state");
+    }
+    String response=SimpleHttp.doPost(getTokenUrl()).param(CODE,code).param(CLIENT_ID,config.getKey()).param(CLIENT_SECRET,config.getSecret()).param(REDIRECT_URI,config.getCallbackUrl()).param(GRANT_TYPE,AUTHORIZATION_CODE).asString();
+    String accessToken;
+    if (response.startsWith("{")) {
+      accessToken=new JSONObject(response).getString(ACCESS_TOKEN);
+    }
+ else {
+      Matcher matcher=Pattern.compile(TOKEN_REGEX).matcher(response);
+      if (matcher.find()) {
+        accessToken=matcher.group(1);
+      }
+ else {
+        throw new SocialProviderException("Invalid response, could not find token");
+      }
+    }
+    return getProfile(accessToken);
+  }
+ catch (  IOException e) {
+    throw new SocialProviderException(e);
+  }
+}

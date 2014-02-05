@@ -2,9 +2,9 @@
   Map<String,String[]> queryParams=getQueryParams();
   RequestDetails requestData=getRequestDetails(queryParams);
   SocialProvider provider=SocialLoader.load(requestData.getProviderId());
-  String realmId=requestData.getClientAttribute("realmId");
+  String realmName=requestData.getClientAttribute("realm");
   RealmManager realmManager=new RealmManager(session);
-  RealmModel realm=realmManager.getRealm(realmId);
+  RealmModel realm=realmManager.getRealmByName(realmName);
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
   if (!realm.isEnabled()) {
     return oauth.forwardToSecurityFailure("Realm not enabled.");

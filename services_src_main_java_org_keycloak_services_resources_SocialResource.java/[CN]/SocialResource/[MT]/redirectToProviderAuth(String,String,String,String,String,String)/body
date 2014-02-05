@@ -1,6 +1,6 @@
 {
   RealmManager realmManager=new RealmManager(session);
-  RealmModel realm=realmManager.getRealm(realmId);
+  RealmModel realm=realmManager.getRealmByName(realmName);
   SocialProvider provider=SocialLoader.load(providerId);
   if (provider == null) {
     return Flows.forms(realm,request,uriInfo).setError("Social provider not found").createErrorPage();
@@ -24,7 +24,7 @@
   }
   try {
     AuthRequest authRequest=provider.getAuthUrl(config);
-    RequestDetails socialRequest=RequestDetails.create(providerId).putSocialAttributes(authRequest.getAttributes()).putClientAttribute("realmId",realmId).putClientAttribute("clientId",clientId).putClientAttribute("scope",scope).putClientAttribute("state",state).putClientAttribute("redirectUri",redirectUri).build();
+    RequestDetails socialRequest=RequestDetails.create(providerId).putSocialAttributes(authRequest.getAttributes()).putClientAttribute("realm",realmName).putClientAttribute("clientId",clientId).putClientAttribute("scope",scope).putClientAttribute("state",state).putClientAttribute("redirectUri",redirectUri).build();
     socialRequestManager.addRequest(authRequest.getId(),socialRequest);
     return Response.status(Status.FOUND).location(authRequest.getAuthUri()).build();
   }

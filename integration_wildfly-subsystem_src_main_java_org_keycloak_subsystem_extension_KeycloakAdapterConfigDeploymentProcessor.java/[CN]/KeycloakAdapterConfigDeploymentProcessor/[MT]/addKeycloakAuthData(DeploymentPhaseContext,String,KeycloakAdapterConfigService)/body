@@ -2,4 +2,16 @@
   DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
   WarMetaData warMetaData=deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
   addJSONData(service.getJSON(deploymentName),warMetaData);
+  JBossWebMetaData webMetaData=warMetaData.getMergedJBossWebMetaData();
+  if (webMetaData == null) {
+    webMetaData=new JBossWebMetaData();
+    warMetaData.setMergedJBossWebMetaData(webMetaData);
+  }
+  LoginConfigMetaData loginConfig=webMetaData.getLoginConfig();
+  if (loginConfig == null) {
+    loginConfig=new LoginConfigMetaData();
+    webMetaData.setLoginConfig(loginConfig);
+  }
+  loginConfig.setAuthMethod("KEYCLOAK");
+  loginConfig.setRealmName(service.getRealmName(deploymentName));
 }

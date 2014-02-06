@@ -1,2 +1,9 @@
 {
+  if (!started) {
+    throw new IllegalStateException("Transaction not yet started");
+  }
+  if (rollbackOnly) {
+    throw new IllegalStateException("Can't commit as transaction marked for rollback");
+  }
+  invocationContext.commit();
 }

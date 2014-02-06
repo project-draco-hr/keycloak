@@ -1,0 +1,29 @@
+{
+  final Class<? extends MongoEntity> type=object.getClass();
+  ObjectInfo objectInfo=getObjectInfo(type);
+  Property<Object> listProperty=objectInfo.getPropertyByName(listPropertyName);
+  if (listProperty == null) {
+    throw new IllegalArgumentException("Property " + listPropertyName + " doesn't exist on object "+ object);
+  }
+  List<S> list=(List<S>)listProperty.getValue(object);
+  if (list == null || !list.contains(itemToPull)) {
+    return false;
+  }
+ else {
+    list.remove(itemToPull);
+    context.addUpdateTask(object,new MongoTask(){
+      @Override public void execute(){
+        Object dbItemToPull=typeConverter.convertApplicationObjectToDBObject(itemToPull,Object.class);
+        BasicDBObject query=new BasicDBObject("_id",getObjectId(object.getId()));
+        BasicDBObject pullObject=new BasicDBObject(listPropertyName,dbItemToPull);
+        BasicDBObject pullCommand=new BasicDBObject("$pull",pullObject);
+        getDBCollectionForType(type).update(query,pullCommand);
+      }
+      @Override public boolean isFullUpdate(){
+        return false;
+      }
+    }
+);
+    return true;
+  }
+}

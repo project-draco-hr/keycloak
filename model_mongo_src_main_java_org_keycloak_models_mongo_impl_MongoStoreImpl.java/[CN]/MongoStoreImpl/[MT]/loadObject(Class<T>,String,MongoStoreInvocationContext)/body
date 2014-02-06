@@ -1,0 +1,12 @@
+{
+  T cached=context.getLoadedObject(type,id);
+  if (cached != null)   return cached;
+  DBCollection dbCollection=getDBCollectionForType(type);
+  BasicDBObject idQuery=new BasicDBObject("_id",getObjectId(id));
+  DBObject dbObject=dbCollection.findOne(idQuery);
+  if (dbObject == null)   return null;
+  ConverterContext<Object> converterContext=new ConverterContext<Object>(dbObject,type,null);
+  T converted=(T)typeConverter.convertDBObjectToApplicationObject(converterContext);
+  context.addLoadedObject(converted);
+  return converted;
+}

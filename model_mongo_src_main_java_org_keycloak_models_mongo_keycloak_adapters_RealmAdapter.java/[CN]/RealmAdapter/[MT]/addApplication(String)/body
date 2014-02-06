@@ -5,7 +5,6 @@
   appData.setRealmId(getId());
   appData.setEnabled(true);
   appData.setResourceUserId(resourceUser.getUser().getId());
-  mongoStore.insertObject(appData);
-  ApplicationModel resource=new ApplicationAdapter(appData,resourceUser,mongoStore);
-  return resource;
+  mongoStore.insertObject(appData,invocationContext);
+  return new ApplicationAdapter(appData,resourceUser,mongoStore,invocationContext);
 }

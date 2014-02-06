@@ -1,0 +1,15 @@
+{
+  Set<MongoIdentifiableEntity> toRemove=new HashSet<MongoIdentifiableEntity>();
+  for (  MongoIdentifiableEntity currentEntity : pendingUpdateTasks.keySet()) {
+    if (currentEntity.getClass().equals(entityType)) {
+      Set<MongoTask> mongoTasks=pendingUpdateTasks.get(currentEntity);
+      for (      MongoTask currentTask : mongoTasks) {
+        currentTask.execute();
+      }
+      toRemove.add(currentEntity);
+    }
+  }
+  for (  MongoIdentifiableEntity entity : toRemove) {
+    pendingUpdateTasks.remove(entity);
+  }
+}

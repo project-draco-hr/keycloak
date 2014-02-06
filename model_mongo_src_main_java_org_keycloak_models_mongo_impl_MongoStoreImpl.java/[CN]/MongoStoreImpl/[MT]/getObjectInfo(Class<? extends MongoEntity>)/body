@@ -1,11 +1,10 @@
 {
   ObjectInfo objectInfo=objectInfoCache.get(objectClass);
   if (objectInfo == null) {
-    Property<String> idProperty=PropertyQueries.<String>createQuery(objectClass).addCriteria(new AnnotatedPropertyCriteria(MongoId.class)).getFirstResult();
     List<Property<Object>> properties=PropertyQueries.createQuery(objectClass).addCriteria(new AnnotatedPropertyCriteria(MongoField.class)).getResultList();
     MongoCollection classAnnotation=objectClass.getAnnotation(MongoCollection.class);
     String dbCollectionName=classAnnotation == null ? null : classAnnotation.collectionName();
-    objectInfo=new ObjectInfo(objectClass,dbCollectionName,idProperty,properties);
+    objectInfo=new ObjectInfo(objectClass,dbCollectionName,properties);
     ObjectInfo existing=objectInfoCache.putIfAbsent(objectClass,objectInfo);
     if (existing != null) {
       objectInfo=existing;

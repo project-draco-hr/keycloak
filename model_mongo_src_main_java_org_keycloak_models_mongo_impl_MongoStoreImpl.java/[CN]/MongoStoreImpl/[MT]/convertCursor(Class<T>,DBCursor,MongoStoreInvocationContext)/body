@@ -1,0 +1,19 @@
+{
+  List<T> result=new ArrayList<T>();
+  try {
+    for (    DBObject dbObject : cursor) {
+      String id=dbObject.get("_id").toString();
+      T object=context.getLoadedObject(type,id);
+      if (object == null) {
+        ConverterContext<Object> converterContext=new ConverterContext<Object>(dbObject,type,null);
+        object=(T)typeConverter.convertDBObjectToApplicationObject(converterContext);
+        context.addLoadedObject(object);
+      }
+      result.add(object);
+    }
+  }
+  finally {
+    cursor.close();
+  }
+  return result;
+}

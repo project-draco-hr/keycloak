@@ -1,10 +1,10 @@
 {
   DBObject query=new QueryBuilder().and("name").is(name).and("applicationId").is(getId()).get();
-  RoleEntity role=mongoStore.loadSingleObject(RoleEntity.class,query);
+  RoleEntity role=mongoStore.loadSingleObject(RoleEntity.class,query,invocationContext);
   if (role == null) {
     return null;
   }
  else {
-    return new RoleAdapter(role,this,mongoStore);
+    return new RoleAdapter(role,this,mongoStore,invocationContext);
   }
 }

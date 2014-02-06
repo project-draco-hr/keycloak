@@ -1,11 +1,5 @@
 {
-  DBObject query=new QueryBuilder().and("socialProvider").is(socialLink.getSocialProvider()).and("socialUsername").is(socialLink.getSocialUsername()).and("realmId").is(getId()).get();
-  SocialLinkEntity socialLinkEntity=mongoStore.loadSingleObject(SocialLinkEntity.class,query);
-  if (socialLinkEntity == null) {
-    return null;
-  }
- else {
-    UserEntity userEntity=mongoStore.loadObject(UserEntity.class,socialLinkEntity.getUserId());
-    return userEntity == null ? null : new UserAdapter(userEntity,mongoStore);
-  }
+  DBObject query=new QueryBuilder().and("socialLinks.socialProvider").is(socialLink.getSocialProvider()).and("socialLinks.socialUsername").is(socialLink.getSocialUsername()).and("realmId").is(getId()).get();
+  UserEntity userEntity=mongoStore.loadSingleObject(UserEntity.class,query,invocationContext);
+  return userEntity == null ? null : new UserAdapter(userEntity,mongoStore,invocationContext);
 }

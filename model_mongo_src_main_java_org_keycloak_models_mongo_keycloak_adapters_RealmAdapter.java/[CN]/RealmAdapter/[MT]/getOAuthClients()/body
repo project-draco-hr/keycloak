@@ -1,9 +1,9 @@
 {
   DBObject query=new QueryBuilder().and("realmId").is(getId()).get();
-  List<OAuthClientEntity> results=mongoStore.loadObjects(OAuthClientEntity.class,query);
+  List<OAuthClientEntity> results=mongoStore.loadObjects(OAuthClientEntity.class,query,invocationContext);
   List<OAuthClientModel> list=new ArrayList<OAuthClientModel>();
   for (  OAuthClientEntity data : results) {
-    list.add(new OAuthClientAdapter(data,mongoStore));
+    list.add(new OAuthClientAdapter(data,mongoStore,invocationContext));
   }
   return list;
 }

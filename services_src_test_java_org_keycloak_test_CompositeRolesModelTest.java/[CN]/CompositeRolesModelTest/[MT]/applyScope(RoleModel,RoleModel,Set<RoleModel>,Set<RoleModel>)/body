@@ -1,0 +1,12 @@
+{
+  if (visited.contains(scope))   return;
+  visited.add(scope);
+  if (role.hasRole(scope)) {
+    requested.add(scope);
+    return;
+  }
+  if (!scope.isComposite())   return;
+  for (  RoleModel contained : scope.getComposites()) {
+    applyScope(role,contained,visited,requested);
+  }
+}

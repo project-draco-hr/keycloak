@@ -1,9 +1,9 @@
 {
   Set<RoleModel> result=new HashSet<RoleModel>();
-  List<RoleEntity> roles=MongoModelUtils.getAllRolesOfUser(user,mongoStore);
+  List<RoleEntity> roles=MongoModelUtils.getAllRolesOfUser(user,mongoStore,invocationContext);
   for (  RoleEntity role : roles) {
     if (getId().equals(role.getApplicationId())) {
-      result.add(new RoleAdapter(role,this,mongoStore));
+      result.add(new RoleAdapter(role,this,mongoStore,invocationContext));
     }
   }
   return result;

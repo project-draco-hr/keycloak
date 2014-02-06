@@ -1,6 +1,7 @@
 {
+  SocialLinkEntity socialLinkEntity=new SocialLinkEntity();
+  socialLinkEntity.setSocialProvider(socialLink.getSocialProvider());
+  socialLinkEntity.setSocialUsername(socialLink.getSocialUsername());
   UserEntity userEntity=((UserAdapter)user).getUser();
-  String userId=userEntity.getId();
-  DBObject query=new QueryBuilder().and("socialProvider").is(socialLink.getSocialProvider()).and("socialUsername").is(socialLink.getSocialUsername()).and("userId").is(userId).get();
-  mongoStore.removeObjects(SocialLinkEntity.class,query);
+  mongoStore.pullItemFromList(userEntity,"socialLinks",socialLinkEntity,invocationContext);
 }

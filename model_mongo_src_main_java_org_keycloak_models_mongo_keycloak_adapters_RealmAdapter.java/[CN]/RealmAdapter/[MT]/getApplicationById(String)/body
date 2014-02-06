@@ -1,8 +1,7 @@
 {
-  ApplicationEntity appData=mongoStore.loadObject(ApplicationEntity.class,id);
+  ApplicationEntity appData=mongoStore.loadObject(ApplicationEntity.class,id,invocationContext);
   if (appData == null || !getId().equals(appData.getRealmId())) {
     return null;
   }
-  ApplicationModel model=new ApplicationAdapter(appData,mongoStore);
-  return model;
+  return new ApplicationAdapter(appData,mongoStore,invocationContext);
 }

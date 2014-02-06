@@ -15,9 +15,8 @@
     Object value=dbObject.get(key);
     Property<Object> property;
     if ("_id".equals(key)) {
-      Property<String> idProperty=objectInfo.getOidProperty();
-      if (idProperty != null) {
-        idProperty.setValue(object,value.toString());
+      if (object instanceof MongoIdentifiableEntity) {
+        ((MongoIdentifiableEntity)object).setId(value.toString());
       }
     }
  else     if ((property=objectInfo.getPropertyByName(key)) != null) {

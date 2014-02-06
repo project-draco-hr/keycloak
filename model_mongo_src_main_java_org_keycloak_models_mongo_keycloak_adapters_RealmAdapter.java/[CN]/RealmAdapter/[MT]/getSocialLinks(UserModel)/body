@@ -1,10 +1,11 @@
 {
   UserEntity userEntity=((UserAdapter)user).getUser();
-  String userId=userEntity.getId();
-  DBObject query=new QueryBuilder().and("userId").is(userId).get();
-  List<SocialLinkEntity> dbSocialLinks=mongoStore.loadObjects(SocialLinkEntity.class,query);
+  List<SocialLinkEntity> linkEntities=userEntity.getSocialLinks();
+  if (linkEntities == null) {
+    return Collections.EMPTY_SET;
+  }
   Set<SocialLinkModel> result=new HashSet<SocialLinkModel>();
-  for (  SocialLinkEntity socialLinkEntity : dbSocialLinks) {
+  for (  SocialLinkEntity socialLinkEntity : linkEntities) {
     SocialLinkModel model=new SocialLinkModel(socialLinkEntity.getSocialProvider(),socialLinkEntity.getSocialUsername());
     result.add(model);
   }

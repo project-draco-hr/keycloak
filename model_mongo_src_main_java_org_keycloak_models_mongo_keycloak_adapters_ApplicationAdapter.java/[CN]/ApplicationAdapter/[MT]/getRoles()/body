@@ -1,9 +1,9 @@
 {
   DBObject query=new QueryBuilder().and("applicationId").is(getId()).get();
-  List<RoleEntity> roles=mongoStore.loadObjects(RoleEntity.class,query);
+  List<RoleEntity> roles=mongoStore.loadObjects(RoleEntity.class,query,invocationContext);
   Set<RoleModel> result=new HashSet<RoleModel>();
   for (  RoleEntity role : roles) {
-    result.add(new RoleAdapter(role,this,mongoStore));
+    result.add(new RoleAdapter(role,this,mongoStore,invocationContext));
   }
   return result;
 }

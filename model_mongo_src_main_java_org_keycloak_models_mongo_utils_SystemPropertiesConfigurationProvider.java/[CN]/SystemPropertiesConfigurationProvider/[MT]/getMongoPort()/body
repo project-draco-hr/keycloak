@@ -1,9 +1,4 @@
 {
-  String portProp=System.getProperty(MONGO_PORT);
-  if (portProp != null) {
-    return Integer.parseInt(portProp);
-  }
- else {
-    return isStartEmbedded() ? MONGO_DEFAULT_PORT_EMBEDDED : MONGO_DEFAULT_PORT;
-  }
+  String portProp=getSystemPropertyWithFallback(MONGO_PORT,MONGO_PORT_2,MONGO_DEFAULT_PORT);
+  return Integer.parseInt(portProp);
 }

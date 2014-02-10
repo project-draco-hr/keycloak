@@ -1,23 +1,23 @@
 {
   this.database=database;
-  typeConverter=new TypeConverter();
+  mapperRegistry=new MapperRegistry();
   for (  Class<?> simpleConverterClass : SIMPLE_TYPES) {
-    SimpleConverter converter=new SimpleConverter(simpleConverterClass);
-    typeConverter.addAppObjectConverter(converter);
-    typeConverter.addDBObjectConverter(converter);
+    SimpleMapper converter=new SimpleMapper(simpleConverterClass);
+    mapperRegistry.addAppObjectMapper(converter);
+    mapperRegistry.addDBObjectMapper(converter);
   }
-  typeConverter.addAppObjectConverter(new ListConverter(typeConverter,ArrayList.class));
-  typeConverter.addAppObjectConverter(new ListConverter(typeConverter,List.class));
-  typeConverter.addDBObjectConverter(new BasicDBListConverter(typeConverter));
-  typeConverter.addAppObjectConverter(new MapConverter(HashMap.class));
-  typeConverter.addAppObjectConverter(new MapConverter(Map.class));
-  typeConverter.addDBObjectConverter(new BasicDBObjectToMapConverter());
-  typeConverter.addAppObjectConverter(new EnumToStringConverter());
-  typeConverter.addDBObjectConverter(new StringToEnumConverter());
+  mapperRegistry.addAppObjectMapper(new ListMapper(mapperRegistry,ArrayList.class));
+  mapperRegistry.addAppObjectMapper(new ListMapper(mapperRegistry,List.class));
+  mapperRegistry.addDBObjectMapper(new BasicDBListMapper(mapperRegistry));
+  mapperRegistry.addAppObjectMapper(new MapMapper(HashMap.class));
+  mapperRegistry.addAppObjectMapper(new MapMapper(Map.class));
+  mapperRegistry.addDBObjectMapper(new BasicDBObjectToMapMapper());
+  mapperRegistry.addAppObjectMapper(new EnumToStringMapper());
+  mapperRegistry.addDBObjectMapper(new StringToEnumMapper());
   for (  Class<? extends MongoEntity> type : managedEntityTypes) {
-    getObjectInfo(type);
-    typeConverter.addAppObjectConverter(new MongoEntityConverter(this,typeConverter,type));
-    typeConverter.addDBObjectConverter(new BasicDBObjectConverter(this,typeConverter,type));
+    getEntityInfo(type);
+    mapperRegistry.addAppObjectMapper(new MongoEntityMapper(this,mapperRegistry,type));
+    mapperRegistry.addDBObjectMapper(new BasicDBObjectMapper(this,mapperRegistry,type));
   }
   if (clearCollectionsOnStartup) {
     clearManagedCollections(managedEntityTypes);

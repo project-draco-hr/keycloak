@@ -1,10 +1,10 @@
 {
   DBObject query=new QueryBuilder().and("realmId").is(getId()).get();
-  List<RoleEntity> roles=mongoStore.loadObjects(RoleEntity.class,query,invocationContext);
+  List<RoleEntity> roles=getMongoStore().loadEntities(RoleEntity.class,query,invocationContext);
   Set<RoleModel> result=new HashSet<RoleModel>();
   if (roles == null)   return result;
   for (  RoleEntity role : roles) {
-    result.add(new RoleAdapter(role,this,mongoStore,invocationContext));
+    result.add(new RoleAdapter(role,this,invocationContext));
   }
   return result;
 }

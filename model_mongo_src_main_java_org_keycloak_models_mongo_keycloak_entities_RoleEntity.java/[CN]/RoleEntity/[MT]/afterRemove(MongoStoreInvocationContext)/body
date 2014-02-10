@@ -1,0 +1,32 @@
+{
+  MongoStore mongoStore=invContext.getMongoStore();
+  DBObject query=new QueryBuilder().and("roleIds").is(getId()).get();
+  List<UserEntity> users=mongoStore.loadEntities(UserEntity.class,query,invContext);
+  for (  UserEntity user : users) {
+    logger.info("Removing role " + getName() + " from user "+ user.getLoginName());
+    mongoStore.pullItemFromList(user,"roleIds",getId(),invContext);
+  }
+  query=new QueryBuilder().and("scopeIds").is(getId()).get();
+  users=mongoStore.loadEntities(UserEntity.class,query,invContext);
+  for (  UserEntity user : users) {
+    logger.info("Removing scope " + getName() + " from user "+ user.getLoginName());
+    mongoStore.pullItemFromList(user,"scopeIds",getId(),invContext);
+  }
+  if (realmId != null) {
+    RealmEntity realmEntity=mongoStore.loadEntity(RealmEntity.class,realmId,invContext);
+    if (realmEntity != null) {
+      mongoStore.pullItemFromList(realmEntity,"defaultRoles",getId(),invContext);
+    }
+  }
+  if (applicationId != null) {
+    ApplicationEntity appEntity=mongoStore.loadEntity(ApplicationEntity.class,applicationId,invContext);
+    if (appEntity != null) {
+      mongoStore.pullItemFromList(appEntity,"defaultRoles",getId(),invContext);
+    }
+  }
+  query=new QueryBuilder().and("compositeRoleIds").is(getId()).get();
+  List<RoleEntity> parentRoles=mongoStore.loadEntities(RoleEntity.class,query,invContext);
+  for (  RoleEntity role : parentRoles) {
+    mongoStore.pullItemFromList(role,"compositeRoleIds",getId(),invContext);
+  }
+}

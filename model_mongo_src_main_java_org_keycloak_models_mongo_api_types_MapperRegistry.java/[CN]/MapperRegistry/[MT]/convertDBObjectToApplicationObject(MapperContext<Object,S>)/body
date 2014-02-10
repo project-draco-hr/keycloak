@@ -1,0 +1,22 @@
+{
+  Object dbObject=context.getObjectToConvert();
+  Class<?> expectedApplicationObjectType=context.getExpectedReturnType();
+  Class<?> dbObjectType=dbObject.getClass();
+  Mapper<Object,S> mapper;
+  Map<Class<?>,Mapper<?,?>> appObjects=dbObjectMappers.get(dbObjectType);
+  if (appObjects == null) {
+    throw new IllegalArgumentException("Not found any mappers for type " + dbObjectType);
+  }
+ else {
+    if (appObjects.size() == 1) {
+      mapper=(Mapper<Object,S>)appObjects.values().iterator().next();
+    }
+ else {
+      mapper=(Mapper<Object,S>)getAppConverterForType(context.getExpectedReturnType(),appObjects);
+    }
+  }
+  if (mapper == null) {
+    throw new IllegalArgumentException("Can't found mapper for type " + dbObjectType + " and expectedApplicationType "+ expectedApplicationObjectType);
+  }
+  return mapper.convertObject(context);
+}

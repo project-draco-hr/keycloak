@@ -1,10 +1,10 @@
 {
   if (resourceUser == null) {
-    UserEntity userEntity=mongoStore.loadObject(UserEntity.class,application.getResourceUserId(),invocationContext);
+    UserEntity userEntity=getMongoStore().loadEntity(UserEntity.class,application.getResourceUserId(),invocationContext);
     if (userEntity == null) {
       throw new IllegalStateException("User " + application.getResourceUserId() + " not found");
     }
-    resourceUser=new UserAdapter(userEntity,mongoStore,invocationContext);
+    resourceUser=new UserAdapter(userEntity,invocationContext);
   }
   return resourceUser;
 }

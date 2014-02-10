@@ -1,20 +1,20 @@
 {
-  final Class<? extends MongoEntity> type=object.getClass();
-  ObjectInfo objectInfo=getObjectInfo(type);
-  Property<Object> listProperty=objectInfo.getPropertyByName(listPropertyName);
+  final Class<? extends MongoEntity> type=entity.getClass();
+  EntityInfo entityInfo=getEntityInfo(type);
+  Property<Object> listProperty=entityInfo.getPropertyByName(listPropertyName);
   if (listProperty == null) {
-    throw new IllegalArgumentException("Property " + listPropertyName + " doesn't exist on object "+ object);
+    throw new IllegalArgumentException("Property " + listPropertyName + " doesn't exist on object "+ entity);
   }
-  List<S> list=(List<S>)listProperty.getValue(object);
+  List<S> list=(List<S>)listProperty.getValue(entity);
   if (list == null || !list.contains(itemToPull)) {
     return false;
   }
  else {
     list.remove(itemToPull);
-    context.addUpdateTask(object,new MongoTask(){
+    context.addUpdateTask(entity,new MongoTask(){
       @Override public void execute(){
-        Object dbItemToPull=typeConverter.convertApplicationObjectToDBObject(itemToPull,Object.class);
-        BasicDBObject query=new BasicDBObject("_id",getObjectId(object.getId()));
+        Object dbItemToPull=mapperRegistry.convertApplicationObjectToDBObject(itemToPull,Object.class);
+        BasicDBObject query=new BasicDBObject("_id",getObjectId(entity.getId()));
         BasicDBObject pullObject=new BasicDBObject(listPropertyName,dbItemToPull);
         BasicDBObject pullCommand=new BasicDBObject("$pull",pullObject);
         getDBCollectionForType(type).update(query,pullCommand);

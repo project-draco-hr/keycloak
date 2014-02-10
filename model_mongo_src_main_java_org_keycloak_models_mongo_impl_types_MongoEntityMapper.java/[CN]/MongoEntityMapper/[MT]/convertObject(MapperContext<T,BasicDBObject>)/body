@@ -1,0 +1,13 @@
+{
+  T applicationObject=context.getObjectToConvert();
+  EntityInfo entityInfo=mongoStoreImpl.getEntityInfo(applicationObject.getClass());
+  BasicDBObject dbObject=new BasicDBObject();
+  Collection<Property<Object>> props=entityInfo.getProperties();
+  for (  Property<Object> property : props) {
+    String propName=property.getName();
+    Object propValue=property.getValue(applicationObject);
+    Object dbValue=propValue == null ? null : mapperRegistry.convertApplicationObjectToDBObject(propValue,Object.class);
+    dbObject.put(propName,dbValue);
+  }
+  return dbObject;
+}

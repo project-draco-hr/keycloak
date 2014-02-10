@@ -1,9 +1,9 @@
 {
   DBObject query=new QueryBuilder().and("realmId").is(getId()).get();
-  List<ApplicationEntity> appDatas=mongoStore.loadObjects(ApplicationEntity.class,query,invocationContext);
+  List<ApplicationEntity> appDatas=getMongoStore().loadEntities(ApplicationEntity.class,query,invocationContext);
   List<ApplicationModel> result=new ArrayList<ApplicationModel>();
   for (  ApplicationEntity appData : appDatas) {
-    result.add(new ApplicationAdapter(appData,mongoStore,invocationContext));
+    result.add(new ApplicationAdapter(appData,invocationContext));
   }
   return result;
 }

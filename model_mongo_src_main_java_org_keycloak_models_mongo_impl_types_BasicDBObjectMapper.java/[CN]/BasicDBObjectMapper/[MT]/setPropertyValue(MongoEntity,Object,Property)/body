@@ -1,0 +1,30 @@
+{
+  if (valueFromDB == null) {
+    property.setValue(object,null);
+    return;
+  }
+  MapperContext<Object,?> context;
+  Type type=property.getBaseType();
+  if (type instanceof ParameterizedType) {
+    ParameterizedType parameterized=(ParameterizedType)type;
+    Type[] genericTypeArguments=parameterized.getActualTypeArguments();
+    List<Class<?>> genericTypes=new ArrayList<Class<?>>();
+    for (    Type genericType : genericTypeArguments) {
+      genericTypes.add((Class<?>)genericType);
+    }
+    Class<?> expectedReturnType=(Class<?>)parameterized.getRawType();
+    context=new MapperContext<Object,Object>(valueFromDB,expectedReturnType,genericTypes);
+  }
+ else {
+    Class<?> expectedReturnType=(Class<?>)type;
+    expectedReturnType=Types.boxedClass(expectedReturnType);
+    context=new MapperContext<Object,Object>(valueFromDB,expectedReturnType,null);
+  }
+  Object appObject=mapperRegistry.convertDBObjectToApplicationObject(context);
+  if (Types.boxedClass(property.getJavaClass()).isAssignableFrom(appObject.getClass())) {
+    property.setValue(object,appObject);
+  }
+ else {
+    throw new IllegalStateException("Converted object " + appObject + " is not of type "+ context.getExpectedReturnType()+ ". So can't be assigned as property "+ property.getName()+ " of "+ object.getClass());
+  }
+}

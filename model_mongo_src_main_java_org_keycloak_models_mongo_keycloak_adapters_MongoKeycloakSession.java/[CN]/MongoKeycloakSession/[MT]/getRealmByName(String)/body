@@ -1,6 +1,6 @@
 {
   DBObject query=new QueryBuilder().and("name").is(name).get();
-  RealmEntity realm=mongoStore.loadSingleObject(RealmEntity.class,query,invocationContext);
+  RealmEntity realm=getMongoStore().loadSingleEntity(RealmEntity.class,query,invocationContext);
   if (realm == null)   return null;
-  return new RealmAdapter(realm,mongoStore,invocationContext);
+  return new RealmAdapter(realm,invocationContext);
 }

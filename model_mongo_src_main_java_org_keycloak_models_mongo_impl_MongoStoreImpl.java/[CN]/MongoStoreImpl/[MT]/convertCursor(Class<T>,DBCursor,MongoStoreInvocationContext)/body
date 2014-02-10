@@ -5,8 +5,8 @@
       String id=dbObject.get("_id").toString();
       T object=context.getLoadedObject(type,id);
       if (object == null) {
-        ConverterContext<Object> converterContext=new ConverterContext<Object>(dbObject,type,null);
-        object=(T)typeConverter.convertDBObjectToApplicationObject(converterContext);
+        MapperContext<Object,T> mapperContext=new MapperContext<Object,T>(dbObject,type,null);
+        object=mapperRegistry.convertDBObjectToApplicationObject(mapperContext);
         context.addLoadedObject(object);
       }
       result.add(object);

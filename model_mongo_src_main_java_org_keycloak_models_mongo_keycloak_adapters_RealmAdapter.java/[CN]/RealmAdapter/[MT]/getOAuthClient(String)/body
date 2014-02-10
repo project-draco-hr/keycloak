@@ -2,6 +2,6 @@
   UserAdapter user=getUser(name);
   if (user == null)   return null;
   DBObject query=new QueryBuilder().and("realmId").is(getId()).and("oauthAgentId").is(user.getUser().getId()).get();
-  OAuthClientEntity oauthClient=mongoStore.loadSingleObject(OAuthClientEntity.class,query,invocationContext);
-  return oauthClient == null ? null : new OAuthClientAdapter(oauthClient,user,mongoStore,invocationContext);
+  OAuthClientEntity oauthClient=getMongoStore().loadSingleEntity(OAuthClientEntity.class,query,invocationContext);
+  return oauthClient == null ? null : new OAuthClientAdapter(oauthClient,user,invocationContext);
 }

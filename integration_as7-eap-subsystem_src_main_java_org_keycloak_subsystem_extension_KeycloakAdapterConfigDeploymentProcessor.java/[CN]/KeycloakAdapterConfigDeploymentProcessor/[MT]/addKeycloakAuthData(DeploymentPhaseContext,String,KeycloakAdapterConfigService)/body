@@ -1,0 +1,20 @@
+{
+  DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
+  WarMetaData warMetaData=deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
+  addJSONData(service.getJSON(deploymentName),warMetaData);
+  JBossWebMetaData webMetaData=warMetaData.getMergedJBossWebMetaData();
+  if (webMetaData == null) {
+    webMetaData=new JBossWebMetaData();
+    warMetaData.setMergedJBossWebMetaData(webMetaData);
+  }
+  List<ValveMetaData> valves=webMetaData.getValves();
+  if (valves == null) {
+    valves=new ArrayList<ValveMetaData>(1);
+    webMetaData.setValves(valves);
+  }
+  ValveMetaData valve=new ValveMetaData();
+  valve.setValveClass(KeycloakAuthenticatorValve.class.getName());
+  valve.setModule("org.keycloak.keycloak-as7-adapter");
+  log.info("******* adding Keycloak valve to: " + deploymentName);
+  valves.add(valve);
+}

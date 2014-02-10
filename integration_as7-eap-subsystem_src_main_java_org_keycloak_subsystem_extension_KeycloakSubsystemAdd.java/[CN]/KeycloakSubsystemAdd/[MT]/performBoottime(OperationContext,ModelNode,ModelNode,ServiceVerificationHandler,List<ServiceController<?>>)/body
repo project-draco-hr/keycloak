@@ -1,0 +1,9 @@
+{
+  context.addStep(new AbstractDeploymentChainStep(){
+    @Override protected void execute(    DeploymentProcessorTarget processorTarget){
+      processorTarget.addDeploymentProcessor(Phase.DEPENDENCIES,0,new KeycloakDependencyProcessor());
+      processorTarget.addDeploymentProcessor(KeycloakAdapterConfigDeploymentProcessor.PHASE,KeycloakAdapterConfigDeploymentProcessor.PRIORITY,new KeycloakAdapterConfigDeploymentProcessor());
+    }
+  }
+,OperationContext.Stage.RUNTIME);
+}

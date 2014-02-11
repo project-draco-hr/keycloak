@@ -4,9 +4,9 @@
     return;
   }
   log.info("KeycloakServletException initialization");
-  InputStream is=servletContext.getResourceAsStream("/WEB-INF/keycloak.json");
+  InputStream is=getJSONFromServletContext(servletContext);
   if (is == null) {
-    is=getJSONFromServletContext(servletContext);
+    is=servletContext.getResourceAsStream("/WEB-INF/keycloak.json");
   }
   if (is == null)   throw new RuntimeException("Unable to find realm config in /WEB-INF/keycloak.json or in keycloak subsystem.");
   RealmConfigurationLoader loader=new RealmConfigurationLoader(is);

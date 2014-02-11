@@ -1,0 +1,30 @@
+{
+  BasicDBObject dbObject=context.getObjectToConvert();
+  if (dbObject == null) {
+    return null;
+  }
+  EntityInfo entityInfo=mongoStoreImpl.getEntityInfo(expectedObjectType);
+  S object;
+  try {
+    object=expectedObjectType.newInstance();
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  for (  String key : dbObject.keySet()) {
+    Object value=dbObject.get(key);
+    Property<Object> property;
+    if ("_id".equals(key)) {
+      if (object instanceof MongoIdentifiableEntity) {
+        ((MongoIdentifiableEntity)object).setId(value.toString());
+      }
+    }
+ else     if ((property=entityInfo.getPropertyByName(key)) != null) {
+      setPropertyValue(object,value,property);
+    }
+ else {
+      logger.warn("Property with key " + key + " not known for type "+ expectedObjectType);
+    }
+  }
+  return object;
+}

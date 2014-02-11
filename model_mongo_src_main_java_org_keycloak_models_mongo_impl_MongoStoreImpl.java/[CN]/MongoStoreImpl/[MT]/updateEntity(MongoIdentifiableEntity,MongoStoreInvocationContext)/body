@@ -1,0 +1,23 @@
+{
+  MongoTask fullUpdateTask=new MongoTask(){
+    @Override public void execute(){
+      Class<? extends MongoEntity> clazz=entity.getClass();
+      EntityInfo entityInfo=getEntityInfo(clazz);
+      BasicDBObject dbObject=mapperRegistry.convertApplicationObjectToDBObject(entity,BasicDBObject.class);
+      DBCollection dbCollection=database.getCollection(entityInfo.getDbCollectionName());
+      String currentId=entity.getId();
+      if (currentId == null) {
+        throw new IllegalStateException("Can't update entity without id: " + entity);
+      }
+ else {
+        BasicDBObject query=new BasicDBObject("_id",getObjectId(currentId));
+        dbCollection.update(query,dbObject);
+      }
+    }
+    @Override public boolean isFullUpdate(){
+      return true;
+    }
+  }
+;
+  context.addUpdateTask(entity,fullUpdateTask);
+}

@@ -1,0 +1,23 @@
+{
+  if (!loadedObjects.containsValue(entityToUpdate)) {
+    throw new IllegalStateException("Entity " + entityToUpdate + " not found in loaded objects");
+  }
+  Set<MongoTask> currentObjectTasks=pendingUpdateTasks.get(entityToUpdate);
+  if (currentObjectTasks == null) {
+    currentObjectTasks=new LinkedHashSet<MongoTask>();
+    pendingUpdateTasks.put(entityToUpdate,currentObjectTasks);
+  }
+ else {
+    if (task.isFullUpdate()) {
+      currentObjectTasks.clear();
+    }
+ else {
+      for (      MongoTask current : currentObjectTasks) {
+        if (current.isFullUpdate()) {
+          return;
+        }
+      }
+    }
+  }
+  currentObjectTasks.add(task);
+}

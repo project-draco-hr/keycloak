@@ -1,0 +1,21 @@
+{
+  super.before();
+  realm=realmManager.createRealm("Test");
+  realm.setAccessCodeLifespan(100);
+  realm.setEnabled(true);
+  realm.setName("Test");
+  realm.setPrivateKeyPem("0234234");
+  realm.setPublicKeyPem("0234234");
+  realm.setTokenLifespan(1000);
+  realm.addRequiredCredential(CredentialRepresentation.PASSWORD);
+  am=new AuthenticationManager();
+  user=realm.addUser("test");
+  user.setEnabled(true);
+  UserCredentialModel credential=new UserCredentialModel();
+  credential.setType(CredentialRepresentation.PASSWORD);
+  credential.setValue("password");
+  realm.updateCredential(user,credential);
+  formData=new MultivaluedHashMap<String,String>();
+  formData.add(CredentialRepresentation.PASSWORD,"password");
+  otp=new TimeBasedOTP();
+}

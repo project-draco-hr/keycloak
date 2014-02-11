@@ -1,0 +1,19 @@
+{
+  List<T> result=new ArrayList<T>();
+  try {
+    for (    DBObject dbObject : cursor) {
+      String id=dbObject.get("_id").toString();
+      T object=context.getLoadedObject(type,id);
+      if (object == null) {
+        MapperContext<Object,T> mapperContext=new MapperContext<Object,T>(dbObject,type,null);
+        object=mapperRegistry.convertDBObjectToApplicationObject(mapperContext);
+        context.addLoadedObject(object);
+      }
+      result.add(object);
+    }
+  }
+  finally {
+    cursor.close();
+  }
+  return result;
+}

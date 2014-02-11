@@ -1,0 +1,22 @@
+{
+  if (roleContainer == null) {
+    if (role.getRealmId() != null) {
+      RealmEntity realm=getMongoStore().loadEntity(RealmEntity.class,role.getRealmId(),invocationContext);
+      if (realm == null) {
+        throw new IllegalStateException("Realm with id: " + role.getRealmId() + " doesn't exists");
+      }
+      roleContainer=new RealmAdapter(realm,invocationContext);
+    }
+ else     if (role.getApplicationId() != null) {
+      ApplicationEntity appEntity=getMongoStore().loadEntity(ApplicationEntity.class,role.getApplicationId(),invocationContext);
+      if (appEntity == null) {
+        throw new IllegalStateException("Application with id: " + role.getApplicationId() + " doesn't exists");
+      }
+      roleContainer=new ApplicationAdapter(appEntity,invocationContext);
+    }
+ else {
+      throw new IllegalStateException("Both realmId and applicationId are null for role: " + this);
+    }
+  }
+  return roleContainer;
+}

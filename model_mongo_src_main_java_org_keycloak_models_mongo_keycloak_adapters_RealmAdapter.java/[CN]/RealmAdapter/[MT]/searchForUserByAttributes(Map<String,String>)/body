@@ -1,23 +1,19 @@
 {
-  NoSQLQueryBuilder queryBuilder=noSQL.createQueryBuilder();
+  QueryBuilder queryBuilder=new QueryBuilder().and("realmId").is(getId());
   for (  Map.Entry<String,String> entry : attributes.entrySet()) {
     if (entry.getKey().equals(UserModel.LOGIN_NAME)) {
-      queryBuilder.andCondition("loginName",entry.getValue());
+      queryBuilder.and("loginName").regex(Pattern.compile("(?i:" + entry.getValue() + "$)"));
     }
  else     if (entry.getKey().equalsIgnoreCase(UserModel.FIRST_NAME)) {
-      queryBuilder.andCondition(UserModel.FIRST_NAME,entry.getValue());
+      queryBuilder.and(UserModel.FIRST_NAME).regex(Pattern.compile("(?i:" + entry.getValue() + "$)"));
     }
  else     if (entry.getKey().equalsIgnoreCase(UserModel.LAST_NAME)) {
-      queryBuilder.andCondition(UserModel.LAST_NAME,entry.getValue());
+      queryBuilder.and(UserModel.LAST_NAME).regex(Pattern.compile("(?i:" + entry.getValue() + "$)"));
     }
  else     if (entry.getKey().equalsIgnoreCase(UserModel.EMAIL)) {
-      queryBuilder.andCondition(UserModel.EMAIL,entry.getValue());
+      queryBuilder.and(UserModel.EMAIL).regex(Pattern.compile("(?i:" + entry.getValue() + "$)"));
     }
   }
-  List<UserData> users=noSQL.loadObjects(UserData.class,queryBuilder.build());
-  List<UserModel> userModels=new ArrayList<UserModel>();
-  for (  UserData user : users) {
-    userModels.add(new UserAdapter(user,noSQL));
-  }
-  return userModels;
+  List<UserEntity> users=getMongoStore().loadEntities(UserEntity.class,queryBuilder.get(),invocationContext);
+  return convertUserEntities(users);
 }

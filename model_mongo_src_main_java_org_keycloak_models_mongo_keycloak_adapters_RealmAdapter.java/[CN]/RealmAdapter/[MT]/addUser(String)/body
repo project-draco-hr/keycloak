@@ -1,11 +1,12 @@
 {
-  if (getUser(username) != null) {
-    throw new IllegalArgumentException("User " + username + " already exists");
+  UserAdapter userModel=addUserEntity(username);
+  for (  String r : getDefaultRoles()) {
+    grantRole(userModel,getRole(r));
   }
-  UserData userData=new UserData();
-  userData.setLoginName(username);
-  userData.setEnabled(true);
-  userData.setRealmId(getOid());
-  noSQL.saveObject(userData);
-  return new UserAdapter(userData,noSQL);
+  for (  ApplicationModel application : getApplications()) {
+    for (    String r : application.getDefaultRoles()) {
+      grantRole(userModel,application.getRole(r));
+    }
+  }
+  return userModel;
 }

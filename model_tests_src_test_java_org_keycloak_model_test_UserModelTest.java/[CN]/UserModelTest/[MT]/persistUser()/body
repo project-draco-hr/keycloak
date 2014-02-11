@@ -1,0 +1,15 @@
+{
+  RealmModel realm=realmManager.createRealm("original");
+  UserModel user=realm.addUser("user");
+  user.setFirstName("first-name");
+  user.setLastName("last-name");
+  user.setEmail("email");
+  user.addRedirectUri("redirect-1");
+  user.addRedirectUri("redirect-2");
+  user.addRequiredAction(RequiredAction.CONFIGURE_TOTP);
+  user.addRequiredAction(RequiredAction.UPDATE_PASSWORD);
+  user.addWebOrigin("origin-1");
+  user.addWebOrigin("origin-2");
+  UserModel persisted=realmManager.getRealm(realm.getId()).getUser("user");
+  assertEquals(user,persisted);
+}

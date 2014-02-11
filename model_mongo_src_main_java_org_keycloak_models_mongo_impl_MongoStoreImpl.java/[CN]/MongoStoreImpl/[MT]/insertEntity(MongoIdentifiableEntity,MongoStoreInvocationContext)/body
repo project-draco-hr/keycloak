@@ -1,0 +1,15 @@
+{
+  Class<? extends MongoEntity> clazz=entity.getClass();
+  EntityInfo entityInfo=getEntityInfo(clazz);
+  BasicDBObject dbObject=mapperRegistry.convertApplicationObjectToDBObject(entity,BasicDBObject.class);
+  DBCollection dbCollection=database.getCollection(entityInfo.getDbCollectionName());
+  String currentId=entity.getId();
+  if (currentId != null) {
+    dbObject.put("_id",getObjectId(currentId));
+  }
+  dbCollection.insert(dbObject);
+  if (currentId == null) {
+    entity.setId(dbObject.getString("_id"));
+  }
+  context.addLoadedObject(entity);
+}

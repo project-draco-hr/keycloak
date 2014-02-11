@@ -1,13 +1,8 @@
 {
-  UserData userData=((UserAdapter)user).getUser();
-  List<String> roleIds=userData.getRoleIds();
-  String roleId=role.getId();
-  if (roleIds != null) {
-    for (    String currentId : roleIds) {
-      if (roleId.equals(currentId)) {
-        return true;
-      }
-    }
+  Set<RoleModel> roles=getRoleMappings(user);
+  if (roles.contains(role))   return true;
+  for (  RoleModel mapping : roles) {
+    if (mapping.hasRole(role))     return true;
   }
   return false;
 }

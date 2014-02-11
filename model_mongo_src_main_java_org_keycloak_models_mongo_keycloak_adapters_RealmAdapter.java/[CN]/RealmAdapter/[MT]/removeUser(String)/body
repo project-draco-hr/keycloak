@@ -1,4 +1,4 @@
 {
-  NoSQLQuery query=noSQL.createQueryBuilder().andCondition("loginName",name).andCondition("realmId",getOid()).build();
-  noSQL.removeObjects(UserData.class,query);
+  DBObject query=new QueryBuilder().and("loginName").is(name).and("realmId").is(getId()).get();
+  return getMongoStore().removeEntities(UserEntity.class,query,invocationContext);
 }

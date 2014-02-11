@@ -1,4 +1,8 @@
 {
-  Credentials.Status status=passwordCredentialHandler.validate(noSQL,((UserAdapter)user).getUser(),password);
-  return status == Credentials.Status.VALID;
+  for (  CredentialEntity cred : ((UserAdapter)user).getUser().getCredentials()) {
+    if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
+      return new Pbkdf2PasswordEncoder(cred.getSalt()).verify(password,cred.getValue());
+    }
+  }
+  return false;
 }

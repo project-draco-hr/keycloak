@@ -1,9 +1,12 @@
 {
-  List<RoleModel> result=new ArrayList<RoleModel>();
-  List<RoleData> roles=ApplicationAdapter.getAllRolesOfUser(user,noSQL);
-  for (  RoleData role : roles) {
-    if (getOid().equals(role.getRealmId())) {
-      result.add(new RoleAdapter(role,noSQL));
+  Set<RoleModel> result=new HashSet<RoleModel>();
+  List<RoleEntity> roles=MongoModelUtils.getAllRolesOfUser(user,invocationContext);
+  for (  RoleEntity role : roles) {
+    if (getId().equals(role.getRealmId())) {
+      result.add(new RoleAdapter(role,this,invocationContext));
+    }
+ else {
+      result.add(new RoleAdapter(role,invocationContext));
     }
   }
   return result;

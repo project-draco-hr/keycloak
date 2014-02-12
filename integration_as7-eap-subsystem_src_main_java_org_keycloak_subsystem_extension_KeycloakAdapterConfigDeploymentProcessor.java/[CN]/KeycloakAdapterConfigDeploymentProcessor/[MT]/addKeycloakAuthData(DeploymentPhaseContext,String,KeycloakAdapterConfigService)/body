@@ -7,14 +7,12 @@
     webMetaData=new JBossWebMetaData();
     warMetaData.setMergedJBossWebMetaData(webMetaData);
   }
-  List<ValveMetaData> valves=webMetaData.getValves();
-  if (valves == null) {
-    valves=new ArrayList<ValveMetaData>(1);
-    webMetaData.setValves(valves);
+  addValve(webMetaData);
+  LoginConfigMetaData loginConfig=webMetaData.getLoginConfig();
+  if (loginConfig == null) {
+    loginConfig=new LoginConfigMetaData();
+    webMetaData.setLoginConfig(loginConfig);
   }
-  ValveMetaData valve=new ValveMetaData();
-  valve.setValveClass(KeycloakAuthenticatorValve.class.getName());
-  valve.setModule("org.keycloak.keycloak-as7-adapter");
-  log.info("******* adding Keycloak valve to: " + deploymentName);
-  valves.add(valve);
+  loginConfig.setAuthMethod("KEYCLOAK");
+  loginConfig.setRealmName(service.getRealmName(deploymentName));
 }

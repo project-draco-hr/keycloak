@@ -4,5 +4,14 @@
   KeycloakAdapterConfigService service=KeycloakAdapterConfigService.find(phaseContext.getServiceRegistry());
   if (service.isKeycloakDeployment(deploymentName)) {
     addKeycloakAuthData(phaseContext,deploymentName,service);
+    return;
+  }
+  WarMetaData warMetaData=deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
+  if (warMetaData == null)   return;
+  JBossWebMetaData webMetaData=warMetaData.getMergedJBossWebMetaData();
+  if (webMetaData == null)   return;
+  LoginConfigMetaData loginConfig=webMetaData.getLoginConfig();
+  if (loginConfig != null && loginConfig.getAuthMethod().equalsIgnoreCase("KEYCLOAK")) {
+    addValve(webMetaData);
   }
 }

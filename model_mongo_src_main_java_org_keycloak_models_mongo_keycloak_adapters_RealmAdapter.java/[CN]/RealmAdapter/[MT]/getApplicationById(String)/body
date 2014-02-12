@@ -1,8 +1,7 @@
 {
-  ApplicationData appData=noSQL.loadObject(ApplicationData.class,id);
-  if (appData == null || !getOid().equals(appData.getRealmId())) {
+  ApplicationEntity appData=getMongoStore().loadEntity(ApplicationEntity.class,id,invocationContext);
+  if (appData == null || !getId().equals(appData.getRealmId())) {
     return null;
   }
-  ApplicationModel model=new ApplicationAdapter(appData,noSQL);
-  return model;
+  return new ApplicationAdapter(appData,invocationContext);
 }

@@ -1,6 +1,7 @@
 {
-  UserData userData=((UserAdapter)user).getUser();
-  String userId=userData.getId();
-  NoSQLQuery query=noSQL.createQueryBuilder().andCondition("socialProvider",socialLink.getSocialProvider()).andCondition("socialUsername",socialLink.getSocialUsername()).andCondition("userId",userId).build();
-  noSQL.removeObjects(SocialLinkData.class,query);
+  SocialLinkEntity socialLinkEntity=new SocialLinkEntity();
+  socialLinkEntity.setSocialProvider(socialLink.getSocialProvider());
+  socialLinkEntity.setSocialUsername(socialLink.getSocialUsername());
+  UserEntity userEntity=((UserAdapter)user).getUser();
+  getMongoStore().pullItemFromList(userEntity,"socialLinks",socialLinkEntity,invocationContext);
 }

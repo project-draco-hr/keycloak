@@ -1,0 +1,10 @@
+{
+  Class<?> dbObjectType=mapper.getTypeOfObjectToConvert();
+  Class<?> appObjectType=mapper.getExpectedReturnType();
+  Map<Class<?>,Mapper<?,?>> appObjects=dbObjectMappers.get(dbObjectType);
+  if (appObjects == null) {
+    appObjects=new HashMap<Class<?>,Mapper<?,?>>();
+    dbObjectMappers.put(dbObjectType,appObjects);
+  }
+  appObjects.put(appObjectType,mapper);
+}

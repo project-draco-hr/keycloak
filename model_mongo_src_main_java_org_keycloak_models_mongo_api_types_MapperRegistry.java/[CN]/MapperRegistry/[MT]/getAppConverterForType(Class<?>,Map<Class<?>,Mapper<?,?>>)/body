@@ -1,0 +1,22 @@
+{
+  Mapper<Object,?> mapper=(Mapper<Object,?>)appObjectConverters.get(appObjectType);
+  if (mapper != null) {
+    return mapper;
+  }
+ else {
+    Class<?>[] interfaces=appObjectType.getInterfaces();
+    for (    Class<?> interface1 : interfaces) {
+      mapper=getAppConverterForType(interface1,appObjectConverters);
+      if (mapper != null) {
+        return mapper;
+      }
+    }
+    Class<?> superType=appObjectType.getSuperclass();
+    if (superType != null) {
+      return getAppConverterForType(superType,appObjectConverters);
+    }
+ else {
+      return null;
+    }
+  }
+}

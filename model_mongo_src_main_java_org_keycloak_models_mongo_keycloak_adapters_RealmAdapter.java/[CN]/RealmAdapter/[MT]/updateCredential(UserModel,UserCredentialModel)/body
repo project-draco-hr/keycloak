@@ -1,10 +1,25 @@
 {
-  if (cred.getType().equals(CredentialRepresentation.PASSWORD)) {
-    passwordCredentialHandler.update(noSQL,((UserAdapter)user).getUser(),cred.getValue(),null,null);
+  CredentialEntity credentialEntity=null;
+  UserEntity userEntity=((UserAdapter)user).getUser();
+  for (  CredentialEntity entity : userEntity.getCredentials()) {
+    if (entity.getType().equals(cred.getType())) {
+      credentialEntity=entity;
+    }
   }
- else   if (cred.getType().equals(CredentialRepresentation.TOTP)) {
-    totpCredentialHandler.update(noSQL,((UserAdapter)user).getUser(),cred.getValue(),cred.getDevice(),null,null);
+  if (credentialEntity == null) {
+    credentialEntity=new CredentialEntity();
+    credentialEntity.setType(cred.getType());
+    credentialEntity.setDevice(cred.getDevice());
+    userEntity.getCredentials().add(credentialEntity);
   }
- else   if (cred.getType().equals(CredentialRepresentation.CLIENT_CERT)) {
+  if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
+    byte[] salt=Pbkdf2PasswordEncoder.getSalt();
+    credentialEntity.setValue(new Pbkdf2PasswordEncoder(salt).encode(cred.getValue()));
+    credentialEntity.setSalt(salt);
   }
+ else {
+    credentialEntity.setValue(cred.getValue());
+  }
+  credentialEntity.setDevice(cred.getDevice());
+  getMongoStore().updateEntity(userEntity,invocationContext);
 }

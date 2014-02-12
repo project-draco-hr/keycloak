@@ -1,10 +1,10 @@
 {
-  UserAdapter resourceUser=addUser(name);
-  ApplicationData appData=new ApplicationData();
+  UserAdapter resourceUser=addUserEntity(name);
+  ApplicationEntity appData=new ApplicationEntity();
   appData.setName(name);
-  appData.setRealmId(getOid());
+  appData.setRealmId(getId());
+  appData.setEnabled(true);
   appData.setResourceUserId(resourceUser.getUser().getId());
-  noSQL.saveObject(appData);
-  ApplicationModel resource=new ApplicationAdapter(appData,noSQL);
-  return resource;
+  getMongoStore().insertEntity(appData,invocationContext);
+  return new ApplicationAdapter(appData,resourceUser,invocationContext);
 }

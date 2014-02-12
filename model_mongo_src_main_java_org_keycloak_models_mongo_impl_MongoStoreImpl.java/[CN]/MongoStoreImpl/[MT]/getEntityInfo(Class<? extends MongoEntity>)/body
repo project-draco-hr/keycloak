@@ -1,0 +1,14 @@
+{
+  EntityInfo entityInfo=entityInfoCache.get(objectClass);
+  if (entityInfo == null) {
+    List<Property<Object>> properties=PropertyQueries.createQuery(objectClass).addCriteria(new AnnotatedPropertyCriteria(MongoField.class)).getResultList();
+    MongoCollection classAnnotation=objectClass.getAnnotation(MongoCollection.class);
+    String dbCollectionName=classAnnotation == null ? null : classAnnotation.collectionName();
+    entityInfo=new EntityInfo(objectClass,dbCollectionName,properties);
+    EntityInfo existing=entityInfoCache.putIfAbsent(objectClass,entityInfo);
+    if (existing != null) {
+      entityInfo=existing;
+    }
+  }
+  return entityInfo;
+}

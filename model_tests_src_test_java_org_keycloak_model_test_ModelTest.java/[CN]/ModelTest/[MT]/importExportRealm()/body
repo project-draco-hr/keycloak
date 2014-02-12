@@ -1,0 +1,27 @@
+{
+  RealmModel realm=realmManager.createRealm("original");
+  realm.setRegistrationAllowed(true);
+  realm.setResetPasswordAllowed(true);
+  realm.setSocial(true);
+  realm.setSslNotRequired(true);
+  realm.setVerifyEmail(true);
+  realm.setTokenLifespan(1000);
+  realm.setPasswordPolicy(new PasswordPolicy("length"));
+  realm.setAccessCodeLifespan(1001);
+  realm.setAccessCodeLifespanUserAction(1002);
+  realm.setPublicKeyPem("0234234");
+  realm.setPrivateKeyPem("1234234");
+  realm.addDefaultRole("default-role");
+  HashMap<String,String> smtp=new HashMap<String,String>();
+  smtp.put("from","auto@keycloak");
+  smtp.put("hostname","localhost");
+  realm.setSmtpConfig(smtp);
+  HashMap<String,String> social=new HashMap<String,String>();
+  social.put("google.key","1234");
+  social.put("google.secret","5678");
+  realm.setSocialConfig(social);
+  RealmModel persisted=realmManager.getRealm(realm.getId());
+  assertEquals(realm,persisted);
+  RealmModel copy=importExport(realm,"copy");
+  assertEquals(realm,copy);
+}

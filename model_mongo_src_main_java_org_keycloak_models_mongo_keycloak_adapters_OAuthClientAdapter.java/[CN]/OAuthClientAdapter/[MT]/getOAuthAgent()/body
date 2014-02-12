@@ -1,7 +1,7 @@
 {
   if (oauthAgent == null) {
-    UserData user=noSQL.loadObject(UserData.class,delegate.getOauthAgentId());
-    oauthAgent=user != null ? new UserAdapter(user,noSQL) : null;
+    UserEntity user=getMongoStore().loadEntity(UserEntity.class,delegate.getOauthAgentId(),invocationContext);
+    oauthAgent=user != null ? new UserAdapter(user,invocationContext) : null;
   }
   return oauthAgent;
 }

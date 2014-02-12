@@ -1,11 +1,5 @@
 {
-  NoSQLQuery query=noSQL.createQueryBuilder().andCondition("socialProvider",socialLink.getSocialProvider()).andCondition("socialUsername",socialLink.getSocialUsername()).andCondition("realmId",getOid()).build();
-  SocialLinkData socialLinkData=noSQL.loadSingleObject(SocialLinkData.class,query);
-  if (socialLinkData == null) {
-    return null;
-  }
- else {
-    UserData userData=noSQL.loadObject(UserData.class,socialLinkData.getUserId());
-    return new UserAdapter(userData,noSQL);
-  }
+  DBObject query=new QueryBuilder().and("socialLinks.socialProvider").is(socialLink.getSocialProvider()).and("socialLinks.socialUsername").is(socialLink.getSocialUsername()).and("realmId").is(getId()).get();
+  UserEntity userEntity=getMongoStore().loadSingleEntity(UserEntity.class,query,invocationContext);
+  return userEntity == null ? null : new UserAdapter(userEntity,invocationContext);
 }

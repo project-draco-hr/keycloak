@@ -1,9 +1,7 @@
 {
-  UserData userData=((UserAdapter)user).getUser();
-  SocialLinkData socialLinkData=new SocialLinkData();
-  socialLinkData.setSocialProvider(socialLink.getSocialProvider());
-  socialLinkData.setSocialUsername(socialLink.getSocialUsername());
-  socialLinkData.setUserId(userData.getId());
-  socialLinkData.setRealmId(getOid());
-  noSQL.saveObject(socialLinkData);
+  UserEntity userEntity=((UserAdapter)user).getUser();
+  SocialLinkEntity socialLinkEntity=new SocialLinkEntity();
+  socialLinkEntity.setSocialProvider(socialLink.getSocialProvider());
+  socialLinkEntity.setSocialUsername(socialLink.getSocialUsername());
+  getMongoStore().pushItemToList(userEntity,"socialLinks",socialLinkEntity,true,invocationContext);
 }

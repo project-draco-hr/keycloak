@@ -1,5 +1,5 @@
 {
-  BaseAdapterConfig rep=new BaseAdapterConfig();
+  InstallationAdapterConfig rep=new InstallationAdapterConfig();
   rep.setRealm(realmModel.getName());
   rep.setRealmKey(realmModel.getPublicKeyPem());
   rep.setSslNotRequired(realmModel.isSslNotRequired());
@@ -7,10 +7,8 @@
   rep.setUseResourceRoleMappings(applicationModel.getRoles().size() > 0);
   rep.setResource(applicationModel.getName());
   Map<String,String> creds=new HashMap<String,String>();
-  creds.put(CredentialRepresentation.PASSWORD,"INSERT APPLICATION PASSWORD");
-  if (applicationModel.getApplicationUser().isTotp()) {
-    creds.put(CredentialRepresentation.TOTP,"INSERT APPLICATION TOTP");
-  }
+  String cred=realmModel.getSecret(applicationModel.getApplicationUser()).getValue();
+  creds.put(CredentialRepresentation.SECRET,cred);
   rep.setCredentials(creds);
   return rep;
 }

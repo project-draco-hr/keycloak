@@ -1,16 +1,12 @@
 {
-  BaseAdapterConfig rep=new BaseAdapterConfig();
+  InstallationAdapterConfig rep=new InstallationAdapterConfig();
   rep.setRealm(realmModel.getName());
   rep.setRealmKey(realmModel.getPublicKeyPem());
   rep.setSslNotRequired(realmModel.isSslNotRequired());
   rep.setAuthServerUrl(baseUri.toString());
-  rep.setUseResourceRoleMappings(false);
   rep.setResource(model.getOAuthAgent().getLoginName());
   Map<String,String> creds=new HashMap<String,String>();
-  creds.put(CredentialRepresentation.PASSWORD,"INSERT CLIENT PASSWORD");
-  if (model.getOAuthAgent().isTotp()) {
-    creds.put(CredentialRepresentation.TOTP,"INSERT CLIENT TOTP");
-  }
+  creds.put(CredentialRepresentation.SECRET,realmModel.getSecret(model.getOAuthAgent()).getValue());
   rep.setCredentials(creds);
   return rep;
 }

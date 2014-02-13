@@ -3,9 +3,11 @@
   ModelNode addKeycloakSub=Util.createAddOperation(PathAddress.pathAddress(KeycloakExtension.PATH_SUBSYSTEM));
   list.add(addKeycloakSub);
   while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
-    if (!reader.getLocalName().equals("realm")) {
-      throw ParseUtils.unexpectedElement(reader);
+    if (reader.getLocalName().equals(RealmDefinition.TAG_NAME)) {
+      readRealm(reader,list);
     }
-    readRealm(reader,list);
+ else     if (reader.getLocalName().equals(SecureDeploymentDefinition.TAG_NAME)) {
+      readDeployment(reader,list);
+    }
   }
 }

@@ -1,5 +1,8 @@
 {
-  for (  Property deployment : deployments.asPropertyList()) {
+  if (!context.getModelNode().get(SecureDeploymentDefinition.TAG_NAME).isDefined()) {
+    return;
+  }
+  for (  Property deployment : context.getModelNode().get(SecureDeploymentDefinition.TAG_NAME).asPropertyList()) {
     writer.writeStartElement(SecureDeploymentDefinition.TAG_NAME);
     writer.writeAttribute("name",deployment.getName());
     ModelNode deploymentElements=deployment.getValue();

@@ -1,12 +1,11 @@
 {
-  List<T> result=loadEntities(type,query,context);
-  if (result.size() > 1) {
-    throw new IllegalStateException("There are " + result.size() + " results for type="+ type+ ", query="+ query+ ". We expect just one");
-  }
- else   if (result.size() == 1) {
-    return result.get(0);
+  context.beforeDBSearch(type);
+  DBCollection dbCollection=getDBCollectionForType(type);
+  DBObject dbObject=dbCollection.findOne(query);
+  if (dbObject == null) {
+    return null;
   }
  else {
-    return null;
+    return convertDBObjectToEntity(type,dbObject,context);
   }
 }

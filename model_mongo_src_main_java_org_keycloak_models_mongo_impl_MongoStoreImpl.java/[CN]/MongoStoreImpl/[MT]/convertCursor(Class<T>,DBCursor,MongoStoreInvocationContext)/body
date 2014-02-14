@@ -2,13 +2,7 @@
   List<T> result=new ArrayList<T>();
   try {
     for (    DBObject dbObject : cursor) {
-      String id=dbObject.get("_id").toString();
-      T entity=context.getLoadedEntity(type,id);
-      if (entity == null) {
-        MapperContext<Object,T> mapperContext=new MapperContext<Object,T>(dbObject,type,null);
-        entity=mapperRegistry.convertDBObjectToApplicationObject(mapperContext);
-        context.addLoadedEntity(entity);
-      }
+      T entity=convertDBObjectToEntity(type,dbObject,context);
       result.add(entity);
     }
   }

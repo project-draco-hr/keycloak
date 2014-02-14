@@ -10,7 +10,7 @@
   resetPasswordPage.assertCurrent();
   resetPasswordPage.changePassword("test-user@localhost");
   resetPasswordPage.assertCurrent();
-  Assert.assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getMessage());
+  Assert.assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
   Assert.assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];
   String body=(String)message.getContent();
@@ -18,8 +18,7 @@
   driver.navigate().to(changePasswordUrl.trim());
   updatePasswordPage.assertCurrent();
   updatePasswordPage.changePassword("invalid","invalid");
-  Assert.assertNotEquals("Success!",resetPasswordPage.getMessage());
-  Assert.assertEquals("Invalid password: minimum length 8",resetPasswordPage.getMessage());
+  Assert.assertEquals("Invalid password: minimum length 8",resetPasswordPage.getErrorMessage());
   updatePasswordPage.changePassword("new-password","new-password");
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   oauth.openLogout();

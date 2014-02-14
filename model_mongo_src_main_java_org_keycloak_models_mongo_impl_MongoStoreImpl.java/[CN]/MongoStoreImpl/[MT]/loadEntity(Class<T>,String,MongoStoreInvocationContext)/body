@@ -1,5 +1,5 @@
 {
-  T cached=context.getLoadedObject(type,id);
+  T cached=context.getLoadedEntity(type,id);
   if (cached != null)   return cached;
   DBCollection dbCollection=getDBCollectionForType(type);
   BasicDBObject idQuery=new BasicDBObject("_id",getObjectId(id));
@@ -7,6 +7,6 @@
   if (dbObject == null)   return null;
   MapperContext<Object,T> mapperContext=new MapperContext<Object,T>(dbObject,type,null);
   T converted=mapperRegistry.convertDBObjectToApplicationObject(mapperContext);
-  context.addLoadedObject(converted);
+  context.addLoadedEntity(converted);
   return converted;
 }

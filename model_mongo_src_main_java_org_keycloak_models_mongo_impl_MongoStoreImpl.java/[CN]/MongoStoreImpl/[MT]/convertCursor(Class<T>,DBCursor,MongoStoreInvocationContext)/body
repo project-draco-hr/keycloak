@@ -3,13 +3,13 @@
   try {
     for (    DBObject dbObject : cursor) {
       String id=dbObject.get("_id").toString();
-      T object=context.getLoadedObject(type,id);
-      if (object == null) {
+      T entity=context.getLoadedEntity(type,id);
+      if (entity == null) {
         MapperContext<Object,T> mapperContext=new MapperContext<Object,T>(dbObject,type,null);
-        object=mapperRegistry.convertDBObjectToApplicationObject(mapperContext);
-        context.addLoadedObject(object);
+        entity=mapperRegistry.convertDBObjectToApplicationObject(mapperContext);
+        context.addLoadedEntity(entity);
       }
-      result.add(object);
+      result.add(entity);
     }
   }
   finally {

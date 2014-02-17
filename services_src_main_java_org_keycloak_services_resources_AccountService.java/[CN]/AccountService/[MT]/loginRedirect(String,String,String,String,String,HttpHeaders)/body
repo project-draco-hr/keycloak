@@ -21,7 +21,6 @@
       logger.debug("state not specified");
       throw new BadRequestException();
     }
-    String path=new JaxrsOAuthClient().checkStateCookie(uriInfo,headers);
     JWSInput input=new JWSInput(code);
     boolean verifiedCode=false;
     try {
@@ -58,6 +57,9 @@
     }
     URI accountUri=Urls.accountBase(uriInfo.getBaseUri()).path("/").build(realm.getName());
     URI redirectUri=path != null ? accountUri.resolve(path) : accountUri;
+    if (referrer != null) {
+      redirectUri=redirectUri.resolve("?referrer=" + referrer);
+    }
     NewCookie cookie=authManager.createAccountIdentityCookie(realm,accessCode.getUser(),client,Urls.accountBase(uriInfo.getBaseUri()).build(realm.getName()));
     return Response.status(302).cookie(cookie).location(redirectUri).build();
   }

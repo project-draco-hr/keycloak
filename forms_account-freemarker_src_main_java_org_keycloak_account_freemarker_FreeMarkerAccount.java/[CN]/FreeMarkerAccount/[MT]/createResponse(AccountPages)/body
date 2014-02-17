@@ -27,7 +27,11 @@
   if (message != null) {
     attributes.put("message",new MessageBean(messages.containsKey(message) ? messages.getProperty(message) : message,messageType));
   }
-  attributes.put("url",new UrlBean(realm,theme,baseUri,getReferrerUri()));
+  ApplicationModel referrerApp=getReferrer();
+  if (referrerApp != null) {
+    attributes.put("referrer",new ReferrerBean(referrerApp));
+  }
+  attributes.put("url",new UrlBean(realm,theme,baseUri));
 switch (page) {
 case ACCOUNT:
     attributes.put("account",new AccountBean(user));

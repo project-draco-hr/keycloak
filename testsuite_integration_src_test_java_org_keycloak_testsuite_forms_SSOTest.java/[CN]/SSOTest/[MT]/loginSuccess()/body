@@ -1,0 +1,11 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  Assert.assertNotNull(oauth.getCurrentQuery().get("code"));
+  appPage.open();
+  oauth.openLoginForm();
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  profilePage.open();
+  Assert.assertTrue(profilePage.isCurrent());
+}

@@ -2,7 +2,16 @@
   if (name == null) {
     name=DEFAULT;
   }
-  Iterable<ThemeProvider> providers=ProviderLoader.load(ThemeProvider.class);
+  List<ThemeProvider> providers=new LinkedList();
+  for (  ThemeProvider p : ProviderLoader.load(ThemeProvider.class)) {
+    providers.add(p);
+  }
+  Collections.sort(providers,new Comparator<ThemeProvider>(){
+    @Override public int compare(    ThemeProvider o1,    ThemeProvider o2){
+      return o2.getProviderPriority() - o1.getProviderPriority();
+    }
+  }
+);
   Theme theme=findTheme(providers,name,type);
   if (theme.getParentName() != null) {
     List<Theme> themes=new LinkedList<Theme>();

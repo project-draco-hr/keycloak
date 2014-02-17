@@ -3,11 +3,15 @@
   String authUrl=Urls.realmLoginPage(uriInfo.getBaseUri(),realm.getName()).toString();
   oauth.setAuthUrl(authUrl);
   oauth.setClientId(Constants.ACCOUNT_APPLICATION);
-  URI accountUri=Urls.accountPageBuilder(uriInfo.getBaseUri()).path(AccountService.class,"loginRedirect").build(realm.getName());
+  UriBuilder uriBuilder=Urls.accountPageBuilder(uriInfo.getBaseUri()).path(AccountService.class,"loginRedirect");
+  if (path != null) {
+    uriBuilder.queryParam("path",path);
+  }
   String referrer=getReferrer();
   if (referrer != null) {
-    path=(path != null ? path : "") + "?referrer=" + referrer;
+    uriBuilder.queryParam("referrer",referrer);
   }
+  URI accountUri=uriBuilder.build(realm.getName());
   oauth.setStateCookiePath(accountUri.getRawPath());
-  return oauth.redirect(uriInfo,accountUri.toString(),path);
+  return oauth.redirect(uriInfo,accountUri.toString());
 }

@@ -4,8 +4,8 @@
   Assert.assertTrue(totpPage.isCurrent());
   Assert.assertFalse(driver.getPageSource().contains("Remove Google"));
   totpPage.configure(totp.generate(totpPage.getTotpSecret() + "123"));
-  Assert.assertTrue(profilePage.isError());
+  Assert.assertEquals("Invalid authenticator code",profilePage.getError());
   totpPage.configure(totp.generate(totpPage.getTotpSecret()));
-  Assert.assertTrue(profilePage.isSuccess());
-  Assert.assertTrue(driver.getPageSource().contains("Remove Google"));
+  Assert.assertEquals("Google authenticator configured.",profilePage.getSuccess());
+  Assert.assertTrue(driver.getPageSource().contains("pficon-delete"));
 }

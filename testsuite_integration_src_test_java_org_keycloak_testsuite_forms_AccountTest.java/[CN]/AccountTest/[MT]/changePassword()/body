@@ -2,11 +2,11 @@
   changePasswordPage.open();
   loginPage.login("test-user@localhost","password");
   changePasswordPage.changePassword("","new-password","new-password");
-  Assert.assertTrue(profilePage.isError());
+  Assert.assertEquals("Please specify password.",profilePage.getError());
   changePasswordPage.changePassword("password","new-password","new-password2");
-  Assert.assertTrue(profilePage.isError());
+  Assert.assertEquals("Password confirmation doesn't match",profilePage.getError());
   changePasswordPage.changePassword("password","new-password","new-password");
-  Assert.assertTrue(profilePage.isSuccess());
+  Assert.assertEquals("Your password has been updated",profilePage.getSuccess());
   changePasswordPage.logout();
   loginPage.open();
   loginPage.login("test-user@localhost","password");

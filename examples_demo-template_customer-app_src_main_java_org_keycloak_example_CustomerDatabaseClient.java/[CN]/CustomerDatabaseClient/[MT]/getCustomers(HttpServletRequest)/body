@@ -6,6 +6,9 @@
     get.addHeader("Authorization","Bearer " + session.getTokenString());
     try {
       HttpResponse response=client.execute(get);
+      if (response.getStatusLine().getStatusCode() != 200) {
+        throw new Failure(response.getStatusLine().getStatusCode());
+      }
       HttpEntity entity=response.getEntity();
       InputStream is=entity.getContent();
       try {

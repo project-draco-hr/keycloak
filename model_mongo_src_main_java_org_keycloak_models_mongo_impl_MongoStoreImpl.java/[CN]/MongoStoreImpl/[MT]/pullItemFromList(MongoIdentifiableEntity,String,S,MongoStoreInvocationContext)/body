@@ -14,7 +14,7 @@
     context.addUpdateTask(entity,new MongoTask(){
       @Override public void execute(){
         Object dbItemToPull=mapperRegistry.convertApplicationObjectToDBObject(itemToPull,Object.class);
-        BasicDBObject query=new BasicDBObject("_id",getObjectId(entity.getId()));
+        BasicDBObject query=new BasicDBObject("_id",entity.getId());
         BasicDBObject pullObject=new BasicDBObject(listPropertyName,dbItemToPull);
         BasicDBObject pullCommand=new BasicDBObject("$pull",pullObject);
         getDBCollectionForType(type).update(query,pullCommand);

@@ -1,0 +1,10 @@
+{
+  String id=dbObject.get("_id").toString();
+  T object=context.getLoadedEntity(type,id);
+  if (object == null) {
+    MapperContext<Object,T> mapperContext=new MapperContext<Object,T>(dbObject,type,null);
+    object=mapperRegistry.convertDBObjectToApplicationObject(mapperContext);
+    context.addLoadedEntity(object);
+  }
+  return object;
+}

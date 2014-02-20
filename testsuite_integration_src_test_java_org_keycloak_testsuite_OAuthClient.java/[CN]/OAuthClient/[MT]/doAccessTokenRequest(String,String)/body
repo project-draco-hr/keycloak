@@ -11,11 +11,12 @@
   if (redirectUri != null) {
     parameters.add(new BasicNameValuePair("redirect_uri",redirectUri));
   }
-  if (clientId != null) {
-    parameters.add(new BasicNameValuePair("client_id",clientId));
+  if (clientId != null && password != null) {
+    String authorization=BasicAuthHelper.createHeader(clientId,password);
+    post.setHeader("Authorization",authorization);
   }
-  if (password != null) {
-    parameters.add(new BasicNameValuePair("secret",password));
+ else   if (clientId != null) {
+    parameters.add(new BasicNameValuePair("client_id",clientId));
   }
   UrlEncodedFormEntity formEntity=null;
   try {

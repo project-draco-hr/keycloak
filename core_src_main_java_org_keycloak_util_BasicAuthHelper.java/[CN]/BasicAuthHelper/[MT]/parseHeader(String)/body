@@ -1,0 +1,16 @@
+{
+  if (header.length() < 6)   return null;
+  String type=header.substring(0,5);
+  type=type.toLowerCase();
+  if (!type.equalsIgnoreCase("Basic"))   return null;
+  String val=header.substring(6);
+  try {
+    val=new String(Base64.decode(val.getBytes()));
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  String[] split=val.split(":");
+  if (split.length != 2)   return null;
+  return split;
+}

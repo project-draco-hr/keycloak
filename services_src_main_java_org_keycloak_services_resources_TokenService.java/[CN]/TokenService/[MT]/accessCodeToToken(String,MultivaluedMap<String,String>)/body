@@ -55,6 +55,6 @@
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   logger.debug("accessRequest SUCCESS");
-  AccessTokenResponse res=accessTokenResponse(realm.getPrivateKey(),accessCode.getToken());
+  AccessTokenResponse res=tokenManager.responseBuilder(realm).accessToken(accessCode.getToken()).generateRefreshToken().build();
   return Cors.add(request,Response.ok(res)).allowedOrigins(client).allowedMethods("POST").build();
 }

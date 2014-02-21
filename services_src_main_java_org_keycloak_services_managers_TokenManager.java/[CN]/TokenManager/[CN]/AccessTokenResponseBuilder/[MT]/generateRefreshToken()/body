@@ -1,0 +1,10 @@
+{
+  if (accessToken == null) {
+    throw new IllegalStateException("accessToken not set");
+  }
+  refreshToken=new RefreshToken(accessToken);
+  refreshToken.id(KeycloakModelUtils.generateId());
+  refreshToken.issuedNow();
+  refreshToken.expiration((System.currentTimeMillis() / 1000) + realm.getRefreshTokenLifespan());
+  return this;
+}

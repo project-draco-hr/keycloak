@@ -21,8 +21,6 @@
     throw new NotAuthorizedException("Auth failed");
   }
   String scope=form.getFirst("scope");
-  AccessToken token=tokenManager.createClientAccessToken(scope,realm,client,user);
-  String encoded=tokenManager.encodeToken(realm,token);
-  AccessTokenResponse res=accessTokenResponse(token,encoded);
+  AccessTokenResponse res=tokenManager.responseBuilder(realm).generateAccessToken(scope,client,user).build();
   return Response.ok(res,MediaType.APPLICATION_JSON_TYPE).build();
 }

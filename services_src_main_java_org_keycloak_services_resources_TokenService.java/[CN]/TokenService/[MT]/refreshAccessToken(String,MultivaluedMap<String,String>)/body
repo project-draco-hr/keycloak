@@ -1,0 +1,19 @@
+{
+  if (!checkSsl()) {
+    throw new NotAcceptableException("HTTPS required");
+  }
+  UserModel client=authorizeClient(authorizationHeader);
+  String refreshToken=form.getFirst("refresh_token");
+  AccessToken accessToken=null;
+  try {
+    accessToken=tokenManager.refreshAccessToken(realm,client,refreshToken);
+  }
+ catch (  OAuthErrorException e) {
+    Map<String,String> error=new HashMap<String,String>();
+    error.put("error",e.getError());
+    if (e.getDescription() != null)     error.put("error_description",e.getDescription());
+    throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build(),e);
+  }
+  AccessTokenResponse res=tokenManager.responseBuilder(realm).accessToken(accessToken).generateRefreshToken().build();
+  return Response.ok(res,MediaType.APPLICATION_JSON_TYPE).build();
+}

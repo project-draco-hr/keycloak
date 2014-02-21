@@ -30,24 +30,19 @@
     logger.warn("Failed to process social callback",e);
     return oauth.forwardToSecurityFailure("Failed to process social callback");
   }
-  SocialLinkModel socialLink=new SocialLinkModel(provider.getId(),socialUser.getUsername());
+  SocialLinkModel socialLink=new SocialLinkModel(provider.getId(),socialUser.getId());
   UserModel user=realm.getUserBySocialLink(socialLink);
   if (user == null) {
     if (!realm.isRegistrationAllowed()) {
       return oauth.forwardToSecurityFailure("Registration not allowed");
     }
-    if (realm.getUser(socialUser.getUsername()) != null) {
-      throw new IllegalStateException("Username " + socialUser.getUsername() + " already registered in the realm. TODO: bind accounts...");
-    }
- else {
-      user=realm.addUser(socialUser.getUsername());
-      user.setEnabled(true);
-      user.setFirstName(socialUser.getFirstName());
-      user.setLastName(socialUser.getLastName());
-      user.setEmail(socialUser.getEmail());
-      if (realm.isUpdateProfileOnInitialSocialLogin()) {
-        user.addRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE);
-      }
+    user=realm.addUser(KeycloakModelUtils.generateId());
+    user.setEnabled(true);
+    user.setFirstName(socialUser.getFirstName());
+    user.setLastName(socialUser.getLastName());
+    user.setEmail(socialUser.getEmail());
+    if (realm.isUpdateProfileOnInitialSocialLogin()) {
+      user.addRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE);
     }
     realm.addSocialLink(user,socialLink);
   }

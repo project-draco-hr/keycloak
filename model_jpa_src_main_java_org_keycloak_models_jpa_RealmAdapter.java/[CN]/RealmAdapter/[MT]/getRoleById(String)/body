@@ -1,5 +1,6 @@
 {
   RoleEntity entity=em.find(RoleEntity.class,id);
-  if (entity == null)   return null;
-  return new RoleAdapter(this,em,entity);
+  if (entity == null || !(entity instanceof RealmRoleEntity))   return null;
+  RealmRoleEntity realmRoleEntity=(RealmRoleEntity)entity;
+  return (realmRoleEntity.getRealm().equals(this.realm)) ? new RoleAdapter(this,em,realmRoleEntity) : null;
 }

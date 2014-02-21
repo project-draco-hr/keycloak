@@ -2,9 +2,23 @@
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=getAdminstrationRealm(realmManager);
   if (realm == null)   throw new NotFoundException();
-  UserModel user=authManager.authenticateSaasIdentityCookie(realm,uriInfo,headers);
+  Auth auth=authManager.authenticateCookie(realm,headers);
+  UserModel user=auth.getUser();
   if (user == null) {
     return Response.status(401).build();
   }
-  return Response.ok(new WhoAmI(user.getLoginName(),user.getLoginName())).build();
+  String displayName;
+  if (user.getFirstName() != null || user.getLastName() != null) {
+    displayName=user.getFirstName();
+    if (user.getLastName() != null) {
+      displayName=displayName != null ? displayName + " " + user.getLastName() : user.getLastName();
+    }
+  }
+ else {
+    displayName=user.getLoginName();
+  }
+  boolean admin=realm.hasRole(user,realm.getRole("admin"));
+  Map<String,Set<String>> realmAccess=new HashMap<String,Set<String>>();
+  addRealmAdminAccess(realmAccess,auth.getRealm().getRoleMappings(auth.getUser()));
+  return Response.ok(new WhoAmI(user.getId(),displayName,admin,realmAccess)).build();
 }

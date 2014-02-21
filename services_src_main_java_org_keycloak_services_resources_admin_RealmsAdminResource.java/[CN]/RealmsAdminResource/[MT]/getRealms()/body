@@ -1,10 +1,18 @@
 {
   logger.debug(("getRealms()"));
-  RealmManager realmManager=new RealmManager(session);
-  List<RealmModel> realms=session.getRealms(admin);
+  List<RealmModel> realms=session.getRealms();
   List<RealmRepresentation> reps=new ArrayList<RealmRepresentation>();
   for (  RealmModel realm : realms) {
-    reps.add(ModelToRepresentation.toRepresentation(realm));
+    String realmAdminApp=AdminRoles.getAdminApp(realm);
+    if (auth.has(realmAdminApp,AdminRoles.MANAGE_REALM)) {
+      reps.add(ModelToRepresentation.toRepresentation(realm));
+    }
+ else     if (auth.hasOneOf(realmAdminApp,AdminRoles.ALL_REALM_ROLES)) {
+      RealmRepresentation rep=new RealmRepresentation();
+      rep.setId(realm.getId());
+      rep.setRealm(realm.getName());
+      reps.add(rep);
+    }
   }
   return reps;
 }

@@ -9,7 +9,6 @@
   realmModel.setAccessTokenLifespan(1000);
   realmModel.setUpdateProfileOnInitialSocialLogin(true);
   realmModel.addDefaultRole("foo");
-  System.out.println(realmModel.getId());
   realmModel=realmManager.getRealm(realmModel.getId());
   Assert.assertNotNull(realmModel);
   Assert.assertEquals(realmModel.getAccessCodeLifespan(),100);
@@ -22,10 +21,8 @@
   Assert.assertEquals(realmModel.isUpdateProfileOnInitialSocialLogin(),true);
   Assert.assertEquals(1,realmModel.getDefaultRoles().size());
   Assert.assertEquals("foo",realmModel.getDefaultRoles().get(0));
-  String id=realmModel.getId();
-  System.out.println("id: " + id);
+  realmModel.getId();
   commit();
-  List<RealmModel> realms=identitySession.getRealms(null);
-  System.out.println("num realms: " + realms.size());
-  Assert.assertEquals(realms.size(),1);
+  List<RealmModel> realms=identitySession.getRealms();
+  Assert.assertEquals(realms.size(),2);
 }

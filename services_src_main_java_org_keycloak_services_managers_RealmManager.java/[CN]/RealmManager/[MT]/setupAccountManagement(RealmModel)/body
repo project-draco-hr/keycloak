@@ -1,9 +1,10 @@
 {
-  ApplicationModel application=realm.getApplicationNameMap().get(Constants.ACCOUNT_APPLICATION);
+  ApplicationModel application=realm.getApplicationNameMap().get(Constants.ACCOUNT_MANAGEMENT_APP);
   if (application == null) {
-    application=new ApplicationManager(this).createApplication(realm,Constants.ACCOUNT_APPLICATION);
+    application=new ApplicationManager(this).createApplication(realm,Constants.ACCOUNT_MANAGEMENT_APP);
     application.setEnabled(true);
-    application.addDefaultRole(Constants.ACCOUNT_PROFILE_ROLE);
-    application.addDefaultRole(Constants.ACCOUNT_MANAGE_ROLE);
+    for (    String role : AccountRoles.ALL) {
+      application.addDefaultRole(role);
+    }
   }
 }

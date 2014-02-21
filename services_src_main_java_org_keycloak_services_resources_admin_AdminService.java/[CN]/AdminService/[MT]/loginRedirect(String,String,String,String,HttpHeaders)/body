@@ -6,12 +6,12 @@
       return redirectOnLoginError(error);
     }
     RealmManager realmManager=new RealmManager(session);
-    RealmModel realm=getAdminstrationRealm(realmManager);
-    if (!realm.isEnabled()) {
+    RealmModel adminRealm=getAdminstrationRealm(realmManager);
+    if (!adminRealm.isEnabled()) {
       logger.debug("realm not enabled");
       return redirectOnLoginError("realm not enabled");
     }
-    ApplicationModel adminConsole=realm.getApplicationNameMap().get(Constants.ADMIN_CONSOLE_APPLICATION);
+    ApplicationModel adminConsole=adminRealm.getApplicationNameMap().get(Constants.ADMIN_CONSOLE_APPLICATION);
     UserModel adminConsoleUser=adminConsole.getApplicationUser();
     if (!adminConsole.isEnabled() || !adminConsoleUser.isEnabled()) {
       logger.debug("admin app not enabled");
@@ -26,47 +26,8 @@
       return redirectOnLoginError("invalid login data");
     }
     new JaxrsOAuthClient().checkStateCookie(uriInfo,headers);
-    JWSInput input=new JWSInput(code);
-    boolean verifiedCode=false;
-    try {
-      verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
-    }
- catch (    Exception ignored) {
-      logger.debug("Failed to verify signature",ignored);
-    }
-    if (!verifiedCode) {
-      logger.debug("unverified access code");
-      return redirectOnLoginError("invalid login data");
-    }
-    String key=input.readContentAsString();
-    AccessCodeEntry accessCode=tokenManager.pullAccessCode(key);
-    if (accessCode == null) {
-      logger.debug("bad access code");
-      return redirectOnLoginError("invalid login data");
-    }
-    if (accessCode.isExpired()) {
-      logger.debug("access code expired");
-      return redirectOnLoginError("invalid login data");
-    }
-    if (!accessCode.getToken().isActive()) {
-      logger.debug("access token expired");
-      return redirectOnLoginError("invalid login data");
-    }
-    if (!accessCode.getRealm().getId().equals(realm.getId())) {
-      logger.debug("bad realm");
-      return redirectOnLoginError("invalid login data");
-    }
-    if (!adminConsoleUser.getLoginName().equals(accessCode.getClient().getLoginName())) {
-      logger.debug("bad client");
-      return redirectOnLoginError("invalid login data");
-    }
-    RoleModel adminConsoleAdminRole=adminConsole.getRole(Constants.ADMIN_CONSOLE_ADMIN_ROLE);
-    if (!realm.hasRole(accessCode.getUser(),adminConsoleAdminRole)) {
-      logger.debug("not allowed");
-      return redirectOnLoginError("No permission to access console");
-    }
     logger.debug("loginRedirect SUCCESS");
-    NewCookie cookie=authManager.createSaasIdentityCookie(realm,accessCode.getUser(),uriInfo);
+    NewCookie cookie=authManager.createCookie(adminRealm,adminConsoleUser,code,AdminService.saasCookiePath(uriInfo).build());
     URI redirectUri=contextRoot(uriInfo).path(adminPath).build();
     if (path != null) {
       redirectUri=redirectUri.resolve("#" + UriBuilder.fromPath(path).build().toString());
@@ -74,6 +35,6 @@
     return Response.status(302).cookie(cookie).location(redirectUri).build();
   }
   finally {
-    authManager.expireCookie(AbstractOAuthClient.OAUTH_TOKEN_REQUEST_STATE,uriInfo.getAbsolutePath().getPath());
+    expireCookie();
   }
 }

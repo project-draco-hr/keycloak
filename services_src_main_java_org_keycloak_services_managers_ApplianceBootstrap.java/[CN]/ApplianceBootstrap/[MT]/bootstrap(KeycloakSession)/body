@@ -23,7 +23,8 @@
   ApplicationModel adminConsole=new ApplicationManager(manager).createApplication(realm,Constants.ADMIN_CONSOLE_APPLICATION);
   adminConsole.setBaseUrl("/auth/admin/index.html");
   adminConsole.setEnabled(true);
-  RoleModel adminRole=adminConsole.addRole(Constants.ADMIN_CONSOLE_ADMIN_ROLE);
+  RoleModel adminRole=realm.getRole(AdminRoles.ADMIN);
+  adminConsole.addScope(adminRole);
   UserModel adminUser=realm.addUser("admin");
   adminUser.setEnabled(true);
   UserCredentialModel password=new UserCredentialModel();
@@ -32,7 +33,7 @@
   realm.updateCredential(adminUser,password);
   adminUser.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
   realm.grantRole(adminUser,adminRole);
-  ApplicationModel accountApp=realm.getApplicationNameMap().get(Constants.ACCOUNT_APPLICATION);
+  ApplicationModel accountApp=realm.getApplicationNameMap().get(Constants.ACCOUNT_MANAGEMENT_APP);
   for (  String r : accountApp.getDefaultRoles()) {
     realm.grantRole(adminUser,accountApp.getRole(r));
   }

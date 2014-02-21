@@ -1,0 +1,39 @@
+{
+  logger.info("authenticateCookie");
+  Cookie cookie=headers.getCookies().get(cookieName);
+  if (cookie == null) {
+    logger.info("authenticateCookie could not find cookie: {0}",cookieName);
+    return null;
+  }
+  String tokenString=cookie.getValue();
+  try {
+    AccessToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),realm.getName(),checkActive);
+    logger.info("token verified");
+    if (checkActive && !token.isActive()) {
+      logger.info("cookie expired");
+      expireCookie(cookie.getName(),cookie.getPath());
+      return null;
+    }
+    UserModel user=realm.getUserById(token.getSubject());
+    if (user == null || !user.isEnabled()) {
+      logger.info("Unknown user in cookie");
+      expireCookie(cookie.getName(),cookie.getPath());
+      return null;
+    }
+    UserModel client=null;
+    if (token.getIssuedFor() != null) {
+      client=realm.getUser(token.getIssuedFor());
+      if (client == null || !client.isEnabled()) {
+        logger.info("Unknown client in cookie");
+        expireCookie(cookie.getName(),cookie.getPath());
+        return null;
+      }
+    }
+    return new Auth(realm,user,client);
+  }
+ catch (  VerificationException e) {
+    logger.info("Failed to verify cookie",e);
+    expireCookie(cookie.getName(),cookie.getPath());
+  }
+  return null;
+}

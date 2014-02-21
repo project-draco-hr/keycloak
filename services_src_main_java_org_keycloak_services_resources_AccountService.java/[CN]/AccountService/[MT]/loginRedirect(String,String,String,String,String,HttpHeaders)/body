@@ -21,49 +21,15 @@
       logger.debug("state not specified");
       throw new BadRequestException();
     }
-    JWSInput input=new JWSInput(code);
-    boolean verifiedCode=false;
-    try {
-      verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
-    }
- catch (    Exception ignored) {
-      logger.debug("Failed to verify signature",ignored);
-    }
-    if (!verifiedCode) {
-      logger.debug("unverified access code");
-      throw new BadRequestException();
-    }
-    String key=input.readContentAsString();
-    AccessCodeEntry accessCode=tokenManager.pullAccessCode(key);
-    if (accessCode == null) {
-      logger.debug("bad access code");
-      throw new BadRequestException();
-    }
-    if (accessCode.isExpired()) {
-      logger.debug("access code expired");
-      throw new BadRequestException();
-    }
-    if (!accessCode.getToken().isActive()) {
-      logger.debug("access token expired");
-      throw new BadRequestException();
-    }
-    if (!accessCode.getRealm().getId().equals(realm.getId())) {
-      logger.debug("bad realm");
-      throw new BadRequestException();
-    }
-    if (!client.getLoginName().equals(accessCode.getClient().getLoginName())) {
-      logger.debug("bad client");
-      throw new BadRequestException();
-    }
     URI accountUri=Urls.accountBase(uriInfo.getBaseUri()).path("/").build(realm.getName());
     URI redirectUri=path != null ? accountUri.resolve(path) : accountUri;
     if (referrer != null) {
       redirectUri=redirectUri.resolve("?referrer=" + referrer);
     }
-    NewCookie cookie=authManager.createAccountIdentityCookie(realm,accessCode.getUser(),client,Urls.accountBase(uriInfo.getBaseUri()).build(realm.getName()));
+    NewCookie cookie=authManager.createCookie(realm,client,code,Urls.accountBase(uriInfo.getBaseUri()).build(realm.getName()));
     return Response.status(302).cookie(cookie).location(redirectUri).build();
   }
   finally {
-    authManager.expireCookie(AbstractOAuthClient.OAUTH_TOKEN_REQUEST_STATE,uriInfo.getAbsolutePath().getRawPath());
+    authManager.expireCookie(Urls.accountBase(uriInfo.getBaseUri()).build(realm.getName()));
   }
 }

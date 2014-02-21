@@ -1,14 +1,8 @@
 {
-  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
-    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
-      appRealm.setPasswordPolicy(new PasswordPolicy("length"));
-    }
-  }
-);
   loginPage.open();
   loginPage.resetPassword();
   resetPasswordPage.assertCurrent();
-  resetPasswordPage.changePassword("login-test");
+  resetPasswordPage.changePassword("login@test.com");
   resetPasswordPage.assertCurrent();
   Assert.assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
   Assert.assertEquals(1,greenMail.getReceivedMessages().length);
@@ -17,12 +11,10 @@
   String changePasswordUrl=body.split("\n")[3];
   driver.navigate().to(changePasswordUrl.trim());
   updatePasswordPage.assertCurrent();
-  updatePasswordPage.changePassword("invalid","invalid");
-  Assert.assertEquals("Invalid password: minimum length 8",resetPasswordPage.getErrorMessage());
-  updatePasswordPage.changePassword("resetPasswordWithPasswordPolicy","resetPasswordWithPasswordPolicy");
+  updatePasswordPage.changePassword("resetPassword","resetPassword");
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   oauth.openLogout();
   loginPage.open();
-  loginPage.login("login-test","resetPasswordWithPasswordPolicy");
+  loginPage.login("login@test.com","resetPassword");
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
 }

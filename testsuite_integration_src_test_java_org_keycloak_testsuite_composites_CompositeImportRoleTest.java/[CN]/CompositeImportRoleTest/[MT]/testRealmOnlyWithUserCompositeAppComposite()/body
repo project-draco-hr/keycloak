@@ -8,7 +8,7 @@
   Assert.assertEquals(200,response.getStatusCode());
   Assert.assertEquals("bearer",response.getTokenType());
   SkeletonKeyToken token=oauth.verifyToken(response.getAccessToken());
-  Assert.assertEquals("REALM_COMPOSITE_1_USER",token.getSubject());
+  Assert.assertEquals("REALM_COMPOSITE_1_USER",oauth.getProfile(response.getAccessToken()).getUsername());
   Assert.assertEquals(2,token.getRealmAccess().getRoles().size());
   Assert.assertTrue(token.getRealmAccess().isUserInRole("REALM_COMPOSITE_1"));
   Assert.assertTrue(token.getRealmAccess().isUserInRole("REALM_ROLE_1"));

@@ -1,0 +1,25 @@
+{
+  AccessToken.Access access=null;
+  if (role.getContainer() instanceof RealmModel) {
+    access=token.getRealmAccess();
+    if (token.getRealmAccess() == null) {
+      access=new AccessToken.Access();
+      token.setRealmAccess(access);
+    }
+ else     if (token.getRealmAccess().getRoles() != null && token.getRealmAccess().isUserInRole(role.getName()))     return;
+  }
+ else {
+    ApplicationModel app=(ApplicationModel)role.getContainer();
+    access=token.getResourceAccess(app.getName());
+    if (access == null) {
+      access=token.addAccess(app.getName());
+      if (app.isSurrogateAuthRequired())       access.verifyCaller(true);
+    }
+ else     if (access.isUserInRole(role.getName()))     return;
+  }
+  access.addRole(role.getName());
+  if (!role.isComposite())   return;
+  for (  RoleModel composite : role.getComposites()) {
+    addComposites(token,composite);
+  }
+}

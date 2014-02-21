@@ -1,0 +1,9 @@
+{
+  super.propagateBearer(exchange,skSession,principal);
+  final ServletRequestContext servletRequestContext=exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+  HttpServletRequest req=(HttpServletRequest)servletRequestContext.getServletRequest();
+  req.setAttribute(KeycloakAuthenticatedSession.class.getName(),skSession);
+  HttpSession session=req.getSession(true);
+  session.setAttribute(KeycloakAuthenticatedSession.class.getName(),skSession);
+  userSessionManagement.login(servletRequestContext.getDeployment().getSessionManager(),session,principal.getName());
+}

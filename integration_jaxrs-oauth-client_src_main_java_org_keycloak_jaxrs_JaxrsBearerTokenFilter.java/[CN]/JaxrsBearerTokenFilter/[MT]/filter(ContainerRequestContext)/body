@@ -9,13 +9,13 @@
   if (!split[0].equalsIgnoreCase("Bearer"))   challengeResponse(request,null,null);
   String tokenString=split[1];
   try {
-    SkeletonKeyToken token=RSATokenVerifier.verifyToken(tokenString,resourceMetadata.getRealmKey(),resourceMetadata.getRealm());
-    SkeletonKeySession skSession=new SkeletonKeySession(tokenString,token,resourceMetadata);
-    ResteasyProviderFactory.pushContext(SkeletonKeySession.class,skSession);
+    AccessToken token=RSATokenVerifier.verifyToken(tokenString,resourceMetadata.getRealmKey(),resourceMetadata.getRealm());
+    KeycloakAuthenticatedSession skSession=new KeycloakAuthenticatedSession(tokenString,token,resourceMetadata);
+    ResteasyProviderFactory.pushContext(KeycloakAuthenticatedSession.class,skSession);
     String callerPrincipal=securityContext.getUserPrincipal() != null ? securityContext.getUserPrincipal().getName() : null;
-    final SkeletonKeyPrincipal principal=new SkeletonKeyPrincipal(token.getSubject(),callerPrincipal);
+    final KeycloakPrincipal principal=new KeycloakPrincipal(token.getSubject(),callerPrincipal);
     final boolean isSecure=securityContext.isSecure();
-    final SkeletonKeyToken.Access access;
+    final AccessToken.Access access;
     if (resourceMetadata.getResourceName() != null) {
       access=token.getResourceAccess(resourceMetadata.getResourceName());
     }

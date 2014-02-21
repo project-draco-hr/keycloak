@@ -1,5 +1,5 @@
 {
-  String email=formData.getFirst("email");
+  String username=formData.getFirst("username");
   String scopeParam=uriInfo.getQueryParameters().getFirst("scope");
   String state=uriInfo.getQueryParameters().getFirst("state");
   String redirect=uriInfo.getQueryParameters().getFirst("redirect_uri");
@@ -11,21 +11,26 @@
   if (!client.isEnabled()) {
     return Flows.oauth(realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
   }
-  UserModel user=realm.getUserByEmail(email);
+  UserModel user=realm.getUser(username);
+  if (user == null && username.contains("@")) {
+    user=realm.getUserByEmail(username);
+  }
   if (user == null) {
-    return Flows.forms(realm,request,uriInfo).setError("emailError").createPasswordReset();
+    logger.warn("Failed to send password reset email: user not found");
   }
-  Set<RequiredAction> requiredActions=new HashSet<RequiredAction>(user.getRequiredActions());
-  requiredActions.add(RequiredAction.UPDATE_PASSWORD);
-  AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,realm,client,user);
-  accessCode.setRequiredActions(requiredActions);
-  accessCode.setExpiration(System.currentTimeMillis() / 1000 + realm.getAccessCodeLifespanUserAction());
-  try {
-    new EmailSender(realm.getSmtpConfig()).sendPasswordReset(user,realm,accessCode,uriInfo);
-  }
- catch (  EmailException e) {
-    logger.error("Failed to send password reset email",e);
-    return Flows.forms(realm,request,uriInfo).setError("emailSendError").createErrorPage();
+ else {
+    Set<RequiredAction> requiredActions=new HashSet<RequiredAction>(user.getRequiredActions());
+    requiredActions.add(RequiredAction.UPDATE_PASSWORD);
+    AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,realm,client,user);
+    accessCode.setRequiredActions(requiredActions);
+    accessCode.setExpiration(System.currentTimeMillis() / 1000 + realm.getAccessCodeLifespanUserAction());
+    try {
+      new EmailSender(realm.getSmtpConfig()).sendPasswordReset(user,realm,accessCode,uriInfo);
+    }
+ catch (    EmailException e) {
+      logger.error("Failed to send password reset email",e);
+      return Flows.forms(realm,request,uriInfo).setError("emailSendError").createErrorPage();
+    }
   }
   return Flows.forms(realm,request,uriInfo).setSuccess("emailSent").createPasswordReset();
 }

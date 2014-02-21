@@ -1,0 +1,29 @@
+{
+  Assert.assertEquals(realm1,identitySession.getRealm("id1"));
+  Assert.assertEquals(realm1,identitySession.getRealmByName("realm1"));
+  Assert.assertEquals(realm2,identitySession.getRealm("id2"));
+  Assert.assertEquals(realm2,identitySession.getRealmByName("realm2"));
+  ApplicationModel r1app1=realm1.getApplicationByName("app1");
+  ApplicationModel r1app2=realm1.getApplicationByName("app2");
+  ApplicationModel r2app1=realm2.getApplicationByName("app1");
+  ApplicationModel r2app2=realm2.getApplicationByName("app2");
+  Assert.assertEquals(r1app1,realm1.getApplicationById(r1app1.getId()));
+  Assert.assertNull(realm2.getApplicationById(r1app1.getId()));
+  OAuthClientModel r2cl1=realm2.getOAuthClient("cl1");
+  Assert.assertNull(realm1.getOAuthClientById(r2cl1.getId()));
+  Assert.assertEquals(r2cl1.getId(),realm2.getOAuthClientById(r2cl1.getId()).getId());
+  RoleModel r1App1Role=r1app1.getRole("app1Role1");
+  Assert.assertNull(realm1.getRoleById(r1App1Role.getId()));
+  Assert.assertNull(realm2.getRoleById(r1App1Role.getId()));
+  Assert.assertEquals(r1App1Role,r1app1.getRoleById(r1App1Role.getId()));
+  Assert.assertNull(r1app2.getRoleById(r1App1Role.getId()));
+  Assert.assertNull(r2app1.getRoleById(r1App1Role.getId()));
+  Assert.assertNull(r2app2.getRoleById(r1App1Role.getId()));
+  RoleModel r2Role1=realm2.getRole("role2");
+  Assert.assertNull(realm1.getRoleById(r2Role1.getId()));
+  Assert.assertEquals(r2Role1,realm2.getRoleById(r2Role1.getId()));
+  Assert.assertNull(r1app1.getRoleById(r2Role1.getId()));
+  Assert.assertNull(r1app2.getRoleById(r2Role1.getId()));
+  Assert.assertNull(r2app1.getRoleById(r2Role1.getId()));
+  Assert.assertNull(r2app2.getRoleById(r2Role1.getId()));
+}

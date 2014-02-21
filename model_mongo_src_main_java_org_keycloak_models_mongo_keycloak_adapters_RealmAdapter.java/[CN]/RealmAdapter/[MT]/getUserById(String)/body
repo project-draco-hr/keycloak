@@ -1,7 +1,6 @@
 {
-  DBObject query=new QueryBuilder().and("id").is(id).and("realmId").is(getId()).get();
-  UserEntity user=getMongoStore().loadSingleEntity(UserEntity.class,query,invocationContext);
-  if (user == null) {
+  UserEntity user=getMongoStore().loadEntity(UserEntity.class,id,invocationContext);
+  if (user == null || !getId().equals(user.getRealmId())) {
     return null;
   }
  else {

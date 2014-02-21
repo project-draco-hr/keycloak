@@ -1,0 +1,17 @@
+{
+  UserModel r1user1=realm1.getUser("user1");
+  UserModel r2user1=realm2.getUser("user1");
+  Assert.assertEquals(r1user1.getLoginName(),r2user1.getLoginName());
+  Assert.assertNotEquals(r1user1.getId(),r2user1.getId());
+  realm1.updateCredential(r1user1,UserCredentialModel.password("pass1"));
+  realm2.updateCredential(r2user1,UserCredentialModel.password("pass2"));
+  Assert.assertTrue(realm1.validatePassword(r1user1,"pass1"));
+  Assert.assertFalse(realm1.validatePassword(r1user1,"pass2"));
+  Assert.assertFalse(realm2.validatePassword(r2user1,"pass1"));
+  Assert.assertTrue(realm2.validatePassword(r2user1,"pass2"));
+  Assert.assertEquals(2,realm1.searchForUser("user").size());
+  realm1.removeUser("user1");
+  realm1.removeUser("user2");
+  Assert.assertEquals(0,realm1.searchForUser("user").size());
+  Assert.assertEquals(2,realm2.searchForUser("user").size());
+}

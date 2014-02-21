@@ -1,48 +1,5 @@
 {
-  AccessCodeEntry code=new AccessCodeEntry();
-  AccessScope scopeMap=null;
-  if (scopeParam != null)   scopeMap=decodeScope(scopeParam);
-  List<RoleModel> realmRolesRequested=code.getRealmRolesRequested();
-  MultivaluedMap<String,RoleModel> resourceRolesRequested=code.getResourceRolesRequested();
-  Set<RoleModel> roleMappings=realm.getRoleMappings(user);
-  Set<RoleModel> scopeMappings=realm.getScopeMappings(client);
-  ApplicationModel clientApp=realm.getApplicationByName(client.getLoginName());
-  Set<RoleModel> clientAppRoles=clientApp == null ? null : clientApp.getRoles();
-  if (clientAppRoles != null)   scopeMappings.addAll(clientAppRoles);
-  Set<RoleModel> requestedRoles=new HashSet<RoleModel>();
-  for (  RoleModel role : roleMappings) {
-    if (clientApp != null && role.getContainer().equals(clientApp))     requestedRoles.add(role);
-    for (    RoleModel desiredRole : scopeMappings) {
-      Set<RoleModel> visited=new HashSet<RoleModel>();
-      applyScope(role,desiredRole,visited,requestedRoles);
-    }
-  }
-  for (  RoleModel role : requestedRoles) {
-    if (role.getContainer() instanceof RealmModel && desiresScope(scopeMap,"realm",role.getName())) {
-      realmRolesRequested.add(role);
-    }
- else     if (role.getContainer() instanceof ApplicationModel) {
-      ApplicationModel app=(ApplicationModel)role.getContainer();
-      if (desiresScope(scopeMap,app.getName(),role.getName())) {
-        resourceRolesRequested.add(app.getName(),role);
-      }
-    }
-  }
-  createToken(code,realm,client,user);
-  code.setRealm(realm);
-  code.setExpiration((System.currentTimeMillis() / 1000) + realm.getAccessCodeLifespan());
-  code.setClient(client);
-  code.setUser(user);
-  code.setState(state);
-  code.setRedirectUri(redirect);
+  AccessCodeEntry code=createAccessCodeEntry(scopeParam,state,redirect,realm,client,user);
   accessCodeMap.put(code.getId(),code);
-  String accessCode=null;
-  try {
-    accessCode=new JWSBuilder().content(code.getId().getBytes("UTF-8")).rsa256(realm.getPrivateKey());
-  }
- catch (  UnsupportedEncodingException e) {
-    throw new RuntimeException(e);
-  }
-  code.setCode(accessCode);
   return code;
 }

@@ -8,7 +8,7 @@
   driver.findElement(By.id("submit")).click();
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   AccessTokenResponse response=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get("code"),"password");
-  SkeletonKeyToken token=oauth.verifyToken(response.getAccessToken());
+  AccessToken token=oauth.verifyToken(response.getAccessToken());
   Assert.assertEquals(36,token.getSubject().length());
   UserRepresentation profile=oauth.getProfile(response.getAccessToken());
   Assert.assertEquals(36,profile.getUsername().length());

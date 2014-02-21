@@ -1,5 +1,5 @@
 {
-  SkeletonKeyToken token=new SkeletonKeyToken();
+  AccessToken token=new AccessToken();
   token.id("111");
   token.addAccess("foo").addRole("admin");
   token.addAccess("bar").addRole("user");
@@ -7,7 +7,7 @@
   String encoded=new JWSBuilder().jsonContent(token).rsa256(keyPair.getPrivate());
   System.out.println(encoded);
   JWSInput input=new JWSInput(encoded);
-  token=input.readJsonContent(SkeletonKeyToken.class);
+  token=input.readJsonContent(AccessToken.class);
   Assert.assertEquals("111",token.getId());
   Assert.assertTrue(RSAProvider.verify(input,keyPair.getPublic()));
 }

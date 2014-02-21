@@ -5,7 +5,7 @@
   Assert.assertEquals(200,response.getStatusCode());
   Assert.assertTrue(response.getExpiresIn() <= 600 && response.getExpiresIn() >= 550);
   Assert.assertEquals("bearer",response.getTokenType());
-  SkeletonKeyToken token=oauth.verifyToken(response.getAccessToken());
+  AccessToken token=oauth.verifyToken(response.getAccessToken());
   UserRepresentation user=oauth.getProfile(response.getAccessToken());
   Assert.assertEquals(user.getId(),token.getSubject());
   Assert.assertNotEquals("test-user@localhost",token.getSubject());

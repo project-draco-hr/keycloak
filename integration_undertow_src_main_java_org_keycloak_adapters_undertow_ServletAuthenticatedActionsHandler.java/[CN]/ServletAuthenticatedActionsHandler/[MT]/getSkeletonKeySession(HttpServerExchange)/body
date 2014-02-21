@@ -1,9 +1,9 @@
 {
-  SkeletonKeySession skSession=super.getSkeletonKeySession(exchange);
+  KeycloakAuthenticatedSession skSession=super.getSkeletonKeySession(exchange);
   if (skSession != null)   return skSession;
   final ServletRequestContext servletRequestContext=exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
   HttpServletRequest req=(HttpServletRequest)servletRequestContext.getServletRequest();
   HttpSession session=req.getSession(false);
   if (session == null)   return null;
-  return (SkeletonKeySession)session.getAttribute(SkeletonKeySession.class.getName());
+  return (KeycloakAuthenticatedSession)session.getAttribute(KeycloakAuthenticatedSession.class.getName());
 }

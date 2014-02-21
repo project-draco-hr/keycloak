@@ -7,7 +7,7 @@
   AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(200,response.getStatusCode());
   Assert.assertEquals("bearer",response.getTokenType());
-  SkeletonKeyToken token=oauth.verifyToken(response.getAccessToken());
+  AccessToken token=oauth.verifyToken(response.getAccessToken());
   Assert.assertEquals("APP_COMPOSITE_USER",oauth.getProfile(response.getAccessToken()).getUsername());
   Assert.assertEquals(1,token.getResourceAccess("APP_ROLE_APPLICATION").getRoles().size());
   Assert.assertEquals(1,token.getRealmAccess().getRoles().size());

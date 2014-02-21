@@ -1,0 +1,25 @@
+{
+  final KeycloakPrincipal skeletonKeyPrincipal=new KeycloakPrincipal(token.getSubject(),surrogate);
+  Set<String> roles=null;
+  if (adapterConfig.isUseResourceRoleMappings()) {
+    AccessToken.Access access=token.getResourceAccess(resourceMetadata.getResourceName());
+    if (access != null)     roles=access.getRoles();
+  }
+ else {
+    AccessToken.Access access=token.getRealmAccess();
+    if (access != null)     roles=access.getRoles();
+  }
+  if (roles == null)   roles=Collections.emptySet();
+  final Set<String> accountRoles=roles;
+  Account account=new Account(){
+    @Override public Principal getPrincipal(){
+      return skeletonKeyPrincipal;
+    }
+    @Override public Set<String> getRoles(){
+      return accountRoles;
+    }
+  }
+;
+  securityContext.authenticationComplete(account,"KEYCLOAK",true);
+  return skeletonKeyPrincipal;
+}

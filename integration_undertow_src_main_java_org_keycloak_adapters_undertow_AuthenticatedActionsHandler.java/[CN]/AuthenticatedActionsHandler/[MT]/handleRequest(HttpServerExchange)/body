@@ -1,10 +1,10 @@
 {
   log.debugv("AuthenticatedActionsValve.invoke {0}",exchange.getRequestURI());
-  KeycloakAuthenticatedSession session=getSkeletonKeySession(exchange);
-  if (corsRequest(exchange,session))   return;
+  KeycloakUndertowAccount account=getAccount(exchange);
+  if (corsRequest(exchange,account))   return;
   String requestUri=exchange.getRequestURI();
   if (requestUri.endsWith(AdapterConstants.K_QUERY_BEARER_TOKEN)) {
-    queryBearerToken(exchange,session);
+    queryBearerToken(exchange,account);
     return;
   }
   next.handleRequest(exchange);

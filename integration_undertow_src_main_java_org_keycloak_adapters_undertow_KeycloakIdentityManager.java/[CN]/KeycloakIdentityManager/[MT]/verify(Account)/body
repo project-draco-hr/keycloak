@@ -1,0 +1,8 @@
+{
+  log.info("Verifying account in IdentityManager");
+  KeycloakUndertowAccount keycloakAccount=(KeycloakUndertowAccount)account;
+  if (keycloakAccount.getAccessToken().isActive())   return account;
+  keycloakAccount.refreshExpiredToken();
+  if (!keycloakAccount.getAccessToken().isActive())   return null;
+  return account;
+}

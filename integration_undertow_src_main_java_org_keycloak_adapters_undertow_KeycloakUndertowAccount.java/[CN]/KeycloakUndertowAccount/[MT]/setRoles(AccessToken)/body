@@ -1,0 +1,13 @@
+{
+  Set<String> roles=null;
+  if (adapterConfig.isUseResourceRoleMappings()) {
+    AccessToken.Access access=accessToken.getResourceAccess(resourceMetadata.getResourceName());
+    if (access != null)     roles=access.getRoles();
+  }
+ else {
+    AccessToken.Access access=accessToken.getRealmAccess();
+    if (access != null)     roles=access.getRoles();
+  }
+  if (roles == null)   roles=Collections.emptySet();
+  this.accountRoles=roles;
+}

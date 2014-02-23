@@ -7,6 +7,10 @@
   boolean secureOnly=!realm.isSslNotRequired();
   logger.debug("creatingLoginCookie - name: {0} path: {1}",cookieName,cookiePath);
   int maxAge=NewCookie.DEFAULT_MAX_AGE;
+  if (rememberMe) {
+    maxAge=realm.getCentralLoginLifespan();
+    logger.info("createLoginCookie maxAge: " + maxAge);
+  }
   NewCookie cookie=new NewCookie(cookieName,encoded,cookiePath,null,null,maxAge,secureOnly,true);
   return cookie;
 }

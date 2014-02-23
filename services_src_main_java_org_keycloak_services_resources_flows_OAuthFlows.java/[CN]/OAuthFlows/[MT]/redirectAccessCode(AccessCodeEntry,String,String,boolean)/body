@@ -1,0 +1,11 @@
+{
+  String code=accessCode.getCode();
+  UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam("code",code);
+  log.debug("redirectAccessCode: state: {0}",state);
+  if (state != null)   redirectUri.queryParam("state",state);
+  Response.ResponseBuilder location=Response.status(302).location(redirectUri.build());
+  Cookie remember=request.getHttpHeaders().getCookies().get(AuthenticationManager.KEYCLOAK_REMEMBER_ME);
+  rememberMe=rememberMe || remember != null;
+  location.cookie(authManager.createLoginCookie(realm,accessCode.getUser(),uriInfo,rememberMe));
+  return location.build();
+}

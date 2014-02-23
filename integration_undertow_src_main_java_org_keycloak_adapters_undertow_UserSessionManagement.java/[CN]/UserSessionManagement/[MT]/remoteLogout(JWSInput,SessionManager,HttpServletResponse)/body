@@ -1,6 +1,6 @@
 {
   try {
-    log.debug("->> remoteLogout: ");
+    log.info("->> remoteLogout: ");
     LogoutAction action=JsonSerialization.readValue(token.getContent(),LogoutAction.class);
     if (action.isExpired()) {
       log.warn("admin request failed, expired token");
@@ -14,11 +14,11 @@
     }
     String user=action.getUser();
     if (user != null) {
-      log.debug("logout of session for: " + user);
+      log.info("logout of session for: " + user);
       logout(manager,user);
     }
  else {
-      log.debug("logout of all sessions");
+      log.info("logout of all sessions");
       logoutAll(manager);
     }
   }

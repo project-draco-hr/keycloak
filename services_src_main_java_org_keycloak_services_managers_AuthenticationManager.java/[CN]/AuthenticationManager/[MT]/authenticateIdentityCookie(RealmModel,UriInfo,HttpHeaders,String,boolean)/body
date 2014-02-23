@@ -1,21 +1,23 @@
 {
+  logger.info("authenticateIdentityCookie");
   Cookie cookie=headers.getCookies().get(cookieName);
   if (cookie == null) {
-    logger.debug("authenticateCookie could not find cookie: {0}",cookieName);
+    logger.info("authenticateCookie could not find cookie: {0}",cookieName);
     return null;
   }
   String tokenString=cookie.getValue();
   try {
-    AccessToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),realm.getName());
-    if (!token.isActive()) {
-      logger.debug("identity cookie expired");
+    AccessToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),realm.getName(),checkActive);
+    logger.info("identity token verified");
+    if (checkActive && !token.isActive()) {
+      logger.info("identity cookie expired");
       expireIdentityCookie(realm,uriInfo);
       return null;
     }
     Auth auth=new Auth(token);
     UserModel user=realm.getUserById(token.getSubject());
     if (user == null || !user.isEnabled()) {
-      logger.debug("Unknown user in identity cookie");
+      logger.info("Unknown user in identity cookie");
       expireIdentityCookie(realm,uriInfo);
       return null;
     }
@@ -23,7 +25,7 @@
     if (token.getIssuedFor() != null) {
       UserModel client=realm.getUser(token.getIssuedFor());
       if (client == null || !client.isEnabled()) {
-        logger.debug("Unknown client in identity cookie");
+        logger.info("Unknown client in identity cookie");
         expireIdentityCookie(realm,uriInfo);
         return null;
       }
@@ -32,7 +34,7 @@
     return auth;
   }
  catch (  VerificationException e) {
-    logger.debug("Failed to verify identity cookie",e);
+    logger.info("Failed to verify identity cookie",e);
     expireCookie(cookie.getName(),cookie.getPath());
   }
   return null;

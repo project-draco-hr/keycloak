@@ -22,7 +22,7 @@
  else {
     auth=new ServletKeycloakAuthenticationMechanism(userSessionManagement,keycloakConfig,realmConfiguration,deploymentInfo.getConfidentialPortManager());
   }
-  ServletAuthenticatedActionsHandler.Wrapper actions=new ServletAuthenticatedActionsHandler.Wrapper(keycloakConfig);
+  AuthenticatedActionsHandler.Wrapper actions=new AuthenticatedActionsHandler.Wrapper(keycloakConfig);
   deploymentInfo.addInitialHandlerChainWrapper(preflight);
   deploymentInfo.addOuterHandlerChainWrapper(new ServletAdminActionsHandler.Wrapper(realmConfiguration,userSessionManagement));
   final ServletKeycloakAuthenticationMechanism theAuth=auth;
@@ -34,21 +34,7 @@
 );
   deploymentInfo.addInnerHandlerChainWrapper(ServletPropagateSessionHandler.WRAPPER);
   deploymentInfo.addInnerHandlerChainWrapper(actions);
-  deploymentInfo.setIdentityManager(new IdentityManager(){
-    @Override public Account verify(    Account account){
-      log.info("Verifying account in IdentityManager");
-      return account;
-    }
-    @Override public Account verify(    String id,    Credential credential){
-      log.warn("Shouldn't call verify!!!");
-      throw new IllegalStateException("Not allowed");
-    }
-    @Override public Account verify(    Credential credential){
-      log.warn("Shouldn't call verify!!!");
-      throw new IllegalStateException("Not allowed");
-    }
-  }
-);
+  deploymentInfo.setIdentityManager(new KeycloakIdentityManager());
   log.info("Setting jsession cookie path to: " + deploymentInfo.getContextPath());
   ServletSessionConfig cookieConfig=new ServletSessionConfig();
   cookieConfig.setPath(deploymentInfo.getContextPath());

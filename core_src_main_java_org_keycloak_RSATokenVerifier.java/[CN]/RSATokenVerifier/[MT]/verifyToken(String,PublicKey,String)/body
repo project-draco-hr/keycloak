@@ -1,28 +1,3 @@
 {
-  JWSInput input=new JWSInput(tokenString);
-  boolean verified=false;
-  try {
-    verified=RSAProvider.verify(input,realmKey);
-  }
- catch (  Exception ignore) {
-  }
-  if (!verified)   throw new VerificationException("Token signature not validated");
-  AccessToken token=null;
-  try {
-    token=input.readJsonContent(AccessToken.class);
-  }
- catch (  IOException e) {
-    throw new VerificationException(e);
-  }
-  if (!token.isActive()) {
-    throw new VerificationException("Token is not active.");
-  }
-  String user=token.getSubject();
-  if (user == null) {
-    throw new VerificationException("Token user was null");
-  }
-  if (!realm.equals(token.getAudience())) {
-    throw new VerificationException("Token audience doesn't match domain");
-  }
-  return token;
+  return verifyToken(tokenString,realmKey,realm,true);
 }

@@ -5,8 +5,10 @@
   token.audience(realm.getName());
   token.issuedNow();
   token.issuedFor(client.getLoginName());
+  token.issuer(realm.getName());
   if (realm.getAccessTokenLifespan() > 0) {
     token.expiration((System.currentTimeMillis() / 1000) + realm.getAccessTokenLifespan());
+    logger.info("Access Token expiration: " + token.getExpiration());
   }
   Set<String> allowedOrigins=client.getWebOrigins();
   if (allowedOrigins != null) {

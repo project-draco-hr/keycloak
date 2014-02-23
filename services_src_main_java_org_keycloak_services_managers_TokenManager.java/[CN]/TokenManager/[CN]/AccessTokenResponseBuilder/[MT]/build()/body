@@ -1,0 +1,17 @@
+{
+  AccessTokenResponse res=new AccessTokenResponse();
+  if (accessToken != null) {
+    String encodedToken=new JWSBuilder().jsonContent(accessToken).rsa256(realm.getPrivateKey());
+    res.setToken(encodedToken);
+    res.setTokenType("bearer");
+    if (accessToken.getExpiration() != 0) {
+      long time=accessToken.getExpiration() - (System.currentTimeMillis() / 1000);
+      res.setExpiresIn(time);
+    }
+  }
+  if (refreshToken != null) {
+    String encodedToken=new JWSBuilder().jsonContent(refreshToken).rsa256(realm.getPrivateKey());
+    res.setRefreshToken(encodedToken);
+  }
+  return res;
+}

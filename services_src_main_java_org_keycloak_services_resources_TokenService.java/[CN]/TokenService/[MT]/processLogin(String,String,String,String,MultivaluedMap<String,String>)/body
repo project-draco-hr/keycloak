@@ -30,10 +30,20 @@
     return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).createLogin();
   }
   AuthenticationStatus status=authManager.authenticateForm(realm,user,formData);
+  String rememberMe=formData.getFirst("rememberMe");
+  boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("on");
+  logger.debug("*** Remember me: " + remember);
+  if (remember) {
+    NewCookie cookie=authManager.createRememberMeCookie(realm,uriInfo);
+    response.addNewCookie(cookie);
+  }
+ else {
+    authManager.expireRememberMeCookie(realm,uriInfo);
+  }
 switch (status) {
 case SUCCESS:
 case ACTIONS_REQUIRED:
-    return oauth.processAccessCode(scopeParam,state,redirect,client,user);
+    return oauth.processAccessCode(scopeParam,state,redirect,client,user,remember);
 case ACCOUNT_DISABLED:
   return Flows.forms(realm,request,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).createLogin();
 case MISSING_TOTP:

@@ -1,0 +1,30 @@
+{
+  if (this.token.isActive())   return;
+  if (this.realmConfiguration == null || refreshToken == null)   return;
+  log.info("Doing refresh");
+  AccessTokenResponse response=null;
+  try {
+    response=TokenGrantRequest.invokeRefresh(realmConfiguration,refreshToken);
+  }
+ catch (  IOException e) {
+    log.error("Refresh token failure",e);
+    return;
+  }
+catch (  TokenGrantRequest.HttpFailure httpFailure) {
+    log.error("Refresh token failure status: " + httpFailure.getStatus() + " "+ httpFailure.getError());
+    return;
+  }
+  log.info("received refresh response");
+  String tokenString=response.getToken();
+  AccessToken token=null;
+  try {
+    token=RSATokenVerifier.verifyToken(tokenString,realmConfiguration.getMetadata().getRealmKey(),realmConfiguration.getMetadata().getRealm());
+    log.info("Token Verification succeeded!");
+  }
+ catch (  VerificationException e) {
+    log.error("failed verification of token");
+  }
+  this.token=token;
+  this.refreshToken=response.getRefreshToken();
+  this.tokenString=tokenString;
+}

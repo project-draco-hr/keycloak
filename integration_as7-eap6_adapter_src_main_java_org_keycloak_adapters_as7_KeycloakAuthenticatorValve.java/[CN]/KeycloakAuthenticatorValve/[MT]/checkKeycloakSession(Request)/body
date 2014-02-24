@@ -1,0 +1,15 @@
+{
+  if (request.getSessionInternal(false) == null || request.getSessionInternal().getPrincipal() == null)   return;
+  RefreshableKeycloakSession session=(RefreshableKeycloakSession)request.getSessionInternal().getNote(KeycloakAuthenticatedSession.class.getName());
+  if (session == null)   return;
+  session.setRealmConfiguration(realmConfiguration);
+  session.setMetadata(resourceMetadata);
+  if (session.isActive())   return;
+  session.refreshExpiredToken();
+  if (session.isActive())   return;
+  request.getSessionInternal().removeNote(KeycloakAuthenticatedSession.class.getName());
+  request.setUserPrincipal(null);
+  request.setAuthType(null);
+  request.getSessionInternal().setPrincipal(null);
+  request.getSessionInternal().setAuthType(null);
+}

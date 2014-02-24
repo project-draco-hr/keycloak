@@ -30,7 +30,7 @@
     Session session=request.getSessionInternal(true);
     session.setPrincipal(principal);
     session.setAuthType("OAUTH");
-    KeycloakAuthenticatedSession skSession=new KeycloakAuthenticatedSession(oauth.getTokenString(),token,realmConfiguration.getMetadata());
+    KeycloakAuthenticatedSession skSession=new RefreshableKeycloakSession(oauth.getTokenString(),oauth.getToken(),resourceMetadata,realmConfiguration,oauth.getRefreshToken());
     session.setNote(KeycloakAuthenticatedSession.class.getName(),skSession);
     String username=token.getSubject();
     log.debug("userSessionManage.login: " + username);

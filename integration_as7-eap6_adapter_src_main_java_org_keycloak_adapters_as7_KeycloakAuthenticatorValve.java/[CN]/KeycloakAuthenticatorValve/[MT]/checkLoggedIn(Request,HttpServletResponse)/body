@@ -1,9 +1,9 @@
 {
-  if (request.getSessionInternal() == null || request.getSessionInternal().getPrincipal() == null)   return false;
+  if (request.getSessionInternal(false) == null || request.getSessionInternal().getPrincipal() == null)   return false;
   log.debug("remote logged in already");
   GenericPrincipal principal=(GenericPrincipal)request.getSessionInternal().getPrincipal();
   request.setUserPrincipal(principal);
-  request.setAuthType("OAUTH");
+  request.setAuthType("KEYCLOAK");
   Session session=request.getSessionInternal();
   if (session != null) {
     KeycloakAuthenticatedSession skSession=(KeycloakAuthenticatedSession)session.getNote(KeycloakAuthenticatedSession.class.getName());

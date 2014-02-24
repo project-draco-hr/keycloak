@@ -1,0 +1,9 @@
+{
+  session.setRealmConfiguration(realmConfiguration);
+  session.setMetadata(realmConfiguration.getMetadata());
+  if (session.isActive())   return true;
+  session.refreshExpiredToken();
+  if (!session.isActive())   return false;
+  setRoles(session.getToken(),config,realmConfiguration.getMetadata());
+  return true;
+}

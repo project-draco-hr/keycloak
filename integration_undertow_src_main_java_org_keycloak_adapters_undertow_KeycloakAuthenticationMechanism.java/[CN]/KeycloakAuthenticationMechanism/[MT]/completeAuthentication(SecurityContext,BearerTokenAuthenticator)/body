@@ -1,5 +1,6 @@
 {
   final KeycloakPrincipal principal=new KeycloakPrincipal(bearer.getToken().getSubject(),bearer.getSurrogate());
-  KeycloakUndertowAccount account=new KeycloakUndertowAccount(principal,bearer.getToken(),bearer.getTokenString(),null,realmConfig,resourceMetadata,adapterConfig);
+  RefreshableKeycloakSession session=new RefreshableKeycloakSession(bearer.getTokenString(),bearer.getToken(),resourceMetadata,realmConfig,null);
+  KeycloakUndertowAccount account=new KeycloakUndertowAccount(principal,session,adapterConfig,resourceMetadata);
   securityContext.authenticationComplete(account,"KEYCLOAK",false);
 }

@@ -1,8 +1,6 @@
 {
-  AuthenticationManager.Auth auth=getAuth(true);
-  if (!hasAccess(auth)) {
-    return noAccess();
-  }
+  Auth auth=getAuth(true);
+  auth.require(application,AccountRoles.MANAGE_ACCOUNT);
   UserModel user=auth.getUser();
   Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
   String error=Validation.validateUpdateProfileForm(formData);

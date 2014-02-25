@@ -21,7 +21,7 @@
   Assert.assertEquals(3,resources.size());
   ApplicationModel application=realm.getApplicationByName("Application");
   ApplicationModel otherApp=realm.getApplicationByName("OtherApp");
-  ApplicationModel accountApp=realm.getApplicationByName(Constants.ACCOUNT_APPLICATION);
+  ApplicationModel accountApp=realm.getApplicationByName(Constants.ACCOUNT_MANAGEMENT_APP);
   ApplicationModel nonExisting=realm.getApplicationByName("NonExisting");
   Assert.assertNotNull(application);
   Assert.assertNotNull(otherApp);
@@ -40,8 +40,8 @@
   Assert.assertTrue(allRoles.contains(realm.getRole("admin")));
   Assert.assertTrue(allRoles.contains(application.getRole("app-admin")));
   Assert.assertTrue(allRoles.contains(otherApp.getRole("otherapp-admin")));
-  Assert.assertTrue(allRoles.contains(accountApp.getRole(Constants.ACCOUNT_PROFILE_ROLE)));
-  Assert.assertTrue(allRoles.contains(accountApp.getRole(Constants.ACCOUNT_MANAGE_ROLE)));
+  Assert.assertTrue(allRoles.contains(accountApp.getRole(AccountRoles.VIEW_PROFILE)));
+  Assert.assertTrue(allRoles.contains(accountApp.getRole(AccountRoles.MANAGE_ACCOUNT)));
   UserModel wburke=realm.getUser("wburke");
   allRoles=realm.getRoleMappings(wburke);
   Assert.assertEquals(4,allRoles.size());

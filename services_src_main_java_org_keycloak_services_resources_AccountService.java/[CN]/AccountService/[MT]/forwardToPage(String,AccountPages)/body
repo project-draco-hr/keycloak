@@ -1,8 +1,11 @@
 {
-  AuthenticationManager.Auth auth=getAuth(false);
+  Auth auth=getAuth(false);
   if (auth != null) {
-    if (!hasAccess(auth)) {
-      return noAccess();
+    try {
+      auth.require(application,AccountRoles.MANAGE_ACCOUNT);
+    }
+ catch (    ForbiddenException e) {
+      return Flows.forms(realm,request,uriInfo).setError("No access").createErrorPage();
     }
     Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
     String referrer=getReferrer();

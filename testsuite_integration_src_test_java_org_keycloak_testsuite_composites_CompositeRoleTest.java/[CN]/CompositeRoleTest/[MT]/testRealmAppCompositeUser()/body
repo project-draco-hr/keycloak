@@ -8,7 +8,7 @@
   Assert.assertEquals(200,response.getStatusCode());
   Assert.assertEquals("bearer",response.getTokenType());
   AccessToken token=oauth.verifyToken(response.getAccessToken());
-  Assert.assertEquals("REALM_APP_COMPOSITE_USER",oauth.getProfile(response.getAccessToken()).getUsername());
+  Assert.assertEquals(keycloakRule.getUser("Test","REALM_APP_COMPOSITE_USER").getId(),token.getSubject());
   Assert.assertEquals(1,token.getResourceAccess("APP_ROLE_APPLICATION").getRoles().size());
   Assert.assertTrue(token.getResourceAccess("APP_ROLE_APPLICATION").isUserInRole("APP_ROLE_1"));
 }

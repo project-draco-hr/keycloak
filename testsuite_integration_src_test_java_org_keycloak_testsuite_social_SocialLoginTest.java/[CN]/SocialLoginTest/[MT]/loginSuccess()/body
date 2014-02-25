@@ -10,7 +10,7 @@
   AccessTokenResponse response=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get("code"),"password");
   AccessToken token=oauth.verifyToken(response.getAccessToken());
   Assert.assertEquals(36,token.getSubject().length());
-  UserRepresentation profile=oauth.getProfile(response.getAccessToken());
+  UserRepresentation profile=keycloakRule.getUserById("test",token.getSubject());
   Assert.assertEquals(36,profile.getUsername().length());
   Assert.assertEquals("Bob",profile.getFirstName());
   Assert.assertEquals("Builder",profile.getLastName());

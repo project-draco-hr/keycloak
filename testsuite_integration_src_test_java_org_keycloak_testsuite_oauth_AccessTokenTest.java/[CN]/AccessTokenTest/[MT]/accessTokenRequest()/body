@@ -6,10 +6,8 @@
   Assert.assertTrue(response.getExpiresIn() <= 600 && response.getExpiresIn() >= 550);
   Assert.assertEquals("bearer",response.getTokenType());
   AccessToken token=oauth.verifyToken(response.getAccessToken());
-  UserRepresentation user=oauth.getProfile(response.getAccessToken());
-  Assert.assertEquals(user.getId(),token.getSubject());
+  Assert.assertEquals(keycloakRule.getUser("test","test-user@localhost").getId(),token.getSubject());
   Assert.assertNotEquals("test-user@localhost",token.getSubject());
-  Assert.assertEquals("test-user@localhost",user.getUsername());
   Assert.assertEquals(1,token.getRealmAccess().getRoles().size());
   Assert.assertTrue(token.getRealmAccess().isUserInRole("user"));
   Assert.assertEquals(1,token.getResourceAccess(oauth.getClientId()).getRoles().size());

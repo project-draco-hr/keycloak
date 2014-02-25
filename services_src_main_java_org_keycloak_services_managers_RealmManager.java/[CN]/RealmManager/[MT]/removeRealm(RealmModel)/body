@@ -1,0 +1,11 @@
+{
+  boolean removed=identitySession.removeRealm(realm.getId());
+  RealmModel adminRealm=getKeycloakAdminstrationRealm();
+  RoleModel adminRole=adminRealm.getRole(AdminRoles.ADMIN);
+  ApplicationModel realmAdminApp=adminRealm.getApplicationByName(AdminRoles.getAdminApp(realm));
+  for (  RoleModel r : realmAdminApp.getRoles()) {
+    adminRole.removeCompositeRole(r);
+  }
+  adminRealm.removeApplication(realmAdminApp.getId());
+  return removed;
+}

@@ -32,12 +32,18 @@
     attributes.put("referrer",new ReferrerBean(referrerApp));
   }
   attributes.put("url",new UrlBean(realm,theme,baseUri));
+  if (realm.isSocial()) {
+    attributes.put("isSocialRealm",true);
+  }
 switch (page) {
 case ACCOUNT:
     attributes.put("account",new AccountBean(user));
   break;
 case TOTP:
 attributes.put("totp",new TotpBean(user,baseUri));
+break;
+case SOCIAL:
+attributes.put("social",new AccountSocialBean(realm,user,uriInfo.getBaseUri()));
 break;
 }
 try {

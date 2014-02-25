@@ -32,6 +32,26 @@
   }
   SocialLinkModel socialLink=new SocialLinkModel(provider.getId(),socialUser.getId());
   UserModel user=realm.getUserBySocialLink(socialLink);
+  String userId=requestData.getClientAttribute("userId");
+  if (userId != null) {
+    UserModel authenticatedUser=realm.getUserById(userId);
+    if (user != null) {
+      return oauth.forwardToSecurityFailure("This social account is already linked to other user");
+    }
+    if (!authenticatedUser.isEnabled()) {
+      return oauth.forwardToSecurityFailure("User is disabled");
+    }
+    if (!realm.hasRole(authenticatedUser,realm.getApplicationByName(Constants.ACCOUNT_MANAGEMENT_APP).getRole(AccountRoles.MANAGE_ACCOUNT))) {
+      return oauth.forwardToSecurityFailure("Insufficient permissions to link social account");
+    }
+    realm.addSocialLink(authenticatedUser,socialLink);
+    logger.debug("Social provider " + provider.getId() + " linked with user "+ authenticatedUser.getLoginName());
+    String redirectUri=requestData.getClientAttributes().get("redirectUri");
+    if (redirectUri == null) {
+      return oauth.forwardToSecurityFailure("Unknown redirectUri");
+    }
+    return Response.status(Status.FOUND).location(UriBuilder.fromUri(redirectUri).build()).build();
+  }
   if (user == null) {
     if (!realm.isRegistrationAllowed()) {
       return oauth.forwardToSecurityFailure("Registration not allowed");

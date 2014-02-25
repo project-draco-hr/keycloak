@@ -1,0 +1,41 @@
+{
+  Auth auth=getAuth(true);
+  require(auth,AccountRoles.MANAGE_ACCOUNT);
+  UserModel user=auth.getUser();
+  Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
+  if (Validation.isEmpty(providerId)) {
+    return account.setError(Messages.MISSING_SOCIAL_PROVIDER).createResponse(AccountPages.SOCIAL);
+  }
+  AccountSocialAction accountSocialAction=AccountSocialAction.getAction(action);
+  if (accountSocialAction == null) {
+    return account.setError(Messages.INVALID_SOCIAL_ACTION).createResponse(AccountPages.SOCIAL);
+  }
+  SocialProvider provider=SocialLoader.load(providerId);
+  if (provider == null) {
+    return account.setError(Messages.SOCIAL_PROVIDER_NOT_FOUND).createResponse(AccountPages.SOCIAL);
+  }
+  if (!user.isEnabled()) {
+    return account.setError(Messages.ACCOUNT_DISABLED).createResponse(AccountPages.SOCIAL);
+  }
+switch (accountSocialAction) {
+case ADD:
+    String redirectUri=UriBuilder.fromUri(Urls.accountSocialPage(uriInfo.getBaseUri(),realm.getName())).build().toString();
+  try {
+    return Flows.social(socialRequestManager,realm,uriInfo,provider).putClientAttribute("realm",realm.getName()).putClientAttribute("clientId",Constants.ACCOUNT_MANAGEMENT_APP).putClientAttribute("state",UUID.randomUUID().toString()).putClientAttribute("redirectUri",redirectUri).putClientAttribute("userId",user.getId()).redirectToSocialProvider();
+  }
+ catch (  SocialProviderException spe) {
+    return account.setError(Messages.SOCIAL_REDIRECT_ERROR).createResponse(AccountPages.SOCIAL);
+  }
+case REMOVE:
+if (realm.removeSocialLink(user,providerId)) {
+  logger.debug("Social provider " + providerId + " removed successfully from user "+ user.getLoginName());
+  return account.setSuccess(Messages.SOCIAL_PROVIDER_REMOVED).createResponse(AccountPages.SOCIAL);
+}
+ else {
+  return account.setError(Messages.SOCIAL_LINK_NOT_ACTIVE).createResponse(AccountPages.SOCIAL);
+}
+default :
+logger.warn("Action is null!");
+return null;
+}
+}

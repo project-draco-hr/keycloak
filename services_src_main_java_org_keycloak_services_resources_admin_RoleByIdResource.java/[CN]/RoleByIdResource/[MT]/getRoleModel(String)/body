@@ -3,5 +3,19 @@
   if (roleModel == null || roleModel.getName().startsWith(Constants.INTERNAL_ROLE)) {
     throw new NotFoundException("Could not find role with id: " + id);
   }
+  RealmAuth.Resource r=null;
+  if (roleModel.getContainer() instanceof RealmModel) {
+    r=RealmAuth.Resource.REALM;
+  }
+ else   if (roleModel.getContainer() instanceof ApplicationModel) {
+    r=RealmAuth.Resource.APPLICATION;
+  }
+ else   if (roleModel.getContainer() instanceof OAuthClientModel) {
+    r=RealmAuth.Resource.CLIENT;
+  }
+ else   if (roleModel.getContainer() instanceof UserModel) {
+    r=RealmAuth.Resource.USER;
+  }
+  auth.init(r);
   return roleModel;
 }

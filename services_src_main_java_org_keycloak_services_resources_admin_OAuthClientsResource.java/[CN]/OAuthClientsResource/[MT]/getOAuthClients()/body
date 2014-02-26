@@ -1,8 +1,16 @@
 {
   List<OAuthClientRepresentation> rep=new ArrayList<OAuthClientRepresentation>();
   List<OAuthClientModel> oauthModels=realm.getOAuthClients();
+  boolean view=auth.hasView();
   for (  OAuthClientModel oauth : oauthModels) {
-    rep.add(OAuthClientManager.toRepresentation(oauth));
+    if (view) {
+      rep.add(OAuthClientManager.toRepresentation(oauth));
+    }
+ else {
+      OAuthClientRepresentation client=new OAuthClientRepresentation();
+      client.setName(oauth.getOAuthAgent().getLoginName());
+      rep.add(client);
+    }
   }
   return rep;
 }

@@ -1,5 +1,7 @@
 {
-  auth.require(AdminRoles.ADMIN);
+  if (!auth.hasRealmRole(AdminRoles.ADMIN)) {
+    throw new ForbiddenException();
+  }
   logger.debug("importRealm: {0}",rep.getRealm());
   RealmManager realmManager=new RealmManager(session);
   if (realmManager.getRealmByName(rep.getRealm()) != null) {

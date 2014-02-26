@@ -5,7 +5,7 @@
   }
  else   if (types.contains(MediaType.APPLICATION_JSON_TYPE)) {
     Auth auth=getAuth(true);
-    auth.requireOneOf(application,AccountRoles.MANAGE_ACCOUNT,AccountRoles.VIEW_PROFILE);
+    requireOneOf(auth,AccountRoles.MANAGE_ACCOUNT,AccountRoles.VIEW_PROFILE);
     return Cors.add(request,Response.ok(ModelToRepresentation.toRepresentation(auth.getUser()))).auth().allowedOrigins(auth.getClient()).build();
   }
  else {

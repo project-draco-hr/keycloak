@@ -1,12 +1,10 @@
 {
-  String realmAdminApp=AdminRoles.getAdminApp(realm);
-  if (auth.has(realmAdminApp,AdminRoles.MANAGE_REALM)) {
+  if (auth.hasView()) {
     return ModelToRepresentation.toRepresentation(realm);
   }
  else {
-    auth.requireOneOf(AdminRoles.getAdminApp(realm),AdminRoles.ALL_REALM_ROLES);
+    auth.requireAny();
     RealmRepresentation rep=new RealmRepresentation();
-    rep.setId(realm.getId());
     rep.setRealm(realm.getName());
     return rep;
   }

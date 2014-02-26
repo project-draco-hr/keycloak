@@ -1,9 +1,10 @@
 {
+  auth.requireView();
   OAuthClientModel oauth=realm.getOAuthClientById(id);
   if (oauth == null) {
     throw new NotFoundException();
   }
-  OAuthClientResource oAuthClientResource=new OAuthClientResource(realm,oauth,session);
+  OAuthClientResource oAuthClientResource=new OAuthClientResource(realm,auth,oauth,session);
   resourceContext.initResource(oAuthClientResource);
   return oAuthClientResource;
 }

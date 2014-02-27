@@ -7,16 +7,9 @@
   applicationModel.setBaseUrl(resourceRep.getBaseUrl());
   applicationModel.updateApplication();
   UserModel resourceUser=applicationModel.getAgent();
-  if (resourceRep.getCredentials() != null && resourceRep.getCredentials().size() > 0) {
-    for (    CredentialRepresentation cred : resourceRep.getCredentials()) {
-      UserCredentialModel credential=new UserCredentialModel();
-      credential.setType(cred.getType());
-      credential.setValue(cred.getValue());
-      realm.updateCredential(resourceUser,credential);
-    }
-  }
- else {
-    generateSecret(realm,applicationModel);
+  applicationModel.setSecret(resourceRep.getSecret());
+  if (applicationModel.getSecret() == null) {
+    generateSecret(applicationModel);
   }
   if (resourceRep.getRedirectUris() != null) {
     for (    String redirectUri : resourceRep.getRedirectUris()) {

@@ -8,7 +8,7 @@
     logger.warn("Realm not enabled");
     return oauth.forwardToSecurityFailure("Realm not enabled");
   }
-  UserModel client=realm.getUser(clientId);
+  ClientModel client=realm.findClient(clientId);
   if (client == null) {
     logger.warn("Unknown login requester: " + clientId);
     return oauth.forwardToSecurityFailure("Unknown login requester.");
@@ -24,8 +24,8 @@
   logger.info("Checking roles...");
   RoleModel resourceRole=realm.getRole(Constants.APPLICATION_ROLE);
   RoleModel identityRequestRole=realm.getRole(Constants.IDENTITY_REQUESTER_ROLE);
-  boolean isResource=realm.hasRole(client,resourceRole);
-  if (!isResource && !realm.hasRole(client,identityRequestRole)) {
+  boolean isResource=realm.hasRole(client.getAgent(),resourceRole);
+  if (!isResource && !realm.hasRole(client.getAgent(),identityRequestRole)) {
     logger.warn("Login requester not allowed to request login.");
     return oauth.forwardToSecurityFailure("Login requester not allowed to request login.");
   }

@@ -20,9 +20,9 @@
       expireCookie(cookie.getName(),cookie.getPath());
       return null;
     }
-    UserModel client=null;
+    ClientModel client=null;
     if (token.getIssuedFor() != null) {
-      client=realm.getUser(token.getIssuedFor());
+      client=realm.findClient(token.getIssuedFor());
       if (client == null || !client.isEnabled()) {
         logger.info("Unknown client in cookie");
         expireCookie(cookie.getName(),cookie.getPath());

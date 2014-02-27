@@ -1,0 +1,9 @@
+{
+  UserModel agent=client.getAgent();
+  TypedQuery<UserScopeMappingEntity> query=getRealmScopeMappingQuery((UserAdapter)agent,(RoleAdapter)role);
+  List<UserScopeMappingEntity> results=query.getResultList();
+  if (results.size() == 0)   return;
+  for (  UserScopeMappingEntity entity : results) {
+    em.remove(entity);
+  }
+}

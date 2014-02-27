@@ -1,7 +1,7 @@
 {
   auth.requireView();
   MappingsRepresentation all=new MappingsRepresentation();
-  Set<RoleModel> realmMappings=realm.getRealmScopeMappings(agent);
+  Set<RoleModel> realmMappings=realm.getRealmScopeMappings(client);
   RealmManager manager=new RealmManager(session);
   if (realmMappings.size() > 0) {
     List<RoleRepresentation> realmRep=new ArrayList<RoleRepresentation>();
@@ -14,7 +14,7 @@
   if (applications.size() > 0) {
     Map<String,ApplicationMappingsRepresentation> appMappings=new HashMap<String,ApplicationMappingsRepresentation>();
     for (    ApplicationModel app : applications) {
-      Set<RoleModel> roleMappings=app.getApplicationScopeMappings(agent);
+      Set<RoleModel> roleMappings=app.getApplicationScopeMappings(client);
       if (roleMappings.size() > 0) {
         ApplicationMappingsRepresentation mappings=new ApplicationMappingsRepresentation();
         mappings.setApplicationId(app.getId());

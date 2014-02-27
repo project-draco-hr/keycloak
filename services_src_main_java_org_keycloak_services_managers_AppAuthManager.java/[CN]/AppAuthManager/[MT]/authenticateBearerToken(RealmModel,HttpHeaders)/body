@@ -19,9 +19,9 @@
     if (user == null || !user.isEnabled()) {
       throw new NotAuthorizedException("invalid_user");
     }
-    UserModel client=null;
+    ClientModel client=null;
     if (token.getIssuedFor() != null) {
-      client=realm.getUser(token.getIssuedFor());
+      client=realm.findClient(token.getIssuedFor());
       if (client == null || !client.isEnabled()) {
         throw new NotAuthorizedException("invalid_user");
       }

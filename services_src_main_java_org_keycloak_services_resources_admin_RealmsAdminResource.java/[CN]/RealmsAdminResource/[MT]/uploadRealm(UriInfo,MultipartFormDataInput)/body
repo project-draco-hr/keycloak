@@ -10,7 +10,11 @@
     RealmRepresentation rep=inputPart.getBody(new GenericType<RealmRepresentation>(){
     }
 );
-    realmManager.importRealm(rep);
+    RealmModel realm=realmManager.importRealm(rep);
+    if (inputParts.size() == 1) {
+      URI location=realmUrl(uriInfo).build(realm.getName());
+      return Response.created(location).build();
+    }
   }
   return Response.noContent().build();
 }

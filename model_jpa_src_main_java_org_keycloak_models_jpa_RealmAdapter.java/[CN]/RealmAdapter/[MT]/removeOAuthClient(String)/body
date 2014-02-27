@@ -1,8 +1,6 @@
 {
   OAuthClientEntity client=em.find(OAuthClientEntity.class,id);
-  em.createQuery("delete from " + UserScopeMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",client.getAgent()).executeUpdate();
-  em.createQuery("delete from " + UserRoleMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",client.getAgent()).executeUpdate();
-  removeUser(client.getAgent());
+  em.createQuery("delete from " + ScopeMappingEntity.class.getSimpleName() + " where client = :client").setParameter("client",client).executeUpdate();
   em.remove(client);
   return true;
 }

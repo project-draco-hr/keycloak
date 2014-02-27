@@ -1,9 +1,0 @@
-{
-  UserEntity userEntity=((UserAdapter)user).getUser();
-  List<String> scopeIds=userEntity.getScopeIds();
-  if (scopeIds == null || scopeIds.isEmpty()) {
-    return Collections.EMPTY_LIST;
-  }
-  DBObject query=new QueryBuilder().and("_id").in(scopeIds).get();
-  return invContext.getMongoStore().loadEntities(RoleEntity.class,query,invContext);
-}

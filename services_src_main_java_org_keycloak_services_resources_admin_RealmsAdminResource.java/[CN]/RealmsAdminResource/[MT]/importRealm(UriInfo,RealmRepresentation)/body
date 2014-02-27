@@ -1,5 +1,5 @@
 {
-  if (!auth.hasRealmRole(AdminRoles.ADMIN)) {
+  if (!auth.hasRealmRole(AdminRoles.CREATE_REALM)) {
     throw new ForbiddenException();
   }
   logger.debug("importRealm: {0}",rep.getRealm());
@@ -8,6 +8,7 @@
     return Flows.errors().exists("Realm " + rep.getRealm() + " already exists");
   }
   RealmModel realm=realmManager.importRealm(rep);
+  grantPermissionsToRealmCreator(realm);
   URI location=realmUrl(uriInfo).build(realm.getName());
   logger.debug("imported realm success, sending back: {0}",location.toString());
   return Response.created(location).build();

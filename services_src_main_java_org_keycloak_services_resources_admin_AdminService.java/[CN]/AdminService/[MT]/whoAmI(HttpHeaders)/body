@@ -17,8 +17,8 @@
  else {
     displayName=user.getLoginName();
   }
-  boolean admin=realm.hasRole(user,realm.getRole("admin"));
+  boolean createRealm=realm.hasRole(user,realm.getRole(AdminRoles.CREATE_REALM));
   Map<String,Set<String>> realmAccess=new HashMap<String,Set<String>>();
   addRealmAdminAccess(realmAccess,auth.getRealm().getRoleMappings(auth.getUser()));
-  return Response.ok(new WhoAmI(user.getId(),displayName,admin,realmAccess)).build();
+  return Response.ok(new WhoAmI(user.getId(),displayName,createRealm,realmAccess)).build();
 }

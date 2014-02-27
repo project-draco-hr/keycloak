@@ -1,9 +1,9 @@
 {
-  TypedQuery<UserScopeMappingEntity> query=em.createNamedQuery("userScopeMappings",UserScopeMappingEntity.class);
-  query.setParameter("user",((UserAdapter)client.getAgent()).getUser());
-  List<UserScopeMappingEntity> entities=query.getResultList();
+  TypedQuery<ScopeMappingEntity> query=em.createNamedQuery("clientScopeMappings",ScopeMappingEntity.class);
+  query.setParameter("client",((ClientAdapter)client).getEntity());
+  List<ScopeMappingEntity> entities=query.getResultList();
   Set<RoleModel> roles=new HashSet<RoleModel>();
-  for (  UserScopeMappingEntity entity : entities) {
+  for (  ScopeMappingEntity entity : entities) {
     roles.add(new RoleAdapter(this,em,entity.getRole()));
   }
   return roles;

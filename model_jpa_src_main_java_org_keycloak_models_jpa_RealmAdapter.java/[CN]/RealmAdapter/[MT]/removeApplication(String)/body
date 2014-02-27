@@ -24,6 +24,6 @@
     return false;
   }
   em.remove(applicationEntity);
-  removeUser(applicationEntity.getApplicationUser());
+  em.createQuery("delete from " + ScopeMappingEntity.class.getSimpleName() + " where client = :client").setParameter("client",applicationEntity).executeUpdate();
   return true;
 }

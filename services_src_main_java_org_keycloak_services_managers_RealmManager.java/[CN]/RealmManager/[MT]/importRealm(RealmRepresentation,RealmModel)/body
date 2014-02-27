@@ -45,9 +45,6 @@
   }
   if (rep.getApplications() != null) {
     Map<String,ApplicationModel> appMap=createApplications(rep,newRealm);
-    for (    ApplicationModel app : appMap.values()) {
-      userMap.put(app.getAgent().getLoginName(),app.getAgent());
-    }
   }
   if (rep.getRoles() != null) {
     if (rep.getRoles().getRealm() != null) {
@@ -92,10 +89,7 @@
     }
   }
   if (rep.getOauthClients() != null) {
-    Map<String,OAuthClientModel> oauthMap=createOAuthClients(rep,newRealm);
-    for (    OAuthClientModel app : oauthMap.values()) {
-      userMap.put(app.getAgent().getLoginName(),app.getAgent());
-    }
+    createOAuthClients(rep,newRealm);
   }
   Map<String,ApplicationModel> appMap=newRealm.getApplicationNameMap();
   if (rep.getApplicationRoleMappings() != null) {
@@ -137,8 +131,7 @@
         if (role == null) {
           role=newRealm.addRole(roleString.trim());
         }
-        UserModel user=userMap.get(scope.getClient());
-        ClientModel client=newRealm.findClient(user.getLoginName());
+        ClientModel client=newRealm.findClient(scope.getClient());
         newRealm.addScopeMapping(client,role);
       }
     }

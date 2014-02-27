@@ -21,14 +21,6 @@
   if (redirect == null) {
     return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
   }
-  logger.info("Checking roles...");
-  RoleModel resourceRole=realm.getRole(Constants.APPLICATION_ROLE);
-  RoleModel identityRequestRole=realm.getRole(Constants.IDENTITY_REQUESTER_ROLE);
-  boolean isResource=realm.hasRole(client.getAgent(),resourceRole);
-  if (!isResource && !realm.hasRole(client.getAgent(),identityRequestRole)) {
-    logger.warn("Login requester not allowed to request login.");
-    return oauth.forwardToSecurityFailure("Login requester not allowed to request login.");
-  }
   logger.info("Checking cookie...");
   UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
   if (user != null) {

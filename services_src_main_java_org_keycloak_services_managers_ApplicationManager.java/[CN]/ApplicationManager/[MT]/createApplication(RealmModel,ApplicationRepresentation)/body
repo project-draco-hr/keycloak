@@ -1,4 +1,34 @@
 {
-  RoleModel loginRole=realm.getRole(Constants.APPLICATION_ROLE);
-  return createApplication(realm,loginRole,resourceRep);
+  logger.debug("************ CREATE APPLICATION: {0}" + resourceRep.getName());
+  ApplicationModel applicationModel=realm.addApplication(resourceRep.getName());
+  applicationModel.setEnabled(resourceRep.isEnabled());
+  applicationModel.setManagementUrl(resourceRep.getAdminUrl());
+  applicationModel.setSurrogateAuthRequired(resourceRep.isSurrogateAuthRequired());
+  applicationModel.setBaseUrl(resourceRep.getBaseUrl());
+  applicationModel.updateApplication();
+  applicationModel.setSecret(resourceRep.getSecret());
+  if (applicationModel.getSecret() == null) {
+    generateSecret(applicationModel);
+  }
+  if (resourceRep.getRedirectUris() != null) {
+    for (    String redirectUri : resourceRep.getRedirectUris()) {
+      applicationModel.addRedirectUri(redirectUri);
+    }
+  }
+  if (resourceRep.getWebOrigins() != null) {
+    for (    String webOrigin : resourceRep.getWebOrigins()) {
+      logger.debug("Application: {0} webOrigin: {1}",resourceRep.getName(),webOrigin);
+      applicationModel.addWebOrigin(webOrigin);
+    }
+  }
+  if (resourceRep.getDefaultRoles() != null) {
+    applicationModel.updateDefaultRoles(resourceRep.getDefaultRoles());
+  }
+  if (resourceRep.getClaims() != null) {
+    ClaimManager.setClaims(applicationModel,resourceRep.getClaims());
+  }
+ else {
+    applicationModel.setAllowedClaimsMask(ClaimMask.USERNAME);
+  }
+  return applicationModel;
 }

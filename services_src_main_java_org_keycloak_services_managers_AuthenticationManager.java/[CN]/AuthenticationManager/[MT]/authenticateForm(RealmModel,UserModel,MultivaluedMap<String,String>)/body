@@ -8,19 +8,7 @@
     return AuthenticationStatus.ACCOUNT_DISABLED;
   }
   Set<String> types=new HashSet<String>();
-  List<RequiredCredentialModel> requiredCredentials=null;
-  RoleModel applicationRole=realm.getRole(Constants.APPLICATION_ROLE);
-  RoleModel identityRequesterRole=realm.getRole(Constants.IDENTITY_REQUESTER_ROLE);
-  if (realm.hasRole(user,applicationRole)) {
-    requiredCredentials=realm.getRequiredApplicationCredentials();
-  }
- else   if (realm.hasRole(user,identityRequesterRole)) {
-    requiredCredentials=realm.getRequiredOAuthClientCredentials();
-  }
- else {
-    requiredCredentials=realm.getRequiredCredentials();
-  }
-  for (  RequiredCredentialModel credential : requiredCredentials) {
+  for (  RequiredCredentialModel credential : realm.getRequiredCredentials()) {
     types.add(credential.getType());
   }
   if (types.contains(CredentialRepresentation.PASSWORD)) {

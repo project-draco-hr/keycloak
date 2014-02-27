@@ -9,7 +9,7 @@
   String secret=realm.getSocialConfig().get(providerId + ".secret");
   String callbackUri=Urls.socialCallback(uriInfo.getBaseUri()).toString();
   SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
-  UserModel client=realm.getUser(clientId);
+  ClientModel client=realm.findClient(clientId);
   if (client == null) {
     logger.warn("Unknown login requester: " + clientId);
     return Flows.forms(realm,request,uriInfo).setError("Unknown login requester.").createErrorPage();

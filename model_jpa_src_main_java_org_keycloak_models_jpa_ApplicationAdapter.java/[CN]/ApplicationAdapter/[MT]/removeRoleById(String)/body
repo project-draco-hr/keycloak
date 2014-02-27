@@ -4,8 +4,8 @@
     return false;
   }
   ApplicationRoleEntity role=(ApplicationRoleEntity)roleAdapter.getRole();
-  application.getRoles().remove(role);
-  application.getDefaultRoles().remove(role);
+  entity.getRoles().remove(role);
+  entity.getDefaultRoles().remove(role);
   em.createQuery("delete from " + UserScopeMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",role).executeUpdate();
   em.createQuery("delete from " + UserRoleMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",role).executeUpdate();
   role.setApplication(null);

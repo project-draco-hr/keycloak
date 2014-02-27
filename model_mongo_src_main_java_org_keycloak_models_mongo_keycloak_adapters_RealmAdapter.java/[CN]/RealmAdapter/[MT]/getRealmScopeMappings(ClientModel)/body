@@ -1,0 +1,11 @@
+{
+  Set<RoleModel> allScopes=getScopeMappings(client);
+  Set<RoleModel> realmRoles=new HashSet<RoleModel>();
+  for (  RoleModel role : allScopes) {
+    RoleEntity roleEntity=((RoleAdapter)role).getRole();
+    if (getId().equals(roleEntity.getRealmId())) {
+      realmRoles.add(role);
+    }
+  }
+  return realmRoles;
+}

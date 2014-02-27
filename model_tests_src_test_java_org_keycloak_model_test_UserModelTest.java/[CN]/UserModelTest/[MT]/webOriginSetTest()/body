@@ -1,13 +1,23 @@
 {
   RealmModel realm=realmManager.createRealm("original");
-  UserModel user=realm.addUser("user");
-  Assert.assertTrue(user.getWebOrigins().isEmpty());
-  user.addWebOrigin("origin-1");
-  Assert.assertEquals(1,user.getWebOrigins().size());
-  user.addWebOrigin("origin-2");
-  Assert.assertEquals(2,user.getWebOrigins().size());
-  user.removeWebOrigin("origin-2");
-  Assert.assertEquals(1,user.getWebOrigins().size());
-  user.removeWebOrigin("origin-1");
-  Assert.assertTrue(user.getWebOrigins().isEmpty());
+  ClientModel client=realm.addApplication("user");
+  Assert.assertTrue(client.getWebOrigins().isEmpty());
+  client.addWebOrigin("origin-1");
+  Assert.assertEquals(1,client.getWebOrigins().size());
+  client.addWebOrigin("origin-2");
+  Assert.assertEquals(2,client.getWebOrigins().size());
+  client.removeWebOrigin("origin-2");
+  Assert.assertEquals(1,client.getWebOrigins().size());
+  client.removeWebOrigin("origin-1");
+  Assert.assertTrue(client.getWebOrigins().isEmpty());
+  client=realm.addOAuthClient("oauthclient2");
+  Assert.assertTrue(client.getWebOrigins().isEmpty());
+  client.addWebOrigin("origin-1");
+  Assert.assertEquals(1,client.getWebOrigins().size());
+  client.addWebOrigin("origin-2");
+  Assert.assertEquals(2,client.getWebOrigins().size());
+  client.removeWebOrigin("origin-2");
+  Assert.assertEquals(1,client.getWebOrigins().size());
+  client.removeWebOrigin("origin-1");
+  Assert.assertTrue(client.getWebOrigins().isEmpty());
 }

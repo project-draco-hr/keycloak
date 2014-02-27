@@ -1,5 +1,5 @@
 {
-  if (!auth.hasRealmRole(AdminRoles.ADMIN)) {
+  if (!auth.hasRealmRole(AdminRoles.CREATE_REALM)) {
     throw new ForbiddenException();
   }
   Map<String,List<InputPart>> uploadForm=input.getFormDataMap();
@@ -11,6 +11,7 @@
     }
 );
     RealmModel realm=realmManager.importRealm(rep);
+    grantPermissionsToRealmCreator(realm);
     if (inputParts.size() == 1) {
       URI location=realmUrl(uriInfo).build(realm.getName());
       return Response.created(location).build();

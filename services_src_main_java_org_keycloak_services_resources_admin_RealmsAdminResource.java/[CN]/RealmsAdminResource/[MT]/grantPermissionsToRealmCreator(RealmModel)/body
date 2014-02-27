@@ -1,0 +1,11 @@
+{
+  if (auth.hasRealmRole(AdminRoles.ADMIN)) {
+    return;
+  }
+  RealmModel adminRealm=new RealmManager(session).getKeycloakAdminstrationRealm();
+  ApplicationModel realmAdminApp=adminRealm.getApplicationByName(AdminRoles.getAdminApp(realm));
+  for (  String r : AdminRoles.ALL_REALM_ROLES) {
+    RoleModel role=realmAdminApp.getRole(r);
+    adminRealm.grantRole(auth.getUser(),role);
+  }
+}

@@ -1,0 +1,14 @@
+{
+  IDToken token=new IDToken();
+  token.id(KeycloakModelUtils.generateId());
+  token.subject(user.getId());
+  token.audience(realm.getName());
+  token.issuedNow();
+  token.issuedFor(client.getLoginName());
+  token.issuer(realm.getName());
+  if (realm.getAccessTokenLifespan() > 0) {
+    token.expiration((System.currentTimeMillis() / 1000) + realm.getAccessTokenLifespan());
+  }
+  initClaims(token,claimer,user);
+  return token;
+}

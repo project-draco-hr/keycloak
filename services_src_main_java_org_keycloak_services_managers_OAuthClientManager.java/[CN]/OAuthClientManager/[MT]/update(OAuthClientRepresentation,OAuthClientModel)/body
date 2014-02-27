@@ -1,11 +1,14 @@
 {
-  model.getOAuthAgent().setEnabled(rep.isEnabled());
+  model.getAgent().setEnabled(rep.isEnabled());
   List<String> redirectUris=rep.getRedirectUris();
   if (redirectUris != null) {
-    model.getOAuthAgent().setRedirectUris(new HashSet<String>(redirectUris));
+    model.getAgent().setRedirectUris(new HashSet<String>(redirectUris));
   }
   List<String> webOrigins=rep.getWebOrigins();
   if (webOrigins != null) {
-    model.getOAuthAgent().setWebOrigins(new HashSet<String>(webOrigins));
+    model.getAgent().setWebOrigins(new HashSet<String>(webOrigins));
+  }
+  if (rep.getClaims() != null) {
+    ClaimManager.setClaims(model,rep.getClaims());
   }
 }

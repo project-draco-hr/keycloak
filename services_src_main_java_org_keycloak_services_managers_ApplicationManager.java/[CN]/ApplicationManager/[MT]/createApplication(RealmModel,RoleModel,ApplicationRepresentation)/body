@@ -6,7 +6,7 @@
   applicationModel.setSurrogateAuthRequired(resourceRep.isSurrogateAuthRequired());
   applicationModel.setBaseUrl(resourceRep.getBaseUrl());
   applicationModel.updateApplication();
-  UserModel resourceUser=applicationModel.getApplicationUser();
+  UserModel resourceUser=applicationModel.getAgent();
   if (resourceRep.getCredentials() != null && resourceRep.getCredentials().size() > 0) {
     for (    CredentialRepresentation cred : resourceRep.getCredentials()) {
       UserCredentialModel credential=new UserCredentialModel();
@@ -32,6 +32,12 @@
   realm.grantRole(resourceUser,loginRole);
   if (resourceRep.getDefaultRoles() != null) {
     applicationModel.updateDefaultRoles(resourceRep.getDefaultRoles());
+  }
+  if (resourceRep.getClaims() != null) {
+    ClaimManager.setClaims(applicationModel,resourceRep.getClaims());
+  }
+ else {
+    applicationModel.setAllowedClaimsMask(ClaimMask.USERNAME);
   }
   return applicationModel;
 }

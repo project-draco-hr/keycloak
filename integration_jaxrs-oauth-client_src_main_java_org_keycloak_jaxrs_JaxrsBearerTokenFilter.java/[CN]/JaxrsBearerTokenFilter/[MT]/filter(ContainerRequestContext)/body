@@ -10,7 +10,7 @@
   String tokenString=split[1];
   try {
     AccessToken token=RSATokenVerifier.verifyToken(tokenString,resourceMetadata.getRealmKey(),resourceMetadata.getRealm());
-    KeycloakAuthenticatedSession skSession=new KeycloakAuthenticatedSession(tokenString,token,resourceMetadata);
+    KeycloakAuthenticatedSession skSession=new KeycloakAuthenticatedSession(tokenString,token,null,null,resourceMetadata);
     ResteasyProviderFactory.pushContext(KeycloakAuthenticatedSession.class,skSession);
     String callerPrincipal=securityContext.getUserPrincipal() != null ? securityContext.getUserPrincipal().getName() : null;
     final KeycloakPrincipal principal=new KeycloakPrincipal(token.getSubject(),callerPrincipal);

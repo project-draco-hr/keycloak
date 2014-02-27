@@ -24,8 +24,18 @@ catch (  IOException e) {
     sendError(HttpServletResponse.SC_FORBIDDEN);
   }
   tokenString=tokenResponse.getToken();
+  idTokenString=tokenResponse.getIdToken();
   try {
     token=RSATokenVerifier.verifyToken(tokenString,realmInfo.getMetadata().getRealmKey(),realmInfo.getMetadata().getRealm());
+    if (idTokenString != null) {
+      JWSInput input=new JWSInput(idTokenString);
+      try {
+        idToken=input.readJsonContent(IDToken.class);
+      }
+ catch (      IOException e) {
+        throw new VerificationException();
+      }
+    }
     log.debug("Token Verification succeeded!");
   }
  catch (  VerificationException e) {

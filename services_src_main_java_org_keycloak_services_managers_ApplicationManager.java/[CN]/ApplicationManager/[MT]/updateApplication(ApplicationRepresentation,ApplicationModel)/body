@@ -10,10 +10,13 @@
   }
   List<String> redirectUris=rep.getRedirectUris();
   if (redirectUris != null) {
-    resource.getApplicationUser().setRedirectUris(new HashSet<String>(redirectUris));
+    resource.getAgent().setRedirectUris(new HashSet<String>(redirectUris));
   }
   List<String> webOrigins=rep.getWebOrigins();
   if (webOrigins != null) {
-    resource.getApplicationUser().setWebOrigins(new HashSet<String>(webOrigins));
+    resource.getAgent().setWebOrigins(new HashSet<String>(webOrigins));
+  }
+  if (rep.getClaims() != null) {
+    ClaimManager.setClaims(resource,rep.getClaims());
   }
 }

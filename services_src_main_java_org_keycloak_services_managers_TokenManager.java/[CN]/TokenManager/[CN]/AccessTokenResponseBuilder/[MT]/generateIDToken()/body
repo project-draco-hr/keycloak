@@ -1,0 +1,40 @@
+{
+  if (accessToken == null) {
+    throw new IllegalStateException("accessToken not set");
+  }
+  idToken=new IDToken();
+  idToken.id(KeycloakModelUtils.generateId());
+  idToken.subject(accessToken.getSubject());
+  idToken.audience(realm.getName());
+  idToken.issuedNow();
+  idToken.issuedFor(accessToken.getIssuedFor());
+  idToken.issuer(accessToken.getIssuer());
+  if (realm.getAccessTokenLifespan() > 0) {
+    idToken.expiration((System.currentTimeMillis() / 1000) + realm.getAccessTokenLifespan());
+  }
+  idToken.setPreferredUsername(accessToken.getPreferredUsername());
+  idToken.setGivenName(accessToken.getGivenName());
+  idToken.setMiddleName(accessToken.getMiddleName());
+  idToken.setFamilyName(accessToken.getFamilyName());
+  idToken.setName(accessToken.getName());
+  idToken.setNickName(accessToken.getNickName());
+  idToken.setGender(accessToken.getGender());
+  idToken.setPicture(accessToken.getPicture());
+  idToken.setProfile(accessToken.getProfile());
+  idToken.setWebsite(accessToken.getWebsite());
+  idToken.setBirthdate(accessToken.getBirthdate());
+  idToken.setEmail(accessToken.getEmail());
+  idToken.setEmailVerified(accessToken.getEmailVerified());
+  idToken.setLocale(accessToken.getLocale());
+  idToken.setFormattedAddress(accessToken.getFormattedAddress());
+  idToken.setAddress(accessToken.getAddress());
+  idToken.setStreetAddress(accessToken.getStreetAddress());
+  idToken.setLocality(accessToken.getLocality());
+  idToken.setRegion(accessToken.getRegion());
+  idToken.setPostalCode(accessToken.getPostalCode());
+  idToken.setCountry(accessToken.getCountry());
+  idToken.setPhoneNumber(accessToken.getPhoneNumber());
+  idToken.setPhoneNumberVerified(accessToken.getPhoneNumberVerified());
+  idToken.setZoneinfo(accessToken.getZoneinfo());
+  return this;
+}

@@ -1,0 +1,17 @@
+{
+  if (ClaimMask.hasUsername(model.getAllowedClaimsMask())) {
+    token.setPreferredUsername(user.getLoginName());
+  }
+  if (ClaimMask.hasEmail(model.getAllowedClaimsMask())) {
+    token.setEmail(user.getEmail());
+    token.setEmailVerified(user.isEmailVerified());
+  }
+  if (ClaimMask.hasName(model.getAllowedClaimsMask())) {
+    token.setFamilyName(user.getLastName());
+    token.setGivenName(user.getFirstName());
+    StringBuilder fullName=new StringBuilder();
+    if (user.getFirstName() != null)     fullName.append(user.getFirstName()).append(" ");
+    if (user.getLastName() != null)     fullName.append(user.getLastName());
+    token.setName(fullName.toString());
+  }
+}

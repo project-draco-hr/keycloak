@@ -1,5 +1,9 @@
 {
   AccessTokenResponse res=new AccessTokenResponse();
+  if (idToken != null) {
+    String encodedToken=new JWSBuilder().jsonContent(idToken).rsa256(realm.getPrivateKey());
+    res.setIdToken(encodedToken);
+  }
   if (accessToken != null) {
     String encodedToken=new JWSBuilder().jsonContent(accessToken).rsa256(realm.getPrivateKey());
     res.setToken(encodedToken);

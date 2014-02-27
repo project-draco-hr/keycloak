@@ -3,6 +3,7 @@
   if (scopeParam != null)   scopeMap=decodeScope(scopeParam);
   Set<RoleModel> roleMappings=realm.getRoleMappings(user);
   Set<RoleModel> scopeMappings=realm.getScopeMappings(client);
+  ClaimRequesterModel claimRequesterModel=getClaimRequester(realm,client);
   ApplicationModel clientApp=realm.getApplicationByName(client.getLoginName());
   Set<RoleModel> clientAppRoles=clientApp == null ? null : clientApp.getRoles();
   if (clientAppRoles != null)   scopeMappings.addAll(clientAppRoles);
@@ -25,7 +26,7 @@
       }
     }
   }
-  AccessToken token=initToken(realm,client,user);
+  AccessToken token=initToken(realm,claimRequesterModel,client,user);
   if (realmRolesRequested.size() > 0) {
     for (    RoleModel role : realmRolesRequested) {
       addComposites(token,role);

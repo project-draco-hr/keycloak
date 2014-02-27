@@ -1,5 +1,5 @@
 {
-  AccessToken token=new AccessToken();
+  IDToken token=new IDToken();
   token.id(KeycloakModelUtils.generateId());
   token.subject(user.getId());
   token.audience(realm.getName());
@@ -8,11 +8,7 @@
   token.issuer(realm.getName());
   if (realm.getAccessTokenLifespan() > 0) {
     token.expiration((System.currentTimeMillis() / 1000) + realm.getAccessTokenLifespan());
-    logger.info("Access Token expiration: " + token.getExpiration());
   }
-  Set<String> allowedOrigins=client.getWebOrigins();
-  if (allowedOrigins != null) {
-    token.setAllowedOrigins(allowedOrigins);
-  }
+  initClaims(token,claimer,user);
   return token;
 }

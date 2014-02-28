@@ -1,11 +1,9 @@
 {
   PublishedRealmRepresentation rep=new PublishedRealmRepresentation();
   rep.setRealm(realm.getName());
-  rep.setSelf(realmUrl(uriInfo).build(realm.getId()).toString());
+  rep.setTokenServiceUrl(TokenService.tokenServiceBaseUrl(uriInfo).build(realm.getId()).toString());
+  rep.setAccountServiceUrl(AccountService.accountServiceBaseUrl(uriInfo).build(realm.getId()).toString());
+  rep.setAdminApiUrl(AdminService.adminApiUrl(uriInfo).build(realm.getId()).toString());
   rep.setPublicKeyPem(realm.getPublicKeyPem());
-  rep.setAdminRole(ADMIN_ROLE);
-  rep.setAuthorizationUrl(TokenService.loginPageUrl(uriInfo).build(realm.getName()).toString());
-  rep.setCodeUrl(TokenService.accessCodeToTokenUrl(uriInfo).build(realm.getName()).toString());
-  rep.setGrantUrl(TokenService.grantAccessTokenUrl(uriInfo).build(realm.getName()).toString());
   return rep;
 }

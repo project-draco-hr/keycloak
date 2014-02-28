@@ -1,18 +1,8 @@
 {
   ServletOAuthClient oAuthClient=(ServletOAuthClient)request.getServletContext().getAttribute(ServletOAuthClient.class.getName());
-  String token=null;
-  try {
-    token=oAuthClient.getBearerToken(request).getToken();
-  }
- catch (  IOException e) {
-    throw new RuntimeException(e);
-  }
-catch (  TokenGrantRequest.HttpFailure failure) {
-    throw new RuntimeException(failure);
-  }
   HttpClient client=oAuthClient.getClient();
   HttpGet get=new HttpGet("http://localhost:8080/database/products");
-  get.addHeader("Authorization","Bearer " + token);
+  get.addHeader("Authorization","Bearer " + accessToken);
   try {
     HttpResponse response=client.execute(get);
     if (response.getStatusLine().getStatusCode() != 200) {

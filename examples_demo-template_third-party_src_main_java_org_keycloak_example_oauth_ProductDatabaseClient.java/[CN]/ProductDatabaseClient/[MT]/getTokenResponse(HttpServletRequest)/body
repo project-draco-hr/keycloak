@@ -1,0 +1,13 @@
+{
+  ServletOAuthClient oAuthClient=(ServletOAuthClient)request.getServletContext().getAttribute(ServletOAuthClient.class.getName());
+  String token=null;
+  try {
+    return oAuthClient.getBearerToken(request);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+catch (  TokenGrantRequest.HttpFailure failure) {
+    throw new RuntimeException(failure);
+  }
+}

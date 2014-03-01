@@ -7,11 +7,11 @@
   KeycloakChallenge challenge=checkStateCookie();
   if (challenge != null)   return challenge;
   AccessTokenResponse tokenResponse=null;
-  String redirectUri=stripOauthParametersFromRedirect();
+  strippedOauthParametersRequestUri=stripOauthParametersFromRedirect();
   try {
-    tokenResponse=TokenGrantRequest.invokeAccessCodeToToken(realmInfo,code,redirectUri);
+    tokenResponse=ServerRequest.invokeAccessCodeToToken(realmInfo,code,strippedOauthParametersRequestUri);
   }
- catch (  TokenGrantRequest.HttpFailure failure) {
+ catch (  ServerRequest.HttpFailure failure) {
     log.error("failed to turn code into token");
     log.error("status from server: " + failure.getStatus());
     if (failure.getStatus() == StatusCodes.BAD_REQUEST && failure.getError() != null) {
@@ -41,6 +41,13 @@ catch (  IOException e) {
   }
  catch (  VerificationException e) {
     log.error("failed verification of token");
+    return challenge(StatusCodes.FORBIDDEN);
+  }
+  if (tokenResponse.getNotBeforePolicy() > realmInfo.getNotBefore()) {
+    realmInfo.setNotBefore(tokenResponse.getNotBeforePolicy());
+  }
+  if (token.getIssuedAt() < realmInfo.getNotBefore()) {
+    log.error("Stale token");
     return challenge(StatusCodes.FORBIDDEN);
   }
   log.info("successful authenticated");

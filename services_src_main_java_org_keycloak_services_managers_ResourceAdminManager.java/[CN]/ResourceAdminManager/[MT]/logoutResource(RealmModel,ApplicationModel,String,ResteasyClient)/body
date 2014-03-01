@@ -1,7 +1,7 @@
 {
   String managementUrl=resource.getManagementUrl();
   if (managementUrl != null) {
-    LogoutAction adminAction=new LogoutAction(TokenIdGenerator.generateId(),System.currentTimeMillis() / 1000 + 30,resource.getName(),user);
+    LogoutAction adminAction=new LogoutAction(TokenIdGenerator.generateId(),(int)(System.currentTimeMillis() / 1000) + 30,resource.getName(),user);
     String token=new TokenManager().encodeToken(realm,adminAction);
     logger.info("logout user: {0} resource: {1} url: {2}",user,resource.getName(),managementUrl);
     Response response=client.target(managementUrl).path(AdapterConstants.K_LOGOUT).request().post(Entity.text(token));

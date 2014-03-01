@@ -23,8 +23,12 @@
     challenge=challengeResponse(exchange,"invalid_token",e.getMessage());
     return AuthenticationMechanism.AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
   }
+  if (token.getIssuedAt() < notBefore) {
+    log.error("Stale token");
+    challenge=challengeResponse(exchange,"invalid_token","Stale token");
+    return AuthenticationMechanism.AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
+  }
   boolean verifyCaller=false;
-  Set<String> roles=new HashSet<String>();
   if (useResourceRoleMappings) {
     verifyCaller=token.isVerifyCaller(resourceMetadata.getResourceName());
   }

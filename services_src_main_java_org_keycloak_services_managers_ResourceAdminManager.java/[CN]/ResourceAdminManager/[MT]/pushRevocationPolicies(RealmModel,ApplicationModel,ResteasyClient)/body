@@ -1,0 +1,18 @@
+{
+  if (realm.getNotBefore() <= 0)   return false;
+  String managementUrl=resource.getManagementUrl();
+  if (managementUrl != null) {
+    PushNotBeforeAction adminAction=new PushNotBeforeAction(TokenIdGenerator.generateId(),(int)(System.currentTimeMillis() / 1000) + 30,resource.getName(),realm.getNotBefore());
+    String token=new TokenManager().encodeToken(realm,adminAction);
+    logger.info("pushRevocation resource: {0} url: {1}",resource.getName(),managementUrl);
+    Response response=client.target(managementUrl).path(AdapterConstants.K_PUSH_NOT_BEFORE).request().post(Entity.text(token));
+    boolean success=response.getStatus() == 204;
+    response.close();
+    logger.info("pushRevocation success.");
+    return success;
+  }
+ else {
+    logger.info("no management URL for application: " + resource.getName());
+    return false;
+  }
+}

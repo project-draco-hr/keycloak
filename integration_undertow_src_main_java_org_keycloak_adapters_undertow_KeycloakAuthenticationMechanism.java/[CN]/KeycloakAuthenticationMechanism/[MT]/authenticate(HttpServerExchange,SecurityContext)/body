@@ -1,4 +1,5 @@
 {
+  log.info("--> authenticate()");
   BearerTokenAuthenticator bearer=createBearerTokenAuthenticator();
   AuthenticationMechanismOutcome outcome=bearer.authenticate(exchange);
   if (outcome == AuthenticationMechanismOutcome.NOT_AUTHENTICATED) {
@@ -24,6 +25,9 @@
     return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
   }
   completeAuthentication(exchange,securityContext,oauth);
+  exchange.getResponseHeaders().put(Headers.LOCATION,oauth.getStrippedOauthParametersRequestUri());
+  exchange.setResponseCode(302);
+  exchange.endExchange();
   log.info("AUTHENTICATED");
   return AuthenticationMechanismOutcome.AUTHENTICATED;
 }

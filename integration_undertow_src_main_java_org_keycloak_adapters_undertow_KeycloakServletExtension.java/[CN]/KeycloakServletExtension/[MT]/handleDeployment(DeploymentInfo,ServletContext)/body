@@ -27,9 +27,19 @@
     }
   }
 );
-  deploymentInfo.addInnerHandlerChainWrapper(ServletPropagateSessionHandler.WRAPPER);
   deploymentInfo.addInnerHandlerChainWrapper(actions);
-  deploymentInfo.setIdentityManager(new KeycloakIdentityManager(keycloakConfig,realmConfiguration));
+  deploymentInfo.setIdentityManager(new IdentityManager(){
+    @Override public Account verify(    Account account){
+      return account;
+    }
+    @Override public Account verify(    String id,    Credential credential){
+      throw new IllegalStateException("Should never be called in Keycloak flow");
+    }
+    @Override public Account verify(    Credential credential){
+      throw new IllegalStateException("Should never be called in Keycloak flow");
+    }
+  }
+);
   log.info("Setting jsession cookie path to: " + deploymentInfo.getContextPath());
   ServletSessionConfig cookieConfig=new ServletSessionConfig();
   cookieConfig.setPath(deploymentInfo.getContextPath());

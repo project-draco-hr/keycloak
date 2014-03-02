@@ -12,6 +12,13 @@
       remoteLogout(input,response);
       return;
     }
+ else     if (requestURI.endsWith(AdapterConstants.K_PUSH_NOT_BEFORE)) {
+      JWSInput input=verifyAdminRequest(request,response);
+      if (input == null) {
+        return;
+      }
+      pushNotBefore(input,response);
+    }
     checkKeycloakSession(request);
     super.invoke(request,response);
   }

@@ -1,0 +1,22 @@
+{
+  try {
+    log.debug("->> pushNotBefore: ");
+    PushNotBeforeAction action=JsonSerialization.readValue(token.getContent(),PushNotBeforeAction.class);
+    if (action.isExpired()) {
+      log.warn("admin request failed, expired token");
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Expired token");
+      return;
+    }
+    if (!resourceMetadata.getResourceName().equals(action.getResource())) {
+      log.warn("Resource name does not match");
+      response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Resource name does not match");
+      return;
+    }
+    realmConfiguration.setNotBefore(action.getNotBefore());
+  }
+ catch (  Exception e) {
+    log.warn("failed to logout",e);
+    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Failed to logout");
+  }
+  response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+}

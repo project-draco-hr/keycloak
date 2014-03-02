@@ -13,6 +13,9 @@
   if (refreshToken.isExpired()) {
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Refresh token expired");
   }
+  if (refreshToken.getIssuedAt() < realm.getNotBefore()) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale refresh token");
+  }
   UserModel user=realm.getUserById(refreshToken.getSubject());
   if (user == null) {
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid refresh token","Unknown user");

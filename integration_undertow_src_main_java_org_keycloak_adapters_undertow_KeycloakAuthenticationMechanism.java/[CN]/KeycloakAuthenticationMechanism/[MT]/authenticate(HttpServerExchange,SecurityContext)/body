@@ -1,4 +1,5 @@
 {
+  log.info("--> authenticate()");
   BearerTokenAuthenticator bearer=createBearerTokenAuthenticator();
   AuthenticationMechanismOutcome outcome=bearer.authenticate(exchange);
   if (outcome == AuthenticationMechanismOutcome.NOT_AUTHENTICATED) {
@@ -6,12 +7,19 @@
     return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
   }
  else   if (outcome == AuthenticationMechanismOutcome.AUTHENTICATED) {
-    completeAuthentication(securityContext,bearer);
+    completeAuthentication(exchange,securityContext,bearer);
     return AuthenticationMechanismOutcome.AUTHENTICATED;
   }
  else   if (adapterConfig.isBearerOnly()) {
     exchange.putAttachment(KEYCLOAK_CHALLENGE_ATTACHMENT_KEY,bearer.getChallenge());
     return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  }
+  KeycloakUndertowAccount account=checkCachedAccount(exchange);
+  if (account != null) {
+    log.info("Cached account found");
+    securityContext.authenticationComplete(account,"KEYCLOAK",false);
+    propagateKeycloakContext(exchange,account);
+    return AuthenticationMechanismOutcome.AUTHENTICATED;
   }
   OAuthAuthenticator oauth=createOAuthAuthenticator(exchange);
   outcome=oauth.authenticate();
@@ -24,6 +32,9 @@
     return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
   }
   completeAuthentication(exchange,securityContext,oauth);
+  exchange.getResponseHeaders().put(Headers.LOCATION,oauth.getStrippedOauthParametersRequestUri());
+  exchange.setResponseCode(302);
+  exchange.endExchange();
   log.info("AUTHENTICATED");
   return AuthenticationMechanismOutcome.AUTHENTICATED;
 }

@@ -9,10 +9,18 @@
   try {
     AccessToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),realm.getName(),checkActive);
     logger.info("identity token verified");
-    if (checkActive && !token.isActive()) {
-      logger.info("identity cookie expired");
-      expireIdentityCookie(realm,uriInfo);
-      return null;
+    if (checkActive) {
+      logger.info("Checking if identity token is active");
+      if (!token.isActive() || token.getIssuedAt() < realm.getNotBefore()) {
+        logger.info("identity cookie expired");
+        expireIdentityCookie(realm,uriInfo);
+        return null;
+      }
+ else {
+        logger.info("token.isActive() : " + token.isActive());
+        logger.info("token.issuedAt: " + token.getIssuedAt());
+        logger.info("real.notbefore: " + realm.getNotBefore());
+      }
     }
     UserModel user=realm.getUserById(token.getSubject());
     if (user == null || !user.isEnabled()) {

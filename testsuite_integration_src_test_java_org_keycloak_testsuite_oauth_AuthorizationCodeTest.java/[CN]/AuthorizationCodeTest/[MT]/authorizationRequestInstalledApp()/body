@@ -1,0 +1,8 @@
+{
+  oauth.redirectUri(Constants.INSTALLED_APP_URN);
+  oauth.doLogin("test-user@localhost","password");
+  String title=driver.getTitle();
+  Assert.assertTrue(title.startsWith("Success code="));
+  String code=driver.findElement(By.id("code")).getText();
+  oauth.verifyCode(code);
+}

@@ -1,0 +1,11 @@
+{
+  ResteasyClient client=new ResteasyClientBuilder().disableTrustManager().build();
+  try {
+    for (    ApplicationModel application : realm.getApplications()) {
+      pushRevocationPolicy(realm,application,realm.getNotBefore(),client);
+    }
+  }
+  finally {
+    client.close();
+  }
+}

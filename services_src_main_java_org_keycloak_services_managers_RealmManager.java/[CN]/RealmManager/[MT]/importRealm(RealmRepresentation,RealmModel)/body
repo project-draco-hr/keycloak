@@ -26,8 +26,8 @@
     newRealm.setPrivateKeyPem(rep.getPrivateKey());
     newRealm.setPublicKeyPem(rep.getPublicKey());
   }
-  newRealm.setLoginTheme(rep.getLoginTheme());
-  newRealm.setAccountTheme(rep.getAccountTheme());
+  if (rep.getLoginTheme() != null)   newRealm.setLoginTheme(rep.getLoginTheme());
+  if (rep.getAccountTheme() != null)   newRealm.setAccountTheme(rep.getAccountTheme());
   Map<String,UserModel> userMap=new HashMap<String,UserModel>();
   if (rep.getRequiredCredentials() != null) {
     for (    String requiredCred : rep.getRequiredCredentials()) {
@@ -37,7 +37,7 @@
  else {
     addRequiredCredential(newRealm,CredentialRepresentation.PASSWORD);
   }
-  newRealm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
+  if (rep.getPasswordPolicy() != null)   newRealm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
   if (rep.getUsers() != null) {
     for (    UserRepresentation userRep : rep.getUsers()) {
       UserModel user=createUser(newRealm,userRep);

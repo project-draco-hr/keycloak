@@ -1,6 +1,5 @@
 {
   if (rep.getRealm() != null) {
-    logger.info("Updating realm name to " + rep.getRealm());
     realm.setName(rep.getRealm());
   }
   if (rep.isEnabled() != null)   realm.setEnabled(rep.isEnabled());
@@ -20,9 +19,9 @@
   if (rep.getRequiredCredentials() != null) {
     realm.updateRequiredCredentials(rep.getRequiredCredentials());
   }
-  realm.setLoginTheme(rep.getLoginTheme());
-  realm.setAccountTheme(rep.getAccountTheme());
-  realm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
+  if (rep.getLoginTheme() != null)   realm.setLoginTheme(rep.getLoginTheme());
+  if (rep.getAccountTheme() != null)   realm.setAccountTheme(rep.getAccountTheme());
+  if (rep.getPasswordPolicy() != null)   realm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
   if (rep.getDefaultRoles() != null) {
     realm.updateDefaultRoles(rep.getDefaultRoles().toArray(new String[rep.getDefaultRoles().size()]));
   }

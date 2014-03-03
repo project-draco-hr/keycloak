@@ -1,5 +1,6 @@
 {
-  model.setEnabled(rep.isEnabled());
+  if (rep.getName() != null)   model.setClientId(rep.getName());
+  if (rep.isEnabled() != null)   model.setEnabled(rep.isEnabled());
   List<String> redirectUris=rep.getRedirectUris();
   if (redirectUris != null) {
     model.setRedirectUris(new HashSet<String>(redirectUris));
@@ -10,5 +11,8 @@
   }
   if (rep.getClaims() != null) {
     ClaimManager.setClaims(model,rep.getClaims());
+  }
+  if (rep.getNotBefore() != null) {
+    model.setNotBefore(rep.getNotBefore());
   }
 }

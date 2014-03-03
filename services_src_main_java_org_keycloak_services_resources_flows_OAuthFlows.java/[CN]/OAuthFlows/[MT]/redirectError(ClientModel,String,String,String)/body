@@ -1,7 +1,12 @@
 {
-  UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam("error",error);
-  if (state != null) {
-    redirectUri.queryParam("state",state);
+  if (Constants.INSTALLED_APP_URN.equals(redirect)) {
+    return Flows.forms(realm,request,uriInfo).setError(error).createCode();
   }
-  return Response.status(302).location(redirectUri.build()).build();
+ else {
+    UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam("error",error);
+    if (state != null) {
+      redirectUri.queryParam("state",state);
+    }
+    return Response.status(302).location(redirectUri.build()).build();
+  }
 }

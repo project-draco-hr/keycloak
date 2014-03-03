@@ -1,0 +1,17 @@
+{
+  RoleAdapter roleAdapter=(RoleAdapter)roleModel;
+  if (roleAdapter == null) {
+    return false;
+  }
+  if (!roleAdapter.getContainer().equals(this))   return false;
+  if (!(roleAdapter.getRole() instanceof ApplicationRoleEntity))   return false;
+  ApplicationRoleEntity role=(ApplicationRoleEntity)roleAdapter.getRole();
+  applicationEntity.getRoles().remove(role);
+  applicationEntity.getDefaultRoles().remove(role);
+  em.createQuery("delete from " + ScopeMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",role).executeUpdate();
+  em.createQuery("delete from " + UserRoleMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",role).executeUpdate();
+  role.setApplication(null);
+  em.flush();
+  em.remove(role);
+  return true;
+}

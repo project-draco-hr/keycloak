@@ -1,9 +1,12 @@
 {
   RoleEntity role=getMongoStore().loadEntity(RoleEntity.class,id,invocationContext);
-  if (role == null || !getId().equals(role.getRealmId())) {
-    return null;
+  if (role == null)   return null;
+  if (role.getRealmId() != null) {
+    if (!role.getRealmId().equals(this.getId()))     return null;
   }
  else {
-    return new RoleAdapter(role,this,invocationContext);
+    ApplicationModel app=getApplicationById(role.getApplicationId());
+    if (app == null)     return null;
   }
+  return new RoleAdapter(this,role,null,invocationContext);
 }

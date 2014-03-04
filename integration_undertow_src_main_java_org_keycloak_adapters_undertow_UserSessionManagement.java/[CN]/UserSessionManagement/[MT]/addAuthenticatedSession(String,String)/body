@@ -1,15 +1,10 @@
 {
 synchronized (userSessionMap) {
-    Set<String> map=userSessionMap.get(username);
-    if (map == null) {
-      final Set<String> value=new HashSet<String>();
-      map=userSessionMap.putIfAbsent(username,value);
-      if (map == null) {
-        map=value;
-      }
+    UserSessions sessions=userSessionMap.get(username);
+    if (sessions == null) {
+      UserSessions session=new UserSessions();
+      userSessionMap.put(username,session);
     }
-synchronized (map) {
-      map.add(sessionId);
-    }
+    sessions.getSessionIds().add(sessionId);
   }
 }

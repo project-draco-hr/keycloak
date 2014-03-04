@@ -1,21 +1,22 @@
 {
   log.info("logoutUser: " + user);
-  Set<String> map=userSessionMap.remove(user);
-  if (map == null) {
+  UserSessions sessions=null;
+synchronized (userSessionMap) {
+    sessions=userSessionMap.remove(user);
+  }
+  if (sessions == null) {
     log.info("no session for user: " + user);
     return;
   }
   log.info("found session for user");
-synchronized (map) {
-    for (    String id : map) {
-      log.debug("invalidating session for user: " + user);
-      Session session=manager.getSession(id);
-      try {
-        session.invalidate(null);
-      }
- catch (      Exception e) {
-        log.warn("Session already invalidated.");
-      }
+  for (  String id : sessions.getSessionIds()) {
+    log.debug("invalidating session for user: " + user);
+    Session session=manager.getSession(id);
+    try {
+      session.invalidate(null);
+    }
+ catch (    Exception e) {
+      log.warn("Session already invalidated.");
     }
   }
 }

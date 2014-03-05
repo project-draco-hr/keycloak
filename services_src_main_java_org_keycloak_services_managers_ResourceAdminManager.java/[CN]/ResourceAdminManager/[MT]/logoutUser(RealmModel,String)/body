@@ -1,0 +1,13 @@
+{
+  ResteasyClient client=new ResteasyClientBuilder().disableTrustManager().build();
+  try {
+    List<ApplicationModel> resources=realm.getApplications();
+    logger.debug("logging out {0} resources ",resources.size());
+    for (    ApplicationModel resource : resources) {
+      logoutApplication(realm,resource,user,client);
+    }
+  }
+  finally {
+    client.close();
+  }
+}

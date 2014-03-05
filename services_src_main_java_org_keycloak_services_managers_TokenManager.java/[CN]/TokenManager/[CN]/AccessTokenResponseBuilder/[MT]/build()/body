@@ -17,6 +17,8 @@
     String encodedToken=new JWSBuilder().jsonContent(refreshToken).rsa256(realm.getPrivateKey());
     res.setRefreshToken(encodedToken);
   }
-  res.setNotBeforePolicy(realm.getNotBefore());
+  int notBefore=realm.getNotBefore();
+  if (client.getNotBefore() > notBefore)   notBefore=client.getNotBefore();
+  res.setNotBeforePolicy(notBefore);
   return res;
 }

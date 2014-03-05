@@ -1,0 +1,12 @@
+{
+  log.info("->> getUserStats: ");
+  UserStatsAction action=JsonSerialization.readValue(token.getContent(),UserStatsAction.class);
+  if (!validateAction(response,action)) {
+    return;
+  }
+  String user=action.getUser();
+  UserStats stats=getUserStats(user);
+  response.setStatus(200);
+  response.setContentType("application/json");
+  JsonSerialization.writeValueToStream(response.getOutputStream(),stats);
+}

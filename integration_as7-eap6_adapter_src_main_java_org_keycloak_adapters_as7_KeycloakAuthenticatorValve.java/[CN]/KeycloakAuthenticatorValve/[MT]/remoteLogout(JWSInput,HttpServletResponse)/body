@@ -2,14 +2,7 @@
   try {
     log.debug("->> remoteLogout: ");
     LogoutAction action=JsonSerialization.readValue(token.getContent(),LogoutAction.class);
-    if (action.isExpired()) {
-      log.warn("admin request failed, expired token");
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Expired token");
-      return;
-    }
-    if (!resourceMetadata.getResourceName().equals(action.getResource())) {
-      log.warn("Resource name does not match");
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Resource name does not match");
+    if (!validateAction(response,action)) {
       return;
     }
     String user=action.getUser();

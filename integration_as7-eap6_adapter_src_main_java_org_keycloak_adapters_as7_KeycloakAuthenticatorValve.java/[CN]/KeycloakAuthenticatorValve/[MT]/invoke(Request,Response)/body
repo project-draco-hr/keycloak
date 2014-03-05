@@ -18,6 +18,23 @@
         return;
       }
       pushNotBefore(input,response);
+      return;
+    }
+ else     if (requestURI.endsWith(AdapterConstants.K_GET_SESSION_STATS)) {
+      JWSInput input=verifyAdminRequest(request,response);
+      if (input == null) {
+        return;
+      }
+      getSessionStats(input,response);
+      return;
+    }
+ else     if (requestURI.endsWith(AdapterConstants.K_GET_USER_STATS)) {
+      JWSInput input=verifyAdminRequest(request,response);
+      if (input == null) {
+        return;
+      }
+      getUserStats(input,response);
+      return;
     }
     checkKeycloakSession(request);
     super.invoke(request,response);

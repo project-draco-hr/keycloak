@@ -4,16 +4,10 @@
   if (token == null)   return;
   UserStatsAction action=JsonSerialization.readValue(token.getContent(),UserStatsAction.class);
   if (!validateAction(response,action))   return;
-  UserStats stats=new UserStats();
-  Long loginTime=userSessionManagement.getUserLoginTime(action.getUser());
-  if (loginTime != null) {
-    stats.setLoggedIn(true);
-    stats.setWhenLoggedIn(loginTime);
-  }
- else {
-    stats.setLoggedIn(false);
-  }
+  String user=action.getUser();
+  UserStats stats=getUserStats(user);
   response.setStatus(200);
+  response.setContentType("application/json");
   JsonSerialization.writeValueToStream(response.getOutputStream(),stats);
   return;
 }

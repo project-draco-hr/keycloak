@@ -1,4 +1,5 @@
 {
+  logger.info("session-stats");
   auth.requireView();
   UserModel user=realm.getUser(username);
   if (user == null) {
@@ -8,7 +9,7 @@
   for (  ApplicationModel applicationModel : realm.getApplications()) {
     if (applicationModel.getManagementUrl() == null)     continue;
     UserStats appStats=new ResourceAdminManager().getUserStats(realm,applicationModel,user);
-    stats.put(applicationModel.getName(),appStats);
+    if (appStats.isLoggedIn())     stats.put(applicationModel.getName(),appStats);
   }
   return stats;
 }

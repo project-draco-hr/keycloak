@@ -1,0 +1,39 @@
+{
+  try {
+    String f=args.length > 0 ? args[0] : "keycloak.json";
+    ApplicationManager.InstallationAdapterConfig config=JsonSerialization.readValue(new FileInputStream(new File(f)),ApplicationManager.InstallationAdapterConfig.class);
+    authServerUrl=config.getAuthServerUrl();
+    realm=config.getRealm();
+    clientId=config.getResource();
+  }
+ catch (  Throwable t) {
+    System.err.println("Failed to load config:");
+    t.printStackTrace();
+    System.exit(1);
+  }
+  br=new BufferedReader(new InputStreamReader(System.in));
+  printHelp();
+  for (String s=br.readLine(); s != null; s=br.readLine()) {
+    if (s.equals("login")) {
+      login();
+    }
+ else     if (s.equals("login-desktop")) {
+      loginDesktop();
+    }
+ else     if (s.equals("login-manual")) {
+      loginManual();
+    }
+ else     if (s.equals("profile")) {
+      profile();
+    }
+ else     if (s.equals("token")) {
+      token();
+    }
+ else     if (s.equals("exit")) {
+      System.exit(0);
+    }
+ else {
+      printHelp();
+    }
+  }
+}

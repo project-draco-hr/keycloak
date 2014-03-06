@@ -3,12 +3,16 @@
   rep.setRealm(realmModel.getName());
   rep.setRealmKey(realmModel.getPublicKeyPem());
   rep.setSslNotRequired(realmModel.isSslNotRequired());
-  rep.setAuthServerUrl(baseUri.toString());
-  rep.setUseResourceRoleMappings(applicationModel.getRoles().size() > 0);
+  if (applicationModel.isPublicClient() && !applicationModel.isBearerOnly())   rep.setPublicClient(true);
+  if (applicationModel.isBearerOnly())   rep.setBearerOnly(true);
+  if (!applicationModel.isBearerOnly())   rep.setAuthServerUrl(baseUri.toString());
+  if (applicationModel.getRoles().size() > 0)   rep.setUseResourceRoleMappings(true);
   rep.setResource(applicationModel.getName());
-  Map<String,String> creds=new HashMap<String,String>();
-  String cred=applicationModel.getSecret();
-  creds.put(CredentialRepresentation.SECRET,cred);
-  rep.setCredentials(creds);
+  if (!applicationModel.isBearerOnly() && !applicationModel.isPublicClient()) {
+    Map<String,String> creds=new HashMap<String,String>();
+    String cred=applicationModel.getSecret();
+    creds.put(CredentialRepresentation.SECRET,cred);
+    rep.setCredentials(creds);
+  }
   return rep;
 }

@@ -1,0 +1,44 @@
+{
+  String client_id=null;
+  String clientSecret=null;
+  if (authorizationHeader != null) {
+    String[] usernameSecret=BasicAuthHelper.parseHeader(authorizationHeader);
+    if (usernameSecret == null) {
+      throw new NotAuthorizedException("Bad Authorization header","Basic realm=\"" + realm.getName() + "\"");
+    }
+    client_id=usernameSecret[0];
+    clientSecret=usernameSecret[1];
+  }
+ else {
+    logger.info("no authorization header");
+    client_id=formData.getFirst("client_id");
+    clientSecret=formData.getFirst("client_secret");
+  }
+  if (client_id == null) {
+    Map<String,String> error=new HashMap<String,String>();
+    error.put("error","invalid_client");
+    error.put("error_description","Could not find client");
+    throw new BadRequestException("Could not find client",Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build());
+  }
+  ClientModel client=realm.findClient(client_id);
+  if (client == null) {
+    Map<String,String> error=new HashMap<String,String>();
+    error.put("error","invalid_client");
+    error.put("error_description","Could not find client");
+    throw new BadRequestException("Could not find client",Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build());
+  }
+  if (!client.isEnabled()) {
+    Map<String,String> error=new HashMap<String,String>();
+    error.put("error","invalid_client");
+    error.put("error_description","Client is not enabled");
+    throw new BadRequestException("Client is not enabled",Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build());
+  }
+  if (!client.isPublicClient()) {
+    if (!client.validateSecret(clientSecret)) {
+      Map<String,String> error=new HashMap<String,String>();
+      error.put("error","unauthorized_client");
+      throw new BadRequestException("Unauthorized Client",Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build());
+    }
+  }
+  return client;
+}

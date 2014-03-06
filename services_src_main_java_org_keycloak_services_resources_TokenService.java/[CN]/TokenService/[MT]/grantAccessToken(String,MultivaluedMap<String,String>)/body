@@ -2,7 +2,10 @@
   if (!checkSsl()) {
     throw new NotAcceptableException("HTTPS required");
   }
-  ClientModel client=authorizeClient(authorizationHeader);
+  ClientModel client=authorizeClient(authorizationHeader,form);
+  if (client.isPublicClient()) {
+    throw new ForbiddenException("Public clients are not allowed to invoke grants/access");
+  }
   String username=form.getFirst(AuthenticationManager.FORM_USERNAME);
   if (username == null) {
     throw new NotAuthorizedException("No user");

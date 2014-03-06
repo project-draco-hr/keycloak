@@ -1,0 +1,28 @@
+{
+  try {
+    CallbackListener callback=new CallbackListener();
+    callback.start();
+    String redirectUri=URLEncoder.encode("http://localhost:" + callback.getPort(),"utf-8");
+    String state=UUID.randomUUID().toString();
+    String loginUrl=authServerUrl + "/rest/realms/" + realm+ "/tokens/login?"+ "client_id="+ clientId+ "&redirect_uri="+ redirectUri+ "&state="+ state;
+    Desktop.getDesktop().browse(new URI(loginUrl));
+    callback.join();
+    if (!state.equals(callback.getStateParam())) {
+      System.err.println("Invalid state received");
+      return;
+    }
+    if (callback.getError() != null) {
+      System.err.println("Failed to login: " + callback.getError());
+      return;
+    }
+    System.out.println("User logged in");
+    String tokenUrl=authServerUrl + "/rest/realms/" + realm+ "/tokens/access/codes";
+    JSONObject response=SimpleHttp.doPost(tokenUrl).param("client_id",clientId).param("code",callback.getCode()).asJson();
+    accessToken=response.getString("access_token");
+    System.out.println("Access token received");
+    return;
+  }
+ catch (  Throwable e) {
+    System.err.println("Failed to log in user: " + e.getMessage());
+  }
+}

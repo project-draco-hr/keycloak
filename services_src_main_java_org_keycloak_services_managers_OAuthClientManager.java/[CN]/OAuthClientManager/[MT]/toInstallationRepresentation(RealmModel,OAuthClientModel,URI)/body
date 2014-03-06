@@ -4,9 +4,12 @@
   rep.setRealmKey(realmModel.getPublicKeyPem());
   rep.setSslNotRequired(realmModel.isSslNotRequired());
   rep.setAuthServerUrl(baseUri.toString());
+  if (model.isPublicClient())   rep.setPublicClient(true);
   rep.setResource(model.getClientId());
-  Map<String,String> creds=new HashMap<String,String>();
-  creds.put(CredentialRepresentation.SECRET,model.getSecret());
-  rep.setCredentials(creds);
+  if (!model.isPublicClient()) {
+    Map<String,String> creds=new HashMap<String,String>();
+    creds.put(CredentialRepresentation.SECRET,model.getSecret());
+    rep.setCredentials(creds);
+  }
   return rep;
 }

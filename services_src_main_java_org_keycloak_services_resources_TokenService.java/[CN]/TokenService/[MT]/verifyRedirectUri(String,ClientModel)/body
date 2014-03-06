@@ -3,11 +3,15 @@
     return client.getRedirectUris().size() == 1 ? client.getRedirectUris().iterator().next() : null;
   }
  else   if (client.getRedirectUris().isEmpty()) {
+    if (client.isPublicClient()) {
+      logger.error("Client redirect uri must be registered for public client");
+      return null;
+    }
     return redirectUri;
   }
  else {
     String r=redirectUri.indexOf('?') != -1 ? redirectUri.substring(0,redirectUri.indexOf('?')) : redirectUri;
-    boolean valid=client.getRedirectUris().contains(r);
+    boolean valid=matchesRedirects(client.getRedirectUris(),r);
     if (!valid && r.startsWith(Constants.INSTALLED_APP_URL) && r.indexOf(':',Constants.INSTALLED_APP_URL.length()) >= 0) {
       int i=r.indexOf(':',Constants.INSTALLED_APP_URL.length());
       StringBuilder sb=new StringBuilder();
@@ -17,7 +21,7 @@
         sb.append(r.substring(i));
       }
       r=sb.toString();
-      valid=client.getRedirectUris().contains(r);
+      valid=matchesRedirects(client.getRedirectUris(),r);
     }
     return valid ? redirectUri : null;
   }

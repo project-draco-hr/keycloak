@@ -3,11 +3,21 @@
   buffer.append("<secure-deployment name=\"WAR MODULE NAME.war\">\n");
   buffer.append("    <realm>").append(realmModel.getName()).append("</realm>\n");
   buffer.append("    <realm-public-key>").append(realmModel.getPublicKeyPem()).append("</realm-public-key>\n");
-  buffer.append("    <auth-server-url>").append(baseUri.toString()).append("</auth-server-url>\n");
+  if (applicationModel.isBearerOnly()) {
+    buffer.append("    <bearer-only>true</bearer-only>\n");
+  }
+ else {
+    buffer.append("    <auth-server-url>").append(baseUri.toString()).append("</auth-server-url>\n");
+    if (applicationModel.isPublicClient() && !applicationModel.isBearerOnly()) {
+      buffer.append("    <public-client>true</public-client>\n");
+    }
+  }
   buffer.append("    <ssl-not-required>").append(realmModel.isSslNotRequired()).append("</ssl-not-required>\n");
   buffer.append("    <resource>").append(applicationModel.getName()).append("</resource>\n");
   String cred=applicationModel.getSecret();
-  buffer.append("    <credential name=\"secret\">").append(cred).append("</credential>\n");
+  if (!applicationModel.isBearerOnly() && !applicationModel.isPublicClient()) {
+    buffer.append("    <credential name=\"secret\">").append(cred).append("</credential>\n");
+  }
   buffer.append("</secure-deployment>\n");
   return buffer.toString();
 }

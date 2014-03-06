@@ -1,6 +1,4 @@
 {
-  AccessScope scopeMap=null;
-  if (scopeParam != null)   scopeMap=decodeScope(scopeParam);
   Set<RoleModel> roleMappings=realm.getRoleMappings(user);
   Set<RoleModel> scopeMappings=realm.getScopeMappings(client);
   ApplicationModel clientApp=(client instanceof ApplicationModel) ? (ApplicationModel)client : null;
@@ -15,14 +13,12 @@
     }
   }
   for (  RoleModel role : requestedRoles) {
-    if (role.getContainer() instanceof RealmModel && desiresScope(scopeMap,"realm",role.getName())) {
+    if (role.getContainer() instanceof RealmModel) {
       realmRolesRequested.add(role);
     }
  else     if (role.getContainer() instanceof ApplicationModel) {
       ApplicationModel app=(ApplicationModel)role.getContainer();
-      if (desiresScope(scopeMap,app.getName(),role.getName())) {
-        resourceRolesRequested.add(app.getName(),role);
-      }
+      resourceRolesRequested.add(app.getName(),role);
     }
   }
   AccessToken token=initToken(realm,client,user);

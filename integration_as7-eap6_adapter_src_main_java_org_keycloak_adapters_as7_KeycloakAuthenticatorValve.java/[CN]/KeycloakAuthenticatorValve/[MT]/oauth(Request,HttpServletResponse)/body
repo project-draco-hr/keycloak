@@ -1,5 +1,5 @@
 {
-  ServletOAuthLogin oauth=new ServletOAuthLogin(realmConfiguration,request,response,request.getConnector().getRedirectPort());
+  ServletOAuthLogin oauth=new ServletOAuthLogin(deployment,request,response,request.getConnector().getRedirectPort());
   String code=oauth.getCode();
   if (code == null) {
     String error=oauth.getError();
@@ -17,8 +17,8 @@
     if (!oauth.resolveCode(code))     return;
     AccessToken token=oauth.getToken();
     Set<String> roles=new HashSet<String>();
-    if (adapterConfig.isUseResourceRoleMappings()) {
-      AccessToken.Access access=token.getResourceAccess(resourceMetadata.getResourceName());
+    if (deployment.isUseResourceRoleMappings()) {
+      AccessToken.Access access=token.getResourceAccess(deployment.getResourceName());
       if (access != null)       roles.addAll(access.getRoles());
     }
  else {
@@ -30,7 +30,7 @@
     Session session=request.getSessionInternal(true);
     session.setPrincipal(principal);
     session.setAuthType("OAUTH");
-    KeycloakSecurityContext skSession=new RefreshableKeycloakSession(oauth.getTokenString(),oauth.getToken(),oauth.getIdTokenString(),oauth.getIdToken(),resourceMetadata,realmConfiguration,oauth.getRefreshToken());
+    KeycloakSecurityContext skSession=new RefreshableKeycloakSession(deployment,oauth.getTokenString(),oauth.getToken(),oauth.getIdTokenString(),oauth.getIdToken(),oauth.getRefreshToken());
     session.setNote(KeycloakSecurityContext.class.getName(),skSession);
     String username=token.getSubject();
     log.debug("userSessionManage.login: " + username);

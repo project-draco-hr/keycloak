@@ -6,8 +6,8 @@
       if (redirect == null) {
         return new AuthenticationMechanism.ChallengeResult(true,StatusCodes.FORBIDDEN);
       }
-      CookieImpl cookie=new CookieImpl(realmInfo.getStateCookieName(),state);
-      cookie.setSecure(realmInfo.isSslRequired());
+      CookieImpl cookie=new CookieImpl(deployment.getStateCookieName(),state);
+      cookie.setSecure(deployment.isSslRequired());
       exchange.setResponseCookie(cookie);
       exchange.getResponseHeaders().put(Headers.LOCATION,redirect);
       return new AuthenticationMechanism.ChallengeResult(true,StatusCodes.FOUND);

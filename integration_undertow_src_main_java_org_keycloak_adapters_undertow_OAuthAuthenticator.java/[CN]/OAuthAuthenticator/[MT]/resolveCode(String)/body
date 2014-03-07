@@ -1,5 +1,5 @@
 {
-  if (realmInfo.isSslRequired() && !isRequestSecure()) {
+  if (deployment.isSslRequired() && !isRequestSecure()) {
     log.error("SSL is required");
     return challenge(StatusCodes.FORBIDDEN);
   }
@@ -9,7 +9,7 @@
   AccessTokenResponse tokenResponse=null;
   strippedOauthParametersRequestUri=stripOauthParametersFromRedirect();
   try {
-    tokenResponse=ServerRequest.invokeAccessCodeToToken(realmInfo,code,strippedOauthParametersRequestUri);
+    tokenResponse=ServerRequest.invokeAccessCodeToToken(deployment,code,strippedOauthParametersRequestUri);
   }
  catch (  ServerRequest.HttpFailure failure) {
     log.error("failed to turn code into token");
@@ -27,7 +27,7 @@ catch (  IOException e) {
   refreshToken=tokenResponse.getRefreshToken();
   idTokenString=tokenResponse.getIdToken();
   try {
-    token=RSATokenVerifier.verifyToken(tokenString,realmInfo.getMetadata().getRealmKey(),realmInfo.getMetadata().getRealm());
+    token=RSATokenVerifier.verifyToken(tokenString,deployment.getRealmKey(),deployment.getRealm());
     if (idTokenString != null) {
       JWSInput input=new JWSInput(idTokenString);
       try {
@@ -43,10 +43,10 @@ catch (  IOException e) {
     log.error("failed verification of token");
     return challenge(StatusCodes.FORBIDDEN);
   }
-  if (tokenResponse.getNotBeforePolicy() > realmInfo.getNotBefore()) {
-    realmInfo.setNotBefore(tokenResponse.getNotBeforePolicy());
+  if (tokenResponse.getNotBeforePolicy() > deployment.getNotBefore()) {
+    deployment.setNotBefore(tokenResponse.getNotBeforePolicy());
   }
-  if (token.getIssuedAt() < realmInfo.getNotBefore()) {
+  if (token.getIssuedAt() < deployment.getNotBefore()) {
     log.error("Stale token");
     return challenge(StatusCodes.FORBIDDEN);
   }

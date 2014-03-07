@@ -1,0 +1,12 @@
+{
+  ObjectMapper mapper=new ObjectMapper();
+  mapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_DEFAULT);
+  AdapterConfig adapterConfig=null;
+  try {
+    adapterConfig=mapper.readValue(is,AdapterConfig.class);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  return new KeycloakDeploymentBuilder().internalBuild(adapterConfig);
+}

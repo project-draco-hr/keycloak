@@ -1,0 +1,17 @@
+{
+  HttpClient client=new HttpClientBuilder().build(adapterConfig);
+  oauthClient.setClient(client);
+  oauthClient.setClientId(adapterConfig.getResource());
+  oauthClient.setPublicClient(adapterConfig.isPublicClient());
+  oauthClient.setCredentials(adapterConfig.getCredentials());
+  if (adapterConfig.getAuthServerUrl() == null) {
+    throw new RuntimeException("You must specify auth-url");
+  }
+  KeycloakUriBuilder serverBuilder=KeycloakUriBuilder.fromUri(adapterConfig.getAuthServerUrl());
+  String authUrl=serverBuilder.clone().path(ServiceUrlConstants.TOKEN_SERVICE_LOGIN_PATH).build(adapterConfig.getRealm()).toString();
+  String tokenUrl=serverBuilder.clone().path(ServiceUrlConstants.TOKEN_SERVICE_ACCESS_CODE_PATH).build(adapterConfig.getRealm()).toString();
+  String refreshUrl=serverBuilder.clone().path(ServiceUrlConstants.TOKEN_SERVICE_REFRESH_PATH).build(adapterConfig.getRealm()).toString();
+  oauthClient.setAuthUrl(authUrl);
+  oauthClient.setCodeUrl(tokenUrl);
+  oauthClient.setRefreshUrl(refreshUrl);
+}

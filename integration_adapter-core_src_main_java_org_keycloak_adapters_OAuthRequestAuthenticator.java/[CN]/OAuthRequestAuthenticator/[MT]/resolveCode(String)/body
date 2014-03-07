@@ -1,0 +1,55 @@
+{
+  if (deployment.isSslRequired() && !isRequestSecure()) {
+    log.error("SSL is required");
+    return challenge(403);
+  }
+  log.info("checking state cookie for after code");
+  AuthChallenge challenge=checkStateCookie();
+  if (challenge != null)   return challenge;
+  AccessTokenResponse tokenResponse=null;
+  strippedOauthParametersRequestUri=stripOauthParametersFromRedirect();
+  try {
+    tokenResponse=ServerRequest.invokeAccessCodeToToken(deployment,code,strippedOauthParametersRequestUri);
+  }
+ catch (  ServerRequest.HttpFailure failure) {
+    log.error("failed to turn code into token");
+    log.error("status from server: " + failure.getStatus());
+    if (failure.getStatus() == 400 && failure.getError() != null) {
+      log.error("   " + failure.getError());
+    }
+    return challenge(403);
+  }
+catch (  IOException e) {
+    log.error("failed to turn code into token",e);
+    return challenge(403);
+  }
+  tokenString=tokenResponse.getToken();
+  refreshToken=tokenResponse.getRefreshToken();
+  idTokenString=tokenResponse.getIdToken();
+  try {
+    token=RSATokenVerifier.verifyToken(tokenString,deployment.getRealmKey(),deployment.getRealm());
+    if (idTokenString != null) {
+      JWSInput input=new JWSInput(idTokenString);
+      try {
+        idToken=input.readJsonContent(IDToken.class);
+      }
+ catch (      IOException e) {
+        throw new VerificationException();
+      }
+    }
+    log.debug("Token Verification succeeded!");
+  }
+ catch (  VerificationException e) {
+    log.error("failed verification of token");
+    return challenge(403);
+  }
+  if (tokenResponse.getNotBeforePolicy() > deployment.getNotBefore()) {
+    deployment.setNotBefore(tokenResponse.getNotBeforePolicy());
+  }
+  if (token.getIssuedAt() < deployment.getNotBefore()) {
+    log.error("Stale token");
+    return challenge(403);
+  }
+  log.info("successful authenticated");
+  return null;
+}

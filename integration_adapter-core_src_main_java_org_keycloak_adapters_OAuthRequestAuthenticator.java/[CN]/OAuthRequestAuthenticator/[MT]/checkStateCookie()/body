@@ -1,0 +1,22 @@
+{
+  HttpFacade.Cookie stateCookie=getCookie(deployment.getStateCookieName());
+  if (stateCookie == null) {
+    log.warn("No state cookie");
+    return challenge(400);
+  }
+  log.info("** reseting application state cookie");
+  facade.getResponse().resetCookie(deployment.getStateCookieName(),stateCookie.getPath());
+  String stateCookieValue=getCookieValue(deployment.getStateCookieName());
+  String state=getQueryParamValue("state");
+  if (state == null) {
+    log.warn("state parameter was null");
+    return challenge(400);
+  }
+  if (!state.equals(stateCookieValue)) {
+    log.warn("state parameter invalid");
+    log.warn("cookie: " + stateCookieValue);
+    log.warn("queryParam: " + state);
+    return challenge(400);
+  }
+  return null;
+}

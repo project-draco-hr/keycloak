@@ -1,0 +1,36 @@
+{
+  log.info("--> authenticate()");
+  BearerTokenRequestAuthenticator bearer=createBearerTokenAuthenticator();
+  AuthOutcome outcome=bearer.authenticate(facade);
+  if (outcome == AuthOutcome.FAILED) {
+    challenge=bearer.getChallenge();
+    return AuthOutcome.FAILED;
+  }
+ else   if (outcome == AuthOutcome.AUTHENTICATED) {
+    completeAuthentication(bearer);
+    return AuthOutcome.AUTHENTICATED;
+  }
+ else   if (deployment.isBearerOnly()) {
+    challenge=bearer.getChallenge();
+    return AuthOutcome.NOT_ATTEMPTED;
+  }
+  if (isCached()) {
+    return AuthOutcome.AUTHENTICATED;
+  }
+  OAuthRequestAuthenticator oauth=createOAuthAuthenticator();
+  outcome=oauth.authenticate();
+  if (outcome == AuthOutcome.FAILED) {
+    challenge=oauth.getChallenge();
+    return AuthOutcome.FAILED;
+  }
+ else   if (outcome == AuthOutcome.NOT_ATTEMPTED) {
+    challenge=oauth.getChallenge();
+    return AuthOutcome.NOT_ATTEMPTED;
+  }
+  completeAuthentication(oauth);
+  facade.getResponse().setHeader("Location",oauth.getStrippedOauthParametersRequestUri());
+  facade.getResponse().setStatus(302);
+  facade.getResponse().end();
+  log.info("AUTHENTICATED");
+  return AuthOutcome.AUTHENTICATED;
+}

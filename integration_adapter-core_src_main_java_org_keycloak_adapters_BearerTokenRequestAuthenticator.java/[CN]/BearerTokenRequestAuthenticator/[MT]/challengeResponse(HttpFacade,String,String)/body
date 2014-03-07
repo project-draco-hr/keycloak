@@ -1,0 +1,19 @@
+{
+  StringBuilder header=new StringBuilder("Bearer realm=\"");
+  header.append(deployment.getRealm()).append("\"");
+  if (error != null) {
+    header.append(", error=\"").append(error).append("\"");
+  }
+  if (description != null) {
+    header.append(", error_description=\"").append(description).append("\"");
+  }
+  final String challenge=header.toString();
+  return new AuthChallenge(){
+    @Override public boolean challenge(    HttpFacade facade){
+      facade.getResponse().setStatus(401);
+      facade.getResponse().addHeader("WWW-Authenticate",challenge);
+      return true;
+    }
+  }
+;
+}

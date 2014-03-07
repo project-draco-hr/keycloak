@@ -1,25 +1,16 @@
 {
-  try {
-    if (bearer(false,request,response))     return true;
- else     if (checkLoggedIn(request,response)) {
-      if (request.getSessionInternal().getNote(Constants.FORM_REQUEST_NOTE) != null) {
-        if (restoreRequest(request,request.getSessionInternal())) {
-          log.debug("restoreRequest");
-          return (true);
-        }
- else {
-          log.debug("Restore of original request failed");
-          response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-          return (false);
-        }
-      }
- else {
-        return true;
-      }
+  CatalinaHttpFacade facade=new CatalinaHttpFacade(request,response);
+  CatalinaRequestAuthenticator authenticator=new CatalinaRequestAuthenticator(deployment,this,userSessionManagement,facade,request);
+  AuthOutcome outcome=authenticator.authenticate();
+  if (outcome == AuthOutcome.AUTHENTICATED) {
+    if (facade.isEnded()) {
+      return false;
     }
-    if (!deployment.isBearerOnly())     oauth(request,response);
+    return true;
   }
- catch (  LoginException e) {
+  AuthChallenge challenge=authenticator.getChallenge();
+  if (challenge != null) {
+    challenge.challenge(facade);
   }
   return false;
 }

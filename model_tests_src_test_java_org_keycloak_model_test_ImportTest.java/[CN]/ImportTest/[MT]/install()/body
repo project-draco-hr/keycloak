@@ -1,8 +1,9 @@
 {
-  RealmManager manager=realmManager;
   RealmRepresentation rep=AbstractModelTest.loadJson("testrealm.json");
-  RealmModel realm=manager.createRealm("demo",rep.getRealm());
-  manager.importRealm(rep,realm);
+  RealmModel realm=realmManager.createRealm("demo",rep.getRealm());
+  realmManager.importRealm(rep,realm);
+  commit();
+  realm=realmManager.getRealm("demo");
   Assert.assertTrue(realm.isVerifyEmail());
   Assert.assertFalse(realm.isUpdateProfileOnInitialSocialLogin());
   List<RequiredCredentialModel> creds=realm.getRequiredCredentials();
@@ -54,6 +55,8 @@
   Assert.assertEquals(1,appRoles.size());
   Assert.assertEquals("app-admin",appRoles.iterator().next().getName());
   ClientModel oauthClient=realm.findClient("oauthclient");
+  Assert.assertEquals("clientpassword",oauthClient.getSecret());
+  Assert.assertEquals(true,oauthClient.isEnabled());
   Assert.assertNotNull(oauthClient);
   Set<RoleModel> allScopes=realm.getScopeMappings(oauthClient);
   Assert.assertEquals(2,allScopes.size());

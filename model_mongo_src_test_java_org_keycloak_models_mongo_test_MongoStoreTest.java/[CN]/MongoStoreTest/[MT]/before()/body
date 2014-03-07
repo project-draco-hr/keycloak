@@ -1,10 +1,4 @@
 {
-  try {
-    mongoClient=new MongoClient("localhost",SystemPropertiesConfigurationProvider.getMongoPort());
-    DB db=mongoClient.getDB("keycloakTest");
-    mongoStore=new MongoStoreImpl(db,true,MANAGED_DATA_TYPES);
-  }
- catch (  UnknownHostException e) {
-    throw new RuntimeException(e);
-  }
+  mongoClientProvider=MongoClientProviderHolder.getInstance();
+  mongoStore=new MongoStoreImpl(mongoClientProvider.getDB(),true,MANAGED_DATA_TYPES);
 }

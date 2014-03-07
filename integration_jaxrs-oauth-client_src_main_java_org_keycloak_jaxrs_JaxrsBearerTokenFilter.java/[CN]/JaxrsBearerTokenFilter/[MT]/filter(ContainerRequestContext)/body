@@ -9,15 +9,15 @@
   if (!split[0].equalsIgnoreCase("Bearer"))   challengeResponse(request,null,null);
   String tokenString=split[1];
   try {
-    AccessToken token=RSATokenVerifier.verifyToken(tokenString,resourceMetadata.getRealmKey(),resourceMetadata.getRealm());
-    KeycloakSecurityContext skSession=new KeycloakSecurityContext(tokenString,token,null,null,resourceMetadata);
+    AccessToken token=RSATokenVerifier.verifyToken(tokenString,realmPublicKey,realm);
+    KeycloakSecurityContext skSession=new KeycloakSecurityContext(tokenString,token,null,null);
     ResteasyProviderFactory.pushContext(KeycloakSecurityContext.class,skSession);
     String callerPrincipal=securityContext.getUserPrincipal() != null ? securityContext.getUserPrincipal().getName() : null;
     final KeycloakPrincipal principal=new KeycloakPrincipal(token.getSubject(),callerPrincipal);
     final boolean isSecure=securityContext.isSecure();
     final AccessToken.Access access;
-    if (resourceMetadata.getResourceName() != null) {
-      access=token.getResourceAccess(resourceMetadata.getResourceName());
+    if (resourceName != null) {
+      access=token.getResourceAccess(resourceName);
     }
  else {
       access=token.getRealmAccess();

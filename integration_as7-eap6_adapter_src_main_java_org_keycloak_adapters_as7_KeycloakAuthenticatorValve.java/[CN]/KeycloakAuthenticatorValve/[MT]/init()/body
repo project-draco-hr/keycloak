@@ -1,9 +1,5 @@
 {
-  RealmConfigurationLoader configLoader=new CatalinaAdapterConfigLoader(context);
-  configLoader.init(true);
-  resourceMetadata=configLoader.getResourceMetadata();
-  adapterConfig=configLoader.getAdapterConfig();
-  realmConfiguration=configLoader.getRealmConfiguration();
-  AuthenticatedActionsValve actions=new AuthenticatedActionsValve(adapterConfig,getNext(),getContainer(),getController());
+  this.deployment=KeycloakDeploymentBuilder.build(getConfigInputStream(context));
+  AuthenticatedActionsValve actions=new AuthenticatedActionsValve(deployment,getNext(),getContainer(),getController());
   setNext(actions);
 }

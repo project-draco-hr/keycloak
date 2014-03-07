@@ -2,8 +2,7 @@
   if (request.getSessionInternal(false) == null || request.getSessionInternal().getPrincipal() == null)   return;
   RefreshableKeycloakSession session=(RefreshableKeycloakSession)request.getSessionInternal().getNote(KeycloakSecurityContext.class.getName());
   if (session == null)   return;
-  session.setRealmConfiguration(realmConfiguration);
-  session.setMetadata(resourceMetadata);
+  session.setDeployment(deployment);
   if (session.isActive())   return;
   session.refreshExpiredToken();
   if (session.isActive())   return;

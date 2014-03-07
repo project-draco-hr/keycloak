@@ -14,22 +14,22 @@
   if (!split[0].equalsIgnoreCase("Bearer"))   challengeResponse(response,null,null);
   tokenString=split[1];
   try {
-    token=RSATokenVerifier.verifyToken(tokenString,resourceMetadata.getRealmKey(),resourceMetadata.getRealm());
+    token=RSATokenVerifier.verifyToken(tokenString,deployment.getRealmKey(),deployment.getRealm());
   }
  catch (  VerificationException e) {
     log.error("Failed to verify token",e);
     challengeResponse(response,"invalid_token",e.getMessage());
   }
-  if (token.getIssuedAt() < notBefore) {
+  if (token.getIssuedAt() < deployment.getNotBefore()) {
     log.error("Stale token");
     challengeResponse(response,"invalid_token","Stale token");
   }
   boolean verifyCaller=false;
   Set<String> roles=new HashSet<String>();
-  if (useResourceRoleMappings) {
-    AccessToken.Access access=token.getResourceAccess(resourceMetadata.getResourceName());
+  if (deployment.isUseResourceRoleMappings()) {
+    AccessToken.Access access=token.getResourceAccess(deployment.getResourceName());
     if (access != null)     roles=access.getRoles();
-    verifyCaller=token.isVerifyCaller(resourceMetadata.getResourceName());
+    verifyCaller=token.isVerifyCaller(deployment.getResourceName());
   }
  else {
     verifyCaller=token.isVerifyCaller();
@@ -53,7 +53,7 @@
   principal=new CatalinaSecurityContextHelper().createPrincipal(request.getContext().getRealm(),skeletonKeyPrincipal,roles);
   request.setUserPrincipal(principal);
   request.setAuthType("KEYCLOAK");
-  KeycloakSecurityContext skSession=new KeycloakSecurityContext(tokenString,token,null,null,resourceMetadata);
+  KeycloakSecurityContext skSession=new KeycloakSecurityContext(tokenString,token,null,null);
   request.setAttribute(KeycloakSecurityContext.class.getName(),skSession);
   return true;
 }

@@ -1,6 +1,6 @@
 {
   String url=getRequestUrl();
-  if (!isRequestSecure() && realmInfo.isSslRequired()) {
+  if (!isRequestSecure() && deployment.isSslRequired()) {
     int port=redirectPort;
     if (port < 0) {
       return null;
@@ -9,9 +9,9 @@
     if (port != 443)     secureUrl.port(port);
     url=secureUrl.build().toString();
   }
-  KeycloakUriBuilder uriBuilder=realmInfo.getAuthUrl().clone().queryParam("client_id",realmInfo.getMetadata().getResourceName()).queryParam("redirect_uri",url).queryParam("state",state).queryParam("login","true");
-  if (realmInfo.getMetadata().getScope() != null) {
-    uriBuilder.queryParam("scope",realmInfo.getMetadata().getScope());
+  KeycloakUriBuilder uriBuilder=deployment.getAuthUrl().clone().queryParam("client_id",deployment.getResourceName()).queryParam("redirect_uri",url).queryParam("state",state).queryParam("login","true");
+  if (deployment.getScope() != null) {
+    uriBuilder.queryParam("scope",deployment.getScope());
   }
   return uriBuilder.build().toString();
 }

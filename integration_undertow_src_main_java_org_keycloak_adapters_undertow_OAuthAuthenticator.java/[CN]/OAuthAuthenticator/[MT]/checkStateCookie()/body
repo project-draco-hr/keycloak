@@ -1,15 +1,15 @@
 {
-  Cookie stateCookie=getCookie(realmInfo.getStateCookieName());
+  Cookie stateCookie=getCookie(deployment.getStateCookieName());
   if (stateCookie == null) {
     log.warn("No state cookie");
     return challenge(StatusCodes.BAD_REQUEST);
   }
   log.info("** reseting application state cookie");
-  Cookie reset=new CookieImpl(realmInfo.getStateCookieName(),"");
+  Cookie reset=new CookieImpl(deployment.getStateCookieName(),"");
   reset.setPath(stateCookie.getPath());
   reset.setMaxAge(0);
   exchange.setResponseCookie(reset);
-  String stateCookieValue=getCookieValue(realmInfo.getStateCookieName());
+  String stateCookieValue=getCookieValue(deployment.getStateCookieName());
   String state=getQueryParamValue("state");
   if (state == null) {
     log.warn("state parameter was null");

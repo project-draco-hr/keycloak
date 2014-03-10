@@ -1,0 +1,23 @@
+{
+  log.info("K_LOGOUT sent");
+  try {
+    JWSInput token=verifyAdminRequest();
+    if (token == null) {
+      return;
+    }
+    LogoutAction action=JsonSerialization.readValue(token.getContent(),LogoutAction.class);
+    if (!validateAction(action))     return;
+    String user=action.getUser();
+    if (user != null) {
+      log.info("logout of session for: " + user);
+      userSessionManagement.logout(user);
+    }
+ else {
+      log.info("logout of all sessions");
+      userSessionManagement.logoutAll();
+    }
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

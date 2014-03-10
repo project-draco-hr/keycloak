@@ -1,0 +1,24 @@
+{
+  String requestUri=facade.getRequest().getURI();
+  log.debugv("adminRequest {0}",requestUri);
+  if (preflightCors()) {
+    return true;
+  }
+  if (requestUri.endsWith(AdapterConstants.K_LOGOUT)) {
+    handleLogout();
+    return true;
+  }
+ else   if (requestUri.endsWith(AdapterConstants.K_PUSH_NOT_BEFORE)) {
+    handlePushNotBefore();
+    return true;
+  }
+ else   if (requestUri.endsWith(AdapterConstants.K_GET_SESSION_STATS)) {
+    handleGetSessionStats();
+    return true;
+  }
+ else   if (requestUri.endsWith(AdapterConstants.K_GET_USER_STATS)) {
+    handleGetUserStats();
+    return true;
+  }
+  return false;
+}

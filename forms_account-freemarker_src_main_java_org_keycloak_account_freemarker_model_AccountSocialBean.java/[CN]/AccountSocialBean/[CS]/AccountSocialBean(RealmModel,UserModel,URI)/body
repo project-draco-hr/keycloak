@@ -1,0 +1,18 @@
+{
+  URI accountSocialUpdateUri=Urls.accountSocialUpdate(baseUri,realm.getName());
+  this.socialLinks=new LinkedList<SocialLinkEntry>();
+  Map<String,String> socialConfig=realm.getSocialConfig();
+  Set<SocialLinkModel> userSocialLinks=realm.getSocialLinks(user);
+  if (socialConfig != null && !socialConfig.isEmpty()) {
+    for (    SocialProvider provider : SocialLoader.load()) {
+      String socialProviderId=provider.getId();
+      if (socialConfig.containsKey(socialProviderId + ".key")) {
+        String socialUsername=getSocialUsername(userSocialLinks,socialProviderId);
+        String action=socialUsername != null ? "remove" : "add";
+        String actionUrl=UriBuilder.fromUri(accountSocialUpdateUri).queryParam("action",action).queryParam("provider_id",socialProviderId).build().toString();
+        SocialLinkEntry entry=new SocialLinkEntry(socialProviderId,provider.getName(),socialUsername,actionUrl);
+        this.socialLinks.add(entry);
+      }
+    }
+  }
+}

@@ -5,10 +5,6 @@
   if (provider == null) {
     return Flows.forms(realm,request,uriInfo).setError("Social provider not found").createErrorPage();
   }
-  String key=realm.getSocialConfig().get(providerId + ".key");
-  String secret=realm.getSocialConfig().get(providerId + ".secret");
-  String callbackUri=Urls.socialCallback(uriInfo.getBaseUri()).toString();
-  SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
     logger.warn("Unknown login requester: " + clientId);
@@ -23,10 +19,7 @@
     return Flows.forms(realm,request,uriInfo).setError("Invalid redirect_uri.").createErrorPage();
   }
   try {
-    AuthRequest authRequest=provider.getAuthUrl(config);
-    RequestDetails socialRequest=RequestDetails.create(providerId).putSocialAttributes(authRequest.getAttributes()).putClientAttribute("realm",realmName).putClientAttribute("clientId",clientId).putClientAttribute("scope",scope).putClientAttribute("state",state).putClientAttribute("redirectUri",redirectUri).build();
-    socialRequestManager.addRequest(authRequest.getId(),socialRequest);
-    return Response.status(Status.FOUND).location(authRequest.getAuthUri()).build();
+    return Flows.social(socialRequestManager,realm,uriInfo,provider).putClientAttribute("realm",realmName).putClientAttribute("clientId",clientId).putClientAttribute("scope",scope).putClientAttribute("state",state).putClientAttribute("redirectUri",redirectUri).redirectToSocialProvider();
   }
  catch (  Throwable t) {
     return Flows.forms(realm,request,uriInfo).setError("Failed to redirect to social auth").createErrorPage();

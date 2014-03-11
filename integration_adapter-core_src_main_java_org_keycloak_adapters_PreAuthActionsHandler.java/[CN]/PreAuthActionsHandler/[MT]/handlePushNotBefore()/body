@@ -1,0 +1,15 @@
+{
+  log.info("K_PUSH_NOT_BEFORE sent");
+  try {
+    JWSInput token=verifyAdminRequest();
+    if (token == null) {
+      return;
+    }
+    PushNotBeforeAction action=JsonSerialization.readValue(token.getContent(),PushNotBeforeAction.class);
+    if (!validateAction(action))     return;
+    deployment.setNotBefore(action.getNotBefore());
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

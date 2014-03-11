@@ -1,0 +1,18 @@
+{
+  if (!action.validate()) {
+    log.warn("admin request failed, not validated" + action.getAction());
+    facade.getResponse().sendError(400,"Not validated");
+    return false;
+  }
+  if (action.isExpired()) {
+    log.warn("admin request failed, expired token");
+    facade.getResponse().sendError(400,"Expired token");
+    return false;
+  }
+  if (!deployment.getResourceName().equals(action.getResource())) {
+    log.warn("Resource name does not match");
+    facade.getResponse().sendError(400,"Resource name does not match");
+    return false;
+  }
+  return true;
+}

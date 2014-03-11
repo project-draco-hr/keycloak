@@ -1,10 +1,7 @@
 {
   log.debugv("AuthenticatedActionsValve.invoke {0}",request.getRequestURI());
-  KeycloakSecurityContext session=getSkeletonKeySession(request);
-  if (corsRequest(request,response,session))   return;
-  String requestUri=request.getRequestURI();
-  if (requestUri.endsWith(AdapterConstants.K_QUERY_BEARER_TOKEN)) {
-    queryBearerToken(request,response,session);
+  AuthenticatedActionsHandler handler=new AuthenticatedActionsHandler(deployment,new CatalinaHttpFacade(request,response));
+  if (handler.handledRequest()) {
     return;
   }
   getNext().invoke(request,response);

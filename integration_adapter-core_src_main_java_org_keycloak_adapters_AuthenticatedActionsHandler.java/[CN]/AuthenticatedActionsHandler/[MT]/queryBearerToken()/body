@@ -1,0 +1,13 @@
+{
+  log.debugv("queryBearerToken {0}",facade.getRequest().getURI());
+  if (abortTokenResponse())   return;
+  facade.getResponse().setStatus(200);
+  facade.getResponse().setHeader("Content-Type","text/plain");
+  try {
+    facade.getResponse().getOutputStream().write(facade.getSecurityContext().getTokenString().getBytes());
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  facade.getResponse().end();
+}

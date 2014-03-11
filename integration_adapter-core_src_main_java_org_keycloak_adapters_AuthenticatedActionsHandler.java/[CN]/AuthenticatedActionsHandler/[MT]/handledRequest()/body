@@ -1,0 +1,10 @@
+{
+  log.debugv("AuthenticatedActionsValve.invoke {0}",facade.getRequest().getURI());
+  if (corsRequest())   return true;
+  String requestUri=facade.getRequest().getURI();
+  if (requestUri.endsWith(AdapterConstants.K_QUERY_BEARER_TOKEN)) {
+    queryBearerToken();
+    return true;
+  }
+  return false;
+}

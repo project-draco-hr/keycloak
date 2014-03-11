@@ -1,39 +1,7 @@
 {
   try {
-    if (deployment.isCors() && new CorsPreflightChecker(deployment).checkCorsPreflight(request,response)) {
-      return;
-    }
-    String requestURI=request.getDecodedRequestURI();
-    if (requestURI.endsWith(AdapterConstants.K_LOGOUT)) {
-      JWSInput input=verifyAdminRequest(request,response);
-      if (input == null) {
-        return;
-      }
-      remoteLogout(input,response);
-      return;
-    }
- else     if (requestURI.endsWith(AdapterConstants.K_PUSH_NOT_BEFORE)) {
-      JWSInput input=verifyAdminRequest(request,response);
-      if (input == null) {
-        return;
-      }
-      pushNotBefore(input,response);
-      return;
-    }
- else     if (requestURI.endsWith(AdapterConstants.K_GET_SESSION_STATS)) {
-      JWSInput input=verifyAdminRequest(request,response);
-      if (input == null) {
-        return;
-      }
-      getSessionStats(input,response);
-      return;
-    }
- else     if (requestURI.endsWith(AdapterConstants.K_GET_USER_STATS)) {
-      JWSInput input=verifyAdminRequest(request,response);
-      if (input == null) {
-        return;
-      }
-      getUserStats(input,response);
+    PreAuthActionsHandler handler=new PreAuthActionsHandler(userSessionManagement,deployment,new CatalinaHttpFacade(request,response));
+    if (handler.handleRequest()) {
       return;
     }
     checkKeycloakSession(request);

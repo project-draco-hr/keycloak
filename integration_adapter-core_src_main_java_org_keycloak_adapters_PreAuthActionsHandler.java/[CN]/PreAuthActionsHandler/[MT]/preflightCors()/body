@@ -1,0 +1,33 @@
+{
+  log.debugv("checkCorsPreflight {0}",facade.getRequest().getURI());
+  if (!facade.getRequest().getMethod().equalsIgnoreCase("OPTIONS")) {
+    return false;
+  }
+  if (facade.getRequest().getHeader(CorsHeaders.ORIGIN) == null) {
+    log.debug("checkCorsPreflight: no origin header");
+    return false;
+  }
+  log.debug("Preflight request returning");
+  facade.getResponse().setStatus(200);
+  String origin=facade.getRequest().getHeader(CorsHeaders.ORIGIN);
+  facade.getResponse().setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,origin);
+  facade.getResponse().setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS,"true");
+  String requestMethods=facade.getRequest().getHeader(CorsHeaders.ACCESS_CONTROL_REQUEST_METHOD);
+  if (requestMethods != null) {
+    if (deployment.getCorsAllowedMethods() != null) {
+      requestMethods=deployment.getCorsAllowedMethods();
+    }
+    facade.getResponse().setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS,requestMethods);
+  }
+  String allowHeaders=facade.getRequest().getHeader(CorsHeaders.ACCESS_CONTROL_REQUEST_HEADERS);
+  if (allowHeaders != null) {
+    if (deployment.getCorsAllowedHeaders() != null) {
+      allowHeaders=deployment.getCorsAllowedHeaders();
+    }
+    facade.getResponse().setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS,allowHeaders);
+  }
+  if (deployment.getCorsMaxAge() > -1) {
+    facade.getResponse().setHeader(CorsHeaders.ACCESS_CONTROL_MAX_AGE,Integer.toString(deployment.getCorsMaxAge()));
+  }
+  return true;
+}

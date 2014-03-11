@@ -1,0 +1,7 @@
+{
+  final ServletRequestContext servletRequestContext=exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+  SessionManagementBridge bridge=new SessionManagementBridge(userSessionManagement,servletRequestContext.getDeployment().getSessionManager());
+  PreAuthActionsHandler handler=new PreAuthActionsHandler(bridge,deployment,new UndertowHttpFacade(exchange));
+  if (handler.handleRequest())   return;
+  next.handleRequest(exchange);
+}

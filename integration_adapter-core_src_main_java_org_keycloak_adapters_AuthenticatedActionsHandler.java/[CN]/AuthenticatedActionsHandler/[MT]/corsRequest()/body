@@ -1,0 +1,32 @@
+{
+  if (!deployment.isCors())   return false;
+  KeycloakSecurityContext securityContext=facade.getSecurityContext();
+  String origin=facade.getRequest().getHeader(CorsHeaders.ORIGIN);
+  log.debugv("Origin: {0} uri: {1}",origin,facade.getRequest().getURI());
+  if (securityContext != null && origin != null) {
+    AccessToken token=securityContext.getToken();
+    Set<String> allowedOrigins=token.getAllowedOrigins();
+    if (log.isDebugEnabled()) {
+      for (      String a : allowedOrigins)       log.debug("   " + a);
+    }
+    if (allowedOrigins == null || (!allowedOrigins.contains("*") && !allowedOrigins.contains(origin))) {
+      if (allowedOrigins == null) {
+        log.debugv("allowedOrigins was null in token");
+      }
+      if (!allowedOrigins.contains("*") && !allowedOrigins.contains(origin)) {
+        log.debugv("allowedOrigins did not contain origin");
+      }
+      facade.getResponse().setStatus(403);
+      facade.getResponse().end();
+      return true;
+    }
+    log.debugv("returning origin: {0}",origin);
+    facade.getResponse().setStatus(200);
+    facade.getResponse().setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,origin);
+    facade.getResponse().setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS,"true");
+  }
+ else {
+    log.debugv("cors validation not needed as we're not a secure session or origin header was null: {0}",facade.getRequest().getURI());
+  }
+  return false;
+}

@@ -1,0 +1,18 @@
+{
+  Group roles=null;
+  Iterator<Principal> iter=principals.iterator();
+  while (iter.hasNext()) {
+    Object next=iter.next();
+    if ((next instanceof Group) == false)     continue;
+    Group grp=(Group)next;
+    if (grp.getName().equals(name)) {
+      roles=grp;
+      break;
+    }
+  }
+  if (roles == null) {
+    roles=new SimpleGroup(name);
+    principals.add(roles);
+  }
+  return roles;
+}

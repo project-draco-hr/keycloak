@@ -1,0 +1,15 @@
+{
+  Set<String> roles=null;
+  if (session.getDeployment().isUseResourceRoleMappings()) {
+    log.info("useResourceRoleMappings");
+    AccessToken.Access access=accessToken.getResourceAccess(session.getDeployment().getResourceName());
+    if (access != null)     roles=access.getRoles();
+  }
+ else {
+    log.info("use realm role mappings");
+    AccessToken.Access access=accessToken.getRealmAccess();
+    if (access != null)     roles=access.getRoles();
+  }
+  if (roles == null)   roles=Collections.emptySet();
+  this.accountRoles=roles;
+}

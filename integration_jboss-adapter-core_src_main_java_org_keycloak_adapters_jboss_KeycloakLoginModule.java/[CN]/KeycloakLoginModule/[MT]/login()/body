@@ -1,0 +1,19 @@
+{
+  log.info("KeycloakLoginModule.login()");
+  if (super.login() == true) {
+    log.info("super.login()==true");
+    return true;
+  }
+  Object credential=getCredential();
+  if (credential != null && (credential instanceof KeycloakAccount)) {
+    log.info("Found Account");
+    KeycloakAccount account=(KeycloakAccount)credential;
+    roleSet=account.getRoles();
+    identity=account.getPrincipal();
+    sharedState.put("javax.security.auth.login.name",identity);
+    sharedState.put("javax.security.auth.login.password",credential);
+    loginOk=true;
+    return true;
+  }
+  return false;
+}

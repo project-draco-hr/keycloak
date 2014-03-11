@@ -1,0 +1,30 @@
+{
+  super.propagateKeycloakContext(account);
+  SecurityInfoHelper.propagateSessionInfo(account);
+  log.info("propagate security context to wildfly");
+  Subject subject=new Subject();
+  Set<Principal> principals=subject.getPrincipals();
+  principals.add(account.getPrincipal());
+  Group[] roleSets=getRoleSets(account.getRoles());
+  for (int g=0; g < roleSets.length; g++) {
+    Group group=roleSets[g];
+    String name=group.getName();
+    Group subjectGroup=createGroup(name,principals);
+    if (subjectGroup instanceof NestableGroup) {
+      SimpleGroup tmp=new SimpleGroup("Roles");
+      subjectGroup.addMember(tmp);
+      subjectGroup=tmp;
+    }
+    Enumeration<? extends Principal> members=group.members();
+    while (members.hasMoreElements()) {
+      Principal role=(Principal)members.nextElement();
+      subjectGroup.addMember(role);
+    }
+  }
+  Group callerGroup=new SimpleGroup(SecurityConstants.CALLER_PRINCIPAL_GROUP);
+  callerGroup.addMember(account.getPrincipal());
+  principals.add(callerGroup);
+  org.jboss.security.SecurityContext sc=SecurityContextAssociation.getSecurityContext();
+  Principal userPrincipal=getPrincipal(subject);
+  sc.getUtil().createSubjectInfo(userPrincipal,account,subject);
+}

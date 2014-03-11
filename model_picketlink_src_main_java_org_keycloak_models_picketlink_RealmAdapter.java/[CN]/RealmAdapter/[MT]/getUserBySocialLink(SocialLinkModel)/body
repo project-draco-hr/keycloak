@@ -1,14 +1,14 @@
 {
   RelationshipQuery<SocialLinkRelationship> query=getRelationshipManager().createRelationshipQuery(SocialLinkRelationship.class);
   query.setParameter(SocialLinkRelationship.SOCIAL_PROVIDER,socialLink.getSocialProvider());
-  query.setParameter(SocialLinkRelationship.SOCIAL_USERNAME,socialLink.getSocialUsername());
+  query.setParameter(SocialLinkRelationship.SOCIAL_USERNAME,socialLink.getSocialUserId());
   query.setParameter(SocialLinkRelationship.REALM,realm.getName());
   List<SocialLinkRelationship> results=query.getResultList();
   if (results.isEmpty()) {
     return null;
   }
  else   if (results.size() > 1) {
-    throw new IllegalStateException("More results found for socialProvider=" + socialLink.getSocialProvider() + ", socialUsername="+ socialLink.getSocialUsername()+ ", results="+ results);
+    throw new IllegalStateException("More results found for socialProvider=" + socialLink.getSocialProvider() + ", socialUserId="+ socialLink.getSocialUserId()+ ", results="+ results);
   }
  else {
     User user=results.get(0).getUser();

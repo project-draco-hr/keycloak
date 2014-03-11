@@ -17,15 +17,21 @@
       redirectUri=p.getValue();
     }
   }
-  String redirect=redirectUri + "?username=" + req.getParameter("username")+ "&state="+ state+ "&code="+ UUID.randomUUID().toString();
-  if (req.getParameter("firstname") != null) {
-    redirect+="&firstname=" + req.getParameter("firstname");
+  String redirect;
+  if (req.getParameter("login") != null) {
+    redirect=redirectUri + "?id=" + req.getParameter("id")+ "&username="+ req.getParameter("username")+ "&state="+ state+ "&code="+ UUID.randomUUID().toString();
+    if (req.getParameter("firstname") != null) {
+      redirect+="&firstname=" + req.getParameter("firstname");
+    }
+    if (req.getParameter("lastname") != null) {
+      redirect+="&lastname=" + req.getParameter("lastname");
+    }
+    if (req.getParameter("email") != null) {
+      redirect+="&email=" + req.getParameter("email");
+    }
   }
-  if (req.getParameter("lastname") != null) {
-    redirect+="&lastname=" + req.getParameter("lastname");
-  }
-  if (req.getParameter("email") != null) {
-    redirect+="&email=" + req.getParameter("email");
+ else {
+    redirect=redirectUri + "?error=access_denied&state=" + state;
   }
   resp.sendRedirect(redirect);
 }

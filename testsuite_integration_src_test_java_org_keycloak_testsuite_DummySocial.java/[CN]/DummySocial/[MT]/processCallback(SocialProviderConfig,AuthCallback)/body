@@ -1,4 +1,8 @@
 {
+  String error=callback.getQueryParam("error");
+  if (error != null) {
+    throw new SocialAccessDeniedException();
+  }
   if (!callback.getQueryParam("state").equals(callback.getAttribute("state"))) {
     throw new SocialProviderException("Invalid state");
   }

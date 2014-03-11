@@ -1,6 +1,9 @@
 {
   Set<String> roles=getRolesFromToken(securityContext);
-  Principal generalPrincipal=new CatalinaSecurityContextHelper().createPrincipal(request.getContext().getRealm(),principal,roles);
+  for (  String role : roles) {
+    log.info("Bearer role: " + role);
+  }
+  Principal generalPrincipal=new CatalinaSecurityContextHelper().createPrincipal(request.getContext().getRealm(),principal,roles,securityContext);
   request.setUserPrincipal(generalPrincipal);
   request.setAuthType("KEYCLOAK");
   request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);

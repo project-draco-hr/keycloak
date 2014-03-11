@@ -11,7 +11,8 @@
     log.info("Account was not in session, returning null");
     return false;
   }
-  if (account.isActive(deployment)) {
+  account.setDeployment(deployment);
+  if (account.isActive()) {
     log.info("Cached account found");
     securityContext.authenticationComplete(account,"KEYCLOAK",false);
     propagateKeycloakContext(account);

@@ -1,6 +1,6 @@
 {
   UndertowHttpFacade facade=new UndertowHttpFacade(exchange);
-  ServletRequestAuthenticator authenticator=new ServletRequestAuthenticator(facade,deployment,portManager.getConfidentialPort(exchange),securityContext,exchange,userSessionManagement);
+  ServletRequestAuthenticator authenticator=createRequestAuthenticator(exchange,securityContext,facade);
   AuthOutcome outcome=authenticator.authenticate();
   if (outcome == AuthOutcome.AUTHENTICATED) {
     return AuthenticationMechanismOutcome.AUTHENTICATED;

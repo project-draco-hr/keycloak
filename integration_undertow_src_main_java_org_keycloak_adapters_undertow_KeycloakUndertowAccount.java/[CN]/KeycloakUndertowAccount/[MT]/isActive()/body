@@ -1,0 +1,15 @@
+{
+  if (session.isActive()) {
+    log.info("session is active");
+    return true;
+  }
+  log.info("session is not active try refresh");
+  session.refreshExpiredToken();
+  if (!session.isActive()) {
+    log.info("session is not active return with failure");
+    return false;
+  }
+  log.info("refresh succeeded");
+  setRoles(session.getToken());
+  return true;
+}

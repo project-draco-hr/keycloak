@@ -26,11 +26,20 @@
   try {
     socialUser=provider.processCallback(config,callback);
   }
- catch (  SocialProviderException e) {
+ catch (  SocialAccessDeniedException e) {
+    MultivaluedHashMap<String,String> queryParms=new MultivaluedHashMap<String,String>();
+    queryParms.putSingle("client_id",requestData.getClientAttribute("clientId"));
+    queryParms.putSingle("state",requestData.getClientAttribute("state"));
+    queryParms.putSingle("scope",requestData.getClientAttribute("scope"));
+    queryParms.putSingle("redirect_uri",requestData.getClientAttribute("redirectUri"));
+    queryParms.putSingle("response_type",requestData.getClientAttribute("responseType"));
+    return Flows.forms(realm,request,uriInfo).setQueryParams(queryParms).setWarning("Access denied").createLogin();
+  }
+catch (  SocialProviderException e) {
     logger.warn("Failed to process social callback",e);
     return oauth.forwardToSecurityFailure("Failed to process social callback");
   }
-  SocialLinkModel socialLink=new SocialLinkModel(provider.getId(),socialUser.getId());
+  SocialLinkModel socialLink=new SocialLinkModel(provider.getId(),socialUser.getId(),socialUser.getUsername());
   UserModel user=realm.getUserBySocialLink(socialLink);
   String userId=requestData.getClientAttribute("userId");
   if (userId != null) {

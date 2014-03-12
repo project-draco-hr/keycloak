@@ -1,11 +1,16 @@
 {
-  for (  SocialProvider provider : SocialLoader.load()) {
-    if (queryParams.containsKey(provider.getRequestIdParamName())) {
-      String requestId=queryParams.get(provider.getRequestIdParamName())[0];
-      if (socialRequestManager.isRequestId(requestId)) {
-        return socialRequestManager.retrieveData(requestId);
-      }
-    }
+  String requestId=null;
+  if (queryParams.containsKey("state")) {
+    requestId=queryParams.get("state")[0];
+  }
+ else   if (queryParams.containsKey("oauth_token")) {
+    requestId=queryParams.get("oauth_token")[0];
+  }
+ else   if (queryParams.containsKey("denied")) {
+    requestId=queryParams.get("denied")[0];
+  }
+  if (requestId != null && socialRequestManager.isRequestId(requestId)) {
+    return socialRequestManager.retrieveData(requestId);
   }
   return null;
 }

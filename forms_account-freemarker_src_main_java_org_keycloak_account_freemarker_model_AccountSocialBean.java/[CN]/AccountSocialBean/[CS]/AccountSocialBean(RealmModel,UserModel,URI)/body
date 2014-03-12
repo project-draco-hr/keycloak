@@ -7,10 +7,10 @@
     for (    SocialProvider provider : SocialLoader.load()) {
       String socialProviderId=provider.getId();
       if (socialConfig.containsKey(socialProviderId + ".key")) {
-        String socialUsername=getSocialUsername(userSocialLinks,socialProviderId);
-        String action=socialUsername != null ? "remove" : "add";
+        SocialLinkModel socialLink=getSocialLink(userSocialLinks,socialProviderId);
+        String action=socialLink != null ? "remove" : "add";
         String actionUrl=UriBuilder.fromUri(accountSocialUpdateUri).queryParam("action",action).queryParam("provider_id",socialProviderId).build().toString();
-        SocialLinkEntry entry=new SocialLinkEntry(socialProviderId,provider.getName(),socialUsername,actionUrl);
+        SocialLinkEntry entry=new SocialLinkEntry(socialLink,provider.getName(),actionUrl);
         this.socialLinks.add(entry);
       }
     }

@@ -1,0 +1,27 @@
+{
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.getRealmByName(realmName);
+  SocialProvider provider=SocialLoader.load(providerId);
+  if (provider == null) {
+    return Flows.forms(realm,request,uriInfo).setError("Social provider not found").createErrorPage();
+  }
+  ClientModel client=realm.findClient(clientId);
+  if (client == null) {
+    logger.warn("Unknown login requester: " + clientId);
+    return Flows.forms(realm,request,uriInfo).setError("Unknown login requester.").createErrorPage();
+  }
+  if (!client.isEnabled()) {
+    logger.warn("Login requester not enabled.");
+    return Flows.forms(realm,request,uriInfo).setError("Login requester not enabled.").createErrorPage();
+  }
+  redirectUri=TokenService.verifyRedirectUri(redirectUri,client);
+  if (redirectUri == null) {
+    return Flows.forms(realm,request,uriInfo).setError("Invalid redirect_uri.").createErrorPage();
+  }
+  try {
+    return Flows.social(socialRequestManager,realm,uriInfo,provider).putClientAttribute("realm",realmName).putClientAttribute("clientId",clientId).putClientAttribute("scope",scope).putClientAttribute("state",state).putClientAttribute("redirectUri",redirectUri).putClientAttribute("responseType",responseType).redirectToSocialProvider();
+  }
+ catch (  Throwable t) {
+    return Flows.forms(realm,request,uriInfo).setError("Failed to redirect to social auth").createErrorPage();
+  }
+}

@@ -1,7 +1,8 @@
 {
   ResteasyClient client=new ResteasyClientBuilder().disableTrustManager().build();
   try {
-    logoutApplication(realm,resource,user,client);
+    resource.setNotBefore((int)(System.currentTimeMillis() / 1000));
+    logoutApplication(realm,resource,user,client,resource.getNotBefore());
   }
   finally {
     client.close();

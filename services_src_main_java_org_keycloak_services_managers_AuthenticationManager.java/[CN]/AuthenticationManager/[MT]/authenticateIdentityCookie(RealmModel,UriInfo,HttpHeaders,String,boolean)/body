@@ -28,6 +28,11 @@
       expireIdentityCookie(realm,uriInfo);
       return null;
     }
+    if (token.getIssuedAt() < user.getNotBefore()) {
+      logger.info("Stale cookie");
+      expireIdentityCookie(realm,uriInfo);
+      return null;
+    }
     return user;
   }
  catch (  VerificationException e) {

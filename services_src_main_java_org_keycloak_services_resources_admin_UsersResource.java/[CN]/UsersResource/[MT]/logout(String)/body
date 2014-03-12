@@ -4,5 +4,6 @@
   if (user == null) {
     throw new NotFoundException();
   }
-  new ResourceAdminManager().logoutUser(realm,user.getId());
+  user.setNotBefore((int)(System.currentTimeMillis() / 1000));
+  new ResourceAdminManager().logoutUser(realm,user);
 }

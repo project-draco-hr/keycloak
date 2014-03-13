@@ -6,12 +6,14 @@
   user.setTotp(rep.isTotp());
   user.setEmailVerified(rep.isEmailVerified());
   List<String> reqActions=rep.getRequiredActions();
-  for (  UserModel.RequiredAction ra : UserModel.RequiredAction.values()) {
-    if (reqActions.contains(ra.name())) {
-      user.addRequiredAction(ra);
-    }
+  if (reqActions != null) {
+    for (    UserModel.RequiredAction ra : UserModel.RequiredAction.values()) {
+      if (reqActions.contains(ra.name())) {
+        user.addRequiredAction(ra);
+      }
  else {
-      user.removeRequiredAction(ra);
+        user.removeRequiredAction(ra);
+      }
     }
   }
   if (rep.getAttributes() != null) {

@@ -1,0 +1,20 @@
+{
+  CallbackListener callback=new CallbackListener();
+  callback.start();
+  String redirectUri="http://localhost:" + callback.server.getLocalPort();
+  String state=UUID.randomUUID().toString();
+  String authUrl=deployment.getAuthUrl().clone().queryParam("client_id",deployment.getResourceName()).queryParam("redirect_uri",redirectUri).queryParam("state",state).queryParam("login","true").build().toString();
+  Desktop.getDesktop().browse(new URI(authUrl));
+  callback.join();
+  if (!state.equals(callback.state)) {
+    throw new VerificationException("Invalid state");
+  }
+  if (callback.error != null) {
+    throw new OAuthErrorException(callback.error,callback.errorDescription);
+  }
+  if (callback.errorException != null) {
+    throw callback.errorException;
+  }
+  processCode(callback.code,redirectUri);
+  status=Status.LOGGED_DESKTOP;
+}

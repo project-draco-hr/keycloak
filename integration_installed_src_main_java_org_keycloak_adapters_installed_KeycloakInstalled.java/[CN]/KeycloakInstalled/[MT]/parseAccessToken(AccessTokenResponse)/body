@@ -1,0 +1,15 @@
+{
+  tokenString=tokenResponse.getToken();
+  refreshToken=tokenResponse.getRefreshToken();
+  idTokenString=tokenResponse.getIdToken();
+  token=RSATokenVerifier.verifyToken(tokenString,deployment.getRealmKey(),deployment.getRealm());
+  if (idTokenString != null) {
+    JWSInput input=new JWSInput(idTokenString);
+    try {
+      idToken=input.readJsonContent(IDToken.class);
+    }
+ catch (    IOException e) {
+      throw new VerificationException();
+    }
+  }
+}

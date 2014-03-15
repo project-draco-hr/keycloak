@@ -1,9 +1,9 @@
 {
   String username=formData.getFirst("username");
-  String scopeParam=uriInfo.getQueryParameters().getFirst("scope");
-  String state=uriInfo.getQueryParameters().getFirst("state");
-  String redirect=uriInfo.getQueryParameters().getFirst("redirect_uri");
-  String clientId=uriInfo.getQueryParameters().getFirst("client_id");
+  String scopeParam=uriInfo.getQueryParameters().getFirst(OAuth2Constants.SCOPE);
+  String state=uriInfo.getQueryParameters().getFirst(OAuth2Constants.STATE);
+  String redirect=uriInfo.getQueryParameters().getFirst(OAuth2Constants.REDIRECT_URI);
+  String clientId=uriInfo.getQueryParameters().getFirst(OAuth2Constants.CLIENT_ID);
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
     return Flows.oauth(realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Unknown login requester.");

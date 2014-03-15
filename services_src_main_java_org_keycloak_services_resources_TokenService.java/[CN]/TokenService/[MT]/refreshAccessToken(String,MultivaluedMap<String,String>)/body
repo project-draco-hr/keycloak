@@ -4,15 +4,15 @@
     throw new NotAcceptableException("HTTPS required");
   }
   ClientModel client=authorizeClient(authorizationHeader,form);
-  String refreshToken=form.getFirst("refresh_token");
+  String refreshToken=form.getFirst(OAuth2Constants.REFRESH_TOKEN);
   AccessToken accessToken=null;
   try {
     accessToken=tokenManager.refreshAccessToken(realm,client,refreshToken);
   }
  catch (  OAuthErrorException e) {
     Map<String,String> error=new HashMap<String,String>();
-    error.put("error",e.getError());
-    if (e.getDescription() != null)     error.put("error_description",e.getDescription());
+    error.put(OAuth2Constants.ERROR,e.getError());
+    if (e.getDescription() != null)     error.put(OAuth2Constants.ERROR_DESCRIPTION,e.getDescription());
     throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build(),e);
   }
   AccessTokenResponse res=tokenManager.responseBuilder(realm,client).accessToken(accessToken).generateIDToken().generateRefreshToken().build();

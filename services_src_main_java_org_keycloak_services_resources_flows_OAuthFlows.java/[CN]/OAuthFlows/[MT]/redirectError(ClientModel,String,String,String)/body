@@ -3,9 +3,9 @@
     return Flows.forms(realm,request,uriInfo).setError(error).createCode();
   }
  else {
-    UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam("error",error);
+    UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam(OAuth2Constants.ERROR,error);
     if (state != null) {
-      redirectUri.queryParam("state",state);
+      redirectUri.queryParam(OAuth2Constants.STATE,state);
     }
     return Response.status(302).location(redirectUri.build()).build();
   }

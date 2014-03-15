@@ -2,7 +2,7 @@
   oauth.clientId("third-party");
   oauth.doLoginGrant("test-user@localhost","password");
   grantPage.accept();
-  String token=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get("code"),"password").getAccessToken();
+  String token=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get(OAuth2Constants.CODE),"password").getAccessToken();
   HttpResponse response=doGetProfile(token,null);
   assertEquals(200,response.getStatusLine().getStatusCode());
   JSONObject profile=new JSONObject(IOUtils.toString(response.getEntity().getContent()));

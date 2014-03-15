@@ -3,17 +3,17 @@
   HttpPost post=new HttpPost(getRefreshTokenUrl());
   List<NameValuePair> parameters=new LinkedList<NameValuePair>();
   if (grantType != null) {
-    parameters.add(new BasicNameValuePair("grant_type",grantType));
+    parameters.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,grantType));
   }
   if (refreshToken != null) {
-    parameters.add(new BasicNameValuePair("refresh_token",refreshToken));
+    parameters.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN,refreshToken));
   }
   if (clientId != null && password != null) {
     String authorization=BasicAuthHelper.createHeader(clientId,password);
     post.setHeader("Authorization",authorization);
   }
  else   if (clientId != null) {
-    parameters.add(new BasicNameValuePair("client_id",clientId));
+    parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,clientId));
   }
   UrlEncodedFormEntity formEntity=null;
   try {

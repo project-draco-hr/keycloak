@@ -1,6 +1,6 @@
 {
   oauth.doLogin("test-user@localhost","password");
-  String code=oauth.getCurrentQuery().get("code");
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
   AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(200,response.getStatusCode());
   Assert.assertThat(response.getExpiresIn(),allOf(greaterThanOrEqualTo(250),lessThanOrEqualTo(300)));

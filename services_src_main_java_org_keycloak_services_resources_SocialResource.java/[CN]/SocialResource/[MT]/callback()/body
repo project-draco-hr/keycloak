@@ -28,11 +28,11 @@
   }
  catch (  SocialAccessDeniedException e) {
     MultivaluedHashMap<String,String> queryParms=new MultivaluedHashMap<String,String>();
-    queryParms.putSingle("client_id",requestData.getClientAttribute("clientId"));
-    queryParms.putSingle("state",requestData.getClientAttribute("state"));
-    queryParms.putSingle("scope",requestData.getClientAttribute("scope"));
-    queryParms.putSingle("redirect_uri",requestData.getClientAttribute("redirectUri"));
-    queryParms.putSingle("response_type",requestData.getClientAttribute("responseType"));
+    queryParms.putSingle(OAuth2Constants.CLIENT_ID,requestData.getClientAttribute("clientId"));
+    queryParms.putSingle(OAuth2Constants.STATE,requestData.getClientAttribute(OAuth2Constants.STATE));
+    queryParms.putSingle(OAuth2Constants.SCOPE,requestData.getClientAttribute(OAuth2Constants.SCOPE));
+    queryParms.putSingle(OAuth2Constants.REDIRECT_URI,requestData.getClientAttribute("redirectUri"));
+    queryParms.putSingle(OAuth2Constants.RESPONSE_TYPE,requestData.getClientAttribute("responseType"));
     return Flows.forms(realm,request,uriInfo).setQueryParams(queryParms).setWarning("Access denied").createLogin();
   }
 catch (  SocialProviderException e) {
@@ -78,8 +78,8 @@ catch (  SocialProviderException e) {
   if (!user.isEnabled()) {
     return oauth.forwardToSecurityFailure("Your account is not enabled.");
   }
-  String scope=requestData.getClientAttributes().get("scope");
-  String state=requestData.getClientAttributes().get("state");
+  String scope=requestData.getClientAttributes().get(OAuth2Constants.SCOPE);
+  String state=requestData.getClientAttributes().get(OAuth2Constants.STATE);
   String redirectUri=requestData.getClientAttributes().get("redirectUri");
   return oauth.processAccessCode(scope,state,redirectUri,client,user);
 }

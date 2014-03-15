@@ -5,8 +5,8 @@
   Assert.assertTrue(driver.getPageSource().contains(ROLE_USER));
   Assert.assertTrue(driver.getPageSource().contains(ROLE_CUSTOMER));
   grantPage.accept();
-  Assert.assertTrue(oauth.getCurrentQuery().containsKey("code"));
-  OAuthClient.AccessTokenResponse accessToken=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get("code"),"password");
+  Assert.assertTrue(oauth.getCurrentQuery().containsKey(OAuth2Constants.CODE));
+  OAuthClient.AccessTokenResponse accessToken=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get(OAuth2Constants.CODE),"password");
   AccessToken token=oauth.verifyToken(accessToken.getAccessToken());
   AccessToken.Access realmAccess=token.getRealmAccess();
   Assert.assertEquals(1,realmAccess.getRoles().size());

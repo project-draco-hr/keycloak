@@ -23,7 +23,7 @@
   if (authManager.authenticateForm(realm,user,form) != AuthenticationStatus.SUCCESS) {
     throw new NotAuthorizedException("Auth failed");
   }
-  String scope=form.getFirst("scope");
+  String scope=form.getFirst(OAuth2Constants.SCOPE);
   AccessTokenResponse res=tokenManager.responseBuilder(realm,client).generateAccessToken(scope,client,user).generateIDToken().build();
   return Response.ok(res,MediaType.APPLICATION_JSON_TYPE).build();
 }

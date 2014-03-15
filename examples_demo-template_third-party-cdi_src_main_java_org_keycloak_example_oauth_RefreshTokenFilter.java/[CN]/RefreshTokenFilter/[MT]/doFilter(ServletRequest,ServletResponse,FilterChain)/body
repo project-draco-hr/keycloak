@@ -2,7 +2,7 @@
   HttpServletRequest request=(HttpServletRequest)req;
   HttpServletResponse response=(HttpServletResponse)resp;
   Map<String,String[]> reqParams=request.getParameterMap();
-  if (reqParams.containsKey("code")) {
+  if (reqParams.containsKey(OAuth2Constants.CODE)) {
     try {
       String accessToken=oauthClient.getBearerToken(request).getToken();
       userData.setAccessToken(accessToken);
@@ -11,8 +11,8 @@
       throw new ServletException(e);
     }
   }
- else   if (reqParams.containsKey("error")) {
-    String oauthError=reqParams.get("error")[0];
+ else   if (reqParams.containsKey(OAuth2Constants.ERROR)) {
+    String oauthError=reqParams.get(OAuth2Constants.ERROR)[0];
     request.setAttribute(OAUTH_ERROR_ATTR,oauthError);
   }
   chain.doFilter(request,response);

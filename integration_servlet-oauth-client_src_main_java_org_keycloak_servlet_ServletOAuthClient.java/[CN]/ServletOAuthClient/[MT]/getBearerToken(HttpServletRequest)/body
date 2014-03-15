@@ -1,11 +1,11 @@
 {
-  String error=request.getParameter("error");
+  String error=request.getParameter(OAuth2Constants.ERROR);
   if (error != null)   throw new IOException("OAuth error: " + error);
   String redirectUri=request.getRequestURL().append("?").append(request.getQueryString()).toString();
   String stateCookie=getCookieValue(stateCookieName,request);
   if (stateCookie == null)   throw new IOException("state cookie not set");
-  String state=request.getParameter("state");
-  String code=request.getParameter("code");
+  String state=request.getParameter(OAuth2Constants.STATE);
+  String code=request.getParameter(OAuth2Constants.CODE);
   if (state == null)   throw new IOException("state parameter was null");
   if (!state.equals(stateCookie)) {
     throw new IOException("state parameter invalid");

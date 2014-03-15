@@ -1,9 +1,9 @@
 {
-  String error=callback.getQueryParam("error");
+  String error=callback.getQueryParam(OAuth2Constants.ERROR);
   if (error != null) {
     throw new SocialAccessDeniedException();
   }
-  if (!callback.getQueryParam("state").equals(callback.getAttribute("state"))) {
+  if (!callback.getQueryParam(OAuth2Constants.STATE).equals(callback.getAttribute(OAuth2Constants.STATE))) {
     throw new SocialProviderException("Invalid state");
   }
   String id=callback.getQueryParam("id");

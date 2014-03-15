@@ -2,7 +2,7 @@
   CallbackListener callback=new CallbackListener();
   callback.start();
   String redirectUri="http://localhost:" + callback.server.getLocalPort();
-  String logoutUrl=deployment.getLogoutUrl().queryParam("redirect_uri",redirectUri).build().toString();
+  String logoutUrl=deployment.getLogoutUrl().queryParam(OAuth2Constants.REDIRECT_URI,redirectUri).build().toString();
   Desktop.getDesktop().browse(new URI(logoutUrl));
   callback.join();
   if (callback.errorException != null) {

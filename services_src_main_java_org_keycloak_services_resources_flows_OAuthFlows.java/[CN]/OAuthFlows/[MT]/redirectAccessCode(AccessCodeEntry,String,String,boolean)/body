@@ -4,9 +4,9 @@
     return Flows.forms(realm,request,uriInfo).setAccessCode(accessCode.getId(),code).createCode();
   }
  else {
-    UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam("code",code);
+    UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam(OAuth2Constants.CODE,code);
     log.debug("redirectAccessCode: state: {0}",state);
-    if (state != null)     redirectUri.queryParam("state",state);
+    if (state != null)     redirectUri.queryParam(OAuth2Constants.STATE,state);
     Response.ResponseBuilder location=Response.status(302).location(redirectUri.build());
     Cookie remember=request.getHttpHeaders().getCookies().get(AuthenticationManager.KEYCLOAK_REMEMBER_ME);
     rememberMe=rememberMe || remember != null;

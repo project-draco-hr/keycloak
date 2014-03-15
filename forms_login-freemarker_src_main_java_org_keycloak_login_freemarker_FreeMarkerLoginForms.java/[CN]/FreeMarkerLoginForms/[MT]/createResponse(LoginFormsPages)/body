@@ -6,7 +6,7 @@
     uriBuilder.replaceQueryParam(k,queryParameterMap.get(k).toArray());
   }
   if (accessCode != null) {
-    uriBuilder.replaceQueryParam("code",accessCode);
+    uriBuilder.replaceQueryParam(OAuth2Constants.CODE,accessCode);
   }
   Map<String,Object> attributes=new HashMap<String,Object>();
   Theme theme;
@@ -56,7 +56,7 @@ case OAUTH_GRANT:
 attributes.put("oauth",new OAuthGrantBean(accessCode,client,realmRolesRequested,resourceRolesRequested));
 break;
 case CODE:
-attributes.put("code",new CodeBean(accessCode,messageType == MessageType.ERROR ? message : null));
+attributes.put(OAuth2Constants.CODE,new CodeBean(accessCode,messageType == MessageType.ERROR ? message : null));
 break;
 }
 try {

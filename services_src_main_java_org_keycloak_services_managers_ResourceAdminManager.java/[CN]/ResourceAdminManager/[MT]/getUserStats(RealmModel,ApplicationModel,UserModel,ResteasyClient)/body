@@ -1,7 +1,7 @@
 {
   String managementUrl=application.getManagementUrl();
   if (managementUrl != null) {
-    UserStatsAction adminAction=new UserStatsAction(TokenIdGenerator.generateId(),(int)(System.currentTimeMillis() / 1000) + 30,application.getName(),user.getId());
+    UserStatsAction adminAction=new UserStatsAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,application.getName(),user.getId());
     String token=new TokenManager().encodeToken(realm,adminAction);
     logger.info("session stats for application: {0} url: {1}",application.getName(),managementUrl);
     Response response=client.target(managementUrl).path(AdapterConstants.K_GET_USER_STATS).request().post(Entity.text(token));

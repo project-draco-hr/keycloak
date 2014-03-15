@@ -19,7 +19,7 @@
   requiredActions.add(UserModel.RequiredAction.UPDATE_PASSWORD);
   AccessCodeEntry accessCode=tokenManager.createAccessCode(scope,state,redirect,realm,client,user);
   accessCode.setRequiredActions(requiredActions);
-  accessCode.setExpiration(System.currentTimeMillis() / 1000 + realm.getAccessCodeLifespanUserAction());
+  accessCode.setExpiration(Time.currentTime() + realm.getAccessCodeLifespanUserAction());
   try {
     new EmailSender(realm.getSmtpConfig()).sendPasswordReset(user,realm,accessCode,uriInfo);
     return Response.ok().build();

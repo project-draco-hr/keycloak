@@ -2,7 +2,7 @@
   if (notBefore <= 0)   return false;
   String managementUrl=resource.getManagementUrl();
   if (managementUrl != null) {
-    PushNotBeforeAction adminAction=new PushNotBeforeAction(TokenIdGenerator.generateId(),(int)(System.currentTimeMillis() / 1000) + 30,resource.getName(),notBefore);
+    PushNotBeforeAction adminAction=new PushNotBeforeAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,resource.getName(),notBefore);
     String token=new TokenManager().encodeToken(realm,adminAction);
     logger.info("pushRevocation resource: {0} url: {1}",resource.getName(),managementUrl);
     Response response=client.target(managementUrl).path(AdapterConstants.K_PUSH_NOT_BEFORE).request().post(Entity.text(token));

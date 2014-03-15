@@ -3,7 +3,7 @@
   String code=oauth.getCurrentQuery().get("code");
   AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(200,response.getStatusCode());
-  Assert.assertTrue(response.getExpiresIn() <= 600 && response.getExpiresIn() >= 550);
+  Assert.assertThat(response.getExpiresIn(),allOf(greaterThanOrEqualTo(250),lessThanOrEqualTo(300)));
   Assert.assertEquals("bearer",response.getTokenType());
   AccessToken token=oauth.verifyToken(response.getAccessToken());
   Assert.assertEquals(keycloakRule.getUser("test","test-user@localhost").getId(),token.getSubject());

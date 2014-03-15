@@ -9,8 +9,7 @@
     res.setToken(encodedToken);
     res.setTokenType("bearer");
     if (accessToken.getExpiration() != 0) {
-      long time=accessToken.getExpiration() - (System.currentTimeMillis() / 1000);
-      res.setExpiresIn(time);
+      res.setExpiresIn(accessToken.getExpiration() - Time.currentTime());
     }
   }
   if (refreshToken != null) {

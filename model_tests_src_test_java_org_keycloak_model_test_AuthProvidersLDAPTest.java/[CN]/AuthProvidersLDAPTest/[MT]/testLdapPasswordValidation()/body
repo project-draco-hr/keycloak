@@ -1,0 +1,25 @@
+{
+  MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("john","password");
+  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm,formData));
+  Assert.assertNull(realm.getUser("john"));
+  setupAuthenticationProviders();
+  try {
+    ResteasyProviderFactory.pushContext(KeycloakRegistry.class,new KeycloakRegistry());
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm,formData));
+    UserModel john=realm.getUser("john");
+    Assert.assertNotNull(john);
+    Assert.assertEquals("john",john.getLoginName());
+    Assert.assertEquals("John",john.getFirstName());
+    Assert.assertEquals("Doe",john.getLastName());
+    Assert.assertEquals("john@email.org",john.getEmail());
+    formData=AuthProvidersExternalModelTest.createFormData("john","invalid");
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm,formData));
+    Set<AuthenticationLinkModel> authLinks=realm.getAuthenticationLinks(john);
+    Assert.assertEquals(1,authLinks.size());
+    AuthenticationLinkModel authLink=authLinks.iterator().next();
+    Assert.assertEquals(authLink.getAuthProvider(),AuthProviderConstants.PROVIDER_NAME_PICKETLINK);
+  }
+  finally {
+    ResteasyProviderFactory.clearContextData();
+  }
+}

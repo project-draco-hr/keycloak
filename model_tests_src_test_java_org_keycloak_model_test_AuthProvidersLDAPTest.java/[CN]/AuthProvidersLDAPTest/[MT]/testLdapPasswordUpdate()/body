@@ -1,0 +1,30 @@
+{
+  setupAuthenticationProviders();
+  try {
+    ResteasyProviderFactory.pushContext(KeycloakRegistry.class,new KeycloakRegistry());
+    AuthenticationProviderManager authProviderManager=AuthenticationProviderManager.getManager(realm);
+    try {
+      authProviderManager.updatePassword("john","password-updated");
+    }
+ catch (    AuthenticationProviderException ape) {
+      ape.printStackTrace();
+      Assert.fail("Error not expected");
+    }
+    MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("john","password-updated");
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm,formData));
+    Assert.assertFalse(realm.validatePassword(realm.getUser("john"),"password-updated"));
+    AuthProvidersExternalModelTest.setPasswordUpdateForProvider(false,AuthProviderConstants.PROVIDER_NAME_PICKETLINK,realm);
+    try {
+      authProviderManager.updatePassword("john","password-updated2");
+    }
+ catch (    AuthenticationProviderException ape) {
+      ape.printStackTrace();
+      Assert.fail("Error not expected");
+    }
+    formData=AuthProvidersExternalModelTest.createFormData("john","password-updated2");
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm,formData));
+  }
+  finally {
+    ResteasyProviderFactory.clearContextData();
+  }
+}

@@ -6,23 +6,16 @@
   if (client.isPublicClient()) {
     throw new ForbiddenException("Public clients are not allowed to invoke grants/access");
   }
-  String username=form.getFirst(AuthenticationManager.FORM_USERNAME);
-  if (username == null) {
-    throw new NotAuthorizedException("No user");
+  if (form.getFirst(AuthenticationManager.FORM_USERNAME) == null) {
+    throw new NotAuthorizedException("No username");
   }
   if (!realm.isEnabled()) {
     throw new NotAuthorizedException("Disabled realm");
   }
-  UserModel user=realm.getUser(username);
-  if (user == null) {
-    throw new NotAuthorizedException("No user");
-  }
-  if (!user.isEnabled()) {
-    throw new NotAuthorizedException("Disabled user.");
-  }
-  if (authManager.authenticateForm(realm,user,form) != AuthenticationStatus.SUCCESS) {
+  if (authManager.authenticateForm(realm,form) != AuthenticationStatus.SUCCESS) {
     throw new NotAuthorizedException("Auth failed");
   }
+  UserModel user=realm.getUser(form.getFirst(AuthenticationManager.FORM_USERNAME));
   String scope=form.getFirst(OAuth2Constants.SCOPE);
   AccessTokenResponse res=tokenManager.responseBuilder(realm,client).generateAccessToken(scope,client,user).generateIDToken().build();
   return Response.ok(res,MediaType.APPLICATION_JSON_TYPE).build();

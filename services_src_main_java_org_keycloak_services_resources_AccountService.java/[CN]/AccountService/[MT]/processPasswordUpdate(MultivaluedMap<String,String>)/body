@@ -12,19 +12,18 @@
  else   if (!passwordNew.equals(passwordConfirm)) {
     return account.setError(Messages.INVALID_PASSWORD_CONFIRM).createResponse(AccountPages.PASSWORD);
   }
+  AuthenticationProviderManager authProviderManager=AuthenticationProviderManager.getManager(realm);
   if (Validation.isEmpty(password)) {
     return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
   }
- else   if (!realm.validatePassword(user,password)) {
+ else   if (authProviderManager.validatePassword(user.getLoginName(),password).getAuthProviderStatus() != AuthProviderStatus.SUCCESS) {
     return account.setError(Messages.INVALID_PASSWORD_EXISTING).createResponse(AccountPages.PASSWORD);
   }
-  String error=Validation.validatePassword(formData,realm.getPasswordPolicy());
-  if (error != null) {
-    return account.setError(error).createResponse(AccountPages.PASSWORD);
+  try {
+    authProviderManager.updatePassword(user.getLoginName(),passwordNew);
   }
-  UserCredentialModel credentials=new UserCredentialModel();
-  credentials.setType(CredentialRepresentation.PASSWORD);
-  credentials.setValue(passwordNew);
-  realm.updateCredential(user,credentials);
+ catch (  AuthenticationProviderException ape) {
+    return account.setError(ape.getMessage()).createResponse(AccountPages.PASSWORD);
+  }
   return account.setSuccess("accountPasswordUpdated").createResponse(AccountPages.PASSWORD);
 }

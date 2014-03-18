@@ -1,0 +1,22 @@
+{
+  List<AuthenticationProviderModel> configuredProviders=getConfiguredProviders(realm);
+  for (  AuthenticationProviderModel authProviderConfig : configuredProviders) {
+    String providerName=authProviderConfig.getProviderName();
+    AuthenticationProvider delegate=getDelegate(providerName);
+    if (delegate == null) {
+      continue;
+    }
+    try {
+      AuthResult currentResult=delegate.validatePassword(realm,authProviderConfig.getConfig(),username,password);
+      logger.debugf("Authentication provider '%s' finished with '%s' for authentication of '%s'",delegate.getName(),currentResult.toString(),username);
+      if (currentResult.getAuthProviderStatus() == AuthProviderStatus.SUCCESS || currentResult.getAuthProviderStatus() == AuthProviderStatus.FAILED) {
+        return currentResult;
+      }
+    }
+ catch (    AuthenticationProviderException ape) {
+      logger.warn(ape.getMessage(),ape);
+    }
+  }
+  logger.debugf("Not able to authenticate '%s' with any authentication provider",username);
+  return new AuthResult(AuthProviderStatus.FAILED);
+}

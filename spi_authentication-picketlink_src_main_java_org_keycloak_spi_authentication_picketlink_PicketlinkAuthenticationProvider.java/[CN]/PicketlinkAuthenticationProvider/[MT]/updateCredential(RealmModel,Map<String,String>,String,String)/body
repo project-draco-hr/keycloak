@@ -1,0 +1,10 @@
+{
+  IdentityManager identityManager=getIdentityManager(realm);
+  User picketlinkUser=BasicModel.getUser(identityManager,username);
+  if (picketlinkUser == null) {
+    logger.debugf("User '%s' doesn't exists. Skip password update",username);
+    return false;
+  }
+  identityManager.updateCredential(picketlinkUser,new Password(password.toCharArray()));
+  return true;
+}

@@ -21,15 +21,7 @@
   if (formData.containsKey("cancel")) {
     return oauth.redirectError(client,"access_denied",state,redirect);
   }
-  String username=formData.getFirst("username");
-  UserModel user=realm.getUser(username);
-  if (user == null && username.contains("@")) {
-    user=realm.getUserByEmail(username);
-  }
-  if (user == null) {
-    return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).createLogin();
-  }
-  AuthenticationStatus status=authManager.authenticateForm(realm,user,formData);
+  AuthenticationStatus status=authManager.authenticateForm(realm,formData);
   String rememberMe=formData.getFirst("rememberMe");
   boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("on");
   logger.debug("*** Remember me: " + remember);
@@ -43,9 +35,10 @@
 switch (status) {
 case SUCCESS:
 case ACTIONS_REQUIRED:
-    return oauth.processAccessCode(scopeParam,state,redirect,client,user,remember);
+    UserModel user=KeycloakModelUtils.findUserByNameOrEmail(realm,formData.getFirst(AuthenticationManager.FORM_USERNAME));
+  return oauth.processAccessCode(scopeParam,state,redirect,client,user,remember);
 case ACCOUNT_DISABLED:
-  return Flows.forms(realm,request,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).createLogin();
+return Flows.forms(realm,request,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).createLogin();
 case MISSING_TOTP:
 return Flows.forms(realm,request,uriInfo).setFormData(formData).createLoginTotp();
 default :

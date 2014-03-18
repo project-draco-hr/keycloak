@@ -1,0 +1,17 @@
+{
+  super.before();
+  realm1=realmManager.createRealm("realm1");
+  realm2=realmManager.createRealm("realm2");
+  realm1.addRequiredCredential(CredentialRepresentation.PASSWORD);
+  realm2.addRequiredCredential(CredentialRepresentation.PASSWORD);
+  UserModel john=realm1.addUser("john");
+  john.setEnabled(true);
+  john.setFirstName("John");
+  john.setLastName("Doe");
+  john.setEmail("john@email.org");
+  UserCredentialModel credential=new UserCredentialModel();
+  credential.setType(CredentialRepresentation.PASSWORD);
+  credential.setValue("password");
+  realm1.updateCredential(john,credential);
+  am=new AuthenticationManager();
+}

@@ -1,0 +1,15 @@
+{
+  String realmId=configuration.get(AuthProviderConstants.EXTERNAL_REALM_ID);
+  if (realmId == null) {
+    throw new AuthenticationProviderException("Option '" + AuthProviderConstants.EXTERNAL_REALM_ID + "' not specified in configuration");
+  }
+  KeycloakSession session=ResteasyProviderFactory.getContextData(KeycloakSession.class);
+  if (session == null) {
+    throw new AuthenticationProviderException("KeycloakSession not available");
+  }
+  RealmModel realm=session.getRealm(realmId);
+  if (realm == null) {
+    throw new AuthenticationProviderException("Realm with id '" + realmId + "' doesn't exists");
+  }
+  return realm;
+}

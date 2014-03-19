@@ -7,9 +7,13 @@
   if (path != null) {
     uriBuilder.queryParam("path",path);
   }
-  String referrer=getReferrer();
+  String referrer=uriInfo.getQueryParameters().getFirst("referrer");
   if (referrer != null) {
     uriBuilder.queryParam("referrer",referrer);
+  }
+  String referrerUri=uriInfo.getQueryParameters().getFirst("referrer_uri");
+  if (referrerUri != null) {
+    uriBuilder.queryParam("referrer_uri",referrerUri);
   }
   URI accountUri=uriBuilder.build(realm.getName());
   oauth.setStateCookiePath(accountUri.getRawPath());

@@ -8,8 +8,12 @@
         continue;
       }
       try {
-        delegate.updateCredential(realm,authProviderConfig.getConfig(),username,password);
-        logger.debugf("Updated password in authentication provider '%s' for user '%s'",delegate.getName(),username);
+        if (delegate.updateCredential(realm,authProviderConfig.getConfig(),username,password)) {
+          logger.debugf("Updated password in authentication provider '%s' for user '%s'",delegate.getName(),username);
+        }
+ else {
+          logger.debugf("Password not updated in authentication provider '%s' for user '%s'",delegate.getName(),username);
+        }
       }
  catch (      AuthenticationProviderException ape) {
         logger.warn("Failed to update password",ape);

@@ -45,18 +45,22 @@
         AuthenticationLinkModel authLink=new AuthenticationLinkModel(authResult.getProviderName(),authUser.getId());
         user=realm.getUserByAuthenticationLink(authLink);
         if (user == null) {
-          user=realm.addUser(authUser.getUsername());
-          user.setEnabled(true);
-          user.setFirstName(authUser.getFirstName());
-          user.setLastName(authUser.getLastName());
-          user.setEmail(authUser.getEmail());
-          realm.addAuthenticationLink(user,authLink);
-          logger.info("User " + username + " successfully authenticated and created based on provider "+ authResult.getProviderName());
+          user=KeycloakModelUtils.findUserByNameOrEmail(realm,username);
+          if (user != null) {
+            realm.addAuthenticationLink(user,authLink);
+            logger.info("User " + authUser.getUsername() + " successfully authenticated and linked with provider "+ authResult.getProviderName());
+          }
+ else {
+            user=realm.addUser(authUser.getUsername());
+            user.setEnabled(true);
+            user.setFirstName(authUser.getFirstName());
+            user.setLastName(authUser.getLastName());
+            user.setEmail(authUser.getEmail());
+            realm.addAuthenticationLink(user,authLink);
+            logger.info("User " + username + " successfully authenticated and created based on provider "+ authResult.getProviderName());
+          }
         }
  else {
-          if (!checkEnabled(user)) {
-            return AuthenticationStatus.ACCOUNT_DISABLED;
-          }
         }
         if (!username.equals(user.getLoginName())) {
           formData.putSingle(FORM_USERNAME,user.getLoginName());
@@ -68,9 +72,9 @@
           logger.warn("User '" + username + "' successfully authenticated, but he doesn't exists and don't know how to create him");
           return AuthenticationStatus.INVALID_USER;
         }
- else         if (!checkEnabled(user)) {
-          return AuthenticationStatus.ACCOUNT_DISABLED;
-        }
+      }
+      if (!checkEnabled(user)) {
+        return AuthenticationStatus.ACCOUNT_DISABLED;
       }
     }
     if (!user.getRequiredActions().isEmpty()) {

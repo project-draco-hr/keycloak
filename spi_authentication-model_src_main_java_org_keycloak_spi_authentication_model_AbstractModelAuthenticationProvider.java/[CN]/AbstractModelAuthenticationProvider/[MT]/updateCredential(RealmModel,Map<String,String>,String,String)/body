@@ -1,0 +1,17 @@
+{
+  RealmModel realm=getRealm(currentRealm,config);
+  String error=realm.getPasswordPolicy().validate(password);
+  if (error != null) {
+    throw new AuthenticationProviderException(error);
+  }
+  UserModel user=realm.getUser(username);
+  if (user == null) {
+    logger.debugf("User '%s' doesn't exists. Skip password update",username);
+    return false;
+  }
+  UserCredentialModel cred=new UserCredentialModel();
+  cred.setType(CredentialRepresentation.PASSWORD);
+  cred.setValue(password);
+  realm.updateCredential(user,cred);
+  return true;
+}

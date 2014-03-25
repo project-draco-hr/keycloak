@@ -1,0 +1,13 @@
+{
+  RealmModel realm=getRealm(currentRealm,config);
+  UserModel user=KeycloakModelUtils.findUserByNameOrEmail(realm,username);
+  if (user == null) {
+    return new AuthResult(AuthProviderStatus.IGNORE);
+  }
+  boolean result=realm.validatePassword(user,password);
+  if (!result) {
+    return new AuthResult(AuthProviderStatus.IGNORE);
+  }
+  AuthenticatedUser authUser=createAuthenticatedUserInstance(user);
+  return new AuthResult(AuthProviderStatus.SUCCESS).setProviderName(getName()).setUser(authUser);
+}

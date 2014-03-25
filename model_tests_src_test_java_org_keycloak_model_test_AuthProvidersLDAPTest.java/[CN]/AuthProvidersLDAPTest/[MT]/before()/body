@@ -1,0 +1,15 @@
+{
+  super.before();
+  try {
+    this.embeddedServer=new LDAPEmbeddedServer();
+    this.embeddedServer.setup();
+    this.embeddedServer.importLDIF("ldap/users.ldif");
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Error starting Embedded LDAP server.",e);
+  }
+  realm=realmManager.createRealm("realm");
+  realm.addRequiredCredential(CredentialRepresentation.PASSWORD);
+  this.embeddedServer.setupLdapInRealm(realm);
+  am=new AuthenticationManager();
+}

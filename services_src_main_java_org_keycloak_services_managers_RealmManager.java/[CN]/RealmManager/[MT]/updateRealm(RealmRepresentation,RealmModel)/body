@@ -31,6 +31,13 @@
   if (rep.getSocialProviders() != null) {
     realm.setSocialConfig(new HashMap(rep.getSocialProviders()));
   }
+  if (rep.getLdapServer() != null) {
+    realm.setLdapServerConfig(new HashMap(rep.getLdapServer()));
+  }
+  if (rep.getAuthenticationProviders() != null) {
+    List<AuthenticationProviderModel> authProviderModels=convertAuthenticationProviders(rep.getAuthenticationProviders());
+    realm.setAuthenticationProviders(authProviderModels);
+  }
   if ("GENERATE".equals(rep.getPublicKey())) {
     generateRealmKeys(realm);
   }

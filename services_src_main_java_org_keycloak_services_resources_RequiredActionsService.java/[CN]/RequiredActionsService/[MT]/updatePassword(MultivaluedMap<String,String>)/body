@@ -16,14 +16,12 @@
  else   if (!passwordNew.equals(passwordConfirm)) {
     return loginForms.setError(Messages.NOTMATCH_PASSWORD).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
-  String error=realm.getPasswordPolicy().validate(passwordNew);
-  if (error != null) {
-    return loginForms.setError(error).createResponse(RequiredAction.UPDATE_PASSWORD);
+  try {
+    AuthenticationProviderManager.getManager(realm).updatePassword(user.getLoginName(),passwordNew);
   }
-  UserCredentialModel credentials=new UserCredentialModel();
-  credentials.setType(CredentialRepresentation.PASSWORD);
-  credentials.setValue(passwordNew);
-  realm.updateCredential(user,credentials);
+ catch (  AuthenticationProviderException ape) {
+    return loginForms.setError(ape.getMessage()).createResponse(RequiredAction.UPDATE_PASSWORD);
+  }
   logger.debug("updatePassword updated credential");
   user.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
   if (accessCode != null) {

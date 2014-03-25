@@ -1,0 +1,15 @@
+{
+  Map<String,String> ldapConfig=realm.getLdapServerConfig();
+  if (ldapConfig == null || ldapConfig.isEmpty()) {
+    logger.warnf("Ldap configuration is missing for realm '%s'",realm.getName());
+    return null;
+  }
+  PartitionManagerContext context=partitionManagers.get(realm.getId());
+  if (context == null || !ldapConfig.equals(context.config)) {
+    logger.infof("Creating new partition manager for the realm: %s",realm.getId());
+    PartitionManager manager=createPartitionManager(ldapConfig);
+    context=new PartitionManagerContext(ldapConfig,manager);
+    partitionManagers.put(realm.getId(),context);
+  }
+  return context.partitionManager;
+}

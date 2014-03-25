@@ -1,0 +1,5 @@
+{
+  DBObject query=new QueryBuilder().and("authenticationLinks.authProvider").is(authenticationLink.getAuthProvider()).and("authenticationLinks.authUserId").is(authenticationLink.getAuthUserId()).and("realmId").is(getId()).get();
+  UserEntity userEntity=getMongoStore().loadSingleEntity(UserEntity.class,query,invocationContext);
+  return userEntity == null ? null : new UserAdapter(userEntity,invocationContext);
+}

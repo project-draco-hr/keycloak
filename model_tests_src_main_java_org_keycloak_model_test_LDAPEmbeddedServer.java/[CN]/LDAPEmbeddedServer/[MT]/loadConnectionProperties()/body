@@ -1,0 +1,19 @@
+{
+  Properties p=new Properties();
+  try {
+    InputStream is=Thread.currentThread().getContextClassLoader().getResourceAsStream(CONNECTION_PROPERTIES);
+    p.load(is);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  connectionUrl=p.getProperty(IDM_TEST_LDAP_CONNECTION_URL,LDAP_URL);
+  baseDn=p.getProperty(IDM_TEST_LDAP_BASE_DN,BASE_DN);
+  userDnSuffix=p.getProperty(IDM_TEST_LDAP_USER_DN_SUFFIX,USER_DN_SUFFIX);
+  rolesDnSuffix=p.getProperty(IDM_TEST_LDAP_ROLES_DN_SUFFIX,ROLES_DN_SUFFIX);
+  groupDnSuffix=p.getProperty(IDM_TEST_LDAP_GROUP_DN_SUFFIX,GROUP_DN_SUFFIX);
+  agentDnSuffix=p.getProperty(IDM_TEST_LDAP_AGENT_DN_SUFFIX,AGENT_DN_SUFFIX);
+  startEmbeddedLdapLerver=Boolean.parseBoolean(p.getProperty(IDM_TEST_LDAP_START_EMBEDDED_LDAP_SERVER,"true"));
+  bindDn=p.getProperty(IDM_TEST_LDAP_BIND_DN,bindDn);
+  bindCredential=p.getProperty(IDM_TEST_LDAP_BIND_CREDENTIAL,bindCredential);
+}

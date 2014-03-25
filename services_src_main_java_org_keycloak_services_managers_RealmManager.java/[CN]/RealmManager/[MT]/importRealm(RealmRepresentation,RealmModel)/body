@@ -146,10 +146,26 @@
       }
     }
   }
+  if (rep.getAuthenticationMappings() != null) {
+    for (    AuthenticationMappingRepresentation authMapping : rep.getAuthenticationMappings()) {
+      UserModel user=userMap.get(authMapping.getUsername());
+      for (      AuthenticationLinkRepresentation link : authMapping.getAuthenticationLinks()) {
+        AuthenticationLinkModel mappingModel=new AuthenticationLinkModel(link.getAuthProvider(),link.getAuthUserId());
+        newRealm.addAuthenticationLink(user,mappingModel);
+      }
+    }
+  }
   if (rep.getSmtpServer() != null) {
     newRealm.setSmtpConfig(new HashMap(rep.getSmtpServer()));
   }
   if (rep.getSocialProviders() != null) {
     newRealm.setSocialConfig(new HashMap(rep.getSocialProviders()));
+  }
+  if (rep.getLdapServer() != null) {
+    newRealm.setLdapServerConfig(new HashMap(rep.getLdapServer()));
+  }
+  if (rep.getAuthenticationProviders() != null) {
+    List<AuthenticationProviderModel> authProviderModels=convertAuthenticationProviders(rep.getAuthenticationProviders());
+    newRealm.setAuthenticationProviders(authProviderModels);
   }
 }

@@ -46,7 +46,13 @@
     UserCredentialModel credentials=new UserCredentialModel();
     credentials.setType(CredentialRepresentation.PASSWORD);
     credentials.setValue(formData.getFirst("password"));
-    realm.updateCredential(user,credentials);
+    try {
+      AuthenticationProviderManager.getManager(realm).updatePassword(username,formData.getFirst("password"));
+    }
+ catch (    AuthenticationProviderException ape) {
+      user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+      return Flows.forms(realm,request,uriInfo).setError(ape.getMessage()).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
+    }
   }
   return processLogin(clientId,scopeParam,state,redirect,formData);
 }

@@ -1,0 +1,19 @@
+{
+  IdentityManager identityManager=getIdentityManager(realm);
+  UsernamePasswordCredentials credential=new UsernamePasswordCredentials();
+  credential.setUsername(username);
+  credential.setPassword(new Password(password.toCharArray()));
+  identityManager.validateCredentials(credential);
+  AuthResult result;
+  if (credential.getStatus() == Credentials.Status.VALID) {
+    result=new AuthResult(AuthProviderStatus.SUCCESS);
+    User picketlinkUser=BasicModel.getUser(identityManager,username);
+    AuthenticatedUser authenticatedUser=new AuthenticatedUser(picketlinkUser.getId(),picketlinkUser.getLoginName()).setName(picketlinkUser.getFirstName(),picketlinkUser.getLastName()).setEmail(picketlinkUser.getEmail());
+    result.setUser(authenticatedUser).setProviderName(getName());
+    return result;
+  }
+ else {
+    logger.debugf("Username: %s, Credential status: %s",username,credential.getStatus());
+    return new AuthResult(AuthProviderStatus.IGNORE);
+  }
+}

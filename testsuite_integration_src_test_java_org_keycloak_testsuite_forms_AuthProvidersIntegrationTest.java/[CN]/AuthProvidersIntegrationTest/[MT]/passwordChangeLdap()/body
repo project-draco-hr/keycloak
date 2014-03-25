@@ -1,0 +1,13 @@
+{
+  changePasswordPage.open();
+  loginPage.login("john","password");
+  changePasswordPage.changePassword("password","new-password","new-password");
+  Assert.assertEquals("Your password has been updated",profilePage.getSuccess());
+  changePasswordPage.logout();
+  loginPage.open();
+  loginPage.login("john","password");
+  Assert.assertEquals("Invalid username or password.",loginPage.getError());
+  loginPage.open();
+  loginPage.login("john","new-password");
+  Assert.assertEquals(AppPage.RequestType.AUTH_RESPONSE,appPage.getRequestType());
+}

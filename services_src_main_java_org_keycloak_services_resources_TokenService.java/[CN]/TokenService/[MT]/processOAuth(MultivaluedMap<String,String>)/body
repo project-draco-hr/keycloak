@@ -1,4 +1,5 @@
 {
+  audit.event(Events.LOGIN).detail(Details.RESPONSE_TYPE,"code");
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
@@ -13,18 +14,27 @@
     logger.debug("Failed to verify signature",ignored);
   }
   if (!verifiedCode) {
+    audit.error(Errors.INVALID_CODE);
     return oauth.forwardToSecurityFailure("Illegal access code.");
   }
   String key=input.readContentAsString();
+  audit.detail(Details.CODE_ID,key);
   AccessCodeEntry accessCodeEntry=tokenManager.getAccessCode(key);
   if (accessCodeEntry == null) {
+    audit.error(Errors.INVALID_CODE);
     return oauth.forwardToSecurityFailure("Unknown access code.");
   }
   String redirect=accessCodeEntry.getRedirectUri();
   String state=accessCodeEntry.getState();
+  audit.client(accessCodeEntry.getClient()).user(accessCodeEntry.getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,accessCodeEntry.getAuthMethod()).detail(Details.REDIRECT_URI,redirect).detail(Details.USERNAME,accessCodeEntry.getUsername());
+  if (accessCodeEntry.isRememberMe()) {
+    audit.detail(Details.REMEMBER_ME,"true");
+  }
   if (formData.containsKey("cancel")) {
+    audit.error(Errors.REJECTED_BY_USER);
     return redirectAccessDenied(redirect,state);
   }
+  audit.success();
   accessCodeEntry.setExpiration(Time.currentTime() + realm.getAccessCodeLifespan());
   return oauth.redirectAccessCode(accessCodeEntry,state,redirect);
 }

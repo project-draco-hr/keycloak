@@ -1,10 +1,12 @@
 {
+  audit.event(Events.LOGOUT).detail(Details.REDIRECT_URI,redirectUri);
   UserModel user=authManager.authenticateIdentityCookie(realm,uriInfo,headers,false);
   if (user != null) {
     logger.info("Logging out: {0}",user.getLoginName());
     authManager.expireIdentityCookie(realm,uriInfo);
     authManager.expireRememberMeCookie(realm,uriInfo);
     resourceAdminManager.logoutUser(realm,user);
+    audit.user(user).success();
   }
  else {
     logger.info("No user logged in for logout");

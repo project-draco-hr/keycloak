@@ -1,7 +1,8 @@
 {
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=locateRealm(name,realmManager);
-  TokenService tokenService=new TokenService(realm,tokenManager);
+  Audit audit=Audit.create(realm,servletRequest.getRemoteAddr());
+  TokenService tokenService=new TokenService(realm,tokenManager,audit);
   resourceContext.initResource(tokenService);
   return tokenService;
 }

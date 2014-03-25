@@ -1,24 +1,32 @@
 {
+  String username=formData.getFirst("username");
+  String email=formData.getFirst("email");
+  audit.event(Events.REGISTER).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.USERNAME,username).detail(Details.EMAIL,email).detail(Details.REGISTER_METHOD,"form");
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
   if (!realm.isEnabled()) {
     logger.warn("Realm not enabled");
+    audit.error(Errors.REALM_DISABLED);
     return oauth.forwardToSecurityFailure("Realm not enabled");
   }
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
     logger.warn("Unknown login requester.");
+    audit.error(Errors.CLIENT_NOT_FOUND);
     return oauth.forwardToSecurityFailure("Unknown login requester.");
   }
   if (!client.isEnabled()) {
     logger.warn("Login requester not enabled.");
+    audit.error(Errors.CLIENT_DISABLED);
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
   redirect=verifyRedirectUri(redirect,client);
   if (redirect == null) {
+    audit.error(Errors.INVALID_REDIRECT_URI);
     return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
   }
   if (!realm.isRegistrationAllowed()) {
     logger.warn("Registration not allowed");
+    audit.error(Errors.REGISTRATION_DISABLED);
     return oauth.forwardToSecurityFailure("Registration not allowed");
   }
   List<String> requiredCredentialTypes=new LinkedList<String>();
@@ -30,18 +38,19 @@
     error=Validation.validatePassword(formData,realm.getPasswordPolicy());
   }
   if (error != null) {
+    audit.error(Errors.INVALID_REGISTRATION);
     return Flows.forms(realm,request,uriInfo).setError(error).setFormData(formData).createRegistration();
   }
-  String username=formData.getFirst("username");
   UserModel user=realm.getUser(username);
   if (user != null) {
+    audit.error(Errors.USERNAME_IN_USE);
     return Flows.forms(realm,request,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).createRegistration();
   }
   user=realm.addUser(username);
   user.setEnabled(true);
   user.setFirstName(formData.getFirst("firstName"));
   user.setLastName(formData.getFirst("lastName"));
-  user.setEmail(formData.getFirst("email"));
+  user.setEmail(email);
   if (requiredCredentialTypes.contains(CredentialRepresentation.PASSWORD)) {
     UserCredentialModel credentials=new UserCredentialModel();
     credentials.setType(CredentialRepresentation.PASSWORD);
@@ -54,5 +63,7 @@
       return Flows.forms(realm,request,uriInfo).setError(ape.getMessage()).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
     }
   }
+  audit.user(user).success();
+  audit.reset();
   return processLogin(clientId,scopeParam,state,redirect,formData);
 }

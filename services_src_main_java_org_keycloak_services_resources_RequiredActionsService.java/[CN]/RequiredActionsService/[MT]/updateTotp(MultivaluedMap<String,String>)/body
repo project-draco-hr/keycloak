@@ -4,6 +4,7 @@
     return unauthorized();
   }
   UserModel user=getUser(accessCode);
+  initAudit(accessCode);
   String totp=formData.getFirst("totp");
   String totpSecret=formData.getFirst("totpSecret");
   LoginForms loginForms=Flows.forms(realm,request,uriInfo).setUser(user);
@@ -20,5 +21,6 @@
   user.setTotp(true);
   user.removeRequiredAction(RequiredAction.CONFIGURE_TOTP);
   accessCode.getRequiredActions().remove(RequiredAction.CONFIGURE_TOTP);
+  audit.clone().event(Events.UPDATE_TOTP).success();
   return redirectOauth(user,accessCode);
 }

@@ -1,4 +1,15 @@
 {
+  if (accessToken != null) {
+    audit.detail(Details.TOKEN_ID,accessToken.getId());
+  }
+  if (refreshToken != null) {
+    if (audit.getEvent().getDetails().containsKey(Details.REFRESH_TOKEN_ID)) {
+      audit.detail(Details.UPDATED_REFRESH_TOKEN_ID,refreshToken.getId());
+    }
+ else {
+      audit.detail(Details.REFRESH_TOKEN_ID,refreshToken.getId());
+    }
+  }
   AccessTokenResponse res=new AccessTokenResponse();
   if (idToken != null) {
     String encodedToken=new JWSBuilder().jsonContent(idToken).rsa256(realm.getPrivateKey());

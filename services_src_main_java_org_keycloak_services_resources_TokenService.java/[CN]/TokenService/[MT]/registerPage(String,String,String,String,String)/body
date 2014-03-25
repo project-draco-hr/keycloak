@@ -1,28 +1,34 @@
 {
   logger.info("**********registerPage()");
+  audit.event(Events.REGISTER).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code");
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
   if (!realm.isEnabled()) {
     logger.warn("Realm not enabled");
+    audit.error(Errors.REALM_DISABLED);
     return oauth.forwardToSecurityFailure("Realm not enabled");
   }
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
     logger.warn("Unknown login requester.");
+    audit.error(Errors.CLIENT_NOT_FOUND);
     return oauth.forwardToSecurityFailure("Unknown login requester.");
   }
   if (!client.isEnabled()) {
     logger.warn("Login requester not enabled.");
+    audit.error(Errors.CLIENT_DISABLED);
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
   redirect=verifyRedirectUri(redirect,client);
   if (redirect == null) {
+    audit.error(Errors.INVALID_REDIRECT_URI);
     return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
   }
   if (!realm.isRegistrationAllowed()) {
     logger.warn("Registration not allowed");
+    audit.error(Errors.REGISTRATION_DISABLED);
     return oauth.forwardToSecurityFailure("Registration not allowed");
   }
   authManager.expireIdentityCookie(realm,uriInfo);

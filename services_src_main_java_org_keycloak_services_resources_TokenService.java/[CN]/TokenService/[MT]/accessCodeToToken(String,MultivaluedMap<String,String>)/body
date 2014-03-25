@@ -3,15 +3,17 @@
   if (!checkSsl()) {
     throw new NotAcceptableException("HTTPS required");
   }
+  audit.event(Events.CODE_TO_TOKEN);
   if (!realm.isEnabled()) {
+    audit.error(Errors.REALM_DISABLED);
     throw new NotAuthorizedException("Realm not enabled");
   }
-  ClientModel client=authorizeClient(authorizationHeader,formData);
   String code=formData.getFirst(OAuth2Constants.CODE);
   if (code == null) {
     Map<String,String> error=new HashMap<String,String>();
     error.put(OAuth2Constants.ERROR,"invalid_request");
     error.put(OAuth2Constants.ERROR_DESCRIPTION,"code not specified");
+    audit.error(Errors.INVALID_CODE);
     throw new BadRequestException("Code not specified",Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build());
   }
   JWSInput input=new JWSInput(code);
@@ -26,35 +28,44 @@
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
     res.put(OAuth2Constants.ERROR_DESCRIPTION,"Unable to verify code signature");
+    audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   String key=input.readContentAsString();
+  audit.detail(Details.CODE_ID,key);
   AccessCodeEntry accessCode=tokenManager.pullAccessCode(key);
   if (accessCode == null) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
     res.put(OAuth2Constants.ERROR_DESCRIPTION,"Code not found");
+    audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
+  audit.user(accessCode.getUser());
+  ClientModel client=authorizeClient(authorizationHeader,formData,audit);
   if (accessCode.isExpired()) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
     res.put(OAuth2Constants.ERROR_DESCRIPTION,"Code is expired");
+    audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   if (!accessCode.getToken().isActive()) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
     res.put(OAuth2Constants.ERROR_DESCRIPTION,"Token expired");
+    audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   if (!client.getClientId().equals(accessCode.getClient().getClientId())) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
     res.put(OAuth2Constants.ERROR_DESCRIPTION,"Auth error");
+    audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   logger.debug("accessRequest SUCCESS");
-  AccessTokenResponse res=tokenManager.responseBuilder(realm,client).accessToken(accessCode.getToken()).generateIDToken().generateRefreshToken().build();
+  AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).accessToken(accessCode.getToken()).generateIDToken().generateRefreshToken().build();
+  audit.success();
   return Cors.add(request,Response.ok(res)).auth().allowedOrigins(client).allowedMethods("POST").build();
 }

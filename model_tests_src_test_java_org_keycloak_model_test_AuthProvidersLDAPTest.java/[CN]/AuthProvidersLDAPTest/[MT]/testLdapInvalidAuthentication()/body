@@ -1,0 +1,23 @@
+{
+  setupAuthenticationProviders();
+  try {
+    ResteasyProviderFactory.pushContext(KeycloakRegistry.class,new KeycloakRegistry());
+    UserModel realmUser=realm.addUser("realmUser");
+    UserCredentialModel credential=new UserCredentialModel();
+    credential.setType(CredentialRepresentation.PASSWORD);
+    credential.setValue("pass");
+    realm.updateCredential(realmUser,credential);
+    MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("invalid","invalid");
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(realm,formData));
+    formData=AuthProvidersExternalModelTest.createFormData("john","invalid");
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm,formData));
+    formData=AuthProvidersExternalModelTest.createFormData("realmUser","invalid");
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm,formData));
+    realmUser.setEnabled(false);
+    formData=AuthProvidersExternalModelTest.createFormData("realmUser","pass");
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.ACCOUNT_DISABLED,am.authenticateForm(realm,formData));
+  }
+  finally {
+    ResteasyProviderFactory.clearContextData();
+  }
+}

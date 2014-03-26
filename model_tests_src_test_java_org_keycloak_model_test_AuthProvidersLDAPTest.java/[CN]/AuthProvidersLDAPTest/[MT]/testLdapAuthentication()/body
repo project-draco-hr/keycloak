@@ -1,6 +1,6 @@
 {
   MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("john","password");
-  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm,formData));
+  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(realm,formData));
   Assert.assertNull(realm.getUser("john"));
   setupAuthenticationProviders();
   try {
@@ -12,8 +12,6 @@
     Assert.assertEquals("John",john.getFirstName());
     Assert.assertEquals("Doe",john.getLastName());
     Assert.assertEquals("john@email.org",john.getEmail());
-    formData=AuthProvidersExternalModelTest.createFormData("john","invalid");
-    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm,formData));
     Set<AuthenticationLinkModel> authLinks=realm.getAuthenticationLinks(john);
     Assert.assertEquals(1,authLinks.size());
     AuthenticationLinkModel authLink=authLinks.iterator().next();

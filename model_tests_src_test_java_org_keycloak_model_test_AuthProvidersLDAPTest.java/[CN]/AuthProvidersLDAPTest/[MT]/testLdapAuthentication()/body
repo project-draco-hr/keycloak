@@ -1,10 +1,11 @@
 {
   MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("john","password");
-  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(realm,formData));
-  Assert.assertNull(realm.getUser("john"));
-  setupAuthenticationProviders();
   try {
     ResteasyProviderFactory.pushContext(KeycloakRegistry.class,new KeycloakRegistry());
+    LdapTestUtils.setLdapPassword(realm,"john","password");
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(realm,formData));
+    Assert.assertNull(realm.getUser("john"));
+    setupAuthenticationProviders();
     Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm,formData));
     UserModel john=realm.getUser("john");
     Assert.assertNotNull(john);

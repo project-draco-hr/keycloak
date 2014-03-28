@@ -1,10 +1,12 @@
 {
   List<AuthenticationProviderEntity> newEntities=new ArrayList<AuthenticationProviderEntity>();
+  int counter=1;
   for (  AuthenticationProviderModel model : authenticationProviders) {
     AuthenticationProviderEntity entity=new AuthenticationProviderEntity();
     entity.setProviderName(model.getProviderName());
     entity.setPasswordUpdateSupported(model.isPasswordUpdateSupported());
     entity.setConfig(model.getConfig());
+    entity.setPriority(counter++);
     newEntities.add(entity);
   }
   Collection<AuthenticationProviderEntity> existing=realm.getAuthenticationProviders();

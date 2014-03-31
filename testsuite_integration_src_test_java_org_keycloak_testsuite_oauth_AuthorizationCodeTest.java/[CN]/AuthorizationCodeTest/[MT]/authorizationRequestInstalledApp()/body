@@ -5,4 +5,6 @@
   Assert.assertTrue(title.startsWith("Success code="));
   String code=driver.findElement(By.id(OAuth2Constants.CODE)).getText();
   oauth.verifyCode(code);
+  String codeId=events.expectLogin().detail(Details.REDIRECT_URI,Constants.INSTALLED_APP_URN).assertEvent().getDetails().get(Details.CODE_ID);
+  Assert.assertEquals(codeId,new JWSInput(code).readContentAsString());
 }

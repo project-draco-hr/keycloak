@@ -1,0 +1,32 @@
+{
+  return new Statement(){
+    @Override public void evaluate() throws Throwable {
+      events.clear();
+      keycloak.configure(new KeycloakRule.KeycloakSetup(){
+        @Override public void config(        RealmManager manager,        RealmModel adminstrationRealm,        RealmModel appRealm){
+          Set<String> listeners=new HashSet<String>();
+          listeners.add("jboss-logging");
+          listeners.add("assert-events");
+          appRealm.setAuditListeners(listeners);
+        }
+      }
+);
+      try {
+        base.evaluate();
+        Event event=events.peek();
+        if (event != null) {
+          Assert.fail("Unexpected event after test: " + event.getEvent());
+        }
+      }
+  finally {
+        keycloak.configure(new KeycloakRule.KeycloakSetup(){
+          @Override public void config(          RealmManager manager,          RealmModel adminstrationRealm,          RealmModel appRealm){
+            appRealm.setAuditListeners(null);
+          }
+        }
+);
+      }
+    }
+  }
+;
+}

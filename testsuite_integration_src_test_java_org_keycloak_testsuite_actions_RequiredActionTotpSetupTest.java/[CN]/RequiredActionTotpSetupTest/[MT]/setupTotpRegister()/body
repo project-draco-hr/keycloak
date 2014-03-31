@@ -2,7 +2,10 @@
   loginPage.open();
   loginPage.clickRegister();
   registerPage.register("firstName","lastName","email","setupTotp","password","password");
+  String userId=events.expectRegister("setupTotp","email").assertEvent().getUserId();
   totpPage.assertCurrent();
   totpPage.configure(totp.generate(totpPage.getTotpSecret()));
+  events.expectRequiredAction("update_totp").user(userId).detail(Details.USERNAME,"setupTotp").assertEvent();
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  events.expectLogin().user(userId).detail(Details.USERNAME,"setupTotp").assertEvent();
 }

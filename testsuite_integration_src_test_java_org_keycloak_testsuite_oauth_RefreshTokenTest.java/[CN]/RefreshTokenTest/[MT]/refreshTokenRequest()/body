@@ -1,10 +1,12 @@
 {
   oauth.doLogin("test-user@localhost","password");
+  String codeId=events.expectLogin().assertEvent().getDetails().get(Details.CODE_ID);
   String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
   AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
   AccessToken token=oauth.verifyToken(tokenResponse.getAccessToken());
   String refreshTokenString=tokenResponse.getRefreshToken();
   RefreshToken refreshToken=oauth.verifyRefreshToken(refreshTokenString);
+  Event tokenEvent=events.expectCodeToToken(codeId).assertEvent();
   Assert.assertNotNull(refreshTokenString);
   Assert.assertEquals("bearer",tokenResponse.getTokenType());
   Assert.assertThat(token.getExpiration() - Time.currentTime(),allOf(greaterThanOrEqualTo(250),lessThanOrEqualTo(300)));
@@ -27,4 +29,7 @@
   Assert.assertTrue(refreshedToken.getRealmAccess().isUserInRole("user"));
   Assert.assertEquals(1,refreshedToken.getResourceAccess(oauth.getClientId()).getRoles().size());
   Assert.assertTrue(refreshedToken.getResourceAccess(oauth.getClientId()).isUserInRole("customer-user"));
+  Event refreshEvent=events.expectRefresh(tokenEvent.getDetails().get(Details.REFRESH_TOKEN_ID)).assertEvent();
+  Assert.assertNotEquals(tokenEvent.getDetails().get(Details.TOKEN_ID),refreshEvent.getDetails().get(Details.TOKEN_ID));
+  Assert.assertNotEquals(tokenEvent.getDetails().get(Details.REFRESH_TOKEN_ID),refreshEvent.getDetails().get(Details.UPDATED_REFRESH_TOKEN_ID));
 }

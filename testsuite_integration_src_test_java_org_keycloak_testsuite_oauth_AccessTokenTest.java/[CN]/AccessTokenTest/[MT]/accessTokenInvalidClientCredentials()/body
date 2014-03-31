@@ -1,0 +1,8 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  String codeId=events.expectLogin().assertEvent().getDetails().get(Details.CODE_ID);
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  AccessTokenResponse response=oauth.doAccessTokenRequest(code,"invalid");
+  Assert.assertEquals(400,response.getStatusCode());
+  events.expectCodeToToken(codeId).error("invalid_client_credentials").removeDetail(Details.TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_ID).assertEvent();
+}

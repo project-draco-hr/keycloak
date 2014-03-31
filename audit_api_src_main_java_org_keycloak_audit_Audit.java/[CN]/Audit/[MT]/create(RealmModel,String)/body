@@ -1,0 +1,10 @@
+{
+  List<AuditListener> listeners=null;
+  if (realm.getAuditListeners() != null) {
+    listeners=new LinkedList<AuditListener>();
+    for (    String id : realm.getAuditListeners()) {
+      listeners.add(AuditLoader.load(id));
+    }
+  }
+  return new Audit(listeners,new Event()).realm(realm).ipAddress(ipAddress);
+}

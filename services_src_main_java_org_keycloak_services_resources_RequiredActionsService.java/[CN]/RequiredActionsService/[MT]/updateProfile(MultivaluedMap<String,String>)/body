@@ -4,14 +4,23 @@
     return unauthorized();
   }
   UserModel user=getUser(accessCode);
+  initAudit(accessCode);
   String error=Validation.validateUpdateProfileForm(formData);
   if (error != null) {
     return Flows.forms(realm,request,uriInfo).setUser(user).setError(error).createResponse(RequiredAction.UPDATE_PROFILE);
   }
   user.setFirstName(formData.getFirst("firstName"));
   user.setLastName(formData.getFirst("lastName"));
-  user.setEmail(formData.getFirst("email"));
+  String email=formData.getFirst("email");
+  String oldEmail=user.getEmail();
+  boolean emailChanged=oldEmail != null ? !oldEmail.equals(email) : email != null;
+  user.setEmail(email);
   user.removeRequiredAction(RequiredAction.UPDATE_PROFILE);
   accessCode.getRequiredActions().remove(RequiredAction.UPDATE_PROFILE);
+  audit.clone().event(Events.UPDATE_PROFILE).success();
+  if (emailChanged) {
+    user.setEmailVerified(false);
+    audit.clone().event(Events.UPDATE_EMAIL).detail(Details.PREVIOUS_EMAIL,oldEmail).detail(Details.UPDATED_EMAIL,email).success();
+  }
   return redirectOauth(user,accessCode);
 }

@@ -1,20 +1,3 @@
 {
-  loginPage.open();
-  loginPage.resetPassword();
-  resetPasswordPage.assertCurrent();
-  resetPasswordPage.changePassword("login@test.com");
-  resetPasswordPage.assertCurrent();
-  Assert.assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
-  Assert.assertEquals(1,greenMail.getReceivedMessages().length);
-  MimeMessage message=greenMail.getReceivedMessages()[0];
-  String body=(String)message.getContent();
-  String changePasswordUrl=body.split("\n")[3];
-  driver.navigate().to(changePasswordUrl.trim());
-  updatePasswordPage.assertCurrent();
-  updatePasswordPage.changePassword("resetPassword","resetPassword");
-  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
-  oauth.openLogout();
-  loginPage.open();
-  loginPage.login("login@test.com","resetPassword");
-  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  resetPassword("login@test.com");
 }

@@ -1,0 +1,29 @@
+{
+  Assert.assertEquals(expected.getEvent(),actual.getEvent());
+  Assert.assertEquals(expected.getRealmId(),actual.getRealmId());
+  Assert.assertEquals(expected.getClientId(),actual.getClientId());
+  Assert.assertEquals(expected.getError(),actual.getError());
+  Assert.assertEquals(expected.getIpAddress(),actual.getIpAddress());
+  Assert.assertThat(actual.getUserId(),userId);
+  if (details == null) {
+    Assert.assertNull(actual.getDetails());
+  }
+ else {
+    Assert.assertNotNull(actual.getDetails());
+    for (    Map.Entry<String,Matcher<String>> d : details.entrySet()) {
+      String actualValue=actual.getDetails().get(d.getKey());
+      if (!actual.getDetails().containsKey(d.getKey())) {
+        Assert.fail(d.getKey() + " missing");
+      }
+      if (!d.getValue().matches(actualValue)) {
+        Assert.fail(d.getKey() + " doesn't match");
+      }
+    }
+    for (    String k : actual.getDetails().keySet()) {
+      if (!details.containsKey(k)) {
+        Assert.fail(k + " was not expected");
+      }
+    }
+  }
+  return actual;
+}

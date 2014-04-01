@@ -1,0 +1,37 @@
+{
+  AuthenticationLinkModel authLink=realm.getAuthenticationLink(user);
+  if (authLink == null) {
+    authLink=new AuthenticationLinkModel(AuthenticationProviderModel.DEFAULT_PROVIDER.getProviderName(),user.getId());
+  }
+  String providerName=authLink.getAuthProvider();
+  AuthenticationProviderModel providerModel=getConfiguredProviderModel(realm,providerName);
+  if (providerModel == null) {
+    return false;
+  }
+  String username=user.getLoginName();
+  if (providerModel.isPasswordUpdateSupported()) {
+    try {
+      AuthenticationProvider delegate=getProvider(providerName);
+      if (delegate == null) {
+        return false;
+      }
+      checkCorrectAuthLink(delegate,providerModel,authLink,username);
+      if (delegate.updateCredential(realm,providerModel.getConfig(),user.getLoginName(),password)) {
+        logger.debugf("Updated password in authentication provider '%s' for user '%s'",providerName,username);
+        return true;
+      }
+ else {
+        logger.warnf("Password not updated in authentication provider '%s' for user '%s'",providerName,username);
+        return false;
+      }
+    }
+ catch (    AuthenticationProviderException ape) {
+      logger.warn("Failed to update password: " + ape.getMessage());
+      throw ape;
+    }
+  }
+ else {
+    logger.warnf("Skip password update for authentication provider '%s' for user '%s'",providerName,username);
+    return false;
+  }
+}

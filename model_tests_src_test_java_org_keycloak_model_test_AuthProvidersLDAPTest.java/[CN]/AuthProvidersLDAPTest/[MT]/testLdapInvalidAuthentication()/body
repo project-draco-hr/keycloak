@@ -3,6 +3,7 @@
   try {
     ResteasyProviderFactory.pushContext(KeycloakRegistry.class,new KeycloakRegistry());
     UserModel realmUser=realm.addUser("realmUser");
+    realmUser.setEnabled(true);
     UserCredentialModel credential=new UserCredentialModel();
     credential.setType(CredentialRepresentation.PASSWORD);
     credential.setValue("pass");
@@ -16,6 +17,9 @@
     realmUser.setEnabled(false);
     formData=AuthProvidersExternalModelTest.createFormData("realmUser","pass");
     Assert.assertEquals(AuthenticationManager.AuthenticationStatus.ACCOUNT_DISABLED,am.authenticateForm(realm,formData));
+    realmUser.setEnabled(true);
+    formData=AuthProvidersExternalModelTest.createFormData("realmUser","pass");
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm,formData));
   }
   finally {
     ResteasyProviderFactory.clearContextData();

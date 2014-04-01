@@ -1,0 +1,22 @@
+{
+  AuthenticationLinkModel authLink=realm.getAuthenticationLink(user);
+  if (authLink == null) {
+    authLink=new AuthenticationLinkModel(AuthenticationProviderModel.DEFAULT_PROVIDER.getProviderName(),user.getId());
+  }
+  String providerName=authLink.getAuthProvider();
+  AuthenticationProviderModel providerModel=getConfiguredProviderModel(realm,providerName);
+  AuthenticationProvider delegate=getProvider(providerName);
+  if (delegate == null || providerModel == null) {
+    return AuthProviderStatus.FAILED;
+  }
+  try {
+    checkCorrectAuthLink(delegate,providerModel,authLink,user.getLoginName());
+    AuthProviderStatus currentResult=delegate.validatePassword(realm,providerModel.getConfig(),user.getLoginName(),password);
+    logger.debugf("Authentication provider '%s' finished with '%s' for authentication of '%s'",delegate.getName(),currentResult.toString(),user.getLoginName());
+    return currentResult;
+  }
+ catch (  AuthenticationProviderException ape) {
+    logger.warn(ape.getMessage(),ape);
+    return AuthProviderStatus.FAILED;
+  }
+}

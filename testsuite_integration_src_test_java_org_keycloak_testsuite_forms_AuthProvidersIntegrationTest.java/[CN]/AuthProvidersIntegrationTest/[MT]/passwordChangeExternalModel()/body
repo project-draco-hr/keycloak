@@ -7,14 +7,14 @@
 );
   try {
     changePasswordPage.open();
-    loginPage.login("mary","password-admin");
+    loginPage.login("mary-admin","password-admin");
     changePasswordPage.changePassword("password-admin","pass","pass");
     Assert.assertEquals("Invalid password: minimum length 6",profilePage.getError());
-    changePasswordPage.changePassword("password-app","password-updated","password-updated");
+    changePasswordPage.changePassword("password-admin","password-updated","password-updated");
     Assert.assertEquals("Your password has been updated",profilePage.getSuccess());
     changePasswordPage.logout();
     loginPage.open();
-    loginPage.login("mary","password-updated");
+    loginPage.login("mary-admin","password-updated");
     Assert.assertEquals(AppPage.RequestType.AUTH_RESPONSE,appPage.getRequestType());
   }
   finally {

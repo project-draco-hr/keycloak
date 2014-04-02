@@ -2,20 +2,24 @@
   setupAuthenticationProviders();
   try {
     ResteasyProviderFactory.pushContext(KeycloakRegistry.class,new KeycloakRegistry());
+    LdapTestUtils.setLdapPassword(realm,"john","password");
+    MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("john","password");
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm,formData));
     AuthenticationProviderManager authProviderManager=AuthenticationProviderManager.getManager(realm);
+    UserModel john=realm.getUser("john");
     try {
-      authProviderManager.updatePassword("john","password-updated");
+      Assert.assertTrue(authProviderManager.updatePassword(john,"password-updated"));
     }
  catch (    AuthenticationProviderException ape) {
       ape.printStackTrace();
       Assert.fail("Error not expected");
     }
-    MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("john","password-updated");
+    formData=AuthProvidersExternalModelTest.createFormData("john","password-updated");
     Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm,formData));
-    Assert.assertFalse(realm.validatePassword(realm.getUser("john"),"password-updated"));
+    Assert.assertFalse(realm.validatePassword(john,"password-updated"));
     AuthProvidersExternalModelTest.setPasswordUpdateForProvider(false,AuthProviderConstants.PROVIDER_NAME_PICKETLINK,realm);
     try {
-      authProviderManager.updatePassword("john","password-updated2");
+      Assert.assertFalse(authProviderManager.updatePassword(john,"password-updated2"));
     }
  catch (    AuthenticationProviderException ape) {
       ape.printStackTrace();

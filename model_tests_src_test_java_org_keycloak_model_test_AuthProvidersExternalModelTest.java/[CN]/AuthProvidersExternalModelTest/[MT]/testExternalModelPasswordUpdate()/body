@@ -1,10 +1,13 @@
 {
   setupAuthenticationProviders();
+  UserModel john=realm2.addUser("john");
+  john.setEnabled(true);
+  realm2.setAuthenticationLink(john,new AuthenticationLinkModel(AuthProviderConstants.PROVIDER_NAME_EXTERNAL_MODEL,realm1.getUser("john").getId()));
   try {
     ResteasyProviderFactory.pushContext(KeycloakSession.class,identitySession);
     AuthenticationProviderManager authProviderManager=AuthenticationProviderManager.getManager(realm2);
     try {
-      authProviderManager.updatePassword("john","password-updated");
+      Assert.assertTrue(authProviderManager.updatePassword(john,"password-updated"));
     }
  catch (    AuthenticationProviderException ape) {
       ape.printStackTrace();
@@ -15,7 +18,7 @@
     Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm2,formData));
     setPasswordUpdateForProvider(false,AuthProviderConstants.PROVIDER_NAME_EXTERNAL_MODEL,realm2);
     try {
-      authProviderManager.updatePassword("john","password-updated2");
+      Assert.assertFalse(authProviderManager.updatePassword(john,"password-updated2"));
     }
  catch (    AuthenticationProviderException ape) {
       ape.printStackTrace();
@@ -23,11 +26,11 @@
     }
     formData=createFormData("john","password-updated2");
     Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm1,formData));
-    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm2,formData));
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm2,formData));
     setPasswordUpdateForProvider(true,AuthProviderConstants.PROVIDER_NAME_EXTERNAL_MODEL,realm2);
     realm1.setPasswordPolicy(new PasswordPolicy("length(8)"));
     try {
-      authProviderManager.updatePassword("john","passw");
+      authProviderManager.updatePassword(john,"passw");
       Assert.fail("Update not expected to pass");
     }
  catch (    AuthenticationProviderException ape) {

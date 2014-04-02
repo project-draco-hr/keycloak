@@ -55,12 +55,19 @@
     UserCredentialModel credentials=new UserCredentialModel();
     credentials.setType(CredentialRepresentation.PASSWORD);
     credentials.setValue(formData.getFirst("password"));
+    boolean passwordUpdateSuccessful;
+    String passwordUpdateError=null;
     try {
-      AuthenticationProviderManager.getManager(realm).updatePassword(username,formData.getFirst("password"));
+      passwordUpdateSuccessful=AuthenticationProviderManager.getManager(realm).updatePassword(user,formData.getFirst("password"));
+      passwordUpdateError="Password update failed";
     }
  catch (    AuthenticationProviderException ape) {
+      passwordUpdateSuccessful=false;
+      passwordUpdateError=ape.getMessage();
+    }
+    if (!passwordUpdateSuccessful) {
       user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
-      return Flows.forms(realm,request,uriInfo).setError(ape.getMessage()).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
+      return Flows.forms(realm,request,uriInfo).setError(passwordUpdateError).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
     }
   }
   audit.user(user).success();

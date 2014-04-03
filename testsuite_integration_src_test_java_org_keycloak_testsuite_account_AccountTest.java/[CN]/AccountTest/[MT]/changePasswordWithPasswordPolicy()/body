@@ -1,0 +1,26 @@
+{
+  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.setPasswordPolicy(new PasswordPolicy("length"));
+    }
+  }
+);
+  try {
+    changePasswordPage.open();
+    loginPage.login("test-user@localhost","password");
+    events.expectLogin().client("account").detail(Details.REDIRECT_URI,ACCOUNT_REDIRECT + "?path=password").assertEvent();
+    changePasswordPage.changePassword("","new","new");
+    Assert.assertEquals("Please specify password.",profilePage.getError());
+    changePasswordPage.changePassword("password","new-password","new-password");
+    Assert.assertEquals("Your password has been updated",profilePage.getSuccess());
+    events.expectAccount("update_password").assertEvent();
+  }
+  finally {
+    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        appRealm.setPasswordPolicy(new PasswordPolicy(null));
+      }
+    }
+);
+  }
+}

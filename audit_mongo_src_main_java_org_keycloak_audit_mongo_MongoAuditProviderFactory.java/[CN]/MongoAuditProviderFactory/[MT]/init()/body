@@ -1,0 +1,10 @@
+{
+  try {
+    client=new MongoClient(System.getProperty(MONGO_HOST,"localhost"),Integer.parseInt(System.getProperty(MONGO_PORT,"27017")));
+    client.setWriteConcern(WriteConcern.UNACKNOWLEDGED);
+    db=client.getDB(System.getProperty(MONGO_DB_NAME,"keycloak-audit"));
+  }
+ catch (  UnknownHostException e) {
+    throw new RuntimeException(e);
+  }
+}

@@ -7,6 +7,7 @@
   }
   logger.debug("updatePassword has access code");
   UserModel user=getUser(accessCode);
+  initAudit(accessCode);
   String passwordNew=formData.getFirst("password-new");
   String passwordConfirm=formData.getFirst("password-confirm");
   LoginForms loginForms=Flows.forms(realm,request,uriInfo).setUser(user);
@@ -17,7 +18,10 @@
     return loginForms.setError(Messages.NOTMATCH_PASSWORD).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
   try {
-    AuthenticationProviderManager.getManager(realm).updatePassword(user.getLoginName(),passwordNew);
+    boolean updateSuccessful=AuthenticationProviderManager.getManager(realm).updatePassword(user,passwordNew);
+    if (!updateSuccessful) {
+      return loginForms.setError("Password update failed").createResponse(RequiredAction.UPDATE_PASSWORD);
+    }
   }
  catch (  AuthenticationProviderException ape) {
     return loginForms.setError(ape.getMessage()).createResponse(RequiredAction.UPDATE_PASSWORD);
@@ -27,5 +31,6 @@
   if (accessCode != null) {
     accessCode.getRequiredActions().remove(RequiredAction.UPDATE_PASSWORD);
   }
+  audit.clone().event(Events.UPDATE_PASSWORD).success();
   return redirectOauth(user,accessCode);
 }

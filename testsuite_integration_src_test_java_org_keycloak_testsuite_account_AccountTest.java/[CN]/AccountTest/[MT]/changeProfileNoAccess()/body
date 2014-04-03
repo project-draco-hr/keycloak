@@ -1,0 +1,7 @@
+{
+  profilePage.open();
+  loginPage.login("test-user-no-access@localhost","password");
+  events.expectLogin().client("account").user(keycloakRule.getUser("test","test-user-no-access@localhost").getId()).detail(Details.USERNAME,"test-user-no-access@localhost").detail(Details.REDIRECT_URI,ACCOUNT_REDIRECT).assertEvent();
+  Assert.assertTrue(errorPage.isCurrent());
+  Assert.assertEquals("No access",errorPage.getError());
+}

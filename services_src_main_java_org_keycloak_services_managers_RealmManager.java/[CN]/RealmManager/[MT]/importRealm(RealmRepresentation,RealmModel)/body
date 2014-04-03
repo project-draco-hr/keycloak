@@ -146,15 +146,6 @@
       }
     }
   }
-  if (rep.getAuthenticationMappings() != null) {
-    for (    AuthenticationMappingRepresentation authMapping : rep.getAuthenticationMappings()) {
-      UserModel user=userMap.get(authMapping.getUsername());
-      for (      AuthenticationLinkRepresentation link : authMapping.getAuthenticationLinks()) {
-        AuthenticationLinkModel mappingModel=new AuthenticationLinkModel(link.getAuthProvider(),link.getAuthUserId());
-        newRealm.addAuthenticationLink(user,mappingModel);
-      }
-    }
-  }
   if (rep.getSmtpServer() != null) {
     newRealm.setSmtpConfig(new HashMap(rep.getSmtpServer()));
   }
@@ -166,6 +157,10 @@
   }
   if (rep.getAuthenticationProviders() != null) {
     List<AuthenticationProviderModel> authProviderModels=convertAuthenticationProviders(rep.getAuthenticationProviders());
+    newRealm.setAuthenticationProviders(authProviderModels);
+  }
+ else {
+    List<AuthenticationProviderModel> authProviderModels=Arrays.asList(AuthenticationProviderModel.DEFAULT_PROVIDER);
     newRealm.setAuthenticationProviders(authProviderModels);
   }
 }

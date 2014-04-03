@@ -27,12 +27,15 @@ case ADD:
     return account.setError(Messages.SOCIAL_REDIRECT_ERROR).createResponse(AccountPages.SOCIAL);
   }
 case REMOVE:
-if (realm.removeSocialLink(user,providerId)) {
-  logger.debug("Social provider " + providerId + " removed successfully from user "+ user.getLoginName());
-  return account.setSuccess(Messages.SOCIAL_PROVIDER_REMOVED).createResponse(AccountPages.SOCIAL);
+SocialLinkModel link=realm.getSocialLink(user,providerId);
+if (link != null) {
+realm.removeSocialLink(user,providerId);
+logger.debug("Social provider " + providerId + " removed successfully from user "+ user.getLoginName());
+audit.event(Events.REMOVE_SOCIAL_LINK).client(auth.getClient()).user(auth.getUser()).detail(Details.USERNAME,link.getSocialUserId() + "@" + link.getSocialProvider()).success();
+return account.setSuccess(Messages.SOCIAL_PROVIDER_REMOVED).createResponse(AccountPages.SOCIAL);
 }
  else {
-  return account.setError(Messages.SOCIAL_LINK_NOT_ACTIVE).createResponse(AccountPages.SOCIAL);
+return account.setError(Messages.SOCIAL_LINK_NOT_ACTIVE).createResponse(AccountPages.SOCIAL);
 }
 default :
 logger.warn("Action is null!");

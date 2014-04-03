@@ -1,0 +1,15 @@
+{
+  totpPage.open();
+  loginPage.login("test-user@localhost","password");
+  events.expectLogin().client("account").detail(Details.REDIRECT_URI,ACCOUNT_REDIRECT + "?path=totp").assertEvent();
+  Assert.assertTrue(totpPage.isCurrent());
+  Assert.assertFalse(driver.getPageSource().contains("Remove Google"));
+  totpPage.configure(totp.generate(totpPage.getTotpSecret() + "123"));
+  Assert.assertEquals("Invalid authenticator code",profilePage.getError());
+  totpPage.configure(totp.generate(totpPage.getTotpSecret()));
+  Assert.assertEquals("Google authenticator configured.",profilePage.getSuccess());
+  events.expectAccount("update_totp").assertEvent();
+  Assert.assertTrue(driver.getPageSource().contains("pficon-delete"));
+  totpPage.removeTotp();
+  events.expectAccount("remove_totp").assertEvent();
+}

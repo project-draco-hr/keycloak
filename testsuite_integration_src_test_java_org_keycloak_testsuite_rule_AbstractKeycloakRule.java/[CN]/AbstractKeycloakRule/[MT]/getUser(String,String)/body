@@ -1,7 +1,8 @@
 {
   KeycloakSession session=server.getKeycloakSessionFactory().createSession();
   try {
-    return ModelToRepresentation.toRepresentation(session.getRealmByName(realm).getUser(name));
+    UserModel user=session.getRealmByName(realm).getUser(name);
+    return user != null ? ModelToRepresentation.toRepresentation(user) : null;
   }
   finally {
     session.close();

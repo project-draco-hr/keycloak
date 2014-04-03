@@ -10,4 +10,6 @@
   Assert.assertTrue(response.isRedirected());
   Assert.assertNotNull(response.getCode());
   oauth.verifyCode(response.getCode());
+  String codeId=events.expectLogin().assertEvent().getDetails().get(Details.CODE_ID);
+  Assert.assertEquals(codeId,new JWSInput(response.getCode()).readContentAsString());
 }

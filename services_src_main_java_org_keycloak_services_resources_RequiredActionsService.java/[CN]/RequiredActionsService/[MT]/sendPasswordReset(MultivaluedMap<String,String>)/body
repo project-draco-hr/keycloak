@@ -11,12 +11,14 @@
   if (!client.isEnabled()) {
     return Flows.oauth(realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
   }
+  audit.event(Events.SEND_RESET_PASSWORD).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
   UserModel user=realm.getUser(username);
   if (user == null && username.contains("@")) {
     user=realm.getUserByEmail(username);
   }
   if (user == null) {
     logger.warn("Failed to send password reset email: user not found");
+    audit.error(Errors.USER_NOT_FOUND);
   }
  else {
     Set<RequiredAction> requiredActions=new HashSet<RequiredAction>(user.getRequiredActions());
@@ -24,8 +26,11 @@
     AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,realm,client,user);
     accessCode.setRequiredActions(requiredActions);
     accessCode.setExpiration(Time.currentTime() + realm.getAccessCodeLifespanUserAction());
+    accessCode.setAuthMethod("form");
+    accessCode.setUsername(username);
     try {
       new EmailSender(realm.getSmtpConfig()).sendPasswordReset(user,realm,accessCode,uriInfo);
+      audit.user(user).detail(Details.EMAIL,user.getEmail()).detail(Details.CODE_ID,accessCode.getId()).success();
     }
  catch (    EmailException e) {
       logger.error("Failed to send password reset email",e);

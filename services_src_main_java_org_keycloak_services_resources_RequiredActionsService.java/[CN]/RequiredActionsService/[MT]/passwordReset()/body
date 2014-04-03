@@ -1,6 +1,7 @@
 {
   if (uriInfo.getQueryParameters().containsKey("key")) {
     AccessCodeEntry accessCode=tokenManager.getAccessCode(uriInfo.getQueryParameters().getFirst("key"));
+    accessCode.setAuthMethod("form");
     if (accessCode == null || accessCode.isExpired() || !accessCode.getRequiredActions().contains(RequiredAction.UPDATE_PASSWORD)) {
       return unauthorized();
     }

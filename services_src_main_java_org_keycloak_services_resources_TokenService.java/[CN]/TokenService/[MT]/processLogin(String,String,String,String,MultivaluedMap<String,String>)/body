@@ -1,30 +1,40 @@
 {
   logger.debug("TokenService.processLogin");
+  String username=formData.getFirst(AuthenticationManager.FORM_USERNAME);
+  String rememberMe=formData.getFirst("rememberMe");
+  boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("on");
+  logger.debug("*** Remember me: " + remember);
+  audit.event(Events.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
+  if (remember) {
+    audit.detail(Details.REMEMBER_ME,"true");
+  }
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
   if (!realm.isEnabled()) {
+    audit.error(Errors.REALM_DISABLED);
     return oauth.forwardToSecurityFailure("Realm not enabled.");
   }
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
+    audit.error(Errors.CLIENT_NOT_FOUND);
     return oauth.forwardToSecurityFailure("Unknown login requester.");
   }
   if (!client.isEnabled()) {
+    audit.error(Errors.CLIENT_NOT_FOUND);
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
   redirect=verifyRedirectUri(redirect,client);
   if (redirect == null) {
+    audit.error(Errors.INVALID_REDIRECT_URI);
     return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
   }
   if (formData.containsKey("cancel")) {
+    audit.error(Errors.REJECTED_BY_USER);
     return oauth.redirectError(client,"access_denied",state,redirect);
   }
   AuthenticationStatus status=authManager.authenticateForm(clientConnection,realm,formData);
-  String rememberMe=formData.getFirst("rememberMe");
-  boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("on");
-  logger.debug("*** Remember me: " + remember);
   if (remember) {
     NewCookie cookie=authManager.createRememberMeCookie(realm,uriInfo);
     response.addNewCookie(cookie);
@@ -35,13 +45,19 @@
 switch (status) {
 case SUCCESS:
 case ACTIONS_REQUIRED:
-    UserModel user=KeycloakModelUtils.findUserByNameOrEmail(realm,formData.getFirst(AuthenticationManager.FORM_USERNAME));
-  return oauth.processAccessCode(scopeParam,state,redirect,client,user,remember);
+    UserModel user=KeycloakModelUtils.findUserByNameOrEmail(realm,username);
+  audit.user(user);
+return oauth.processAccessCode(scopeParam,state,redirect,client,user,username,remember,"form",audit);
 case ACCOUNT_DISABLED:
+audit.error(Errors.USER_DISABLED);
 return Flows.forms(realm,request,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).createLogin();
 case MISSING_TOTP:
 return Flows.forms(realm,request,uriInfo).setFormData(formData).createLoginTotp();
+case INVALID_USER:
+audit.error(Errors.USER_NOT_FOUND);
+return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).createLogin();
 default :
+audit.error(Errors.INVALID_USER_CREDENTIALS);
 return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).createLogin();
 }
 }

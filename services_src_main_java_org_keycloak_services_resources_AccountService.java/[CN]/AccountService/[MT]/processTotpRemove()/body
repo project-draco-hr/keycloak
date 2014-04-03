@@ -3,6 +3,7 @@
   require(auth,AccountRoles.MANAGE_ACCOUNT);
   UserModel user=auth.getUser();
   user.setTotp(false);
+  audit.event(Events.REMOVE_TOTP).client(auth.getClient()).user(auth.getUser()).success();
   Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
   return account.setSuccess("successTotpRemoved").createResponse(AccountPages.TOTP);
 }

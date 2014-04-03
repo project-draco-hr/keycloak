@@ -1,0 +1,28 @@
+{
+  UsernameLoginFailureModel user=getUserModel(session,event);
+  if (user == null)   return;
+  user.setLastIPFailure(event.ip);
+  long currentTime=System.currentTimeMillis();
+  long last=user.getLastFailure();
+  long deltaTime=0;
+  if (last > 0) {
+    deltaTime=currentTime - last;
+  }
+  user.setLastFailure(currentTime);
+  if (deltaTime > 0) {
+    if (deltaTime > maxDeltaTime) {
+      user.clearFailures();
+    }
+  }
+  user.incrementFailures();
+  int waitSeconds=waitIncrementSeconds * (user.getNumFailures() / failureFactor);
+  if (waitSeconds == 0) {
+    if (deltaTime > quickLoginCheckMilliSeconds) {
+      waitSeconds=minimumQuickLoginWaitSeconds;
+    }
+  }
+  waitSeconds=Math.min(maxFailureWaitSeconds,waitSeconds);
+  if (waitSeconds > 0) {
+    user.setFailedLoginNotBefore((int)(currentTime / 1000) + waitSeconds);
+  }
+}

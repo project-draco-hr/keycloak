@@ -9,17 +9,17 @@
     credential.setValue("pass");
     realm.updateCredential(realmUser,credential);
     MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("invalid","invalid");
-    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(realm,formData));
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(null,realm,formData));
     formData=AuthProvidersExternalModelTest.createFormData("john","invalid");
-    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm,formData));
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(null,realm,formData));
     formData=AuthProvidersExternalModelTest.createFormData("realmUser","invalid");
-    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(realm,formData));
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(null,realm,formData));
     realmUser.setEnabled(false);
     formData=AuthProvidersExternalModelTest.createFormData("realmUser","pass");
-    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.ACCOUNT_DISABLED,am.authenticateForm(realm,formData));
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.ACCOUNT_DISABLED,am.authenticateForm(null,realm,formData));
     realmUser.setEnabled(true);
     formData=AuthProvidersExternalModelTest.createFormData("realmUser","pass");
-    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm,formData));
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(null,realm,formData));
   }
   finally {
     ResteasyProviderFactory.clearContextData();

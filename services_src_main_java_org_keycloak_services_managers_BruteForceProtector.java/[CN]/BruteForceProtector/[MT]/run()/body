@@ -1,0 +1,55 @@
+{
+  final ArrayList<LoginEvent> events=new ArrayList<LoginEvent>(TRANSACTION_SIZE + 1);
+  while (run) {
+    try {
+      LoginEvent take=queue.poll(2,TimeUnit.SECONDS);
+      if (take == null) {
+        continue;
+      }
+      try {
+        events.add(take);
+        queue.drainTo(events,TRANSACTION_SIZE);
+        for (        LoginEvent event : events) {
+          if (event instanceof FailedLogin) {
+            logFailure(event);
+          }
+ else {
+            logSuccess(event);
+          }
+        }
+        Collections.sort(events);
+        KeycloakSession session=factory.createSession();
+        try {
+          for (          LoginEvent event : events) {
+            if (event instanceof FailedLogin) {
+              failure(session,event);
+            }
+          }
+          session.getTransaction().commit();
+        }
+ catch (        Exception e) {
+          session.getTransaction().rollback();
+          throw e;
+        }
+ finally {
+          for (          LoginEvent event : events) {
+            if (event instanceof FailedLogin) {
+              ((FailedLogin)event).latch.countDown();
+            }
+          }
+          events.clear();
+          session.close();
+        }
+      }
+ catch (      Exception e) {
+        logger.error("Failed processing event",e);
+      }
+    }
+ catch (    InterruptedException e) {
+      break;
+    }
+ finally {
+      shutdownLatch.countDown();
+    }
+  }
+}

@@ -1,12 +1,12 @@
 {
   MultivaluedMap<String,String> formData=createFormData("john","password");
-  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm1,formData));
-  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(realm2,formData));
+  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(null,realm1,formData));
+  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(null,realm2,formData));
   Assert.assertNull(realm2.getUser("john"));
   setupAuthenticationProviders();
   try {
     ResteasyProviderFactory.pushContext(KeycloakSession.class,identitySession);
-    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(realm2,formData));
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(null,realm2,formData));
     UserModel john2=realm2.getUser("john");
     Assert.assertNotNull(john2);
     Assert.assertEquals("john",john2.getLoginName());

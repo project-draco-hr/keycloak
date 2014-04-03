@@ -1,0 +1,16 @@
+{
+  List<AuditListener> listeners=new LinkedList<AuditListener>();
+  AuditProvider auditProvider=providers.getProvider(AuditProvider.class);
+  if (auditProvider != null) {
+    listeners.add(auditProvider);
+  }
+  if (realm.getAuditListeners() != null) {
+    for (    String id : realm.getAuditListeners()) {
+      AuditListener listener=providers.getProvider(AuditListener.class,id);
+      if (listener != null) {
+        listeners.add(listener);
+      }
+    }
+  }
+  return new Audit(listeners,realm,clientConnection.getRemoteAddr());
+}

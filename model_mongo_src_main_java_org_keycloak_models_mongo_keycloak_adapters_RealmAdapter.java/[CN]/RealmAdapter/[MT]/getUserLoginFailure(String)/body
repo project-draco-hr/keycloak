@@ -1,0 +1,10 @@
+{
+  DBObject query=new QueryBuilder().and("username").is(name).and("realmId").is(getId()).get();
+  UsernameLoginFailureEntity user=getMongoStore().loadSingleEntity(UsernameLoginFailureEntity.class,query,invocationContext);
+  if (user == null) {
+    return null;
+  }
+ else {
+    return new UsernameLoginFailureAdapter(invocationContext,user);
+  }
+}

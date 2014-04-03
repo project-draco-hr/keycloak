@@ -1,0 +1,15 @@
+{
+  ResteasyProviderFactory.pushContext(ClientConnection.class,new ClientConnection(){
+    @Override public String getRemoteAddr(){
+      return request.getRemoteAddr();
+    }
+    @Override public String getRemoteHost(){
+      return request.getRemoteHost();
+    }
+    @Override public int getReportPort(){
+      return request.getRemotePort();
+    }
+  }
+);
+  chain.doFilter(request,response);
+}

@@ -1,0 +1,27 @@
+{
+  String username=formData.getFirst(FORM_USERNAME);
+  if (username == null) {
+    logger.warn("Username not provided");
+    return AuthenticationStatus.INVALID_USER;
+  }
+  AuthenticationStatus status=authenticateInternal(realm,formData,username);
+  if (realm.isBruteForceProtected()) {
+switch (status) {
+case SUCCESS:
+      protector.successfulLogin(realm,username,clientConnection);
+    break;
+case FAILED:
+case MISSING_TOTP:
+case MISSING_PASSWORD:
+case INVALID_CREDENTIALS:
+  protector.failedLogin(realm,username,clientConnection);
+break;
+case INVALID_USER:
+protector.invalidUser(realm,username,clientConnection);
+break;
+default :
+break;
+}
+}
+return status;
+}

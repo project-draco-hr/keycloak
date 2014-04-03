@@ -4,8 +4,7 @@
     return forwardToPage(null,AccountPages.ACCOUNT);
   }
  else   if (types.contains(MediaType.APPLICATION_JSON_TYPE)) {
-    Auth auth=getAuth(true);
-    requireOneOf(auth,AccountRoles.MANAGE_ACCOUNT,AccountRoles.VIEW_PROFILE);
+    requireOneOf(AccountRoles.MANAGE_ACCOUNT,AccountRoles.VIEW_PROFILE);
     return Cors.add(request,Response.ok(ModelToRepresentation.toRepresentation(auth.getUser()))).auth().allowedOrigins(auth.getClient()).build();
   }
  else {

@@ -5,7 +5,7 @@
   String realmName=requestData.getClientAttribute("realm");
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=realmManager.getRealmByName(realmName);
-  Audit audit=Audit.create(realm,servletRequest.getRemoteAddr()).event(Events.LOGIN).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"social");
+  Audit audit=createAudit(realm).event(Events.LOGIN).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"social");
   OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
   if (!realm.isEnabled()) {
     audit.error(Errors.REALM_DISABLED);

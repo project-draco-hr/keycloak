@@ -1,4 +1,7 @@
 {
+  ProviderSessionFactory providerSessionFactory=(ProviderSessionFactory)servletRequest.getServletContext().getAttribute(ProviderSessionFactory.class.getName());
+  ProviderSession providerSession=providerSessionFactory.createSession();
+  ResteasyProviderFactory.pushContext(ProviderSession.class,providerSession);
   KeycloakRegistry registry=(KeycloakRegistry)servletRequest.getServletContext().getAttribute(KeycloakRegistry.class.getName());
   ResteasyProviderFactory.pushContext(KeycloakRegistry.class,registry);
   KeycloakSessionFactory factory=registry.getService(KeycloakSessionFactory.class);
@@ -29,6 +32,7 @@ catch (  RuntimeException ex) {
   }
  finally {
     session.close();
+    providerSession.close();
     ResteasyProviderFactory.clearContextData();
   }
 }

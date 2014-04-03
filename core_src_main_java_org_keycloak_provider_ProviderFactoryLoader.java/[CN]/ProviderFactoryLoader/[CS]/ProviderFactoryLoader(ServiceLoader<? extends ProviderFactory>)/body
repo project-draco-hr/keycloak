@@ -1,0 +1,10 @@
+{
+  for (  ProviderFactory p : serviceLoader) {
+    if (!System.getProperties().containsKey(p.getClass().getName() + ".disabled")) {
+      if (p.lazyLoad()) {
+        p=new LazyProviderFactory(p);
+      }
+      factories.put(p.getId(),p);
+    }
+  }
+}

@@ -1,8 +1,6 @@
 {
-  Auth auth=getAuth(true);
-  require(auth,AccountRoles.MANAGE_ACCOUNT);
+  require(AccountRoles.MANAGE_ACCOUNT);
   UserModel user=auth.getUser();
-  Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
   String error=Validation.validateUpdateProfileForm(formData);
   if (error != null) {
     return account.setError(error).createResponse(AccountPages.ACCOUNT);

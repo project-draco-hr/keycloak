@@ -1,8 +1,6 @@
 {
-  Auth auth=getAuth(true);
-  require(auth,AccountRoles.MANAGE_ACCOUNT);
+  require(AccountRoles.MANAGE_ACCOUNT);
   UserModel user=auth.getUser();
-  Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
   if (Validation.isEmpty(providerId)) {
     return account.setError(Messages.MISSING_SOCIAL_PROVIDER).createResponse(AccountPages.SOCIAL);
   }

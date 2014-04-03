@@ -1,0 +1,12 @@
+{
+  Integer hash=clazz.hashCode();
+  T provider=(T)providers.get(hash);
+  if (provider == null) {
+    ProviderFactory<T> providerFactory=factory.getProviderFactory(clazz);
+    if (providerFactory != null) {
+      provider=providerFactory.create();
+      providers.put(hash,provider);
+    }
+  }
+  return provider;
+}

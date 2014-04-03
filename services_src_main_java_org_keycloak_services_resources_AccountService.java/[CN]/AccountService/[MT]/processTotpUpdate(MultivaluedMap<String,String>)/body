@@ -1,10 +1,8 @@
 {
-  Auth auth=getAuth(true);
-  require(auth,AccountRoles.MANAGE_ACCOUNT);
+  require(AccountRoles.MANAGE_ACCOUNT);
   UserModel user=auth.getUser();
   String totp=formData.getFirst("totp");
   String totpSecret=formData.getFirst("totpSecret");
-  Account account=AccountLoader.load().createAccount(uriInfo).setRealm(realm).setUser(auth.getUser());
   if (Validation.isEmpty(totp)) {
     return account.setError(Messages.MISSING_TOTP).createResponse(AccountPages.TOTP);
   }

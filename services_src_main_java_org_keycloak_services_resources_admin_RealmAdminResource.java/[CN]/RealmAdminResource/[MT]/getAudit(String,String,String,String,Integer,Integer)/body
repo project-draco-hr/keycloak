@@ -1,0 +1,24 @@
+{
+  auth.init(RealmAuth.Resource.AUDIT).requireView();
+  AuditProvider audit=providers.getProvider(AuditProvider.class);
+  EventQuery query=audit.createQuery().realm(realm.getId());
+  if (client != null) {
+    query.client(client);
+  }
+  if (event != null) {
+    query.event(event);
+  }
+  if (user != null) {
+    query.user(user);
+  }
+  if (ipAddress != null) {
+    query.ipAddress(ipAddress);
+  }
+  if (firstResult != null) {
+    query.firstResult(firstResult);
+  }
+  if (maxResults != null) {
+    query.maxResults(maxResults);
+  }
+  return query.getResultList();
+}

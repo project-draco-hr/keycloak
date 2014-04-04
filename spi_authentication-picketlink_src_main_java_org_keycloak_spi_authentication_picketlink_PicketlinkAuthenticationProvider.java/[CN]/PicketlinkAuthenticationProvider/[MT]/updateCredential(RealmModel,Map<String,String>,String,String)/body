@@ -1,10 +1,15 @@
 {
   IdentityManager identityManager=getIdentityManager(realm);
-  User picketlinkUser=BasicModel.getUser(identityManager,username);
-  if (picketlinkUser == null) {
-    logger.debugf("User '%s' doesn't exists. Skip password update",username);
-    return false;
+  try {
+    User picketlinkUser=BasicModel.getUser(identityManager,username);
+    if (picketlinkUser == null) {
+      logger.debugf("User '%s' doesn't exists. Skip password update",username);
+      return false;
+    }
+    identityManager.updateCredential(picketlinkUser,new Password(password.toCharArray()));
+    return true;
   }
-  identityManager.updateCredential(picketlinkUser,new Password(password.toCharArray()));
-  return true;
+ catch (  IdentityManagementException ie) {
+    throw convertIDMException(ie);
+  }
 }

@@ -1,5 +1,5 @@
 {
-  Logger.Level level=event.isError() ? Logger.Level.WARN : Logger.Level.INFO;
+  Logger.Level level=event.getError() != null ? Logger.Level.WARN : Logger.Level.INFO;
   if (logger.isEnabled(level)) {
     StringBuilder sb=new StringBuilder();
     sb.append("event=");
@@ -12,7 +12,7 @@
     sb.append(event.getUserId());
     sb.append(", ipAddress=");
     sb.append(event.getIpAddress());
-    if (event.isError()) {
+    if (event.getError() != null) {
       sb.append(", error=");
       sb.append(event.getError());
     }

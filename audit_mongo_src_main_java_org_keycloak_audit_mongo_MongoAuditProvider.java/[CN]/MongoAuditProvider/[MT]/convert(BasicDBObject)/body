@@ -8,10 +8,12 @@
   e.setIpAddress(o.getString("ipAddress"));
   e.setError(o.getString("error"));
   BasicDBObject d=(BasicDBObject)o.get("details");
-  Map<String,String> details=new HashMap<String,String>();
-  for (  Object k : d.keySet()) {
-    details.put((String)k,d.getString((String)k));
+  if (d != null) {
+    Map<String,String> details=new HashMap<String,String>();
+    for (    Object k : d.keySet()) {
+      details.put((String)k,d.getString((String)k));
+    }
+    e.setDetails(details);
   }
-  e.setDetails(details);
   return e;
 }

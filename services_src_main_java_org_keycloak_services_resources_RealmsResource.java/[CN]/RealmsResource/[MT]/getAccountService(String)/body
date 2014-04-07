@@ -6,7 +6,7 @@
     logger.debug("account management not enabled");
     throw new NotFoundException();
   }
-  Audit audit=createAudit(realm);
+  Audit audit=new AuditManager(realm,providers,clientConnection).createAudit();
   AccountService accountService=new AccountService(realm,application,tokenManager,socialRequestManager,audit);
   resourceContext.initResource(accountService);
   accountService.init();

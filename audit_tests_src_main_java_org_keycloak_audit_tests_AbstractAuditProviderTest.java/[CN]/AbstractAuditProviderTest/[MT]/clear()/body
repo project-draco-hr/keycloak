@@ -3,8 +3,9 @@
   provider.onEvent(create(System.currentTimeMillis() - 20000,"event","realmId","clientId","userId","127.0.0.1","error"));
   provider.onEvent(create(System.currentTimeMillis(),"event","realmId","clientId","userId","127.0.0.1","error"));
   provider.onEvent(create(System.currentTimeMillis(),"event","realmId","clientId","userId","127.0.0.1","error"));
+  provider.onEvent(create(System.currentTimeMillis() - 30000,"event","realmId2","clientId","userId","127.0.0.1","error"));
   provider.close();
   provider=factory.create();
-  provider.clear();
-  Assert.assertEquals(0,provider.createQuery().getResultList().size());
+  provider.clear("realmId");
+  Assert.assertEquals(1,provider.createQuery().getResultList().size());
 }

@@ -1,7 +1,7 @@
 {
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=realmManager.getRealmByName(realmName);
-  Audit audit=createAudit(realm).event(Events.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirectUri).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"social@" + providerId);
+  Audit audit=new AuditManager(realm,providers,clientConnection).createAudit().event(Events.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirectUri).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"social@" + providerId);
   SocialProvider provider=SocialLoader.load(providerId);
   if (provider == null) {
     audit.error(Errors.SOCIAL_PROVIDER_NOT_FOUND);

@@ -19,9 +19,14 @@
     e.add(events.poll());
     Collections.reverse(e);
     Assert.assertTrue(logPage.isCurrent());
-    List<List<String>> actual=logPage.getEvents();
-    Assert.assertEquals(e.size(),actual.size());
-    Iterator<List<String>> itr=actual.iterator();
+    final int expectedEvents=e.size();
+    Retry.execute(new Runnable(){
+      @Override public void run(){
+        Assert.assertEquals(expectedEvents,logPage.getEvents().size());
+      }
+    }
+,10,500);
+    Iterator<List<String>> itr=logPage.getEvents().iterator();
     for (    Event event : e) {
       List<String> a=itr.next();
       Assert.assertEquals(event.getEvent().replace('_',' '),a.get(1));
@@ -29,7 +34,10 @@
       Assert.assertEquals(event.getClientId(),a.get(3));
     }
   }
-  finally {
+ catch (  InterruptedException e) {
+    e.printStackTrace();
+  }
+ finally {
     keycloakRule.configure(new KeycloakSetup(){
       @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
         appRealm.setAuditEnabled(false);

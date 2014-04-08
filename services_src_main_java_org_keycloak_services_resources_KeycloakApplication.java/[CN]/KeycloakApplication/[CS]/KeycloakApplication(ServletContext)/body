@@ -4,7 +4,8 @@
   KeycloakRegistry registry=new KeycloakRegistry();
   registry.putService(KeycloakSessionFactory.class,factory);
   context.setAttribute(KeycloakRegistry.class.getName(),registry);
-  context.setAttribute(ProviderSessionFactory.class.getName(),createProviderSessionFactory());
+  DefaultProviderSessionFactory providerSessionFactory=createProviderSessionFactory();
+  context.setAttribute(ProviderSessionFactory.class.getName(),providerSessionFactory);
   TokenManager tokenManager=new TokenManager();
   SocialRequestManager socialRequestManager=new SocialRequestManager();
   singletons.add(new RealmsResource(tokenManager,socialRequestManager));
@@ -14,4 +15,5 @@
   classes.add(QRCodeResource.class);
   classes.add(ThemeResource.class);
   setupDefaultRealm(context.getContextPath());
+  setupScheduledTasks(providerSessionFactory,factory);
 }

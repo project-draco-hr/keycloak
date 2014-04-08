@@ -1,0 +1,34 @@
+{
+  ProviderFactory<TimerProvider> timerFactory=providerSessionFactory.getProviderFactory(TimerProvider.class);
+  if (timerFactory == null) {
+    log.error("Can't setup schedule tasks, no timer provider found");
+    return;
+  }
+  TimerProvider timer=timerFactory.create();
+  final ProviderFactory<AuditProvider> auditFactory=providerSessionFactory.getProviderFactory(AuditProvider.class);
+  if (auditFactory != null) {
+    timer.schedule(new Runnable(){
+      @Override public void run(){
+        KeycloakSession keycloakSession=keycloakSessionFactory.createSession();
+        AuditProvider audit=providerSessionFactory.getProviderFactory(AuditProvider.class).create();
+        try {
+          for (          RealmModel realm : keycloakSession.getRealms()) {
+            if (realm.isAuditEnabled() && realm.getAuditExpiration() > 0) {
+              long olderThan=System.currentTimeMillis() - realm.getAuditExpiration() * 1000;
+              log.info("Expiring audit events for " + realm.getName() + " older than "+ new Date(olderThan));
+              audit.clear(realm.getId(),olderThan);
+            }
+          }
+        }
+  finally {
+          keycloakSession.close();
+          audit.close();
+        }
+      }
+    }
+,Config.getAuditExpirationSchedule());
+  }
+ else {
+    log.info("Not scheduling audit expiration, no audit provider found");
+  }
+}

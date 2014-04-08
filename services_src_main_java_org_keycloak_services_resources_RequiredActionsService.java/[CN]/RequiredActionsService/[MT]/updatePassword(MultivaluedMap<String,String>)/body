@@ -18,7 +18,7 @@
     return loginForms.setError(Messages.NOTMATCH_PASSWORD).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
   try {
-    boolean updateSuccessful=AuthenticationProviderManager.getManager(realm).updatePassword(user,passwordNew);
+    boolean updateSuccessful=AuthenticationProviderManager.getManager(realm,providerSession).updatePassword(user,passwordNew);
     if (!updateSuccessful) {
       return loginForms.setError("Password update failed").createResponse(RequiredAction.UPDATE_PASSWORD);
     }

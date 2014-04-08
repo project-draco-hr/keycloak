@@ -4,6 +4,7 @@
   String state=uriInfo.getQueryParameters().getFirst(OAuth2Constants.STATE);
   String redirect=uriInfo.getQueryParameters().getFirst(OAuth2Constants.REDIRECT_URI);
   String clientId=uriInfo.getQueryParameters().getFirst(OAuth2Constants.CLIENT_ID);
+  AuthenticationManager authManager=new AuthenticationManager(providerSession);
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
     return Flows.oauth(realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Unknown login requester.");

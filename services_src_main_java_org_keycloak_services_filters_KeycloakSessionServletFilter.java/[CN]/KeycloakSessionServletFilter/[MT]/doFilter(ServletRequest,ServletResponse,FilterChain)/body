@@ -2,9 +2,7 @@
   ProviderSessionFactory providerSessionFactory=(ProviderSessionFactory)servletRequest.getServletContext().getAttribute(ProviderSessionFactory.class.getName());
   ProviderSession providerSession=providerSessionFactory.createSession();
   ResteasyProviderFactory.pushContext(ProviderSession.class,providerSession);
-  KeycloakRegistry registry=(KeycloakRegistry)servletRequest.getServletContext().getAttribute(KeycloakRegistry.class.getName());
-  ResteasyProviderFactory.pushContext(KeycloakRegistry.class,registry);
-  KeycloakSessionFactory factory=registry.getService(KeycloakSessionFactory.class);
+  KeycloakSessionFactory factory=(KeycloakSessionFactory)servletRequest.getServletContext().getAttribute(KeycloakSessionFactory.class.getName());
   if (factory == null)   throw new ServletException("Factory was null");
   KeycloakSession session=factory.createSession();
   ResteasyProviderFactory.pushContext(KeycloakSession.class,session);

@@ -10,6 +10,7 @@
     logger.debug("redirectOauth: redirecting to: {0}",accessCode.getRedirectUri());
     accessCode.setExpiration(Time.currentTime() + realm.getAccessCodeLifespan());
     audit.success();
+    AuthenticationManager authManager=new AuthenticationManager(providerSession);
     return Flows.oauth(realm,request,uriInfo,authManager,tokenManager).redirectAccessCode(accessCode,accessCode.getState(),accessCode.getRedirectUri());
   }
 }

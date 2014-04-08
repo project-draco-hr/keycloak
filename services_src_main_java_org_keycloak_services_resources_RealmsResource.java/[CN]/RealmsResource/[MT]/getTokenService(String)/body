@@ -2,7 +2,8 @@
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=locateRealm(name,realmManager);
   Audit audit=new AuditManager(realm,providers,clientConnection).createAudit();
-  TokenService tokenService=new TokenService(realm,tokenManager,audit);
+  AuthenticationManager authManager=new AuthenticationManager(providers);
+  TokenService tokenService=new TokenService(realm,tokenManager,audit,authManager);
   resourceContext.initResource(tokenService);
   return tokenService;
 }

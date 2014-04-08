@@ -1,7 +1,10 @@
 {
-  KeycloakRegistry registry=(KeycloakRegistry)sce.getServletContext().getAttribute(KeycloakRegistry.class.getName());
-  KeycloakSessionFactory factory=registry.getService(KeycloakSessionFactory.class);
-  if (factory != null) {
-    factory.close();
+  ProviderSessionFactory providerSessionFactory=(ProviderSessionFactory)sce.getServletContext().getAttribute(ProviderSessionFactory.class.getName());
+  KeycloakSessionFactory kcSessionFactory=(KeycloakSessionFactory)sce.getServletContext().getAttribute(KeycloakSessionFactory.class.getName());
+  if (providerSessionFactory != null) {
+    providerSessionFactory.close();
+  }
+  if (kcSessionFactory != null) {
+    kcSessionFactory.close();
   }
 }

@@ -4,13 +4,13 @@
     log.error("Can't setup schedule tasks, no timer provider found");
     return;
   }
-  TimerProvider timer=timerFactory.create();
+  TimerProvider timer=timerFactory.create(null);
   final ProviderFactory<AuditProvider> auditFactory=providerSessionFactory.getProviderFactory(AuditProvider.class);
   if (auditFactory != null) {
     timer.schedule(new Runnable(){
       @Override public void run(){
         KeycloakSession keycloakSession=keycloakSessionFactory.createSession();
-        AuditProvider audit=providerSessionFactory.getProviderFactory(AuditProvider.class).create();
+        AuditProvider audit=providerSessionFactory.getProviderFactory(AuditProvider.class).create(null);
         try {
           for (          RealmModel realm : keycloakSession.getRealms()) {
             if (realm.isAuditEnabled() && realm.getAuditExpiration() > 0) {

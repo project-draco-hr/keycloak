@@ -1,23 +1,17 @@
 {
   MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("john","password");
-  try {
-    ResteasyProviderFactory.pushContext(KeycloakRegistry.class,new KeycloakRegistry());
-    LdapTestUtils.setLdapPassword(realm,"john","password");
-    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(null,realm,formData));
-    Assert.assertNull(realm.getUser("john"));
-    setupAuthenticationProviders();
-    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(null,realm,formData));
-    UserModel john=realm.getUser("john");
-    Assert.assertNotNull(john);
-    Assert.assertEquals("john",john.getLoginName());
-    Assert.assertEquals("John",john.getFirstName());
-    Assert.assertEquals("Doe",john.getLastName());
-    Assert.assertEquals("john@email.org",john.getEmail());
-    AuthenticationLinkModel authLink=realm.getAuthenticationLink(john);
-    Assert.assertNotNull(authLink);
-    Assert.assertEquals(authLink.getAuthProvider(),AuthProviderConstants.PROVIDER_NAME_PICKETLINK);
-  }
-  finally {
-    ResteasyProviderFactory.clearContextData();
-  }
+  LdapTestUtils.setLdapPassword(providerSession,realm,"john","password");
+  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(null,realm,formData));
+  Assert.assertNull(realm.getUser("john"));
+  setupAuthenticationProviders();
+  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(null,realm,formData));
+  UserModel john=realm.getUser("john");
+  Assert.assertNotNull(john);
+  Assert.assertEquals("john",john.getLoginName());
+  Assert.assertEquals("John",john.getFirstName());
+  Assert.assertEquals("Doe",john.getLastName());
+  Assert.assertEquals("john@email.org",john.getEmail());
+  AuthenticationLinkModel authLink=realm.getAuthenticationLink(john);
+  Assert.assertNotNull(authLink);
+  Assert.assertEquals(authLink.getAuthProvider(),AuthProviderConstants.PROVIDER_NAME_PICKETLINK);
 }

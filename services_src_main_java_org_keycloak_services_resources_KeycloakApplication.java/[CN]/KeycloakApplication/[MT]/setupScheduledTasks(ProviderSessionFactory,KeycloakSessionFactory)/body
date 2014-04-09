@@ -10,7 +10,8 @@
     timer.schedule(new Runnable(){
       @Override public void run(){
         KeycloakSession keycloakSession=keycloakSessionFactory.createSession();
-        AuditProvider audit=providerSessionFactory.getProviderFactory(AuditProvider.class).create(null);
+        ProviderSession providerSession=providerSessionFactory.createSession();
+        AuditProvider audit=providerSession.getProvider(AuditProvider.class);
         try {
           for (          RealmModel realm : keycloakSession.getRealms()) {
             if (realm.isAuditEnabled() && realm.getAuditExpiration() > 0) {

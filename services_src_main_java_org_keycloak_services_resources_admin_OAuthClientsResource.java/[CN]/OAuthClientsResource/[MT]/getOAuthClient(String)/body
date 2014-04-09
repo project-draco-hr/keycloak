@@ -2,9 +2,9 @@
   auth.requireView();
   OAuthClientModel oauth=realm.getOAuthClientById(id);
   if (oauth == null) {
-    throw new NotFoundException();
+    throw new NotFoundException("OAuth Client not found");
   }
   OAuthClientResource oAuthClientResource=new OAuthClientResource(realm,auth,oauth,session);
-  resourceContext.initResource(oAuthClientResource);
+  ResteasyProviderFactory.getInstance().injectProperties(oAuthClientResource);
   return oAuthClientResource;
 }

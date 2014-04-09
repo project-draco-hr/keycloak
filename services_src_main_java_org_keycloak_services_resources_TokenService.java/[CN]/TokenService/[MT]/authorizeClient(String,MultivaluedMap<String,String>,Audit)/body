@@ -4,7 +4,7 @@
   if (authorizationHeader != null) {
     String[] usernameSecret=BasicAuthHelper.parseHeader(authorizationHeader);
     if (usernameSecret == null) {
-      throw new NotAuthorizedException("Bad Authorization header","Basic realm=\"" + realm.getName() + "\"");
+      throw new UnauthorizedException("Bad Authorization header",Response.status(401).header(HttpHeaders.WWW_AUTHENTICATE,"Basic realm=\"" + realm.getName() + "\"").build());
     }
     client_id=usernameSecret[0];
     clientSecret=usernameSecret[1];

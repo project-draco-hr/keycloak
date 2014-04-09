@@ -3,12 +3,12 @@
   logger.debug("** addRealmRoleMappings: {0}",roles);
   UserModel user=realm.getUser(username);
   if (user == null) {
-    throw new NotFoundException();
+    throw new NotFoundException("User not found");
   }
   for (  RoleRepresentation role : roles) {
     RoleModel roleModel=realm.getRole(role.getName());
     if (roleModel == null || !roleModel.getId().equals(role.getId())) {
-      throw new NotFoundException();
+      throw new NotFoundException("Role not found");
     }
     realm.grantRole(user,roleModel);
   }

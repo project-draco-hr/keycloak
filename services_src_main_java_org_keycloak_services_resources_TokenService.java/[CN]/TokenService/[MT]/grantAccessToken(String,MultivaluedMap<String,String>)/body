@@ -11,16 +11,16 @@
   String username=form.getFirst(AuthenticationManager.FORM_USERNAME);
   if (username == null) {
     audit.error(Errors.USERNAME_MISSING);
-    throw new NotAuthorizedException("No username");
+    throw new UnauthorizedException("No username");
   }
   audit.detail(Details.USERNAME,username);
   if (!realm.isEnabled()) {
     audit.error(Errors.REALM_DISABLED);
-    throw new NotAuthorizedException("Disabled realm");
+    throw new UnauthorizedException("Disabled realm");
   }
   if (authManager.authenticateForm(clientConnection,realm,form) != AuthenticationStatus.SUCCESS) {
     audit.error(Errors.INVALID_USER_CREDENTIALS);
-    throw new NotAuthorizedException("Auth failed");
+    throw new UnauthorizedException("Auth failed");
   }
   UserModel user=realm.getUser(form.getFirst(AuthenticationManager.FORM_USERNAME));
   String scope=form.getFirst(OAuth2Constants.SCOPE);

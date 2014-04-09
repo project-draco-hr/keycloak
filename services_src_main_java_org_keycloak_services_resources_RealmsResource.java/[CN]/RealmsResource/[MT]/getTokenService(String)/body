@@ -4,6 +4,6 @@
   Audit audit=new AuditManager(realm,providers,clientConnection).createAudit();
   AuthenticationManager authManager=new AuthenticationManager(providers);
   TokenService tokenService=new TokenService(realm,tokenManager,audit,authManager);
-  resourceContext.initResource(tokenService);
+  ResteasyProviderFactory.getInstance().injectProperties(tokenService);
   return tokenService;
 }

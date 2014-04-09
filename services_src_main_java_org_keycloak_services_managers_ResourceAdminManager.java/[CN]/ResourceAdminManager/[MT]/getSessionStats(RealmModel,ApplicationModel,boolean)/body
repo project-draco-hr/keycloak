@@ -1,9 +1,9 @@
 {
-  ResteasyClient client=new ResteasyClientBuilder().disableTrustManager().build();
+  ApacheHttpClient4Executor executor=createExecutor();
   try {
-    return getSessionStats(realm,application,users,client);
+    return getSessionStats(realm,application,users,executor);
   }
   finally {
-    client.close();
+    executor.getHttpClient().getConnectionManager().shutdown();
   }
 }

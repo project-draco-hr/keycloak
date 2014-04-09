@@ -9,29 +9,29 @@
   }
   if (!verifiedCode) {
     logger.debug("unverified access code");
-    throw new BadRequestException();
+    throw new BadRequestException("unverified access code");
   }
   String key=input.readContentAsString();
   AccessCodeEntry accessCode=tokenManager.pullAccessCode(key);
   if (accessCode == null) {
     logger.debug("bad access code");
-    throw new BadRequestException();
+    throw new BadRequestException("bad access code");
   }
   if (accessCode.isExpired()) {
     logger.debug("access code expired");
-    throw new BadRequestException();
+    throw new BadRequestException("access code expired");
   }
   if (!accessCode.getToken().isActive()) {
     logger.debug("access token expired");
-    throw new BadRequestException();
+    throw new BadRequestException("access token expired");
   }
   if (!accessCode.getRealm().getId().equals(realm.getId())) {
     logger.debug("bad realm");
-    throw new BadRequestException();
+    throw new BadRequestException("bad realm");
   }
   if (!client.getClientId().equals(accessCode.getClient().getClientId())) {
     logger.debug("bad client");
-    throw new BadRequestException();
+    throw new BadRequestException("bad client");
   }
   return createLoginCookie(realm,accessCode.getUser(),accessCode.getClient(),cookieName,uri.getRawPath(),false);
 }

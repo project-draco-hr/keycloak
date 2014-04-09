@@ -1,10 +1,10 @@
 {
-  ResteasyClient client=new ResteasyClientBuilder().disableTrustManager().build();
+  ApacheHttpClient4Executor executor=createExecutor();
   try {
     resource.setNotBefore(Time.currentTime());
-    logoutApplication(realm,resource,user,client,resource.getNotBefore());
+    logoutApplication(realm,resource,user,executor,resource.getNotBefore());
   }
   finally {
-    client.close();
+    executor.getHttpClient().getConnectionManager().shutdown();
   }
 }

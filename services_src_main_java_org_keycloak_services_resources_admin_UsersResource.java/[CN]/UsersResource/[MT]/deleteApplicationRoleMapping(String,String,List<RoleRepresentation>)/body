@@ -2,11 +2,11 @@
   auth.requireManage();
   UserModel user=realm.getUser(username);
   if (user == null) {
-    throw new NotFoundException();
+    throw new NotFoundException("User not found");
   }
   ApplicationModel application=realm.getApplicationByName(appName);
   if (application == null) {
-    throw new NotFoundException();
+    throw new NotFoundException("Application not found");
   }
   if (roles == null) {
     Set<RoleModel> roleModels=application.getApplicationRoleMappings(user);
@@ -22,7 +22,7 @@
     for (    RoleRepresentation role : roles) {
       RoleModel roleModel=application.getRole(role.getName());
       if (roleModel == null || !roleModel.getId().equals(role.getId())) {
-        throw new NotFoundException();
+        throw new NotFoundException("Role not found");
       }
       realm.deleteRoleMapping(user,roleModel);
     }

@@ -1,0 +1,9 @@
+{
+  Cookie stateCookie=headers.getCookies().get(stateCookieName);
+  if (stateCookie == null)   throw new BadRequestException("state cookie not set");
+  String state=uriInfo.getQueryParameters().getFirst(OAuth2Constants.STATE);
+  if (state == null)   throw new BadRequestException("state parameter was null");
+  if (!state.equals(stateCookie.getValue())) {
+    throw new BadRequestException("state parameter invalid");
+  }
+}

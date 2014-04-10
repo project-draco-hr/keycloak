@@ -2,12 +2,12 @@
   auth.requireManage();
   ApplicationModel app=realm.getApplicationByName(appName);
   if (app == null) {
-    throw new NotFoundException();
+    throw new NotFoundException("Application not found");
   }
   for (  RoleRepresentation role : roles) {
     RoleModel roleModel=app.getRole(role.getName());
     if (roleModel == null) {
-      throw new NotFoundException();
+      throw new NotFoundException("Role not found");
     }
     realm.addScopeMapping(client,roleModel);
   }

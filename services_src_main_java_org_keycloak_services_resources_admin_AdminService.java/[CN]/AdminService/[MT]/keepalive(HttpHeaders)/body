@@ -2,7 +2,7 @@
   logger.debug("keepalive");
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=getAdminstrationRealm(realmManager);
-  if (realm == null)   throw new NotFoundException();
+  if (realm == null)   throw new NotFoundException("No realm found");
   Auth auth=authManager.authenticateCookie(realm,headers);
   if (auth == null) {
     return Response.status(401).build();

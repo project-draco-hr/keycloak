@@ -1,17 +1,17 @@
 {
   RealmManager realmManager=new RealmManager(session);
   RealmModel adminRealm=getAdminstrationRealm(realmManager);
-  if (adminRealm == null)   throw new NotFoundException();
+  if (adminRealm == null)   throw new NotFoundException("Admin realm not found");
   Auth auth=authManager.authenticate(adminRealm,headers);
   UserModel admin=auth.getUser();
   if (admin == null) {
-    throw new NotAuthorizedException("Bearer");
+    throw new UnauthorizedException("Bearer");
   }
   ApplicationModel adminConsole=adminRealm.getApplicationNameMap().get(Constants.ADMIN_CONSOLE_APPLICATION);
   if (adminConsole == null) {
-    throw new NotFoundException();
+    throw new NotFoundException("Admin console application not found");
   }
   ServerInfoAdminResource adminResource=new ServerInfoAdminResource();
-  resourceContext.initResource(adminResource);
+  ResteasyProviderFactory.getInstance().injectProperties(adminResource);
   return adminResource;
 }

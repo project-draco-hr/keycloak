@@ -2,10 +2,10 @@
   auth.requireManage();
   UserModel user=realm.getUser(username);
   if (user == null) {
-    throw new NotFoundException();
+    throw new NotFoundException("User not found");
   }
   if (pass == null || pass.getValue() == null || !CredentialRepresentation.PASSWORD.equals(pass.getType())) {
-    throw new BadRequestException();
+    throw new BadRequestException("No password provided");
   }
   UserCredentialModel cred=RealmManager.fromRepresentation(pass);
   realm.updateCredential(user,cred);

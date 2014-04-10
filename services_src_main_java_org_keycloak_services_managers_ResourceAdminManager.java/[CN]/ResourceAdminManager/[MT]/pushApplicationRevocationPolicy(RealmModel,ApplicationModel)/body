@@ -1,9 +1,9 @@
 {
-  ResteasyClient client=new ResteasyClientBuilder().disableTrustManager().build();
+  ApacheHttpClient4Executor executor=createExecutor();
   try {
-    pushRevocationPolicy(realm,application,application.getNotBefore(),client);
+    pushRevocationPolicy(realm,application,application.getNotBefore(),executor);
   }
   finally {
-    client.close();
+    executor.getHttpClient().getConnectionManager().shutdown();
   }
 }

@@ -1,13 +1,13 @@
 {
-  ResteasyClient client=new ResteasyClientBuilder().disableTrustManager().build();
+  ApacheHttpClient4Executor executor=createExecutor();
   try {
     List<ApplicationModel> resources=realm.getApplications();
     logger.debug("logging out {0} resources ",resources.size());
     for (    ApplicationModel resource : resources) {
-      logoutApplication(realm,resource,user.getId(),client,0);
+      logoutApplication(realm,resource,user.getId(),executor,0);
     }
   }
   finally {
-    client.close();
+    executor.getHttpClient().getConnectionManager().shutdown();
   }
 }

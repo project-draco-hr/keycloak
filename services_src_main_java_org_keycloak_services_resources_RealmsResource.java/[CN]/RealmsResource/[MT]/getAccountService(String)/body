@@ -4,11 +4,11 @@
   ApplicationModel application=realm.getApplicationNameMap().get(Constants.ACCOUNT_MANAGEMENT_APP);
   if (application == null || !application.isEnabled()) {
     logger.debug("account management not enabled");
-    throw new NotFoundException();
+    throw new NotFoundException("account management not enabled");
   }
   Audit audit=new AuditManager(realm,providers,clientConnection).createAudit();
   AccountService accountService=new AccountService(realm,application,tokenManager,socialRequestManager,audit);
-  resourceContext.initResource(accountService);
+  ResteasyProviderFactory.getInstance().injectProperties(accountService);
   accountService.init();
   return accountService;
 }

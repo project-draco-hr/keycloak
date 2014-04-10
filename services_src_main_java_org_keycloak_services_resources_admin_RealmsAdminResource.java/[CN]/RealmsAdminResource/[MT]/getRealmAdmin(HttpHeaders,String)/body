@@ -4,6 +4,6 @@
   if (realm == null)   throw new NotFoundException("{realm} = " + name);
   RealmAuth realmAuth=new RealmAuth(auth,AdminRoles.getAdminApp(realm));
   RealmAdminResource adminResource=new RealmAdminResource(realmAuth,realm,tokenManager);
-  resourceContext.initResource(adminResource);
+  ResteasyProviderFactory.getInstance().injectProperties(adminResource);
   return adminResource;
 }

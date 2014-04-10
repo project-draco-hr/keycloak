@@ -1,35 +1,35 @@
 {
   String tokenString;
-  String authHeader=headers.getHeaderString(HttpHeaders.AUTHORIZATION);
+  String authHeader=headers.getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
   if (authHeader == null) {
     return null;
   }
  else {
     String[] split=authHeader.trim().split("\\s+");
-    if (split == null || split.length != 2)     throw new NotAuthorizedException("Bearer");
-    if (!split[0].equalsIgnoreCase("Bearer"))     throw new NotAuthorizedException("Bearer");
+    if (split == null || split.length != 2)     throw new UnauthorizedException("Bearer");
+    if (!split[0].equalsIgnoreCase("Bearer"))     throw new UnauthorizedException("Bearer");
     tokenString=split[1];
   }
   try {
     AccessToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),realm.getName());
     if (!token.isActive()) {
-      throw new NotAuthorizedException("token_expired");
+      throw new UnauthorizedException("token_expired");
     }
     UserModel user=realm.getUserById(token.getSubject());
     if (user == null || !user.isEnabled()) {
-      throw new NotAuthorizedException("invalid_user");
+      throw new UnauthorizedException("invalid_user");
     }
     ClientModel client=null;
     if (token.getIssuedFor() != null) {
       client=realm.findClient(token.getIssuedFor());
       if (client == null || !client.isEnabled()) {
-        throw new NotAuthorizedException("invalid_user");
+        throw new UnauthorizedException("invalid_user");
       }
     }
     return new Auth(token,user,client);
   }
  catch (  VerificationException e) {
     logger.error("Failed to verify token",e);
-    throw new NotAuthorizedException("invalid_token");
+    throw new UnauthorizedException("invalid_token");
   }
 }

@@ -15,7 +15,7 @@
     error.put(OAuth2Constants.ERROR,e.getError());
     if (e.getDescription() != null)     error.put(OAuth2Constants.ERROR_DESCRIPTION,e.getDescription());
     audit.error(Errors.INVALID_TOKEN);
-    throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build(),e);
+    throw new BadRequestException("OAuth Error",e,Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build());
   }
   AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).accessToken(accessToken).generateIDToken().generateRefreshToken().build();
   audit.success();

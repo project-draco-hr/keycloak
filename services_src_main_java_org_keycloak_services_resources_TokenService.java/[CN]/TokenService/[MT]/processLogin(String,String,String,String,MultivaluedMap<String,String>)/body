@@ -50,14 +50,14 @@ case ACTIONS_REQUIRED:
 return oauth.processAccessCode(scopeParam,state,redirect,client,user,username,remember,"form",audit);
 case ACCOUNT_DISABLED:
 audit.error(Errors.USER_DISABLED);
-return Flows.forms(realm,request,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).createLogin();
+return Flows.forms(realm,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).createLogin();
 case MISSING_TOTP:
-return Flows.forms(realm,request,uriInfo).setFormData(formData).createLoginTotp();
+return Flows.forms(realm,uriInfo).setFormData(formData).createLoginTotp();
 case INVALID_USER:
 audit.error(Errors.USER_NOT_FOUND);
-return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).createLogin();
+return Flows.forms(realm,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).createLogin();
 default :
 audit.error(Errors.INVALID_USER_CREDENTIALS);
-return Flows.forms(realm,request,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).createLogin();
+return Flows.forms(realm,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).createLogin();
 }
 }

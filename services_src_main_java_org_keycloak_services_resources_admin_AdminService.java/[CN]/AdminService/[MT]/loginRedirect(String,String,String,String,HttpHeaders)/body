@@ -24,7 +24,7 @@
       logger.debug("state not specified");
       return redirectOnLoginError("invalid login data");
     }
-    new JaxrsOAuthClient().checkStateCookie(uriInfo,headers);
+    new OAuthRedirect().checkStateCookie(uriInfo,headers);
     logger.debug("loginRedirect SUCCESS");
     NewCookie cookie=authManager.createCookie(adminRealm,adminConsole,code,AdminService.saasCookiePath(uriInfo).build());
     URI redirectUri=UriBuilder.fromUri(uriInfo.getBaseUri()).path("../").path(adminPath).build();

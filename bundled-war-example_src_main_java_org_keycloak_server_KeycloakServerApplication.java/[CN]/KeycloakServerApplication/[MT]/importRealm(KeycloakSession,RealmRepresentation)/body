@@ -1,0 +1,12 @@
+{
+  RealmManager manager=new RealmManager(session);
+  RealmModel realm=manager.getRealmByName(rep.getRealm());
+  if (realm != null) {
+    log.info("Not importing realm " + rep.getRealm() + " realm already exists");
+    return realm;
+  }
+  realm=manager.createRealm(rep.getId(),rep.getRealm());
+  manager.importRealm(rep,realm);
+  log.info("Imported realm " + realm.getName());
+  return realm;
+}

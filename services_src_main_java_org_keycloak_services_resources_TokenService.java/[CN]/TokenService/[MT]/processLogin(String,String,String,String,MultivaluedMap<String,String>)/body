@@ -48,6 +48,9 @@ case ACTIONS_REQUIRED:
     UserModel user=KeycloakModelUtils.findUserByNameOrEmail(realm,username);
   audit.user(user);
 return oauth.processAccessCode(scopeParam,state,redirect,client,user,username,remember,"form",audit);
+case ACCOUNT_TEMPORARILY_DISABLED:
+audit.error(Errors.USER_TEMPORARILY_DISABLED);
+return Flows.forms(realm,uriInfo).setError(Messages.ACCOUNT_TEMPORARILY_DISABLED).setFormData(formData).createLogin();
 case ACCOUNT_DISABLED:
 audit.error(Errors.USER_DISABLED);
 return Flows.forms(realm,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).createLogin();

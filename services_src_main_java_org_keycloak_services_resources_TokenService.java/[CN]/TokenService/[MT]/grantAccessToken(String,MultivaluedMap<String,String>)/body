@@ -18,13 +18,23 @@
     audit.error(Errors.REALM_DISABLED);
     throw new UnauthorizedException("Disabled realm");
   }
-  if (authManager.authenticateForm(clientConnection,realm,form) != AuthenticationStatus.SUCCESS) {
-    audit.error(Errors.INVALID_USER_CREDENTIALS);
-    throw new UnauthorizedException("Auth failed");
-  }
-  UserModel user=realm.getUser(form.getFirst(AuthenticationManager.FORM_USERNAME));
-  String scope=form.getFirst(OAuth2Constants.SCOPE);
-  AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).generateAccessToken(scope,client,user).generateIDToken().build();
-  audit.success();
-  return Response.ok(res,MediaType.APPLICATION_JSON_TYPE).build();
+  AuthenticationStatus authenticationStatus=authManager.authenticateForm(clientConnection,realm,form);
+switch (authenticationStatus) {
+case SUCCESS:
+    break;
+case ACCOUNT_TEMPORARILY_DISABLED:
+case ACTIONS_REQUIRED:
+  audit.error(Errors.USER_TEMPORARILY_DISABLED);
+return Response.status(503).type(MediaType.TEXT_PLAIN).entity("Account temporarily disabled").build();
+case ACCOUNT_DISABLED:
+return Response.status(403).type(MediaType.TEXT_PLAIN).entity("Account disabled").build();
+default :
+audit.error(Errors.INVALID_USER_CREDENTIALS);
+throw new UnauthorizedException("Auth failed");
+}
+UserModel user=realm.getUser(form.getFirst(AuthenticationManager.FORM_USERNAME));
+String scope=form.getFirst(OAuth2Constants.SCOPE);
+AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).generateAccessToken(scope,client,user).generateIDToken().build();
+audit.success();
+return Response.ok(res,MediaType.APPLICATION_JSON_TYPE).build();
 }

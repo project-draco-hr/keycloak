@@ -9,7 +9,9 @@
   realm.setAccessTokenLifespan(1000);
   realm.addRequiredCredential(CredentialRepresentation.PASSWORD);
   realm.setAuthenticationProviders(Arrays.asList(AuthenticationProviderModel.DEFAULT_PROVIDER));
-  am=new AuthenticationManager(providerSession);
+  protector=new BruteForceProtector(factory);
+  protector.start();
+  am=new AuthenticationManager(providerSession,protector);
   user=realm.addUser("test");
   user.setEnabled(true);
   UserCredentialModel credential=new UserCredentialModel();

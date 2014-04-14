@@ -4,6 +4,11 @@
     logger.warn("Username not provided");
     return AuthenticationStatus.INVALID_USER;
   }
+  if (realm.isBruteForceProtected()) {
+    if (protector.isTemporarilyDisabled(realm,username)) {
+      return AuthenticationStatus.ACCOUNT_TEMPORARILY_DISABLED;
+    }
+  }
   AuthenticationStatus status=authenticateInternal(realm,formData,username);
   if (realm.isBruteForceProtected()) {
 switch (status) {

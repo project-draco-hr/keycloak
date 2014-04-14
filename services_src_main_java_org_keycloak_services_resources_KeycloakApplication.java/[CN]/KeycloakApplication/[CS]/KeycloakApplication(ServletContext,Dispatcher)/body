@@ -2,6 +2,11 @@
   dispatcher.getDefaultContextObjects().put(KeycloakApplication.class,this);
   this.contextPath=context.getContextPath();
   this.factory=createSessionFactory();
+  BruteForceProtector protector=new BruteForceProtector(factory);
+  dispatcher.getDefaultContextObjects().put(BruteForceProtector.class,protector);
+  ResteasyProviderFactory.pushContext(BruteForceProtector.class,protector);
+  protector.start();
+  context.setAttribute(BruteForceProtector.class.getName(),protector);
   this.providerSessionFactory=createProviderSessionFactory();
   context.setAttribute(KeycloakSessionFactory.class.getName(),factory);
   context.setAttribute(ProviderSessionFactory.class.getName(),this.providerSessionFactory);

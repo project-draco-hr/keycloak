@@ -1,4 +1,6 @@
 {
+  RealmModel realm=getRealmModel(session,event);
+  logFailure(event);
   UsernameLoginFailureModel user=getUserModel(session,event);
   if (user == null)   return;
   user.setLastIPFailure(event.ip);
@@ -10,18 +12,18 @@
   }
   user.setLastFailure(currentTime);
   if (deltaTime > 0) {
-    if (deltaTime > maxDeltaTimeMilliSeconds) {
+    if (deltaTime > (long)realm.getMaxDeltaTimeSeconds() * 1000L) {
       user.clearFailures();
     }
   }
   user.incrementFailures();
-  int waitSeconds=waitIncrementSeconds * (user.getNumFailures() / failureFactor);
+  int waitSeconds=realm.getWaitIncrementSeconds() * (user.getNumFailures() / realm.getFailureFactor());
   if (waitSeconds == 0) {
-    if (deltaTime > quickLoginCheckMilliSeconds) {
-      waitSeconds=minimumQuickLoginWaitSeconds;
+    if (deltaTime > realm.getQuickLoginCheckMilliSeconds()) {
+      waitSeconds=realm.getMinimumQuickLoginWaitSeconds();
     }
   }
-  waitSeconds=Math.min(maxFailureWaitSeconds,waitSeconds);
+  waitSeconds=Math.min(realm.getMaxFailureWaitSeconds(),waitSeconds);
   if (waitSeconds > 0) {
     user.setFailedLoginNotBefore((int)(currentTime / 1000) + waitSeconds);
   }

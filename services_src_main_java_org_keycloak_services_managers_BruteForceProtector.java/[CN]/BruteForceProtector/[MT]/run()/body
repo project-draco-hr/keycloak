@@ -9,14 +9,6 @@
       try {
         events.add(take);
         queue.drainTo(events,TRANSACTION_SIZE);
-        for (        LoginEvent event : events) {
-          if (event instanceof FailedLogin) {
-            logFailure(event);
-          }
- else           if (event instanceof SuccessfulLogin) {
-            logSuccess(event);
-          }
-        }
         Collections.sort(events);
         KeycloakSession session=factory.createSession();
         try {

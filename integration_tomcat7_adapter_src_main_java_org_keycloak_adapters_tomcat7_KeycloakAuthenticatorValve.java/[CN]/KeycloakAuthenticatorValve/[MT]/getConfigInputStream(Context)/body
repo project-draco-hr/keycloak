@@ -1,0 +1,20 @@
+{
+  InputStream is=getJSONFromServletContext(context.getServletContext());
+  if (is == null) {
+    String path=context.getServletContext().getInitParameter("keycloak.config.file");
+    if (path == null) {
+      log.info("**** using /WEB-INF/keycloak.json");
+      is=context.getServletContext().getResourceAsStream("/WEB-INF/keycloak.json");
+    }
+ else {
+      try {
+        is=new FileInputStream(path);
+      }
+ catch (      FileNotFoundException e) {
+        log.severe("NOT FOUND /WEB-INF/keycloak.json");
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  return is;
+}

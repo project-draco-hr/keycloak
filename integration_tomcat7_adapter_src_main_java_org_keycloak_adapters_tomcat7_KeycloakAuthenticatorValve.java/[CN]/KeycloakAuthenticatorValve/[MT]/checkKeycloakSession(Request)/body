@@ -1,0 +1,14 @@
+{
+  if (request.getSessionInternal(false) == null || request.getSessionInternal().getPrincipal() == null)   return;
+  RefreshableKeycloakSecurityContext session=(RefreshableKeycloakSecurityContext)request.getSessionInternal().getNote(KeycloakSecurityContext.class.getName());
+  if (session == null)   return;
+  session.setDeployment(deployment);
+  if (session.isActive())   return;
+  session.refreshExpiredToken();
+  if (session.isActive())   return;
+  request.getSessionInternal().removeNote(KeycloakSecurityContext.class.getName());
+  request.setUserPrincipal(null);
+  request.setAuthType(null);
+  request.getSessionInternal().setPrincipal(null);
+  request.getSessionInternal().setAuthType(null);
+}

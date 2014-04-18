@@ -1,0 +1,18 @@
+{
+  if (!Session.SESSION_DESTROYED_EVENT.equals(event.getType()) && (!Session.SESSION_PASSIVATED_EVENT.equals(event.getType())))   return;
+  Session session=event.getSession();
+  GenericPrincipal principal=(GenericPrincipal)session.getPrincipal();
+  if (principal == null)   return;
+  session.setPrincipal(null);
+  session.setAuthType(null);
+  String username=principal.getUserPrincipal().getName();
+synchronized (userSessionMap) {
+    UserSessions sessions=userSessionMap.get(username);
+    if (sessions != null) {
+      sessions.getSessions().remove(session.getId());
+      if (sessions.getSessions().isEmpty()) {
+        userSessionMap.remove(username);
+      }
+    }
+  }
+}

@@ -11,6 +11,7 @@
         queue.drainTo(events,TRANSACTION_SIZE);
         Collections.sort(events);
         KeycloakSession session=factory.createSession();
+        session.getTransaction().begin();
         try {
           for (          LoginEvent event : events) {
             if (event instanceof FailedLogin) {

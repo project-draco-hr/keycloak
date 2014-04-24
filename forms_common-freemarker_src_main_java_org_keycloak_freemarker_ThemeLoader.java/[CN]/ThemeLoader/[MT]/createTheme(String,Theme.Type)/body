@@ -16,6 +16,10 @@
   if (theme.getParentName() != null) {
     List<Theme> themes=new LinkedList<Theme>();
     themes.add(theme);
+    if (theme.getImportName() != null) {
+      String[] s=theme.getImportName().split("/");
+      themes.add(findTheme(providers,s[1],Theme.Type.valueOf(s[0].toUpperCase())));
+    }
     for (String parentName=theme.getParentName(); parentName != null; parentName=theme.getParentName()) {
       theme=findTheme(providers,parentName,type);
       themes.add(theme);

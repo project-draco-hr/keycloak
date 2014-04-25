@@ -13,12 +13,7 @@
     dbCollection.insert(dbObject);
   }
  catch (  MongoException e) {
-    if (e instanceof MongoException.DuplicateKey) {
-      throw new ModelDuplicateException(e);
-    }
- else {
-      throw new ModelException(e);
-    }
+    throw convertException(e);
   }
   context.addCreatedEntity(entity);
 }

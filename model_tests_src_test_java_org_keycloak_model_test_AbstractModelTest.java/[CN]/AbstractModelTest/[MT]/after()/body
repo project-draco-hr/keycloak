@@ -2,6 +2,18 @@
   identitySession.getTransaction().commit();
   providerSession.close();
   identitySession.close();
-  providerSessionFactory.close();
-  factory.close();
+  identitySession=factory.createSession();
+  try {
+    identitySession.getTransaction().begin();
+    RealmManager rm=new RealmManager(identitySession);
+    for (    RealmModel realm : identitySession.getRealms()) {
+      if (!realm.getName().equals(Config.getAdminRealm())) {
+        rm.removeRealm(realm);
+      }
+    }
+    identitySession.getTransaction().commit();
+  }
+  finally {
+    identitySession.close();
+  }
 }

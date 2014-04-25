@@ -5,5 +5,10 @@
   if (rollbackOnly) {
     throw new IllegalStateException("Can't commit as transaction marked for rollback");
   }
-  invocationContext.commit();
+  try {
+    invocationContext.commit();
+  }
+ catch (  MongoException e) {
+    throw MongoStoreImpl.convertException(e);
+  }
 }

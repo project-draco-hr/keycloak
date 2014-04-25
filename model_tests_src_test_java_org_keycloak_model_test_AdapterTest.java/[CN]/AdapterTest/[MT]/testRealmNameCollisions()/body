@@ -1,0 +1,23 @@
+{
+  test1CreateRealm();
+  commit();
+  try {
+    test1CreateRealm();
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  commit(true);
+  realmModel=realmManager.createRealm("JUGGLER2");
+  commit();
+  realmModel=realmManager.getRealmByName("JUGGLER2");
+  try {
+    realmModel.setName("JUGGLER");
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  commit(true);
+}

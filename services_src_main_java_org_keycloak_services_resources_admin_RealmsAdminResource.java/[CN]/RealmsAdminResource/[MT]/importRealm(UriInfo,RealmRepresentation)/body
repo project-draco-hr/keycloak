@@ -4,12 +4,14 @@
   }
   logger.debug("importRealm: {0}",rep.getRealm());
   RealmManager realmManager=new RealmManager(session);
-  if (realmManager.getRealmByName(rep.getRealm()) != null) {
+  try {
+    RealmModel realm=realmManager.importRealm(rep);
+    grantPermissionsToRealmCreator(realm);
+    URI location=realmUrl(uriInfo).build(realm.getName());
+    logger.debug("imported realm success, sending back: {0}",location.toString());
+    return Response.created(location).build();
+  }
+ catch (  ModelDuplicateException e) {
     return Flows.errors().exists("Realm " + rep.getRealm() + " already exists");
   }
-  RealmModel realm=realmManager.importRealm(rep);
-  grantPermissionsToRealmCreator(realm);
-  URI location=realmUrl(uriInfo).build(realm.getName());
-  logger.debug("imported realm success, sending back: {0}",location.toString());
-  return Response.created(location).build();
 }

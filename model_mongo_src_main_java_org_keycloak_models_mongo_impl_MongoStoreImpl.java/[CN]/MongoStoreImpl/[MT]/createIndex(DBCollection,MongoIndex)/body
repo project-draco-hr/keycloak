@@ -1,0 +1,13 @@
+{
+  BasicDBObject fields=new BasicDBObject();
+  for (  String f : index.fields()) {
+    fields.put(f,1);
+  }
+  String name=index.name();
+  if (name.length() == 0) {
+    name=null;
+  }
+  boolean unique=index.unique();
+  dbCollection.ensureIndex(fields,name,unique);
+  logger.debug("Created index " + fields + (unique ? " (unique)" : "")+ " on "+ dbCollection.getName()+ " in "+ this.database.getName());
+}

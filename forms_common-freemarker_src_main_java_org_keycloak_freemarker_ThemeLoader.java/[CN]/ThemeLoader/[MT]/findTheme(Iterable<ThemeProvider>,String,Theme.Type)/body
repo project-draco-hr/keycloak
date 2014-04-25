@@ -5,21 +5,9 @@
         return p.createTheme(name,type);
       }
  catch (      IOException e) {
-        if (name.equals(Config.getThemeBase())) {
-          throw new FreeMarkerException("Failed to create " + type.toString().toLowerCase() + " theme",e);
-        }
- else {
-          logger.error("Failed to create " + type.toString().toLowerCase() + " theme",e);
-          return findTheme(providers,Config.getThemeBase(),type);
-        }
+        throw new RuntimeException("Failed to create " + type.toString().toLowerCase() + " theme",e);
       }
     }
   }
-  if (name.equals(Config.getThemeBase())) {
-    throw new FreeMarkerException(type.toString().toLowerCase() + " theme '" + name+ "' not found");
-  }
- else {
-    logger.error(type.toString().toLowerCase() + " theme '" + name+ "' not found");
-    return findTheme(providers,Config.getThemeBase(),type);
-  }
+  throw new RuntimeException(type.toString().toLowerCase() + " theme '" + name+ "' not found");
 }

@@ -3,11 +3,10 @@
   List<RealmModel> realms=session.getRealms();
   List<RealmRepresentation> reps=new ArrayList<RealmRepresentation>();
   for (  RealmModel realm : realms) {
-    String realmAdminApp=AdminRoles.getAdminApp(realm);
-    if (auth.hasAppRole(realmAdminApp,AdminRoles.MANAGE_REALM)) {
+    if (auth.hasAppRole(realm.getAdminApp(),AdminRoles.MANAGE_REALM)) {
       reps.add(ModelToRepresentation.toRepresentation(realm));
     }
- else     if (auth.hasOneOfAppRole(realmAdminApp,AdminRoles.ALL_REALM_ROLES)) {
+ else     if (auth.hasOneOfAppRole(realm.getAdminApp(),AdminRoles.ALL_REALM_ROLES)) {
       RealmRepresentation rep=new RealmRepresentation();
       rep.setRealm(realm.getName());
       reps.add(rep);

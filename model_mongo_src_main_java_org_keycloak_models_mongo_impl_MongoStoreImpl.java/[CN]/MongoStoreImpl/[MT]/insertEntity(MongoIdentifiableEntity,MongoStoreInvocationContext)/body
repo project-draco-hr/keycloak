@@ -9,6 +9,16 @@
     entity.setId(currentId);
   }
   dbObject.put("_id",currentId);
-  dbCollection.insert(dbObject);
+  try {
+    dbCollection.insert(dbObject);
+  }
+ catch (  MongoException e) {
+    if (e instanceof MongoException.DuplicateKey) {
+      throw new ModelDuplicateException(e);
+    }
+ else {
+      throw new ModelException(e);
+    }
+  }
   context.addCreatedEntity(entity);
 }

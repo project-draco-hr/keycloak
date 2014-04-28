@@ -1,0 +1,13 @@
+{
+  String file=System.getProperty("keycloak.import");
+  if (file != null) {
+    RealmRepresentation rep=null;
+    try {
+      rep=loadJson(new FileInputStream(file),RealmRepresentation.class);
+    }
+ catch (    FileNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    importRealm(rep,"file " + file);
+  }
+}

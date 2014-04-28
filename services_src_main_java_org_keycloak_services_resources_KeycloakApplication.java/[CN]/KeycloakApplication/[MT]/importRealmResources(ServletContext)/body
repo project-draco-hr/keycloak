@@ -1,0 +1,15 @@
+{
+  String resources=context.getInitParameter("keycloak.import.realm.resources");
+  if (resources != null) {
+    StringTokenizer tokenizer=new StringTokenizer(resources,",");
+    while (tokenizer.hasMoreTokens()) {
+      String resource=tokenizer.nextToken().trim();
+      InputStream is=context.getResourceAsStream(resource);
+      if (is == null) {
+        log.warn("Could not find realm resource to import: " + resource);
+      }
+      RealmRepresentation rep=loadJson(is,RealmRepresentation.class);
+      importRealm(rep,"resource " + resource);
+    }
+  }
+}

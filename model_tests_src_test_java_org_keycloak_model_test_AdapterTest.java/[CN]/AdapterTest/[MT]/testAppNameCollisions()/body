@@ -1,18 +1,19 @@
 {
-  test1CreateRealm();
+  realmManager.createRealm("JUGGLER1").addApplication("app1");
+  realmManager.createRealm("JUGGLER2").addApplication("app1");
   commit();
   try {
-    test1CreateRealm();
+    realmManager.getRealmByName("JUGGLER1").addApplication("app1");
     commit();
     Assert.fail("Expected exception");
   }
  catch (  ModelDuplicateException e) {
   }
   commit(true);
-  realmManager.createRealm("JUGGLER2");
+  realmManager.getRealmByName("JUGGLER1").addApplication("app2");
   commit();
   try {
-    realmManager.getRealmByName("JUGGLER2").setName("JUGGLER");
+    realmManager.getRealmByName("JUGGLER1").getApplicationByName("app2").setName("app1");
     commit();
     Assert.fail("Expected exception");
   }

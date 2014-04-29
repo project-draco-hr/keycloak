@@ -1,5 +1,11 @@
 {
   auth.requireManage();
   OAuthClientManager manager=new OAuthClientManager(realm);
-  manager.update(rep,oauthClient);
+  try {
+    manager.update(rep,oauthClient);
+    return Response.noContent().build();
+  }
+ catch (  ModelDuplicateException e) {
+    return Flows.errors().exists("Client " + rep.getName() + " already exists");
+  }
 }

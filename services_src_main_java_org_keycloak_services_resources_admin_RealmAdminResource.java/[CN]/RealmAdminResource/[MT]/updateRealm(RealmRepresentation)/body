@@ -1,5 +1,11 @@
 {
   auth.requireManage();
   logger.debug("updating realm: " + realm.getName());
-  new RealmManager(session).updateRealm(rep,realm);
+  try {
+    new RealmManager(session).updateRealm(rep,realm);
+    return Response.noContent().build();
+  }
+ catch (  ModelDuplicateException e) {
+    return Flows.errors().exists("Realm " + rep.getRealm() + " already exists");
+  }
 }

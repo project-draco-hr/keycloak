@@ -3,15 +3,6 @@
     return method.invoke(em,args);
   }
  catch (  InvocationTargetException e) {
-    Throwable c=e.getCause();
-    if (c.getCause() != null && c.getCause() instanceof ConstraintViolationException) {
-      throw new ModelDuplicateException(c);
-    }
-    if (c instanceof EntityExistsException) {
-      throw new ModelDuplicateException(c);
-    }
- else {
-      throw new ModelException(c);
-    }
+    throw convert(e.getCause());
   }
 }

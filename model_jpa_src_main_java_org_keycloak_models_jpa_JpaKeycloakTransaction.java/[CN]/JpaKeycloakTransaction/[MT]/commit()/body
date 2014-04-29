@@ -1,3 +1,8 @@
 {
-  em.getTransaction().commit();
+  try {
+    em.getTransaction().commit();
+  }
+ catch (  PersistenceException e) {
+    throw PersistenceExceptionConverter.convert(e.getCause());
+  }
 }

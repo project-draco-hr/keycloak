@@ -1,5 +1,14 @@
 {
   IdentityConfigurationBuilder builder=new IdentityConfigurationBuilder();
-  builder.named("SIMPLE_LDAP_STORE_CONFIG").stores().ldap().addCredentialHandler(LDAPAgentIgnoreCredentialHandler.class).baseDN(ldapConfig.get(LdapConstants.BASE_DN)).bindDN(ldapConfig.get(LdapConstants.BIND_DN)).bindCredential(ldapConfig.get(LdapConstants.BIND_CREDENTIAL)).url(ldapConfig.get(LdapConstants.CONNECTION_URL)).supportAllFeatures().mapping(User.class).baseDN(ldapConfig.get(LdapConstants.USER_DN_SUFFIX)).objectClasses("inetOrgPerson","organizationalPerson").attribute("loginName",UID,true).attribute("firstName",CN).attribute("lastName",SN).attribute("email",EMAIL).readOnlyAttribute("createdDate",CREATE_TIMESTAMP);
+  Properties connectionProps=new Properties();
+  connectionProps.put("com.sun.jndi.ldap.connect.pool","true");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.authentication","none simple");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.initsize","1");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.maxsize","10");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.prefsize","5");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.timeout","300000");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.protocol","plain");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.debug","off");
+  builder.named("SIMPLE_LDAP_STORE_CONFIG").stores().ldap().connectionProperties(connectionProps).addCredentialHandler(LDAPAgentIgnoreCredentialHandler.class).baseDN(ldapConfig.get(LdapConstants.BASE_DN)).bindDN(ldapConfig.get(LdapConstants.BIND_DN)).bindCredential(ldapConfig.get(LdapConstants.BIND_CREDENTIAL)).url(ldapConfig.get(LdapConstants.CONNECTION_URL)).supportAllFeatures().mapping(User.class).baseDN(ldapConfig.get(LdapConstants.USER_DN_SUFFIX)).objectClasses("inetOrgPerson","organizationalPerson").attribute("loginName",UID,true).attribute("firstName",CN).attribute("lastName",SN).attribute("email",EMAIL).readOnlyAttribute("createdDate",CREATE_TIMESTAMP);
   return new DefaultPartitionManager(builder.buildAll());
 }

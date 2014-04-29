@@ -1,8 +1,14 @@
 {
   auth.requireManage();
-  UserModel user=realm.getUser(username);
-  if (user == null) {
-    throw new NotFoundException("User not found");
+  try {
+    UserModel user=realm.getUser(username);
+    if (user == null) {
+      throw new NotFoundException("User not found");
+    }
+    updateUserFromRep(user,rep);
+    return Response.noContent().build();
   }
-  updateUserFromRep(user,rep);
+ catch (  ModelDuplicateException e) {
+    return Flows.errors().exists("User exists with same username or email");
+  }
 }

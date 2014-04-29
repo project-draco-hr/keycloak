@@ -1,0 +1,23 @@
+{
+  realmManager.createRealm("JUGGLER1").addUser("user1");
+  realmManager.createRealm("JUGGLER2").addUser("user1");
+  commit();
+  try {
+    realmManager.getRealmByName("JUGGLER1").addUser("user1");
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  commit(true);
+  realmManager.getRealmByName("JUGGLER1").addUser("user2");
+  commit();
+  try {
+    realmManager.getRealmByName("JUGGLER1").getUser("user2").setLoginName("user1");
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  resetSession();
+}

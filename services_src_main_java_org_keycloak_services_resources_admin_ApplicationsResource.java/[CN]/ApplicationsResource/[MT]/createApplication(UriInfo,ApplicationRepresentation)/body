@@ -1,9 +1,11 @@
 {
   auth.requireManage();
-  if (realm.getApplicationNameMap().containsKey(rep.getName())) {
+  ApplicationManager resourceManager=new ApplicationManager(new RealmManager(session));
+  try {
+    ApplicationModel applicationModel=resourceManager.createApplication(realm,rep);
+    return Response.created(uriInfo.getAbsolutePathBuilder().path(applicationModel.getName()).build()).build();
+  }
+ catch (  ModelDuplicateException e) {
     return Flows.errors().exists("Application " + rep.getName() + " already exists");
   }
-  ApplicationManager resourceManager=new ApplicationManager(new RealmManager(session));
-  ApplicationModel applicationModel=resourceManager.createApplication(realm,rep);
-  return Response.created(uriInfo.getAbsolutePathBuilder().path(applicationModel.getName()).build()).build();
 }

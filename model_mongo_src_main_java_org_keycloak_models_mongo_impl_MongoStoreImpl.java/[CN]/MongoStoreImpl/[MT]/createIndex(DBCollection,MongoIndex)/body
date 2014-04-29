@@ -8,6 +8,17 @@
     name=null;
   }
   boolean unique=index.unique();
-  dbCollection.ensureIndex(fields,name,unique);
-  logger.debug("Created index " + fields + (unique ? " (unique)" : "")+ " on "+ dbCollection.getName()+ " in "+ this.database.getName());
+  boolean sparse=index.sparse();
+  BasicDBObject options=new BasicDBObject();
+  if (name != null) {
+    options.put("name",name);
+  }
+  if (unique) {
+    options.put("unique",unique);
+  }
+  if (sparse) {
+    options.put("sparse",sparse);
+  }
+  dbCollection.ensureIndex(fields,options);
+  logger.debug("Created index " + fields + "(options: "+ options+ ") on "+ dbCollection.getName()+ " in "+ this.database.getName());
 }

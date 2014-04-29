@@ -1,0 +1,11 @@
+{
+  Config.setExportImportAction(ExportImportProviderImpl.ACTION_EXPORT);
+  Config.setExportImportProvider(EncryptedZIPIOProvider.PROVIDER_ID);
+  File zipFile=getZipFile();
+  Config.setExportImportZipFile(zipFile.getAbsolutePath());
+  Config.setExportImportZipPassword("password123");
+  if (zipFile.exists()) {
+    zipFile.delete();
+  }
+  new ExportImportProviderImpl().checkExportImport(factory);
+}

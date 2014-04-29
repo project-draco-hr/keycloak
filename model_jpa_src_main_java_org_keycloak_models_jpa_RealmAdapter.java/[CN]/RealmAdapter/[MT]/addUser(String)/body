@@ -1,17 +1,3 @@
 {
-  UserEntity entity=new UserEntity();
-  entity.setLoginName(username);
-  entity.setRealm(realm);
-  em.persist(entity);
-  em.flush();
-  UserModel userModel=new UserAdapter(entity);
-  for (  String r : getDefaultRoles()) {
-    grantRole(userModel,getRole(r));
-  }
-  for (  ApplicationModel application : getApplications()) {
-    for (    String r : application.getDefaultRoles()) {
-      grantRole(userModel,application.getRole(r));
-    }
-  }
-  return userModel;
+  return this.addUser(KeycloakModelUtils.generateId(),username);
 }

@@ -1,0 +1,31 @@
+{
+  Config.setModelProvider(getExportModelProvider());
+  factory=KeycloakApplication.createSessionFactory();
+  beginTransaction();
+  new ApplianceBootstrap().bootstrap(identitySession,"/auth");
+  commitTransaction();
+  beginTransaction();
+  RealmRepresentation rep=AbstractModelTest.loadJson("testrealm.json");
+  realmManager=new RealmManager(identitySession);
+  RealmModel realm=realmManager.createRealm("demo",rep.getRealm());
+  realmManager.importRealm(rep,realm);
+  commitTransaction();
+  exportModel(factory);
+  beginTransaction();
+  realm=identitySession.getRealm("demo");
+  String wburkeId=realm.getUser("wburke").getId();
+  String appId=realm.getApplicationByName("Application").getId();
+  commitTransaction();
+  factory.close();
+  Config.setModelProvider(getImportModelProvider());
+  factory=KeycloakApplication.createSessionFactory();
+  importModel(factory);
+  beginTransaction();
+  RealmModel importedRealm=identitySession.getRealm("demo");
+  System.out.println("Exported realm: " + realm + ", Imported realm: "+ importedRealm);
+  Assert.assertEquals(wburkeId,importedRealm.getUser("wburke").getId());
+  Assert.assertEquals(appId,importedRealm.getApplicationByName("Application").getId());
+  ImportTest.assertDataImportedInRealm(importedRealm);
+  commitTransaction();
+  factory.close();
+}

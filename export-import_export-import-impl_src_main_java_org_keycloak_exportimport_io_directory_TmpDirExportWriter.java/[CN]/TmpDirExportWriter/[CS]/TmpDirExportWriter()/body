@@ -1,0 +1,10 @@
+{
+  String tempDir=System.getProperty("java.io.tmpdir");
+  this.rootDirectory=new File(tempDir + "/keycloak-export");
+  if (this.rootDirectory.exists()) {
+    recursiveDeleteDir(this.rootDirectory);
+  }
+  this.rootDirectory.mkdirs();
+  logger.infof("Exporting into directory %s",this.rootDirectory.getAbsolutePath());
+  this.objectMapper=getObjectMapper();
+}

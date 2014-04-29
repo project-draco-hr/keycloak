@@ -1,0 +1,10 @@
+{
+  DBObject query=new QueryBuilder().and("realmId").is(getId()).get();
+  List<MongoUsernameLoginFailureEntity> failures=getMongoStore().loadEntities(MongoUsernameLoginFailureEntity.class,query,invocationContext);
+  List<UsernameLoginFailureModel> result=new ArrayList<UsernameLoginFailureModel>();
+  if (failures == null)   return result;
+  for (  MongoUsernameLoginFailureEntity failure : failures) {
+    result.add(new UsernameLoginFailureAdapter(invocationContext,failure));
+  }
+  return result;
+}

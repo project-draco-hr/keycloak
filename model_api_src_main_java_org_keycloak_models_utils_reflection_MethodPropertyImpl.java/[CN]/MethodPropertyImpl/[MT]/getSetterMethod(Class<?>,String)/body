@@ -1,0 +1,12 @@
+{
+  Method[] methods=clazz.getMethods();
+  for (  Method method : methods) {
+    String methodName=method.getName();
+    if (methodName.startsWith(SETTER_METHOD_PREFIX) && method.getParameterTypes().length == 1) {
+      if (Introspector.decapitalize(methodName.substring(SETTER_METHOD_PREFIX_LENGTH)).equals(name)) {
+        return method;
+      }
+    }
+  }
+  return null;
+}

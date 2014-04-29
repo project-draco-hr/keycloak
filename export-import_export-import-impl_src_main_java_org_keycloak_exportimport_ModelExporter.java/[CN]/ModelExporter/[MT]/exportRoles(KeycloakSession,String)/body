@@ -1,0 +1,33 @@
+{
+  List<RoleModel> allRoles=getAllRoles(keycloakSession);
+  List<RoleEntity> result=new LinkedList<RoleEntity>();
+  for (  RoleModel roleModel : allRoles) {
+    RoleEntity roleEntity=new RoleEntity();
+    roleEntity.setId(roleModel.getId());
+    result.add(roleEntity);
+    roleEntity.setName(roleModel.getName());
+    roleEntity.setDescription(roleModel.getDescription());
+    RoleContainerModel roleContainer=roleModel.getContainer();
+    if (roleContainer instanceof RealmModel) {
+      RealmModel realm=(RealmModel)roleContainer;
+      roleEntity.setRealmId(realm.getId());
+    }
+ else {
+      ApplicationModel appModel=(ApplicationModel)roleContainer;
+      roleEntity.setApplicationId(appModel.getId());
+    }
+    List<String> compositeRolesIds=null;
+    for (    RoleModel composite : roleModel.getComposites()) {
+      if (compositeRolesIds == null) {
+        compositeRolesIds=new ArrayList<String>();
+      }
+      compositeRolesIds.add(composite.getId());
+    }
+    roleEntity.setCompositeRoleIds(compositeRolesIds);
+  }
+  this.exportWriter.writeEntities(fileName,result);
+  logger.infof("%d roles exported: ",result.size());
+  if (logger.isDebugEnabled()) {
+    logger.debug("Exported roles: " + result);
+  }
+}

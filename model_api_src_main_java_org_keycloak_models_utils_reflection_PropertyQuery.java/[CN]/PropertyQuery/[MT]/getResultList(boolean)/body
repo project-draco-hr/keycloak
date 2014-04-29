@@ -1,0 +1,22 @@
+{
+  Map<String,Property<V>> properties=new HashMap<String,Property<V>>();
+  for (  Method method : targetClass.getMethods()) {
+    if (!(method.getName().startsWith("is") || method.getName().startsWith("get"))) {
+      continue;
+    }
+    boolean match=true;
+    for (    PropertyCriteria c : criteria) {
+      if (!c.methodMatches(method)) {
+        match=false;
+        break;
+      }
+    }
+    if (match) {
+      MethodProperty<V> property=Properties.<V>createProperty(method);
+      if (!writable || !property.isReadOnly()) {
+        properties.put(property.getName(),property);
+      }
+    }
+  }
+  return Collections.unmodifiableMap(properties);
+}

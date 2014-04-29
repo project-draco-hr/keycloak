@@ -1,0 +1,13 @@
+{
+  try {
+    ByteArrayOutputStream bos=new ByteArrayOutputStream();
+    this.decrypter.extractEntry(this.decrypter.getEntry(fileName),bos,this.password);
+    ByteArrayInputStream bis=new ByteArrayInputStream(bos.toByteArray());
+    T[] template=(T[])Array.newInstance(entityClass,0);
+    T[] result=(T[])this.objectMapper.readValue(bis,template.getClass());
+    return Arrays.asList(result);
+  }
+ catch (  Exception ioe) {
+    throw new RuntimeException(ioe);
+  }
+}

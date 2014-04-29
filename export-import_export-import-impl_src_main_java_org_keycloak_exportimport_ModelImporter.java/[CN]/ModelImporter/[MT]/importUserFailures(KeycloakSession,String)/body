@@ -1,0 +1,11 @@
+{
+  List<UsernameLoginFailureEntity> userFailures=this.importReader.readEntities(fileName,UsernameLoginFailureEntity.class);
+  for (  UsernameLoginFailureEntity entity : userFailures) {
+    RealmModel realm=keycloakSession.getRealm(entity.getRealmId());
+    UsernameLoginFailureModel model=realm.addUserLoginFailure(entity.getUsername());
+    this.propertiesManager.setBasicPropertiesToModel(model,entity);
+    for (int i=0; i < entity.getNumFailures(); i++) {
+      model.incrementFailures();
+    }
+  }
+}

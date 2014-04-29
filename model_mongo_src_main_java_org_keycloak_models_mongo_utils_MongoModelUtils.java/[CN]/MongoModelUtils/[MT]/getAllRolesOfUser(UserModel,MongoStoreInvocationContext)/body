@@ -1,9 +1,9 @@
 {
-  UserEntity userEntity=((UserAdapter)user).getUser();
+  MongoUserEntity userEntity=((UserAdapter)user).getUser();
   List<String> roleIds=userEntity.getRoleIds();
   if (roleIds == null || roleIds.isEmpty()) {
     return Collections.EMPTY_LIST;
   }
   DBObject query=new QueryBuilder().and("_id").in(roleIds).get();
-  return invContext.getMongoStore().loadEntities(RoleEntity.class,query,invContext);
+  return invContext.getMongoStore().loadEntities(MongoRoleEntity.class,query,invContext);
 }

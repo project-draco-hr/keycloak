@@ -6,8 +6,10 @@
   for (  Property<Object> property : props) {
     String propName=property.getName();
     Object propValue=property.getValue(applicationObject);
-    Object dbValue=propValue == null ? null : mapperRegistry.convertApplicationObjectToDBObject(propValue,Object.class);
-    dbObject.put(propName,dbValue);
+    if (propValue != null) {
+      Object dbValue=mapperRegistry.convertApplicationObjectToDBObject(propValue,Object.class);
+      dbObject.put(propName,dbValue);
+    }
   }
   return dbObject;
 }

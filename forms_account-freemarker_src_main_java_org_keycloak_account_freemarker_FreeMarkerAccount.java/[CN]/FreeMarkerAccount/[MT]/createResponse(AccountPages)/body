@@ -24,13 +24,18 @@
     messages=new Properties();
   }
   URI baseUri=uriInfo.getBaseUri();
+  UriBuilder baseUriBuilder=uriInfo.getBaseUriBuilder();
+  for (  Map.Entry<String,List<String>> e : uriInfo.getQueryParameters().entrySet()) {
+    baseUriBuilder.queryParam(e.getKey(),e.getValue().toArray());
+  }
+  URI baseQueryUri=baseUriBuilder.build();
   if (message != null) {
     attributes.put("message",new MessageBean(messages.containsKey(message) ? messages.getProperty(message) : message,messageType));
   }
   if (referrer != null) {
     attributes.put("referrer",new ReferrerBean(referrer));
   }
-  attributes.put("url",new UrlBean(realm,theme,baseUri));
+  attributes.put("url",new UrlBean(realm,theme,baseUri,baseQueryUri));
   attributes.put("features",new FeaturesBean(social,audit,passwordUpdateSupported));
 switch (page) {
 case ACCOUNT:

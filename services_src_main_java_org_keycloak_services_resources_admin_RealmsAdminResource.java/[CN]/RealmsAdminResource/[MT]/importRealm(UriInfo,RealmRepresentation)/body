@@ -2,13 +2,13 @@
   if (!auth.hasRealmRole(AdminRoles.CREATE_REALM)) {
     throw new ForbiddenException();
   }
-  logger.debug("importRealm: {0}",rep.getRealm());
+  logger.debugv("importRealm: {0}",rep.getRealm());
   RealmManager realmManager=new RealmManager(session);
   try {
     RealmModel realm=realmManager.importRealm(rep);
     grantPermissionsToRealmCreator(realm);
     URI location=realmUrl(uriInfo).build(realm.getName());
-    logger.debug("imported realm success, sending back: {0}",location.toString());
+    logger.debugv("imported realm success, sending back: {0}",location.toString());
     return Response.created(location).build();
   }
  catch (  ModelDuplicateException e) {

@@ -1,0 +1,24 @@
+{
+  realmManager.createRealm("JUGGLER1").addRole("role1");
+  realmManager.getRealmByName("JUGGLER1").addApplication("app1").addRole("role1");
+  realmManager.getRealmByName("JUGGLER1").addApplication("app2").addRole("role1");
+  commit();
+  try {
+    realmManager.getRealmByName("JUGGLER1").addRole("role1");
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  commit(true);
+  realmManager.getRealmByName("JUGGLER1").addRole("role2");
+  commit();
+  try {
+    realmManager.getRealmByName("JUGGLER1").getRole("role2").setName("role1");
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  resetSession();
+}

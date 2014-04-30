@@ -1,8 +1,14 @@
 {
   auth.requireManage();
   RoleModel role=roleContainer.getRole(roleName);
-  if (role == null || role.getName().startsWith(Constants.INTERNAL_ROLE)) {
+  if (role == null) {
     throw new NotFoundException("Could not find role: " + roleName);
   }
-  updateRole(rep,role);
+  try {
+    updateRole(rep,role);
+    return Response.noContent().build();
+  }
+ catch (  ModelDuplicateException e) {
+    return Flows.errors().exists("Role with name " + rep.getName() + " already exists");
+  }
 }

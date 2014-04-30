@@ -1,12 +1,11 @@
 {
   auth.requireManage();
-  if (roleContainer.getRole(rep.getName()) != null || rep.getName().startsWith(Constants.INTERNAL_ROLE)) {
+  try {
+    RoleModel role=roleContainer.addRole(rep.getName());
+    role.setDescription(rep.getDescription());
+    return Response.created(uriInfo.getAbsolutePathBuilder().path(role.getName()).build()).build();
+  }
+ catch (  ModelDuplicateException e) {
     return Flows.errors().exists("Role with name " + rep.getName() + " already exists");
   }
-  RoleModel role=roleContainer.addRole(rep.getName());
-  if (role == null) {
-    throw new NotFoundException("Role not found");
-  }
-  role.setDescription(rep.getDescription());
-  return Response.created(uriInfo.getAbsolutePathBuilder().path(role.getName()).build()).build();
 }

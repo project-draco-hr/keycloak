@@ -1,6 +1,10 @@
 {
   UndertowHttpFacade facade=new UndertowHttpFacade(exchange);
-  ServletRequestAuthenticator authenticator=createRequestAuthenticator(exchange,securityContext,facade);
+  KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
+  if (!deployment.isConfigured()) {
+    return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  }
+  ServletRequestAuthenticator authenticator=createRequestAuthenticator(deployment,exchange,securityContext,facade);
   AuthOutcome outcome=authenticator.authenticate();
   if (outcome == AuthOutcome.AUTHENTICATED) {
     return AuthenticationMechanismOutcome.AUTHENTICATED;

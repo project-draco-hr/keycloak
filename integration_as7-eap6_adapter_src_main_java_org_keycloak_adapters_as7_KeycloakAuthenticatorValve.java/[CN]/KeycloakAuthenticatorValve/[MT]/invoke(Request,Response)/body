@@ -1,10 +1,14 @@
 {
   try {
-    PreAuthActionsHandler handler=new PreAuthActionsHandler(userSessionManagement,deploymentContext.getDeployment(),new CatalinaHttpFacade(request,response));
-    if (handler.handleRequest()) {
-      return;
+    CatalinaHttpFacade facade=new CatalinaHttpFacade(request,response);
+    KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
+    if (deployment != null && deployment.isConfigured()) {
+      PreAuthActionsHandler handler=new PreAuthActionsHandler(userSessionManagement,deployment,facade);
+      if (handler.handleRequest()) {
+        return;
+      }
     }
-    checkKeycloakSession(request);
+    checkKeycloakSession(request,facade);
     super.invoke(request,response);
   }
   finally {

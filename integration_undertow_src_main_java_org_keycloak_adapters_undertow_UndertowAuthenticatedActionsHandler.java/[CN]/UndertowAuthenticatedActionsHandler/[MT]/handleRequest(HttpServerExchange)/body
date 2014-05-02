@@ -1,5 +1,9 @@
 {
-  AuthenticatedActionsHandler handler=new AuthenticatedActionsHandler(deployment,new UndertowHttpFacade(exchange));
-  if (handler.handledRequest())   return;
+  UndertowHttpFacade facade=new UndertowHttpFacade(exchange);
+  KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
+  if (deployment != null && deployment.isConfigured()) {
+    AuthenticatedActionsHandler handler=new AuthenticatedActionsHandler(deployment,facade);
+    if (handler.handledRequest())     return;
+  }
   next.handleRequest(exchange);
 }

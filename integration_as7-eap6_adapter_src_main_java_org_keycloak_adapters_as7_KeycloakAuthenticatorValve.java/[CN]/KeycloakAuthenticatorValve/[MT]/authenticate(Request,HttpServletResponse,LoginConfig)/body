@@ -1,7 +1,10 @@
 {
-  if (!deploymentContext.getDeployment().isConfigured())   return false;
   CatalinaHttpFacade facade=new CatalinaHttpFacade(request,response);
-  CatalinaRequestAuthenticator authenticator=new CatalinaRequestAuthenticator(deploymentContext.getDeployment(),this,userSessionManagement,facade,request);
+  KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
+  if (deployment == null || !deployment.isConfigured()) {
+    return false;
+  }
+  CatalinaRequestAuthenticator authenticator=new CatalinaRequestAuthenticator(deployment,this,userSessionManagement,facade,request);
   AuthOutcome outcome=authenticator.authenticate();
   if (outcome == AuthOutcome.AUTHENTICATED) {
     if (facade.isEnded()) {

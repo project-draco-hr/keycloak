@@ -1,6 +1,15 @@
 {
-  this.deployment=KeycloakDeploymentBuilder.build(getConfigInputStream(context));
-  log.info("deployment realm:" + deployment.getRealm() + " resource:"+ deployment.getResourceName());
-  AuthenticatedActionsValve actions=new AuthenticatedActionsValve(deployment,getNext(),getContainer(),getObjectName());
+  InputStream configInputStream=getConfigInputStream(context);
+  KeycloakDeployment kd=null;
+  if (configInputStream == null) {
+    log.warning("No adapter configuration.  Keycloak is unconfigured and will deny all requests.");
+    kd=new KeycloakDeployment();
+  }
+ else {
+    kd=KeycloakDeploymentBuilder.build(configInputStream);
+  }
+  deploymentContext=new AdapterDeploymentContext(kd);
+  context.getServletContext().setAttribute(AdapterDeploymentContext.class.getName(),deploymentContext);
+  AuthenticatedActionsValve actions=new AuthenticatedActionsValve(deploymentContext,getNext(),getContainer(),getObjectName());
   setNext(actions);
 }

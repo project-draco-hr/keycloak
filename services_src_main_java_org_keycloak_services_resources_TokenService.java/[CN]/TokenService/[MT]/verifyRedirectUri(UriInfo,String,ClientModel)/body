@@ -1,0 +1,42 @@
+{
+  Set<String> validRedirects=client.getRedirectUris();
+  if (redirectUri == null) {
+    return validRedirects.size() == 1 ? validRedirects.iterator().next() : null;
+  }
+ else   if (validRedirects.isEmpty()) {
+    if (client.isPublicClient()) {
+      logger.error("Client redirect uri must be registered for public client");
+      return null;
+    }
+    return redirectUri;
+  }
+ else {
+    String r=redirectUri.indexOf('?') != -1 ? redirectUri.substring(0,redirectUri.indexOf('?')) : redirectUri;
+    Set<String> resolveValidRedirects=new HashSet<String>();
+    for (    String validRedirect : validRedirects) {
+      if (validRedirect.startsWith("/")) {
+        URI baseUri=uriInfo.getBaseUri();
+        String uri=baseUri.getScheme() + "://" + baseUri.getHost();
+        if (baseUri.getPort() != -1) {
+          uri+=":" + baseUri.getPort();
+        }
+        validRedirect=uri + validRedirect;
+        logger.debugv("replacing relative valid redirect with: {0}",validRedirect);
+      }
+      resolveValidRedirects.add(validRedirect);
+    }
+    boolean valid=matchesRedirects(resolveValidRedirects,r);
+    if (!valid && r.startsWith(Constants.INSTALLED_APP_URL) && r.indexOf(':',Constants.INSTALLED_APP_URL.length()) >= 0) {
+      int i=r.indexOf(':',Constants.INSTALLED_APP_URL.length());
+      StringBuilder sb=new StringBuilder();
+      sb.append(r.substring(0,i));
+      i=r.indexOf('/',i);
+      if (i >= 0) {
+        sb.append(r.substring(i));
+      }
+      r=sb.toString();
+      valid=matchesRedirects(resolveValidRedirects,r);
+    }
+    return valid ? redirectUri : null;
+  }
+}

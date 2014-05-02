@@ -1,0 +1,35 @@
+{
+  driver.navigate().to("http://localhost:8081/customer-portal");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  loginPage.login("bburke@redhat.com","password");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/customer-portal");
+  String pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  driver.navigate().to("http://localhost:8081/product-portal");
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/product-portal");
+  pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("iPhone") && pageSource.contains("iPad"));
+  Client client=ClientBuilder.newClient();
+  WebTarget adminTarget=client.target("http://localhost:8081/auth/rest/admin/realms/demo");
+  Map<String,SessionStats> stats=adminTarget.path("session-stats").request().header(HttpHeaders.AUTHORIZATION,"Bearer " + adminToken).get(new GenericType<Map<String,SessionStats>>(){
+  }
+);
+  SessionStats custStats=stats.get("customer-portal");
+  Assert.assertNotNull(custStats);
+  Assert.assertEquals(1,custStats.getActiveSessions());
+  SessionStats prodStats=stats.get("product-portal");
+  Assert.assertNotNull(prodStats);
+  Assert.assertEquals(1,prodStats.getActiveSessions());
+  client.close();
+  String logoutUri=UriBuilder.fromUri("http://localhost:8081/auth/rest/realms/demo/tokens/logout").queryParam(OAuth2Constants.REDIRECT_URI,"http://localhost:8081/customer-portal").build().toString();
+  driver.navigate().to(logoutUri);
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  driver.navigate().to("http://localhost:8081/product-portal");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  driver.navigate().to("http://localhost:8081/customer-portal");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+}

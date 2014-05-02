@@ -1,0 +1,28 @@
+{
+  String managementUrl=getManagementUrl(requestUri,resource);
+  if (managementUrl != null) {
+    LogoutAction adminAction=new LogoutAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,resource.getName(),user,notBefore);
+    String token=new TokenManager().encodeToken(realm,adminAction);
+    logger.infov("logout user: {0} resource: {1} url: {2}",user,resource.getName(),managementUrl);
+    ClientRequest request=client.createRequest(UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_LOGOUT).build().toString());
+    ClientResponse response=null;
+    try {
+      response=request.body(MediaType.TEXT_PLAIN_TYPE,token).post(UserStats.class);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+    try {
+      boolean success=response.getStatus() == 204;
+      logger.info("logout success.");
+      return success;
+    }
+  finally {
+      response.releaseConnection();
+    }
+  }
+ else {
+    logger.info("Can't logout" + resource.getName() + " no mgmt url.");
+    return false;
+  }
+}

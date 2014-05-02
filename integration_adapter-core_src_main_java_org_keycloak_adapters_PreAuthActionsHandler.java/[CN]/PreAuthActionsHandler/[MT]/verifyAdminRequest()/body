@@ -1,4 +1,8 @@
 {
+  if (deployment.isSslRequired() && !facade.getRequest().isSecure()) {
+    log.warn("SSL is required for adapter admin action");
+    facade.getResponse().sendError(403,"ssl required");
+  }
   String token=StreamUtil.readString(facade.getRequest().getInputStream());
   if (token == null) {
     log.warn("admin request failed, no token");

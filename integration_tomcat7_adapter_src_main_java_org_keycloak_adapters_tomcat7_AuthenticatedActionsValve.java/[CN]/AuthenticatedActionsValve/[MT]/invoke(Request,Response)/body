@@ -1,8 +1,12 @@
 {
   log.finer("AuthenticatedActionsValve.invoke" + request.getRequestURI());
-  AuthenticatedActionsHandler handler=new AuthenticatedActionsHandler(deployment,new CatalinaHttpFacade(request,response));
-  if (handler.handledRequest()) {
-    return;
+  CatalinaHttpFacade facade=new CatalinaHttpFacade(request,response);
+  KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
+  if (deployment != null && deployment.isConfigured()) {
+    AuthenticatedActionsHandler handler=new AuthenticatedActionsHandler(deployment,new CatalinaHttpFacade(request,response));
+    if (handler.handledRequest()) {
+      return;
+    }
   }
   getNext().invoke(request,response);
 }

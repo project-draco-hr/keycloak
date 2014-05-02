@@ -1,0 +1,15 @@
+{
+  Principal principal=null;
+  Principal callerPrincipal=null;
+  if (subject != null) {
+    Set<Principal> principals=subject.getPrincipals();
+    if (principals != null && !principals.isEmpty()) {
+      for (      Principal p : principals) {
+        if (!(p instanceof Group) && principal == null) {
+          principal=p;
+        }
+      }
+    }
+  }
+  return callerPrincipal == null ? principal : callerPrincipal;
+}

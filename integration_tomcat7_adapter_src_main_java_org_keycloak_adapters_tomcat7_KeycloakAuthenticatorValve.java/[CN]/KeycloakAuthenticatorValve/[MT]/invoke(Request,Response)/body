@@ -1,0 +1,12 @@
+{
+  try {
+    PreAuthActionsHandler handler=new PreAuthActionsHandler(userSessionManagement,deployment,new CatalinaHttpFacade(request,response));
+    if (handler.handleRequest()) {
+      return;
+    }
+    checkKeycloakSession(request);
+    super.invoke(request,response);
+  }
+  finally {
+  }
+}

@@ -2,7 +2,7 @@
   if (request.getSessionInternal(false) == null || request.getSessionInternal().getPrincipal() == null)   return;
   RefreshableKeycloakSecurityContext session=(RefreshableKeycloakSecurityContext)request.getSessionInternal().getNote(KeycloakSecurityContext.class.getName());
   if (session == null)   return;
-  session.setDeployment(deploymentContext.resolveDeployment(facade));
+  if (session.getDeployment() == null)   session.setDeployment(deploymentContext.resolveDeployment(facade));
   if (session.isActive())   return;
   session.refreshExpiredToken();
   if (session.isActive())   return;

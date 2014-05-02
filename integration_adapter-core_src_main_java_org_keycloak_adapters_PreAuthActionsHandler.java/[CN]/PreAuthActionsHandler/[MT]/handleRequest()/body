@@ -1,23 +1,26 @@
 {
-  if (!deployment.isConfigured())   return false;
   String requestUri=facade.getRequest().getURI();
   log.debugv("adminRequest {0}",requestUri);
   if (preflightCors()) {
     return true;
   }
   if (requestUri.endsWith(AdapterConstants.K_LOGOUT)) {
+    if (!resolveDeployment())     return true;
     handleLogout();
     return true;
   }
  else   if (requestUri.endsWith(AdapterConstants.K_PUSH_NOT_BEFORE)) {
+    if (!resolveDeployment())     return true;
     handlePushNotBefore();
     return true;
   }
  else   if (requestUri.endsWith(AdapterConstants.K_GET_SESSION_STATS)) {
+    if (!resolveDeployment())     return true;
     handleGetSessionStats();
     return true;
   }
  else   if (requestUri.endsWith(AdapterConstants.K_GET_USER_STATS)) {
+    if (!resolveDeployment())     return true;
     handleGetUserStats();
     return true;
   }

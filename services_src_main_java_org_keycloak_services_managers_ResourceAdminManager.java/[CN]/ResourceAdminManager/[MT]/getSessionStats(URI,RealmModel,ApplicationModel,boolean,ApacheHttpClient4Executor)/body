@@ -1,0 +1,41 @@
+{
+  String managementUrl=getManagementUrl(requestUri,application);
+  if (managementUrl != null) {
+    SessionStatsAction adminAction=new SessionStatsAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,application.getName());
+    adminAction.setListUsers(users);
+    String token=new TokenManager().encodeToken(realm,adminAction);
+    logger.infov("session stats for application: {0} url: {1}",application.getName(),managementUrl);
+    ClientRequest request=client.createRequest(UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_GET_SESSION_STATS).build().toString());
+    ClientResponse<SessionStats> response=null;
+    try {
+      response=request.body(MediaType.TEXT_PLAIN_TYPE,token).post(SessionStats.class);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+    try {
+      if (response.getStatus() != 200) {
+        logger.warn("Failed to get stats: " + response.getStatus());
+        return null;
+      }
+      SessionStats stats=response.getEntity();
+      if (users && stats.getUsers() != null) {
+        Map<String,UserStats> newUsers=new HashMap<String,UserStats>();
+        for (        Map.Entry<String,UserStats> entry : stats.getUsers().entrySet()) {
+          UserModel user=realm.getUserById(entry.getKey());
+          if (user == null)           continue;
+          newUsers.put(user.getLoginName(),entry.getValue());
+        }
+        stats.setUsers(newUsers);
+      }
+      return stats;
+    }
+  finally {
+      response.releaseConnection();
+    }
+  }
+ else {
+    logger.info("no management url.");
+    return null;
+  }
+}

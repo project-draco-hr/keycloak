@@ -3,7 +3,14 @@
   factory.registerLoader(AuditProvider.class,ProviderFactoryLoader.create(AuditProviderFactory.class),Config.getAuditProvider());
   factory.registerLoader(AuditListener.class,ProviderFactoryLoader.create(AuditListenerFactory.class));
   factory.registerLoader(TimerProvider.class,ProviderFactoryLoader.create(TimerProviderFactory.class),Config.getTimerProvider());
-  factory.registerLoader(IdentityManagerProvider.class,ProviderFactoryLoader.create(IdentityManagerProviderFactory.class),Config.getIdentityManagerProvider());
+  try {
+    Class identityManagerProvider=Class.forName("org.keycloak.picketlink.IdentityManagerProvider");
+    Class identityManagerProviderFactory=Class.forName("org.keycloak.picketlink.IdentityManagerProviderFactory");
+    factory.registerLoader(identityManagerProvider,ProviderFactoryLoader.create(identityManagerProviderFactory),Config.getIdentityManagerProvider());
+  }
+ catch (  ClassNotFoundException e) {
+    log.warn("Picketlink libraries not installed for IdentityManagerProviderFactory");
+  }
   factory.registerLoader(AuthenticationProvider.class,ProviderFactoryLoader.create(AuthenticationProviderFactory.class));
   factory.init();
   return factory;

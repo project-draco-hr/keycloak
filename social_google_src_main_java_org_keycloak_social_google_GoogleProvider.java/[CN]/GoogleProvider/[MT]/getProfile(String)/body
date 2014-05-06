@@ -1,9 +1,9 @@
 {
   try {
-    JSONObject profile=SimpleHttp.doGet(PROFILE_URL).header("Authorization","Bearer " + accessToken).asJson();
-    SocialUser user=new SocialUser(profile.getString("sub"),profile.getString("email"));
-    user.setName(profile.optString("given_name"),profile.optString("family_name"));
-    user.setEmail(profile.optString("email"));
+    JsonNode profile=SimpleHttp.doGet(PROFILE_URL).header("Authorization","Bearer " + accessToken).asJson();
+    SocialUser user=new SocialUser(profile.get("sub").getTextValue(),profile.get("email").getTextValue());
+    user.setName(profile.has("given_name") ? profile.get("given_name").getTextValue() : null,profile.has("family_name") ? profile.get("family_name").getTextValue() : null);
+    user.setEmail(profile.has("email") ? profile.get("email").getTextValue() : null);
     return user;
   }
  catch (  Exception e) {

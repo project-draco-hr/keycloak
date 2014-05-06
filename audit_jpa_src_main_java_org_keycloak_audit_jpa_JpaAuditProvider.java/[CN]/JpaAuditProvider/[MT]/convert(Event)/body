@@ -8,6 +8,11 @@
   e.setUserId(o.getUserId());
   e.setIpAddress(o.getIpAddress());
   e.setError(o.getError());
-  e.setDetailsJson(new JSONObject(o.getDetails()).toString());
+  try {
+    e.setDetailsJson(mapper.writeValueAsString(o.getDetails()));
+  }
+ catch (  IOException ex) {
+    logger.error("Failed to write log details",ex);
+  }
   return e;
 }

@@ -1,7 +1,7 @@
 {
-  JSONObject o=SimpleHttp.doPost("http://localhost:8081/tojson").param("key-one","value one ;)").param("key-two","value two!&").asJson();
-  JSONObject p=o.getJSONObject("params");
-  assertEquals(2,p.length());
-  assertEquals("value one ;)",p.getString("key-one"));
-  assertEquals("value two!&",p.getString("key-two"));
+  JsonNode o=SimpleHttp.doPost("http://localhost:8081/tojson").param("key-one","value one ;)").param("key-two","value two!&").asJson();
+  JsonNode p=o.get("params");
+  assertEquals(2,p.size());
+  assertEquals("value one ;)",p.get("key-one").getTextValue());
+  assertEquals("value two!&",p.get("key-two").getTextValue());
 }

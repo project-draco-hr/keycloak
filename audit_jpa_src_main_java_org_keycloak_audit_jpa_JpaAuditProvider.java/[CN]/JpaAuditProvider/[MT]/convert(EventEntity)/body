@@ -7,11 +7,12 @@
   e.setUserId(o.getUserId());
   e.setIpAddress(o.getIpAddress());
   e.setError(o.getError());
-  JSONObject object=new JSONObject(o.getDetailsJson());
-  Map<String,String> details=new HashMap<String,String>();
-  for (  Object k : object.keySet()) {
-    details.put((String)k,object.getString((String)k));
+  try {
+    Map<String,String> details=mapper.readValue(o.getDetailsJson(),mapType);
+    e.setDetails(details);
   }
-  e.setDetails(details);
+ catch (  IOException ex) {
+    logger.error("Failed to read log details",ex);
+  }
   return e;
 }

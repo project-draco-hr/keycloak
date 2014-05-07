@@ -8,6 +8,9 @@
   realmModel.addScopeMapping(client,appRole);
   RoleModel realmRole=realmModel.addRole("test");
   realmModel.addScopeMapping(app,realmRole);
+  commit();
+  realmModel=identitySession.getRealm("JUGGLER");
+  app=realmModel.getApplicationByName("test-app");
   Assert.assertTrue(realmModel.removeRoleById(realmRole.getId()));
   Assert.assertFalse(realmModel.removeRoleById(realmRole.getId()));
   Assert.assertNull(realmModel.getRole(realmRole.getName()));

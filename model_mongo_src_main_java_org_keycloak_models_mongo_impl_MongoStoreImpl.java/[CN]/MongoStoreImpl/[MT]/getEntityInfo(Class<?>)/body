@@ -1,0 +1,14 @@
+{
+  EntityInfo entityInfo=entityInfoCache.get(entityClass);
+  if (entityInfo == null) {
+    Map<String,Property<Object>> properties=PropertyQueries.createQuery(entityClass).getWritableResultList();
+    MongoCollection classAnnotation=entityClass.getAnnotation(MongoCollection.class);
+    String dbCollectionName=classAnnotation == null ? null : classAnnotation.collectionName();
+    entityInfo=new EntityInfo(entityClass,dbCollectionName,properties);
+    EntityInfo existing=entityInfoCache.putIfAbsent(entityClass,entityInfo);
+    if (existing != null) {
+      entityInfo=existing;
+    }
+  }
+  return entityInfo;
+}

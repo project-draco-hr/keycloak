@@ -1,0 +1,9 @@
+{
+  List<ApplicationEntity> apps=this.importReader.readEntities(fileName,ApplicationEntity.class);
+  for (  ApplicationEntity appEntity : apps) {
+    RealmModel realm=keycloakSession.getRealm(appEntity.getRealmId());
+    ApplicationModel application=realm.getApplicationById(appEntity.getId());
+    application.updateDefaultRoles(appEntity.getDefaultRoles().toArray(new String[]{}));
+    addScopes(realm,application,appEntity);
+  }
+}

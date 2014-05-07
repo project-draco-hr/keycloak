@@ -1,0 +1,25 @@
+{
+  try {
+    if (Thread.currentThread().getContextClassLoader() != null) {
+      return (Class<T>)Class.forName(name,true,Thread.currentThread().getContextClassLoader());
+    }
+ else {
+      return (Class<T>)Class.forName(name);
+    }
+  }
+ catch (  ClassNotFoundException e) {
+    for (    ClassLoader l : loaders) {
+      try {
+        return (Class<T>)Class.forName(name,true,l);
+      }
+ catch (      ClassNotFoundException ex) {
+      }
+    }
+  }
+  if (Thread.currentThread().getContextClassLoader() != null) {
+    throw new ClassNotFoundException("Could not load class " + name + " with the context class loader "+ Thread.currentThread().getContextClassLoader().toString()+ " or any of the additional ClassLoaders: "+ Arrays.toString(loaders));
+  }
+ else {
+    throw new ClassNotFoundException("Could not load class " + name + " using Class.forName or using any of the additional ClassLoaders: "+ Arrays.toString(loaders));
+  }
+}

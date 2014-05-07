@@ -1,8 +1,8 @@
 {
   DBObject query=new QueryBuilder().and("applicationId").is(getId()).get();
-  List<RoleEntity> roles=getMongoStore().loadEntities(RoleEntity.class,query,invocationContext);
+  List<MongoRoleEntity> roles=getMongoStore().loadEntities(MongoRoleEntity.class,query,invocationContext);
   Set<RoleModel> result=new HashSet<RoleModel>();
-  for (  RoleEntity role : roles) {
+  for (  MongoRoleEntity role : roles) {
     result.add(new RoleAdapter(getRealm(),role,this,invocationContext));
   }
   return result;

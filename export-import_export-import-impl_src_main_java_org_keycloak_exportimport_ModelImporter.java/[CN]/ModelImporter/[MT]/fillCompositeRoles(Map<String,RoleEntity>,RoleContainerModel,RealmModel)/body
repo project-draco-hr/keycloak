@@ -1,0 +1,12 @@
+{
+  for (  RoleModel role : roleContainer.getRoles()) {
+    RoleEntity roleEntity=rolesMap.get(role.getId());
+    if (roleEntity.getCompositeRoleIds() == null) {
+      continue;
+    }
+    for (    String compositeRoleId : roleEntity.getCompositeRoleIds()) {
+      RoleModel compositeRole=realm.getRoleById(compositeRoleId);
+      role.addCompositeRole(compositeRole);
+    }
+  }
+}

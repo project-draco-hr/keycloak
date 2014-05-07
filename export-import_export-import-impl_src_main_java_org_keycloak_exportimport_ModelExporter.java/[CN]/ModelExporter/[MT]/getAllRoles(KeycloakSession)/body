@@ -1,0 +1,12 @@
+{
+  List<RoleModel> allRoles=new ArrayList<RoleModel>();
+  List<RealmModel> realms=keycloakSession.getRealms();
+  for (  RealmModel realmModel : realms) {
+    allRoles.addAll(realmModel.getRoles());
+  }
+  List<ApplicationModel> allApplications=getAllApplications(keycloakSession);
+  for (  ApplicationModel appModel : allApplications) {
+    allRoles.addAll(appModel.getRoles());
+  }
+  return allRoles;
+}

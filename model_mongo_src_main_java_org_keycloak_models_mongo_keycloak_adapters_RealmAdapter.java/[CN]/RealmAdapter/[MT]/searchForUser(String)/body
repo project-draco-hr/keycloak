@@ -14,6 +14,6 @@
     nameBuilder=new QueryBuilder().or(new QueryBuilder().put("firstName").regex(caseInsensitivePattern).get(),new QueryBuilder().put("lastName").regex(caseInsensitivePattern).get());
   }
   QueryBuilder builder=new QueryBuilder().and(new QueryBuilder().and("realmId").is(getId()).get(),new QueryBuilder().or(new QueryBuilder().put("loginName").regex(caseInsensitivePattern).get(),new QueryBuilder().put("email").regex(caseInsensitivePattern).get(),nameBuilder.get()).get());
-  List<UserEntity> users=getMongoStore().loadEntities(UserEntity.class,builder.get(),invocationContext);
+  List<MongoUserEntity> users=getMongoStore().loadEntities(MongoUserEntity.class,builder.get(),invocationContext);
   return convertUserEntities(users);
 }

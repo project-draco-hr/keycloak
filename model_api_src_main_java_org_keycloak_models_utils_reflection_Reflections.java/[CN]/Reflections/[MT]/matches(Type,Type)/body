@@ -1,0 +1,41 @@
+{
+  if (type1 instanceof Class<?>) {
+    Class<?> clazz=(Class<?>)type1;
+    if (matches(clazz,EMPTY_TYPES,type2)) {
+      return true;
+    }
+  }
+  if (type1 instanceof ParameterizedType) {
+    ParameterizedType parameterizedType1=(ParameterizedType)type1;
+    if (parameterizedType1.getRawType() instanceof Class<?>) {
+      if (matches((Class<?>)parameterizedType1.getRawType(),parameterizedType1.getActualTypeArguments(),type2)) {
+        return true;
+      }
+    }
+  }
+  if (type1 instanceof WildcardType) {
+    WildcardType wildcardType=(WildcardType)type1;
+    if (isTypeBounded(type2,wildcardType.getLowerBounds(),wildcardType.getUpperBounds())) {
+      return true;
+    }
+  }
+  if (type2 instanceof WildcardType) {
+    WildcardType wildcardType=(WildcardType)type2;
+    if (isTypeBounded(type1,wildcardType.getUpperBounds(),wildcardType.getLowerBounds())) {
+      return true;
+    }
+  }
+  if (type1 instanceof TypeVariable<?>) {
+    TypeVariable<?> typeVariable=(TypeVariable<?>)type1;
+    if (isTypeBounded(type2,EMPTY_TYPES,typeVariable.getBounds())) {
+      return true;
+    }
+  }
+  if (type2 instanceof TypeVariable<?>) {
+    TypeVariable<?> typeVariable=(TypeVariable<?>)type2;
+    if (isTypeBounded(type1,typeVariable.getBounds(),EMPTY_TYPES)) {
+      return true;
+    }
+  }
+  return false;
+}

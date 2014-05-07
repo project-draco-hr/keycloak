@@ -1,0 +1,27 @@
+{
+  if (setAccessible && !method.isAccessible()) {
+    setAccessible(method);
+  }
+  try {
+    return expectedReturnType.cast(method.invoke(instance,args));
+  }
+ catch (  IllegalAccessException ex) {
+    throw new RuntimeException(buildInvokeMethodErrorMessage(method,instance,args),ex);
+  }
+catch (  IllegalArgumentException ex) {
+    throw new IllegalArgumentException(buildInvokeMethodErrorMessage(method,instance,args),ex);
+  }
+catch (  InvocationTargetException ex) {
+    throw new RuntimeException(buildInvokeMethodErrorMessage(method,instance,args),ex.getCause());
+  }
+catch (  NullPointerException ex) {
+    NullPointerException ex2=new NullPointerException(buildInvokeMethodErrorMessage(method,instance,args));
+    ex2.initCause(ex.getCause());
+    throw ex2;
+  }
+catch (  ExceptionInInitializerError e) {
+    ExceptionInInitializerError e2=new ExceptionInInitializerError(buildInvokeMethodErrorMessage(method,instance,args));
+    e2.initCause(e.getCause());
+    throw e2;
+  }
+}

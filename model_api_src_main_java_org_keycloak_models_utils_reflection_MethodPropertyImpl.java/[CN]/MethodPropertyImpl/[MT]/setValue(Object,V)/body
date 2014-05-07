@@ -1,0 +1,13 @@
+{
+  if (setterMethod == null) {
+    if (getDeclaringClass().isAssignableFrom(instance.getClass())) {
+      Method instanceSetterMethod=getSetterMethod(instance.getClass(),getName());
+      if (instanceSetterMethod != null) {
+        Reflections.invokeMethod(instanceSetterMethod,instance,value);
+        return;
+      }
+    }
+    throw new UnsupportedOperationException("Property " + this.getterMethod.getDeclaringClass() + "."+ propertyName+ " is read only, as there is no setter method.");
+  }
+  Reflections.invokeMethod(setterMethod,instance,value);
+}

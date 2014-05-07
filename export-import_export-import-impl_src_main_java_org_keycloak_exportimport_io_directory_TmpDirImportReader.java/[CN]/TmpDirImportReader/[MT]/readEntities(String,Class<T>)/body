@@ -1,0 +1,12 @@
+{
+  try {
+    File file=new File(this.rootDirectory,fileName);
+    FileInputStream stream=new FileInputStream(file);
+    T[] template=(T[])Array.newInstance(entityClass,0);
+    T[] result=(T[])this.objectMapper.readValue(stream,template.getClass());
+    return Arrays.asList(result);
+  }
+ catch (  IOException ioe) {
+    throw new RuntimeException(ioe);
+  }
+}

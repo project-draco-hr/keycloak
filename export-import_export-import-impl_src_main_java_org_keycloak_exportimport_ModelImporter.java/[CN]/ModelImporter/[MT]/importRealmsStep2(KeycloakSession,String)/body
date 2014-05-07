@@ -1,0 +1,12 @@
+{
+  List<RealmEntity> realms=this.importReader.readEntities(fileName,RealmEntity.class);
+  RealmModel adminRealm=keycloakSession.getRealm(Config.getAdminRealm());
+  for (  RealmEntity realmEntity : realms) {
+    RealmModel realm=keycloakSession.getRealm(realmEntity.getId());
+    String adminAppId=realmEntity.getAdminAppId();
+    if (adminAppId != null) {
+      realm.setAdminApp(adminRealm.getApplicationById(adminAppId));
+    }
+    realm.updateDefaultRoles(realmEntity.getDefaultRoles().toArray(new String[]{}));
+  }
+}

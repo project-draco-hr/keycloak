@@ -1,0 +1,16 @@
+{
+  List<ApplicationModel> allApplications=getAllApplications(keycloakSession);
+  List<ApplicationEntity> result=new LinkedList<ApplicationEntity>();
+  for (  ApplicationModel appModel : allApplications) {
+    ApplicationEntity appEntity=new ApplicationEntity();
+    appEntity.setId(appModel.getId());
+    result.add(appEntity);
+    this.propertiesManager.setBasicPropertiesFromModel(appModel,appEntity);
+    appEntity.setRealmId(appModel.getRealm().getId());
+    appEntity.setDefaultRoles(appModel.getDefaultRoles());
+    List<String> scopeIds=getScopeIds(appModel);
+    appEntity.setScopeIds(scopeIds);
+  }
+  this.exportWriter.writeEntities(fileName,result);
+  logger.infof("Applications exported: " + result);
+}

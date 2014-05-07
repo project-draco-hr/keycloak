@@ -1,0 +1,15 @@
+{
+  try {
+    this.zipFile=new File(zipFileName);
+    if (zipFile.exists()) {
+      throw new IllegalStateException("File " + zipFileName + " already exists");
+    }
+    this.objectMapper=JsonSerialization.mapper;
+    AESEncrypter encrypter=new AESEncrypterBC();
+    this.encrypter=new AesZipFileEncrypter(this.zipFile,encrypter);
+    this.password=password;
+  }
+ catch (  IOException ioe) {
+    throw new RuntimeException(ioe);
+  }
+}

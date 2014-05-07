@@ -1,0 +1,11 @@
+{
+  try {
+    ByteArrayOutputStream stream=new ByteArrayOutputStream();
+    this.objectMapper.writeValue(stream,entities);
+    byte[] byteArray=stream.toByteArray();
+    this.encrypter.add(fileName,new ByteArrayInputStream(byteArray),this.password);
+  }
+ catch (  IOException ioe) {
+    throw new RuntimeException(ioe);
+  }
+}

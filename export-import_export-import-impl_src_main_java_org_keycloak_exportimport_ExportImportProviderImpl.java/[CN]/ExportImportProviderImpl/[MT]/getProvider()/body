@@ -1,0 +1,11 @@
+{
+  String providerId=Config.getExportImportProvider();
+  logger.infof("Requested migration provider: " + providerId);
+  Iterable<ExportImportIOProvider> providers=ProviderLoader.load(ExportImportIOProvider.class);
+  for (  ExportImportIOProvider provider : providers) {
+    if (providerId.equals(provider.getId())) {
+      return provider;
+    }
+  }
+  throw new IllegalStateException("Provider " + providerId + " not found");
+}

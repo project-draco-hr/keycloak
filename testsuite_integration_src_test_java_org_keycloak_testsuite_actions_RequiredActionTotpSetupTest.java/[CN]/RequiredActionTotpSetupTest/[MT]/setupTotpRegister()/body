@@ -5,7 +5,7 @@
   String userId=events.expectRegister("setupTotp","email").assertEvent().getUserId();
   totpPage.assertCurrent();
   totpPage.configure(totp.generate(totpPage.getTotpSecret()));
-  events.expectRequiredAction("update_totp").user(userId).detail(Details.USERNAME,"setupTotp").assertEvent();
+  String sessionId=events.expectRequiredAction("update_totp").user(userId).detail(Details.USERNAME,"setupTotp").assertEvent().getSessionId();
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
-  events.expectLogin().user(userId).detail(Details.USERNAME,"setupTotp").assertEvent();
+  events.expectLogin().user(userId).session(sessionId).detail(Details.USERNAME,"setupTotp").assertEvent();
 }

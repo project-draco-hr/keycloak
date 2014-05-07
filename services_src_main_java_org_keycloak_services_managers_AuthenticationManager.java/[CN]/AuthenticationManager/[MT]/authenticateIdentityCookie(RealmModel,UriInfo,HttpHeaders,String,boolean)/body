@@ -6,9 +6,9 @@
     return null;
   }
   String tokenString=cookie.getValue();
-  UserModel user=verifyIdentityToken(realm,uriInfo,checkActive,tokenString);
-  if (user == null) {
+  AuthResult authResult=verifyIdentityToken(realm,uriInfo,checkActive,tokenString);
+  if (authResult == null) {
     expireIdentityCookie(realm,uriInfo);
   }
-  return user;
+  return authResult;
 }

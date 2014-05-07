@@ -1,0 +1,31 @@
+{
+  audit.event(Events.LOGOUT);
+  if (redirectUri != null) {
+    audit.detail(Details.REDIRECT_URI,redirectUri);
+  }
+  if (sessionState != null) {
+    audit.session(sessionState);
+  }
+  AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(realm,uriInfo,headers,false);
+  if (authResult != null) {
+    logout(authResult.getSession());
+  }
+ else   if (sessionState != null) {
+    UserSessionModel userSession=realm.getUserSession(sessionState);
+    if (userSession != null) {
+      logout(userSession);
+    }
+ else {
+      audit.error(Errors.USER_SESSION_NOT_FOUND);
+    }
+  }
+ else {
+    audit.error(Errors.USER_NOT_LOGGED_IN);
+  }
+  if (redirectUri != null) {
+    return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
+  }
+ else {
+    return Response.ok().build();
+  }
+}

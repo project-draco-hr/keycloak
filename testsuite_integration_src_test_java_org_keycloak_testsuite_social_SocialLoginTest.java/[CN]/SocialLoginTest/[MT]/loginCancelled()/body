@@ -4,7 +4,7 @@
   driver.findElement(By.id("cancel")).click();
   Assert.assertTrue(loginPage.isCurrent());
   Assert.assertEquals("Access denied",loginPage.getWarning());
-  events.expectLogin().error("rejected_by_user").user((String)null).detail(Details.AUTH_METHOD,"social@dummy").removeDetail(Details.USERNAME).removeDetail(Details.CODE_ID).assertEvent();
+  events.expectLogin().error("rejected_by_user").user((String)null).session((String)null).detail(Details.AUTH_METHOD,"social@dummy").removeDetail(Details.USERNAME).removeDetail(Details.CODE_ID).assertEvent();
   loginPage.login("test-user@localhost","password");
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   events.expectLogin().assertEvent();

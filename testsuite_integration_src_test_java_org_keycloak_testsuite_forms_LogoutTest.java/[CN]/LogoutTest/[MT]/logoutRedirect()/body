@@ -1,0 +1,16 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  assertTrue(appPage.isCurrent());
+  String sessionId=events.expectLogin().assertEvent().getSessionId();
+  String redirectUri=AppPage.baseUrl + "?logout";
+  String logoutUrl=oauth.getLogoutUrl(redirectUri,null);
+  driver.navigate().to(logoutUrl);
+  events.expectLogout(sessionId).detail(Details.REDIRECT_URI,redirectUri).assertEvent();
+  assertEquals(redirectUri,driver.getCurrentUrl());
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  assertTrue(appPage.isCurrent());
+  String sessionId2=events.expectLogin().assertEvent().getSessionId();
+  assertNotEquals(sessionId,sessionId2);
+}

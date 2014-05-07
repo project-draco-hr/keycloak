@@ -1,0 +1,21 @@
+{
+  AccessToken token=new AccessToken();
+  token.id(KeycloakModelUtils.generateId());
+  token.subject(user.getId());
+  token.audience(realm.getName());
+  token.issuedNow();
+  token.issuedFor(client.getClientId());
+  token.issuer(realm.getName());
+  if (session != null) {
+    token.setSessionState(session.getId());
+  }
+  if (realm.getAccessTokenLifespan() > 0) {
+    token.expiration(Time.currentTime() + realm.getAccessTokenLifespan());
+  }
+  Set<String> allowedOrigins=client.getWebOrigins();
+  if (allowedOrigins != null) {
+    token.setAllowedOrigins(allowedOrigins);
+  }
+  initClaims(token,client,user);
+  return token;
+}

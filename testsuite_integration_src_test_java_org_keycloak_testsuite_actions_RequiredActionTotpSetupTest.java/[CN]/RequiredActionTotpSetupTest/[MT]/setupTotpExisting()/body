@@ -4,11 +4,11 @@
   totpPage.assertCurrent();
   String totpSecret=totpPage.getTotpSecret();
   totpPage.configure(totp.generate(totpSecret));
-  events.expectRequiredAction("update_totp").assertEvent();
+  String sessionId=events.expectRequiredAction("update_totp").assertEvent().getSessionId();
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
-  events.expectLogin().assertEvent();
+  Event loginEvent=events.expectLogin().session(sessionId).assertEvent();
   oauth.openLogout();
-  events.expectLogout().assertEvent();
+  events.expectLogout(loginEvent.getSessionId()).assertEvent();
   loginPage.open();
   loginPage.login("test-user@localhost","password");
   loginTotpPage.login(totp.generate(totpSecret));

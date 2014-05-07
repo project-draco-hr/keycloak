@@ -1,6 +1,8 @@
 {
   oauth.doLogin("test-user@localhost","password");
-  String codeId=events.expectLogin().assertEvent().getDetails().get(Details.CODE_ID);
+  Event loginEvent=events.expectLogin().assertEvent();
+  String sessionId=loginEvent.getSessionId();
+  String codeId=loginEvent.getDetails().get(Details.CODE_ID);
   String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
   AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(200,response.getStatusCode());
@@ -9,14 +11,16 @@
   AccessToken token=oauth.verifyToken(response.getAccessToken());
   Assert.assertEquals(keycloakRule.getUser("test","test-user@localhost").getId(),token.getSubject());
   Assert.assertNotEquals("test-user@localhost",token.getSubject());
+  Assert.assertEquals(sessionId,token.getSessionState());
   Assert.assertEquals(1,token.getRealmAccess().getRoles().size());
   Assert.assertTrue(token.getRealmAccess().isUserInRole("user"));
   Assert.assertEquals(1,token.getResourceAccess(oauth.getClientId()).getRoles().size());
   Assert.assertTrue(token.getResourceAccess(oauth.getClientId()).isUserInRole("customer-user"));
-  Event event=events.expectCodeToToken(codeId).assertEvent();
+  Event event=events.expectCodeToToken(codeId,sessionId).assertEvent();
   Assert.assertEquals(token.getId(),event.getDetails().get(Details.TOKEN_ID));
   Assert.assertEquals(oauth.verifyRefreshToken(response.getRefreshToken()).getId(),event.getDetails().get(Details.REFRESH_TOKEN_ID));
+  Assert.assertEquals(sessionId,token.getSessionState());
   response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(400,response.getStatusCode());
-  events.expectCodeToToken(codeId).error("invalid_code").removeDetail(Details.TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_ID).client((String)null).user((String)null).assertEvent();
+  events.expectCodeToToken(codeId,null).error("invalid_code").removeDetail(Details.TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_ID).client((String)null).user((String)null).assertEvent();
 }

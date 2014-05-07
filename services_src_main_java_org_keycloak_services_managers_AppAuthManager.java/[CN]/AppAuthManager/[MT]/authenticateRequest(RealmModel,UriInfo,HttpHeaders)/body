@@ -1,5 +1,9 @@
 {
-  UserModel user=authenticateIdentityCookie(realm,uriInfo,headers);
-  if (user != null)   return user;
-  return authenticateBearerToken(realm,uriInfo,headers);
+  AuthResult authResult=authenticateIdentityCookie(realm,uriInfo,headers);
+  if (authResult != null) {
+    return authResult.getUser();
+  }
+ else {
+    return authenticateBearerToken(realm,uriInfo,headers);
+  }
 }

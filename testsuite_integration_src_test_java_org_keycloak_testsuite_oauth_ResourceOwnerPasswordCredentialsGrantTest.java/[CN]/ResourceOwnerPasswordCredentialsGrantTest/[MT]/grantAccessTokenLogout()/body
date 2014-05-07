@@ -1,0 +1,18 @@
+{
+  oauth.clientId("resource-owner");
+  OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("secret","test-user@localhost","password");
+  assertEquals(200,response.getStatusCode());
+  AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
+  RefreshToken refreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
+  events.expectLogin().client("resource-owner").session(accessToken.getSessionState()).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token").detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).assertEvent();
+  HttpResponse logoutResponse=oauth.doLogout(null,accessToken.getSessionState());
+  assertEquals(200,logoutResponse.getStatusLine().getStatusCode());
+  events.expectLogout(accessToken.getSessionState()).removeDetail(Details.REDIRECT_URI).assertEvent();
+  logoutResponse=oauth.doLogout(null,accessToken.getSessionState());
+  assertEquals(200,logoutResponse.getStatusLine().getStatusCode());
+  events.expectLogout(accessToken.getSessionState()).user((String)null).removeDetail(Details.REDIRECT_URI).error(Errors.USER_SESSION_NOT_FOUND).assertEvent();
+  response=oauth.doRefreshTokenRequest(response.getRefreshToken(),"secret");
+  assertEquals(400,response.getStatusCode());
+  assertEquals("invalid_grant",response.getError());
+  events.expectRefresh(refreshToken.getId(),refreshToken.getSessionState()).client("resource-owner").removeDetail(Details.TOKEN_ID).removeDetail(Details.UPDATED_REFRESH_TOKEN_ID).error(Errors.INVALID_TOKEN).assertEvent();
+}

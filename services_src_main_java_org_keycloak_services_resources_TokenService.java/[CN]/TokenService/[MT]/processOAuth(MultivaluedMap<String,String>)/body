@@ -30,11 +30,17 @@
   if (accessCodeEntry.isRememberMe()) {
     audit.detail(Details.REMEMBER_ME,"true");
   }
+  UserSessionModel session=realm.getUserSession(accessCodeEntry.getSessionState());
+  if (session == null || session.getExpires() < Time.currentTime()) {
+    audit.error(Errors.INVALID_CODE);
+    return oauth.forwardToSecurityFailure("Session not active");
+  }
+  audit.session(session);
   if (formData.containsKey("cancel")) {
     audit.error(Errors.REJECTED_BY_USER);
     return redirectAccessDenied(redirect,state);
   }
   audit.success();
   accessCodeEntry.setExpiration(Time.currentTime() + realm.getAccessCodeLifespan());
-  return oauth.redirectAccessCode(accessCodeEntry,state,redirect);
+  return oauth.redirectAccessCode(accessCodeEntry,session,state,redirect);
 }

@@ -1,0 +1,15 @@
+{
+  logger.info("createIdentityToken");
+  AccessToken token=new AccessToken();
+  token.id(KeycloakModelUtils.generateId());
+  token.issuedNow();
+  token.subject(user.getId());
+  token.audience(realm.getName());
+  if (session != null) {
+    token.setSessionState(session.getId());
+  }
+  if (realm.getCentralLoginLifespan() > 0) {
+    token.expiration(Time.currentTime() + realm.getCentralLoginLifespan());
+  }
+  return token;
+}

@@ -1,0 +1,26 @@
+{
+  AccessCodeEntry code=new AccessCodeEntry();
+  if (session != null) {
+    code.setSessionState(session.getId());
+  }
+  List<RoleModel> realmRolesRequested=code.getRealmRolesRequested();
+  MultivaluedMap<String,RoleModel> resourceRolesRequested=code.getResourceRolesRequested();
+  AccessToken token=createClientAccessToken(scopeParam,realm,client,user,session,realmRolesRequested,resourceRolesRequested);
+  token.setSessionState(code.getSessionState());
+  code.setToken(token);
+  code.setRealm(realm);
+  code.setExpiration(Time.currentTime() + realm.getAccessCodeLifespan());
+  code.setClient(client);
+  code.setUser(user);
+  code.setState(state);
+  code.setRedirectUri(redirect);
+  String accessCode=null;
+  try {
+    accessCode=new JWSBuilder().content(code.getId().getBytes("UTF-8")).rsa256(realm.getPrivateKey());
+  }
+ catch (  UnsupportedEncodingException e) {
+    throw new RuntimeException(e);
+  }
+  code.setCode(accessCode);
+  return code;
+}

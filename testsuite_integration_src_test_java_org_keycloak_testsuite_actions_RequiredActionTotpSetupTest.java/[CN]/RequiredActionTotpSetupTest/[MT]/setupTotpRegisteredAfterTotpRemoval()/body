@@ -19,7 +19,7 @@
   events.expectLogin().user(userId).detail(Details.USERNAME,"setupTotp2").assertEvent();
   accountTotpPage.open();
   accountTotpPage.assertCurrent();
-  events.expectLogin().user(userId).detail(Details.AUTH_METHOD,"sso").client("account").detail(Details.REDIRECT_URI,"http://localhost:8081/auth/rest/realms/test/account/login-redirect?path=totp").removeDetail(Details.USERNAME).assertEvent();
+  events.expectLogin().user(userId).detail(Details.AUTH_METHOD,"sso").client("account").detail(Details.REDIRECT_URI,AccountService.loginRedirectUrl(UriBuilder.fromUri("http://localhost:8081/auth")).queryParam("path","totp").build("test").toString()).removeDetail(Details.USERNAME).assertEvent();
   accountTotpPage.removeTotp();
   events.expectAccount("remove_totp").user(userId).assertEvent();
   oauth.openLogout();

@@ -1,10 +1,13 @@
 {
+  RealmManager realmManager=new RealmManager(session);
+  if (!auth.getRealm().equals(realmManager.getKeycloakAdminstrationRealm())) {
+    throw new ForbiddenException();
+  }
   if (!auth.hasRealmRole(AdminRoles.CREATE_REALM)) {
     throw new ForbiddenException();
   }
   Map<String,List<InputPart>> uploadForm=input.getFormDataMap();
   List<InputPart> inputParts=uploadForm.get("file");
-  RealmManager realmManager=new RealmManager(session);
   for (  InputPart inputPart : inputParts) {
     inputPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
     RealmRepresentation rep=inputPart.getBody(new GenericType<RealmRepresentation>(){
@@ -19,7 +22,7 @@
     }
     grantPermissionsToRealmCreator(realm);
     if (inputParts.size() == 1) {
-      URI location=realmUrl(uriInfo).build(realm.getName());
+      URI location=AdminRoot.realmsUrl(uriInfo).path(realm.getName()).build();
       return Response.created(location).build();
     }
   }

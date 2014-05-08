@@ -1,0 +1,26 @@
+{
+  RealmManager realmManager=new RealmManager(session);
+  UserModel user=authManager.authenticateBearerToken(realm,uriInfo,headers);
+  if (user == null) {
+    return Response.status(401).build();
+  }
+  String displayName;
+  if (user.getFirstName() != null || user.getLastName() != null) {
+    displayName=user.getFirstName();
+    if (user.getLastName() != null) {
+      displayName=displayName != null ? displayName + " " + user.getLastName() : user.getLastName();
+    }
+  }
+ else {
+    displayName=user.getLoginName();
+  }
+  RealmModel masterRealm=getAdminstrationRealm(realmManager);
+  if (masterRealm == null)   throw new NotFoundException("No realm found");
+  boolean createRealm=false;
+  if (realm.equals(masterRealm)) {
+    createRealm=masterRealm.hasRole(user,masterRealm.getRole(AdminRoles.CREATE_REALM));
+  }
+  Map<String,Set<String>> realmAccess=new HashMap<String,Set<String>>();
+  addRealmAdminAccess(realmAccess,realm.getRoleMappings(user));
+  return Response.ok(new WhoAmI(user.getId(),realm.getName(),displayName,createRealm,realmAccess)).build();
+}

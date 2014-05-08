@@ -25,10 +25,8 @@
     if (referrer != null) {
       redirectUri=redirectUri.resolve("?referrer=" + referrer);
     }
-    NewCookie cookie=authManager.createCookie(realm,application,code,Urls.accountBase(uriInfo.getBaseUri()).build(realm.getName()));
-    return Response.status(302).cookie(cookie).location(redirectUri).build();
+    return Response.status(302).location(redirectUri).build();
   }
   finally {
-    authManager.expireCookie(Urls.accountBase(uriInfo.getBaseUri()).build(realm.getName()));
   }
 }

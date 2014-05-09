@@ -2,8 +2,9 @@
   auditProvider=providers.getProvider(AuditProvider.class);
   account=AccountLoader.load().createAccount(uriInfo).setRealm(realm);
   boolean passwordUpdateSupported=false;
-  auth=authManager.authenticate(realm,headers);
-  if (auth != null) {
+  UserModel user=authManager.authenticateRequest(realm,uriInfo,headers);
+  if (user != null) {
+    auth=new Auth(realm,user,application);
     account.setUser(auth.getUser());
     AuthenticationLinkModel authLinkModel=realm.getAuthenticationLink(auth.getUser());
     if (authLinkModel != null) {

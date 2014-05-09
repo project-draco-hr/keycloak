@@ -1,13 +1,16 @@
 {
+  RealmManager realmManager=new RealmManager(session);
+  if (!auth.getRealm().equals(realmManager.getKeycloakAdminstrationRealm())) {
+    throw new ForbiddenException();
+  }
   if (!auth.hasRealmRole(AdminRoles.CREATE_REALM)) {
     throw new ForbiddenException();
   }
   logger.debugv("importRealm: {0}",rep.getRealm());
-  RealmManager realmManager=new RealmManager(session);
   try {
     RealmModel realm=realmManager.importRealm(rep);
     grantPermissionsToRealmCreator(realm);
-    URI location=realmUrl(uriInfo).build(realm.getName());
+    URI location=AdminRoot.realmsUrl(uriInfo).path(realm.getName()).build();
     logger.debugv("imported realm success, sending back: {0}",location.toString());
     return Response.created(location).build();
   }

@@ -1,0 +1,29 @@
+{
+  String tokenString=authManager.extractAuthorizationHeaderToken(headers);
+  if (tokenString == null)   throw new UnauthorizedException("Bearer");
+  JWSInput input=new JWSInput(tokenString);
+  AccessToken token;
+  try {
+    token=input.readJsonContent(AccessToken.class);
+  }
+ catch (  IOException e) {
+    throw new UnauthorizedException("Bearer token format error");
+  }
+  String realmName=token.getAudience();
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.getRealmByName(realmName);
+  if (realm == null) {
+    throw new UnauthorizedException("Unknown realm in token");
+  }
+  UserModel user=authManager.authenticateBearerToken(realm,uriInfo,headers);
+  if (user == null) {
+    logger.debug("Token not valid");
+    throw new UnauthorizedException("Bearer");
+  }
+  ApplicationModel consoleApp=realm.getApplicationByName(Constants.ADMIN_CONSOLE_APPLICATION);
+  if (consoleApp == null) {
+    throw new NotFoundException("Could not find admin console application");
+  }
+  Auth auth=new Auth(realm,user,consoleApp);
+  return auth;
+}

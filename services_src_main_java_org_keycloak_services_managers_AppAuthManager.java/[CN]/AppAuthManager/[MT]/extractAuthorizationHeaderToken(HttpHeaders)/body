@@ -1,0 +1,11 @@
+{
+  String tokenString=null;
+  String authHeader=headers.getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+  if (authHeader != null) {
+    String[] split=authHeader.trim().split("\\s+");
+    if (split == null || split.length != 2)     throw new UnauthorizedException("Bearer");
+    if (!split[0].equalsIgnoreCase("Bearer"))     throw new UnauthorizedException("Bearer");
+    tokenString=split[1];
+  }
+  return tokenString;
+}

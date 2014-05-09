@@ -3,11 +3,15 @@
   this.socialLinks=new LinkedList<SocialLinkEntry>();
   Map<String,String> socialConfig=realm.getSocialConfig();
   Set<SocialLinkModel> userSocialLinks=realm.getSocialLinks(user);
+  int availableLinks=0;
   if (socialConfig != null && !socialConfig.isEmpty()) {
     for (    SocialProvider provider : SocialLoader.load()) {
       String socialProviderId=provider.getId();
       if (socialConfig.containsKey(socialProviderId + ".key")) {
         SocialLinkModel socialLink=getSocialLink(userSocialLinks,socialProviderId);
+        if (socialLink != null) {
+          availableLinks++;
+        }
         String action=socialLink != null ? "remove" : "add";
         String actionUrl=UriBuilder.fromUri(accountSocialUpdateUri).queryParam("action",action).queryParam("provider_id",socialProviderId).build().toString();
         SocialLinkEntry entry=new SocialLinkEntry(socialLink,provider.getName(),actionUrl);
@@ -15,4 +19,5 @@
       }
     }
   }
+  this.removeLinkPossible=availableLinks > 1 || realm.getAuthenticationLink(user) != null;
 }

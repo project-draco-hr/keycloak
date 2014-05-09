@@ -1,0 +1,14 @@
+{
+  auth.requireView();
+  UserModel user=realm.getUser(username);
+  if (user == null) {
+    throw new NotFoundException("User not found");
+  }
+  Set<SocialLinkModel> socialLinks=realm.getSocialLinks(user);
+  List<SocialLinkRepresentation> result=new ArrayList<SocialLinkRepresentation>();
+  for (  SocialLinkModel socialLink : socialLinks) {
+    SocialLinkRepresentation rep=ModelToRepresentation.toRepresentation(socialLink);
+    result.add(rep);
+  }
+  return result;
+}

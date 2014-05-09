@@ -5,7 +5,8 @@
   Assert.assertEquals(expected.getError(),actual.getError());
   Assert.assertEquals(expected.getIpAddress(),actual.getIpAddress());
   Assert.assertThat(actual.getUserId(),userId);
-  if (details == null) {
+  Assert.assertThat(actual.getSessionId(),sessionId);
+  if (details == null || details.isEmpty()) {
     Assert.assertNull(actual.getDetails());
   }
  else {
@@ -15,9 +16,7 @@
       if (!actual.getDetails().containsKey(d.getKey())) {
         Assert.fail(d.getKey() + " missing");
       }
-      if (!d.getValue().matches(actualValue)) {
-        Assert.fail(d.getKey() + " doesn't match");
-      }
+      Assert.assertThat("Unexpected value for " + d.getKey(),actualValue,d.getValue());
     }
     for (    String k : actual.getDetails().keySet()) {
       if (!details.containsKey(k)) {

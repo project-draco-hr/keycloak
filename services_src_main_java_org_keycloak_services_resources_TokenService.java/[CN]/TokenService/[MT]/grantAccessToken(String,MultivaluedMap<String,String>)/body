@@ -3,38 +3,52 @@
     throw new NotAcceptableException("HTTPS required");
   }
   audit.event(Events.LOGIN).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token");
-  ClientModel client=authorizeClient(authorizationHeader,form,audit);
-  if (client.isPublicClient()) {
-    audit.error(Errors.NOT_ALLOWED);
-    throw new ForbiddenException("Public clients are not allowed to invoke grants/access");
-  }
   String username=form.getFirst(AuthenticationManager.FORM_USERNAME);
   if (username == null) {
     audit.error(Errors.USERNAME_MISSING);
     throw new UnauthorizedException("No username");
   }
   audit.detail(Details.USERNAME,username);
+  UserModel user=realm.getUser(username);
+  audit.user(user);
+  ClientModel client=authorizeClient(authorizationHeader,form,audit);
+  if (client.isPublicClient()) {
+    audit.error(Errors.NOT_ALLOWED);
+    throw new ForbiddenException("Public clients are not allowed to invoke grants/access");
+  }
   if (!realm.isEnabled()) {
     audit.error(Errors.REALM_DISABLED);
     throw new UnauthorizedException("Disabled realm");
   }
   AuthenticationStatus authenticationStatus=authManager.authenticateForm(clientConnection,realm,form);
+  Map<String,String> err;
 switch (authenticationStatus) {
 case SUCCESS:
     break;
 case ACCOUNT_TEMPORARILY_DISABLED:
 case ACTIONS_REQUIRED:
-  audit.error(Errors.USER_TEMPORARILY_DISABLED);
-return Response.status(503).type(MediaType.TEXT_PLAIN).entity("Account temporarily disabled").build();
+  err=new HashMap<String,String>();
+err.put(OAuth2Constants.ERROR,"invalid_grant");
+err.put(OAuth2Constants.ERROR_DESCRIPTION,"Account temporarily disabled");
+audit.error(Errors.USER_TEMPORARILY_DISABLED);
+return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(err).build();
 case ACCOUNT_DISABLED:
-return Response.status(403).type(MediaType.TEXT_PLAIN).entity("Account disabled").build();
+err=new HashMap<String,String>();
+err.put(OAuth2Constants.ERROR,"invalid_grant");
+err.put(OAuth2Constants.ERROR_DESCRIPTION,"Account disabled");
+audit.error(Errors.USER_DISABLED);
+return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(err).build();
 default :
+err=new HashMap<String,String>();
+err.put(OAuth2Constants.ERROR,"invalid_grant");
+err.put(OAuth2Constants.ERROR_DESCRIPTION,"Invalid user credentials");
 audit.error(Errors.INVALID_USER_CREDENTIALS);
-throw new UnauthorizedException("Auth failed");
+return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(err).build();
 }
-UserModel user=realm.getUser(form.getFirst(AuthenticationManager.FORM_USERNAME));
 String scope=form.getFirst(OAuth2Constants.SCOPE);
-AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).generateAccessToken(scope,client,user).generateIDToken().build();
+UserSessionModel session=realm.createUserSession(user,clientConnection.getRemoteAddr());
+audit.session(session);
+AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).generateAccessToken(scope,client,user,session).generateRefreshToken().generateIDToken().build();
 audit.success();
 return Response.ok(res,MediaType.APPLICATION_JSON_TYPE).build();
 }

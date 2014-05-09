@@ -24,7 +24,9 @@
  else {
     Set<RequiredAction> requiredActions=new HashSet<RequiredAction>(user.getRequiredActions());
     requiredActions.add(RequiredAction.UPDATE_PASSWORD);
-    AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,realm,client,user);
+    UserSessionModel session=realm.createUserSession(user,clientConnection.getRemoteAddr());
+    audit.session(session);
+    AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,realm,client,user,session);
     accessCode.setRequiredActions(requiredActions);
     accessCode.setExpiration(Time.currentTime() + realm.getAccessCodeLifespanUserAction());
     accessCode.setAuthMethod("form");

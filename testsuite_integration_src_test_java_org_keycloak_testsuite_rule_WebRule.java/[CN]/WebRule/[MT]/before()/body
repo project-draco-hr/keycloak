@@ -1,23 +1,5 @@
 {
-  String browser="htmlunit";
-  if (System.getProperty("browser") != null) {
-    browser=System.getProperty("browser");
-  }
-  if (browser.equals("htmlunit")) {
-    HtmlUnitDriver d=new HtmlUnitDriver();
-    d.getWebClient().getOptions().setJavaScriptEnabled(true);
-    d.getWebClient().getOptions().setCssEnabled(false);
-    driver=d;
-  }
- else   if (browser.equals("chrome")) {
-    driver=new ChromeDriver();
-  }
- else   if (browser.equals("firefox")) {
-    driver=new FirefoxDriver();
-  }
- else {
-    throw new RuntimeException("Unsupported browser " + browser);
-  }
+  driver=createWebDriver();
   oauth=new OAuthClient(driver);
   initWebResources(test);
 }

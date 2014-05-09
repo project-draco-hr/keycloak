@@ -1,0 +1,16 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  Event loginEvent=events.expectLogin().assertEvent();
+  String sessionId=loginEvent.getSessionId();
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
+  events.poll();
+  String refreshId=oauth.verifyRefreshToken(tokenResponse.getRefreshToken()).getId();
+  keycloakRule.removeUserSession(sessionId);
+  tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
+  assertEquals(400,tokenResponse.getStatusCode());
+  assertNull(tokenResponse.getAccessToken());
+  assertNull(tokenResponse.getRefreshToken());
+  events.expectRefresh(refreshId,sessionId).error(Errors.INVALID_TOKEN);
+  events.clear();
+}

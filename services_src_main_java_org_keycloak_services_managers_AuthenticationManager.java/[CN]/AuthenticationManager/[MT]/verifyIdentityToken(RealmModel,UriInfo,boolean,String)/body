@@ -24,7 +24,13 @@
       logger.info("Stale cookie");
       return null;
     }
-    return user;
+    UserSessionModel session=realm.getUserSession(token.getSessionState());
+    if (session == null || session.getExpires() < Time.currentTime()) {
+      logger.info("User session not active");
+      expireIdentityCookie(realm,uriInfo);
+      return null;
+    }
+    return new AuthResult(user,session);
   }
  catch (  VerificationException e) {
     logger.info("Failed to verify identity token",e);

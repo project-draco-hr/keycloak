@@ -1,0 +1,31 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  assertTrue(appPage.isCurrent());
+  String sessionId=events.expectLogin().assertEvent().getSessionId();
+  WebDriver driver2=WebRule.createWebDriver();
+  OAuthClient oauth2=new OAuthClient(driver2);
+  oauth2.doLogin("test-user@localhost","password");
+  String sessionId2=events.expectLogin().assertEvent().getSessionId();
+  assertNotEquals(sessionId,sessionId2);
+  oauth.openLoginForm();
+  events.expectLogin().session(sessionId).detail(Details.AUTH_METHOD,"sso").removeDetail(Details.USERNAME).assertEvent();
+  oauth2.openLoginForm();
+  events.expectLogin().session(sessionId2).detail(Details.AUTH_METHOD,"sso").removeDetail(Details.USERNAME).assertEvent();
+  driver.navigate().to(oauth.getLogoutUrl(AppPage.baseUrl,null));
+  events.expectLogout(sessionId).detail(Details.REDIRECT_URI,AppPage.baseUrl).assertEvent();
+  oauth2.openLoginForm();
+  events.expectLogin().session(sessionId2).detail(Details.AUTH_METHOD,"sso").removeDetail(Details.USERNAME).assertEvent();
+  oauth.openLoginForm();
+  assertEquals(oauth.getLoginFormUrl(),driver.getCurrentUrl());
+  oauth.doLogin("test-user@localhost","password");
+  String sessionId3=events.expectLogin().assertEvent().getSessionId();
+  assertNotEquals(sessionId,sessionId3);
+  assertNotEquals(sessionId2,sessionId3);
+  oauth2.doLogout(null,sessionId2);
+  events.expectLogout(sessionId2).removeDetail(Details.REDIRECT_URI).assertEvent();
+  oauth.openLoginForm();
+  events.expectLogin().session(sessionId3).detail(Details.AUTH_METHOD,"sso").removeDetail(Details.USERNAME).assertEvent();
+  oauth2.openLoginForm();
+  assertEquals(oauth2.getLoginFormUrl(),driver2.getCurrentUrl());
+}

@@ -12,19 +12,7 @@
   }
  else {
     String r=redirectUri.indexOf('?') != -1 ? redirectUri.substring(0,redirectUri.indexOf('?')) : redirectUri;
-    Set<String> resolveValidRedirects=new HashSet<String>();
-    for (    String validRedirect : validRedirects) {
-      if (validRedirect.startsWith("/")) {
-        URI baseUri=uriInfo.getBaseUri();
-        String uri=baseUri.getScheme() + "://" + baseUri.getHost();
-        if (baseUri.getPort() != -1) {
-          uri+=":" + baseUri.getPort();
-        }
-        validRedirect=uri + validRedirect;
-        logger.debugv("replacing relative valid redirect with: {0}",validRedirect);
-      }
-      resolveValidRedirects.add(validRedirect);
-    }
+    Set<String> resolveValidRedirects=resolveValidRedirects(uriInfo,validRedirects);
     boolean valid=matchesRedirects(resolveValidRedirects,r);
     if (!valid && r.startsWith(Constants.INSTALLED_APP_URL) && r.indexOf(':',Constants.INSTALLED_APP_URL.length()) >= 0) {
       int i=r.indexOf(':',Constants.INSTALLED_APP_URL.length());

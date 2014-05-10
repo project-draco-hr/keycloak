@@ -1,0 +1,38 @@
+{
+  AuthenticationManager auth=new AuthenticationManager(providers);
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=locateRealm(name,realmManager);
+  ClientModel client=realm.findClient(client_id);
+  if (client == null) {
+    throw new NotFoundException("could not find client: " + client_id);
+  }
+  AuthenticationManager.AuthResult result=auth.authenticateIdentityCookie(realm,uriInfo,headers);
+  if (result == null) {
+    throw new UnauthorizedException("not logged in, can't get page");
+  }
+  InputStream is=getClass().getClassLoader().getResourceAsStream("login-status-iframe.html");
+  if (is == null)   throw new NotFoundException("Could not find login-status-iframe.html ");
+  Set<String> redirectUris=TokenService.resolveValidRedirects(uriInfo,client.getRedirectUris());
+  String origin=null;
+  for (  String redirect : redirectUris) {
+    int index=redirect.indexOf("://");
+    if (index == -1)     continue;
+    index=redirect.indexOf('/',index + 3);
+    if (index == -1) {
+      origin=redirect;
+    }
+ else {
+      origin=redirect.substring(0,index);
+    }
+    break;
+  }
+  String file=null;
+  try {
+    file=StreamUtil.readString(is);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  file=file.replace("ORIGIN",origin);
+  return file;
+}

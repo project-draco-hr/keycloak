@@ -1,0 +1,17 @@
+{
+  ApplicationModel adminConsole=new ApplicationManager(this).createApplication(realm,Constants.ADMIN_CONSOLE_APPLICATION);
+  String baseUrl=contextPath + "/admin/" + realm.getName()+ "/console";
+  adminConsole.setBaseUrl(baseUrl + "/index.html");
+  adminConsole.setEnabled(true);
+  adminConsole.setPublicClient(true);
+  adminConsole.addRedirectUri(baseUrl + "/*");
+  RoleModel adminRole;
+  if (realm.getName().equals(Config.getAdminRealm())) {
+    adminRole=realm.getRole(AdminRoles.ADMIN);
+  }
+ else {
+    ApplicationModel realmApp=realm.getApplicationByName(getRealmAdminApplicationName(realm));
+    adminRole=realmApp.getRole(AdminRoles.REALM_ADMIN);
+  }
+  realm.addScopeMapping(adminConsole,adminRole);
+}

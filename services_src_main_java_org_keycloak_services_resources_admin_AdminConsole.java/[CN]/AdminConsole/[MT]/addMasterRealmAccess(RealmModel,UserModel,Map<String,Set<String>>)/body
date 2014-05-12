@@ -1,0 +1,14 @@
+{
+  List<RealmModel> realms=session.getRealms();
+  for (  RealmModel realm : realms) {
+    ApplicationModel realmAdminApp=realm.getMasterAdminApp();
+    Set<RoleModel> roles=realmAdminApp.getRoles();
+    for (    RoleModel role : roles) {
+      if (!masterRealm.hasRole(user,role))       continue;
+      if (!realmAdminAccess.containsKey(realm.getName())) {
+        realmAdminAccess.put(realm.getName(),new HashSet<String>());
+      }
+      realmAdminAccess.get(realm.getName()).add(role.getName());
+    }
+  }
+}

@@ -5,7 +5,7 @@
     return Response.status(401).build();
   }
   String displayName;
-  if (user.getFirstName() != null || user.getLastName() != null) {
+  if ((user.getFirstName() != null && !user.getFirstName().trim().equals("")) || (user.getLastName() != null && !user.getLastName().trim().equals(""))) {
     displayName=user.getFirstName();
     if (user.getLastName() != null) {
       displayName=displayName != null ? displayName + " " + user.getLastName() : user.getLastName();
@@ -15,12 +15,20 @@
     displayName=user.getLoginName();
   }
   RealmModel masterRealm=getAdminstrationRealm(realmManager);
+  Map<String,Set<String>> realmAccess=new HashMap<String,Set<String>>();
   if (masterRealm == null)   throw new NotFoundException("No realm found");
   boolean createRealm=false;
   if (realm.equals(masterRealm)) {
+    logger.info("setting up realm access for a master realm user");
     createRealm=masterRealm.hasRole(user,masterRealm.getRole(AdminRoles.CREATE_REALM));
+    addMasterRealmAccess(realm,user,realmAccess);
   }
-  Map<String,Set<String>> realmAccess=new HashMap<String,Set<String>>();
-  addRealmAdminAccess(realmAccess,realm.getRoleMappings(user));
+ else {
+    logger.info("setting up realm access for a realm user");
+    addRealmAccess(realm,user,realmAccess);
+  }
+  if (realmAccess.size() == 0) {
+    return Response.status(401).build();
+  }
   return Response.ok(new WhoAmI(user.getId(),realm.getName(),displayName,createRealm,realmAccess)).build();
 }

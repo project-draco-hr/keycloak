@@ -1,6 +1,10 @@
 {
   try {
-    Theme theme=ThemeLoader.createTheme(Config.getThemeAdmin(),Theme.Type.ADMIN);
+    String themeName=realm.getAdminTheme();
+    if (themeName == null || themeName.trim().equals("")) {
+      themeName=Config.getThemeAdmin();
+    }
+    Theme theme=ThemeLoader.createTheme(themeName,Theme.Type.ADMIN);
     InputStream resource=theme.getResourceAsStream(path);
     if (resource != null) {
       String contentType=mimeTypes.getContentType(path);

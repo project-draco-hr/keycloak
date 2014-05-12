@@ -1,0 +1,13 @@
+{
+  if (realm.getName().equals(Config.getAdminRealm())) {
+    return;
+  }
+  ApplicationManager applicationManager=new ApplicationManager(new RealmManager(identitySession));
+  ApplicationModel realmAdminApp=applicationManager.createApplication(realm,getRealmAdminApplicationName(realm));
+  RoleModel adminRole=realmAdminApp.addRole(AdminRoles.REALM_ADMIN);
+  realmAdminApp.setBearerOnly(true);
+  for (  String r : AdminRoles.ALL_REALM_ROLES) {
+    RoleModel role=realmAdminApp.addRole(r);
+    adminRole.addCompositeRole(role);
+  }
+}

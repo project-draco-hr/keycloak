@@ -5,7 +5,13 @@
   if (!auth.getRealm().equals(realmManager.getKeycloakAdminstrationRealm()) && !auth.getRealm().equals(realm)) {
     throw new ForbiddenException();
   }
-  RealmAuth realmAuth=new RealmAuth(auth,realm.getAdminApp());
+  RealmAuth realmAuth;
+  if (auth.getRealm().equals(realmManager.getKeycloakAdminstrationRealm())) {
+    realmAuth=new RealmAuth(auth,realm.getMasterAdminApp());
+  }
+ else {
+    realmAuth=new RealmAuth(auth,realm.getApplicationByName(realmManager.getRealmAdminApplicationName(auth.getRealm())));
+  }
   RealmAdminResource adminResource=new RealmAdminResource(realmAuth,realm,tokenManager);
   ResteasyProviderFactory.getInstance().injectProperties(adminResource);
   return adminResource;

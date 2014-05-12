@@ -1,0 +1,15 @@
+{
+  super.setupDefaultRealm(contextPath);
+  KeycloakSession session=factory.createSession();
+  session.getTransaction().begin();
+  try {
+    RealmManager manager=new RealmManager(session);
+    RealmModel master=manager.getKeycloakAdminstrationRealm();
+    UserModel admin=master.getUser("admin");
+    if (admin != null)     master.removeUser(admin.getLoginName());
+    session.getTransaction().commit();
+  }
+  finally {
+    session.close();
+  }
+}

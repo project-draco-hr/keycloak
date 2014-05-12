@@ -4,11 +4,12 @@
   if (auth.getRealm().equals(realmManager.getKeycloakAdminstrationRealm())) {
     List<RealmModel> realms=session.getRealms();
     for (    RealmModel realm : realms) {
-      addRealmRep(reps,realm);
+      addRealmRep(reps,realm,realm.getMasterAdminApp());
     }
   }
  else {
-    addRealmRep(reps,auth.getRealm());
+    ApplicationModel adminApp=auth.getRealm().getApplicationByName(realmManager.getRealmAdminApplicationName(auth.getRealm()));
+    addRealmRep(reps,auth.getRealm(),adminApp);
   }
   logger.debug(("getRealms()"));
   return reps;

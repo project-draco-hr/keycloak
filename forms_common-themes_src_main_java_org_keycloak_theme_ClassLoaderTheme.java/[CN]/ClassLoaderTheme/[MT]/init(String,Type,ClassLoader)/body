@@ -1,0 +1,20 @@
+{
+  this.name=name;
+  this.type=type;
+  this.classLoader=classLoader;
+  String themeRoot="theme/" + type.toString().toLowerCase() + "/"+ name+ "/";
+  this.templateRoot=themeRoot;
+  this.resourceRoot=themeRoot + "resources/";
+  this.messages=themeRoot + "messages/messages.properties";
+  this.properties=new Properties();
+  URL p=classLoader.getResource(themeRoot + "theme.properties");
+  if (p != null) {
+    properties.load(p.openStream());
+    this.parentName=properties.getProperty("parent");
+    this.importName=properties.getProperty("import");
+  }
+ else {
+    this.parentName=null;
+    this.importName=null;
+  }
+}

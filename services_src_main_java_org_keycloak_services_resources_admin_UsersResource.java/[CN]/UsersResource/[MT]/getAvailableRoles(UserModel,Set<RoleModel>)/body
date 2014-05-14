@@ -1,0 +1,12 @@
+{
+  Set<RoleModel> roles=new HashSet<RoleModel>();
+  for (  RoleModel roleModel : available) {
+    if (realm.hasRole(user,roleModel))     continue;
+    roles.add(roleModel);
+  }
+  List<RoleRepresentation> mappings=new ArrayList<RoleRepresentation>();
+  for (  RoleModel roleModel : roles) {
+    mappings.add(ModelToRepresentation.toRepresentation(roleModel));
+  }
+  return mappings;
+}

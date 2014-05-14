@@ -35,7 +35,7 @@
   if (referrer != null) {
     attributes.put("referrer",new ReferrerBean(referrer));
   }
-  attributes.put("url",new UrlBean(realm,theme,baseUri,baseQueryUri));
+  attributes.put("url",new UrlBean(realm,theme,baseUri,baseQueryUri,uriInfo.getRequestUri()));
   attributes.put("features",new FeaturesBean(social,audit,passwordUpdateSupported));
 switch (page) {
 case ACCOUNT:
@@ -49,6 +49,10 @@ attributes.put("social",new AccountSocialBean(realm,user,uriInfo.getBaseUri()));
 break;
 case LOG:
 attributes.put("log",new LogBean(events));
+break;
+case SESSIONS:
+attributes.put("sessions",new SessionsBean(sessions));
+break;
 }
 try {
 String result=FreeMarkerUtil.processTemplate(attributes,Templates.getTemplate(page),theme);

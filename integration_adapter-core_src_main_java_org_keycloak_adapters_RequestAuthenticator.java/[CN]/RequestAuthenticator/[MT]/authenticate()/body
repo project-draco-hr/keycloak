@@ -1,5 +1,9 @@
 {
   log.info("--> authenticate()");
+  if (!facade.getRequest().isSecure() && deployment.isSslRequired()) {
+    log.warn("SSL is required to authenticate");
+    return AuthOutcome.FAILED;
+  }
   BearerTokenRequestAuthenticator bearer=createBearerTokenAuthenticator();
   log.info("try bearer");
   AuthOutcome outcome=bearer.authenticate(facade);

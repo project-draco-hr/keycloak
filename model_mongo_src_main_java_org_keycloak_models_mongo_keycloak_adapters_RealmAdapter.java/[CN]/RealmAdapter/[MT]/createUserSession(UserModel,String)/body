@@ -3,9 +3,8 @@
   entity.setUser(user.getId());
   entity.setIpAddress(ipAddress);
   int currentTime=Time.currentTime();
-  int expires=currentTime + realm.getSsoSessionIdleTimeout();
   entity.setStarted(currentTime);
-  entity.setExpires(expires);
+  entity.setLastSessionRefresh(currentTime);
   getMongoStore().insertEntity(entity,invocationContext);
   return new UserSessionAdapter(entity,this,invocationContext);
 }

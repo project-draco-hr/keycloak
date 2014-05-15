@@ -81,7 +81,7 @@
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   UserSessionModel session=realm.getUserSession(accessCode.getSessionState());
-  if (session == null || session.getExpires() < Time.currentTime()) {
+  if (AuthenticationManager.isSessionValid(realm,session)) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
     res.put(OAuth2Constants.ERROR_DESCRIPTION,"Session not active");

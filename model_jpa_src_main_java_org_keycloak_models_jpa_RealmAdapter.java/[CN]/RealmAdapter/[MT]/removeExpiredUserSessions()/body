@@ -1,3 +1,3 @@
 {
-  em.createNamedQuery("removeUserSessionExpired").setParameter("currentTime",Time.currentTime()).executeUpdate();
+  em.createNamedQuery("removeUserSessionExpired").setParameter("maxTime",Time.currentTime() - getSsoSessionMaxLifespan()).setParameter("idleTime",Time.currentTime() - getSsoSessionIdleTimeout()).executeUpdate();
 }

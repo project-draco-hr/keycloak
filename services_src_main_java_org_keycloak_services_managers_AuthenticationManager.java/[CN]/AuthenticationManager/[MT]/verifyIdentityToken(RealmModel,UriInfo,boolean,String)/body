@@ -6,7 +6,6 @@
       logger.info("Checking if identity token is active");
       if (!token.isActive() || token.getIssuedAt() < realm.getNotBefore()) {
         logger.info("identity cookie expired");
-        expireIdentityCookie(realm,uriInfo);
         return null;
       }
  else {
@@ -25,9 +24,12 @@
       return null;
     }
     UserSessionModel session=realm.getUserSession(token.getSessionState());
-    if (session == null || session.getExpires() < Time.currentTime()) {
+    int currentTime=Time.currentTime();
+    if (isSessionValid(realm,session)) {
+      if (session != null) {
+        realm.removeUserSession(session);
+      }
       logger.info("User session not active");
-      expireIdentityCookie(realm,uriInfo);
       return null;
     }
     return new AuthResult(user,session);

@@ -1,6 +1,10 @@
 {
   AuthResult authResult=authenticateIdentityCookie(realm,uriInfo,headers);
   if (authResult != null) {
+    Cookie remember=headers.getCookies().get(AuthenticationManager.KEYCLOAK_REMEMBER_ME);
+    boolean rememberMe=remember != null;
+    createLoginCookie(realm,authResult.getUser(),authResult.getSession(),uriInfo,rememberMe);
+    if (rememberMe)     createRememberMeCookie(realm,uriInfo);
     return authResult.getUser();
   }
  else {

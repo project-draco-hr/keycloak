@@ -1,6 +1,6 @@
 {
   realmManager.createRealm("userSessions");
-  realmManager.getRealmByName("userSessions").setCentralLoginLifespan(5);
+  realmManager.getRealmByName("userSessions").setSsoSessionIdleTimeout(5);
   UserModel user=realmManager.getRealmByName("userSessions").addUser("userSessions1");
   UserSessionModel userSession=realmManager.getRealmByName("userSessions").createUserSession(user,"127.0.0.1");
   commit();
@@ -14,7 +14,7 @@
   realmManager.getRealmByName("userSessions").removeUserSessions(user);
   commit();
   assertNull(realmManager.getRealmByName("userSessions").getUserSession(userSession.getId()));
-  realmManager.getRealmByName("userSessions").setCentralLoginLifespan(1);
+  realmManager.getRealmByName("userSessions").setSsoSessionIdleTimeout(1);
   userSession=realmManager.getRealmByName("userSessions").createUserSession(user,"127.0.0.1");
   commit();
   Thread.sleep(2000);

@@ -2,7 +2,8 @@
   super.setupTest(context);
   worker=getWorker();
   factory=getFactory();
-  KeycloakSession identitySession=factory.createSession();
+  ProviderSession providerSession=factory.createSession();
+  KeycloakSession identitySession=providerSession.getProvider(KeycloakSession.class);
   KeycloakTransaction transaction=identitySession.getTransaction();
   transaction.begin();
   int workerId=counter.getAndIncrement();
@@ -17,6 +18,6 @@
  else {
       transaction.rollback();
     }
-    identitySession.close();
+    providerSession.close();
   }
 }

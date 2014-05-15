@@ -1,6 +1,6 @@
 {
-  KeycloakSession keycloakSession=keycloakSessionFactory.createSession();
   ProviderSession providerSession=providerSessionFactory.createSession();
+  KeycloakSession keycloakSession=providerSession.getProvider(KeycloakSession.class);
   try {
     keycloakSession.getTransaction().begin();
     task.run(keycloakSession,providerSession);
@@ -12,12 +12,6 @@
     keycloakSession.getTransaction().rollback();
   }
  finally {
-    try {
-      keycloakSession.close();
-    }
- catch (    Throwable t) {
-      logger.error("Failed to close KeycloakSession",t);
-    }
     try {
       providerSession.close();
     }

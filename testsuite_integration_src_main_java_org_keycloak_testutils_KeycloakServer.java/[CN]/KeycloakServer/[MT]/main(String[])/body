@@ -26,9 +26,8 @@
     if (!dir.isDirectory() || !new File(dir,"forms").isDirectory()) {
       throw new RuntimeException("Invalid resources directory");
     }
-    if (Config.getThemeDir() == null) {
-      System.setProperty(DefaultKeycloakThemeProvider.class.getName() + ".disabled","");
-      Config.setThemeDir(file(dir.getAbsolutePath(),"forms","common-themes","src","main","resources","theme").getAbsolutePath());
+    if (!System.getProperties().containsKey("keycloak.theme.dir")) {
+      System.setProperty("keycloak.theme.dir",file(dir.getAbsolutePath(),"forms","common-themes","src","main","resources","theme").getAbsolutePath());
     }
     config.setResourcesHome(dir.getAbsolutePath());
   }

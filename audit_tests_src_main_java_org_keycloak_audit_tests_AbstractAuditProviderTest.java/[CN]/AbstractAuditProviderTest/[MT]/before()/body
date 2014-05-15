@@ -1,6 +1,11 @@
 {
-  ProviderFactoryLoader<AuditProvider> loader=ProviderFactoryLoader.create(AuditProviderFactory.class);
-  factory=loader.find(getProviderId());
-  factory.init();
+  String providerId=getProviderId();
+  ServiceLoader<AuditProviderFactory> factories=ServiceLoader.load(AuditProviderFactory.class);
+  for (  AuditProviderFactory f : factories) {
+    if (f.getId().equals(providerId)) {
+      factory=f;
+      factory.init(Config.scope("audit",providerId));
+    }
+  }
   provider=factory.create(null);
 }

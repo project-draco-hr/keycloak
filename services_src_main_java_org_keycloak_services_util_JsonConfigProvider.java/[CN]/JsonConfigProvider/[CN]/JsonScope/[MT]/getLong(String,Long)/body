@@ -1,0 +1,15 @@
+{
+  if (config == null) {
+    return defaultValue;
+  }
+  JsonNode n=config.get(key);
+  if (n == null) {
+    return defaultValue;
+  }
+  if (n.isTextual()) {
+    return Long.parseLong(StringPropertyReplacer.replaceProperties(n.getTextValue()));
+  }
+ else {
+    return n.getLongValue();
+  }
+}

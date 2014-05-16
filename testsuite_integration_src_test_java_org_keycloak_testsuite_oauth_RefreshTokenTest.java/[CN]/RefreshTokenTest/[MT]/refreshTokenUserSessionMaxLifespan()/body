@@ -1,0 +1,25 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  Event loginEvent=events.expectLogin().assertEvent();
+  String sessionId=loginEvent.getSessionId();
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
+  events.poll();
+  String refreshId=oauth.verifyRefreshToken(tokenResponse.getRefreshToken()).getId();
+  KeycloakSession session=keycloakRule.startSession();
+  RealmModel realm=session.getRealmByName("test");
+  int maxLifespan=realm.getSsoSessionMaxLifespan();
+  realm.setSsoSessionMaxLifespan(1);
+  keycloakRule.stopSession(session,true);
+  Thread.sleep(1000);
+  tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
+  assertEquals(400,tokenResponse.getStatusCode());
+  assertNull(tokenResponse.getAccessToken());
+  assertNull(tokenResponse.getRefreshToken());
+  session=keycloakRule.startSession();
+  realm=session.getRealmByName("test");
+  realm.setSsoSessionMaxLifespan(maxLifespan);
+  keycloakRule.stopSession(session,true);
+  events.expectRefresh(refreshId,sessionId).error(Errors.INVALID_TOKEN);
+  events.clear();
+}

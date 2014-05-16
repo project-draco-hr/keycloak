@@ -1,0 +1,7 @@
+{
+  if (session == null)   return false;
+  int currentTime=Time.currentTime();
+  int max=session.getStarted() + realm.getSsoSessionMaxLifespan();
+  boolean valid=session != null && session.getLastSessionRefresh() + realm.getSsoSessionIdleTimeout() > currentTime && max > currentTime;
+  return valid;
+}

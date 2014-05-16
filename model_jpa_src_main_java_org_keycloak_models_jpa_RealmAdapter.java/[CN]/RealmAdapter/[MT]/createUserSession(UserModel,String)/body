@@ -3,9 +3,8 @@
   entity.setUser(((UserAdapter)user).getUser());
   entity.setIpAddress(ipAddress);
   int currentTime=Time.currentTime();
-  int expires=currentTime + realm.getCentralLoginLifespan();
   entity.setStarted(currentTime);
-  entity.setExpires(expires);
+  entity.setLastSessionRefresh(currentTime);
   em.persist(entity);
   return new UserSessionAdapter(entity);
 }

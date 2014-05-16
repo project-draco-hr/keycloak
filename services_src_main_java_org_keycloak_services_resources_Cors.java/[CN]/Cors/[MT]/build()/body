@@ -13,9 +13,15 @@
  else {
     response.header(ACCESS_CONTROL_ALLOW_METHODS,DEFAULT_ALLOW_METHODS);
   }
+  if (exposedHeaders != null) {
+    response.header(ACCESS_CONTROL_EXPOSE_HEADERS,CollectionUtil.join(exposedHeaders));
+  }
   response.header(ACCESS_CONTROL_ALLOW_CREDENTIALS,Boolean.toString(auth));
   if (auth) {
-    response.header(ACCESS_CONTROL_ALLOW_HEADERS,AUTHORIZATION_HEADER);
+    response.header(ACCESS_CONTROL_ALLOW_HEADERS,String.format("%s, %s",DEFAULT_ALLOW_HEADERS,AUTHORIZATION_HEADER));
+  }
+ else {
+    response.header(ACCESS_CONTROL_ALLOW_HEADERS,DEFAULT_ALLOW_HEADERS);
   }
   response.header(ACCESS_CONTROL_MAX_AGE,DEFAULT_MAX_AGE);
   return response.build();

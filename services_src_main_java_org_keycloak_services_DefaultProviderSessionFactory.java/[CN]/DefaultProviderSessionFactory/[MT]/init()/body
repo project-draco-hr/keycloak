@@ -1,5 +1,32 @@
 {
-  for (  ProviderFactoryLoader l : loaders.values()) {
-    l.init();
+  for (  Spi spi : ServiceLoader.load(Spi.class)) {
+    Map<String,ProviderFactory> factories=new HashMap<String,ProviderFactory>();
+    factoriesMap.put(spi.getProviderClass(),factories);
+    String provider=Config.getProvider(spi.getName());
+    if (provider != null) {
+      this.provider.put(spi.getProviderClass(),provider);
+      ProviderFactory factory=loadProviderFactory(spi,provider);
+      Config.Scope scope=Config.scope(spi.getName(),provider);
+      factory.init(scope);
+      log.debug("Initialized " + factory.getClass().getName() + " (config = "+ scope+ ")");
+      factories.put(factory.getId(),factory);
+      log.info("Loaded SPI " + spi.getName() + " (provider = "+ provider+ ")");
+    }
+ else {
+      for (      ProviderFactory factory : ServiceLoader.load(spi.getProviderFactoryClass())) {
+        Config.Scope scope=Config.scope(spi.getName(),factory.getId());
+        factory.init(scope);
+        log.debug("Initialized " + factory.getClass().getName() + " (config = "+ scope+ ")");
+        factories.put(factory.getId(),factory);
+      }
+      if (factories.size() == 1) {
+        provider=factories.values().iterator().next().getId();
+        this.provider.put(spi.getProviderClass(),provider);
+        log.info("Loaded SPI " + spi.getName() + " (provider = "+ provider+ ")");
+      }
+ else {
+        log.info("Loaded SPI " + spi.getName() + " (providers = "+ factories.keySet()+ ")");
+      }
+    }
   }
 }

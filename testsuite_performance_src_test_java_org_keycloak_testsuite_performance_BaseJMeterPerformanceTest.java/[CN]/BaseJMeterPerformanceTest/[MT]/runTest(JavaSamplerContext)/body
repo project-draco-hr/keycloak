@@ -8,7 +8,8 @@
     result.setSuccessful(true);
     return result;
   }
-  KeycloakSession identitySession=factory.createSession();
+  ProviderSession providerSession=factory.createSession();
+  KeycloakSession identitySession=providerSession.getProvider(KeycloakSession.class);
   KeycloakTransaction transaction=identitySession.getTransaction();
   try {
     transaction.begin();
@@ -24,7 +25,7 @@
  finally {
     result.sampleEnd();
     result.setSuccessful(true);
-    identitySession.close();
+    providerSession.close();
   }
   return result;
 }

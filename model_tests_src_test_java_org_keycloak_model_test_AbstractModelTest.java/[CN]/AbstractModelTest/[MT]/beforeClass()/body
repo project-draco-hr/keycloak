@@ -1,13 +1,13 @@
 {
-  factory=KeycloakApplication.createSessionFactory();
   providerSessionFactory=KeycloakApplication.createProviderSessionFactory();
-  KeycloakSession identitySession=factory.createSession();
+  ProviderSession providerSession=providerSessionFactory.createSession();
+  KeycloakSession identitySession=providerSession.getProvider(KeycloakSession.class);
   try {
     identitySession.getTransaction().begin();
     new ApplianceBootstrap().bootstrap(identitySession,"/auth");
     identitySession.getTransaction().commit();
   }
   finally {
-    identitySession.close();
+    providerSession.close();
   }
 }

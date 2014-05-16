@@ -1,0 +1,22 @@
+{
+  try {
+    String host=config.get("host",ServerAddress.defaultHost());
+    int port=config.getInt("port",ServerAddress.defaultPort());
+    String dbName=config.get("db","keycloak-audit");
+    boolean clearOnStartup=config.getBoolean("clearOnStartup",false);
+    String user=config.get("user");
+    String password=config.get("password");
+    if (user != null && password != null) {
+      MongoCredential credential=MongoCredential.createMongoCRCredential(user,dbName,password.toCharArray());
+      client=new MongoClient(new ServerAddress(host,port),Collections.singletonList(credential));
+    }
+ else {
+      client=new MongoClient(host,port);
+    }
+    DB db=client.getDB(dbName);
+    this.mongoStore=new MongoStoreImpl(db,clearOnStartup,MANAGED_ENTITY_TYPES);
+  }
+ catch (  UnknownHostException e) {
+    throw new RuntimeException(e);
+  }
+}

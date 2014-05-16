@@ -1,8 +1,8 @@
 {
-  KeycloakSession keycloakSession=startSession();
-  RealmModel realm=keycloakSession.getRealm("test");
+  ProviderSession providerSession=startSession();
+  RealmModel realm=providerSession.getProvider(KeycloakSession.class).getRealm("test");
   UserSessionModel session=realm.getUserSession(sessionId);
   assertNotNull(session);
   realm.removeUserSession(session);
-  stopSession(keycloakSession,true);
+  stopSession(providerSession,true);
 }

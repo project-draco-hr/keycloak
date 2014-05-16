@@ -31,8 +31,8 @@
     audit.detail(Details.REMEMBER_ME,"true");
   }
   UserSessionModel session=realm.getUserSession(accessCodeEntry.getSessionState());
-  int currentTime=Time.currentTime();
-  if (AuthenticationManager.isSessionValid(realm,session)) {
+  if (!AuthenticationManager.isSessionValid(realm,session)) {
+    AuthenticationManager.logout(realm,session,uriInfo);
     audit.error(Errors.INVALID_CODE);
     return oauth.forwardToSecurityFailure("Session not active");
   }

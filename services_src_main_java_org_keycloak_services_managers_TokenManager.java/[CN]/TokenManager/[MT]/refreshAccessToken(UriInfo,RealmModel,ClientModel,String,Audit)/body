@@ -26,10 +26,8 @@
   }
   UserSessionModel session=realm.getUserSession(refreshToken.getSessionState());
   int currentTime=Time.currentTime();
-  if (AuthenticationManager.isSessionValid(realm,session)) {
-    if (session != null) {
-      realm.removeUserSession(session);
-    }
+  if (!AuthenticationManager.isSessionValid(realm,session)) {
+    AuthenticationManager.logout(realm,session,uriInfo);
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Session not active","Session not active");
   }
   if (!client.getClientId().equals(refreshToken.getIssuedFor())) {

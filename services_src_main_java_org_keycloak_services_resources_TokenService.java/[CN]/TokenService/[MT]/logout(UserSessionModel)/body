@@ -1,9 +1,5 @@
 {
   UserModel user=session.getUser();
-  logger.infov("Logging out: {0} ({1})",user.getLoginName(),session.getId());
-  realm.removeUserSession(session);
-  authManager.expireIdentityCookie(realm,uriInfo);
-  authManager.expireRememberMeCookie(realm,uriInfo);
-  resourceAdminManager.logoutUser(uriInfo.getRequestUri(),realm,user.getId(),session.getId());
+  authManager.logout(realm,session,uriInfo);
   audit.user(user).session(session).success();
 }

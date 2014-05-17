@@ -6,13 +6,20 @@
   session.setPrincipal(null);
   session.setAuthType(null);
   String username=principal.getUserPrincipal().getName();
-synchronized (userSessionMap) {
-    UserSessions sessions=userSessionMap.get(username);
-    if (sessions != null) {
-      sessions.getSessions().remove(session.getId());
-      if (sessions.getSessions().isEmpty()) {
-        userSessionMap.remove(username);
-      }
+  UserSessions userSessions=userSessionMap.get(username);
+  if (userSessions == null) {
+    return;
+  }
+  String sessionid=session.getId();
+synchronized (this) {
+    String keycloakSessionId=userSessions.httpSessionToKeycloakSession.remove(sessionid);
+    if (keycloakSessionId != null) {
+      userSessions.keycloakSessionToHttpSession.remove(keycloakSessionId);
+      keycloakSessionMap.remove(keycloakSessionId);
+    }
+    userSessions.sessions.remove(sessionid);
+    if (userSessions.httpSessionToKeycloakSession.size() == 0) {
+      userSessionMap.remove(username);
     }
   }
 }

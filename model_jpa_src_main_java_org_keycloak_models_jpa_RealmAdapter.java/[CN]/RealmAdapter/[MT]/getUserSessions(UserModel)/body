@@ -1,7 +1,7 @@
 {
   List<UserSessionModel> sessions=new LinkedList<UserSessionModel>();
   for (  UserSessionEntity e : em.createNamedQuery("getUserSessionByUser",UserSessionEntity.class).setParameter("user",((UserAdapter)user).getUser()).getResultList()) {
-    sessions.add(new UserSessionAdapter(e));
+    sessions.add(new UserSessionAdapter(em,this,e));
   }
   return sessions;
 }

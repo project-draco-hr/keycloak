@@ -4,6 +4,7 @@
   if (user == null) {
     throw new NotFoundException("User not found");
   }
+  realm.removeUserSessions(user);
   user.setNotBefore(Time.currentTime());
   new ResourceAdminManager().logoutUser(uriInfo.getRequestUri(),realm,user.getId(),null);
 }

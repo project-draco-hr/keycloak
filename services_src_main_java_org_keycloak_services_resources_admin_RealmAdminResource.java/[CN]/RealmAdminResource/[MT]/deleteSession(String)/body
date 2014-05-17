@@ -1,0 +1,6 @@
+{
+  UserSessionModel session=realm.getUserSession(sessionId);
+  if (session == null)   throw new NotFoundException("Sesssion not found");
+  realm.removeUserSession(session);
+  new ResourceAdminManager().logoutSession(uriInfo.getRequestUri(),realm,session.getId());
+}

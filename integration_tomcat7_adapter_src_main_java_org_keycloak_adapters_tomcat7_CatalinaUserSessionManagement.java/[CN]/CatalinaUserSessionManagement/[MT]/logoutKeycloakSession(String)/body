@@ -1,0 +1,17 @@
+{
+  UserSessions sessions=keycloakSessionMap.remove(keycloakSessionId);
+  if (sessions == null) {
+    return;
+  }
+  String sessionId=sessions.keycloakSessionToHttpSession.remove(keycloakSessionId);
+  if (sessionId == null) {
+  }
+  sessions.httpSessionToKeycloakSession.remove(sessionId);
+  Session session=sessions.sessions.remove(sessionId);
+  session.setPrincipal(null);
+  session.setAuthType(null);
+  session.getSession().invalidate();
+  if (sessions.keycloakSessionToHttpSession.size() == 0) {
+    userSessionMap.remove(sessions.user);
+  }
+}

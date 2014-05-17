@@ -1,0 +1,10 @@
+{
+  List<ClientModel> clients=getClientAssociations();
+  for (  ClientModel ass : clients) {
+    if (ass.getId().equals(client.getId()))     return;
+  }
+  MongoClientUserSessionAssociationEntity association=new MongoClientUserSessionAssociationEntity();
+  association.setClientId(client.getId());
+  association.setSessionId(getId());
+  getMongoStore().insertEntity(association,invocationContext);
+}

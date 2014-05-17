@@ -1,0 +1,23 @@
+{
+  log.debug("logoutUser: " + user);
+  UserSessions sessions=null;
+  sessions=userSessionMap.remove(user);
+  if (sessions == null) {
+    log.debug("no session for user: " + user);
+    return;
+  }
+  log.debug("found session for user");
+  for (  Map.Entry<String,String> entry : sessions.httpSessionToKeycloakSession.entrySet()) {
+    log.debug("invalidating session for user: " + user);
+    String sessionId=entry.getKey();
+    String keycloakSessionId=entry.getValue();
+    Session session=manager.getSession(sessionId);
+    try {
+      session.invalidate(null);
+    }
+ catch (    Exception e) {
+      log.warn("Session already invalidated.");
+    }
+    keycloakSessionMap.remove(keycloakSessionId);
+  }
+}

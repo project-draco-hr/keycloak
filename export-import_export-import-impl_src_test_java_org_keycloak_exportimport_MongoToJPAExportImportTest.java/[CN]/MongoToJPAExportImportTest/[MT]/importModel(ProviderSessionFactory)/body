@@ -1,0 +1,19 @@
+{
+  ExportImportConfig.setAction(ExportImportProviderImpl.ACTION_IMPORT);
+  ExportImportConfig.setProvider(EncryptedZIPIOProvider.PROVIDER_ID);
+  File zipFile=getZipFile();
+  ExportImportConfig.setZipFile(zipFile.getAbsolutePath());
+  ExportImportConfig.setZipPassword("password-invalid");
+  try {
+    new ExportImportProviderImpl().checkExportImport(factory);
+    Assert.fail("Not expected to be here. Exception should be thrown");
+  }
+ catch (  Exception e) {
+  }
+  ;
+  ExportImportConfig.setZipPassword("password123");
+  new ExportImportProviderImpl().checkExportImport(factory);
+  if (zipFile.exists()) {
+    zipFile.delete();
+  }
+}

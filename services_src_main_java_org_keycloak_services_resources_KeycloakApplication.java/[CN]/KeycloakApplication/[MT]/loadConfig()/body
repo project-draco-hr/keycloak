@@ -1,0 +1,14 @@
+{
+  try {
+    URL config=Thread.currentThread().getContextClassLoader().getResource("META-INF/keycloak-server.json");
+    if (config != null) {
+      JsonNode node=new ObjectMapper().readTree(config);
+      Config.init(new JsonConfigProvider(node));
+      log.info("Loaded config from " + config);
+      return;
+    }
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Failed to load config",e);
+  }
+}

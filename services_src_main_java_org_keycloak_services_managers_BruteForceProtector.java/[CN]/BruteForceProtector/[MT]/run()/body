@@ -10,7 +10,8 @@
         events.add(take);
         queue.drainTo(events,TRANSACTION_SIZE);
         Collections.sort(events);
-        KeycloakSession session=factory.createSession();
+        ProviderSession providerSession=factory.createSession();
+        KeycloakSession session=providerSession.getProvider(KeycloakSession.class);
         session.getTransaction().begin();
         try {
           for (          LoginEvent event : events) {
@@ -31,7 +32,7 @@
             }
           }
           events.clear();
-          session.close();
+          providerSession.close();
         }
       }
  catch (      Exception e) {

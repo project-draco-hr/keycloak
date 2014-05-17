@@ -1,0 +1,12 @@
+{
+  ProviderSession providerSession=factory.createSession();
+  KeycloakSession session=providerSession.getProvider(KeycloakSession.class);
+  session.getTransaction().begin();
+  try {
+    bootstrap(session,contextPath);
+    session.getTransaction().commit();
+  }
+  finally {
+    providerSession.close();
+  }
+}

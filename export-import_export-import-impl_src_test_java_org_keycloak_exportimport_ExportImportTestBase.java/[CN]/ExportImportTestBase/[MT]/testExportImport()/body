@@ -1,6 +1,6 @@
 {
-  Config.setModelProvider(getExportModelProvider());
-  factory=KeycloakApplication.createSessionFactory();
+  System.setProperty("keycloak.model.provider",getExportModelProvider());
+  factory=KeycloakApplication.createProviderSessionFactory();
   beginTransaction();
   new ApplianceBootstrap().bootstrap(identitySession,"/auth");
   commitTransaction();
@@ -17,8 +17,8 @@
   String appId=realm.getApplicationByName("Application").getId();
   commitTransaction();
   factory.close();
-  Config.setModelProvider(getImportModelProvider());
-  factory=KeycloakApplication.createSessionFactory();
+  System.setProperty("keycloak.model.provider",getImportModelProvider());
+  factory=KeycloakApplication.createProviderSessionFactory();
   importModel(factory);
   beginTransaction();
   RealmModel importedRealm=identitySession.getRealm("demo");

@@ -1,6 +1,7 @@
 {
-  identitySession.close();
-  identitySession=factory.createSession();
+  providerSession.close();
+  providerSession=providerSessionFactory.createSession();
+  identitySession=providerSession.getProvider(KeycloakSession.class);
   identitySession.getTransaction().begin();
   realmManager=new RealmManager(identitySession);
 }

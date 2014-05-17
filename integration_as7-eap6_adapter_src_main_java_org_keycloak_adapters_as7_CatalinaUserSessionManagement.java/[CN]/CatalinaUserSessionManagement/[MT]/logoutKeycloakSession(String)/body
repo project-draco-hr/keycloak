@@ -1,0 +1,20 @@
+{
+  log.debug("logoutKeycloakSession: " + keycloakSessionId);
+  UserSessions sessions=keycloakSessionMap.remove(keycloakSessionId);
+  if (sessions == null) {
+    log.debug("no session for keycloak session id: " + keycloakSessionId);
+    return;
+  }
+  String sessionId=sessions.keycloakSessionToHttpSession.remove(keycloakSessionId);
+  if (sessionId == null) {
+    log.debug("no session for keycloak session id: " + keycloakSessionId);
+  }
+  sessions.httpSessionToKeycloakSession.remove(sessionId);
+  Session session=sessions.sessions.remove(sessionId);
+  session.setPrincipal(null);
+  session.setAuthType(null);
+  session.getSession().invalidate();
+  if (sessions.keycloakSessionToHttpSession.size() == 0) {
+    userSessionMap.remove(sessions.user);
+  }
+}

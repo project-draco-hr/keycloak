@@ -1,0 +1,13 @@
+{
+  String sessionId=session.getId();
+  UserSessions sessions=userSessionMap.get(username);
+  if (sessions == null) {
+    sessions=new UserSessions();
+    sessions.user=username;
+    userSessionMap.put(username,sessions);
+  }
+  keycloakSessionMap.put(keycloakSessionId,sessions);
+  sessions.httpSessionToKeycloakSession.put(sessionId,keycloakSessionId);
+  sessions.keycloakSessionToHttpSession.put(keycloakSessionId,sessionId);
+  session.addSessionListener(this);
+}

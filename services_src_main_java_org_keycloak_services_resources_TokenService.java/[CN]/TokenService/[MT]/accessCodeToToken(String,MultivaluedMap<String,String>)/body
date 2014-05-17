@@ -90,6 +90,7 @@
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   logger.debug("accessRequest SUCCESS");
+  session.associateClient(client);
   AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).accessToken(accessCode.getToken()).generateIDToken().generateRefreshToken().build();
   audit.success();
   return Cors.add(request,Response.ok(res)).auth().allowedOrigins(client).allowedMethods("POST").exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build();

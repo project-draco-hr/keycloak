@@ -1,0 +1,11 @@
+{
+  Set<UserSessionModel> list=new HashSet<UserSessionModel>();
+  TypedQuery<ClientUserSessionAssociationEntity> query=em.createNamedQuery("getClientUserSessionByClient",ClientUserSessionAssociationEntity.class);
+  String id=getId();
+  query.setParameter("clientId",id);
+  List<ClientUserSessionAssociationEntity> results=query.getResultList();
+  for (  ClientUserSessionAssociationEntity entity : results) {
+    list.add(new UserSessionAdapter(em,realm,entity.getSession()));
+  }
+  return list;
+}

@@ -1,0 +1,16 @@
+{
+  String sessionId=session.getId();
+  UserSessions sessions=userSessionMap.get(username);
+  if (sessions == null) {
+    sessions=new UserSessions();
+    sessions.user=username;
+    userSessionMap.put(username,sessions);
+  }
+  sessions.httpSessionToKeycloakSession.put(sessionId,keycloakSessionId);
+  sessions.keycloakSessionToHttpSession.put(keycloakSessionId,sessionId);
+  keycloakSessionMap.put(keycloakSessionId,sessions);
+  if (!registered) {
+    manager.registerSessionListener(this);
+    registered=true;
+  }
+}

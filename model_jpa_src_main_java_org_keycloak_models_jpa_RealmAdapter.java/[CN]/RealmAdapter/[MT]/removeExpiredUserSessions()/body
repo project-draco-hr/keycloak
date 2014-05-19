@@ -1,3 +1,7 @@
 {
-  em.createNamedQuery("removeUserSessionExpired").setParameter("maxTime",Time.currentTime() - getSsoSessionMaxLifespan()).setParameter("idleTime",Time.currentTime() - getSsoSessionIdleTimeout()).executeUpdate();
+  TypedQuery<UserSessionEntity> query=em.createNamedQuery("getUserSessionExpired",UserSessionEntity.class).setParameter("maxTime",Time.currentTime() - getSsoSessionMaxLifespan()).setParameter("idleTime",Time.currentTime() - getSsoSessionIdleTimeout());
+  List<UserSessionEntity> results=query.getResultList();
+  for (  UserSessionEntity entity : results) {
+    em.remove(entity);
+  }
 }

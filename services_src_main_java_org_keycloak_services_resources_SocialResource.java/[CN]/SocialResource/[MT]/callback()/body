@@ -7,7 +7,7 @@
   RealmModel realm=realmManager.getRealmByName(realmName);
   Audit audit=new AuditManager(realm,providers,clientConnection).createAudit().event(Events.LOGIN).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"social@" + provider.getId());
   AuthenticationManager authManager=new AuthenticationManager(providers);
-  OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
+  OAuthFlows oauth=Flows.oauth(providerSession,realm,request,uriInfo,authManager,tokenManager);
   if (!realm.isEnabled()) {
     audit.error(Errors.REALM_DISABLED);
     return oauth.forwardToSecurityFailure("Realm not enabled.");
@@ -44,7 +44,7 @@
     queryParms.putSingle(OAuth2Constants.REDIRECT_URI,redirectUri);
     queryParms.putSingle(OAuth2Constants.RESPONSE_TYPE,responseType);
     audit.error(Errors.REJECTED_BY_USER);
-    return Flows.forms(realm,uriInfo).setQueryParams(queryParms).setWarning("Access denied").createLogin();
+    return Flows.forms(providerSession,realm,uriInfo).setQueryParams(queryParms).setWarning("Access denied").createLogin();
   }
 catch (  SocialProviderException e) {
     logger.error("Failed to process social callback",e);

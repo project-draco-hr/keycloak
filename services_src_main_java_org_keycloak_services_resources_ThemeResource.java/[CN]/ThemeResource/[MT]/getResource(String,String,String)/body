@@ -1,6 +1,7 @@
 {
   try {
-    Theme theme=ThemeLoader.createTheme(themeName,Theme.Type.valueOf(themType.toUpperCase()));
+    ExtendingThemeManager themeManager=new ExtendingThemeManager(providerSession);
+    Theme theme=themeManager.createTheme(themeName,Theme.Type.valueOf(themType.toUpperCase()));
     InputStream resource=theme.getResourceAsStream(path);
     if (resource != null) {
       return Response.ok(resource).type(mimeTypes.getContentType(path)).build();

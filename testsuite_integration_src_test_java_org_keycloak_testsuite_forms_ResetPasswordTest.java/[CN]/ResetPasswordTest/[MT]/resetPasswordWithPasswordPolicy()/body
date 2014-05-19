@@ -14,7 +14,7 @@
   Assert.assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];
   String body=(String)message.getContent();
-  String changePasswordUrl=body.split("\n")[3];
+  String changePasswordUrl=MailUtil.getLink(body);
   String sessionId=events.expectRequiredAction("send_reset_password").user(userId).detail(Details.USERNAME,"login-test").detail(Details.EMAIL,"login@test.com").assertEvent().getSessionId();
   driver.navigate().to(changePasswordUrl.trim());
   updatePasswordPage.assertCurrent();

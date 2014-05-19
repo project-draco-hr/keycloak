@@ -2,7 +2,7 @@
   String username=formData.getFirst("username");
   String email=formData.getFirst("email");
   audit.event(Events.REGISTER).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.USERNAME,username).detail(Details.EMAIL,email).detail(Details.REGISTER_METHOD,"form");
-  OAuthFlows oauth=Flows.oauth(realm,request,uriInfo,authManager,tokenManager);
+  OAuthFlows oauth=Flows.oauth(providerSession,realm,request,uriInfo,authManager,tokenManager);
   if (!realm.isEnabled()) {
     logger.warn("Realm not enabled");
     audit.error(Errors.REALM_DISABLED);
@@ -39,12 +39,12 @@
   }
   if (error != null) {
     audit.error(Errors.INVALID_REGISTRATION);
-    return Flows.forms(realm,uriInfo).setError(error).setFormData(formData).createRegistration();
+    return Flows.forms(providerSession,realm,uriInfo).setError(error).setFormData(formData).createRegistration();
   }
   AuthenticationProviderManager authenticationProviderManager=AuthenticationProviderManager.getManager(realm,providerSession);
   if (realm.getUser(username) != null || authenticationProviderManager.getUser(username) != null) {
     audit.error(Errors.USERNAME_IN_USE);
-    return Flows.forms(realm,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).createRegistration();
+    return Flows.forms(providerSession,realm,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).createRegistration();
   }
   UserModel user=realm.addUser(username);
   user.setEnabled(true);
@@ -67,7 +67,7 @@
     }
     if (!passwordUpdateSuccessful) {
       user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
-      return Flows.forms(realm,uriInfo).setError(passwordUpdateError).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
+      return Flows.forms(providerSession,realm,uriInfo).setError(passwordUpdateError).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
     }
   }
   audit.user(user).success();

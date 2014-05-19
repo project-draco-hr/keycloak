@@ -1,9 +1,10 @@
 {
   RealmManager realmManager=new RealmManager(session);
-  UserModel user=authManager.authenticateBearerToken(realm,uriInfo,headers);
-  if (user == null) {
+  AuthenticationManager.AuthResult authResult=authManager.authenticateBearerToken(realm,uriInfo,headers);
+  if (authResult == null) {
     return Response.status(401).build();
   }
+  UserModel user=authResult.getUser();
   String displayName;
   if ((user.getFirstName() != null && !user.getFirstName().trim().equals("")) || (user.getLastName() != null && !user.getLastName().trim().equals(""))) {
     displayName=user.getFirstName();

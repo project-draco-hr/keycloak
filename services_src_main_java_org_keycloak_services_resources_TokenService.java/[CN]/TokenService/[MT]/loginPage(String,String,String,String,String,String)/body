@@ -21,6 +21,10 @@
     audit.error(Errors.CLIENT_DISABLED);
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
+  if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
+    audit.error(Errors.NOT_ALLOWED);
+    return oauth.forwardToSecurityFailure("Bearer-only applications are not allowed to initiate login");
+  }
   redirect=verifyRedirectUri(uriInfo,redirect,client);
   if (redirect == null) {
     audit.error(Errors.INVALID_REDIRECT_URI);

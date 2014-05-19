@@ -12,9 +12,9 @@
   UserModel user=realm.getUser(username);
   audit.user(user);
   ClientModel client=authorizeClient(authorizationHeader,form,audit);
-  if (client.isPublicClient()) {
+  if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
     audit.error(Errors.NOT_ALLOWED);
-    throw new ForbiddenException("Public clients are not allowed to invoke grants/access");
+    throw new ForbiddenException("Bearer-only applications are not allowed to invoke grants/access");
   }
   if (!realm.isEnabled()) {
     audit.error(Errors.REALM_DISABLED);

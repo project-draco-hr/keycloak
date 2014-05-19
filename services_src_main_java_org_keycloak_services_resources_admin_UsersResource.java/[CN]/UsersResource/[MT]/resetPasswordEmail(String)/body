@@ -13,7 +13,7 @@
   String scope=null;
   ClientModel client=realm.findClient(clientId);
   if (client == null || !client.isEnabled()) {
-    return Flows.errors().error("Account management not enabled",Response.Status.INTERNAL_SERVER_ERROR);
+    return Flows.errors().error("AccountProvider management not enabled",Response.Status.INTERNAL_SERVER_ERROR);
   }
   Set<UserModel.RequiredAction> requiredActions=new HashSet<UserModel.RequiredAction>(user.getRequiredActions());
   requiredActions.add(UserModel.RequiredAction.UPDATE_PASSWORD);
@@ -21,7 +21,11 @@
   accessCode.setRequiredActions(requiredActions);
   accessCode.setExpiration(Time.currentTime() + realm.getAccessCodeLifespanUserAction());
   try {
-    new EmailSender(realm.getSmtpConfig()).sendPasswordReset(user,realm,accessCode,uriInfo);
+    UriBuilder builder=Urls.loginPasswordResetBuilder(uriInfo.getBaseUri());
+    builder.queryParam("key",accessCode.getId());
+    String link=builder.build(realm.getName()).toString();
+    long expiration=TimeUnit.SECONDS.toMinutes(realm.getAccessCodeLifespanUserAction());
+    providerSession.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendPasswordReset(link,expiration);
     return Response.ok().build();
   }
  catch (  EmailException e) {

@@ -1,0 +1,66 @@
+{
+  Map<String,Object> attributes=new HashMap<String,Object>();
+  ExtendingThemeManager themeManager=new ExtendingThemeManager(session);
+  Theme theme;
+  try {
+    theme=themeManager.createTheme(realm.getAccountTheme(),Theme.Type.ACCOUNT);
+  }
+ catch (  IOException e) {
+    logger.error("Failed to create theme",e);
+    return Response.serverError().build();
+  }
+  try {
+    attributes.put("properties",theme.getProperties());
+  }
+ catch (  IOException e) {
+    logger.warn("Failed to load properties",e);
+  }
+  Properties messages;
+  try {
+    messages=theme.getMessages();
+    attributes.put("rb",messages);
+  }
+ catch (  IOException e) {
+    logger.warn("Failed to load messages",e);
+    messages=new Properties();
+  }
+  URI baseUri=uriInfo.getBaseUri();
+  UriBuilder baseUriBuilder=uriInfo.getBaseUriBuilder();
+  for (  Map.Entry<String,List<String>> e : uriInfo.getQueryParameters().entrySet()) {
+    baseUriBuilder.queryParam(e.getKey(),e.getValue().toArray());
+  }
+  URI baseQueryUri=baseUriBuilder.build();
+  if (message != null) {
+    attributes.put("message",new MessageBean(messages.containsKey(message) ? messages.getProperty(message) : message,messageType));
+  }
+  if (referrer != null) {
+    attributes.put("referrer",new ReferrerBean(referrer));
+  }
+  attributes.put("url",new UrlBean(realm,theme,baseUri,baseQueryUri,uriInfo.getRequestUri()));
+  attributes.put("features",new FeaturesBean(social,audit,passwordUpdateSupported));
+switch (page) {
+case ACCOUNT:
+    attributes.put("account",new AccountBean(user));
+  break;
+case TOTP:
+attributes.put("totp",new TotpBean(user,baseUri));
+break;
+case SOCIAL:
+attributes.put("social",new AccountSocialBean(realm,user,uriInfo.getBaseUri()));
+break;
+case LOG:
+attributes.put("log",new LogBean(events));
+break;
+case SESSIONS:
+attributes.put("sessions",new SessionsBean(realm,sessions));
+break;
+}
+try {
+String result=FreeMarkerUtil.processTemplate(attributes,Templates.getTemplate(page),theme);
+return Response.status(status).type(MediaType.TEXT_HTML).entity(result).build();
+}
+ catch (FreeMarkerException e) {
+logger.error("Failed to process template",e);
+return Response.serverError().build();
+}
+}

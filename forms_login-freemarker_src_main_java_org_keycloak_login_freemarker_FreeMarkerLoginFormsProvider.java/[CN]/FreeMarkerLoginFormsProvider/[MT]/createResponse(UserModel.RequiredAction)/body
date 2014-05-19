@@ -1,0 +1,39 @@
+{
+  String actionMessage;
+  LoginFormsPages page;
+switch (action) {
+case CONFIGURE_TOTP:
+    actionMessage=Messages.ACTION_WARN_TOTP;
+  page=LoginFormsPages.LOGIN_CONFIG_TOTP;
+break;
+case UPDATE_PROFILE:
+actionMessage=Messages.ACTION_WARN_PROFILE;
+page=LoginFormsPages.LOGIN_UPDATE_PROFILE;
+break;
+case UPDATE_PASSWORD:
+actionMessage=Messages.ACTION_WARN_PASSWD;
+page=LoginFormsPages.LOGIN_UPDATE_PASSWORD;
+break;
+case VERIFY_EMAIL:
+try {
+UriBuilder builder=Urls.loginActionEmailVerificationBuilder(uriInfo.getBaseUri());
+builder.queryParam("key",accessCodeId);
+String link=builder.build(realm.getName()).toString();
+long expiration=TimeUnit.SECONDS.toMinutes(realm.getAccessCodeLifespanUserAction());
+session.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendVerifyEmail(link,expiration);
+}
+ catch (EmailException e) {
+logger.error("Failed to send verification email",e);
+return setError("emailSendError").createErrorPage();
+}
+actionMessage=Messages.ACTION_WARN_EMAIL;
+page=LoginFormsPages.LOGIN_VERIFY_EMAIL;
+break;
+default :
+return Response.serverError().build();
+}
+if (message == null) {
+setWarning(actionMessage);
+}
+return createResponse(page);
+}

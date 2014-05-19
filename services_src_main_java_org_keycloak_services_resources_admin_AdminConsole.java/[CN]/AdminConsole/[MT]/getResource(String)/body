@@ -3,7 +3,8 @@
     return getKeycloakJs();
   }
   try {
-    Theme theme=ThemeLoader.createTheme(realm.getAdminTheme(),Theme.Type.ADMIN);
+    ExtendingThemeManager themeManager=new ExtendingThemeManager(providerSession);
+    Theme theme=themeManager.createTheme(realm.getAdminTheme(),Theme.Type.ADMIN);
     InputStream resource=theme.getResourceAsStream(path);
     if (resource != null) {
       String contentType=mimeTypes.getContentType(path);

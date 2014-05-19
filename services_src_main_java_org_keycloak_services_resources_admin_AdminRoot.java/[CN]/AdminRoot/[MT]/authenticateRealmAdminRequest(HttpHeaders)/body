@@ -15,8 +15,8 @@
   if (realm == null) {
     throw new UnauthorizedException("Unknown realm in token");
   }
-  UserModel user=authManager.authenticateBearerToken(realm,uriInfo,headers);
-  if (user == null) {
+  AuthenticationManager.AuthResult authResult=authManager.authenticateBearerToken(realm,uriInfo,headers);
+  if (authResult == null) {
     logger.debug("Token not valid");
     throw new UnauthorizedException("Bearer");
   }
@@ -24,6 +24,6 @@
   if (consoleApp == null) {
     throw new NotFoundException("Could not find admin console application");
   }
-  Auth auth=new Auth(realm,user,consoleApp);
+  Auth auth=new Auth(realm,authResult.getUser(),consoleApp);
   return auth;
 }

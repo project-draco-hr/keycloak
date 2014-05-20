@@ -3,7 +3,7 @@
   loginPage.login("test-user@localhost","password");
   changePasswordPage.assertCurrent();
   changePasswordPage.changePassword("new-password","new-password");
-  String sessionId=events.expectRequiredAction("update_password").assertEvent().getSessionId();
+  String sessionId=events.expectRequiredAction(EventType.UPDATE_PASSWORD).assertEvent().getSessionId();
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   Event loginEvent=events.expectLogin().session(sessionId).assertEvent();
   oauth.openLogout();

@@ -8,13 +8,13 @@
   Assert.assertEquals("Password confirmation doesn't match",profilePage.getError());
   changePasswordPage.changePassword("password","new-password","new-password");
   Assert.assertEquals("Your password has been updated",profilePage.getSuccess());
-  events.expectAccount("update_password").assertEvent();
+  events.expectAccount(EventType.UPDATE_PASSWORD).assertEvent();
   changePasswordPage.logout();
   events.expectLogout(sessionId).detail(Details.REDIRECT_URI,AccountPasswordPage.PATH).assertEvent();
   loginPage.open();
   loginPage.login("test-user@localhost","password");
   Assert.assertEquals("Invalid username or password.",loginPage.getError());
-  events.expectLogin().user((String)null).session((String)null).error("invalid_user_credentials").removeDetail(Details.CODE_ID).assertEvent();
+  events.expectLogin().session((String)null).error("invalid_user_credentials").removeDetail(Details.CODE_ID).assertEvent();
   loginPage.open();
   loginPage.login("test-user@localhost","new-password");
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());

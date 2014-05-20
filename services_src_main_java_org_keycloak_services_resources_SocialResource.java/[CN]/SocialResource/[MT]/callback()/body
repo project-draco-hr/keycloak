@@ -5,7 +5,7 @@
   String realmName=requestData.getClientAttribute("realm");
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=realmManager.getRealmByName(realmName);
-  Audit audit=new AuditManager(realm,providers,clientConnection).createAudit().event(Events.LOGIN).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"social@" + provider.getId());
+  Audit audit=new AuditManager(realm,providers,clientConnection).createAudit().event(EventType.LOGIN).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"social@" + provider.getId());
   AuthenticationManager authManager=new AuthenticationManager(providers);
   OAuthFlows oauth=Flows.oauth(providerSession,realm,request,uriInfo,authManager,tokenManager);
   if (!realm.isEnabled()) {
@@ -56,7 +56,7 @@ catch (  SocialProviderException e) {
   String userId=requestData.getClientAttribute("userId");
   if (userId != null) {
     UserModel authenticatedUser=realm.getUserById(userId);
-    audit.event(Events.SOCIAL_LINK).user(userId);
+    audit.event(EventType.SOCIAL_LINK).user(userId);
     if (user != null) {
       audit.error(Errors.SOCIAL_ID_IN_USE);
       return oauth.forwardToSecurityFailure("This social account is already linked to other user");
@@ -92,7 +92,7 @@ catch (  SocialProviderException e) {
       user.addRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE);
     }
     realm.addSocialLink(user,socialLink);
-    audit.clone().user(user).event(Events.REGISTER).detail(Details.REGISTER_METHOD,"social@" + provider.getId()).detail(Details.EMAIL,socialUser.getEmail()).removeDetail("auth_method").success();
+    audit.clone().user(user).event(EventType.REGISTER).detail(Details.REGISTER_METHOD,"social@" + provider.getId()).detail(Details.EMAIL,socialUser.getEmail()).removeDetail("auth_method").success();
   }
   audit.user(user);
   if (!user.isEnabled()) {

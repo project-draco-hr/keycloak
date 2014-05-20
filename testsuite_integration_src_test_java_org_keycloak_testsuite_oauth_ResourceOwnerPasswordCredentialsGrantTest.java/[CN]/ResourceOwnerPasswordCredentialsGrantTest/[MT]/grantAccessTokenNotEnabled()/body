@@ -1,0 +1,22 @@
+{
+  try {
+    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        appRealm.setPasswordCredentialGrantAllowed(false);
+      }
+    }
+);
+    oauth.clientId("resource-owner");
+    OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("secret","test-user@localhost","password");
+    assertEquals(403,response.getStatusCode());
+    assertEquals("not_enabled",response.getError());
+  }
+  finally {
+    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        appRealm.setPasswordCredentialGrantAllowed(true);
+      }
+    }
+);
+  }
+}

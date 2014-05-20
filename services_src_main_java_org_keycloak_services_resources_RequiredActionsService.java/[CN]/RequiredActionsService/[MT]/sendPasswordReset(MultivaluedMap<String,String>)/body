@@ -12,7 +12,7 @@
   if (!client.isEnabled()) {
     return Flows.oauth(providerSession,realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
   }
-  audit.event(Events.SEND_RESET_PASSWORD).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
+  audit.event(EventType.SEND_RESET_PASSWORD).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
   UserModel user=realm.getUser(username);
   if (user == null && username.contains("@")) {
     user=realm.getUserByEmail(username);

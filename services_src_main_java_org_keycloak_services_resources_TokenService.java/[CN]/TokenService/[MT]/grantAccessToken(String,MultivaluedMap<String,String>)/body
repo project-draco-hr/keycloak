@@ -5,7 +5,7 @@
   if (!realm.isPasswordCredentialGrantAllowed()) {
     return createError("not_enabled","Resource Owner Password Credentials Grant not enabled",Response.Status.FORBIDDEN);
   }
-  audit.event(Events.LOGIN).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token");
+  audit.event(EventType.LOGIN).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token");
   String username=form.getFirst(AuthenticationManager.FORM_USERNAME);
   if (username == null) {
     audit.error(Errors.USERNAME_MISSING);

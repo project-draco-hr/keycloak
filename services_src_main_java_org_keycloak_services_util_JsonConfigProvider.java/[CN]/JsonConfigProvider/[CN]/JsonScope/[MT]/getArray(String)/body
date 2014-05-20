@@ -1,0 +1,19 @@
+{
+  if (config == null) {
+    return null;
+  }
+  JsonNode n=config.get(key);
+  if (n == null) {
+    return null;
+  }
+ else   if (n.isArray()) {
+    ArrayList<String> l=new ArrayList<String>();
+    for (    JsonNode e : n) {
+      l.add(StringPropertyReplacer.replaceProperties(e.getTextValue()));
+    }
+    return (String[])l.toArray();
+  }
+ else {
+    return new String[]{StringPropertyReplacer.replaceProperties(n.getTextValue())};
+  }
+}

@@ -15,13 +15,13 @@
   MimeMessage message=greenMail.getReceivedMessages()[0];
   String body=(String)message.getContent();
   String changePasswordUrl=MailUtil.getLink(body);
-  String sessionId=events.expectRequiredAction("send_reset_password").user(userId).detail(Details.USERNAME,"login-test").detail(Details.EMAIL,"login@test.com").assertEvent().getSessionId();
+  String sessionId=events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).user(userId).detail(Details.USERNAME,"login-test").detail(Details.EMAIL,"login@test.com").assertEvent().getSessionId();
   driver.navigate().to(changePasswordUrl.trim());
   updatePasswordPage.assertCurrent();
   updatePasswordPage.changePassword("invalid","invalid");
   Assert.assertEquals("Invalid password: minimum length 8",resetPasswordPage.getErrorMessage());
   updatePasswordPage.changePassword("resetPasswordWithPasswordPolicy","resetPasswordWithPasswordPolicy");
-  events.expectRequiredAction("update_password").user(userId).session(sessionId).detail(Details.USERNAME,"login-test").assertEvent();
+  events.expectRequiredAction(EventType.UPDATE_PASSWORD).user(userId).session(sessionId).detail(Details.USERNAME,"login-test").assertEvent();
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   Event loginEvent=events.expectLogin().user(userId).session(sessionId).detail(Details.USERNAME,"login-test").assertEvent();
   oauth.openLogout();

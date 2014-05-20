@@ -4,7 +4,7 @@
   String rememberMe=formData.getFirst("rememberMe");
   boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("on");
   logger.debug("*** Remember me: " + remember);
-  audit.event(Events.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
+  audit.event(EventType.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
   if (remember) {
     audit.detail(Details.REMEMBER_ME,"true");
   }
@@ -41,13 +41,15 @@
  else {
     authManager.expireRememberMeCookie(realm,uriInfo);
   }
+  UserModel user=KeycloakModelUtils.findUserByNameOrEmail(realm,username);
+  if (user != null) {
+    audit.user(user);
+  }
 switch (status) {
 case SUCCESS:
 case ACTIONS_REQUIRED:
-    UserModel user=KeycloakModelUtils.findUserByNameOrEmail(realm,username);
-  audit.user(user);
-UserSessionModel session=realm.createUserSession(user,clientConnection.getRemoteAddr());
-audit.session(session);
+    UserSessionModel session=realm.createUserSession(user,clientConnection.getRemoteAddr());
+  audit.session(session);
 return oauth.processAccessCode(scopeParam,state,redirect,client,user,session,username,remember,"form",audit);
 case ACCOUNT_TEMPORARILY_DISABLED:
 audit.error(Errors.USER_TEMPORARILY_DISABLED);

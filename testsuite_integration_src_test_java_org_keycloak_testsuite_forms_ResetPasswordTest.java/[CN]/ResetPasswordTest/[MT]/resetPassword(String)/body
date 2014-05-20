@@ -4,7 +4,7 @@
   resetPasswordPage.assertCurrent();
   resetPasswordPage.changePassword(username);
   resetPasswordPage.assertCurrent();
-  String sessionId=events.expectRequiredAction("send_reset_password").user(userId).detail(Details.USERNAME,username).detail(Details.EMAIL,"login@test.com").assertEvent().getSessionId();
+  String sessionId=events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).user(userId).detail(Details.USERNAME,username).detail(Details.EMAIL,"login@test.com").assertEvent().getSessionId();
   Assert.assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
   Assert.assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];
@@ -13,7 +13,7 @@
   driver.navigate().to(changePasswordUrl.trim());
   updatePasswordPage.assertCurrent();
   updatePasswordPage.changePassword("resetPassword","resetPassword");
-  events.expectRequiredAction("update_password").user(userId).session(sessionId).detail(Details.USERNAME,username).assertEvent();
+  events.expectRequiredAction(EventType.UPDATE_PASSWORD).user(userId).session(sessionId).detail(Details.USERNAME,username).assertEvent();
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   Event loginEvent=events.expectLogin().user(userId).session(sessionId).detail(Details.USERNAME,username).assertEvent();
   oauth.openLogout();

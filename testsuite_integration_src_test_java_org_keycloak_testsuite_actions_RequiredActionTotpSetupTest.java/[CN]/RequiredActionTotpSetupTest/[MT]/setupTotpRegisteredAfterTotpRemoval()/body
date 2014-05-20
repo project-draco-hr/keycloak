@@ -7,7 +7,7 @@
   String totpCode=totpPage.getTotpSecret();
   totpPage.configure(totp.generate(totpCode));
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
-  events.expectRequiredAction("update_totp").user(userId).detail(Details.USERNAME,"setupTotp2").assertEvent();
+  events.expectRequiredAction(EventType.UPDATE_TOTP).user(userId).detail(Details.USERNAME,"setupTotp2").assertEvent();
   Event loginEvent=events.expectLogin().user(userId).detail(Details.USERNAME,"setupTotp2").assertEvent();
   oauth.openLogout();
   events.expectLogout(loginEvent.getSessionId()).user(userId).assertEvent();
@@ -20,14 +20,14 @@
   accountTotpPage.open();
   accountTotpPage.assertCurrent();
   accountTotpPage.removeTotp();
-  events.expectAccount("remove_totp").user(userId).assertEvent();
+  events.expectAccount(EventType.REMOVE_TOTP).user(userId).assertEvent();
   oauth.openLogout();
   events.expectLogout(loginEvent.getSessionId()).user(userId).assertEvent();
   loginPage.open();
   loginPage.login("setupTotp2","password2");
   totpPage.assertCurrent();
   totpPage.configure(totp.generate(totpPage.getTotpSecret()));
-  String sessionId=events.expectRequiredAction("update_totp").user(userId).detail(Details.USERNAME,"setupTotp2").assertEvent().getSessionId();
+  String sessionId=events.expectRequiredAction(EventType.UPDATE_TOTP).user(userId).detail(Details.USERNAME,"setupTotp2").assertEvent().getSessionId();
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   events.expectLogin().user(userId).session(sessionId).detail(Details.USERNAME,"setupTotp2").assertEvent();
 }

@@ -1,6 +1,9 @@
 {
   if (!checkSsl()) {
-    throw new NotAcceptableException("HTTPS required");
+    return createError("https_required","HTTPS required",Response.Status.FORBIDDEN);
+  }
+  if (!realm.isPasswordCredentialGrantAllowed()) {
+    return createError("not_enabled","Resource Owner Password Credentials Grant not enabled",Response.Status.FORBIDDEN);
   }
   audit.event(Events.LOGIN).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token");
   String username=form.getFirst(AuthenticationManager.FORM_USERNAME);
@@ -14,11 +17,11 @@
   ClientModel client=authorizeClient(authorizationHeader,form,audit);
   if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
     audit.error(Errors.NOT_ALLOWED);
-    throw new ForbiddenException("Bearer-only applications are not allowed to invoke grants/access");
+    return createError("not_allowed","Bearer-only applications are not allowed to invoke grants/access",Response.Status.FORBIDDEN);
   }
   if (!realm.isEnabled()) {
     audit.error(Errors.REALM_DISABLED);
-    throw new UnauthorizedException("Disabled realm");
+    return createError("realm_disabled","Realm is disabled",Response.Status.UNAUTHORIZED);
   }
   AuthenticationStatus authenticationStatus=authManager.authenticateForm(clientConnection,realm,form);
   Map<String,String> err;

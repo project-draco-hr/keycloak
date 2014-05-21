@@ -8,7 +8,6 @@
       ProviderFactory factory=loadProviderFactory(spi,provider);
       Config.Scope scope=Config.scope(spi.getName(),provider);
       factory.init(scope);
-      log.debug("Initialized " + factory.getClass().getName() + " (config = "+ scope+ ")");
       factories.put(factory.getId(),factory);
       log.info("Loaded SPI " + spi.getName() + " (provider = "+ provider+ ")");
     }
@@ -16,7 +15,6 @@
       for (      ProviderFactory factory : ServiceLoader.load(spi.getProviderFactoryClass())) {
         Config.Scope scope=Config.scope(spi.getName(),factory.getId());
         factory.init(scope);
-        log.debug("Initialized " + factory.getClass().getName() + " (config = "+ scope+ ")");
         factories.put(factory.getId(),factory);
       }
       if (factories.size() == 1) {

@@ -7,11 +7,11 @@
     if (idx > -1) {
       validRedirect=validRedirect.substring(0,idx);
     }
-    return validRedirect;
+    redirectUri=validRedirect;
   }
  else   if (validRedirects.isEmpty()) {
     logger.error("Redirect URI is required for client: " + client.getClientId());
-    return null;
+    redirectUri=null;
   }
  else {
     String r=redirectUri.indexOf('?') != -1 ? redirectUri.substring(0,redirectUri.indexOf('?')) : redirectUri;
@@ -28,6 +28,12 @@
       r=sb.toString();
       valid=matchesRedirects(resolveValidRedirects,r);
     }
-    return valid ? redirectUri : null;
+    redirectUri=valid ? redirectUri : null;
+  }
+  if (Constants.INSTALLED_APP_URN.equals(redirectUri)) {
+    return Urls.realmInstalledAppUrnCallback(uriInfo.getBaseUri(),realm.getName()).toString();
+  }
+ else {
+    return redirectUri;
   }
 }

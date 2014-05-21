@@ -1,10 +1,9 @@
 {
-  DBObject query=new QueryBuilder().and("clientId").is(getId()).get();
-  List<MongoClientUserSessionAssociationEntity> associations=getMongoStore().loadEntities(MongoClientUserSessionAssociationEntity.class,query,invocationContext);
+  DBObject query=new QueryBuilder().and("associatedClientIds").is(getId()).get();
+  List<MongoUserSessionEntity> sessions=getMongoStore().loadEntities(MongoUserSessionEntity.class,query,invocationContext);
   Set<UserSessionModel> result=new HashSet<UserSessionModel>();
-  for (  MongoClientUserSessionAssociationEntity association : associations) {
-    UserSessionModel session=realm.getUserSession(association.getSessionId());
-    result.add(session);
+  for (  MongoUserSessionEntity session : sessions) {
+    result.add(new UserSessionAdapter(session,realm,invocationContext));
   }
   return result;
 }

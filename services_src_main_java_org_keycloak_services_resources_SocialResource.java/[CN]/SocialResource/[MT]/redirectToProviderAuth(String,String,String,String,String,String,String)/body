@@ -18,7 +18,7 @@
     logger.warn("Login requester not enabled.");
     return Flows.forms(providerSession,realm,uriInfo).setError("Login requester not enabled.").createErrorPage();
   }
-  redirectUri=TokenService.verifyRedirectUri(uriInfo,redirectUri,client);
+  redirectUri=TokenService.verifyRedirectUri(uriInfo,redirectUri,realm,client);
   if (redirectUri == null) {
     audit.error(Errors.INVALID_REDIRECT_URI);
     return Flows.forms(providerSession,realm,uriInfo).setError("Invalid redirect_uri.").createErrorPage();

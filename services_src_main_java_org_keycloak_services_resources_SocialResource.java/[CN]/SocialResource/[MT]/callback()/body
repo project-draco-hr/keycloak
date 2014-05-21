@@ -1,6 +1,9 @@
 {
   Map<String,String[]> queryParams=getQueryParams();
   RequestDetails requestData=getRequestDetails(queryParams);
+  if (requestData == null) {
+    Flows.forms(providerSession,null,uriInfo).setError("Unexpected callback").createErrorPage();
+  }
   SocialProvider provider=SocialLoader.load(requestData.getProviderId());
   String realmName=requestData.getClientAttribute("realm");
   RealmManager realmManager=new RealmManager(session);

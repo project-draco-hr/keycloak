@@ -1,6 +1,6 @@
 {
   T cached=context.getLoadedEntity(type,id);
-  if (cached != null)   return cached;
+  if (cached != null && type.isAssignableFrom(cached.getClass()))   return cached;
   DBCollection dbCollection=getDBCollectionForType(type);
   BasicDBObject idQuery=new BasicDBObject("_id",id);
   DBObject dbObject=dbCollection.findOne(idQuery);

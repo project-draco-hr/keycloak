@@ -1,10 +1,17 @@
 {
-  DBObject query=new QueryBuilder().and("sessionId").is(getId()).get();
-  List<MongoClientUserSessionAssociationEntity> associations=getMongoStore().loadEntities(MongoClientUserSessionAssociationEntity.class,query,invocationContext);
-  List<ClientModel> result=new ArrayList<ClientModel>();
-  for (  MongoClientUserSessionAssociationEntity association : associations) {
-    ClientModel client=realm.findClientById(association.getClientId());
-    result.add(client);
+  List<String> associatedClientIds=getMongoEntity().getAssociatedClientIds();
+  List<ClientModel> clients=new ArrayList<ClientModel>();
+  for (  String clientId : associatedClientIds) {
+    ClientModel client=realm.getApplicationById(clientId);
+    if (client == null) {
+      client=realm.getOAuthClientById(clientId);
+    }
+    if (client != null) {
+      clients.add(client);
+    }
+ else {
+      logger.warnf("Not found associated client with Id: %s",clientId);
+    }
   }
-  return result;
+  return clients;
 }

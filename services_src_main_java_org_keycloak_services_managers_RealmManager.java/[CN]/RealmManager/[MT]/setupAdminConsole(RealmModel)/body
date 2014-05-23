@@ -9,8 +9,11 @@
   RoleModel adminRole;
   if (realm.getName().equals(Config.getAdminRealm())) {
     adminRole=realm.getRole(AdminRoles.ADMIN);
-    realm.addScopeMapping(adminConsole,adminRole);
   }
  else {
+    String realmAdminApplicationName=getRealmAdminApplicationName(realm);
+    ApplicationModel realmAdminApp=realm.getApplicationByName(realmAdminApplicationName);
+    adminRole=realmAdminApp.getRole(AdminRoles.REALM_ADMIN);
   }
+  realm.addScopeMapping(adminConsole,adminRole);
 }

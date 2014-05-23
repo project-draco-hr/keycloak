@@ -20,10 +20,9 @@
     logger.debug("Token not valid");
     throw new UnauthorizedException("Bearer");
   }
-  ApplicationModel consoleApp=realm.getApplicationByName(Constants.ADMIN_CONSOLE_APPLICATION);
-  if (consoleApp == null) {
-    throw new NotFoundException("Could not find admin console application");
+  ClientModel client=realm.findClient(token.getIssuedFor());
+  if (client == null) {
+    throw new NotFoundException("Could not find client for authorization");
   }
-  Auth auth=new Auth(realm,token,authResult.getUser(),consoleApp);
-  return auth;
+  return new AdminAuth(realm,authResult.getToken(),authResult.getUser(),client);
 }

@@ -1,9 +1,10 @@
 {
   if (request.getHttpMethod().equalsIgnoreCase("OPTIONS")) {
-    Response response=Cors.add(request,Response.ok()).allowedMethods("GET","PUT","POST","DELETE").auth().build();
+    logger.info("*** CORS ADMIN PREFLIGHT!!!!");
+    Response response=Cors.add(request,Response.ok()).preflight().allowedMethods("GET","PUT","POST","DELETE").auth().build();
     throw new WebApplicationException(response);
   }
-  Auth auth=authenticateRealmAdminRequest(headers);
+  AdminAuth auth=authenticateRealmAdminRequest(headers);
   if (auth != null) {
     logger.info("authenticated admin access for: " + auth.getUser().getLoginName());
   }

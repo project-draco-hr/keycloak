@@ -1,0 +1,10 @@
+{
+  if (client instanceof ApplicationModel) {
+    RoleModel roleModel=realm.getRole(role);
+    return realm.hasRole(user,roleModel) && realm.hasScope(client,roleModel);
+  }
+ else {
+    AccessToken.Access access=token.getRealmAccess();
+    return access != null && access.isUserInRole(role);
+  }
+}

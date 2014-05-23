@@ -1,28 +1,28 @@
 {
   String origin=request.getHttpHeaders().getRequestHeaders().getFirst(ORIGIN_HEADER);
   if (origin == null) {
-    return response.build();
+    return builder.build();
   }
   if (!preflight && (allowedOrigins == null || !allowedOrigins.contains(origin))) {
-    return response.build();
+    return builder.build();
   }
-  response.header(ACCESS_CONTROL_ALLOW_ORIGIN,origin);
+  builder.header(ACCESS_CONTROL_ALLOW_ORIGIN,origin);
   if (allowedMethods != null) {
-    response.header(ACCESS_CONTROL_ALLOW_METHODS,CollectionUtil.join(allowedMethods));
+    builder.header(ACCESS_CONTROL_ALLOW_METHODS,CollectionUtil.join(allowedMethods));
   }
  else {
-    response.header(ACCESS_CONTROL_ALLOW_METHODS,DEFAULT_ALLOW_METHODS);
+    builder.header(ACCESS_CONTROL_ALLOW_METHODS,DEFAULT_ALLOW_METHODS);
   }
   if (exposedHeaders != null) {
-    response.header(ACCESS_CONTROL_EXPOSE_HEADERS,CollectionUtil.join(exposedHeaders));
+    builder.header(ACCESS_CONTROL_EXPOSE_HEADERS,CollectionUtil.join(exposedHeaders));
   }
-  response.header(ACCESS_CONTROL_ALLOW_CREDENTIALS,Boolean.toString(auth));
+  builder.header(ACCESS_CONTROL_ALLOW_CREDENTIALS,Boolean.toString(auth));
   if (auth) {
-    response.header(ACCESS_CONTROL_ALLOW_HEADERS,String.format("%s, %s",DEFAULT_ALLOW_HEADERS,AUTHORIZATION_HEADER));
+    builder.header(ACCESS_CONTROL_ALLOW_HEADERS,String.format("%s, %s",DEFAULT_ALLOW_HEADERS,AUTHORIZATION_HEADER));
   }
  else {
-    response.header(ACCESS_CONTROL_ALLOW_HEADERS,DEFAULT_ALLOW_HEADERS);
+    builder.header(ACCESS_CONTROL_ALLOW_HEADERS,DEFAULT_ALLOW_HEADERS);
   }
-  response.header(ACCESS_CONTROL_MAX_AGE,DEFAULT_MAX_AGE);
-  return response.build();
+  builder.header(ACCESS_CONTROL_MAX_AGE,DEFAULT_MAX_AGE);
+  return builder.build();
 }

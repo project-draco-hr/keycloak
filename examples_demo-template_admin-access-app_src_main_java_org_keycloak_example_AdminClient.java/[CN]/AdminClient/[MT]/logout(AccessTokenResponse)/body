@@ -1,0 +1,16 @@
+{
+  HttpClient client=new HttpClientBuilder().disableTrustManager().build();
+  try {
+    HttpGet get=new HttpGet(KeycloakUriBuilder.fromUri("http://localhost:8080/auth").path(ServiceUrlConstants.TOKEN_SERVICE_LOGIN_PATH).queryParam("session-state",res.getSessionState()).build("demo"));
+    HttpResponse response=client.execute(get);
+    HttpEntity entity=response.getEntity();
+    if (entity == null) {
+      return;
+    }
+    InputStream is=entity.getContent();
+    if (is != null)     is.close();
+  }
+  finally {
+    client.getConnectionManager().shutdown();
+  }
+}

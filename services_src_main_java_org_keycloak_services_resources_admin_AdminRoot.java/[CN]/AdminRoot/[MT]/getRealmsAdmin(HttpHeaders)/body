@@ -1,8 +1,13 @@
 {
+  if (request.getHttpMethod().equalsIgnoreCase("OPTIONS")) {
+    Response response=Cors.add(request,Response.ok()).allowedMethods("GET","PUT","POST","DELETE").auth().build();
+    throw new WebApplicationException(response);
+  }
   Auth auth=authenticateRealmAdminRequest(headers);
   if (auth != null) {
     logger.info("authenticated admin access for: " + auth.getUser().getLoginName());
   }
+  Cors.add(request).allowedOrigins(auth.getToken()).allowedMethods("GET","PUT","POST","DELETE").auth().build(response);
   RealmsAdminResource adminResource=new RealmsAdminResource(auth,tokenManager);
   ResteasyProviderFactory.getInstance().injectProperties(adminResource);
   return adminResource;

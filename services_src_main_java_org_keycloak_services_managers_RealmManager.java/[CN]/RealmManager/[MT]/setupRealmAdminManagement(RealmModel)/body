@@ -3,7 +3,11 @@
     return;
   }
   ApplicationManager applicationManager=new ApplicationManager(new RealmManager(identitySession));
-  ApplicationModel realmAdminApp=applicationManager.createApplication(realm,getRealmAdminApplicationName(realm));
+  String realmAdminApplicationName=getRealmAdminApplicationName(realm);
+  ApplicationModel realmAdminApp=realm.getApplicationByName(realmAdminApplicationName);
+  if (realmAdminApp == null) {
+    realmAdminApp=applicationManager.createApplication(realm,realmAdminApplicationName);
+  }
   RoleModel adminRole=realmAdminApp.addRole(AdminRoles.REALM_ADMIN);
   realmAdminApp.setBearerOnly(true);
   for (  String r : AdminRoles.ALL_REALM_ROLES) {

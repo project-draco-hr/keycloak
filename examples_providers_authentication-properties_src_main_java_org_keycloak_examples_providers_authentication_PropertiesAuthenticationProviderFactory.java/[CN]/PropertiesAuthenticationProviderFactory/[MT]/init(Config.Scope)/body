@@ -1,0 +1,28 @@
+{
+  String propsFileLocation=config.get("propertiesFileLocation");
+  if (propsFileLocation == null) {
+    throw new IllegalStateException("Properties file location is not configured in PropertiesAuthenticationProviderFactory");
+  }
+ else {
+    log.info("Using properties file: " + propsFileLocation);
+  }
+  this.properties=new Properties();
+  InputStream propertiesStream=null;
+  try {
+    propertiesStream=getClass().getClassLoader().getResourceAsStream(propsFileLocation);
+    this.properties.load(propertiesStream);
+  }
+ catch (  IOException ioException) {
+    throw new RuntimeException(ioException);
+  }
+ finally {
+    if (propertiesStream != null) {
+      try {
+        propertiesStream.close();
+      }
+ catch (      IOException e) {
+        log.error("Error when closing InputStream",e);
+      }
+    }
+  }
+}

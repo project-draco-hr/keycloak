@@ -1,11 +1,8 @@
 {
-  Set<ThemeProvider> themeProviders=providers.getAllProviders(ThemeProvider.class);
+  ExtendingThemeManager themeManager=new ExtendingThemeManager(providers);
   info.themes=new HashMap<String,List<String>>();
   for (  Theme.Type type : Theme.Type.values()) {
-    List<String> themes=new LinkedList<String>();
-    for (    ThemeProvider p : themeProviders) {
-      themes.addAll(p.nameSet(type));
-    }
+    List<String> themes=new LinkedList<String>(themeManager.nameSet(type));
     Collections.sort(themes);
     info.themes.put(type.toString().toLowerCase(),themes);
   }

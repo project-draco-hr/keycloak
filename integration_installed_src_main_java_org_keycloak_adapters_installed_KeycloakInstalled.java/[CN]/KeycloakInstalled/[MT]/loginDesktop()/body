@@ -3,7 +3,7 @@
   callback.start();
   String redirectUri="http://localhost:" + callback.server.getLocalPort();
   String state=UUID.randomUUID().toString();
-  String authUrl=deployment.getAuthUrl().clone().queryParam(OAuth2Constants.CLIENT_ID,deployment.getResourceName()).queryParam(OAuth2Constants.REDIRECT_URI,redirectUri).queryParam(OAuth2Constants.STATE,state).queryParam("login","true").build().toString();
+  String authUrl=deployment.getAuthUrl().clone().queryParam(OAuth2Constants.CLIENT_ID,deployment.getResourceName()).queryParam(OAuth2Constants.REDIRECT_URI,redirectUri).queryParam(OAuth2Constants.STATE,state).build().toString();
   Desktop.getDesktop().browse(new URI(authUrl));
   callback.join();
   if (!state.equals(callback.state)) {

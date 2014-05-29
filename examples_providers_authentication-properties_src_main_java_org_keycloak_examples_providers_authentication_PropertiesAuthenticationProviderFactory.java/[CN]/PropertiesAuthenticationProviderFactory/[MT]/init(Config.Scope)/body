@@ -1,15 +1,17 @@
 {
-  String propsFileLocation=config.get("propertiesFileLocation");
-  if (propsFileLocation == null) {
-    throw new IllegalStateException("Properties file location is not configured in PropertiesAuthenticationProviderFactory");
-  }
- else {
-    log.info("Using properties file: " + propsFileLocation);
-  }
-  this.properties=new Properties();
+  this.propsFileLocation=config.get("propertiesFileLocation");
   InputStream propertiesStream=null;
+  this.properties=new Properties();
   try {
-    propertiesStream=getClass().getClassLoader().getResourceAsStream(propsFileLocation);
+    if (propsFileLocation == null) {
+      log.info("propertiesFileLocation not configured. Using default users.properties file from classpath.");
+      log.warn("Password updates won't be persisted!");
+      propertiesStream=getClass().getClassLoader().getResourceAsStream("users.properties");
+    }
+ else {
+      log.info("Using properties file from location: " + propsFileLocation);
+      propertiesStream=new FileInputStream(propsFileLocation);
+    }
     this.properties.load(propertiesStream);
   }
  catch (  IOException ioException) {

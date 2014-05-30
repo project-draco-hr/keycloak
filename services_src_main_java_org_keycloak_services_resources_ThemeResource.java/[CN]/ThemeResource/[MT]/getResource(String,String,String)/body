@@ -4,7 +4,10 @@
     Theme theme=themeManager.createTheme(themeName,Theme.Type.valueOf(themType.toUpperCase()));
     InputStream resource=theme.getResourceAsStream(path);
     if (resource != null) {
-      return Response.ok(resource).type(mimeTypes.getContentType(path)).build();
+      CacheControl cacheControl=new CacheControl();
+      cacheControl.setNoTransform(false);
+      cacheControl.setMaxAge(themeManager.getStaticMaxAge());
+      return Response.ok(resource).type(mimeTypes.getContentType(path)).cacheControl(cacheControl).build();
     }
  else {
       return Response.status(Response.Status.NOT_FOUND).build();

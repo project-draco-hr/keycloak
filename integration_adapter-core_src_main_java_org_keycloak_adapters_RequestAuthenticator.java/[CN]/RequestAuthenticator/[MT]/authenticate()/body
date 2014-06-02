@@ -1,9 +1,5 @@
 {
   log.info("--> authenticate()");
-  if (!facade.getRequest().isSecure() && deployment.isSslRequired()) {
-    log.warn("SSL is required to authenticate");
-    return AuthOutcome.FAILED;
-  }
   BearerTokenRequestAuthenticator bearer=createBearerTokenAuthenticator();
   log.info("try bearer");
   AuthOutcome outcome=bearer.authenticate(facade);
@@ -13,6 +9,7 @@
     return AuthOutcome.FAILED;
   }
  else   if (outcome == AuthOutcome.AUTHENTICATED) {
+    if (verifySSL())     return AuthOutcome.FAILED;
     completeAuthentication(bearer);
     log.info("Bearer AUTHENTICATED");
     return AuthOutcome.AUTHENTICATED;
@@ -24,6 +21,7 @@
   }
   log.info("try oauth");
   if (isCached()) {
+    if (verifySSL())     return AuthOutcome.FAILED;
     log.info("AUTHENTICATED: was cached");
     return AuthOutcome.AUTHENTICATED;
   }
@@ -37,6 +35,7 @@
     challenge=oauth.getChallenge();
     return AuthOutcome.NOT_ATTEMPTED;
   }
+  if (verifySSL())   return AuthOutcome.FAILED;
   completeAuthentication(oauth);
   facade.getResponse().setHeader("Location",oauth.getStrippedOauthParametersRequestUri());
   facade.getResponse().setStatus(302);

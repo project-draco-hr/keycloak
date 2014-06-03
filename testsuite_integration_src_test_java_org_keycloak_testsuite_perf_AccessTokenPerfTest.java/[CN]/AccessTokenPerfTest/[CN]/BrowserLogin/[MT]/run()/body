@@ -1,0 +1,9 @@
+{
+  WebDriver driver=WebRule.createWebDriver();
+  OAuthClient oauth=new OAuthClient(driver);
+  oauth.doLogin("test-user@localhost","password");
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
+  Assert.assertEquals(200,response.getStatusCode());
+  driver.close();
+}

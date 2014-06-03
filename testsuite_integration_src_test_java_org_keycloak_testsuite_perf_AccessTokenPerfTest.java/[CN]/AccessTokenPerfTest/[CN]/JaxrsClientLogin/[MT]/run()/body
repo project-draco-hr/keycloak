@@ -1,0 +1,25 @@
+{
+  this.client=new ResteasyClientBuilder().build();
+  String state="42";
+  Response response=client.target(getLoginFormUrl(state)).request().get();
+  URI uri=null;
+  if (200 == response.getStatus()) {
+    response.close();
+    Form form=new Form();
+    form.param("username","test-user@localhost");
+    form.param("password","password");
+    response=client.target(getProcessLoginUrl(state)).request().post(Entity.form(form));
+  }
+  Assert.assertEquals(302,response.getStatus());
+  uri=response.getLocation();
+  response.close();
+  Assert.assertNotNull(uri);
+  String code=getCode(uri);
+  Assert.assertNotNull(code);
+  Form form=new Form();
+  form.param(OAuth2Constants.GRANT_TYPE,grantType).param(OAuth2Constants.CODE,code).param(OAuth2Constants.REDIRECT_URI,redirectUri);
+  String authorization=BasicAuthHelper.createHeader(clientId,"password");
+  String res=client.target(TokenService.accessCodeToTokenUrl(UriBuilder.fromUri(baseUrl)).build(realm)).request().header(HttpHeaders.AUTHORIZATION,authorization).post(Entity.form(form),String.class);
+  count.incrementAndGet();
+  client.close();
+}

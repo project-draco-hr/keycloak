@@ -1,13 +1,17 @@
 {
   List<AuthenticationProviderEntity> entities=realm.getAuthenticationProviders();
-  Collections.sort(entities,new Comparator<AuthenticationProviderEntity>(){
+  List<AuthenticationProviderEntity> copy=new ArrayList<AuthenticationProviderEntity>();
+  for (  AuthenticationProviderEntity entity : entities) {
+    copy.add(entity);
+  }
+  Collections.sort(copy,new Comparator<AuthenticationProviderEntity>(){
     @Override public int compare(    AuthenticationProviderEntity o1,    AuthenticationProviderEntity o2){
       return o1.getPriority() - o2.getPriority();
     }
   }
 );
   List<AuthenticationProviderModel> result=new ArrayList<AuthenticationProviderModel>();
-  for (  AuthenticationProviderEntity entity : entities) {
+  for (  AuthenticationProviderEntity entity : copy) {
     result.add(new AuthenticationProviderModel(entity.getProviderName(),entity.isPasswordUpdateSupported(),entity.getConfig()));
   }
   return result;

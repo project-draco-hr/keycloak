@@ -22,7 +22,7 @@ switch (accountSocialAction) {
 case ADD:
     String redirectUri=UriBuilder.fromUri(Urls.accountSocialPage(uriInfo.getBaseUri(),realm.getName())).build().toString();
   try {
-    return Flows.social(socialRequestManager,realm,uriInfo,provider).putClientAttribute("realm",realm.getName()).putClientAttribute("clientId",Constants.ACCOUNT_MANAGEMENT_APP).putClientAttribute(OAuth2Constants.STATE,UUID.randomUUID().toString()).putClientAttribute("redirectUri",redirectUri).putClientAttribute("userId",user.getId()).redirectToSocialProvider();
+    return Flows.social(realm,uriInfo,provider).user(user).putClientAttribute(OAuth2Constants.CLIENT_ID,Constants.ACCOUNT_MANAGEMENT_APP).putClientAttribute(OAuth2Constants.STATE,UUID.randomUUID().toString()).putClientAttribute(OAuth2Constants.REDIRECT_URI,redirectUri).redirectToSocialProvider();
   }
  catch (  SocialProviderException spe) {
     return account.setError(Messages.SOCIAL_REDIRECT_ERROR).createResponse(AccountPages.SOCIAL);

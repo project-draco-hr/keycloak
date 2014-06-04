@@ -10,9 +10,6 @@
   }
   try {
     String code=callback.getQueryParam(CODE);
-    if (!callback.getQueryParam(STATE).equals(callback.getAttribute(STATE))) {
-      throw new SocialProviderException("Invalid state");
-    }
     String response=SimpleHttp.doPost(getTokenUrl()).param(CODE,code).param(CLIENT_ID,config.getKey()).param(CLIENT_SECRET,config.getSecret()).param(REDIRECT_URI,config.getCallbackUrl()).param(GRANT_TYPE,AUTHORIZATION_CODE).asString();
     String accessToken;
     if (response.startsWith("{")) {

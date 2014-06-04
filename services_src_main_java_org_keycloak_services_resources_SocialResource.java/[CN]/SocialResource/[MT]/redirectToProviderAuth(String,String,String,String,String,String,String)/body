@@ -24,7 +24,7 @@
     return Flows.forms(providerSession,realm,uriInfo).setError("Invalid redirect_uri.").createErrorPage();
   }
   try {
-    return Flows.social(socialRequestManager,realm,uriInfo,provider).putClientAttribute("realm",realmName).putClientAttribute("clientId",clientId).putClientAttribute(OAuth2Constants.SCOPE,scope).putClientAttribute(OAuth2Constants.STATE,state).putClientAttribute("redirectUri",redirectUri).putClientAttribute("responseType",responseType).redirectToSocialProvider();
+    return Flows.social(realm,uriInfo,provider).putClientAttribute(OAuth2Constants.CLIENT_ID,clientId).putClientAttribute(OAuth2Constants.SCOPE,scope).putClientAttribute(OAuth2Constants.STATE,state).putClientAttribute(OAuth2Constants.REDIRECT_URI,redirectUri).putClientAttribute(OAuth2Constants.RESPONSE_TYPE,responseType).redirectToSocialProvider();
   }
  catch (  Throwable t) {
     logger.error("Failed to redirect to social auth",t);

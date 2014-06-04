@@ -4,8 +4,12 @@
   String secret=realm.getSocialConfig().get(socialProviderId + ".secret");
   String callbackUri=Urls.socialCallback(uriInfo.getBaseUri()).toString();
   SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
-  AuthRequest authRequest=socialProvider.getAuthUrl(config);
-  RequestDetails socialRequest=socialRequestBuilder.putSocialAttributes(authRequest.getAttributes()).build();
-  socialRequestManager.addRequest(authRequest.getId(),socialRequest);
+  String encodedState=new JWSBuilder().jsonContent(state).rsa256(realm.getPrivateKey());
+  AuthRequest authRequest=socialProvider.getAuthUrl(config,encodedState);
+  if (authRequest.getAttributes() != null) {
+    String cookiePath=Urls.socialBase(uriInfo.getBaseUri()).build().getRawPath().toString();
+    String encoded=new JWSBuilder().jsonContent(authRequest.getAttributes()).rsa256(realm.getPrivateKey());
+    CookieHelper.addCookie("KEYCLOAK_SOCIAL",encoded,cookiePath,null,null,-1,!realm.isSslNotRequired(),true);
+  }
   return Response.status(302).location(authRequest.getAuthUri()).build();
 }

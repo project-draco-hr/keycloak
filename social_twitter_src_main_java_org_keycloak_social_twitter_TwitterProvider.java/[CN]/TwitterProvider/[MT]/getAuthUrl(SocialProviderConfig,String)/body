@@ -1,0 +1,12 @@
+{
+  try {
+    Twitter twitter=new TwitterFactory().getInstance();
+    twitter.setOAuthConsumer(config.getKey(),config.getSecret());
+    URI uri=new URI(config.getCallbackUrl() + "?state=" + state);
+    RequestToken requestToken=twitter.getOAuthRequestToken(uri.toString());
+    return AuthRequest.create(requestToken.getAuthenticationURL()).setAttribute("token",requestToken.getToken()).setAttribute("tokenSecret",requestToken.getTokenSecret()).build();
+  }
+ catch (  Exception e) {
+    throw new SocialProviderException(e);
+  }
+}

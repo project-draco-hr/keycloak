@@ -7,7 +7,7 @@
     throw new NotFoundException("account management not enabled");
   }
   Audit audit=new AuditManager(realm,providers,clientConnection).createAudit();
-  AccountService accountService=new AccountService(realm,application,tokenManager,socialRequestManager,audit);
+  AccountService accountService=new AccountService(realm,application,audit);
   ResteasyProviderFactory.getInstance().injectProperties(accountService);
   accountService.init();
   return accountService;

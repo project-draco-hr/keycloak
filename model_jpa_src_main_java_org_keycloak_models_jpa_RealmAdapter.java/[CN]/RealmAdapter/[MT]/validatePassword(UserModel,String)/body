@@ -1,5 +1,5 @@
 {
-  for (  CredentialEntity cred : ((UserAdapter)user).getUser().getCredentials()) {
+  for (  UserCredentialValueModel cred : user.getCredentialsDirectly()) {
     if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
       return new Pbkdf2PasswordEncoder(cred.getSalt()).verify(password,cred.getValue());
     }

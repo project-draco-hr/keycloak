@@ -1,3 +1,18 @@
 {
-  this.client=new ResteasyClientBuilder().build();
+  DefaultHttpClient httpClient=(DefaultHttpClient)new HttpClientBuilder().build();
+  httpClient.setCookieStore(new CookieStore(){
+    @Override public void addCookie(    Cookie cookie){
+    }
+    @Override public List<Cookie> getCookies(){
+      return Collections.emptyList();
+    }
+    @Override public boolean clearExpired(    Date date){
+      return false;
+    }
+    @Override public void clear(){
+    }
+  }
+);
+  ApacheHttpClient4Engine engine=new ApacheHttpClient4Engine(httpClient);
+  this.client=new ResteasyClientBuilder().httpEngine(engine).build();
 }

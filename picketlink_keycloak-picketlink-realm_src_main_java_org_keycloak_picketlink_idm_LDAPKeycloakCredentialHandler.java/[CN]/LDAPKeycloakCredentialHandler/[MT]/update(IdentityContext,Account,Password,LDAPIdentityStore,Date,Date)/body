@@ -1,0 +1,20 @@
+{
+  super.update(context,account,password,store,effectiveDate,expiryDate);
+  if (userAccountControlAfterPasswordUpdate != null) {
+    ModificationItem[] mods=new ModificationItem[1];
+    BasicAttribute mod0=new BasicAttribute("userAccountControl",userAccountControlAfterPasswordUpdate);
+    mods[0]=new ModificationItem(DirContext.REPLACE_ATTRIBUTE,mod0);
+    try {
+      String bindingDN=(String)GET_BINDING_DN_METHOD.invoke(store,account);
+      LDAPOperationManager operationManager=(LDAPOperationManager)GET_OPERATION_MANAGER_METHOD.invoke(store);
+      operationManager.modifyAttribute(bindingDN,mod0);
+    }
+ catch (    IllegalAccessException iae) {
+      throw new RuntimeException(iae);
+    }
+catch (    InvocationTargetException ite) {
+      Throwable cause=ite.getTargetException() != null ? ite.getTargetException() : ite;
+      throw new RuntimeException(cause);
+    }
+  }
+}

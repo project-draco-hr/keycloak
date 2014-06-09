@@ -4,17 +4,6 @@
   if (!deployment.isConfigured()) {
     return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
   }
-  ServletRequestAuthenticator authenticator=createRequestAuthenticator(deployment,exchange,securityContext,facade);
-  AuthOutcome outcome=authenticator.authenticate();
-  if (outcome == AuthOutcome.AUTHENTICATED) {
-    return AuthenticationMechanismOutcome.AUTHENTICATED;
-  }
-  AuthChallenge challenge=authenticator.getChallenge();
-  if (challenge != null) {
-    exchange.putAttachment(KEYCLOAK_CHALLENGE_ATTACHMENT_KEY,challenge);
-  }
-  if (outcome == AuthOutcome.FAILED) {
-    return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
-  }
-  return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  RequestAuthenticator authenticator=createRequestAuthenticator(deployment,exchange,securityContext,facade);
+  return super.keycloakAuthenticate(exchange,authenticator);
 }

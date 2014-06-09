@@ -1,10 +1,10 @@
 {
   setupAuthenticationProviders();
-  LdapTestUtils.setLdapPassword(providerSession,realm,"john","password");
-  MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("john","password");
+  LdapTestUtils.setLdapPassword(providerSession,realm,"johnkeycloak","password");
+  MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("johnkeycloak","password");
   Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(null,realm,formData));
   AuthenticationProviderManager authProviderManager=AuthenticationProviderManager.getManager(realm,providerSession);
-  UserModel john=realm.getUser("john");
+  UserModel john=realm.getUser("johnkeycloak");
   try {
     Assert.assertTrue(authProviderManager.updatePassword(john,"password-updated"));
   }
@@ -12,7 +12,7 @@
     ape.printStackTrace();
     Assert.fail("Error not expected");
   }
-  formData=AuthProvidersExternalModelTest.createFormData("john","password-updated");
+  formData=AuthProvidersExternalModelTest.createFormData("johnkeycloak","password-updated");
   Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(null,realm,formData));
   Assert.assertFalse(realm.validatePassword(john,"password-updated"));
   AuthProvidersExternalModelTest.setPasswordUpdateForProvider(false,AuthProviderConstants.PROVIDER_NAME_PICKETLINK,realm);
@@ -23,6 +23,6 @@
     ape.printStackTrace();
     Assert.fail("Error not expected");
   }
-  formData=AuthProvidersExternalModelTest.createFormData("john","password-updated2");
+  formData=AuthProvidersExternalModelTest.createFormData("johnkeycloak","password-updated2");
   Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_CREDENTIALS,am.authenticateForm(null,realm,formData));
 }

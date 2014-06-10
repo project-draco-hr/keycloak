@@ -1,11 +1,8 @@
 {
-  if (role instanceof ApplicationRoleEntity) {
-    ApplicationRoleEntity entity=(ApplicationRoleEntity)role;
-    return new ApplicationAdapter(realm,em,entity.getApplication());
+  if (role.isApplicationRole()) {
+    return realm.getApplicationById(role.getApplication().getId());
   }
- else   if (role instanceof RealmRoleEntity) {
-    RealmRoleEntity entity=(RealmRoleEntity)role;
-    return new RealmAdapter(em,entity.getRealm());
+ else {
+    return realm;
   }
-  throw new IllegalStateException("Unknown role entity type");
 }

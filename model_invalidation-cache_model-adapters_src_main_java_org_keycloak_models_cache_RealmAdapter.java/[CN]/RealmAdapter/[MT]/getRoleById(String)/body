@@ -1,3 +1,17 @@
 {
-  return null;
+  if (updated != null)   return updated.getRoleById(id);
+  if (!cached.getRolesById().contains(id))   return null;
+  CachedRole cachedRole=cache.getRole(id);
+  if (cachedRole == null) {
+    RoleModel roleModel=cacheSession.getDelegate().getRoleById(id,this);
+    if (roleModel == null)     return null;
+    if (roleModel.getContainer() instanceof ApplicationModel) {
+      cachedRole=new CachedApplicationRole(((ApplicationModel)roleModel.getContainer()).getId(),roleModel);
+      cache.addCachedRole(cachedRole);
+    }
+ else {
+      cachedRole=new CachedRealmRole(roleModel);
+    }
+  }
+  return new RoleAdapter(cachedRole,cache,cacheSession,this);
 }

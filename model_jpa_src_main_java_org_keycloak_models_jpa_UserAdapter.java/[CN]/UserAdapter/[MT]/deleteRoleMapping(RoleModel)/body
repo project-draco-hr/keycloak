@@ -1,0 +1,10 @@
+{
+  if (user == null || role == null)   return;
+  TypedQuery<UserRoleMappingEntity> query=getUserRoleMappingEntityTypedQuery(role);
+  List<UserRoleMappingEntity> results=query.getResultList();
+  if (results.size() == 0)   return;
+  for (  UserRoleMappingEntity entity : results) {
+    em.remove(entity);
+  }
+  em.flush();
+}

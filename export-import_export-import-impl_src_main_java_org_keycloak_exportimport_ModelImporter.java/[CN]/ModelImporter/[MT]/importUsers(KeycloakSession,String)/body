@@ -3,8 +3,8 @@
   for (  UserEntity userEntity : users) {
     RealmModel realm=keycloakSession.getRealm(userEntity.getRealmId());
     UserModel user=realm.addUser(userEntity.getId(),userEntity.getLoginName());
-    for (    RoleModel role : realm.getRoleMappings(user)) {
-      realm.deleteRoleMapping(user,role);
+    for (    RoleModel role : user.getRoleMappings()) {
+      user.deleteRoleMapping(role);
     }
     this.propertiesManager.setBasicPropertiesToModel(user,userEntity);
     AuthenticationLinkEntity authLinkEntity=userEntity.getAuthenticationLink();
@@ -35,7 +35,7 @@
     if (userEntity.getRoleIds() != null) {
       for (      String roleId : userEntity.getRoleIds()) {
         RoleModel role=realm.getRoleById(roleId);
-        realm.grantRole(user,role);
+        user.grantRole(role);
       }
     }
     List<CredentialEntity> credentials=userEntity.getCredentials();

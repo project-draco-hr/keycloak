@@ -5,13 +5,13 @@
   entity.setRealm(realm);
   em.persist(entity);
   em.flush();
-  UserModel userModel=new UserAdapter(em,entity);
+  UserModel userModel=new UserAdapter(this,em,entity);
   for (  String r : getDefaultRoles()) {
-    grantRole(userModel,getRole(r));
+    userModel.grantRole(getRole(r));
   }
   for (  ApplicationModel application : getApplications()) {
     for (    String r : application.getDefaultRoles()) {
-      grantRole(userModel,application.getRole(r));
+      userModel.grantRole(application.getRole(r));
     }
   }
   return userModel;

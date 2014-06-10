@@ -1,13 +1,7 @@
 {
-  RoleEntity entity=em.find(RoleEntity.class,id);
+  RoleEntity entity=null;
+  entity=em.find(RoleEntity.class,id);
   if (entity == null)   return null;
-  if (entity instanceof RealmRoleEntity) {
-    RealmRoleEntity roleEntity=(RealmRoleEntity)entity;
-    if (!roleEntity.getRealm().getId().equals(getId()))     return null;
-  }
- else {
-    ApplicationRoleEntity roleEntity=(ApplicationRoleEntity)entity;
-    if (!roleEntity.getApplication().getRealm().getId().equals(getId()))     return null;
-  }
+  if (!getId().equals(entity.getRealmId()))   return null;
   return new RoleAdapter(this,em,entity);
 }

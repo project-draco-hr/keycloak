@@ -4,10 +4,10 @@
   OAuthClientModel client=realmModel.addOAuthClient("client");
   ApplicationModel app=realmModel.addApplication("test-app");
   RoleModel appRole=app.addRole("test");
-  realmModel.grantRole(user,appRole);
-  realmModel.addScopeMapping(client,appRole);
+  user.grantRole(appRole);
+  client.addScopeMapping(appRole);
   RoleModel realmRole=realmModel.addRole("test");
-  realmModel.addScopeMapping(app,realmRole);
+  app.addScopeMapping(realmRole);
   Assert.assertTrue(realmModel.removeApplication(app.getId()));
   Assert.assertFalse(realmModel.removeApplication(app.getId()));
   assertNull(realmModel.getApplicationById(app.getId()));

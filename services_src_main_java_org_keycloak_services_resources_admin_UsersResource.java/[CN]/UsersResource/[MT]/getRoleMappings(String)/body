@@ -5,7 +5,7 @@
     throw new NotFoundException("User not found");
   }
   MappingsRepresentation all=new MappingsRepresentation();
-  Set<RoleModel> realmMappings=realm.getRoleMappings(user);
+  Set<RoleModel> realmMappings=user.getRoleMappings();
   RealmManager manager=new RealmManager(session);
   if (realmMappings.size() > 0) {
     List<RoleRepresentation> realmRep=new ArrayList<RoleRepresentation>();
@@ -18,7 +18,7 @@
   if (applications.size() > 0) {
     Map<String,ApplicationMappingsRepresentation> appMappings=new HashMap<String,ApplicationMappingsRepresentation>();
     for (    ApplicationModel application : applications) {
-      Set<RoleModel> roleMappings=application.getApplicationRoleMappings(user);
+      Set<RoleModel> roleMappings=user.getApplicationRoleMappings(application);
       if (roleMappings.size() > 0) {
         ApplicationMappingsRepresentation mappings=new ApplicationMappingsRepresentation();
         mappings.setApplicationId(application.getId());

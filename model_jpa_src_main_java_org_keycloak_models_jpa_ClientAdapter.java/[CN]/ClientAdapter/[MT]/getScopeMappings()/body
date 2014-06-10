@@ -1,0 +1,10 @@
+{
+  TypedQuery<ScopeMappingEntity> query=em.createNamedQuery("clientScopeMappings",ScopeMappingEntity.class);
+  query.setParameter("client",getEntity());
+  List<ScopeMappingEntity> entities=query.getResultList();
+  Set<RoleModel> roles=new HashSet<RoleModel>();
+  for (  ScopeMappingEntity entity : entities) {
+    roles.add(new RoleAdapter(realm,em,entity.getRole()));
+  }
+  return roles;
+}

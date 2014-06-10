@@ -4,8 +4,8 @@
     return false;
   }
   if (!roleAdapter.getContainer().equals(this))   return false;
-  if (!(roleAdapter.getRole() instanceof ApplicationRoleEntity))   return false;
-  ApplicationRoleEntity role=(ApplicationRoleEntity)roleAdapter.getRole();
+  if (!roleAdapter.getRole().isApplicationRole())   return false;
+  RoleEntity role=roleAdapter.getRole();
   applicationEntity.getRoles().remove(role);
   applicationEntity.getDefaultRoles().remove(role);
   em.createNativeQuery("delete from CompositeRole where role = :role").setParameter("role",role).executeUpdate();

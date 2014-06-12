@@ -1,3 +1,11 @@
 {
-  return null;
+  MongoUserSessionEntity entity=new MongoUserSessionEntity();
+  entity.setRealmId(realm.getId());
+  entity.setUser(user.getId());
+  entity.setIpAddress(ipAddress);
+  int currentTime=Time.currentTime();
+  entity.setStarted(currentTime);
+  entity.setLastSessionRefresh(currentTime);
+  getMongoStore().insertEntity(entity,invocationContext);
+  return new UserSessionAdapter(entity,realm,invocationContext);
 }

@@ -1,10 +1,3 @@
 {
-  DBObject query=new QueryBuilder().and("loginName").is(name).and("realmId").is(getId()).get();
-  MongoUserEntity user=getMongoStore().loadSingleEntity(MongoUserEntity.class,query,invocationContext);
-  if (user == null) {
-    return null;
-  }
- else {
-    return new UserAdapter(this,user,invocationContext);
-  }
+  return session.getUserByUsername(name,this);
 }

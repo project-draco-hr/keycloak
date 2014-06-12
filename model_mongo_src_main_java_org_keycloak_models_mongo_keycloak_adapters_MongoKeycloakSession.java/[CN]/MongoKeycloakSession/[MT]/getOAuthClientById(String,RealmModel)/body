@@ -1,3 +1,5 @@
 {
-  return null;
+  MongoOAuthClientEntity clientEntity=getMongoStore().loadEntity(MongoOAuthClientEntity.class,id,invocationContext);
+  if (clientEntity == null || !realm.getId().equals(clientEntity.getRealmId()))   return null;
+  return new OAuthClientAdapter(this,realm,clientEntity,invocationContext);
 }

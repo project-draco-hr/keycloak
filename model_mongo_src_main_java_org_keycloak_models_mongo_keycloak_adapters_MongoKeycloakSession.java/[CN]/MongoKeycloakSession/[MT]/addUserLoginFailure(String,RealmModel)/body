@@ -1,3 +1,11 @@
 {
-  return null;
+  UsernameLoginFailureModel userLoginFailure=getUserLoginFailure(username,realm);
+  if (userLoginFailure != null) {
+    return userLoginFailure;
+  }
+  MongoUsernameLoginFailureEntity userEntity=new MongoUsernameLoginFailureEntity();
+  userEntity.setUsername(username);
+  userEntity.setRealmId(realm.getId());
+  getMongoStore().insertEntity(userEntity,invocationContext);
+  return new UsernameLoginFailureAdapter(invocationContext,userEntity);
 }

@@ -1,3 +1,5 @@
 {
-  return null;
+  DBObject query=new QueryBuilder().and("socialLinks.socialProvider").is(socialLink.getSocialProvider()).and("socialLinks.socialUserId").is(socialLink.getSocialUserId()).and("realmId").is(realm.getId()).get();
+  MongoUserEntity userEntity=getMongoStore().loadSingleEntity(MongoUserEntity.class,query,invocationContext);
+  return userEntity == null ? null : new UserAdapter(this,realm,userEntity,invocationContext);
 }

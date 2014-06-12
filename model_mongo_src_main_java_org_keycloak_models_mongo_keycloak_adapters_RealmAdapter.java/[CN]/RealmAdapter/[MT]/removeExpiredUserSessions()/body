@@ -1,7 +1,3 @@
 {
-  int currentTime=Time.currentTime();
-  DBObject query=new QueryBuilder().and("started").lessThan(currentTime - realm.getSsoSessionMaxLifespan()).get();
-  getMongoStore().removeEntities(MongoUserSessionEntity.class,query,invocationContext);
-  query=new QueryBuilder().and("lastSessionRefresh").lessThan(currentTime - realm.getSsoSessionIdleTimeout()).get();
-  getMongoStore().removeEntities(MongoUserSessionEntity.class,query,invocationContext);
+  this.session.removeExpiredUserSessions(this);
 }

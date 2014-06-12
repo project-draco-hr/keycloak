@@ -1,3 +1,8 @@
 {
-  return null;
+  DBObject query=new BasicDBObject("user",user.getId());
+  List<UserSessionModel> sessions=new LinkedList<UserSessionModel>();
+  for (  MongoUserSessionEntity e : getMongoStore().loadEntities(MongoUserSessionEntity.class,query,invocationContext)) {
+    sessions.add(new UserSessionAdapter(e,realm,invocationContext));
+  }
+  return sessions;
 }

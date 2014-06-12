@@ -1,3 +1,7 @@
 {
-  return null;
+  MongoApplicationEntity appData=getMongoStore().loadEntity(MongoApplicationEntity.class,id,invocationContext);
+  if (appData == null || !realm.getId().equals(appData.getRealmId())) {
+    return null;
+  }
+  return new ApplicationAdapter(this,realm,appData,invocationContext);
 }

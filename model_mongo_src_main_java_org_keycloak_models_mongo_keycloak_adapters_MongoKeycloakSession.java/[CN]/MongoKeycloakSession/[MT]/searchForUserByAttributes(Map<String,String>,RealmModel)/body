@@ -1,3 +1,19 @@
 {
-  return null;
+  QueryBuilder queryBuilder=new QueryBuilder().and("realmId").is(realm.getId());
+  for (  Map.Entry<String,String> entry : attributes.entrySet()) {
+    if (entry.getKey().equals(UserModel.LOGIN_NAME)) {
+      queryBuilder.and("loginName").regex(Pattern.compile("(?i:" + entry.getValue() + "$)"));
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.FIRST_NAME)) {
+      queryBuilder.and(UserModel.FIRST_NAME).regex(Pattern.compile("(?i:" + entry.getValue() + "$)"));
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.LAST_NAME)) {
+      queryBuilder.and(UserModel.LAST_NAME).regex(Pattern.compile("(?i:" + entry.getValue() + "$)"));
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.EMAIL)) {
+      queryBuilder.and(UserModel.EMAIL).regex(Pattern.compile("(?i:" + entry.getValue() + "$)"));
+    }
+  }
+  List<MongoUserEntity> users=getMongoStore().loadEntities(MongoUserEntity.class,queryBuilder.get(),invocationContext);
+  return convertUserEntities(realm,users);
 }

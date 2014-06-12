@@ -1,11 +1,3 @@
 {
-  UsernameLoginFailureModel model=getUserLoginFailure(username);
-  if (model != null)   return model;
-  String id=username + "-" + realm.getId();
-  UsernameLoginFailureEntity entity=new UsernameLoginFailureEntity();
-  entity.setId(id);
-  entity.setUsername(username);
-  entity.setRealm(realm);
-  em.persist(entity);
-  return new UsernameLoginFailureAdapter(entity);
+  return session.addUserLoginFailure(username,this);
 }

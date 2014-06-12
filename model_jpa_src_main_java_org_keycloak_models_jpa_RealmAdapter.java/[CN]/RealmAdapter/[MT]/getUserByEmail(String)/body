@@ -1,7 +1,3 @@
 {
-  TypedQuery<UserEntity> query=em.createNamedQuery("getRealmUserByEmail",UserEntity.class);
-  query.setParameter("email",email);
-  query.setParameter("realm",realm);
-  List<UserEntity> results=query.getResultList();
-  return results.isEmpty() ? null : new UserAdapter(this,em,results.get(0));
+  return session.getUserByEmail(email,this);
 }

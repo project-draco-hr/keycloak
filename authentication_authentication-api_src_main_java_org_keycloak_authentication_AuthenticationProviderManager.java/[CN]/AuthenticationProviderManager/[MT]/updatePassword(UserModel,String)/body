@@ -1,5 +1,5 @@
 {
-  AuthenticationLinkModel authLink=realm.getAuthenticationLink(user);
+  AuthenticationLinkModel authLink=user.getAuthenticationLink();
   if (authLink == null) {
     List<AuthenticationProviderModel> configuredProviders=getConfiguredProviderModels(realm);
     for (    AuthenticationProviderModel providerModel : configuredProviders) {
@@ -10,7 +10,7 @@
           if (authUser != null) {
             if (providerModel.getProviderName().equals(AuthenticationProviderModel.DEFAULT_PROVIDER.getProviderName())) {
               authLink=new AuthenticationLinkModel(providerModel.getProviderName(),authUser.getId());
-              realm.setAuthenticationLink(user,authLink);
+              user.setAuthenticationLink(authLink);
               logger.infof("User '%s' linked with provider '%s'",authUser.getUsername(),authUser.getProviderName());
             }
  else {
@@ -20,7 +20,7 @@
  else {
             String userIdInProvider=delegate.registerUser(realm,providerModel.getConfig(),user.getLoginName());
             authLink=new AuthenticationLinkModel(providerModel.getProviderName(),userIdInProvider);
-            realm.setAuthenticationLink(user,authLink);
+            user.setAuthenticationLink(authLink);
             logger.infof("User '%s' registered in provider '%s' and linked",user.getLoginName(),providerModel.getProviderName());
           }
           break;

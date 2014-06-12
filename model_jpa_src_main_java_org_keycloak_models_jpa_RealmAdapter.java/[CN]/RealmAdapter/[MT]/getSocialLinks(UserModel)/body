@@ -1,10 +1,3 @@
 {
-  TypedQuery<SocialLinkEntity> query=em.createNamedQuery("findSocialLinkByUser",SocialLinkEntity.class);
-  query.setParameter("user",((UserAdapter)user).getUser());
-  List<SocialLinkEntity> results=query.getResultList();
-  Set<SocialLinkModel> set=new HashSet<SocialLinkModel>();
-  for (  SocialLinkEntity entity : results) {
-    set.add(new SocialLinkModel(entity.getSocialProvider(),entity.getSocialUserId(),entity.getSocialUsername()));
-  }
-  return set;
+  return session.getSocialLinks(user,this);
 }

@@ -1,9 +1,9 @@
 {
-  AuthenticationLinkModel authLink=realm.getAuthenticationLink(user);
+  AuthenticationLinkModel authLink=user.getAuthenticationLink();
   if (authLink == null) {
     AuthUser authUser=getUser(user.getLoginName());
     authLink=new AuthenticationLinkModel(authUser.getProviderName(),authUser.getId());
-    realm.setAuthenticationLink(user,authLink);
+    user.setAuthenticationLink(authLink);
     logger.infof("User '%s' linked with provider '%s'",authUser.getUsername(),authUser.getProviderName());
   }
   String providerName=authLink.getAuthProvider();

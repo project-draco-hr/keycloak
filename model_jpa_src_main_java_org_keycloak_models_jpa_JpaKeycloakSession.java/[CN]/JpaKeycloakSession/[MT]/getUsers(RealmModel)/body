@@ -1,3 +1,9 @@
 {
-  return null;
+  TypedQuery<UserEntity> query=em.createQuery("select u from UserEntity u where u.realm = :realm",UserEntity.class);
+  RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
+  query.setParameter("realm",realmEntity);
+  List<UserEntity> results=query.getResultList();
+  List<UserModel> users=new ArrayList<UserModel>();
+  for (  UserEntity entity : results)   users.add(new UserAdapter(realm,em,entity));
+  return users;
 }

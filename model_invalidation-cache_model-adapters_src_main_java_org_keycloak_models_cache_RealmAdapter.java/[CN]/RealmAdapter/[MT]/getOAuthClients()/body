@@ -1,0 +1,12 @@
+{
+  if (updated != null)   return updated.getOAuthClients();
+  List<OAuthClientModel> clients=new LinkedList<OAuthClientModel>();
+  for (  String id : cached.getClients().values()) {
+    OAuthClientModel model=cacheSession.getOAuthClientById(id,this);
+    if (model == null) {
+      throw new IllegalStateException("Cached oauth client not found: " + id);
+    }
+    clients.add(model);
+  }
+  return clients;
+}

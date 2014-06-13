@@ -1,0 +1,10 @@
+{
+  DBObject query=new QueryBuilder().and("email").is(email).and("realmId").is(realm.getId()).get();
+  MongoUserEntity user=getMongoStore().loadSingleEntity(MongoUserEntity.class,query,invocationContext);
+  if (user == null) {
+    return null;
+  }
+ else {
+    return new UserAdapter(this,realm,user,invocationContext);
+  }
+}

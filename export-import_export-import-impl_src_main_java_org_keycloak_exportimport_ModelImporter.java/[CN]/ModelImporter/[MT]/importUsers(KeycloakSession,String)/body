@@ -3,15 +3,15 @@
   for (  UserEntity userEntity : users) {
     RealmModel realm=keycloakSession.getRealm(userEntity.getRealmId());
     UserModel user=realm.addUser(userEntity.getId(),userEntity.getLoginName());
-    for (    RoleModel role : realm.getRoleMappings(user)) {
-      realm.deleteRoleMapping(user,role);
+    for (    RoleModel role : user.getRoleMappings()) {
+      user.deleteRoleMapping(role);
     }
     this.propertiesManager.setBasicPropertiesToModel(user,userEntity);
     AuthenticationLinkEntity authLinkEntity=userEntity.getAuthenticationLink();
     if (authLinkEntity != null) {
       AuthenticationLinkModel authLinkModel=new AuthenticationLinkModel();
       this.propertiesManager.setBasicPropertiesToModel(authLinkModel,authLinkEntity);
-      realm.setAuthenticationLink(user,authLinkModel);
+      user.setAuthenticationLink(authLinkModel);
     }
     List<SocialLinkEntity> socialLinks=userEntity.getSocialLinks();
     if (socialLinks != null && !socialLinks.isEmpty()) {
@@ -35,7 +35,7 @@
     if (userEntity.getRoleIds() != null) {
       for (      String roleId : userEntity.getRoleIds()) {
         RoleModel role=realm.getRoleById(roleId);
-        realm.grantRole(user,role);
+        user.grantRole(role);
       }
     }
     List<CredentialEntity> credentials=userEntity.getCredentials();
@@ -43,7 +43,7 @@
       for (      CredentialEntity credEntity : credentials) {
         UserCredentialValueModel credModel=new UserCredentialValueModel();
         this.propertiesManager.setBasicPropertiesToModel(credModel,credEntity);
-        realm.updateCredentialDirectly(user,credModel);
+        user.updateCredentialDirectly(credModel);
       }
     }
   }

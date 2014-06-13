@@ -1,11 +1,3 @@
 {
-  MongoUserSessionEntity entity=new MongoUserSessionEntity();
-  entity.setRealmId(getId());
-  entity.setUser(user.getId());
-  entity.setIpAddress(ipAddress);
-  int currentTime=Time.currentTime();
-  entity.setStarted(currentTime);
-  entity.setLastSessionRefresh(currentTime);
-  getMongoStore().insertEntity(entity,invocationContext);
-  return new UserSessionAdapter(entity,this,invocationContext);
+  return session.createUserSession(this,user,ipAddress);
 }

@@ -1,6 +1,6 @@
 {
   if (!validatePassword(user,password))   return false;
-  for (  CredentialEntity cred : ((UserAdapter)user).getUser().getCredentials()) {
+  for (  UserCredentialValueModel cred : user.getCredentialsDirectly()) {
     if (cred.getType().equals(UserCredentialModel.TOTP)) {
       return new TimeBasedOTP().validate(token,cred.getValue().getBytes());
     }

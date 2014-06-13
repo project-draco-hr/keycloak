@@ -1,0 +1,13 @@
+{
+  Set<RoleModel> result=new HashSet<RoleModel>();
+  List<MongoRoleEntity> roles=MongoModelUtils.getAllScopesOfClient(this,invocationContext);
+  for (  MongoRoleEntity role : roles) {
+    if (realm.getId().equals(role.getRealmId())) {
+      result.add(new RoleAdapter(session,realm,role,realm,invocationContext));
+    }
+ else {
+      result.add(new RoleAdapter(session,realm,role,invocationContext));
+    }
+  }
+  return result;
+}

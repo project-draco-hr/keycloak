@@ -10,7 +10,7 @@
       this.propertiesManager.setBasicPropertiesFromModel(userModel,userEntity);
       userEntity.setLoginName(userModel.getLoginName());
       userEntity.setRealmId(realm.getId());
-      AuthenticationLinkModel authLink=realm.getAuthenticationLink(userModel);
+      AuthenticationLinkModel authLink=userModel.getAuthenticationLink();
       if (authLink != null) {
         AuthenticationLinkEntity authLinkEntity=new AuthenticationLinkEntity();
         this.propertiesManager.setBasicPropertiesFromModel(authLink,authLinkEntity);
@@ -31,13 +31,13 @@
         userEntity.setRequiredActions(new ArrayList<UserModel.RequiredAction>(requiredActions));
       }
       userEntity.setAttributes(userModel.getAttributes());
-      Set<RoleModel> roles=realm.getRoleMappings(userModel);
+      Set<RoleModel> roles=userModel.getRoleMappings();
       List<String> roleIds=new ArrayList<String>();
       for (      RoleModel role : roles) {
         roleIds.add(role.getId());
       }
       userEntity.setRoleIds(roleIds);
-      List<UserCredentialValueModel> credentials=realm.getCredentialsDirectly(userModel);
+      List<UserCredentialValueModel> credentials=userModel.getCredentialsDirectly();
       List<CredentialEntity> credEntities=new ArrayList<CredentialEntity>();
       for (      UserCredentialValueModel credModel : credentials) {
         CredentialEntity credEntity=new CredentialEntity();

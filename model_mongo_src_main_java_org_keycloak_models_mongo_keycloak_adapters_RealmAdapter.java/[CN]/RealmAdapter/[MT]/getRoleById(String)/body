@@ -1,12 +1,3 @@
 {
-  MongoRoleEntity role=getMongoStore().loadEntity(MongoRoleEntity.class,id,invocationContext);
-  if (role == null)   return null;
-  if (role.getRealmId() != null) {
-    if (!role.getRealmId().equals(this.getId()))     return null;
-  }
- else {
-    ApplicationModel app=getApplicationById(role.getApplicationId());
-    if (app == null)     return null;
-  }
-  return new RoleAdapter(this,role,null,invocationContext);
+  return session.getRoleById(id,this);
 }

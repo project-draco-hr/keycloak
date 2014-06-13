@@ -1,0 +1,13 @@
+{
+  MongoUserEntity userEntity=((UserAdapter)user).getUser();
+  List<SocialLinkEntity> linkEntities=userEntity.getSocialLinks();
+  if (linkEntities == null) {
+    return Collections.EMPTY_SET;
+  }
+  Set<SocialLinkModel> result=new HashSet<SocialLinkModel>();
+  for (  SocialLinkEntity socialLinkEntity : linkEntities) {
+    SocialLinkModel model=new SocialLinkModel(socialLinkEntity.getSocialProvider(),socialLinkEntity.getSocialUserId(),socialLinkEntity.getSocialUsername());
+    result.add(model);
+  }
+  return result;
+}

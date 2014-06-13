@@ -1,8 +1,3 @@
 {
-  TypedQuery<UserEntity> query=em.createNamedQuery("getRealmUserByLoginName",UserEntity.class);
-  query.setParameter("loginName",name);
-  query.setParameter("realm",realm);
-  List<UserEntity> results=query.getResultList();
-  if (results.size() == 0)   return null;
-  return new UserAdapter(results.get(0));
+  return session.getUserByUsername(name,this);
 }

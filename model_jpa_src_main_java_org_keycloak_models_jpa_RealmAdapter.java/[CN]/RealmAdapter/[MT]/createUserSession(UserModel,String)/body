@@ -1,11 +1,3 @@
 {
-  UserSessionEntity entity=new UserSessionEntity();
-  entity.setRealmId(realm.getId());
-  entity.setUserId(user.getId());
-  entity.setIpAddress(ipAddress);
-  int currentTime=Time.currentTime();
-  entity.setStarted(currentTime);
-  entity.setLastSessionRefresh(currentTime);
-  em.persist(entity);
-  return new UserSessionAdapter(em,this,entity);
+  return session.createUserSession(this,user,ipAddress);
 }

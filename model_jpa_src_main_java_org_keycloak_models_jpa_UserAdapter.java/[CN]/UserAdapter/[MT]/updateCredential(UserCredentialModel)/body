@@ -1,0 +1,21 @@
+{
+  CredentialEntity credentialEntity=getCredentialEntity(user,cred.getType());
+  if (credentialEntity == null) {
+    credentialEntity=new CredentialEntity();
+    credentialEntity.setType(cred.getType());
+    credentialEntity.setDevice(cred.getDevice());
+    credentialEntity.setUser(user);
+    em.persist(credentialEntity);
+    user.getCredentials().add(credentialEntity);
+  }
+  if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
+    byte[] salt=getSalt();
+    credentialEntity.setValue(new Pbkdf2PasswordEncoder(salt).encode(cred.getValue()));
+    credentialEntity.setSalt(salt);
+  }
+ else {
+    credentialEntity.setValue(cred.getValue());
+  }
+  credentialEntity.setDevice(cred.getDevice());
+  em.flush();
+}

@@ -1,0 +1,9 @@
+{
+  CachedRealm cached=cache.getCachedRealmByName(name);
+  if (cached == null) {
+    RealmModel model=getDelegate().getRealmByName(name);
+    if (model == null)     return null;
+    cached=new CachedRealm(cache,this,model);
+  }
+  return new RealmAdapter(cached,this);
+}

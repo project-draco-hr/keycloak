@@ -1,0 +1,19 @@
+{
+  CachedOAuthClient cached=cache.getOAuthClient(id);
+  if (cached == null) {
+    OAuthClientModel model=getDelegate().getOAuthClientById(id,realm);
+    if (model == null)     return null;
+    if (clientInvalidations.contains(id))     return model;
+    cached=new CachedOAuthClient(cache,getDelegate(),realm,model);
+    cache.addCachedOAuthClient(cached);
+  }
+ else   if (clientInvalidations.contains(id)) {
+    return getDelegate().getOAuthClientById(id,realm);
+  }
+ else   if (managedClients.containsKey(id)) {
+    return managedClients.get(id);
+  }
+  OAuthClientAdapter adapter=new OAuthClientAdapter(realm,cached,this,cache);
+  managedClients.put(id,adapter);
+  return adapter;
+}

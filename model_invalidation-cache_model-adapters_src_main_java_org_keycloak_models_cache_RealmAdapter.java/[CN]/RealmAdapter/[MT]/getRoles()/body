@@ -2,7 +2,9 @@
   if (updated != null)   return updated.getRoles();
   Set<RoleModel> roles=new HashSet<RoleModel>();
   for (  String id : cached.getRealmRoles().values()) {
-    roles.add(cacheSession.getRoleById(id,this));
+    RoleModel roleById=cacheSession.getRoleById(id,this);
+    if (roleById == null)     continue;
+    roles.add(roleById);
   }
   return roles;
 }

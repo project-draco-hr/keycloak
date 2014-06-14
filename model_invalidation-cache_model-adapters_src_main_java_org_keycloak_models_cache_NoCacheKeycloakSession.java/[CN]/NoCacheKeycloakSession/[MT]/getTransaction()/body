@@ -1,0 +1,37 @@
+{
+  return new KeycloakTransaction(){
+    @Override public void begin(){
+      transactionActive=true;
+    }
+    @Override public void commit(){
+      if (sessionDelegate == null)       return;
+      try {
+        sessionDelegate.getTransaction().commit();
+      }
+  finally {
+      }
+    }
+    @Override public void rollback(){
+      setRollbackOnly=true;
+      if (sessionDelegate == null)       return;
+      try {
+        sessionDelegate.getTransaction().rollback();
+      }
+  finally {
+      }
+    }
+    @Override public void setRollbackOnly(){
+      setRollbackOnly=true;
+      if (sessionDelegate == null)       return;
+      sessionDelegate.getTransaction().setRollbackOnly();
+      setRollbackOnly=true;
+    }
+    @Override public boolean getRollbackOnly(){
+      return setRollbackOnly;
+    }
+    @Override public boolean isActive(){
+      return transactionActive;
+    }
+  }
+;
+}

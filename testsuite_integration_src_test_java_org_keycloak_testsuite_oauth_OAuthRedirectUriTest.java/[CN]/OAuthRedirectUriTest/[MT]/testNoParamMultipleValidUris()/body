@@ -1,5 +1,5 @@
 {
-  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
     @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
       appRealm.getApplicationNameMap().get("test-app").addRedirectUri("http://localhost:8081/app2");
     }
@@ -12,7 +12,7 @@
     Assert.assertEquals("Invalid redirect_uri.",errorPage.getError());
   }
   finally {
-    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+    keycloakRule.update(new KeycloakRule.KeycloakSetup(){
       @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
         appRealm.getApplicationNameMap().get("test-app").removeRedirectUri("http://localhost:8081/app2");
       }

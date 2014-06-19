@@ -42,7 +42,6 @@
   masterAdminApp=model.getMasterAdminApp().getId();
   for (  RoleModel role : model.getRoles()) {
     realmRoles.put(role.getName(),role.getId());
-    rolesById.add(role.getId());
     CachedRole cachedRole=new CachedRealmRole(role);
     cache.addCachedRole(cachedRole);
   }
@@ -50,9 +49,6 @@
     applications.put(app.getName(),app.getId());
     CachedApplication cachedApp=new CachedApplication(cache,delegate,model,app);
     cache.addCachedApplication(cachedApp);
-    for (    String roleId : cachedApp.getRoles().values()) {
-      rolesById.add(roleId);
-    }
   }
   for (  OAuthClientModel client : model.getOAuthClients()) {
     clients.put(client.getClientId(),client.getId());

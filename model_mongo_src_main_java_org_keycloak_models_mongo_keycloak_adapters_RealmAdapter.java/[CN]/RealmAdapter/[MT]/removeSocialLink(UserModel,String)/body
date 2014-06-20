@@ -1,8 +1,9 @@
 {
-  SocialLinkEntity socialLinkEntity=findSocialLink(user,socialProvider);
+  UserModel user=getUserById(userModel.getId());
+  MongoUserEntity userEntity=((UserAdapter)user).getUser();
+  SocialLinkEntity socialLinkEntity=findSocialLink(userEntity,socialProvider);
   if (socialLinkEntity == null) {
     return false;
   }
-  MongoUserEntity userEntity=((UserAdapter)user).getUser();
   return getMongoStore().pullItemFromList(userEntity,"socialLinks",socialLinkEntity,invocationContext);
 }

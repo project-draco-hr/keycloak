@@ -1,5 +1,5 @@
 {
-  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
     @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
       appRealm.setPasswordPolicy(new PasswordPolicy("length"));
     }
@@ -16,7 +16,7 @@
     events.expectAccount(EventType.UPDATE_PASSWORD).assertEvent();
   }
   finally {
-    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+    keycloakRule.update(new KeycloakRule.KeycloakSetup(){
       @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
         appRealm.setPasswordPolicy(new PasswordPolicy(null));
       }

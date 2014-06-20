@@ -1,0 +1,22 @@
+{
+  this.id=user.getId();
+  this.loginName=user.getLoginName();
+  this.usernameKey=realm.getId() + "." + this.loginName;
+  this.firstName=user.getFirstName();
+  this.lastName=user.getLastName();
+  this.attributes.putAll(user.getAttributes());
+  this.email=user.getEmail();
+  if (this.email != null) {
+    this.emailKey=realm.getId() + "." + this.email;
+  }
+  this.emailVerified=user.isEmailVerified();
+  this.notBefore=user.getNotBefore();
+  this.credentials.addAll(user.getCredentialsDirectly());
+  this.enabled=user.isEnabled();
+  this.totp=user.isTotp();
+  this.requiredActions.addAll(user.getRequiredActions());
+  this.authenticationLink=user.getAuthenticationLink();
+  for (  RoleModel role : user.getRoleMappings()) {
+    roleMappings.add(role.getId());
+  }
+}

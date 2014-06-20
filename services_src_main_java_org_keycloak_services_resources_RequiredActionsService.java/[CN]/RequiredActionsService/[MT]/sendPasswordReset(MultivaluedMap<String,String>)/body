@@ -28,16 +28,15 @@
     audit.session(session);
     AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,realm,client,user,session);
     accessCode.setRequiredActions(requiredActions);
-    accessCode.setExpiration(Time.currentTime() + realm.getAccessCodeLifespanUserAction());
     accessCode.setAuthMethod("form");
-    accessCode.setUsername(username);
+    accessCode.setUsernameUsed(username);
     try {
       UriBuilder builder=Urls.loginPasswordResetBuilder(uriInfo.getBaseUri());
-      builder.queryParam("key",accessCode.getId());
+      builder.queryParam("key",accessCode.getCode());
       String link=builder.build(realm.getName()).toString();
       long expiration=TimeUnit.SECONDS.toMinutes(realm.getAccessCodeLifespanUserAction());
       providerSession.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendPasswordReset(link,expiration);
-      audit.user(user).detail(Details.EMAIL,user.getEmail()).detail(Details.CODE_ID,accessCode.getId()).success();
+      audit.user(user).detail(Details.EMAIL,user.getEmail()).detail(Details.CODE_ID,accessCode.getCodeId()).success();
     }
  catch (    EmailException e) {
       logger.error("Failed to send password reset email",e);

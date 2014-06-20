@@ -4,11 +4,11 @@
   }
   Set<RequiredAction> requiredActions=user.getRequiredActions();
   if (!requiredActions.isEmpty()) {
-    return Flows.forms(providerSession,realm,uriInfo).setAccessCode(accessCode.getId(),accessCode.getCode()).setUser(user).createResponse(requiredActions.iterator().next());
+    return Flows.forms(providerSession,realm,uriInfo).setAccessCode(accessCode.getCode()).setUser(user).createResponse(requiredActions.iterator().next());
   }
  else {
     logger.debugv("redirectOauth: redirecting to: {0}",accessCode.getRedirectUri());
-    accessCode.setExpiration(Time.currentTime() + realm.getAccessCodeLifespan());
+    accessCode.resetExpiration();
     AuthenticationManager authManager=new AuthenticationManager(providerSession);
     UserSessionModel session=realm.getUserSession(accessCode.getSessionState());
     if (!AuthenticationManager.isSessionValid(realm,session)) {

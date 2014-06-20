@@ -5,28 +5,15 @@
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
   String code=formData.getFirst(OAuth2Constants.CODE);
-  JWSInput input=new JWSInput(code);
-  boolean verifiedCode=false;
-  try {
-    verifiedCode=RSAProvider.verify(input,realm.getPublicKey());
-  }
- catch (  Exception ignored) {
-    logger.debug("Failed to verify signature",ignored);
-  }
-  if (!verifiedCode) {
-    audit.error(Errors.INVALID_CODE);
-    return oauth.forwardToSecurityFailure("Illegal access code.");
-  }
-  String key=input.readContentAsString();
-  audit.detail(Details.CODE_ID,key);
-  AccessCodeEntry accessCodeEntry=tokenManager.getAccessCode(key);
+  AccessCodeEntry accessCodeEntry=tokenManager.parseCode(code,realm);
   if (accessCodeEntry == null) {
     audit.error(Errors.INVALID_CODE);
     return oauth.forwardToSecurityFailure("Unknown access code.");
   }
+  audit.detail(Details.CODE_ID,accessCodeEntry.getCodeId());
   String redirect=accessCodeEntry.getRedirectUri();
   String state=accessCodeEntry.getState();
-  audit.client(accessCodeEntry.getClient()).user(accessCodeEntry.getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,accessCodeEntry.getAuthMethod()).detail(Details.REDIRECT_URI,redirect).detail(Details.USERNAME,accessCodeEntry.getUsername());
+  audit.client(accessCodeEntry.getClient()).user(accessCodeEntry.getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,accessCodeEntry.getAuthMethod()).detail(Details.REDIRECT_URI,redirect).detail(Details.USERNAME,accessCodeEntry.getUsernameUsed());
   if (accessCodeEntry.isRememberMe()) {
     audit.detail(Details.REMEMBER_ME,"true");
   }
@@ -42,6 +29,6 @@
     return redirectAccessDenied(redirect,state);
   }
   audit.success();
-  accessCodeEntry.setExpiration(Time.currentTime() + realm.getAccessCodeLifespan());
+  accessCodeEntry.resetExpiration();
   return oauth.redirectAccessCode(accessCodeEntry,session,state,redirect);
 }

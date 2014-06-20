@@ -1,0 +1,15 @@
+{
+  try {
+    JWSInput input=new JWSInput(code);
+    if (!RSAProvider.verify(input,realm.getPublicKey())) {
+      logger.error("Could not verify access code");
+      return null;
+    }
+    AccessCode accessCode=input.readJsonContent(AccessCode.class);
+    return new AccessCodeEntry(realm,accessCode);
+  }
+ catch (  Exception e) {
+    logger.error("error parsing access code",e);
+    return null;
+  }
+}

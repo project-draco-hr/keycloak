@@ -7,5 +7,6 @@
   Assert.assertNull(response.getError());
   oauth.verifyCode(response.getCode());
   String codeId=events.expectLogin().assertEvent().getDetails().get(Details.CODE_ID);
-  Assert.assertEquals(codeId,new JWSInput(response.getCode()).readContentAsString());
+  AccessCode accessCode=new JWSInput(response.getCode()).readJsonContent(AccessCode.class);
+  Assert.assertEquals(codeId,accessCode.getId());
 }

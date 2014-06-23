@@ -1,9 +1,11 @@
 {
   IdentityManager identityManager=getIdentityManager(realm);
   try {
-    User picketlinkUser=new User(username);
+    User picketlinkUser=new User(user.getLoginName());
+    picketlinkUser.setFirstName(user.getFirstName());
+    picketlinkUser.setLastName(user.getLastName());
+    picketlinkUser.setEmail(user.getEmail());
     identityManager.add(picketlinkUser);
-    picketlinkUser=BasicModel.getUser(identityManager,picketlinkUser.getLoginName());
     return picketlinkUser.getId();
   }
  catch (  IdentityManagementException ie) {

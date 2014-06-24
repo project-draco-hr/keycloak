@@ -1,0 +1,14 @@
+{
+  IdentityManager identityManager=getIdentityManager(realm);
+  try {
+    User picketlinkUser=new User(user.getLoginName());
+    picketlinkUser.setFirstName(user.getFirstName());
+    picketlinkUser.setLastName(user.getLastName());
+    picketlinkUser.setEmail(user.getEmail());
+    identityManager.add(picketlinkUser);
+    return picketlinkUser.getId();
+  }
+ catch (  IdentityManagementException ie) {
+    throw convertIDMException(ie);
+  }
+}

@@ -9,16 +9,23 @@
   checkSystemProperty("com.sun.jndi.ldap.connect.pool.timeout","300000");
   checkSystemProperty("com.sun.jndi.ldap.connect.pool.protocol","plain");
   checkSystemProperty("com.sun.jndi.ldap.connect.pool.debug","off");
-  String vendor=ldapConfig.get(LdapConstants.VENDOR);
-  if (vendor != null && vendor.equals(LdapConstants.VENDOR_RHDS)) {
+  String vendor=ldapConfig.get(LDAPConstants.VENDOR);
+  if (vendor != null && vendor.equals(LDAPConstants.VENDOR_RHDS)) {
     checkSystemProperty(LDAPIdentityStoreConfiguration.ENTRY_IDENTIFIER_ATTRIBUTE_NAME,"nsuniqueid");
   }
-  boolean activeDirectory=vendor != null && vendor.equals(LdapConstants.VENDOR_ACTIVE_DIRECTORY);
-  String ldapLoginName=getNameOfLDAPAttribute("keycloak.ldap.idm.loginName",UID,CN,activeDirectory);
-  String ldapFirstName=getNameOfLDAPAttribute("keycloak.ldap.idm.firstName",CN,"givenName",activeDirectory);
-  String ldapLastName=getNameOfLDAPAttribute("keycloak.ldap.idm.lastName",SN,SN,activeDirectory);
-  String ldapEmail=getNameOfLDAPAttribute("keycloak.ldap.idm.email",EMAIL,EMAIL,activeDirectory);
-  logger.infof("LDAP Attributes mapping: loginName: %s, firstName: %s, lastName: %s, email: %s",ldapLoginName,ldapFirstName,ldapLastName,ldapEmail);
-  builder.named("SIMPLE_LDAP_STORE_CONFIG").stores().ldap().connectionProperties(connectionProps).addCredentialHandler(LDAPKeycloakCredentialHandler.class).baseDN(ldapConfig.get(LdapConstants.BASE_DN)).bindDN(ldapConfig.get(LdapConstants.BIND_DN)).bindCredential(ldapConfig.get(LdapConstants.BIND_CREDENTIAL)).url(ldapConfig.get(LdapConstants.CONNECTION_URL)).activeDirectory(activeDirectory).supportAllFeatures().mapping(User.class).baseDN(ldapConfig.get(LdapConstants.USER_DN_SUFFIX)).objectClasses("inetOrgPerson","organizationalPerson").attribute("loginName",ldapLoginName,true).attribute("firstName",ldapFirstName).attribute("lastName",ldapLastName).attribute("email",ldapEmail);
-  return new DefaultPartitionManager(builder.buildAll());
+  boolean activeDirectory=vendor != null && vendor.equals(LDAPConstants.VENDOR_ACTIVE_DIRECTORY);
+  String ldapLoginNameMapping=ldapConfig.get(LDAPConstants.USERNAME_LDAP_ATTRIBUTE);
+  if (ldapLoginNameMapping == null) {
+    ldapLoginNameMapping=activeDirectory ? CN : UID;
+  }
+  ldapLoginNameMapping=getNameOfLDAPAttribute("keycloak.ldap.idm.loginName",ldapLoginNameMapping,ldapLoginNameMapping,activeDirectory);
+  String ldapFirstNameMapping=getNameOfLDAPAttribute("keycloak.ldap.idm.firstName",CN,"givenName",activeDirectory);
+  String ldapLastNameMapping=getNameOfLDAPAttribute("keycloak.ldap.idm.lastName",SN,SN,activeDirectory);
+  String ldapEmailMapping=getNameOfLDAPAttribute("keycloak.ldap.idm.email",EMAIL,EMAIL,activeDirectory);
+  logger.infof("LDAP Attributes mapping: loginName: %s, firstName: %s, lastName: %s, email: %s",ldapLoginNameMapping,ldapFirstNameMapping,ldapLastNameMapping,ldapEmailMapping);
+  builder.named("SIMPLE_LDAP_STORE_CONFIG").stores().ldap().connectionProperties(connectionProps).addCredentialHandler(LDAPKeycloakCredentialHandler.class).baseDN(ldapConfig.get(LDAPConstants.BASE_DN)).bindDN(ldapConfig.get(LDAPConstants.BIND_DN)).bindCredential(ldapConfig.get(LDAPConstants.BIND_CREDENTIAL)).url(ldapConfig.get(LDAPConstants.CONNECTION_URL)).activeDirectory(activeDirectory).supportAllFeatures().mapping(User.class).baseDN(ldapConfig.get(LDAPConstants.USER_DN_SUFFIX)).objectClasses("inetOrgPerson","organizationalPerson").attribute("loginName",ldapLoginNameMapping,true).attribute("firstName",ldapFirstNameMapping).attribute("lastName",ldapLastNameMapping).attribute("email",ldapEmailMapping);
+  List<IdentityConfiguration> identityConfigs=builder.buildAll();
+  IdentityStoreConfiguration identityStoreConfig=identityConfigs.get(0).getStoreConfiguration().get(0);
+  ((AbstractIdentityStoreConfiguration)identityStoreConfig).setIdentityStoreType(KeycloakLDAPIdentityStore.class);
+  return new DefaultPartitionManager(identityConfigs);
 }

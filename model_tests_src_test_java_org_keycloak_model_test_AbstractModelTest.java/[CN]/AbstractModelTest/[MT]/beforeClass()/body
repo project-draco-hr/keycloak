@@ -1,13 +1,12 @@
 {
-  providerSessionFactory=KeycloakApplication.createProviderSessionFactory();
-  ProviderSession providerSession=providerSessionFactory.createSession();
-  KeycloakSession identitySession=providerSession.getProvider(CacheKeycloakSession.class,"simple");
+  sessionFactory=KeycloakApplication.createSessionFactory();
+  KeycloakSession session=sessionFactory.create();
   try {
-    identitySession.getTransaction().begin();
-    new ApplianceBootstrap().bootstrap(identitySession,"/auth");
-    identitySession.getTransaction().commit();
+    session.getTransaction().begin();
+    new ApplianceBootstrap().bootstrap(session,"/auth");
+    session.getTransaction().commit();
   }
   finally {
-    providerSession.close();
+    session.close();
   }
 }

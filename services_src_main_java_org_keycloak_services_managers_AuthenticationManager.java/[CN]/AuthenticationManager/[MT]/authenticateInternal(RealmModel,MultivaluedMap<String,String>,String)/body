@@ -1,7 +1,7 @@
 {
   UserModel user=KeycloakModelUtils.findUserByNameOrEmail(realm,username);
   if (user == null) {
-    AuthUser authUser=AuthenticationProviderManager.getManager(realm,providerSession).getUser(username);
+    AuthUser authUser=AuthenticationProviderManager.getManager(realm,session).getUser(username);
     if (authUser != null) {
       user=realm.addUser(authUser.getUsername());
       user.setEnabled(true);
@@ -42,7 +42,7 @@
     }
  else {
       logger.debug("validating password for user: " + username);
-      AuthProviderStatus authStatus=AuthenticationProviderManager.getManager(realm,providerSession).validatePassword(user,password);
+      AuthProviderStatus authStatus=AuthenticationProviderManager.getManager(realm,session).validatePassword(user,password);
       if (authStatus == AuthProviderStatus.INVALID_CREDENTIALS) {
         logger.debug("invalid password for user: " + username);
         return AuthenticationStatus.INVALID_CREDENTIALS;

@@ -6,7 +6,7 @@
   OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
   events.poll();
   String refreshId=oauth.verifyRefreshToken(tokenResponse.getRefreshToken()).getId();
-  KeycloakSession session=keycloakRule.startCacheSession();
+  KeycloakSession session=keycloakRule.startSession();
   RealmModel realm=session.getRealmByName("test");
   int maxLifespan=realm.getSsoSessionMaxLifespan();
   realm.setSsoSessionMaxLifespan(1);
@@ -17,7 +17,7 @@
   assertEquals(400,tokenResponse.getStatusCode());
   assertNull(tokenResponse.getAccessToken());
   assertNull(tokenResponse.getRefreshToken());
-  session=keycloakRule.startCacheSession();
+  session=keycloakRule.startSession();
   realm=session.getRealmByName("test");
   realm.setSsoSessionMaxLifespan(maxLifespan);
   session.getTransaction().commit();

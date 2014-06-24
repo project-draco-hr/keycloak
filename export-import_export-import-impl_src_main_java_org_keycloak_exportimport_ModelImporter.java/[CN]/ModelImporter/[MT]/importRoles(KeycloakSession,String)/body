@@ -4,11 +4,11 @@
   for (  RoleEntity roleEntity : roles) {
     RoleModel role=null;
     if (roleEntity.getRealmId() != null) {
-      RealmModel realm=keycloakSession.getRealm(roleEntity.getRealmId());
+      RealmModel realm=session.getRealm(roleEntity.getRealmId());
       role=realm.addRole(roleEntity.getId(),roleEntity.getName());
     }
  else     if (roleEntity.getApplicationId() != null) {
-      ApplicationModel app=findApplicationById(keycloakSession,roleEntity.getApplicationId());
+      ApplicationModel app=findApplicationById(session,roleEntity.getApplicationId());
       role=app.addRole(roleEntity.getId(),roleEntity.getName());
     }
  else {
@@ -17,7 +17,7 @@
     role.setDescription(roleEntity.getDescription());
     rolesMap.put(roleEntity.getId(),roleEntity);
   }
-  for (  RealmModel realm : keycloakSession.getRealms()) {
+  for (  RealmModel realm : session.getRealms()) {
     fillCompositeRoles(rolesMap,realm,realm);
     for (    ApplicationModel app : realm.getApplications()) {
       fillCompositeRoles(rolesMap,app,realm);

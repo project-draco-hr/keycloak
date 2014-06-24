@@ -1,7 +1,7 @@
 {
   logger.info("TokenService.loginPage");
   audit.event(EventType.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code");
-  OAuthFlows oauth=Flows.oauth(providerSession,realm,request,uriInfo,authManager,tokenManager);
+  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
@@ -47,5 +47,5 @@
     return oauth.redirectError(client,"access_denied",state,redirect);
   }
   logger.info("createLogin() now...");
-  return Flows.forms(providerSession,realm,uriInfo).createLogin();
+  return Flows.forms(session,realm,uriInfo).createLogin();
 }

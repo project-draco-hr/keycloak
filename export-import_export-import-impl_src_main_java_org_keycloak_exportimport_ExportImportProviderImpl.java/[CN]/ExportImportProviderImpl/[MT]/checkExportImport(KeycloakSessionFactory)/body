@@ -1,0 +1,47 @@
+{
+  String exportImportAction=ExportImportConfig.getAction();
+  boolean export=false;
+  boolean importt=false;
+  if (ACTION_EXPORT.equals(exportImportAction)) {
+    logger.infof("Full model export requested");
+    export=true;
+  }
+ else   if (ACTION_IMPORT.equals(exportImportAction)) {
+    logger.infof("Full model import requested");
+    importt=true;
+  }
+  if (export || importt) {
+    KeycloakSession session=sessionFactory.create();
+    KeycloakTransaction transaction=session.getTransaction();
+    try {
+      transaction.begin();
+      if (export) {
+        ExportWriter exportWriter=getProvider().getExportWriter();
+        new ModelExporter().exportModel(session,exportWriter);
+        logger.infof("Export finished successfully");
+      }
+ else {
+        ImportReader importReader=getProvider().getImportReader();
+        new ModelImporter().importModel(session,importReader);
+        logger.infof("Import finished successfully");
+      }
+      if (transaction.isActive()) {
+        if (transaction.getRollbackOnly()) {
+          transaction.rollback();
+        }
+ else {
+          transaction.commit();
+        }
+      }
+    }
+ catch (    Exception e) {
+      if (transaction.isActive()) {
+        session.getTransaction().rollback();
+      }
+      throw new RuntimeException(e);
+    }
+ finally {
+      session.close();
+    }
+  }
+}

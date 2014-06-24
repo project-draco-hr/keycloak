@@ -1,0 +1,11 @@
+{
+  DeploymentInfo deploymentInfo=new DeploymentInfo();
+  deploymentInfo.setClassLoader(getClass().getClassLoader());
+  deploymentInfo.setDeploymentName("PerfApp");
+  deploymentInfo.setContextPath("/perf-app");
+  ServletInfo servlet=new ServletInfo("PerfAppServlet",PerfAppServlet.class);
+  servlet.addMapping("/*");
+  deploymentInfo.addServlet(servlet);
+  keycloakServer.getServer().deploy(deploymentInfo);
+  System.out.println("PerfApp deployed");
+}

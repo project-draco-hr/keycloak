@@ -1,0 +1,17 @@
+{
+  ResteasyDeployment deployment=new ResteasyDeployment();
+  deployment.setApplicationClass(KeycloakToolsApplication.class.getName());
+  UndertowJaxrsServer server=keycloakServer.getServer();
+  DeploymentInfo di=server.undertowDeployment(deployment,"");
+  di.setClassLoader(KeycloakTestApplication.class.getClassLoader());
+  di.setContextPath("/keycloak-tools");
+  di.setDeploymentName("KeycloakTools");
+  FilterInfo filter=Servlets.filter("SessionFilter",KeycloakSessionServletFilter.class);
+  di.addFilter(filter);
+  di.addFilterUrlMapping("SessionFilter","/perf/*",DispatcherType.REQUEST);
+  FilterInfo connectionFilter=Servlets.filter("ClientConnectionFilter",ClientConnectionFilter.class);
+  di.addFilter(connectionFilter);
+  di.addFilterUrlMapping("ClientConnectionFilter","/perf/*",DispatcherType.REQUEST);
+  server.deploy(di);
+  System.out.println("Keycloak tools deployed");
+}

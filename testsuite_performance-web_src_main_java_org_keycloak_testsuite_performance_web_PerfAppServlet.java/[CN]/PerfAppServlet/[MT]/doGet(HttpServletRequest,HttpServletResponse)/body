@@ -1,20 +1,27 @@
 {
-  String resourcePath="perf-app-resources" + req.getPathInfo();
-  System.out.println("Resource path: " + resourcePath);
-  InputStream inputStream=getClass().getClassLoader().getResourceAsStream(resourcePath);
-  if (inputStream == null) {
-    resp.getWriter().println("Not found: " + resourcePath);
-  }
- else {
-    OutputStream servletOutputStream=resp.getOutputStream();
-    byte[] buf=new byte[1024];
-    int bytesRead=0;
-    while (bytesRead != -1) {
-      bytesRead=inputStream.read(buf);
-      if (bytesRead != -1) {
-        servletOutputStream.write(buf,0,bytesRead);
-      }
+  resp.setContentType("text/html");
+  String action=req.getParameter("action");
+  if (action != null) {
+    if (action.equals("code")) {
+      keycloakLoginRedirect(req,resp);
+      return;
     }
-    servletOutputStream.flush();
+ else     if (action.equals("exchangeCode")) {
+      exchangeCodeForToken(req,resp);
+    }
+ else     if (action.equals("refresh")) {
+      refreshToken(req,resp);
+    }
+ else     if (action.equals("logout")) {
+      logoutRedirect(req,resp);
+      return;
+    }
   }
+  String code=req.getParameter("code");
+  if (code != null) {
+    req.getSession().setAttribute("code",code);
+  }
+  String freemarkerRedirect=freemarkerRedirect(req,resp);
+  resp.getWriter().println(freemarkerRedirect);
+  resp.getWriter().flush();
 }

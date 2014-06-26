@@ -1,6 +1,7 @@
 {
   resp.setContentType("text/html");
   String action=req.getParameter("action");
+  String actionDone=null;
   if (action != null) {
     if (action.equals("code")) {
       keycloakLoginRedirect(req,resp);
@@ -8,9 +9,11 @@
     }
  else     if (action.equals("exchangeCode")) {
       exchangeCodeForToken(req,resp);
+      actionDone="Token retrieved";
     }
  else     if (action.equals("refresh")) {
       refreshToken(req,resp);
+      actionDone="Token refreshed";
     }
  else     if (action.equals("logout")) {
       logoutRedirect(req,resp);
@@ -20,8 +23,9 @@
   String code=req.getParameter("code");
   if (code != null) {
     req.getSession().setAttribute("code",code);
+    actionDone="Code retrieved";
   }
-  String freemarkerRedirect=freemarkerRedirect(req,resp);
+  String freemarkerRedirect=freemarkerRedirect(req,resp,actionDone);
   resp.getWriter().println(freemarkerRedirect);
   resp.getWriter().flush();
 }

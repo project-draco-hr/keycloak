@@ -1,8 +1,5 @@
 {
   String refreshToken=(String)req.getSession().getAttribute("refreshToken");
   OAuthClient.AccessTokenResponse atResponse=oauthClient.doRefreshTokenRequest(refreshToken,"password");
-  String accessToken=atResponse.getAccessToken();
-  refreshToken=atResponse.getRefreshToken();
-  req.getSession().setAttribute("accessToken",accessToken);
-  req.getSession().setAttribute("refreshToken",refreshToken);
+  updateTokensInSession(req,atResponse);
 }

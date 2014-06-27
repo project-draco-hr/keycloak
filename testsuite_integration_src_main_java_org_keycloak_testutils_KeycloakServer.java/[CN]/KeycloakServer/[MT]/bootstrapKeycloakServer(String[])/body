@@ -34,6 +34,10 @@
     }
     config.setResourcesHome(dir.getAbsolutePath());
   }
+  if (System.getProperties().containsKey("undertowWorkerThreads")) {
+    int undertowWorkerThreads=Integer.parseInt(System.getProperty("undertowWorkerThreads"));
+    config.setWorkerThreads(undertowWorkerThreads);
+  }
   final KeycloakServer keycloak=new KeycloakServer(config);
   keycloak.sysout=true;
   keycloak.start();

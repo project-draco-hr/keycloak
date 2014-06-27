@@ -1,10 +1,5 @@
 {
-  String sessionState=null;
-  AccessToken accessTokenParsed=(AccessToken)req.getSession().getAttribute("accessTokenParsed");
-  if (accessTokenParsed != null) {
-    sessionState=accessTokenParsed.getSessionState();
-  }
   req.getSession(false).invalidate();
-  String logoutURL=oauthClient.getLogoutUrl(oauthClient.getRedirectUri(),sessionState);
+  String logoutURL=oauthClient.getLogoutUrl(oauthClient.getRedirectUri(),null);
   resp.sendRedirect(logoutURL);
 }

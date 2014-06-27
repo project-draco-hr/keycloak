@@ -32,5 +32,10 @@
     accessCode.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
   }
   audit.clone().event(EventType.UPDATE_PASSWORD).success();
+  if (accessCode.getSessionState() == null) {
+    UserSessionModel userSession=realm.createUserSession(realm.getUserById(accessCode.getUser().getId()),clientConnection.getRemoteAddr());
+    accessCode.getToken().setSessionState(userSession.getId());
+    audit.session(userSession);
+  }
   return redirectOauth(user,accessCode);
 }

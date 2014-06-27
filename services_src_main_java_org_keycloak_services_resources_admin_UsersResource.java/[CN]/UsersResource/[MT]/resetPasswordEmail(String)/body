@@ -26,7 +26,7 @@
     builder.queryParam("key",accessCode.getCode());
     String link=builder.build(realm.getName()).toString();
     long expiration=TimeUnit.SECONDS.toMinutes(realm.getAccessCodeLifespanUserAction());
-    providerSession.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendPasswordReset(link,expiration);
+    session.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendPasswordReset(link,expiration);
     return Response.ok().build();
   }
  catch (  EmailException e) {

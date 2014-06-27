@@ -1,9 +1,7 @@
 {
-  ProviderSessionFactory providerSessionFactory=(ProviderSessionFactory)servletRequest.getServletContext().getAttribute(ProviderSessionFactory.class.getName());
-  ProviderSession providerSession=providerSessionFactory.createSession();
   HttpServletRequest request=(HttpServletRequest)servletRequest;
-  ResteasyProviderFactory.pushContext(ProviderSession.class,providerSession);
-  KeycloakSession session=providerSession.getProvider(CacheKeycloakSession.class);
+  KeycloakSessionFactory sessionFactory=(KeycloakSessionFactory)servletRequest.getServletContext().getAttribute(KeycloakSessionFactory.class.getName());
+  KeycloakSession session=sessionFactory.create();
   ResteasyProviderFactory.pushContext(KeycloakSession.class,session);
   KeycloakTransaction tx=session.getTransaction();
   ResteasyProviderFactory.pushContext(KeycloakTransaction.class,tx);
@@ -28,7 +26,7 @@ catch (  RuntimeException ex) {
     throw new RuntimeException("request path: " + request.getRequestURI(),ex);
   }
  finally {
-    providerSession.close();
+    session.close();
     ResteasyProviderFactory.clearContextData();
   }
 }

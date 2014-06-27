@@ -1,0 +1,19 @@
+{
+  RealmEntity realm=em.find(RealmEntity.class,id);
+  if (realm == null) {
+    return false;
+  }
+  RealmAdapter adapter=new RealmAdapter(session,em,realm);
+  adapter.removeUserSessions();
+  for (  ApplicationEntity a : new LinkedList<ApplicationEntity>(realm.getApplications())) {
+    adapter.removeApplication(a.getId());
+  }
+  for (  OAuthClientModel oauth : adapter.getOAuthClients()) {
+    adapter.removeOAuthClient(oauth.getId());
+  }
+  for (  UserEntity u : em.createQuery("from UserEntity u where u.realm = :realm",UserEntity.class).setParameter("realm",realm).getResultList()) {
+    adapter.removeUser(u.getLoginName());
+  }
+  em.remove(realm);
+  return true;
+}

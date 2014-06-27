@@ -1,14 +1,14 @@
 {
   loadConfig();
-  this.providerSessionFactory=createProviderSessionFactory();
+  this.sessionFactory=createSessionFactory();
   dispatcher.getDefaultContextObjects().put(KeycloakApplication.class,this);
   this.contextPath=context.getContextPath();
-  BruteForceProtector protector=new BruteForceProtector(providerSessionFactory);
+  BruteForceProtector protector=new BruteForceProtector(sessionFactory);
   dispatcher.getDefaultContextObjects().put(BruteForceProtector.class,protector);
   ResteasyProviderFactory.pushContext(BruteForceProtector.class,protector);
   protector.start();
   context.setAttribute(BruteForceProtector.class.getName(),protector);
-  context.setAttribute(ProviderSessionFactory.class.getName(),this.providerSessionFactory);
+  context.setAttribute(KeycloakSessionFactory.class.getName(),this.sessionFactory);
   TokenManager tokenManager=new TokenManager();
   singletons.add(new RealmsResource(tokenManager));
   singletons.add(new SocialResource(tokenManager));
@@ -20,6 +20,6 @@
   classes.add(WelcomeResource.class);
   checkExportImportProvider();
   setupDefaultRealm(context.getContextPath());
-  setupScheduledTasks(providerSessionFactory);
+  setupScheduledTasks(sessionFactory);
   importRealms(context);
 }

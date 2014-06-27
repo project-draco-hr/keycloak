@@ -1,8 +1,7 @@
 {
   job.start();
-  ProviderSession providerSession=providerSessionFactory.createSession();
+  KeycloakSession session=sessionFactory.create();
   try {
-    KeycloakSession session=providerSession.getProvider(CacheKeycloakSession.class);
     session.getTransaction().begin();
     RealmModel realm=new RealmManager(session).getRealmByName(realmName);
     for (int i=start; i < (start + count); i++) {
@@ -28,6 +27,6 @@
     job.setError(sw.toString());
   }
  finally {
-    providerSession.close();
+    session.close();
   }
 }

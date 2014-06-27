@@ -1,19 +1,18 @@
 {
-  identitySession.getTransaction().commit();
-  providerSession.close();
-  providerSession=providerSessionFactory.createSession();
-  identitySession=providerSession.getProvider(CacheKeycloakSession.class,"simple");
+  session.getTransaction().commit();
+  session.close();
+  session=sessionFactory.create();
   try {
-    identitySession.getTransaction().begin();
-    RealmManager rm=new RealmManager(identitySession);
-    for (    RealmModel realm : identitySession.getRealms()) {
+    session.getTransaction().begin();
+    RealmManager rm=new RealmManager(session);
+    for (    RealmModel realm : session.getRealms()) {
       if (!realm.getName().equals(Config.getAdminRealm())) {
         rm.removeRealm(realm);
       }
     }
-    identitySession.getTransaction().commit();
+    session.getTransaction().commit();
   }
   finally {
-    providerSession.close();
+    session.close();
   }
 }

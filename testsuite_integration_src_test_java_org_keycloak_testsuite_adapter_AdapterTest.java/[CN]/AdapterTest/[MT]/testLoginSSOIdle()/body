@@ -8,18 +8,18 @@
   String pageSource=driver.getPageSource();
   System.out.println(pageSource);
   Assert.assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
-  KeycloakSession keycloakSession=keycloakRule.startCacheSession();
-  RealmModel realm=keycloakSession.getRealmByName("demo");
+  KeycloakSession session=keycloakRule.startSession();
+  RealmModel realm=session.getRealmByName("demo");
   int originalIdle=realm.getSsoSessionIdleTimeout();
   realm.setSsoSessionIdleTimeout(1);
-  keycloakSession.getTransaction().commit();
-  keycloakSession.close();
+  session.getTransaction().commit();
+  session.close();
   Thread.sleep(2000);
   driver.navigate().to("http://localhost:8081/product-portal");
   Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
-  keycloakSession=keycloakRule.startCacheSession();
-  realm=keycloakSession.getRealmByName("demo");
+  session=keycloakRule.startSession();
+  realm=session.getRealmByName("demo");
   realm.setSsoSessionIdleTimeout(originalIdle);
-  keycloakSession.getTransaction().commit();
-  keycloakSession.close();
+  session.getTransaction().commit();
+  session.close();
 }

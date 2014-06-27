@@ -1,16 +1,15 @@
 {
-  ProviderSession providerSession=server.getProviderSessionFactory().createSession();
-  KeycloakSession session=providerSession.getProvider(CacheKeycloakSession.class);
+  KeycloakSession session=server.getSessionFactory().create();
   session.getTransaction().begin();
   try {
     RealmManager manager=new RealmManager(session);
     RealmModel adminstrationRealm=manager.getRealm(Config.getAdminRealm());
     RealmModel appRealm=manager.getRealm("test");
-    configurer.providerSession=providerSession;
+    configurer.session=session;
     configurer.config(manager,adminstrationRealm,appRealm);
     session.getTransaction().commit();
   }
   finally {
-    providerSession.close();
+    session.close();
   }
 }

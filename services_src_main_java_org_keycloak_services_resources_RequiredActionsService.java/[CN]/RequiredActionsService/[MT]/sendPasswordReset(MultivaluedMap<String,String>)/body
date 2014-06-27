@@ -4,13 +4,13 @@
   String state=uriInfo.getQueryParameters().getFirst(OAuth2Constants.STATE);
   String redirect=uriInfo.getQueryParameters().getFirst(OAuth2Constants.REDIRECT_URI);
   String clientId=uriInfo.getQueryParameters().getFirst(OAuth2Constants.CLIENT_ID);
-  AuthenticationManager authManager=new AuthenticationManager(providerSession);
+  AuthenticationManager authManager=new AuthenticationManager(session);
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
-    return Flows.oauth(providerSession,realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Unknown login requester.");
+    return Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Unknown login requester.");
   }
   if (!client.isEnabled()) {
-    return Flows.oauth(providerSession,realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
+    return Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
   }
   audit.event(EventType.SEND_RESET_PASSWORD).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
   UserModel user=realm.getUser(username);
@@ -35,13 +35,13 @@
       builder.queryParam("key",accessCode.getCode());
       String link=builder.build(realm.getName()).toString();
       long expiration=TimeUnit.SECONDS.toMinutes(realm.getAccessCodeLifespanUserAction());
-      providerSession.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendPasswordReset(link,expiration);
+      this.session.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendPasswordReset(link,expiration);
       audit.user(user).detail(Details.EMAIL,user.getEmail()).detail(Details.CODE_ID,accessCode.getCodeId()).success();
     }
  catch (    EmailException e) {
       logger.error("Failed to send password reset email",e);
-      return Flows.forms(providerSession,realm,uriInfo).setError("emailSendError").createErrorPage();
+      return Flows.forms(this.session,realm,uriInfo).setError("emailSendError").createErrorPage();
     }
   }
-  return Flows.forms(providerSession,realm,uriInfo).setSuccess("emailSent").createPasswordReset();
+  return Flows.forms(session,realm,uriInfo).setSuccess("emailSent").createPasswordReset();
 }

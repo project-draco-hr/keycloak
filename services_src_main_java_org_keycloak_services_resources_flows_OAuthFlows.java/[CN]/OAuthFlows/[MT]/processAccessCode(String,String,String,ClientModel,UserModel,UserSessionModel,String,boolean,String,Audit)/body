@@ -17,7 +17,7 @@
     if (action.equals(RequiredAction.VERIFY_EMAIL)) {
       audit.clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,accessCode.getUser().getEmail()).success();
     }
-    return Flows.forms(providerSession,realm,uriInfo).setAccessCode(accessCode.getCode()).setUser(user).createResponse(action);
+    return Flows.forms(this.session,realm,uriInfo).setAccessCode(accessCode.getCode()).setUser(user).createResponse(action);
   }
   if (!isResource) {
     accessCode.resetExpiration();
@@ -43,7 +43,7 @@
         }
       }
     }
-    return Flows.forms(providerSession,realm,uriInfo).setAccessCode(accessCode.getCode()).setAccessRequest(realmRolesRequested,appRolesRequested).setClient(client).createOAuthGrant();
+    return Flows.forms(this.session,realm,uriInfo).setAccessCode(accessCode.getCode()).setAccessRequest(realmRolesRequested,appRolesRequested).setClient(client).createOAuthGrant();
   }
   if (redirect != null) {
     audit.success();

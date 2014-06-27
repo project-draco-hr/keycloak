@@ -1,6 +1,5 @@
 {
-  ProviderSession providerSession=providerSessionFactory.createSession();
-  KeycloakSession session=providerSession.getProvider(KeycloakSession.class);
+  KeycloakSession session=sessionFactory.create();
   try {
     session.getTransaction().begin();
     RealmManager manager=new RealmManager(session);
@@ -19,6 +18,6 @@
     session.getTransaction().commit();
   }
   finally {
-    providerSession.close();
+    session.close();
   }
 }

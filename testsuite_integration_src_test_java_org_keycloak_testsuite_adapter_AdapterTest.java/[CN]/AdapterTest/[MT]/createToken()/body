@@ -1,7 +1,7 @@
 {
-  ProviderSession providerSession=keycloakRule.startSession();
+  KeycloakSession session=keycloakRule.startSession();
   try {
-    RealmManager manager=new RealmManager(providerSession.getProvider(KeycloakSession.class));
+    RealmManager manager=new RealmManager(session);
     RealmModel adminRealm=manager.getRealm(Config.getAdminRealm());
     ApplicationModel adminConsole=adminRealm.getApplicationByName(Constants.ADMIN_CONSOLE_APPLICATION);
     TokenManager tm=new TokenManager();
@@ -11,6 +11,6 @@
     return tm.encodeToken(adminRealm,token);
   }
   finally {
-    keycloakRule.stopSession(providerSession,true);
+    keycloakRule.stopSession(session,true);
   }
 }

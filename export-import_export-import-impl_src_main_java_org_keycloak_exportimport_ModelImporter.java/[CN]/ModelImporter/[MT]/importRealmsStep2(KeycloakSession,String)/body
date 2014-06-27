@@ -1,8 +1,8 @@
 {
   List<RealmEntity> realms=this.importReader.readEntities(fileName,RealmEntity.class);
-  RealmModel adminRealm=keycloakSession.getRealm(Config.getAdminRealm());
+  RealmModel adminRealm=session.getRealm(Config.getAdminRealm());
   for (  RealmEntity realmEntity : realms) {
-    RealmModel realm=keycloakSession.getRealm(realmEntity.getId());
+    RealmModel realm=session.getRealm(realmEntity.getId());
     String adminAppId=realmEntity.getAdminAppId();
     if (adminAppId != null) {
       realm.setMasterAdminApp(adminRealm.getApplicationById(adminAppId));

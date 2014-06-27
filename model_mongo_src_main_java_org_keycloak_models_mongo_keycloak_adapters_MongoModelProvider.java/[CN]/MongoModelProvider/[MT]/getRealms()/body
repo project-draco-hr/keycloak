@@ -1,0 +1,9 @@
+{
+  DBObject query=new BasicDBObject();
+  List<MongoRealmEntity> realms=getMongoStore().loadEntities(MongoRealmEntity.class,query,invocationContext);
+  List<RealmModel> results=new ArrayList<RealmModel>();
+  for (  MongoRealmEntity realmEntity : realms) {
+    results.add(new RealmAdapter(session,realmEntity,invocationContext));
+  }
+  return results;
+}

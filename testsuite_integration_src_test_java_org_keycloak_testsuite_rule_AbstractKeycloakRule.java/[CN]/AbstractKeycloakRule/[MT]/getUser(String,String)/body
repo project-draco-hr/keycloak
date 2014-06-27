@@ -1,11 +1,11 @@
 {
-  ProviderSession providerSession=server.getProviderSessionFactory().createSession();
-  KeycloakSession session=providerSession.getProvider(KeycloakSession.class);
+  KeycloakSession session=server.getSessionFactory().create();
+  session.getTransaction().begin();
   try {
     UserModel user=session.getRealmByName(realm).getUser(name);
     return user != null ? ModelToRepresentation.toRepresentation(user) : null;
   }
   finally {
-    providerSession.close();
+    session.close();
   }
 }

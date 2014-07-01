@@ -2,7 +2,7 @@
   long start=System.currentTimeMillis();
   ResteasyDeployment deployment=new ResteasyDeployment();
   deployment.setApplicationClass(KeycloakApplication.class.getName());
-  Builder builder=Undertow.builder().addListener(config.getPort(),config.getHost());
+  Builder builder=Undertow.builder().addHttpListener(config.getPort(),config.getHost()).setWorkerThreads(config.getWorkerThreads()).setIoThreads(config.getWorkerThreads() / 8);
   server=new UndertowJaxrsServer().start(builder);
   DeploymentInfo di=server.undertowDeployment(deployment,"");
   di.setClassLoader(getClass().getClassLoader());

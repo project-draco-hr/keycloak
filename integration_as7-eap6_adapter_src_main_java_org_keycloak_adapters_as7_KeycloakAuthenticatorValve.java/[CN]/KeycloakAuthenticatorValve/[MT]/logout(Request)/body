@@ -1,0 +1,17 @@
+{
+  KeycloakSecurityContext ksc=(KeycloakSecurityContext)request.getAttribute(KeycloakSecurityContext.class.getName());
+  if (ksc != null) {
+    request.removeAttribute(KeycloakSecurityContext.class.getName());
+    Session session=request.getSessionInternal(false);
+    if (session != null) {
+      session.removeNote(KeycloakSecurityContext.class.getName());
+      try {
+        ServerRequest.invokeLogout(deploymentContext.getDeployment(),ksc.getToken().getSessionState());
+      }
+ catch (      Exception e) {
+        log.error("failed to invoke remote logout",e);
+      }
+    }
+  }
+  super.logout(request);
+}

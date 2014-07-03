@@ -1,0 +1,14 @@
+{
+  URI uri=deployment.getLogoutUrl().clone().queryParam("session_state",sessionId).build();
+  HttpGet logout=new HttpGet(uri);
+  HttpResponse response=deployment.getClient().execute(logout);
+  int status=response.getStatusLine().getStatusCode();
+  HttpEntity entity=response.getEntity();
+  if (status != 200) {
+    error(status,entity);
+  }
+  if (entity == null) {
+    return;
+  }
+  entity.getContent().close();
+}

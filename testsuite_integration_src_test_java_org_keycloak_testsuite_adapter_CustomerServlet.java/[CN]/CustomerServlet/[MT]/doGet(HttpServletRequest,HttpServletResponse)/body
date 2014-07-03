@@ -1,4 +1,12 @@
 {
+  PrintWriter pw=resp.getWriter();
+  if (req.getRequestURI().toString().endsWith("logout")) {
+    resp.setStatus(200);
+    pw.println("ok");
+    pw.flush();
+    req.logout();
+    return;
+  }
   KeycloakSecurityContext context=(KeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
   Client client=ClientBuilder.newClient();
   try {
@@ -8,7 +16,6 @@
     response.close();
     String html=target.request().header(HttpHeaders.AUTHORIZATION,"Bearer " + context.getTokenString()).get(String.class);
     resp.setContentType("text/html");
-    PrintWriter pw=resp.getWriter();
     pw.println(html);
     pw.flush();
   }

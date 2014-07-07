@@ -1,0 +1,23 @@
+{
+  if (id == null) {
+    id=KeycloakModelUtils.generateId();
+  }
+  UserEntity entity=new UserEntity();
+  entity.setId(id);
+  entity.setUsername(username);
+  entity.setRealm(realm);
+  em.persist(entity);
+  em.flush();
+  UserModel userModel=new UserAdapter(this,em,entity);
+  if (addDefaultRoles) {
+    for (    String r : getDefaultRoles()) {
+      userModel.grantRole(getRole(r));
+    }
+    for (    ApplicationModel application : getApplications()) {
+      for (      String r : application.getDefaultRoles()) {
+        userModel.grantRole(application.getRole(r));
+      }
+    }
+  }
+  return userModel;
+}

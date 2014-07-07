@@ -1,0 +1,16 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmManager manager=new RealmManager(session);
+    RealmModel adminRealm=manager.getRealm(Config.getAdminRealm());
+    ApplicationModel adminConsole=adminRealm.getApplicationByName(Constants.ADMIN_CONSOLE_APPLICATION);
+    TokenManager tm=new TokenManager();
+    UserModel admin=adminRealm.getUser("admin");
+    UserSessionModel userSession=adminRealm.createUserSession(admin,null);
+    AccessToken token=tm.createClientAccessToken(null,adminRealm,adminConsole,admin,userSession);
+    return tm.encodeToken(adminRealm,token);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

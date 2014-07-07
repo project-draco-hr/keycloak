@@ -38,7 +38,6 @@
   if (rep.getAccountTheme() != null)   newRealm.setAccountTheme(rep.getAccountTheme());
   if (rep.getAdminTheme() != null)   newRealm.setAdminTheme(rep.getAdminTheme());
   if (rep.getEmailTheme() != null)   newRealm.setEmailTheme(rep.getEmailTheme());
-  Map<String,UserModel> userMap=new HashMap<String,UserModel>();
   if (rep.getRequiredCredentials() != null) {
     for (    String requiredCred : rep.getRequiredCredentials()) {
       addRequiredCredential(newRealm,requiredCred);
@@ -48,12 +47,6 @@
     addRequiredCredential(newRealm,CredentialRepresentation.PASSWORD);
   }
   if (rep.getPasswordPolicy() != null)   newRealm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
-  if (rep.getUsers() != null) {
-    for (    UserRepresentation userRep : rep.getUsers()) {
-      UserModel user=createUser(newRealm,userRep);
-      userMap.put(user.getUsername(),user);
-    }
-  }
   if (rep.getApplications() != null) {
     Map<String,ApplicationModel> appMap=createApplications(rep,newRealm);
   }
@@ -103,16 +96,6 @@
     createOAuthClients(rep,newRealm);
   }
   Map<String,ApplicationModel> appMap=newRealm.getApplicationNameMap();
-  if (rep.getApplicationRoleMappings() != null) {
-    ApplicationManager manager=new ApplicationManager(this);
-    for (    Map.Entry<String,List<UserRoleMappingRepresentation>> entry : rep.getApplicationRoleMappings().entrySet()) {
-      ApplicationModel app=appMap.get(entry.getKey());
-      if (app == null) {
-        throw new RuntimeException("Unable to find application role mappings for app: " + entry.getKey());
-      }
-      manager.createRoleMappings(newRealm,app,entry.getValue());
-    }
-  }
   if (rep.getApplicationScopeMappings() != null) {
     ApplicationManager manager=new ApplicationManager(this);
     for (    Map.Entry<String,List<ScopeMappingRepresentation>> entry : rep.getApplicationScopeMappings().entrySet()) {
@@ -121,18 +104,6 @@
         throw new RuntimeException("Unable to find application role mappings for app: " + entry.getKey());
       }
       manager.createScopeMappings(newRealm,app,entry.getValue());
-    }
-  }
-  if (rep.getRoleMappings() != null) {
-    for (    UserRoleMappingRepresentation mapping : rep.getRoleMappings()) {
-      UserModel user=userMap.get(mapping.getUsername());
-      for (      String roleString : mapping.getRoles()) {
-        RoleModel role=newRealm.getRole(roleString.trim());
-        if (role == null) {
-          role=newRealm.addRole(roleString.trim());
-        }
-        user.grantRole(role);
-      }
     }
   }
   if (rep.getScopeMappings() != null) {
@@ -144,15 +115,6 @@
         }
         ClientModel client=newRealm.findClient(scope.getClient());
         client.addScopeMapping(role);
-      }
-    }
-  }
-  if (rep.getSocialMappings() != null) {
-    for (    SocialMappingRepresentation socialMapping : rep.getSocialMappings()) {
-      UserModel user=userMap.get(socialMapping.getUsername());
-      for (      SocialLinkRepresentation link : socialMapping.getSocialLinks()) {
-        SocialLinkModel mappingModel=new SocialLinkModel(link.getSocialProvider(),link.getSocialUserId(),link.getSocialUsername());
-        newRealm.addSocialLink(user,mappingModel);
       }
     }
   }
@@ -172,5 +134,10 @@
  else {
     List<AuthenticationProviderModel> authProviderModels=Arrays.asList(AuthenticationProviderModel.DEFAULT_PROVIDER);
     newRealm.setAuthenticationProviders(authProviderModels);
+  }
+  if (rep.getUsers() != null) {
+    for (    UserRepresentation userRep : rep.getUsers()) {
+      UserModel user=createUser(newRealm,userRep,appMap);
+    }
   }
 }

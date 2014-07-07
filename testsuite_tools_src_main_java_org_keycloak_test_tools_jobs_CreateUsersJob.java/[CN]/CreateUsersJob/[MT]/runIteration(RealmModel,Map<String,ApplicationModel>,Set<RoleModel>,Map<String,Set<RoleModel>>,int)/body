@@ -1,0 +1,15 @@
+{
+  String username=prefix + "-" + counter;
+  UserModel user=realm.addUser(username);
+  user.setEnabled(true);
+  user.setFirstName("First");
+  user.setLastName("Last");
+  user.setEmail(username + "@localhost");
+  UserCredentialModel password=new UserCredentialModel();
+  password.setType(UserCredentialModel.PASSWORD);
+  password.setValue("password");
+  user.updateCredential(password);
+  for (  String r : roles) {
+    grantRole(user,r,realmRoles,appRoles);
+  }
+}

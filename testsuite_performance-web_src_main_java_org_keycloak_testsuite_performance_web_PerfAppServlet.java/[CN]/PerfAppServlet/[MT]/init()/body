@@ -3,7 +3,8 @@
     Configuration cfg=new Configuration();
     cfg.setTemplateLoader(new ClassTemplateLoader(getClass(),"/"));
     indexTemplate=cfg.getTemplate("perf-app-resources/index.ftl");
-    oauthClient=new OAuthClient();
+    String baseUrl=getInitParameter(BASE_URL_INIT_PARAM);
+    oauthClient=new OAuthClient(baseUrl);
   }
  catch (  IOException ioe) {
     throw new ServletException(ioe);

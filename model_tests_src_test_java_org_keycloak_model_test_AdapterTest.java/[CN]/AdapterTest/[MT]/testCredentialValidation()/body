@@ -6,4 +6,11 @@
   cred.setValue("geheim");
   user.updateCredential(cred);
   Assert.assertTrue(realmModel.validatePassword(user,"geheim"));
+  List<UserCredentialValueModel> creds=user.getCredentialsDirectly();
+  Assert.assertEquals(creds.get(0).getHashIterations(),1);
+  realmModel.setPasswordPolicy(new PasswordPolicy("hashIterations(200)"));
+  Assert.assertTrue(realmModel.validatePassword(user,"geheim"));
+  creds=user.getCredentialsDirectly();
+  Assert.assertEquals(creds.get(0).getHashIterations(),200);
+  realmModel.setPasswordPolicy(new PasswordPolicy("hashIterations(1)"));
 }

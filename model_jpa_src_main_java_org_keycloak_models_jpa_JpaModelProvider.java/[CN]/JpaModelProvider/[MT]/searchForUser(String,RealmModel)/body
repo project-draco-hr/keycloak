@@ -1,5 +1,5 @@
 {
-  TypedQuery<UserEntity> query=em.createQuery("select u from UserEntity u where u.realm = :realm and ( lower(u.loginName) like :search or lower(concat(u.firstName, ' ', u.lastName)) like :search or u.email like :search )",UserEntity.class);
+  TypedQuery<UserEntity> query=em.createQuery("select u from UserEntity u where u.realm = :realm and ( lower(u.username) like :search or lower(concat(u.firstName, ' ', u.lastName)) like :search or u.email like :search )",UserEntity.class);
   RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
   query.setParameter("realm",realmEntity);
   query.setParameter("search","%" + search.toLowerCase() + "%");

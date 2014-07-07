@@ -8,8 +8,15 @@
   }
   if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
     byte[] salt=Pbkdf2PasswordEncoder.getSalt();
-    credentialEntity.setValue(new Pbkdf2PasswordEncoder(salt).encode(cred.getValue()));
+    int hashIterations=1;
+    PasswordPolicy policy=realm.getPasswordPolicy();
+    if (policy != null) {
+      hashIterations=policy.getHashIterations();
+      if (hashIterations == -1)       hashIterations=1;
+    }
+    credentialEntity.setValue(new Pbkdf2PasswordEncoder(salt).encode(cred.getValue(),hashIterations));
     credentialEntity.setSalt(salt);
+    credentialEntity.setHashIterations(hashIterations);
   }
  else {
     credentialEntity.setValue(cred.getValue());

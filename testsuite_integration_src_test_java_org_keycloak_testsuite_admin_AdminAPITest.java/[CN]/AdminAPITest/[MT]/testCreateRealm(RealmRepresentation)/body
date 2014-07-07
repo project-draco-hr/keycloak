@@ -1,0 +1,27 @@
+{
+  String token=createToken();
+  final String authHeader="Bearer " + token;
+  ClientRequestFilter authFilter=new ClientRequestFilter(){
+    @Override public void filter(    ClientRequestContext requestContext) throws IOException {
+      requestContext.getHeaders().add(HttpHeaders.AUTHORIZATION,authHeader);
+    }
+  }
+;
+  Client client=ClientBuilder.newBuilder().register(authFilter).build();
+  UriBuilder authBase=UriBuilder.fromUri("http://localhost:8081/auth");
+  WebTarget adminRealms=client.target(AdminRoot.realmsUrl(authBase));
+  String realmName=rep.getRealm();
+  RealmRepresentation newRep=new RealmRepresentation();
+  newRep.setRealm(rep.getRealm());
+  newRep.setEnabled(rep.isEnabled());
+{
+    Response response=adminRealms.request().post(Entity.json(newRep));
+    Assert.assertEquals(201,response.getStatus());
+    response.close();
+  }
+{
+    Response response=adminRealms.path(realmName).request().delete();
+    Assert.assertEquals(204,response.getStatus());
+    response.close();
+  }
+}

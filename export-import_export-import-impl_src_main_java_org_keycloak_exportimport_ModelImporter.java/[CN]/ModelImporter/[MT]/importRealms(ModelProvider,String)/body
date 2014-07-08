@@ -1,0 +1,21 @@
+{
+  List<RealmEntity> realms=this.importReader.readEntities(fileName,RealmEntity.class);
+  for (  RealmEntity realmEntity : realms) {
+    RealmModel realm=model.createRealm(realmEntity.getId(),realmEntity.getName());
+    this.propertiesManager.setBasicPropertiesToModel(realm,realmEntity);
+    Set<String> reqCredModels=new HashSet<String>();
+    for (    RequiredCredentialEntity requiredCredEntity : realmEntity.getRequiredCredentials()) {
+      reqCredModels.add(requiredCredEntity.getType());
+    }
+    realm.updateRequiredCredentials(reqCredModels);
+    realm.setPasswordPolicy(new PasswordPolicy(realmEntity.getPasswordPolicy()));
+    List<AuthenticationProviderModel> authProviderModels=new ArrayList<AuthenticationProviderModel>();
+    for (    AuthenticationProviderEntity authProviderEntity : realmEntity.getAuthenticationProviders()) {
+      AuthenticationProviderModel authProvider=new AuthenticationProviderModel();
+      this.propertiesManager.setBasicPropertiesToModel(authProvider,authProviderEntity);
+      authProviderModels.add(authProvider);
+    }
+    realm.setAuthenticationProviders(authProviderModels);
+  }
+  logger.infof("Realms imported: " + realms);
+}

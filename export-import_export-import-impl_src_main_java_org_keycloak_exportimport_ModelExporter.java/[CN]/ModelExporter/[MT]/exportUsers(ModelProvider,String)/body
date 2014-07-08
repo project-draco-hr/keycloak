@@ -1,0 +1,55 @@
+{
+  List<RealmModel> realms=model.getRealms();
+  List<UserEntity> result=new LinkedList<UserEntity>();
+  for (  RealmModel realm : realms) {
+    List<UserModel> userModels=realm.getUsers();
+    for (    UserModel userModel : userModels) {
+      UserEntity userEntity=new UserEntity();
+      userEntity.setId(userModel.getId());
+      result.add(userEntity);
+      this.propertiesManager.setBasicPropertiesFromModel(userModel,userEntity);
+      userEntity.setUsername(userModel.getUsername());
+      userEntity.setRealmId(realm.getId());
+      AuthenticationLinkModel authLink=userModel.getAuthenticationLink();
+      if (authLink != null) {
+        AuthenticationLinkEntity authLinkEntity=new AuthenticationLinkEntity();
+        this.propertiesManager.setBasicPropertiesFromModel(authLink,authLinkEntity);
+        userEntity.setAuthenticationLink(authLinkEntity);
+      }
+      Set<SocialLinkModel> socialLinks=realm.getSocialLinks(userModel);
+      if (socialLinks != null && !socialLinks.isEmpty()) {
+        List<SocialLinkEntity> socialLinkEntities=new ArrayList<SocialLinkEntity>();
+        for (        SocialLinkModel socialLink : socialLinks) {
+          SocialLinkEntity socialLinkEntity=new SocialLinkEntity();
+          this.propertiesManager.setBasicPropertiesFromModel(socialLink,socialLinkEntity);
+          socialLinkEntities.add(socialLinkEntity);
+        }
+        userEntity.setSocialLinks(socialLinkEntities);
+      }
+      Set<UserModel.RequiredAction> requiredActions=userModel.getRequiredActions();
+      if (requiredActions != null && !requiredActions.isEmpty()) {
+        userEntity.setRequiredActions(new ArrayList<UserModel.RequiredAction>(requiredActions));
+      }
+      userEntity.setAttributes(userModel.getAttributes());
+      Set<RoleModel> roles=userModel.getRoleMappings();
+      List<String> roleIds=new ArrayList<String>();
+      for (      RoleModel role : roles) {
+        roleIds.add(role.getId());
+      }
+      userEntity.setRoleIds(roleIds);
+      List<UserCredentialValueModel> credentials=userModel.getCredentialsDirectly();
+      List<CredentialEntity> credEntities=new ArrayList<CredentialEntity>();
+      for (      UserCredentialValueModel credModel : credentials) {
+        CredentialEntity credEntity=new CredentialEntity();
+        this.propertiesManager.setBasicPropertiesFromModel(credModel,credEntity);
+        credEntities.add(credEntity);
+      }
+      userEntity.setCredentials(credEntities);
+    }
+  }
+  this.exportWriter.writeEntities(fileName,result);
+  logger.infof("%d users exported: ",result.size());
+  if (logger.isDebugEnabled()) {
+    logger.debug("Exported users: " + result);
+  }
+}

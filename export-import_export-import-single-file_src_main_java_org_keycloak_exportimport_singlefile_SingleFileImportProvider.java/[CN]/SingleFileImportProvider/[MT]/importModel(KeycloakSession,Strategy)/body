@@ -1,0 +1,10 @@
+{
+  logger.infof("Full importing from file %s",this.file.getAbsolutePath());
+  ExportImportUtils.runJobInTransaction(session,new ExportImportJob(){
+    @Override public void run() throws IOException {
+      FileInputStream is=new FileInputStream(file);
+      ImportUtils.importFromStream(session,JsonSerialization.mapper,is,strategy);
+    }
+  }
+);
+}

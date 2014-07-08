@@ -1,0 +1,11 @@
+{
+  logger.infof("Exporting realm '%s' into file %s",realmName,this.file.getAbsolutePath());
+  ExportImportUtils.runJobInTransaction(session,new ExportImportJob(){
+    @Override public void run() throws IOException {
+      RealmModel realm=session.getModel().getRealmByName(realmName);
+      RealmRepresentation realmRep=ExportUtils.exportRealm(realm,true);
+      writeToFile(realmRep);
+    }
+  }
+);
+}

@@ -1,0 +1,13 @@
+{
+  final RealmsHolder holder=new RealmsHolder();
+  ExportImportUtils.runJobInTransaction(session,new ExportImportJob(){
+    @Override public void run(){
+      List<RealmModel> realms=session.getModel().getRealms();
+      holder.realms=realms;
+    }
+  }
+);
+  for (  RealmModel realm : holder.realms) {
+    exportRealm(session,realm.getName());
+  }
+}

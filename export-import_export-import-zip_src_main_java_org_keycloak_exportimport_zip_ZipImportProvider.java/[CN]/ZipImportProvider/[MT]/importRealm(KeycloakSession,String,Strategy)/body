@@ -1,0 +1,31 @@
+{
+  try {
+    ByteArrayOutputStream bos=new ByteArrayOutputStream();
+    this.decrypter.extractEntry(this.decrypter.getEntry(realmName + "-realm.json"),bos,this.password);
+    ByteArrayInputStream bis=new ByteArrayInputStream(bos.toByteArray());
+    final RealmRepresentation realmRep=JsonSerialization.mapper.readValue(bis,RealmRepresentation.class);
+    ExportImportUtils.runJobInTransaction(session,new ExportImportJob(){
+      @Override public void run() throws IOException {
+        ImportUtils.importRealm(session,realmRep,strategy);
+      }
+    }
+);
+    for (    ExtZipEntry entry : this.decrypter.getEntryList()) {
+      String name=entry.getName();
+      if ((name.startsWith(realmName)) && (name.endsWith(".json")) && (name.substring(realmName.length()).contains("-users-"))) {
+        bos=new ByteArrayOutputStream();
+        this.decrypter.extractEntry(entry,bos,this.password);
+        final ByteArrayInputStream bis2=new ByteArrayInputStream(bos.toByteArray());
+        ExportImportUtils.runJobInTransaction(session,new ExportImportJob(){
+          @Override public void run() throws IOException {
+            ImportUtils.importUsersFromStream(session,realmName,JsonSerialization.mapper,bis2);
+          }
+        }
+);
+      }
+    }
+  }
+ catch (  DataFormatException dfe) {
+    throw new RuntimeException(dfe);
+  }
+}

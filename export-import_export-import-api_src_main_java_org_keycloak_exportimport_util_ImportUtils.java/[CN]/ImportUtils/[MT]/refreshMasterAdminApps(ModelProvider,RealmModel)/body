@@ -1,0 +1,15 @@
+{
+  String adminRealmId=Config.getAdminRealm();
+  if (adminRealmId.equals(realm.getId())) {
+    RealmModel adminRealm=realm;
+    for (    RealmModel currentRealm : model.getRealms()) {
+      ApplicationModel masterApp=adminRealm.getApplicationByName(ExportImportUtils.getMasterRealmAdminApplicationName(currentRealm));
+      currentRealm.setMasterAdminApp(masterApp);
+    }
+  }
+ else {
+    RealmModel adminRealm=model.getRealm(adminRealmId);
+    ApplicationModel masterApp=adminRealm.getApplicationByName(ExportImportUtils.getMasterRealmAdminApplicationName(realm));
+    realm.setMasterAdminApp(masterApp);
+  }
+}

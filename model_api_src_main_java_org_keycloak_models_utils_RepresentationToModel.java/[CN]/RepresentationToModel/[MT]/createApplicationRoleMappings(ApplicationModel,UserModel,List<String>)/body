@@ -1,0 +1,12 @@
+{
+  if (user == null) {
+    throw new RuntimeException("User not found");
+  }
+  for (  String roleName : roleNames) {
+    RoleModel role=applicationModel.getRole(roleName.trim());
+    if (role == null) {
+      role=applicationModel.addRole(roleName.trim());
+    }
+    user.grantRole(role);
+  }
+}

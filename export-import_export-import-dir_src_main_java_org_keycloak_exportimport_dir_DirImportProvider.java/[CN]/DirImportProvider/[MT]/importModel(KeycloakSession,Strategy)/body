@@ -1,0 +1,13 @@
+{
+  File[] realmFiles=this.rootDirectory.listFiles(new FilenameFilter(){
+    @Override public boolean accept(    File dir,    String name){
+      return (name.endsWith("-realm.json"));
+    }
+  }
+);
+  for (  File file : realmFiles) {
+    String fileName=file.getName();
+    String realmName=fileName.substring(0,fileName.length() - 11);
+    importRealm(session,realmName,strategy);
+  }
+}

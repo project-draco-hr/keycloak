@@ -1,0 +1,20 @@
+{
+  if (cred.getValue() != null) {
+    UserCredentialModel plainTextCred=convertCredential(cred);
+    user.updateCredential(plainTextCred);
+  }
+ else {
+    UserCredentialValueModel hashedCred=new UserCredentialValueModel();
+    hashedCred.setType(cred.getType());
+    hashedCred.setDevice(cred.getDevice());
+    hashedCred.setHashIterations(cred.getHashIterations());
+    try {
+      hashedCred.setSalt(Base64.decode(cred.getSalt()));
+    }
+ catch (    IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+    hashedCred.setValue(cred.getHashedSaltedValue());
+    user.updateCredentialDirectly(hashedCred);
+  }
+}

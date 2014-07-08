@@ -1,0 +1,12 @@
+{
+  for (  ClientUserSessionAssociationEntity ass : entity.getClients()) {
+    if (ass.getClientId().equals(client))     return;
+  }
+  ClientUserSessionAssociationEntity association=new ClientUserSessionAssociationEntity();
+  association.setClientId(client);
+  association.setSession(entity);
+  association.setUserId(entity.getUserId());
+  association.setRealmId(realm);
+  em.persist(association);
+  entity.getClients().add(association);
+}

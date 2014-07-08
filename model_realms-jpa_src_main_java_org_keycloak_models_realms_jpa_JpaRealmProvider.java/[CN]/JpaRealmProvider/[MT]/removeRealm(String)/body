@@ -1,0 +1,15 @@
+{
+  RealmEntity realm=em.find(RealmEntity.class,id);
+  if (realm == null) {
+    return false;
+  }
+  RealmAdapter adapter=new RealmAdapter(this,em,realm);
+  for (  Application a : adapter.getApplications()) {
+    adapter.removeApplication(a);
+  }
+  for (  OAuthClient oauth : adapter.getOAuthClients()) {
+    adapter.removeOAuthClient(oauth);
+  }
+  em.remove(realm);
+  return true;
+}

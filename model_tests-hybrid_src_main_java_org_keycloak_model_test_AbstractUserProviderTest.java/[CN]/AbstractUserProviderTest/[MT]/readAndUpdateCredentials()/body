@@ -1,0 +1,26 @@
+{
+  if (provider.supports(Feature.READ_CREDENTIALS) && provider.supports(Feature.UPDATE_CREDENTIALS)) {
+    persistUsers();
+    provider.getTransaction().begin();
+    User user=provider.getUserById(userId,"test-realm");
+    User user2=provider.getUserById(userId2,"test-realm");
+    User user3=provider.getUserById(userId3,"test-realm2");
+    byte[] salt=Pbkdf2PasswordEncoder.getSalt();
+    Pbkdf2PasswordEncoder encoder=new Pbkdf2PasswordEncoder(salt);
+    user.updateCredential(new Credentials(UserCredentialModel.PASSWORD,salt,encoder.encode("password",1000),1000,null));
+    user.updateCredential(new Credentials(UserCredentialModel.TOTP,"totp-secret",null));
+    user2.updateCredential(new Credentials(UserCredentialModel.PASSWORD,salt,encoder.encode("password2",1000),1000,null));
+    user3.updateCredential(new Credentials(UserCredentialModel.PASSWORD,salt,encoder.encode("password3",1000),1000,null));
+    provider.getTransaction().commit();
+    User persisted=provider.getUserById(userId,"test-realm");
+    assertEquals(2,persisted.getCredentials().size());
+    assertPassword(persisted,"password");
+    assertTotp(user,"totp-secret");
+    User persisted2=provider.getUserById(userId2,"test-realm");
+    assertEquals(1,persisted2.getCredentials().size());
+    assertPassword(persisted2,"password2");
+    User persisted3=provider.getUserById(userId3,"test-realm2");
+    assertEquals(1,persisted3.getCredentials().size());
+    assertPassword(persisted3,"password3");
+  }
+}

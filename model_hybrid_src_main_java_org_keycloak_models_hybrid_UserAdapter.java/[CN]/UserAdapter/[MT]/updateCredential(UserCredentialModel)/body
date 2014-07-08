@@ -1,0 +1,23 @@
+{
+  if (provider.users().supports(Feature.UPDATE_CREDENTIALS)) {
+    Credentials credentials;
+    if (model.getType().equals(UserCredentialModel.PASSWORD)) {
+      byte[] salt=getSalt();
+      int hashIterations=1;
+      PasswordPolicy policy=realm.getPasswordPolicy();
+      if (policy != null) {
+        hashIterations=policy.getHashIterations();
+        if (hashIterations == -1)         hashIterations=1;
+      }
+      String value=new Pbkdf2PasswordEncoder(salt).encode(model.getValue(),hashIterations);
+      credentials=new Credentials(model.getType(),salt,value,hashIterations,model.getDevice());
+    }
+ else {
+      credentials=new Credentials(model.getType(),model.getValue(),model.getDevice());
+    }
+    user.updateCredential(credentials);
+  }
+ else {
+    throw new RuntimeException("Users store doesn't support updating credentials");
+  }
+}

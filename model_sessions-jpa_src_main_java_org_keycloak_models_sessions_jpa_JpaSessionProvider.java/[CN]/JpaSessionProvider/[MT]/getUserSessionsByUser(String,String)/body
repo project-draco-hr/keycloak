@@ -1,0 +1,7 @@
+{
+  List<Session> sessions=new LinkedList<Session>();
+  for (  UserSessionEntity e : em.createNamedQuery("getUserSessionByUser",UserSessionEntity.class).setParameter("userId",user).getResultList()) {
+    sessions.add(new UserSessionAdapter(em,realm,e));
+  }
+  return sessions;
+}

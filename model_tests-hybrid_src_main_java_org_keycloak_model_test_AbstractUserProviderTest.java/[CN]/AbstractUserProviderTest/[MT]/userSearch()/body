@@ -1,0 +1,51 @@
+{
+  provider.getTransaction().begin();
+{
+    User user=provider.addUser("bill-burke","bill-burke",null,"test-realm");
+    user.setLastName("Burke");
+    user.setFirstName("Bill");
+    user.setEmail("bburke@redhat.com");
+    User user2=provider.addUser("knut-ole","knut-ole",null,"test-realm");
+    user2.setFirstName("Knut Ole");
+    user2.setLastName("Alver");
+    user2.setEmail("knut@redhat.com");
+    User user3=provider.addUser("ole-alver","ole-alver",null,"test-realm");
+    user3.setFirstName("Ole");
+    user3.setLastName("Alver Veland");
+    user3.setEmail("knut2@redhat.com");
+  }
+  provider.getTransaction().commit();
+  assertUsers(provider.searchForUser("total junk query","test-realm"));
+  assertUsers(provider.searchForUser("Bill Burke","test-realm"),"bill-burke");
+  assertUsers(provider.searchForUser("bill burk","test-realm"),"bill-burke");
+  assertUsers(provider.searchForUser("bill burk","test-realm"),"bill-burke");
+  assertUsers(provider.searchForUser("ole alver","test-realm"),"knut-ole","ole-alver");
+  assertUsers(provider.searchForUser("bburke@redhat.com","test-realm"),"bill-burke");
+  assertUsers(provider.searchForUser("rke@redhat.com","test-realm"),"bill-burke");
+  assertUsers(provider.searchForUser("bburke","test-realm"),"bill-burke");
+  assertUsers(provider.searchForUser("BurK","test-realm"),"bill-burke");
+  assertUsers(provider.searchForUser("Burke","test-realm"),"bill-burke");
+  provider.getTransaction().begin();
+{
+    User user=provider.addUser("monica-burke","monica-burke",null,"test-realm");
+    user.setLastName("Burke");
+    user.setFirstName("Monica");
+    user.setEmail("mburke@redhat.com");
+  }
+{
+    User user=provider.addUser("stian-thorgersen","stian-thorgersen",null,"test-realm");
+    user.setLastName("Thorgersen");
+    user.setFirstName("Stian");
+    user.setEmail("thor@redhat.com");
+  }
+  provider.getTransaction().commit();
+  assertUsers(provider.searchForUser("Monica Burke","test-realm"),"monica-burke");
+  assertUsers(provider.searchForUser("mburke@redhat.com","test-realm"),"monica-burke");
+  assertUsers(provider.searchForUser("mburke","test-realm"),"monica-burke");
+  assertUsers(provider.searchForUser("Burke","test-realm"),"bill-burke","monica-burke");
+  provider.getTransaction().begin();
+  provider.addUser("bill-burke","bill-burke",null,"test-realm2");
+  provider.getTransaction().commit();
+  Assert.assertEquals(1,provider.getUsers("test-realm2").size());
+  assertUsers(provider.searchForUser("Burke","test-realm2"),"bill-burke");
+}

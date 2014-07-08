@@ -1,0 +1,11 @@
+{
+  RoleEntity entity=new RoleEntity();
+  entity.setId(id);
+  entity.setName(name);
+  entity.setRealm(realm);
+  entity.setRealmId(realm.getId());
+  em.persist(entity);
+  realm.getRoles().add(entity);
+  em.flush();
+  return new RoleAdapter(provider,em,entity);
+}

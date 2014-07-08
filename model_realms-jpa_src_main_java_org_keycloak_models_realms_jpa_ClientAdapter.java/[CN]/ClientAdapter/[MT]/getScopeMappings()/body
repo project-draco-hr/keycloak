@@ -1,0 +1,12 @@
+{
+  TypedQuery<String> query=em.createNamedQuery("clientScopeMappingIds",String.class);
+  query.setParameter("client",getEntity());
+  List<String> ids=query.getResultList();
+  Set<Role> roles=new HashSet<Role>();
+  for (  String roleId : ids) {
+    Role role=provider.getRoleById(roleId,entity.getRealm().getId());
+    if (role == null)     continue;
+    roles.add(role);
+  }
+  return roles;
+}

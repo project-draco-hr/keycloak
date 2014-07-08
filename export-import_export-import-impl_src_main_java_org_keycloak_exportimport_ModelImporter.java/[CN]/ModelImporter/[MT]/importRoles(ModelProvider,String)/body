@@ -1,0 +1,30 @@
+{
+  Map<String,RoleEntity> rolesMap=new HashMap<String,RoleEntity>();
+  List<RoleEntity> roles=this.importReader.readEntities(fileName,RoleEntity.class);
+  for (  RoleEntity roleEntity : roles) {
+    RoleModel role=null;
+    if (roleEntity.getRealmId() != null) {
+      RealmModel realm=model.getRealm(roleEntity.getRealmId());
+      role=realm.addRole(roleEntity.getId(),roleEntity.getName());
+    }
+ else     if (roleEntity.getApplicationId() != null) {
+      ApplicationModel app=findApplicationById(model,roleEntity.getApplicationId());
+      role=app.addRole(roleEntity.getId(),roleEntity.getName());
+    }
+ else {
+      throw new IllegalStateException("Role " + roleEntity.getId() + " doesn't have realmId nor applicationId");
+    }
+    role.setDescription(roleEntity.getDescription());
+    rolesMap.put(roleEntity.getId(),roleEntity);
+  }
+  for (  RealmModel realm : model.getRealms()) {
+    fillCompositeRoles(rolesMap,realm,realm);
+    for (    ApplicationModel app : realm.getApplications()) {
+      fillCompositeRoles(rolesMap,app,realm);
+    }
+  }
+  logger.infof("%d roles imported: ",roles.size());
+  if (logger.isDebugEnabled()) {
+    logger.debug("Imported roles: " + roles);
+  }
+}

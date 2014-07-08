@@ -4,8 +4,9 @@
   session=sessionFactory.create();
   try {
     session.getTransaction().begin();
+    model=session.getModel();
     RealmManager rm=new RealmManager(session);
-    for (    RealmModel realm : session.getRealms()) {
+    for (    RealmModel realm : model.getRealms()) {
       if (!realm.getName().equals(Config.getAdminRealm())) {
         rm.removeRealm(realm);
       }

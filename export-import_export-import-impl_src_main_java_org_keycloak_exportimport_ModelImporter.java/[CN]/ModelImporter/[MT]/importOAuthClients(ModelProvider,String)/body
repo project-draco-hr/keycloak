@@ -1,0 +1,11 @@
+{
+  List<OAuthClientEntity> clients=this.importReader.readEntities(fileName,OAuthClientEntity.class);
+  for (  OAuthClientEntity clientEntity : clients) {
+    RealmModel realm=model.getRealm(clientEntity.getRealmId());
+    OAuthClientModel client=realm.addOAuthClient(clientEntity.getId(),clientEntity.getName());
+    this.propertiesManager.setBasicPropertiesToModel(client,clientEntity);
+    client.setClientId(clientEntity.getName());
+    addScopes(realm,client,clientEntity);
+  }
+  logger.info("OAuth clients imported: " + clients);
+}

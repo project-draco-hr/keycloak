@@ -1,0 +1,7 @@
+{
+  TypedQuery<UserSessionEntity> query=em.createNamedQuery("getUserSessionExpired",UserSessionEntity.class).setParameter("maxTime",sessionTimeout).setParameter("idleTime",refreshTimeout);
+  List<UserSessionEntity> results=query.getResultList();
+  for (  UserSessionEntity entity : results) {
+    em.remove(entity);
+  }
+}

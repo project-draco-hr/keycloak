@@ -1,0 +1,16 @@
+{
+  Set<Role> roleMappings=client.getScopeMappings();
+  Set<Role> appRoles=new HashSet<Role>();
+  for (  Role role : roleMappings) {
+    RoleContainer container=role.getContainer();
+    if (container instanceof Realm) {
+    }
+ else {
+      Application app=(Application)container;
+      if (app.getId().equals(getId())) {
+        appRoles.add(role);
+      }
+    }
+  }
+  return appRoles;
+}

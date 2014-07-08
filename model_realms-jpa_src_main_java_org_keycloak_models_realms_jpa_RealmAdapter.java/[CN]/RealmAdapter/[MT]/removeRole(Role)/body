@@ -1,0 +1,13 @@
+{
+  if (role == null) {
+    return false;
+  }
+  if (!role.getContainer().equals(this))   return false;
+  RoleEntity roleEntity=((RoleAdapter)role).getRole();
+  realm.getRoles().remove(role);
+  realm.getDefaultRoles().remove(role);
+  em.createNativeQuery("delete from CompositeRole where childRole = :role").setParameter("role",roleEntity).executeUpdate();
+  em.createQuery("delete from " + ScopeMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",roleEntity).executeUpdate();
+  em.remove(roleEntity);
+  return true;
+}

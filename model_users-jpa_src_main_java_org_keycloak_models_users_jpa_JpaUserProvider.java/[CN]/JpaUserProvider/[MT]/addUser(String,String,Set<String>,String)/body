@@ -1,0 +1,15 @@
+{
+  UserEntity entity=new UserEntity();
+  entity.setId(id);
+  entity.setUsername(username);
+  entity.setEmailConstraint(id);
+  entity.setRealm(realm);
+  em.persist(entity);
+  UserAdapter adapter=new UserAdapter(realm,em,entity);
+  if (initialRoles != null && !initialRoles.isEmpty()) {
+    for (    String role : initialRoles) {
+      adapter.grantRole(role);
+    }
+  }
+  return adapter;
+}

@@ -1,0 +1,9 @@
+{
+  for (  Credentials cred : user.getCredentials()) {
+    if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
+      assertTrue("Invalid credentials",new Pbkdf2PasswordEncoder(cred.getSalt(),1000).verify(expectedPassword,cred.getValue()));
+      return;
+    }
+  }
+  fail("Password credentials not found");
+}

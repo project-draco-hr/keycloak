@@ -1,0 +1,17 @@
+{
+  if (id == null) {
+    id=KeycloakModelUtils.generateId();
+  }
+  Set<String> initialRoles=new HashSet<String>();
+  if (addDefaultRoles) {
+    for (    String r : realm.getDefaultRoles()) {
+      initialRoles.add(realm.getRole(r).getId());
+    }
+    for (    Application app : realm.getApplications()) {
+      for (      String r : app.getDefaultRoles()) {
+        initialRoles.add(app.getRole(r).getId());
+      }
+    }
+  }
+  return provider.mappings().wrap(this,provider.users().addUser(id,username,initialRoles,realm.getId()));
+}

@@ -1,0 +1,18 @@
+{
+  TypedQuery<UserEntity> query=em.createNamedQuery("findUserByLinkAndRealm",UserEntity.class);
+  RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
+  query.setParameter("realm",realmEntity);
+  query.setParameter("socialProvider",socialLink.getSocialProvider());
+  query.setParameter("socialUserId",socialLink.getSocialUserId());
+  List<UserEntity> results=query.getResultList();
+  if (results.isEmpty()) {
+    return null;
+  }
+ else   if (results.size() > 1) {
+    throw new IllegalStateException("More results found for socialProvider=" + socialLink.getSocialProvider() + ", socialUserId="+ socialLink.getSocialUserId()+ ", results="+ results);
+  }
+ else {
+    UserEntity user=results.get(0);
+    return new UserAdapter(realm,em,user);
+  }
+}

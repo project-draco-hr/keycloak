@@ -1,0 +1,23 @@
+{
+  Collection<RoleEntity> entities=realm.getDefaultRoles();
+  Set<String> already=new HashSet<String>();
+  List<RoleEntity> remove=new ArrayList<RoleEntity>();
+  for (  RoleEntity rel : entities) {
+    if (!contains(rel.getName(),defaultRoles)) {
+      remove.add(rel);
+    }
+ else {
+      already.add(rel.getName());
+    }
+  }
+  for (  RoleEntity entity : remove) {
+    entities.remove(entity);
+  }
+  em.flush();
+  for (  String roleName : defaultRoles) {
+    if (!already.contains(roleName)) {
+      addDefaultRole(roleName);
+    }
+  }
+  em.flush();
+}

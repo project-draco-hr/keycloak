@@ -1,0 +1,15 @@
+{
+  CredentialEntity credentialEntity=getCredentialEntity(user,credModel.getType());
+  if (credentialEntity == null) {
+    credentialEntity=new CredentialEntity();
+    credentialEntity.setType(credModel.getType());
+    credentialEntity.setUser(user);
+    em.persist(credentialEntity);
+    user.getCredentials().add(credentialEntity);
+  }
+  credentialEntity.setValue(credModel.getValue());
+  credentialEntity.setSalt(credModel.getSalt());
+  credentialEntity.setDevice(credModel.getDevice());
+  credentialEntity.setHashIterations(credModel.getHashIterations());
+  em.flush();
+}

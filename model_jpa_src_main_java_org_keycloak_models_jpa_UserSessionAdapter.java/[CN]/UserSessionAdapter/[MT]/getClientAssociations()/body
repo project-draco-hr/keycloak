@@ -1,0 +1,11 @@
+{
+  List<ClientModel> clients=new ArrayList<ClientModel>();
+  for (  ClientUserSessionAssociationEntity association : entity.getClients()) {
+    ClientModel client=realm.findClientById(association.getClientId());
+    if (client == null) {
+      throw new ModelException("couldnt find client");
+    }
+    clients.add(client);
+  }
+  return clients;
+}

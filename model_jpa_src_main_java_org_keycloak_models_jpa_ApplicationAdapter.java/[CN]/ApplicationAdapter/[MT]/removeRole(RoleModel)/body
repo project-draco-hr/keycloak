@@ -1,0 +1,18 @@
+{
+  if (roleModel == null) {
+    return false;
+  }
+  if (!roleModel.getContainer().equals(this))   return false;
+  RoleEntity role=RoleAdapter.toRoleEntity(roleModel,em);
+  if (!role.isApplicationRole())   return false;
+  applicationEntity.getRoles().remove(role);
+  applicationEntity.getDefaultRoles().remove(role);
+  em.createNativeQuery("delete from CompositeRole where childRole = :role").setParameter("role",role).executeUpdate();
+  em.createQuery("delete from " + ScopeMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",role).executeUpdate();
+  em.createQuery("delete from " + UserRoleMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",role).executeUpdate();
+  role.setApplication(null);
+  em.flush();
+  em.remove(role);
+  em.flush();
+  return true;
+}

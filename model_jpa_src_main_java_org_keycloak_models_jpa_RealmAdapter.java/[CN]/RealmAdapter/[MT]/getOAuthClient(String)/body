@@ -1,0 +1,8 @@
+{
+  TypedQuery<OAuthClientEntity> query=em.createNamedQuery("findOAuthClientByName",OAuthClientEntity.class);
+  query.setParameter("name",name);
+  query.setParameter("realm",realm);
+  List<OAuthClientEntity> entities=query.getResultList();
+  if (entities.size() == 0)   return null;
+  return new OAuthClientAdapter(this,entities.get(0),em);
+}

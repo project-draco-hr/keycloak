@@ -34,7 +34,7 @@
     audit.error(Errors.REJECTED_BY_USER);
     return oauth.redirectError(client,"access_denied",state,redirect);
   }
-  AuthenticationStatus status=authManager.authenticateForm(clientConnection,realm,formData);
+  AuthenticationStatus status=authManager.authenticateForm(session,clientConnection,realm,formData);
   if (remember) {
     authManager.createRememberMeCookie(realm,uriInfo);
   }
@@ -48,9 +48,9 @@
 switch (status) {
 case SUCCESS:
 case ACTIONS_REQUIRED:
-    UserSessionModel session=realm.createUserSession(user,clientConnection.getRemoteAddr());
-  audit.session(session);
-return oauth.processAccessCode(scopeParam,state,redirect,client,user,session,username,remember,"form",audit);
+    UserSessionModel userSession=session.sessions().createUserSession(realm,user,clientConnection.getRemoteAddr());
+  audit.session(userSession);
+return oauth.processAccessCode(scopeParam,state,redirect,client,user,userSession,username,remember,"form",audit);
 case ACCOUNT_TEMPORARILY_DISABLED:
 audit.error(Errors.USER_TEMPORARILY_DISABLED);
 return Flows.forms(this.session,realm,uriInfo).setError(Messages.ACCOUNT_TEMPORARILY_DISABLED).setFormData(formData).createLogin();

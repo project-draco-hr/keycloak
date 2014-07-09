@@ -1,7 +1,0 @@
-{
-  TypedQuery<UserSessionEntity> query=em.createNamedQuery("getUserSessionExpired",UserSessionEntity.class).setParameter("maxTime",Time.currentTime() - realm.getSsoSessionMaxLifespan()).setParameter("idleTime",Time.currentTime() - realm.getSsoSessionIdleTimeout());
-  List<UserSessionEntity> results=query.getResultList();
-  for (  UserSessionEntity entity : results) {
-    em.remove(entity);
-  }
-}

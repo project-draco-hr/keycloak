@@ -17,18 +17,18 @@
   if (accessCodeEntry.isRememberMe()) {
     audit.detail(Details.REMEMBER_ME,"true");
   }
-  UserSessionModel session=realm.getUserSession(accessCodeEntry.getSessionState());
-  if (!AuthenticationManager.isSessionValid(realm,session)) {
-    AuthenticationManager.logout(realm,session,uriInfo);
+  UserSessionModel userSession=session.sessions().getUserSession(realm,accessCodeEntry.getSessionState());
+  if (!AuthenticationManager.isSessionValid(realm,userSession)) {
+    AuthenticationManager.logout(session,realm,userSession,uriInfo);
     audit.error(Errors.INVALID_CODE);
     return oauth.forwardToSecurityFailure("Session not active");
   }
-  audit.session(session);
+  audit.session(userSession);
   if (formData.containsKey("cancel")) {
     audit.error(Errors.REJECTED_BY_USER);
     return redirectAccessDenied(redirect,state);
   }
   audit.success();
   accessCodeEntry.resetExpiration();
-  return oauth.redirectAccessCode(accessCodeEntry,session,state,redirect);
+  return oauth.redirectAccessCode(accessCodeEntry,userSession,state,redirect);
 }

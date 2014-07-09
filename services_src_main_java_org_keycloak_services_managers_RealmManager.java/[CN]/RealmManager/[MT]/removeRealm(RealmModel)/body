@@ -1,7 +1,11 @@
 {
   boolean removed=model.removeRealm(realm.getId());
   if (removed) {
-    getKeycloakAdminstrationRealm().removeApplication(realm.getMasterAdminApp().getId());
+    new ApplicationManager(this).removeApplication(getKeycloakAdminstrationRealm(),realm.getMasterAdminApp());
+    UserSessionProvider sessions=session.sessions();
+    if (sessions != null) {
+      sessions.onRealmRemoved(realm);
+    }
   }
   return removed;
 }

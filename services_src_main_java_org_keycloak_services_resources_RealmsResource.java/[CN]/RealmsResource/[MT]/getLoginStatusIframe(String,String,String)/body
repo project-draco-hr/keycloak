@@ -1,13 +1,13 @@
 {
   logger.info("getLoginStatusIframe");
-  AuthenticationManager auth=new AuthenticationManager(session);
+  AuthenticationManager auth=new AuthenticationManager();
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=locateRealm(name,realmManager);
   ClientModel client=realm.findClient(client_id);
   if (client == null) {
     throw new NotFoundException("could not find client: " + client_id);
   }
-  AuthenticationManager.AuthResult result=auth.authenticateIdentityCookie(realm,uriInfo,headers);
+  AuthenticationManager.AuthResult result=auth.authenticateIdentityCookie(session,realm,uriInfo,headers);
   if (result == null) {
     throw new UnauthorizedException("not logged in, can't get page");
   }

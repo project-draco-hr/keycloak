@@ -1,4 +1,8 @@
 {
   auth.requireManage();
-  realm.removeUser(username);
+  UserModel user=realm.getUser(username);
+  if (user == null) {
+    throw new NotFoundException("User not found");
+  }
+  new UserManager(session).removeUser(realm,user);
 }

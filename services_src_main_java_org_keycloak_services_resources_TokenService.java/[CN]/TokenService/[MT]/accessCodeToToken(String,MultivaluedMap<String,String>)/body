@@ -64,9 +64,9 @@
     audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  UserSessionModel session=realm.getUserSession(accessCode.getSessionState());
-  if (!AuthenticationManager.isSessionValid(realm,session)) {
-    AuthenticationManager.logout(realm,session,uriInfo);
+  UserSessionModel userSession=session.sessions().getUserSession(realm,accessCode.getSessionState());
+  if (!AuthenticationManager.isSessionValid(realm,userSession)) {
+    AuthenticationManager.logout(session,realm,userSession,uriInfo);
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
     res.put(OAuth2Constants.ERROR_DESCRIPTION,"Session not active");
@@ -74,7 +74,7 @@
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   logger.debug("accessRequest SUCCESS");
-  session.associateClient(client);
+  userSession.associateClient(client);
   AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).accessToken(accessCode.getToken()).generateIDToken().generateRefreshToken().build();
   audit.success();
   return Cors.add(request,Response.ok(res)).auth().allowedOrigins(client).allowedMethods("POST").exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build();

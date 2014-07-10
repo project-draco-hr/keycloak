@@ -1,10 +1,10 @@
 {
   auth.requireView();
   Map<String,Integer> stats=new HashMap<String,Integer>();
-  for (  ApplicationModel applicationModel : realm.getApplications()) {
-    int size=applicationModel.getActiveUserSessions();
+  for (  ApplicationModel application : realm.getApplications()) {
+    int size=session.sessions().getActiveUserSessions(application.getRealm(),application);
     if (size == 0)     continue;
-    stats.put(applicationModel.getName(),size);
+    stats.put(application.getName(),size);
   }
   return stats;
 }

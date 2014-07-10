@@ -1,0 +1,12 @@
+{
+  UsernameLoginFailureModel failure=session.sessions().getUserLoginFailure(realm,username);
+  if (failure == null) {
+    return false;
+  }
+  int currTime=(int)(System.currentTimeMillis() / 1000);
+  if (currTime < failure.getFailedLoginNotBefore()) {
+    logger.debugv("Current: {0} notBefore: {1}",currTime,failure.getFailedLoginNotBefore());
+    return true;
+  }
+  return false;
+}

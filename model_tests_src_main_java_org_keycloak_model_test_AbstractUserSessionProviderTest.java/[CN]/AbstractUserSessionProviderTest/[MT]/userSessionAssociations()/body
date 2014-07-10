@@ -1,0 +1,21 @@
+{
+  UserSessionModel userSession=provider.createUserSession(realm,user,"127.0.0.1");
+  assertEquals(0,userSession.getClientAssociations().size());
+  userSession.associateClient(app1);
+  userSession.associateClient(client1);
+  assertEquals(2,userSession.getClientAssociations().size());
+  assertTrue(provider.getUserSessions(realm,app1).contains(userSession));
+  assertFalse(provider.getUserSessions(realm,app2).contains(userSession));
+  assertTrue(provider.getUserSessions(realm,client1).contains(userSession));
+  commit();
+  userSession=provider.getUserSession(realm,userSession.getId());
+  userSession.removeAssociatedClient(app1);
+  assertEquals(1,userSession.getClientAssociations().size());
+  assertEquals(client1,userSession.getClientAssociations().get(0));
+  assertFalse(provider.getUserSessions(realm,app1).contains(userSession));
+  commit();
+  userSession=provider.getUserSession(realm,userSession.getId());
+  userSession.removeAssociatedClient(client1);
+  assertEquals(0,userSession.getClientAssociations().size());
+  assertFalse(provider.getUserSessions(realm,client1).contains(userSession));
+}

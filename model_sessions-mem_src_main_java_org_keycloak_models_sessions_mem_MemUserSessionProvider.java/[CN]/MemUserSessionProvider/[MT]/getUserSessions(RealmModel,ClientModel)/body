@@ -1,8 +1,8 @@
 {
-  Set<UserSessionModel> clientSessions=new HashSet<UserSessionModel>();
+  List<UserSessionModel> clientSessions=new LinkedList<UserSessionModel>();
   for (  UserSessionEntity s : sessions.values()) {
     if (s.getRealm().equals(realm.getId()) && s.getClients().contains(client.getClientId())) {
-      clientSessions.add(new UserSessionAdapter(session,s));
+      clientSessions.add(new UserSessionAdapter(session,realm,s));
     }
   }
   return clientSessions;

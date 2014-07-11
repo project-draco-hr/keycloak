@@ -1,0 +1,7 @@
+{
+  int currentTime=Time.currentTime();
+  DBObject query=new QueryBuilder().and("started").lessThan(currentTime - realm.getSsoSessionMaxLifespan()).get();
+  mongoStore.removeEntities(MongoUserSessionEntity.class,query,invocationContext);
+  query=new QueryBuilder().and("lastSessionRefresh").lessThan(currentTime - realm.getSsoSessionIdleTimeout()).get();
+  mongoStore.removeEntities(MongoUserSessionEntity.class,query,invocationContext);
+}

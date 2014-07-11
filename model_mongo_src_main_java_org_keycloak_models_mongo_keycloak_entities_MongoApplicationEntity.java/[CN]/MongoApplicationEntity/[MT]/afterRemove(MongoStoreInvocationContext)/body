@@ -1,9 +1,4 @@
 {
   DBObject query=new QueryBuilder().and("applicationId").is(getId()).get();
   context.getMongoStore().removeEntities(MongoRoleEntity.class,query,context);
-  query=new QueryBuilder().and("associatedClientIds").is(getId()).get();
-  List<MongoUserSessionEntity> sessions=context.getMongoStore().loadEntities(MongoUserSessionEntity.class,query,context);
-  for (  MongoUserSessionEntity session : sessions) {
-    context.getMongoStore().pullItemFromList(session,"associatedClientIds",getId(),context);
-  }
 }

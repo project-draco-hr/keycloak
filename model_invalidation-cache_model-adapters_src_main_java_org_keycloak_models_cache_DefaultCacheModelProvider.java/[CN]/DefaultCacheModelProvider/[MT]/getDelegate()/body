@@ -2,12 +2,5 @@
   if (!transactionActive)   throw new IllegalStateException("Cannot access delegate without a transaction");
   if (delegate != null)   return delegate;
   delegate=session.getProvider(ModelProvider.class);
-  transactionDelegate=delegate.getTransaction();
-  if (!transactionDelegate.isActive()) {
-    transactionDelegate.begin();
-    if (setRollbackOnly) {
-      transactionDelegate.setRollbackOnly();
-    }
-  }
   return delegate;
 }

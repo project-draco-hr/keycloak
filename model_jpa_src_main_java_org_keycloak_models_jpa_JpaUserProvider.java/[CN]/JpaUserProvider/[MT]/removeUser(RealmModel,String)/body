@@ -1,0 +1,10 @@
+{
+  TypedQuery<UserEntity> query=em.createNamedQuery("getRealmUserByUsername",UserEntity.class);
+  query.setParameter("username",name);
+  RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
+  query.setParameter("realm",realmEntity);
+  List<UserEntity> results=query.getResultList();
+  if (results.size() == 0)   return false;
+  removeUser(results.get(0));
+  return true;
+}

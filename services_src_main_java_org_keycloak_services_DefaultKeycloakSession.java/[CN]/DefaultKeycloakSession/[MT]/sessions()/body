@@ -1,3 +1,9 @@
 {
-  return getProvider(UserSessionProvider.class);
+  if (!transaction.isActive())   throw new IllegalStateException("Transaction is not active");
+  if (sessionProvider == null) {
+    sessionProvider=getProvider(UserSessionProvider.class);
+    sessionProvider.getTransaction().begin();
+    managedTransactions.add(sessionProvider.getTransaction());
+  }
+  return sessionProvider;
 }

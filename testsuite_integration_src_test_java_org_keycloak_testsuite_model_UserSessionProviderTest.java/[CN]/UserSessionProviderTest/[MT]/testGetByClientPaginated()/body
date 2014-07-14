@@ -1,0 +1,13 @@
+{
+  for (int i=0; i < 25; i++) {
+    UserSessionModel userSession=session.sessions().createUserSession(realm,realm.getUser("user1"),"127.0.0." + i);
+    userSession.setStarted(Time.currentTime() + i);
+    userSession.associateClient(realm.findClient("test-app"));
+  }
+  resetSession();
+  assertPaginatedSession(realm,realm.findClient("test-app"),0,1,1);
+  assertPaginatedSession(realm,realm.findClient("test-app"),0,10,10);
+  assertPaginatedSession(realm,realm.findClient("test-app"),10,10,10);
+  assertPaginatedSession(realm,realm.findClient("test-app"),20,10,5);
+  assertPaginatedSession(realm,realm.findClient("test-app"),30,10,0);
+}

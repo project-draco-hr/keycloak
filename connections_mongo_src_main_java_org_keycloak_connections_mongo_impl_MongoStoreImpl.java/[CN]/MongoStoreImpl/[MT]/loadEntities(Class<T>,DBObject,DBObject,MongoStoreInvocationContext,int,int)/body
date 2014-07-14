@@ -1,0 +1,11 @@
+{
+  context.beforeDBSearch(type);
+  DBCollection dbCollection=getDBCollectionForType(type);
+  DBCursor cursor=dbCollection.find(query);
+  cursor.skip(firstResult);
+  cursor.limit(maxResults);
+  if (sort != null) {
+    cursor.sort(sort);
+  }
+  return convertCursor(type,cursor,context);
+}

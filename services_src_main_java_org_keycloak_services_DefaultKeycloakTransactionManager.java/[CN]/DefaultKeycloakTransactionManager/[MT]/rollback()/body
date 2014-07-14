@@ -8,6 +8,14 @@
       exception=exception != null ? e : exception;
     }
   }
+  for (  KeycloakTransaction tx : afterCompletion) {
+    try {
+      tx.rollback();
+    }
+ catch (    RuntimeException e) {
+      exception=exception != null ? e : exception;
+    }
+  }
   if (exception != null) {
     throw exception;
   }

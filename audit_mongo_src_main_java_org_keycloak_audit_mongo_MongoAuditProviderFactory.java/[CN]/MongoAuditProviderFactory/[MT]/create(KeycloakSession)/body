@@ -1,3 +1,6 @@
 {
-  return new MongoAuditProvider(db.getCollection("audit"),includedEvents);
+  MongoConnectionProvider connection=session.getProvider(MongoConnectionProvider.class);
+  DBCollection collection=connection.getDB().getCollection("audit");
+  collection.setWriteConcern(WriteConcern.UNACKNOWLEDGED);
+  return new MongoAuditProvider(collection,includedEvents);
 }

@@ -1,0 +1,8 @@
+{
+  List<UserSessionModel> list=new LinkedList<UserSessionModel>();
+  TypedQuery<UserSessionEntity> query=em.createNamedQuery("getUserSessionByClient",UserSessionEntity.class).setParameter("realmId",realm.getId()).setParameter("clientId",client.getClientId());
+  for (  UserSessionEntity entity : query.getResultList()) {
+    list.add(new UserSessionAdapter(session,em,realm,entity));
+  }
+  return list;
+}

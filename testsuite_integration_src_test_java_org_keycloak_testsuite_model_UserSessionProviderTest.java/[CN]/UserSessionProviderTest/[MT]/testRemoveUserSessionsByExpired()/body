@@ -1,0 +1,11 @@
+{
+  UserSessionModel[] sessions=createSessions();
+  session.sessions().getUserSession(realm,sessions[0].getId()).setStarted(Time.currentTime() - realm.getSsoSessionMaxLifespan() - 1);
+  session.sessions().getUserSession(realm,sessions[1].getId()).setLastSessionRefresh(Time.currentTime() - realm.getSsoSessionIdleTimeout() - 1);
+  resetSession();
+  session.sessions().removeExpiredUserSessions(realm);
+  resetSession();
+  assertNull(session.sessions().getUserSession(realm,sessions[0].getId()));
+  assertNull(session.sessions().getUserSession(realm,sessions[1].getId()));
+  assertNotNull(session.sessions().getUserSession(realm,sessions[2].getId()));
+}

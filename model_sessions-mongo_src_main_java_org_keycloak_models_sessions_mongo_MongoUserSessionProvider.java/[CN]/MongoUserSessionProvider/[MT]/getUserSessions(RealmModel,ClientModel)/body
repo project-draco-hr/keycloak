@@ -1,0 +1,9 @@
+{
+  DBObject query=new QueryBuilder().and("associatedClientIds").is(client.getId()).get();
+  List<MongoUserSessionEntity> sessions=mongoStore.loadEntities(MongoUserSessionEntity.class,query,invocationContext);
+  List<UserSessionModel> result=new LinkedList<UserSessionModel>();
+  for (  MongoUserSessionEntity session : sessions) {
+    result.add(new UserSessionAdapter(session,realm,invocationContext));
+  }
+  return result;
+}

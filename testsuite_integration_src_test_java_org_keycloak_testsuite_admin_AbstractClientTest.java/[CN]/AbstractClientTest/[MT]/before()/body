@@ -1,0 +1,12 @@
+{
+  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      adminstrationRealm.setPasswordCredentialGrantAllowed(true);
+      RealmModel testRealm=manager.createRealm(REALM_NAME);
+      testRealm.setEnabled(true);
+    }
+  }
+);
+  keycloak=Keycloak.getInstance("http://localhost:8081/auth","master","admin","admin",Constants.ADMIN_CONSOLE_APPLICATION);
+  realm=keycloak.realm(REALM_NAME);
+}

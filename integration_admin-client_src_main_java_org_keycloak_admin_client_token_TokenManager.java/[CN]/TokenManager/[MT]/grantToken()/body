@@ -1,0 +1,15 @@
+{
+  ResteasyClient client=new ResteasyClientBuilder().build();
+  ResteasyWebTarget target=client.target(config.getServerUrl());
+  Form form=new Form().param("username",config.getUsername()).param("password",config.getPassword());
+  if (config.isPublicClient()) {
+    form.param("client_id",config.getClientId());
+  }
+ else {
+    target.register(new BasicAuthFilter(config.getClientId(),config.getClientSecret()));
+  }
+  TokenService tokenService=target.proxy(TokenService.class);
+  AccessTokenResponse response=tokenService.grantToken(config.getRealm(),form.asMap());
+  defineCurrentToken(response);
+  return response;
+}

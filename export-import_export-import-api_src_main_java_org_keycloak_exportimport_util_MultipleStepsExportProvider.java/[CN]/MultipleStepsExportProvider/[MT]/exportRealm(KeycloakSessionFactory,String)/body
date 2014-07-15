@@ -4,7 +4,7 @@
   final boolean exportUsersIntoSameFile=usersPerFile < 0;
   ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
     @Override public void run(    KeycloakSession session) throws IOException {
-      RealmModel realm=session.model().getRealmByName(realmName);
+      RealmModel realm=session.realms().getRealmByName(realmName);
       RealmRepresentation rep=ExportUtils.exportRealm(session,realm,exportUsersIntoSameFile);
       writeRealm(realmName + "-realm.json",rep);
       logger.info("Realm '" + realmName + "' - data exported");
@@ -26,7 +26,7 @@
       }
       ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
         @Override public void run(        KeycloakSession session) throws IOException {
-          RealmModel realm=session.model().getRealmByName(realmName);
+          RealmModel realm=session.realms().getRealmByName(realmName);
           List<UserModel> users=session.users().getUsers(realm);
           usersHolder.users=users.subList(usersHolder.currentPageStart,usersHolder.currentPageEnd);
           writeUsers(realmName + "-users-" + (usersHolder.currentPageStart / countPerPage)+ ".json",session,realm,usersHolder.users);

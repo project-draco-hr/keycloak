@@ -1,0 +1,26 @@
+{
+  File realmFile=new File(this.rootDirectory + File.separator + realmName+ "-realm.json");
+  File[] userFiles=this.rootDirectory.listFiles(new FilenameFilter(){
+    @Override public boolean accept(    File dir,    String name){
+      return (name.startsWith(realmName)) && (name.endsWith(".json")) && (name.substring(realmName.length()).contains("-users-"));
+    }
+  }
+);
+  FileInputStream is=new FileInputStream(realmFile);
+  final RealmRepresentation realmRep=JsonSerialization.readValue(is,RealmRepresentation.class);
+  ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
+    @Override public void run(    KeycloakSession session) throws IOException {
+      ImportUtils.importRealm(session,realmRep,strategy);
+    }
+  }
+);
+  for (  File userFile : userFiles) {
+    final FileInputStream fis=new FileInputStream(userFile);
+    ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
+      @Override public void run(      KeycloakSession session) throws IOException {
+        ImportUtils.importUsersFromStream(session,realmName,JsonSerialization.mapper,fis);
+      }
+    }
+);
+  }
+}

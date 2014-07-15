@@ -1,0 +1,21 @@
+{
+  RealmModel adminRealm;
+  RoleModel adminRole;
+  if (realm.getName().equals(Config.getAdminRealm())) {
+    adminRealm=realm;
+    adminRole=realm.addRole(AdminRoles.ADMIN);
+    RoleModel createRealmRole=realm.addRole(AdminRoles.CREATE_REALM);
+    adminRole.addCompositeRole(createRealmRole);
+  }
+ else {
+    adminRealm=model.getRealmByName(Config.getAdminRealm());
+    adminRole=adminRealm.getRole(AdminRoles.ADMIN);
+  }
+  ApplicationModel realmAdminApp=KeycloakModelUtils.createApplication(adminRealm,ExportImportUtils.getMasterRealmAdminApplicationName(realm));
+  realmAdminApp.setBearerOnly(true);
+  realm.setMasterAdminApp(realmAdminApp);
+  for (  String r : AdminRoles.ALL_REALM_ROLES) {
+    RoleModel role=realmAdminApp.addRole(r);
+    adminRole.addCompositeRole(role);
+  }
+}

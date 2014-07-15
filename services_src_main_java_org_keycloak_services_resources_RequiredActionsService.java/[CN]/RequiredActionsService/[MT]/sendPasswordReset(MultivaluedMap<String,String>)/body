@@ -13,9 +13,9 @@
     return Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
   }
   audit.event(EventType.SEND_RESET_PASSWORD).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
-  UserModel user=realm.getUser(username);
+  UserModel user=session.users().getUserByUsername(username,realm);
   if (user == null && username.contains("@")) {
-    user=realm.getUserByEmail(username);
+    user=session.users().getUserByEmail(username,realm);
   }
   if (user == null) {
     logger.warn("Failed to send password reset email: user not found");
@@ -24,7 +24,7 @@
  else {
     Set<RequiredAction> requiredActions=new HashSet<RequiredAction>(user.getRequiredActions());
     requiredActions.add(RequiredAction.UPDATE_PASSWORD);
-    AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,realm,client,user,null);
+    AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,session,realm,client,user,null);
     accessCode.setRequiredActions(requiredActions);
     accessCode.setAuthMethod("form");
     accessCode.setUsernameUsed(username);

@@ -4,7 +4,7 @@
   if (error != null) {
     throw new AuthenticationProviderException(error);
   }
-  UserModel user=realm.getUser(username);
+  UserModel user=keycloakSession.users().getUserByUsername(username,realm);
   if (user == null) {
     logger.warnf("User '%s' doesn't exists. Skip password update",username);
     return false;

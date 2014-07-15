@@ -1,5 +1,5 @@
 {
-  UserModel user=newRealm.addUser(userRep.getId(),userRep.getUsername(),false);
+  UserModel user=session.users().addUser(newRealm,userRep.getId(),userRep.getUsername(),false);
   user.setEnabled(userRep.isEnabled());
   user.setEmail(userRep.getEmail());
   user.setFirstName(userRep.getFirstName());
@@ -28,7 +28,7 @@
   if (userRep.getSocialLinks() != null) {
     for (    SocialLinkRepresentation socialLink : userRep.getSocialLinks()) {
       SocialLinkModel mappingModel=new SocialLinkModel(socialLink.getSocialProvider(),socialLink.getSocialUserId(),socialLink.getSocialUsername());
-      newRealm.addSocialLink(user,mappingModel);
+      session.users().addSocialLink(newRealm,user,mappingModel);
     }
   }
   if (userRep.getRealmRoles() != null) {

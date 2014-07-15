@@ -1,28 +1,29 @@
 {
   RealmModel realm=realmManager.createRealm("original");
-  UserModel user=realm.addUser("user");
+  KeycloakSession session=realmManager.getSession();
+  UserModel user=session.users().addUser(realm,"user");
   Assert.assertTrue(user.getRequiredActions().isEmpty());
   user.addRequiredAction(UserModel.RequiredAction.CONFIGURE_TOTP);
   String id=realm.getId();
   commit();
   realm=realmManager.getRealm(id);
-  user=realm.getUser("user");
+  user=session.users().getUserByUsername("user",realm);
   Assert.assertEquals(1,user.getRequiredActions().size());
   Assert.assertTrue(user.getRequiredActions().contains(RequiredAction.CONFIGURE_TOTP));
   user.addRequiredAction(UserModel.RequiredAction.CONFIGURE_TOTP);
-  user=realm.getUser("user");
+  user=session.users().getUserByUsername("user",realm);
   Assert.assertEquals(1,user.getRequiredActions().size());
   Assert.assertTrue(user.getRequiredActions().contains(RequiredAction.CONFIGURE_TOTP));
   user.addRequiredAction(UserModel.RequiredAction.VERIFY_EMAIL);
-  user=realm.getUser("user");
+  user=session.users().getUserByUsername("user",realm);
   Assert.assertEquals(2,user.getRequiredActions().size());
   Assert.assertTrue(user.getRequiredActions().contains(RequiredAction.CONFIGURE_TOTP));
   Assert.assertTrue(user.getRequiredActions().contains(RequiredAction.VERIFY_EMAIL));
   user.removeRequiredAction(UserModel.RequiredAction.CONFIGURE_TOTP);
-  user=realm.getUser("user");
+  user=session.users().getUserByUsername("user",realm);
   Assert.assertEquals(1,user.getRequiredActions().size());
   Assert.assertTrue(user.getRequiredActions().contains(RequiredAction.VERIFY_EMAIL));
   user.removeRequiredAction(UserModel.RequiredAction.VERIFY_EMAIL);
-  user=realm.getUser("user");
+  user=session.users().getUserByUsername("user",realm);
   Assert.assertTrue(user.getRequiredActions().isEmpty());
 }

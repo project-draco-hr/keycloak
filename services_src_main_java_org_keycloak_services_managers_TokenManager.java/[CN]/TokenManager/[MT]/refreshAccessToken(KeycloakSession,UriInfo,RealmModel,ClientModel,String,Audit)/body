@@ -17,7 +17,7 @@
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale refresh token");
   }
   audit.user(refreshToken.getSubject()).session(refreshToken.getSessionState()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId());
-  UserModel user=realm.getUserById(refreshToken.getSubject());
+  UserModel user=session.users().getUserById(refreshToken.getSubject(),realm);
   if (user == null) {
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid refresh token","Unknown user");
   }

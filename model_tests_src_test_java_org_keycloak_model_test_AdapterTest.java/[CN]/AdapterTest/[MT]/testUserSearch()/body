@@ -1,15 +1,15 @@
 {
   test1CreateRealm();
 {
-    UserModel user=realmModel.addUser("bburke");
+    UserModel user=realmManager.getSession().users().addUser(realmModel,"bburke");
     user.setLastName("Burke");
     user.setFirstName("Bill");
     user.setEmail("bburke@redhat.com");
-    UserModel user2=realmModel.addUser("doublefirst");
+    UserModel user2=realmManager.getSession().users().addUser(realmModel,"doublefirst");
     user2.setFirstName("Knut Ole");
     user2.setLastName("Alver");
     user2.setEmail("knut@redhat.com");
-    UserModel user3=realmModel.addUser("doublelast");
+    UserModel user3=realmManager.getSession().users().addUser(realmModel,"doublelast");
     user3.setFirstName("Ole");
     user3.setLastName("Alver Veland");
     user3.setEmail("knut2@redhat.com");
@@ -85,13 +85,13 @@
     Assert.assertEquals(bburke.getEmail(),"bburke@redhat.com");
   }
 {
-    UserModel user=realmModel.addUser("mburke");
+    UserModel user=realmManager.getSession().users().addUser(realmModel,"mburke");
     user.setLastName("Burke");
     user.setFirstName("Monica");
     user.setEmail("mburke@redhat.com");
   }
 {
-    UserModel user=realmModel.addUser("thor");
+    UserModel user=realmManager.getSession().users().addUser(realmModel,"thor");
     user.setLastName("Thorgersen");
     user.setFirstName("Stian");
     user.setEmail("thor@redhat.com");
@@ -133,7 +133,7 @@
     }
   }
   RealmModel otherRealm=adapter.createRealm("other");
-  otherRealm.addUser("bburke");
-  Assert.assertEquals(1,otherRealm.getUsers().size());
-  Assert.assertEquals(1,otherRealm.searchForUser("bu").size());
+  realmManager.getSession().users().addUser(otherRealm,"bburke");
+  Assert.assertEquals(1,realmManager.getSession().users().getUsers(otherRealm).size());
+  Assert.assertEquals(1,realmManager.getSession().users().searchForUser("bu",otherRealm).size());
 }

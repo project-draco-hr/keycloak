@@ -4,7 +4,7 @@
   MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("johnkeycloak","password");
   Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(session,null,realm,formData));
   AuthenticationProviderManager authProviderManager=AuthenticationProviderManager.getManager(realm,session);
-  UserModel john=realm.getUser("johnkeycloak");
+  UserModel john=session.users().getUserByUsername("johnkeycloak",realm);
   try {
     Assert.assertTrue(authProviderManager.updatePassword(john,"password-updated"));
   }

@@ -16,7 +16,7 @@
     audit.error(Errors.INVALID_CODE);
     throw new BadRequestException("Code not specified",Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build());
   }
-  AccessCodeEntry accessCode=tokenManager.parseCode(code,realm);
+  AccessCodeEntry accessCode=tokenManager.parseCode(code,session,realm);
   if (accessCode == null) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
@@ -49,7 +49,7 @@
     audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  UserModel user=realm.getUserById(accessCode.getUser().getId());
+  UserModel user=session.users().getUserById(accessCode.getUser().getId(),realm);
   if (user == null) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");

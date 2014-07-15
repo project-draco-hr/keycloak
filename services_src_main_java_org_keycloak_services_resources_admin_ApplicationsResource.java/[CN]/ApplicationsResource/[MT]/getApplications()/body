@@ -2,11 +2,10 @@
   auth.requireAny();
   List<ApplicationRepresentation> rep=new ArrayList<ApplicationRepresentation>();
   List<ApplicationModel> applicationModels=realm.getApplications();
-  ApplicationManager resourceManager=new ApplicationManager(new RealmManager(session));
   boolean view=auth.hasView();
   for (  ApplicationModel applicationModel : applicationModels) {
     if (view) {
-      rep.add(resourceManager.toRepresentation(applicationModel));
+      rep.add(ModelToRepresentation.toRepresentation(applicationModel));
     }
  else {
       ApplicationRepresentation app=new ApplicationRepresentation();

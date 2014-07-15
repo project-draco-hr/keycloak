@@ -1,0 +1,27 @@
+{
+  if (rep.getName() != null)   resource.setName(rep.getName());
+  if (rep.isEnabled() != null)   resource.setEnabled(rep.isEnabled());
+  if (rep.isBearerOnly() != null)   resource.setBearerOnly(rep.isBearerOnly());
+  if (rep.isPublicClient() != null)   resource.setPublicClient(rep.isPublicClient());
+  if (rep.getAdminUrl() != null)   resource.setManagementUrl(rep.getAdminUrl());
+  if (rep.getBaseUrl() != null)   resource.setBaseUrl(rep.getBaseUrl());
+  if (rep.isSurrogateAuthRequired() != null)   resource.setSurrogateAuthRequired(rep.isSurrogateAuthRequired());
+  resource.updateApplication();
+  if (rep.getNotBefore() != null) {
+    resource.setNotBefore(rep.getNotBefore());
+  }
+  if (rep.getDefaultRoles() != null) {
+    resource.updateDefaultRoles(rep.getDefaultRoles());
+  }
+  List<String> redirectUris=rep.getRedirectUris();
+  if (redirectUris != null) {
+    resource.setRedirectUris(new HashSet<String>(redirectUris));
+  }
+  List<String> webOrigins=rep.getWebOrigins();
+  if (webOrigins != null) {
+    resource.setWebOrigins(new HashSet<String>(webOrigins));
+  }
+  if (rep.getClaims() != null) {
+    setClaims(resource,rep.getClaims());
+  }
+}

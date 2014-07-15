@@ -7,7 +7,7 @@
   if (pass == null || pass.getValue() == null || !CredentialRepresentation.PASSWORD.equals(pass.getType())) {
     throw new BadRequestException("No password provided");
   }
-  UserCredentialModel cred=RealmManager.fromRepresentation(pass);
+  UserCredentialModel cred=RepresentationToModel.convertCredential(pass);
   user.updateCredential(cred);
   user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
 }

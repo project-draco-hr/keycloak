@@ -2,12 +2,5 @@
   ExportImportConfig.setAction("export");
   ExportImportConfig.setProvider("dir");
   ExportImportConfig.setDir(dir);
-  Iterator<ExportImportProvider> providers=ProviderLoader.load(ExportImportProvider.class).iterator();
-  if (providers.hasNext()) {
-    ExportImportProvider exportImport=providers.next();
-    exportImport.checkExportImport(sessionFactory);
-  }
- else {
-    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-  }
+  new ExportImportManager().checkExportImport(sessionFactory);
 }

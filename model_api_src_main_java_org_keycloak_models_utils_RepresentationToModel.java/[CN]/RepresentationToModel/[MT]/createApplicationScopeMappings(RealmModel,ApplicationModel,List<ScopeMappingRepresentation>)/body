@@ -1,0 +1,12 @@
+{
+  for (  ScopeMappingRepresentation mapping : mappings) {
+    ClientModel client=realm.findClient(mapping.getClient());
+    for (    String roleString : mapping.getRoles()) {
+      RoleModel role=applicationModel.getRole(roleString.trim());
+      if (role == null) {
+        role=applicationModel.addRole(roleString.trim());
+      }
+      client.addScopeMapping(role);
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  String realmName=rep.getRealm();
+  ModelProvider model=session.model();
+  RealmModel realm=model.getRealmByName(realmName);
+  if (realm != null) {
+    if (strategy == Strategy.IGNORE_EXISTING) {
+      logger.infof("Realm '%s' already exists. Import skipped",realmName);
+      return realm;
+    }
+ else {
+      logger.infof("Realm '%s' already exists. Removing it before import",realmName);
+      if (Config.getAdminRealm().equals(realm.getId())) {
+        realm.setMasterAdminApp(null);
+      }
+      model.removeRealm(realm.getId());
+    }
+  }
+  realm=rep.getId() != null ? model.createRealm(rep.getId(),realmName) : model.createRealm(realmName);
+  RepresentationToModel.importRealm(session,rep,realm);
+  refreshMasterAdminApps(model,realm);
+  logger.infof("Realm '%s' imported",realmName);
+  return realm;
+}

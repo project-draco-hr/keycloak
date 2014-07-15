@@ -1,0 +1,10 @@
+{
+  logger.infof("Full importing from file %s",this.file.getAbsolutePath());
+  ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
+    @Override public void run(    KeycloakSession session) throws IOException {
+      FileInputStream is=new FileInputStream(file);
+      ImportUtils.importFromStream(session,JsonSerialization.mapper,is,strategy);
+    }
+  }
+);
+}

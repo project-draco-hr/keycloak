@@ -1,8 +1,6 @@
 {
-  TypedQuery<UserEntity> query=em.createQuery("select u from UserEntity u where u.realm = :realm",UserEntity.class);
   RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
-  query.setParameter("realm",realmEntity);
-  for (  UserEntity u : query.getResultList()) {
-    em.remove(u);
+  for (  UserEntity u : em.createQuery("from UserEntity u where u.realm = :realm",UserEntity.class).setParameter("realm",realmEntity).getResultList()) {
+    removeUser(realm,u.getUsername());
   }
 }

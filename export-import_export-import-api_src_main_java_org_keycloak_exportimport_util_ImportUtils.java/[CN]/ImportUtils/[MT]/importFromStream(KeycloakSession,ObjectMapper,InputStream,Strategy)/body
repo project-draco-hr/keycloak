@@ -1,0 +1,22 @@
+{
+  JsonFactory factory=mapper.getJsonFactory();
+  JsonParser parser=factory.createJsonParser(is);
+  try {
+    parser.nextToken();
+    if (parser.getCurrentToken() == JsonToken.START_ARRAY) {
+      parser.nextToken();
+      while (parser.getCurrentToken() == JsonToken.START_OBJECT) {
+        RealmRepresentation realmRep=parser.readValueAs(RealmRepresentation.class);
+        parser.nextToken();
+        importRealm(session,realmRep,strategy);
+      }
+    }
+ else     if (parser.getCurrentToken() == JsonToken.START_OBJECT) {
+      RealmRepresentation realmRep=parser.readValueAs(RealmRepresentation.class);
+      importRealm(session,realmRep,strategy);
+    }
+  }
+  finally {
+    parser.close();
+  }
+}

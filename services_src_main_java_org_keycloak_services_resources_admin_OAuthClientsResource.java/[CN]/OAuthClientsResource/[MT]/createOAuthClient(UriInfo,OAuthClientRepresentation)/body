@@ -1,8 +1,7 @@
 {
   auth.requireManage();
-  OAuthClientManager resourceManager=new OAuthClientManager(realm);
   try {
-    OAuthClientModel oauth=resourceManager.create(rep);
+    OAuthClientModel oauth=RepresentationToModel.createOAuthClient(rep,realm);
     return Response.created(uriInfo.getAbsolutePathBuilder().path(oauth.getId()).build()).build();
   }
  catch (  ModelDuplicateException e) {

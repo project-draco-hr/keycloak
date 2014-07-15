@@ -1,5 +1,5 @@
 {
-  RealmModel realm=session.model().getRealm(realmId);
+  RealmModel realm=session.realms().getRealm(realmId);
   if (realm == null) {
     throw new IllegalStateException("Realm '" + realmId + "' not found");
   }
@@ -12,7 +12,7 @@
     }
     String username=PerfTestUtils.getUsername(userCounterInRealm);
     lastUsername=username;
-    UserModel user=realm.getUser(username);
+    UserModel user=session.users().getUserByUsername(username,realm);
     if (readRoles) {
       user.getRoleMappings();
     }
@@ -22,11 +22,11 @@
       realm.validatePassword(user,username);
     }
     if (readSocialLinks) {
-      realm.getSocialLinks(user);
+      session.users().getSocialLinks(user,realm);
     }
     if (searchBySocialLinks) {
       SocialLinkModel socialLink=new SocialLinkModel("facebook",username,username);
-      realm.getUserBySocialLink(socialLink);
+      session.users().getUserBySocialLink(socialLink,realm);
     }
   }
   log.info("Finished iteration " + ++iterationNumber + " in ReadUsers test for "+ realmId+ " worker. Last read user "+ lastUsername+ " in realm: "+ realmId);

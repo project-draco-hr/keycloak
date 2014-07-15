@@ -1,9 +1,9 @@
 {
-  UserModel user=KeycloakModelUtils.findUserByNameOrEmail(realm,username);
+  UserModel user=KeycloakModelUtils.findUserByNameOrEmail(session,realm,username);
   if (user == null) {
     AuthUser authUser=AuthenticationProviderManager.getManager(realm,session).getUser(username);
     if (authUser != null) {
-      user=realm.addUser(authUser.getUsername());
+      user=session.users().addUser(realm,authUser.getUsername());
       user.setEnabled(true);
       user.setFirstName(authUser.getFirstName());
       user.setLastName(authUser.getLastName());

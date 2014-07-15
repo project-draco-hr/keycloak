@@ -2,8 +2,8 @@
   logger.infof("Exporting realm '%s' into file %s",realmName,this.file.getAbsolutePath());
   ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
     @Override public void run(    KeycloakSession session) throws IOException {
-      RealmModel realm=session.model().getRealmByName(realmName);
-      RealmRepresentation realmRep=ExportUtils.exportRealm(realm,true);
+      RealmModel realm=session.realms().getRealmByName(realmName);
+      RealmRepresentation realmRep=ExportUtils.exportRealm(session,realm,true);
       writeToFile(realmRep);
     }
   }

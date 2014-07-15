@@ -1,0 +1,15 @@
+{
+  List<RoleModel> realmRolesRequested=new LinkedList<RoleModel>();
+  MultivaluedMap<String,RoleModel> resourceRolesRequested=new MultivaluedMapImpl<String,RoleModel>();
+  AccessToken token=createClientAccessToken(scopeParam,realm,client,user,session,realmRolesRequested,resourceRolesRequested);
+  if (session != null)   token.setSessionState(session.getId());
+  AccessCode code=new AccessCode();
+  code.setId(UUID.randomUUID().toString() + System.currentTimeMillis());
+  code.setAccessToken(token);
+  code.setTimestamp(Time.currentTime());
+  code.setExpiration(Time.currentTime() + realm.getAccessCodeLifespan());
+  code.setState(state);
+  code.setRedirectUri(redirect);
+  AccessCodeEntry entry=new AccessCodeEntry(keycloakSession,realm,code);
+  return entry;
+}

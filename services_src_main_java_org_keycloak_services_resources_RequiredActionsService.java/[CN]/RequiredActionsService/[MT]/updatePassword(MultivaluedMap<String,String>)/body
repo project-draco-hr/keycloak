@@ -33,7 +33,7 @@
   }
   audit.clone().event(EventType.UPDATE_PASSWORD).success();
   if (accessCode.getSessionState() == null) {
-    UserSessionModel userSession=session.sessions().createUserSession(realm,realm.getUserById(accessCode.getUser().getId()),clientConnection.getRemoteAddr());
+    UserSessionModel userSession=session.sessions().createUserSession(realm,session.users().getUserById(accessCode.getUser().getId(),realm),clientConnection.getRemoteAddr());
     accessCode.getToken().setSessionState(userSession.getId());
     audit.session(userSession);
   }

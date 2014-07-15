@@ -1,0 +1,28 @@
+{
+  return new KeycloakTransaction(){
+    @Override public void begin(){
+      transactionActive=true;
+    }
+    @Override public void commit(){
+      if (delegate == null)       return;
+      if (clearAll) {
+        cache.clear();
+      }
+      runInvalidations();
+    }
+    @Override public void rollback(){
+      setRollbackOnly=true;
+      runInvalidations();
+    }
+    @Override public void setRollbackOnly(){
+      setRollbackOnly=true;
+    }
+    @Override public boolean getRollbackOnly(){
+      return setRollbackOnly;
+    }
+    @Override public boolean isActive(){
+      return transactionActive;
+    }
+  }
+;
+}

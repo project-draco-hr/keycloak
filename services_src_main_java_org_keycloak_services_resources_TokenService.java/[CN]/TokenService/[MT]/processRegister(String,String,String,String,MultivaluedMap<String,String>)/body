@@ -42,11 +42,11 @@
     return Flows.forms(session,realm,uriInfo).setError(error).setFormData(formData).createRegistration();
   }
   AuthenticationProviderManager authenticationProviderManager=AuthenticationProviderManager.getManager(realm,session);
-  if (realm.getUser(username) != null || authenticationProviderManager.getUser(username) != null) {
+  if (session.users().getUserByUsername(username,realm) != null || authenticationProviderManager.getUser(username) != null) {
     audit.error(Errors.USERNAME_IN_USE);
     return Flows.forms(session,realm,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).createRegistration();
   }
-  UserModel user=realm.addUser(username);
+  UserModel user=session.users().addUser(realm,username);
   user.setEnabled(true);
   user.setFirstName(formData.getFirst("firstName"));
   user.setLastName(formData.getFirst("lastName"));

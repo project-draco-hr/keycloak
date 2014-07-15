@@ -1,6 +1,6 @@
 {
   String adminRealmName=Config.getAdminRealm();
-  if (session.model().getRealm(adminRealmName) != null) {
+  if (session.realms().getRealm(adminRealmName) != null) {
     return;
   }
   logger.info("Initializing " + adminRealmName + " realm");
@@ -20,7 +20,7 @@
   KeycloakModelUtils.generateRealmKeys(realm);
   realm.setAuthenticationProviders(Arrays.asList(AuthenticationProviderModel.DEFAULT_PROVIDER));
   realm.setAuditListeners(Collections.singleton("jboss-logging"));
-  UserModel adminUser=realm.addUser("admin");
+  UserModel adminUser=session.users().addUser(realm,"admin");
   adminUser.setEnabled(true);
   UserCredentialModel password=new UserCredentialModel();
   password.setType(UserCredentialModel.PASSWORD);

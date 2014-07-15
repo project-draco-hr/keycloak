@@ -20,13 +20,13 @@
     if (username != null) {
       attributes.put(UserModel.LOGIN_NAME,username);
     }
-    userModels=realm.searchForUserByAttributes(attributes);
+    userModels=session.users().searchForUserByAttributes(attributes,realm);
     for (    UserModel user : userModels) {
       results.add(ModelToRepresentation.toRepresentation(user));
     }
   }
  else {
-    userModels=realm.getUsers();
+    userModels=session.users().getUsers(realm);
   }
   for (  UserModel user : userModels) {
     results.add(ModelToRepresentation.toRepresentation(user));

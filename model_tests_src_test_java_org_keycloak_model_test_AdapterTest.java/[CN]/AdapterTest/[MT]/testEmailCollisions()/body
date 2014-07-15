@@ -1,19 +1,24 @@
 {
-  realmManager.createRealm("JUGGLER1").addUser("user1").setEmail("email@example.com");
-  realmManager.createRealm("JUGGLER2").addUser("user1").setEmail("email@example.com");
+  RealmModel juggler1=realmManager.createRealm("JUGGLER1");
+  realmManager.getSession().users().addUser(juggler1,"user1").setEmail("email@example.com");
+  RealmModel juggler2=realmManager.createRealm("JUGGLER2");
+  realmManager.getSession().users().addUser(juggler2,"user1").setEmail("email@example.com");
   commit();
+  juggler1=realmManager.getRealmByName("JUGGLER1");
   try {
-    realmManager.getRealmByName("JUGGLER1").addUser("user2").setEmail("email@example.com");
+    realmManager.getSession().users().addUser(juggler1,"user2").setEmail("email@example.com");
     commit();
     Assert.fail("Expected exception");
   }
  catch (  ModelDuplicateException e) {
   }
   resetSession();
-  realmManager.getRealmByName("JUGGLER1").addUser("user3").setEmail("email2@example.com");
+  juggler1=realmManager.getRealmByName("JUGGLER1");
+  realmManager.getSession().users().addUser(juggler1,"user3").setEmail("email2@example.com");
   commit();
   try {
-    realmManager.getRealmByName("JUGGLER1").getUser("user3").setEmail("email@example.com");
+    juggler1=realmManager.getRealmByName("JUGGLER1");
+    realmManager.getSession().users().getUserByUsername("user3",juggler1).setEmail("email@example.com");
     commit();
     Assert.fail("Expected exception");
   }

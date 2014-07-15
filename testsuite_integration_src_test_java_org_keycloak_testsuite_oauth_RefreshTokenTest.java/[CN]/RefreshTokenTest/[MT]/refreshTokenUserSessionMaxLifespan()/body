@@ -7,7 +7,7 @@
   events.poll();
   String refreshId=oauth.verifyRefreshToken(tokenResponse.getRefreshToken()).getId();
   KeycloakSession session=keycloakRule.startSession();
-  RealmModel realm=session.model().getRealmByName("test");
+  RealmModel realm=session.realms().getRealmByName("test");
   int maxLifespan=realm.getSsoSessionMaxLifespan();
   realm.setSsoSessionMaxLifespan(1);
   session.getTransaction().commit();
@@ -18,7 +18,7 @@
   assertNull(tokenResponse.getAccessToken());
   assertNull(tokenResponse.getRefreshToken());
   session=keycloakRule.startSession();
-  realm=session.model().getRealmByName("test");
+  realm=session.realms().getRealmByName("test");
   realm.setSsoSessionMaxLifespan(maxLifespan);
   session.getTransaction().commit();
   session.close();

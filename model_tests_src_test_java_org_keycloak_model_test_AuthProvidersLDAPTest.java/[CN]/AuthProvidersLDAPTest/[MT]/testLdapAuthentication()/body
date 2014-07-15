@@ -2,10 +2,10 @@
   MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("johnkeycloak","password");
   LDAPTestUtils.setLdapPassword(session,realm,"johnkeycloak","password");
   Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(session,null,realm,formData));
-  Assert.assertNull(realm.getUser("johnkeycloak"));
+  Assert.assertNull(session.users().getUserByUsername("johnkeycloak",realm));
   setupAuthenticationProviders();
   Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(session,null,realm,formData));
-  UserModel john=realm.getUser("johnkeycloak");
+  UserModel john=session.users().getUserByUsername("johnkeycloak",realm);
   Assert.assertNotNull(john);
   Assert.assertEquals("johnkeycloak",john.getUsername());
   Assert.assertEquals("John",john.getFirstName());

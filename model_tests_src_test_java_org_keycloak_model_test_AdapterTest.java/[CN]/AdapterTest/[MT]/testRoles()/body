@@ -4,7 +4,7 @@
   realmModel.addRole("user");
   Set<RoleModel> roles=realmModel.getRoles();
   Assert.assertEquals(3,roles.size());
-  UserModel user=realmModel.addUser("bburke");
+  UserModel user=realmManager.getSession().users().addUser(realmModel,"bburke");
   RoleModel realmUserRole=realmModel.getRole("user");
   user.grantRole(realmUserRole);
   Assert.assertTrue(user.hasRole(realmUserRole));

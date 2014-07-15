@@ -1,6 +1,6 @@
 {
   if (uriInfo.getQueryParameters().containsKey("key")) {
-    AccessCodeEntry accessCode=tokenManager.parseCode(uriInfo.getQueryParameters().getFirst("key"),realm);
+    AccessCodeEntry accessCode=tokenManager.parseCode(uriInfo.getQueryParameters().getFirst("key"),session,realm);
     accessCode.setAuthMethod("form");
     if (accessCode == null || accessCode.isExpired() || !accessCode.hasRequiredAction(RequiredAction.UPDATE_PASSWORD)) {
       return unauthorized();

@@ -5,7 +5,7 @@
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
   String code=formData.getFirst(OAuth2Constants.CODE);
-  AccessCodeEntry accessCodeEntry=tokenManager.parseCode(code,realm);
+  AccessCodeEntry accessCodeEntry=tokenManager.parseCode(code,session,realm);
   if (accessCodeEntry == null) {
     audit.error(Errors.INVALID_CODE);
     return oauth.forwardToSecurityFailure("Unknown access code.");

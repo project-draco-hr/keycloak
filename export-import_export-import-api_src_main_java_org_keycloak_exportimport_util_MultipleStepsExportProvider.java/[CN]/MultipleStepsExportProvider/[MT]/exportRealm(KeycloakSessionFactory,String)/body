@@ -4,12 +4,12 @@
   final boolean exportUsersIntoSameFile=usersPerFile < 0;
   ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
     @Override public void run(    KeycloakSession session) throws IOException {
-      RealmModel realm=session.model().getRealmByName(realmName);
-      RealmRepresentation rep=ExportUtils.exportRealm(realm,exportUsersIntoSameFile);
+      RealmModel realm=session.realms().getRealmByName(realmName);
+      RealmRepresentation rep=ExportUtils.exportRealm(session,realm,exportUsersIntoSameFile);
       writeRealm(realmName + "-realm.json",rep);
       logger.info("Realm '" + realmName + "' - data exported");
       if (!exportUsersIntoSameFile) {
-        usersHolder.totalCount=realm.getUsers().size();
+        usersHolder.totalCount=session.users().getUsers(realm).size();
       }
     }
   }
@@ -26,10 +26,10 @@
       }
       ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
         @Override public void run(        KeycloakSession session) throws IOException {
-          RealmModel realm=session.model().getRealmByName(realmName);
-          List<UserModel> users=realm.getUsers();
+          RealmModel realm=session.realms().getRealmByName(realmName);
+          List<UserModel> users=session.users().getUsers(realm);
           usersHolder.users=users.subList(usersHolder.currentPageStart,usersHolder.currentPageEnd);
-          writeUsers(realmName + "-users-" + (usersHolder.currentPageStart / countPerPage)+ ".json",realm,usersHolder.users);
+          writeUsers(realmName + "-users-" + (usersHolder.currentPageStart / countPerPage)+ ".json",session,realm,usersHolder.users);
           logger.info("Users " + usersHolder.currentPageStart + "-"+ usersHolder.currentPageEnd+ " exported");
         }
       }

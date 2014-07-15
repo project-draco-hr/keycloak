@@ -1,6 +1,6 @@
 {
   auth.requireManage();
-  UserModel user=realm.getUser(username);
+  UserModel user=session.users().getUserByUsername(username,realm);
   if (user == null) {
     throw new NotFoundException("User not found");
   }
@@ -17,7 +17,7 @@
   }
   Set<UserModel.RequiredAction> requiredActions=new HashSet<UserModel.RequiredAction>(user.getRequiredActions());
   requiredActions.add(UserModel.RequiredAction.UPDATE_PASSWORD);
-  AccessCodeEntry accessCode=tokenManager.createAccessCode(scope,state,redirect,realm,client,user,null);
+  AccessCodeEntry accessCode=tokenManager.createAccessCode(scope,state,redirect,session,realm,client,user,null);
   accessCode.setRequiredActions(requiredActions);
   accessCode.setUsernameUsed(username);
   accessCode.resetExpiration();

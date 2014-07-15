@@ -12,7 +12,7 @@
     throw new UnauthorizedException("No username");
   }
   audit.detail(Details.USERNAME,username);
-  UserModel user=realm.getUser(username);
+  UserModel user=session.users().getUserByUsername(username,realm);
   if (user != null)   audit.user(user);
   ClientModel client=authorizeClient(authorizationHeader,form,audit);
   if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {

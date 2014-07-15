@@ -1,5 +1,5 @@
 {
-  ModelProvider model=session.model();
+  RealmProvider model=session.realms();
   JsonFactory factory=mapper.getJsonFactory();
   JsonParser parser=factory.createJsonParser(is);
   try {
@@ -23,7 +23,7 @@
           userReps.add(user);
           parser.nextToken();
         }
-        importUsers(model,realmName,userReps);
+        importUsers(session,model,realmName,userReps);
         if (parser.getCurrentToken() == JsonToken.END_ARRAY) {
           parser.nextToken();
         }

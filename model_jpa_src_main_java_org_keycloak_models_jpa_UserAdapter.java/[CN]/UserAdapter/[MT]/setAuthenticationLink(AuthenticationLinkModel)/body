@@ -2,8 +2,15 @@
   AuthenticationLinkEntity entity=new AuthenticationLinkEntity();
   entity.setAuthProvider(authenticationLink.getAuthProvider());
   entity.setAuthUserId(authenticationLink.getAuthUserId());
-  user.setAuthenticationLink(entity);
+  entity.setUser(user);
+  if (user.getAuthenticationLink() != null) {
+    AuthenticationLinkEntity old=user.getAuthenticationLink();
+    old.setUser(null);
+    em.remove(old);
+    user.setAuthenticationLink(null);
+    em.flush();
+  }
   em.persist(entity);
-  em.persist(user);
+  user.setAuthenticationLink(entity);
   em.flush();
 }

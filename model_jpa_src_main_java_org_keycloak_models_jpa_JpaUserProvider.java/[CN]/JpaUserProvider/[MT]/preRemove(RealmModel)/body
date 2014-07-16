@@ -1,7 +1,9 @@
 {
   RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
-  int num=em.createQuery("delete from " + UserRoleMappingEntity.class.getSimpleName() + " mapping where mapping.user IN (select u from UserEntity u where realm=:realm)").setParameter("realm",realmEntity).executeUpdate();
-  num=em.createQuery("delete from " + SocialLinkEntity.class.getSimpleName() + " socialLink where socialLink.user IN (select u from UserEntity u where realm=:realm)").setParameter("realm",realmEntity).executeUpdate();
-  num=em.createQuery("delete from " + CredentialEntity.class.getSimpleName() + " mapping where mapping.user IN (select u from UserEntity u where realm=:realm)").setParameter("realm",realmEntity).executeUpdate();
-  num=em.createQuery("delete from UserEntity u where u.realm = :realm").setParameter("realm",realmEntity).executeUpdate();
+  int num=em.createNamedQuery("deleteUserRoleMappingsByRealm").setParameter("realm",realmEntity).executeUpdate();
+  num=em.createNamedQuery("deleteSocialLinkByRealm").setParameter("realm",realmEntity).executeUpdate();
+  num=em.createNamedQuery("deleteCredentialsByRealm").setParameter("realm",realmEntity).executeUpdate();
+  num=em.createNamedQuery("deleteUserAttributesByRealm").setParameter("realm",realmEntity).executeUpdate();
+  num=em.createNamedQuery("deleteAuthenticationLinksByRealm").setParameter("realm",realmEntity).executeUpdate();
+  num=em.createNamedQuery("deleteUsersByRealm").setParameter("realm",realmEntity).executeUpdate();
 }

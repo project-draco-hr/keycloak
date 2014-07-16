@@ -1,6 +1,7 @@
 {
   RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
-  for (  UserEntity u : em.createQuery("from UserEntity u where u.realm = :realm",UserEntity.class).setParameter("realm",realmEntity).getResultList()) {
-    removeUser(realm,u.getUsername());
-  }
+  int num=em.createQuery("delete from " + UserRoleMappingEntity.class.getSimpleName() + " mapping where mapping.user IN (select u from UserEntity u where realm=:realm)").setParameter("realm",realmEntity).executeUpdate();
+  num=em.createQuery("delete from " + SocialLinkEntity.class.getSimpleName() + " socialLink where socialLink.user IN (select u from UserEntity u where realm=:realm)").setParameter("realm",realmEntity).executeUpdate();
+  num=em.createQuery("delete from " + CredentialEntity.class.getSimpleName() + " mapping where mapping.user IN (select u from UserEntity u where realm=:realm)").setParameter("realm",realmEntity).executeUpdate();
+  num=em.createQuery("delete from UserEntity u where u.realm = :realm").setParameter("realm",realmEntity).executeUpdate();
 }

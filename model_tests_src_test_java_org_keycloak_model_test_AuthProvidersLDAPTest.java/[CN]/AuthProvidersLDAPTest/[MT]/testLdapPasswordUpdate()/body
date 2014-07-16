@@ -14,7 +14,7 @@
   }
   formData=AuthProvidersExternalModelTest.createFormData("johnkeycloak","password-updated");
   Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(session,null,realm,formData));
-  Assert.assertFalse(realm.validatePassword(john,"password-updated"));
+  Assert.assertFalse(session.users().validCredentials(realm,john,UserCredentialModel.password("password-updated")));
   AuthProvidersExternalModelTest.setPasswordUpdateForProvider(false,AuthProviderConstants.PROVIDER_NAME_PICKETLINK,realm);
   try {
     Assert.assertFalse(authProviderManager.updatePassword(john,"password-updated2"));

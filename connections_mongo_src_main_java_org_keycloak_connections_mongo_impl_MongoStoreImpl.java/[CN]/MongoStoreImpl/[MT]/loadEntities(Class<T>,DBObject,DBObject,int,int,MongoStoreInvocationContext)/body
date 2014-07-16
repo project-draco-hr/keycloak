@@ -2,8 +2,12 @@
   context.beforeDBSearch(type);
   DBCollection dbCollection=getDBCollectionForType(type);
   DBCursor cursor=dbCollection.find(query);
-  cursor.skip(firstResult);
-  cursor.limit(maxResults);
+  if (firstResult != -1) {
+    cursor.skip(firstResult);
+  }
+  if (maxResults != -1) {
+    cursor.limit(maxResults);
+  }
   if (sort != null) {
     cursor.sort(sort);
   }

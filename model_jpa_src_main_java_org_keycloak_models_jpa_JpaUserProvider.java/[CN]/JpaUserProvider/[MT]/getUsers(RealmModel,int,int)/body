@@ -1,0 +1,15 @@
+{
+  TypedQuery<UserEntity> query=em.createQuery("select u from UserEntity u where u.realm = :realm order by u.username",UserEntity.class);
+  RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
+  query.setParameter("realm",realmEntity);
+  if (firstResult != -1) {
+    query.setFirstResult(firstResult);
+  }
+  if (maxResults != -1) {
+    query.setMaxResults(maxResults);
+  }
+  List<UserEntity> results=query.getResultList();
+  List<UserModel> users=new ArrayList<UserModel>();
+  for (  UserEntity entity : results)   users.add(new UserAdapter(realm,em,entity));
+  return users;
+}

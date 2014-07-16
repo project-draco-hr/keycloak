@@ -1,0 +1,16 @@
+{
+  TypedQuery<UserEntity> query=em.createQuery("select u from UserEntity u where u.realm = :realm and ( lower(u.username) like :search or lower(concat(u.firstName, ' ', u.lastName)) like :search or u.email like :search ) order by u.username",UserEntity.class);
+  RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
+  query.setParameter("realm",realmEntity);
+  query.setParameter("search","%" + search.toLowerCase() + "%");
+  if (firstResult != -1) {
+    query.setFirstResult(firstResult);
+  }
+  if (maxResults != -1) {
+    query.setMaxResults(maxResults);
+  }
+  List<UserEntity> results=query.getResultList();
+  List<UserModel> users=new ArrayList<UserModel>();
+  for (  UserEntity entity : results)   users.add(new UserAdapter(realm,em,entity));
+  return users;
+}

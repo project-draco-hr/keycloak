@@ -1,8 +1,14 @@
 {
-  Map<String,String> attributes=user.getAttributes();
-  if (attributes == null) {
-    attributes=new HashMap<String,String>();
+  for (  UserAttributeEntity attr : user.getAttributes()) {
+    if (attr.getName().equals(name)) {
+      attr.setValue(value);
+      return;
+    }
   }
-  attributes.put(name,value);
-  user.setAttributes(attributes);
+  UserAttributeEntity attr=new UserAttributeEntity();
+  attr.setName(name);
+  attr.setValue(value);
+  attr.setUser(user);
+  em.persist(attr);
+  user.getAttributes().add(attr);
 }

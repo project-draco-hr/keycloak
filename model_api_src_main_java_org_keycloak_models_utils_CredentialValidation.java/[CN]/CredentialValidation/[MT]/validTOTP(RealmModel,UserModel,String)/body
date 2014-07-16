@@ -1,0 +1,11 @@
+{
+  UserCredentialValueModel passwordCred=null;
+  for (  UserCredentialValueModel cred : user.getCredentialsDirectly()) {
+    if (cred.getType().equals(UserCredentialModel.TOTP)) {
+      if (new TimeBasedOTP().validate(otp,cred.getValue().getBytes())) {
+        return true;
+      }
+    }
+  }
+  return false;
+}

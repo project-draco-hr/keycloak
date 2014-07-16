@@ -36,7 +36,7 @@
         return AuthenticationStatus.MISSING_TOTP;
       }
       logger.debug("validating TOTP");
-      if (!realm.validateTOTP(user,password,token)) {
+      if (!session.users().validCredentials(realm,user,UserCredentialModel.totp(token))) {
         return AuthenticationStatus.INVALID_CREDENTIALS;
       }
     }

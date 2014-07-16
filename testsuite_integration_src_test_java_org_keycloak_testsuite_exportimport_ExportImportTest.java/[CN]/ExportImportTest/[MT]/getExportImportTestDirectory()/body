@@ -1,0 +1,16 @@
+{
+  String dirPath=null;
+  String relativeDirExportImportPath="testsuite" + File.separator + "integration"+ File.separator+ "target"+ File.separator+ "export-import";
+  if (System.getProperties().containsKey("maven.home")) {
+    dirPath=System.getProperty("user.dir").replaceFirst("testsuite.integration.*",Matcher.quoteReplacement(relativeDirExportImportPath));
+  }
+ else {
+    for (    String c : System.getProperty("java.class.path").split(File.pathSeparator)) {
+      if (c.contains(File.separator + "testsuite" + File.separator+ "integration")) {
+        dirPath=c.replaceFirst("testsuite.integration.*",Matcher.quoteReplacement(relativeDirExportImportPath));
+      }
+    }
+  }
+  String absolutePath=new File(dirPath).getAbsolutePath();
+  return absolutePath;
+}

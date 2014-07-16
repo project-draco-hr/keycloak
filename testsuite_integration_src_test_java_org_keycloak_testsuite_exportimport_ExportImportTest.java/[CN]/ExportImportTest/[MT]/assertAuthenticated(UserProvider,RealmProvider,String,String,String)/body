@@ -1,0 +1,11 @@
+{
+  RealmModel realm=realmProvider.getRealmByName(realmName);
+  if (realm == null) {
+    Assert.fail("realm " + realmName + " not found");
+  }
+  UserModel user=userProvider.getUserByUsername(username,realm);
+  if (user == null) {
+    Assert.fail("user " + username + " not found");
+  }
+  Assert.assertTrue(userProvider.validCredentials(realm,user,UserCredentialModel.password(password)));
+}

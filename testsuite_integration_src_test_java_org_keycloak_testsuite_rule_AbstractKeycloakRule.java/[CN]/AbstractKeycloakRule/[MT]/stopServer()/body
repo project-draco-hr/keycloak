@@ -1,0 +1,19 @@
+{
+  server.stop();
+  try {
+    Retry.execute(new Runnable(){
+      @Override public void run(){
+        try {
+          new Socket(server.getConfig().getHost(),server.getConfig().getPort());
+          throw new RuntimeException();
+        }
+ catch (        IOException expected) {
+        }
+      }
+    }
+,10,500);
+  }
+ catch (  InterruptedException ie) {
+    Thread.currentThread().interrupt();
+  }
+}

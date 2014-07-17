@@ -2,7 +2,7 @@
   OAuthClientModel oauth=getOAuthClientById(id);
   if (oauth == null)   return false;
   OAuthClientEntity client=em.getReference(OAuthClientEntity.class,oauth.getId());
-  em.createQuery("delete from " + ScopeMappingEntity.class.getSimpleName() + " where client = :client").setParameter("client",client).executeUpdate();
+  em.createNamedQuery("deleteScopeMappingByClient").setParameter("client",client).executeUpdate();
   em.remove(client);
   return true;
 }

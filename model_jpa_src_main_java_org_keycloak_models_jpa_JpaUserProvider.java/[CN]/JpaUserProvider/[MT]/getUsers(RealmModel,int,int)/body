@@ -1,7 +1,6 @@
 {
-  TypedQuery<UserEntity> query=em.createQuery("select u from UserEntity u where u.realm = :realm order by u.username",UserEntity.class);
-  RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
-  query.setParameter("realm",realmEntity);
+  TypedQuery<UserEntity> query=em.createNamedQuery("getAllUsersByRealm",UserEntity.class);
+  query.setParameter("realmId",realm.getId());
   if (firstResult != -1) {
     query.setFirstResult(firstResult);
   }

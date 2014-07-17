@@ -1,7 +1,6 @@
 {
   TypedQuery<UserEntity> query=em.createNamedQuery("findUserByLinkAndRealm",UserEntity.class);
-  RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
-  query.setParameter("realm",realmEntity);
+  query.setParameter("realmId",realm.getId());
   query.setParameter("socialProvider",socialLink.getSocialProvider());
   query.setParameter("socialUserId",socialLink.getSocialUserId());
   List<UserEntity> results=query.getResultList();

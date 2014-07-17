@@ -63,10 +63,7 @@
           throw new RuntimeException("App doesn't exist in role definitions: " + entry.getKey());
         }
         for (        RoleRepresentation roleRep : entry.getValue()) {
-          RoleModel role=app.getRole(roleRep.getName());
-          if (role == null) {
-            role=app.addRole(roleRep.getName());
-          }
+          RoleModel role=roleRep.getId() != null ? app.addRole(roleRep.getId(),roleRep.getName()) : app.addRole(roleRep.getName());
           role.setDescription(roleRep.getDescription());
         }
       }
@@ -93,6 +90,14 @@
   if (rep.getDefaultRoles() != null) {
     for (    String roleString : rep.getDefaultRoles()) {
       newRealm.addDefaultRole(roleString.trim());
+    }
+  }
+  if (rep.getApplications() != null) {
+    for (    ApplicationRepresentation resourceRep : rep.getApplications()) {
+      if (resourceRep.getDefaultRoles() != null) {
+        ApplicationModel appModel=newRealm.getApplicationByName(resourceRep.getName());
+        appModel.updateDefaultRoles(resourceRep.getDefaultRoles());
+      }
     }
   }
   if (rep.getOauthClients() != null) {

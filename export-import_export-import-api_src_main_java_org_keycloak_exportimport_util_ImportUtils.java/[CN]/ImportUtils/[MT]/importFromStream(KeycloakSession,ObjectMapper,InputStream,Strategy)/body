@@ -5,9 +5,18 @@
     parser.nextToken();
     if (parser.getCurrentToken() == JsonToken.START_ARRAY) {
       parser.nextToken();
+      List<RealmRepresentation> realmReps=new ArrayList<RealmRepresentation>();
       while (parser.getCurrentToken() == JsonToken.START_OBJECT) {
         RealmRepresentation realmRep=parser.readValueAs(RealmRepresentation.class);
         parser.nextToken();
+        if (Config.getAdminRealm().equals(realmRep.getRealm())) {
+          realmReps.add(0,realmRep);
+        }
+ else {
+          realmReps.add(realmRep);
+        }
+      }
+      for (      RealmRepresentation realmRep : realmReps) {
         importRealm(session,realmRep,strategy);
       }
     }

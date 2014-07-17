@@ -3,14 +3,15 @@
   entity.setAuthProvider(authenticationLink.getAuthProvider());
   entity.setAuthUserId(authenticationLink.getAuthUserId());
   entity.setUser(user);
-  if (user.getAuthenticationLink() != null) {
-    AuthenticationLinkEntity old=user.getAuthenticationLink();
-    old.setUser(null);
-    em.remove(old);
-    user.setAuthenticationLink(null);
-    em.flush();
+  if (user.getAuthenticationLink() == null) {
+    user.setAuthenticationLink(new LinkedList<AuthenticationLinkEntity>());
   }
+ else   if (!user.getAuthenticationLink().isEmpty()) {
+    AuthenticationLinkEntity old=user.getAuthenticationLink().iterator().next();
+    user.getAuthenticationLink().clear();
+    em.remove(old);
+  }
+  user.getAuthenticationLink().add(entity);
   em.persist(entity);
-  user.setAuthenticationLink(entity);
   em.flush();
 }

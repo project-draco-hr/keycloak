@@ -8,7 +8,7 @@
   realm.getRoles().remove(role);
   realm.getDefaultRoles().remove(role);
   em.createNativeQuery("delete from CompositeRole where childRole = :role").setParameter("role",roleEntity).executeUpdate();
-  em.createQuery("delete from " + ScopeMappingEntity.class.getSimpleName() + " where role = :role").setParameter("role",roleEntity).executeUpdate();
+  em.createNamedQuery("deleteScopeMappingByRole").setParameter("role",roleEntity).executeUpdate();
   em.remove(roleEntity);
   return true;
 }

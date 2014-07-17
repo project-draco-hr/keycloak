@@ -1,6 +1,6 @@
 {
-  em.createQuery("delete from " + UserRoleMappingEntity.class.getSimpleName() + " where user = :user").setParameter("user",user).executeUpdate();
-  em.createQuery("delete from " + SocialLinkEntity.class.getSimpleName() + " where user = :user").setParameter("user",user).executeUpdate();
+  em.createNamedQuery("deleteUserRoleMappingsByUser").setParameter("user",user).executeUpdate();
+  em.createNamedQuery("deleteSocialLinkByUser").setParameter("user",user).executeUpdate();
   if (user.getAuthenticationLink() != null) {
     for (    AuthenticationLinkEntity l : user.getAuthenticationLink()) {
       em.remove(l);

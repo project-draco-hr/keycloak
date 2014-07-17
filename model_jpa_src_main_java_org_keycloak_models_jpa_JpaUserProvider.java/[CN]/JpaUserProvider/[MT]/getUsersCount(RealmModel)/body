@@ -1,5 +1,5 @@
 {
   RealmEntity realmEntity=em.getReference(RealmEntity.class,realm.getId());
-  Object count=em.createQuery("select count(u) from UserEntity u where u.realm = :realm").setParameter("realm",realmEntity).getSingleResult();
+  Object count=em.createNamedQuery("getRealmUserCount").setParameter("realm",realmEntity).getSingleResult();
   return ((Number)count).intValue();
 }

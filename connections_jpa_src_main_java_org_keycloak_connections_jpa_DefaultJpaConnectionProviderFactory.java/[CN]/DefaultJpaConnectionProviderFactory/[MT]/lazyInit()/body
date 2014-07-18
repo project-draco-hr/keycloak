@@ -2,7 +2,39 @@
   if (emf == null) {
 synchronized (this) {
       if (emf == null) {
-        emf=Persistence.createEntityManagerFactory(unitName,getHibernateProperties());
+        String unitName=config.get("unitName");
+        Map<String,Object> properties=new HashMap<String,Object>();
+        if (unitName == null) {
+          unitName="keycloak-default";
+          String dataSource=config.get("dataSource");
+          if (dataSource != null) {
+            if (config.getBoolean("jta",false)) {
+              properties.put(AvailableSettings.JTA_DATASOURCE,dataSource);
+            }
+ else {
+              properties.put(AvailableSettings.NON_JTA_DATASOURCE,dataSource);
+            }
+          }
+ else {
+            properties.put(AvailableSettings.JDBC_URL,config.get("url"));
+            properties.put(AvailableSettings.JDBC_DRIVER,config.get("driver"));
+            String user=config.get("user");
+            if (user != null) {
+              properties.put(AvailableSettings.JDBC_USER,user);
+            }
+            String password=config.get("password");
+            if (password != null) {
+              properties.put(AvailableSettings.JDBC_PASSWORD,password);
+            }
+          }
+          String databaseSchema=config.get("databaseSchema","validate");
+          if (databaseSchema != null) {
+            properties.put("hibernate.hbm2ddl.auto",databaseSchema);
+          }
+          properties.put("hibernate.show_sql",config.getBoolean("showSql",false));
+          properties.put("hibernate.format_sql",config.getBoolean("formatSql",true));
+        }
+        emf=Persistence.createEntityManagerFactory(unitName,properties);
       }
     }
   }

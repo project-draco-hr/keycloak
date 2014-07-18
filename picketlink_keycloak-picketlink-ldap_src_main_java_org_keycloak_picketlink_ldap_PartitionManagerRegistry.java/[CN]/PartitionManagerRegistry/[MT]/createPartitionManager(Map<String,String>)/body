@@ -1,0 +1,31 @@
+{
+  IdentityConfigurationBuilder builder=new IdentityConfigurationBuilder();
+  Properties connectionProps=new Properties();
+  connectionProps.put("com.sun.jndi.ldap.connect.pool","true");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.authentication","none simple");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.initsize","1");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.maxsize","1000");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.prefsize","5");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.timeout","300000");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.protocol","plain");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.debug","off");
+  String vendor=ldapConfig.get(LDAPConstants.VENDOR);
+  boolean activeDirectory=vendor != null && vendor.equals(LDAPConstants.VENDOR_ACTIVE_DIRECTORY);
+  String ldapLoginNameMapping=ldapConfig.get(LDAPConstants.USERNAME_LDAP_ATTRIBUTE);
+  if (ldapLoginNameMapping == null) {
+    ldapLoginNameMapping=activeDirectory ? CN : UID;
+  }
+  String ldapFirstNameMapping=activeDirectory ? "givenName" : CN;
+  String[] userObjectClasses=getUserObjectClasses(ldapConfig);
+  LDAPStoreConfigurationBuilder ldapStoreBuilder=builder.named("SIMPLE_LDAP_STORE_CONFIG").stores().ldap().connectionProperties(connectionProps).addCredentialHandler(LDAPKeycloakCredentialHandler.class).baseDN(ldapConfig.get(LDAPConstants.BASE_DN)).bindDN(ldapConfig.get(LDAPConstants.BIND_DN)).bindCredential(ldapConfig.get(LDAPConstants.BIND_CREDENTIAL)).url(ldapConfig.get(LDAPConstants.CONNECTION_URL)).activeDirectory(activeDirectory).supportAllFeatures();
+  if (vendor != null && vendor.equals(LDAPConstants.VENDOR_RHDS)) {
+    ldapStoreBuilder.uniqueIdentifierAttributeName("nsuniqueid");
+  }
+  LDAPMappingConfigurationBuilder ldapUserMappingBuilder=ldapStoreBuilder.mapping(User.class).baseDN(ldapConfig.get(LDAPConstants.USER_DN_SUFFIX)).objectClasses(userObjectClasses).attribute("loginName",ldapLoginNameMapping,true).attribute("firstName",ldapFirstNameMapping).attribute("lastName",SN).attribute("email",EMAIL);
+  if (activeDirectory && ldapLoginNameMapping.equals("sAMAccountName")) {
+    ldapUserMappingBuilder.bindingAttribute("fullName",CN);
+    logger.infof("Using 'cn' attribute for DN of user and 'sAMAccountName' for username");
+  }
+  KeycloakEventBridge eventBridge=new KeycloakEventBridge(activeDirectory && "true".equals(ldapConfig.get(LDAPConstants.USER_ACCOUNT_CONTROLS_AFTER_PASSWORD_UPDATE)));
+  return new DefaultPartitionManager(builder.buildAll(),eventBridge,null);
+}

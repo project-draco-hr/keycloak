@@ -3,6 +3,14 @@
   logger.debug("updating realm: " + realm.getName());
   try {
     RepresentationToModel.updateRealm(rep,realm);
+    if (rep.isRealmCacheEnabled() != null && session.realms() instanceof CacheRealmProvider) {
+      CacheRealmProvider cacheRealmProvider=(CacheRealmProvider)session.realms();
+      cacheRealmProvider.setEnabled(rep.isRealmCacheEnabled());
+    }
+    if (rep.isUserCacheEnabled() != null && session.users() instanceof CacheUserProvider) {
+      CacheUserProvider cache=(CacheUserProvider)session.users();
+      cache.setEnabled(rep.isUserCacheEnabled());
+    }
     return Response.noContent().build();
   }
  catch (  ModelDuplicateException e) {

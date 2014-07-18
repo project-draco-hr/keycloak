@@ -1,6 +1,15 @@
 {
   if (auth.hasView()) {
-    return ModelToRepresentation.toRepresentation(realm);
+    RealmRepresentation rep=ModelToRepresentation.toRepresentation(realm);
+    if (session.realms() instanceof CacheRealmProvider) {
+      CacheRealmProvider cacheRealmProvider=(CacheRealmProvider)session.realms();
+      rep.setRealmCacheEnabled(cacheRealmProvider.isEnabled());
+    }
+    if (session.users() instanceof CacheUserProvider) {
+      CacheUserProvider cache=(CacheUserProvider)session.users();
+      rep.setUserCacheEnabled(cache.isEnabled());
+    }
+    return rep;
   }
  else {
     auth.requireAny();

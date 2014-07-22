@@ -1,14 +1,13 @@
 {
   if (uriInfo.getQueryParameters().containsKey("key")) {
     AccessCodeEntry accessCode=tokenManager.parseCode(uriInfo.getQueryParameters().getFirst("key"),session,realm);
-    if (accessCode == null || accessCode.isExpired() || !accessCode.hasRequiredAction(RequiredAction.VERIFY_EMAIL)) {
+    if (accessCode == null || accessCode.isExpired() || !RequiredAction.VERIFY_EMAIL.equals(accessCode.getRequiredAction())) {
       return unauthorized();
     }
     UserModel user=getUser(accessCode);
     initAudit(accessCode);
     user.setEmailVerified(true);
     user.removeRequiredAction(RequiredAction.VERIFY_EMAIL);
-    accessCode.removeRequiredAction(RequiredAction.VERIFY_EMAIL);
     audit.clone().event(EventType.VERIFY_EMAIL).detail(Details.EMAIL,accessCode.getUser().getEmail()).success();
     return redirectOauth(user,accessCode);
   }

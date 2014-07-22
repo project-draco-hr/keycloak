@@ -1,3 +1,4 @@
 {
-  return accessCode.getExpiration() != 0 && Time.currentTime() > accessCode.getExpiration();
+  int lifespan=accessCode.getAction() == null ? realm.getAccessCodeLifespan() : realm.getAccessCodeLifespanUserAction();
+  return accessCode.getTimestamp() + lifespan < Time.currentTime();
 }

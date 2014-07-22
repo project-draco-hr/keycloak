@@ -4,7 +4,9 @@
   try {
     RealmModel realmByName=session.realms().getRealmByName(realm);
     UserModel user=session.users().getUserByUsername(name,realmByName);
-    return user != null ? ModelToRepresentation.toRepresentation(user) : null;
+    UserRepresentation userRep=user != null ? ModelToRepresentation.toRepresentation(user) : null;
+    session.getTransaction().commit();
+    return userRep;
   }
   finally {
     session.close();

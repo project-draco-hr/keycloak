@@ -1,0 +1,25 @@
+{
+  List<FederationProviderEntity> newEntities=new ArrayList<FederationProviderEntity>();
+  int counter=1;
+  for (  FederationProviderModel model : providers) {
+    FederationProviderEntity entity=new FederationProviderEntity();
+    entity.setId(KeycloakModelUtils.generateId());
+    entity.setRealm(realm);
+    entity.setProviderName(model.getProviderName());
+    entity.setConfig(model.getConfig());
+    entity.setPriority(counter++);
+    newEntities.add(entity);
+  }
+  Collection<FederationProviderEntity> existing=realm.getFederationProviders();
+  Collection<FederationProviderEntity> copy=new ArrayList<FederationProviderEntity>(existing);
+  for (  FederationProviderEntity apToRemove : copy) {
+    existing.remove(apToRemove);
+    em.remove(apToRemove);
+  }
+  em.flush();
+  for (  FederationProviderEntity apToAdd : newEntities) {
+    existing.add(apToAdd);
+    em.persist(apToAdd);
+  }
+  em.flush();
+}

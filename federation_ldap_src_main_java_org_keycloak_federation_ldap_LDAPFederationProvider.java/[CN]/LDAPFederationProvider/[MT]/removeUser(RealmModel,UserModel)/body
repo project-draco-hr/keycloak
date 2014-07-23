@@ -1,0 +1,14 @@
+{
+  IdentityManager identityManager=getIdentityManager();
+  try {
+    User picketlinkUser=BasicModel.getUser(identityManager,user.getUsername());
+    if (picketlinkUser == null) {
+      return false;
+    }
+    identityManager.remove(picketlinkUser);
+    return true;
+  }
+ catch (  IdentityManagementException ie) {
+    throw convertIDMException(ie);
+  }
+}

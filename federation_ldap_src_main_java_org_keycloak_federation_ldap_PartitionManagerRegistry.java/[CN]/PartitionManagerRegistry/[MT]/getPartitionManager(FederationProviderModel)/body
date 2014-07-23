@@ -1,0 +1,11 @@
+{
+  PartitionManagerContext context=partitionManagers.get(model.getId());
+  Map<String,String> config=model.getConfig();
+  if (context == null || !config.equals(context.config)) {
+    logger.infof("Creating new partition manager for the federation provider: %s, LDAP Connection URL: %s, LDAP Base DN: %s, LDAP Vendor: %s",model.getId(),config.get(LDAPConstants.CONNECTION_URL),config.get(LDAPConstants.BASE_DN),config.get(LDAPConstants.VENDOR));
+    PartitionManager manager=createPartitionManager(config);
+    context=new PartitionManagerContext(config,manager);
+    partitionManagers.put(model.getId(),context);
+  }
+  return context.partitionManager;
+}

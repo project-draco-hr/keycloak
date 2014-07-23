@@ -48,9 +48,9 @@
 switch (status) {
 case SUCCESS:
 case ACTIONS_REQUIRED:
-    UserSessionModel userSession=session.sessions().createUserSession(realm,user,clientConnection.getRemoteAddr());
+    UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"form",remember);
   audit.session(userSession);
-return oauth.processAccessCode(scopeParam,state,redirect,client,user,userSession,username,remember,"form",audit);
+return oauth.processAccessCode(scopeParam,state,redirect,client,user,userSession,audit);
 case ACCOUNT_TEMPORARILY_DISABLED:
 audit.error(Errors.USER_TEMPORARILY_DISABLED);
 return Flows.forms(this.session,realm,uriInfo).setError(Messages.ACCOUNT_TEMPORARILY_DISABLED).setFormData(formData).createLogin();

@@ -1,3 +1,22 @@
 {
-  return redirectAccessCode(accessCode,session,state,redirect,false);
+  String code=accessCode.getCode();
+  UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam(OAuth2Constants.CODE,code);
+  log.debugv("redirectAccessCode: state: {0}",state);
+  if (state != null)   redirectUri.queryParam(OAuth2Constants.STATE,state);
+  Response.ResponseBuilder location=Response.status(302).location(redirectUri.build());
+  Cookie remember=request.getHttpHeaders().getCookies().get(AuthenticationManager.KEYCLOAK_REMEMBER_ME);
+  Cookie sessionCookie=request.getHttpHeaders().getCookies().get(AuthenticationManager.KEYCLOAK_SESSION_COOKIE);
+  if (sessionCookie != null) {
+    String oldSessionId=sessionCookie.getValue().split("/")[2];
+    if (!oldSessionId.equals(userSession.getId())) {
+      UserSessionModel oldSession=session.sessions().getUserSession(realm,oldSessionId);
+      if (oldSession != null) {
+        log.debugv("Removing old user session: session: {0}",oldSessionId);
+        session.sessions().removeUserSession(realm,oldSession);
+      }
+    }
+  }
+  authManager.createLoginCookie(realm,accessCode.getUser(),userSession,uriInfo);
+  if (userSession.isRememberMe())   authManager.createRememberMeCookie(realm,uriInfo);
+  return location.build();
 }

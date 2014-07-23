@@ -6,18 +6,22 @@
   }
   String code=formData.getFirst(OAuth2Constants.CODE);
   AccessCodeEntry accessCodeEntry=tokenManager.parseCode(code,session,realm);
-  if (accessCodeEntry == null) {
+  if (accessCodeEntry == null || !AccessCode.Action.OAUTH_GRANT.equals(accessCodeEntry.getAction())) {
     audit.error(Errors.INVALID_CODE);
     return oauth.forwardToSecurityFailure("Unknown access code.");
   }
   audit.detail(Details.CODE_ID,accessCodeEntry.getCodeId());
   String redirect=accessCodeEntry.getRedirectUri();
   String state=accessCodeEntry.getState();
-  audit.client(accessCodeEntry.getClient()).user(accessCodeEntry.getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,accessCodeEntry.getAuthMethod()).detail(Details.REDIRECT_URI,redirect).detail(Details.USERNAME,accessCodeEntry.getUsernameUsed());
-  if (accessCodeEntry.isRememberMe()) {
-    audit.detail(Details.REMEMBER_ME,"true");
-  }
+  audit.client(accessCodeEntry.getClient()).user(accessCodeEntry.getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.REDIRECT_URI,redirect);
   UserSessionModel userSession=session.sessions().getUserSession(realm,accessCodeEntry.getSessionState());
+  if (userSession != null) {
+    audit.detail(Details.AUTH_METHOD,userSession.getAuthMethod());
+    audit.detail(Details.USERNAME,userSession.getLoginUsername());
+    if (userSession.isRememberMe()) {
+      audit.detail(Details.REMEMBER_ME,"true");
+    }
+  }
   if (!AuthenticationManager.isSessionValid(realm,userSession)) {
     AuthenticationManager.logout(session,realm,userSession,uriInfo);
     audit.error(Errors.INVALID_CODE);
@@ -29,6 +33,6 @@
     return redirectAccessDenied(redirect,state);
   }
   audit.success();
-  accessCodeEntry.resetExpiration();
+  accessCodeEntry.setAction(null);
   return oauth.redirectAccessCode(accessCodeEntry,userSession,state,redirect);
 }

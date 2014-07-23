@@ -1,0 +1,28 @@
+{
+  Map<String,UserModel> users=new HashMap<String,UserModel>();
+  List<UserModel> query=session.userStorage().searchForUserByAttributes(attributes,realm,firstResult,maxResults);
+  for (  UserModel user : query) {
+    FederationProvider link=getFederationLink(realm,user);
+    if (link != null) {
+      users.put(user.getUsername(),link.proxy(user));
+    }
+ else {
+      users.put(user.getUsername(),user);
+    }
+  }
+  if (users.size() >= maxResults) {
+    List<UserModel> results=new ArrayList<UserModel>(users.size());
+    results.addAll(users.values());
+    return results;
+  }
+  List<FederationProviderModel> federationProviders=realm.getFederationProviders();
+  for (int i=federationProviders.size(); i >= 0; i--) {
+    FederationProviderModel federation=federationProviders.get(i);
+    FederationProvider fed=getFederationProvider(federation);
+    query=fed.searchForUserByAttributes(attributes,realm,firstResult,maxResults);
+    for (    UserModel user : query)     users.put(user.getUsername(),user);
+  }
+  List<UserModel> results=new ArrayList<UserModel>(users.size());
+  results.addAll(users.values());
+  return results;
+}

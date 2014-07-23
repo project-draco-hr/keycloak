@@ -1,0 +1,16 @@
+{
+  UserModel user=session.userStorage().getUserByUsername(username,realm);
+  if (user != null) {
+    FederationProvider link=getFederationLink(realm,user);
+    if (link != null) {
+      return link.proxy(user);
+    }
+    return user;
+  }
+  for (  FederationProviderModel federation : realm.getFederationProviders()) {
+    FederationProvider fed=session.getProvider(FederationProvider.class,federation.getProviderName());
+    user=fed.getUserByUsername(username,realm);
+    if (user != null)     return user;
+  }
+  return user;
+}

@@ -1,11 +1,12 @@
 {
   FederationProvider link=getFederationLink(realm,user);
   if (link != null) {
-    if (link.getSupportedCredentialTypes().size() > 0) {
+    Set<String> supportedCredentialTypes=link.getSupportedCredentialTypes();
+    if (supportedCredentialTypes.size() > 0) {
       List<UserCredentialModel> fedCreds=new ArrayList<UserCredentialModel>();
       List<UserCredentialModel> localCreds=new ArrayList<UserCredentialModel>();
       for (      UserCredentialModel cred : input) {
-        if (fedCreds.contains(cred.getType())) {
+        if (supportedCredentialTypes.contains(cred.getType())) {
           fedCreds.add(cred);
         }
  else {

@@ -1,9 +1,10 @@
 {
   String email=(picketlinkUser.getEmail() != null && picketlinkUser.getEmail().trim().length() > 0) ? picketlinkUser.getEmail() : null;
   UserModel imported=session.userStorage().addUser(realm,picketlinkUser.getLoginName());
+  imported.setEnabled(true);
   imported.setEmail(email);
   imported.setFirstName(picketlinkUser.getFirstName());
   imported.setLastName(picketlinkUser.getLastName());
   imported.setFederationLink(model.getId());
-  return imported;
+  return proxy(imported);
 }

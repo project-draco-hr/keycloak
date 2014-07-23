@@ -1,0 +1,16 @@
+{
+  String id=KeycloakModelUtils.generateId();
+  UserSessionEntity entity=new UserSessionEntity();
+  entity.setId(id);
+  entity.setRealm(realm.getId());
+  entity.setUser(user.getId());
+  entity.setLoginUsername(loginUsername);
+  entity.setIpAddress(ipAddress);
+  entity.setAuthMethod(authMethod);
+  entity.setRememberMe(rememberMe);
+  int currentTime=Time.currentTime();
+  entity.setStarted(currentTime);
+  entity.setLastSessionRefresh(currentTime);
+  sessions.put(new UserSessionKey(realm.getId(),id),entity);
+  return new UserSessionAdapter(session,realm,entity);
+}

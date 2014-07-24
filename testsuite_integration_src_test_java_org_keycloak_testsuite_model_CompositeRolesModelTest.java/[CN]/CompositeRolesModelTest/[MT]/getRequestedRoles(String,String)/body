@@ -1,0 +1,18 @@
+{
+  Set<RoleModel> requestedRoles=new HashSet<RoleModel>();
+  RealmModel realm=realmManager.getRealm("TestComposites");
+  UserModel user=realmManager.getSession().users().getUserByUsername(username,realm);
+  ApplicationModel application=realm.getApplicationByName(applicationName);
+  Set<RoleModel> roleMappings=user.getRoleMappings();
+  Set<RoleModel> scopeMappings=application.getScopeMappings();
+  Set<RoleModel> appRoles=application.getRoles();
+  if (appRoles != null)   scopeMappings.addAll(appRoles);
+  for (  RoleModel role : roleMappings) {
+    if (role.getContainer().equals(application))     requestedRoles.add(role);
+    for (    RoleModel desiredRole : scopeMappings) {
+      Set<RoleModel> visited=new HashSet<RoleModel>();
+      applyScope(role,desiredRole,visited,requestedRoles);
+    }
+  }
+  return requestedRoles;
+}

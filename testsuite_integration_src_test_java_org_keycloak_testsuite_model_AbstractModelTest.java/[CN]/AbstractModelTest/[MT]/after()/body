@@ -1,0 +1,16 @@
+{
+  kc.stopSession(session,true);
+  session=kc.startSession();
+  try {
+    model=session.realms();
+    RealmManager rm=new RealmManager(session);
+    for (    RealmModel realm : model.getRealms()) {
+      if (!realm.getName().equals(Config.getAdminRealm())) {
+        rm.removeRealm(realm);
+      }
+    }
+  }
+  finally {
+    kc.stopSession(session,true);
+  }
+}

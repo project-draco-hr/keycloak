@@ -1,0 +1,10 @@
+{
+  audit.onEvent(create(System.currentTimeMillis() - 30000,EventType.LOGIN,"realmId","clientId","userId","127.0.0.1","error"));
+  audit.onEvent(create(System.currentTimeMillis() - 20000,EventType.LOGIN,"realmId","clientId","userId","127.0.0.1","error"));
+  audit.onEvent(create(System.currentTimeMillis(),EventType.LOGIN,"realmId","clientId","userId","127.0.0.1","error"));
+  audit.onEvent(create(System.currentTimeMillis(),EventType.LOGIN,"realmId","clientId","userId","127.0.0.1","error"));
+  audit.onEvent(create(System.currentTimeMillis() - 30000,EventType.LOGIN,"realmId2","clientId","userId","127.0.0.1","error"));
+  resetSession();
+  audit.clear("realmId");
+  Assert.assertEquals(1,audit.createQuery().getResultList().size());
+}

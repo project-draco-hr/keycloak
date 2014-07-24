@@ -1,6 +1,9 @@
 {
   if (!cache.isEnabled())   return getDelegate().getOAuthClientById(id,realm);
   CachedOAuthClient cached=cache.getOAuthClient(id);
+  if (cached != null && !cached.getRealm().equals(realm.getId())) {
+    cached=null;
+  }
   if (cached == null) {
     OAuthClientModel model=getDelegate().getOAuthClientById(id,realm);
     if (model == null)     return null;

@@ -1,0 +1,8 @@
+{
+  UserModel user=session.userStorage().addUser(realm,id,username,addDefaultRoles);
+  for (  UserFederationProviderModel federation : realm.getFederationProviders()) {
+    UserFederationProvider fed=session.getProvider(UserFederationProvider.class,federation.getProviderName());
+    return fed.addUser(realm,user);
+  }
+  return user;
+}

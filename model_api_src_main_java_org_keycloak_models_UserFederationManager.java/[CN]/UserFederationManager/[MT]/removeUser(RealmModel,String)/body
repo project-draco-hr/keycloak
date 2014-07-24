@@ -1,0 +1,9 @@
+{
+  UserModel user=session.userStorage().getUserByUsername(name,realm);
+  if (user == null)   return false;
+  UserFederationProvider link=getFederationLink(realm,user);
+  if (link != null) {
+    return link.removeUser(realm,user);
+  }
+  return session.userStorage().removeUser(realm,name);
+}

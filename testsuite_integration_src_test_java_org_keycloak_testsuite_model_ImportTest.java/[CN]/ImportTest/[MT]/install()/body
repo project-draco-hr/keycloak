@@ -1,0 +1,11 @@
+{
+  RealmRepresentation rep=AbstractModelTest.loadJson("model/testrealm.json");
+  RealmModel realm=realmManager.createRealm("demo",rep.getRealm());
+  realmManager.importRealm(rep,realm);
+  commit();
+  realm=realmManager.getRealm("demo");
+  assertDataImportedInRealm(realmManager.getSession(),realm);
+  commit();
+  realm=realmManager.getRealm("demo");
+  realmManager.removeRealm(realm);
+}

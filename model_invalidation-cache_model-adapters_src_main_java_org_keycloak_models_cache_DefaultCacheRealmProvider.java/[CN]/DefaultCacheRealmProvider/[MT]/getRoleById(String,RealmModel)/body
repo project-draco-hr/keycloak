@@ -1,15 +1,18 @@
 {
   if (!cache.isEnabled())   return getDelegate().getRoleById(id,realm);
   CachedRole cached=cache.getRole(id);
+  if (cached != null && !cached.getRealm().equals(realm.getId())) {
+    cached=null;
+  }
   if (cached == null) {
     RoleModel model=getDelegate().getRoleById(id,realm);
     if (model == null)     return null;
     if (roleInvalidations.contains(id))     return model;
     if (model.getContainer() instanceof ApplicationModel) {
-      cached=new CachedApplicationRole(((ApplicationModel)model.getContainer()).getId(),model);
+      cached=new CachedApplicationRole(((ApplicationModel)model.getContainer()).getId(),model,realm);
     }
  else {
-      cached=new CachedRealmRole(model);
+      cached=new CachedRealmRole(model,realm);
     }
     cache.addCachedRole(cached);
   }

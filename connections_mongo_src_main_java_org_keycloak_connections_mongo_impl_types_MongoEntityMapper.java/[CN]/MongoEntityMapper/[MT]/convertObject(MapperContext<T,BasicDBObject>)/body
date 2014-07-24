@@ -5,7 +5,7 @@
   Collection<Property<Object>> props=entityInfo.getProperties();
   for (  Property<Object> property : props) {
     String propName=property.getName();
-    if (!"id".equals(propName)) {
+    if (!"id".equals(propName) || !(applicationObject instanceof MongoIdentifiableEntity)) {
       Object propValue=property.getValue(applicationObject);
       if (propValue != null) {
         Object dbValue=propValue == null ? null : mapperRegistry.convertApplicationObjectToDBObject(propValue,Object.class);

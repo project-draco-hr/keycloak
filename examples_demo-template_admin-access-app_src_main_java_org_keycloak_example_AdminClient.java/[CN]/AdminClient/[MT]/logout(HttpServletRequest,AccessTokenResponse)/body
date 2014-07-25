@@ -1,7 +1,7 @@
 {
   HttpClient client=new HttpClientBuilder().disableTrustManager().build();
   try {
-    HttpGet get=new HttpGet(KeycloakUriBuilder.fromUri("http://localhost:8080/auth").path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).queryParam("session_state",res.getSessionState()).build("demo"));
+    HttpGet get=new HttpGet(KeycloakUriBuilder.fromUri(getBaseUrl(request) + "/auth").path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).queryParam("session_state",res.getSessionState()).build("demo"));
     HttpResponse response=client.execute(get);
     HttpEntity entity=response.getEntity();
     if (entity == null) {

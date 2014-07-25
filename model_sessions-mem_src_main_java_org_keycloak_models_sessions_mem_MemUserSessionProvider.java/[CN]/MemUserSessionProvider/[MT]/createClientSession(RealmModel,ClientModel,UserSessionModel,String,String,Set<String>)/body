@@ -1,0 +1,14 @@
+{
+  UserSessionEntity userSessionEntity=getUserSessionEntity(realm,userSession.getId());
+  ClientSessionEntity entity=new ClientSessionEntity();
+  entity.setId(KeycloakModelUtils.generateId());
+  entity.setTimestamp(Time.currentTime());
+  entity.setClientId(client.getId());
+  entity.setSession(userSessionEntity);
+  entity.setRedirectUri(redirectUri);
+  entity.setState(state);
+  entity.setRoles(roles);
+  userSessionEntity.addClientSession(entity);
+  clientSessions.put(entity.getId(),entity);
+  return new ClientSessionAdapter(session,this,realm,entity);
+}

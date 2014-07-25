@@ -1,7 +1,25 @@
 {
-  createSessions();
+  UserSessionModel[] sessions=createSessions();
+  List<String> clientSessionsRemoved=new LinkedList<String>();
+  List<String> clientSessionsKept=new LinkedList<String>();
+  for (  UserSessionModel s : sessions) {
+    for (    ClientSessionModel c : s.getClientSessions()) {
+      if (c.getUserSession().getUser().getUsername().equals("user1")) {
+        clientSessionsRemoved.add(c.getId());
+      }
+ else {
+        clientSessionsKept.add(c.getId());
+      }
+    }
+  }
   session.sessions().removeUserSessions(realm,session.users().getUserByUsername("user1",realm));
   resetSession();
   assertTrue(session.sessions().getUserSessions(realm,session.users().getUserByUsername("user1",realm)).isEmpty());
   assertFalse(session.sessions().getUserSessions(realm,session.users().getUserByUsername("user2",realm)).isEmpty());
+  for (  String c : clientSessionsRemoved) {
+    assertNull(session.sessions().getClientSession(realm,c));
+  }
+  for (  String c : clientSessionsKept) {
+    assertNotNull(session.sessions().getClientSession(realm,c));
+  }
 }

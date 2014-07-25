@@ -4,8 +4,7 @@
   Assert.assertNotNull(response.getCode());
   Assert.assertNull(response.getState());
   Assert.assertNull(response.getError());
-  oauth.verifyCode(response.getCode());
+  keycloakRule.verifyCode(response.getCode());
   String codeId=events.expectLogin().assertEvent().getDetails().get(Details.CODE_ID);
-  AccessCode accessCode=new JWSInput(response.getCode()).readJsonContent(AccessCode.class);
-  Assert.assertEquals(codeId,accessCode.getId());
+  assertCode(codeId,response.getCode());
 }

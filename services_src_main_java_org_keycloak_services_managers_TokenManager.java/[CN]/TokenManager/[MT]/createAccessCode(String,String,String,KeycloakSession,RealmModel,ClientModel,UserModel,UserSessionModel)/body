@@ -1,3 +1,8 @@
 {
-  return createAccessCodeEntry(scopeParam,state,redirect,keycloakSession,realm,client,user,session);
+  Set<String> requestedRoles=new HashSet<String>();
+  for (  RoleModel r : getAccess(scopeParam,client,user)) {
+    requestedRoles.add(r.getId());
+  }
+  ClientSessionModel clientSession=session.sessions().createClientSession(realm,client,userSession,redirect,state,requestedRoles);
+  return new AccessCode(realm,clientSession);
 }

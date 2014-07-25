@@ -13,8 +13,18 @@
     }
   }
   if (authResult != null) {
-    if (authResult.getSession() != null) {
-      authResult.getSession().associateClient(application);
+    UserSessionModel userSession=authResult.getSession();
+    if (userSession != null) {
+      boolean associated=false;
+      for (      ClientSessionModel c : userSession.getClientSessions()) {
+        if (c.getClient().equals(application)) {
+          associated=true;
+          break;
+        }
+      }
+      if (!associated) {
+        session.sessions().createClientSession(realm,application,userSession,null,null,null);
+      }
     }
     account.setUser(auth.getUser());
     AuthenticationLinkModel authLinkModel=auth.getUser().getAuthenticationLink();

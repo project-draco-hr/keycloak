@@ -1,14 +1,8 @@
 {
-  Iterator<UserSessionEntity> itr=sessions.values().iterator();
-  while (itr.hasNext()) {
-    UserSessionEntity s=itr.next();
-    if (s.getRealm().equals(realm.getId())) {
-      itr.remove();
-    }
-  }
-  for (  UserSessionEntity s : sessions.values()) {
-    if (s.getRealm().equals(realm.getId())) {
-      s.getClients().remove(client.getClientId());
+  for (  ClientSessionEntity e : clientSessions.values()) {
+    if (e.getSession().getRealm().equals(realm.getId()) && e.getClientId().equals(client.getId())) {
+      clientSessions.remove(e.getId());
+      e.getSession().removeClientSession(e);
     }
   }
 }

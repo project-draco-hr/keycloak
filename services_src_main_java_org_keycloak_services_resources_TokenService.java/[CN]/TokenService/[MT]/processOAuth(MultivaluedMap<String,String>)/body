@@ -5,16 +5,16 @@
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
   String code=formData.getFirst(OAuth2Constants.CODE);
-  AccessCodeEntry accessCodeEntry=tokenManager.parseCode(code,session,realm);
-  if (accessCodeEntry == null || !AccessCode.Action.OAUTH_GRANT.equals(accessCodeEntry.getAction())) {
+  AccessCode accessCode=AccessCode.parse(code,session,realm);
+  if (accessCode == null || !accessCode.isValid(ClientSessionModel.Action.OAUTH_GRANT)) {
     audit.error(Errors.INVALID_CODE);
-    return oauth.forwardToSecurityFailure("Unknown access code.");
+    return oauth.forwardToSecurityFailure("Invalid access code.");
   }
-  audit.detail(Details.CODE_ID,accessCodeEntry.getCodeId());
-  String redirect=accessCodeEntry.getRedirectUri();
-  String state=accessCodeEntry.getState();
-  audit.client(accessCodeEntry.getClient()).user(accessCodeEntry.getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.REDIRECT_URI,redirect);
-  UserSessionModel userSession=session.sessions().getUserSession(realm,accessCodeEntry.getSessionState());
+  audit.detail(Details.CODE_ID,accessCode.getCodeId());
+  String redirect=accessCode.getRedirectUri();
+  String state=accessCode.getState();
+  audit.client(accessCode.getClient()).user(accessCode.getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.REDIRECT_URI,redirect);
+  UserSessionModel userSession=session.sessions().getUserSession(realm,accessCode.getSessionState());
   if (userSession != null) {
     audit.detail(Details.AUTH_METHOD,userSession.getAuthMethod());
     audit.detail(Details.USERNAME,userSession.getLoginUsername());
@@ -33,6 +33,6 @@
     return redirectAccessDenied(redirect,state);
   }
   audit.success();
-  accessCodeEntry.setAction(null);
-  return oauth.redirectAccessCode(accessCodeEntry,userSession,state,redirect);
+  accessCode.setAction(ClientSessionModel.Action.CODE_TO_TOKEN);
+  return oauth.redirectAccessCode(accessCode,userSession,state,redirect);
 }

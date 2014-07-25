@@ -1,7 +1,14 @@
 {
-  createSessions();
+  UserSessionModel[] sessions=createSessions();
+  List<ClientSessionModel> clientSessions=new LinkedList<ClientSessionModel>();
+  for (  UserSessionModel s : sessions) {
+    clientSessions.addAll(s.getClientSessions());
+  }
   session.sessions().removeUserSessions(realm);
   resetSession();
   assertTrue(session.sessions().getUserSessions(realm,session.users().getUserByUsername("user1",realm)).isEmpty());
   assertTrue(session.sessions().getUserSessions(realm,session.users().getUserByUsername("user2",realm)).isEmpty());
+  for (  ClientSessionModel c : clientSessions) {
+    assertNull(session.sessions().getClientSession(realm,c.getId()));
+  }
 }

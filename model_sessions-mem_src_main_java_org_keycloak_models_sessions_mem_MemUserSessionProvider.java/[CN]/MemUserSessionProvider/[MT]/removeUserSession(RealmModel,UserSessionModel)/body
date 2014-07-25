@@ -1,3 +1,9 @@
 {
-  sessions.remove(new UserSessionKey(realm.getId(),session.getId()));
+  UserSessionEntity entity=getUserSessionEntity(realm,session.getId());
+  if (entity != null) {
+    userSessions.remove(entity.getId());
+    for (    ClientSessionEntity clientSession : entity.getClientSessions()) {
+      clientSessions.remove(clientSession.getId());
+    }
+  }
 }

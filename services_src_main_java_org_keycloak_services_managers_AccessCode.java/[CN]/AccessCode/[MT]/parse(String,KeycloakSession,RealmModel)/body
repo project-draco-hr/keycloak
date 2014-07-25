@@ -1,0 +1,18 @@
+{
+  try {
+    String[] parts=code.split("\\.");
+    String id=new String(Base64Url.decode(parts[1]));
+    ClientSessionModel clientSession=session.sessions().getClientSession(realm,id);
+    if (clientSession == null) {
+      return null;
+    }
+    String hash=createSignatureHash(realm,clientSession);
+    if (!hash.equals(parts[0])) {
+      return null;
+    }
+    return new AccessCode(realm,clientSession);
+  }
+ catch (  RuntimeException e) {
+    return null;
+  }
+}

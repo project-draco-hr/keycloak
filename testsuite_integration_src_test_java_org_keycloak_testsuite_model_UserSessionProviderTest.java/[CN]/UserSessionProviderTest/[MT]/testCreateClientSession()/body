@@ -1,0 +1,14 @@
+{
+  UserSessionModel[] sessions=createSessions();
+  List<ClientSessionModel> clientSessions=sessions[0].getClientSessions();
+  assertEquals(2,clientSessions.size());
+  ClientSessionModel session=clientSessions.get(0);
+  assertEquals(null,session.getAction());
+  assertEquals(realm.findClient("test-app").getClientId(),session.getClient().getClientId());
+  assertEquals(sessions[0].getId(),session.getUserSession().getId());
+  assertEquals("http://redirect",session.getRedirectUri());
+  assertEquals("state",session.getState());
+  assertEquals(2,session.getRoles().size());
+  assertTrue(session.getRoles().contains("one"));
+  assertTrue(session.getRoles().contains("two"));
+}

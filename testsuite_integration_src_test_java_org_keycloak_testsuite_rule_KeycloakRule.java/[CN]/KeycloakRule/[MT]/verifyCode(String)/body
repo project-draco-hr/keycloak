@@ -1,0 +1,19 @@
+{
+  KeycloakSession session=startSession();
+  try {
+    RealmModel realm=session.realms().getRealm("test");
+    try {
+      AccessCode accessCode=AccessCode.parse(code,session,realm);
+      if (accessCode == null) {
+        Assert.fail("Invalid code");
+      }
+      return accessCode;
+    }
+ catch (    Throwable t) {
+      throw new AssertionError("Failed to parse code",t);
+    }
+  }
+  finally {
+    stopSession(session,false);
+  }
+}

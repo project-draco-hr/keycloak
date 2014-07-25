@@ -1,7 +1,7 @@
 {
   if (uriInfo.getQueryParameters().containsKey("key")) {
-    AccessCodeEntry accessCode=tokenManager.parseCode(uriInfo.getQueryParameters().getFirst("key"),session,realm);
-    if (accessCode == null || accessCode.isExpired() || !RequiredAction.VERIFY_EMAIL.equals(accessCode.getRequiredAction())) {
+    AccessCode accessCode=AccessCode.parse(uriInfo.getQueryParameters().getFirst("key"),session,realm);
+    if (accessCode == null || !accessCode.isValid(RequiredAction.VERIFY_EMAIL)) {
       return unauthorized();
     }
     UserModel user=getUser(accessCode);
@@ -12,7 +12,7 @@
     return redirectOauth(user,accessCode);
   }
  else {
-    AccessCodeEntry accessCode=getAccessCodeEntry(RequiredAction.VERIFY_EMAIL);
+    AccessCode accessCode=getAccessCodeEntry(RequiredAction.VERIFY_EMAIL);
     if (accessCode == null) {
       return unauthorized();
     }

@@ -1,0 +1,18 @@
+{
+  List<FederationProviderEntity> entities=realm.getFederationProviders();
+  List<FederationProviderEntity> copy=new ArrayList<FederationProviderEntity>();
+  for (  FederationProviderEntity entity : entities) {
+    copy.add(entity);
+  }
+  Collections.sort(copy,new Comparator<FederationProviderEntity>(){
+    @Override public int compare(    FederationProviderEntity o1,    FederationProviderEntity o2){
+      return o1.getPriority() - o2.getPriority();
+    }
+  }
+);
+  List<UserFederationProviderModel> result=new ArrayList<UserFederationProviderModel>();
+  for (  FederationProviderEntity entity : copy) {
+    result.add(new UserFederationProviderModel(entity.getId(),entity.getProviderName(),entity.getConfig()));
+  }
+  return result;
+}

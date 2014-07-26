@@ -16,7 +16,7 @@
     audit.error(Errors.INVALID_CODE);
     throw new BadRequestException("Code not specified",Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build());
   }
-  AccessCodeEntry accessCode=tokenManager.parseCode(code,realm);
+  AccessCodeEntry accessCode=tokenManager.parseCode(code,session,realm);
   if (accessCode == null) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
@@ -32,10 +32,10 @@
     audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  if (!accessCode.getToken().isActive()) {
+  if (accessCode.getAction() != null) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
-    res.put(OAuth2Constants.ERROR_DESCRIPTION,"Token expired");
+    res.put(OAuth2Constants.ERROR_DESCRIPTION,"Code is not active");
     audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
@@ -49,7 +49,7 @@
     audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  UserModel user=realm.getUserById(accessCode.getUser().getId());
+  UserModel user=session.users().getUserById(accessCode.getUser().getId(),realm);
   if (user == null) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
@@ -64,9 +64,9 @@
     audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  UserSessionModel session=realm.getUserSession(accessCode.getSessionState());
-  if (!AuthenticationManager.isSessionValid(realm,session)) {
-    AuthenticationManager.logout(realm,session,uriInfo);
+  UserSessionModel userSession=session.sessions().getUserSession(realm,accessCode.getSessionState());
+  if (!AuthenticationManager.isSessionValid(realm,userSession)) {
+    AuthenticationManager.logout(session,realm,userSession,uriInfo);
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
     res.put(OAuth2Constants.ERROR_DESCRIPTION,"Session not active");
@@ -74,8 +74,19 @@
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   logger.debug("accessRequest SUCCESS");
-  session.associateClient(client);
-  AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).accessToken(accessCode.getToken()).generateIDToken().generateRefreshToken().build();
+  userSession.associateClient(client);
+  AccessToken token=tokenManager.createClientAccessToken(accessCode.getRequestedRoles(),realm,client,user,userSession);
+  try {
+    tokenManager.verifyAccess(token,realm,client,user);
+  }
+ catch (  OAuthErrorException e) {
+    Map<String,String> error=new HashMap<String,String>();
+    error.put(OAuth2Constants.ERROR,e.getError());
+    if (e.getDescription() != null)     error.put(OAuth2Constants.ERROR_DESCRIPTION,e.getDescription());
+    audit.error(Errors.INVALID_CODE);
+    return Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build();
+  }
+  AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).accessToken(token).generateIDToken().generateRefreshToken().build();
   audit.success();
   return Cors.add(request,Response.ok(res)).auth().allowedOrigins(client).allowedMethods("POST").exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build();
 }

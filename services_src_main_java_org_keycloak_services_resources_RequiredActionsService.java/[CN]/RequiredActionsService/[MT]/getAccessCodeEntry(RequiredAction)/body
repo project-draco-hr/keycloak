@@ -4,7 +4,7 @@
     logger.debug("getAccessCodeEntry code as not in query param");
     return null;
   }
-  AccessCodeEntry accessCodeEntry=tokenManager.parseCode(code,realm);
+  AccessCodeEntry accessCodeEntry=tokenManager.parseCode(code,session,realm);
   if (accessCodeEntry == null) {
     logger.debug("getAccessCodeEntry access code entry null");
     return null;
@@ -14,8 +14,8 @@
     logger.debugv("getAccessCodeEntry access code entry expired");
     return null;
   }
-  if (accessCodeEntry.getRequiredActions() == null || !accessCodeEntry.getRequiredActions().contains(requiredAction)) {
-    logger.debugv("getAccessCodeEntry required actions null || entry does not contain required action: {0}|{1}",(accessCodeEntry.getRequiredActions() == null),!accessCodeEntry.getRequiredActions().contains(requiredAction));
+  if (!requiredAction.equals(accessCodeEntry.getRequiredAction())) {
+    logger.debugv("Invalid access code action: {0}",requiredAction);
     return null;
   }
   return accessCodeEntry;

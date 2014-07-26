@@ -1,0 +1,9 @@
+{
+  TypedQuery<RealmEntity> query=em.createNamedQuery("getAllRealms",RealmEntity.class);
+  List<RealmEntity> entities=query.getResultList();
+  List<Realm> realms=new ArrayList<Realm>();
+  for (  RealmEntity entity : entities) {
+    realms.add(new RealmAdapter(this,em,entity));
+  }
+  return realms;
+}

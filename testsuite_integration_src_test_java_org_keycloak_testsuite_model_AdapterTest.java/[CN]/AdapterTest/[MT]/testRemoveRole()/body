@@ -1,0 +1,20 @@
+{
+  test1CreateRealm();
+  UserModel user=realmManager.getSession().users().addUser(realmModel,"bburke");
+  OAuthClientModel client=realmModel.addOAuthClient("client");
+  ApplicationModel app=realmModel.addApplication("test-app");
+  RoleModel appRole=app.addRole("test");
+  user.grantRole(appRole);
+  client.addScopeMapping(appRole);
+  RoleModel realmRole=realmModel.addRole("test");
+  app.addScopeMapping(realmRole);
+  commit();
+  realmModel=model.getRealm("JUGGLER");
+  app=realmModel.getApplicationByName("test-app");
+  Assert.assertTrue(realmModel.removeRoleById(realmRole.getId()));
+  Assert.assertFalse(realmModel.removeRoleById(realmRole.getId()));
+  assertNull(realmModel.getRole(realmRole.getName()));
+  Assert.assertTrue(realmModel.removeRoleById(appRole.getId()));
+  Assert.assertFalse(realmModel.removeRoleById(appRole.getId()));
+  assertNull(app.getRole(appRole.getName()));
+}

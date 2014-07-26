@@ -1,0 +1,18 @@
+{
+  if (provider.users().supports(Feature.READ_CREDENTIALS)) {
+    List<UserCredentialValueModel> models=new LinkedList<UserCredentialValueModel>();
+    for (    Credentials cred : user.getCredentials()) {
+      UserCredentialValueModel model=new UserCredentialValueModel();
+      model.setType(cred.getType());
+      model.setValue(cred.getValue());
+      model.setDevice(cred.getDevice());
+      model.setSalt(cred.getSalt());
+      model.setHashIterations(cred.getHashIterations());
+      models.add(model);
+    }
+    return models;
+  }
+ else {
+    throw new IllegalStateException("Users provider doesn't support reading credentials");
+  }
+}

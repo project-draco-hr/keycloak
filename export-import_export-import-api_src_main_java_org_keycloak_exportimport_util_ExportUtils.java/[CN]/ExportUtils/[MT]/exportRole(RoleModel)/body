@@ -1,0 +1,39 @@
+{
+  RoleRepresentation roleRep=ModelToRepresentation.toRepresentation(role);
+  Set<RoleModel> composites=role.getComposites();
+  if (composites != null && composites.size() > 0) {
+    Set<String> compositeRealmRoles=null;
+    Map<String,List<String>> compositeAppRoles=null;
+    for (    RoleModel composite : composites) {
+      RoleContainerModel crContainer=composite.getContainer();
+      if (crContainer instanceof RealmModel) {
+        if (compositeRealmRoles == null) {
+          compositeRealmRoles=new HashSet<String>();
+        }
+        compositeRealmRoles.add(composite.getName());
+      }
+ else {
+        if (compositeAppRoles == null) {
+          compositeAppRoles=new HashMap<String,List<String>>();
+        }
+        ApplicationModel app=(ApplicationModel)crContainer;
+        String appName=app.getName();
+        List<String> currentAppComposites=compositeAppRoles.get(appName);
+        if (currentAppComposites == null) {
+          currentAppComposites=new ArrayList<String>();
+          compositeAppRoles.put(appName,currentAppComposites);
+        }
+        currentAppComposites.add(composite.getName());
+      }
+    }
+    RoleRepresentation.Composites compRep=new RoleRepresentation.Composites();
+    if (compositeRealmRoles != null) {
+      compRep.setRealm(compositeRealmRoles);
+    }
+    if (compositeAppRoles != null) {
+      compRep.setApplication(compositeAppRoles);
+    }
+    roleRep.setComposites(compRep);
+  }
+  return roleRep;
+}

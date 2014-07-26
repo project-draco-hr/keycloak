@@ -12,7 +12,7 @@
     throw new UnauthorizedException("No username");
   }
   audit.detail(Details.USERNAME,username);
-  UserModel user=realm.getUser(username);
+  UserModel user=session.users().getUserByUsername(username,realm);
   if (user != null)   audit.user(user);
   ClientModel client=authorizeClient(authorizationHeader,form,audit);
   if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
@@ -23,7 +23,7 @@
     audit.error(Errors.REALM_DISABLED);
     return createError("realm_disabled","Realm is disabled",Response.Status.UNAUTHORIZED);
   }
-  AuthenticationStatus authenticationStatus=authManager.authenticateForm(clientConnection,realm,form);
+  AuthenticationStatus authenticationStatus=authManager.authenticateForm(session,clientConnection,realm,form);
   Map<String,String> err;
 switch (authenticationStatus) {
 case SUCCESS:
@@ -49,10 +49,10 @@ audit.error(Errors.INVALID_USER_CREDENTIALS);
 return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(err).build();
 }
 String scope=form.getFirst(OAuth2Constants.SCOPE);
-UserSessionModel session=realm.createUserSession(user,clientConnection.getRemoteAddr());
-session.associateClient(client);
-audit.session(session);
-AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).generateAccessToken(scope,client,user,session).generateRefreshToken().generateIDToken().build();
+UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"oauth_credentials",false);
+userSession.associateClient(client);
+audit.session(userSession);
+AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).generateAccessToken(scope,client,user,userSession).generateRefreshToken().generateIDToken().build();
 audit.success();
 return Response.ok(res,MediaType.APPLICATION_JSON_TYPE).build();
 }

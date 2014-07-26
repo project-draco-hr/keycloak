@@ -1,0 +1,21 @@
+{
+  test1CreateRealm();
+  UserModel user=realmManager.getSession().users().addUser(realmModel,"bburke");
+  user.setAttribute("attr1","val1");
+  user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+  RoleModel testRole=realmModel.addRole("test");
+  user.grantRole(testRole);
+  ApplicationModel app=realmModel.addApplication("test-app");
+  RoleModel appRole=app.addRole("test");
+  user.grantRole(appRole);
+  SocialLinkModel socialLink=new SocialLinkModel("google","google1",user.getUsername());
+  realmManager.getSession().users().addSocialLink(realmModel,user,socialLink);
+  UserCredentialModel cred=new UserCredentialModel();
+  cred.setType(CredentialRepresentation.PASSWORD);
+  cred.setValue("password");
+  user.updateCredential(cred);
+  commit();
+  realmModel=model.getRealm("JUGGLER");
+  Assert.assertTrue(realmManager.getSession().users().removeUser(realmModel,user));
+  assertNull(realmManager.getSession().users().getUserByUsername("bburke",realmModel));
+}

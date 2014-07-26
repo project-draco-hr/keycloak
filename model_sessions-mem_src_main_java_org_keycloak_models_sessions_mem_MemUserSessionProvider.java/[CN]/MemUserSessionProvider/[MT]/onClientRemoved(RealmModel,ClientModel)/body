@@ -1,0 +1,14 @@
+{
+  Iterator<UserSessionEntity> itr=sessions.values().iterator();
+  while (itr.hasNext()) {
+    UserSessionEntity s=itr.next();
+    if (s.getRealm().equals(realm.getId())) {
+      itr.remove();
+    }
+  }
+  for (  UserSessionEntity s : sessions.values()) {
+    if (s.getRealm().equals(realm.getId())) {
+      s.getClients().remove(client.getClientId());
+    }
+  }
+}

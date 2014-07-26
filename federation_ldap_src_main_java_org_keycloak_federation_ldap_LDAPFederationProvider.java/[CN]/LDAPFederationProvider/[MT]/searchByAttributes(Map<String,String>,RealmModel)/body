@@ -1,0 +1,38 @@
+{
+  IdentityManager identityManager=getIdentityManager();
+  List<UserModel> searchResults=new LinkedList<UserModel>();
+  try {
+    Map<String,User> results=new HashMap<String,User>();
+    if (attributes.containsKey(USERNAME)) {
+      User user=BasicModel.getUser(identityManager,attributes.get(USERNAME));
+      if (user != null)       results.put(user.getLoginName(),user);
+    }
+ else     if (attributes.containsKey(EMAIL)) {
+      User user=queryByEmail(identityManager,attributes.get(EMAIL));
+      if (user != null)       results.put(user.getLoginName(),user);
+    }
+ else     if (attributes.containsKey(FIRST_NAME) || attributes.containsKey(LAST_NAME)) {
+      IdentityQuery<User> query=identityManager.createIdentityQuery(User.class);
+      if (attributes.containsKey(FIRST_NAME)) {
+        query.setParameter(User.FIRST_NAME,attributes.get(FIRST_NAME));
+      }
+      if (attributes.containsKey(LAST_NAME)) {
+        query.setParameter(User.LAST_NAME,attributes.get(LAST_NAME));
+      }
+      List<User> agents=query.getResultList();
+      for (      User user : agents) {
+        results.put(user.getLoginName(),user);
+      }
+    }
+    for (    User user : results.values()) {
+      if (session.userStorage().getUserByUsername(user.getLoginName(),realm) == null) {
+        UserModel imported=importUserFromPicketlink(realm,user);
+        searchResults.add(imported);
+      }
+    }
+  }
+ catch (  IdentityManagementException ie) {
+    throw convertIDMException(ie);
+  }
+  return searchResults;
+}

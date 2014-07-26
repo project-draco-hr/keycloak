@@ -1,0 +1,14 @@
+{
+  try {
+    if (!zipFile.exists()) {
+      throw new IllegalStateException("File " + zipFile.getAbsolutePath() + " doesn't exists");
+    }
+    AESDecrypter decrypter=new AESDecrypterBC();
+    this.decrypter=new AesZipFileDecrypter(zipFile,decrypter);
+    this.password=password;
+  }
+ catch (  IOException ioe) {
+    throw new RuntimeException(ioe);
+  }
+  logger.infof("Importing from ZIP file %s",zipFile.getAbsolutePath());
+}

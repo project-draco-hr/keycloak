@@ -1,0 +1,16 @@
+{
+  assertEquals(user.getId(),session.getUser().getId());
+  assertEquals(ipAddress,session.getIpAddress());
+  assertEquals(user.getUsername(),session.getLoginUsername());
+  assertEquals("form",session.getAuthMethod());
+  assertEquals(true,session.isRememberMe());
+  assertTrue(session.getStarted() >= started - 1 && session.getStarted() <= started + 1);
+  assertTrue(session.getLastSessionRefresh() >= lastRefresh - 1 && session.getLastSessionRefresh() <= lastRefresh + 1);
+  String[] actualClients=new String[session.getClientAssociations().size()];
+  for (int i=0; i < actualClients.length; i++) {
+    actualClients[i]=session.getClientAssociations().get(i).getClientId();
+  }
+  Arrays.sort(clients);
+  Arrays.sort(actualClients);
+  assertArrayEquals(clients,actualClients);
+}

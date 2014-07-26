@@ -1,0 +1,24 @@
+{
+  UserFederationProvider link=getFederationLink(realm,user);
+  if (link != null) {
+    validateUser(realm,user);
+    Set<String> supportedCredentialTypes=link.getSupportedCredentialTypes();
+    if (supportedCredentialTypes.size() > 0) {
+      List<UserCredentialModel> fedCreds=new ArrayList<UserCredentialModel>();
+      List<UserCredentialModel> localCreds=new ArrayList<UserCredentialModel>();
+      for (      UserCredentialModel cred : input) {
+        if (supportedCredentialTypes.contains(cred.getType())) {
+          fedCreds.add(cred);
+        }
+ else {
+          localCreds.add(cred);
+        }
+      }
+      if (!link.validCredentials(realm,user,fedCreds)) {
+        return false;
+      }
+      return session.userStorage().validCredentials(realm,user,localCreds);
+    }
+  }
+  return session.userStorage().validCredentials(realm,user,input);
+}

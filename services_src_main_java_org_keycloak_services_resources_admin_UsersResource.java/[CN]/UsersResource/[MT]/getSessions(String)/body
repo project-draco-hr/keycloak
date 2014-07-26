@@ -1,11 +1,11 @@
 {
   logger.info("sessions");
   auth.requireView();
-  UserModel user=realm.getUser(username);
+  UserModel user=session.users().getUserByUsername(username,realm);
   if (user == null) {
     throw new NotFoundException("User not found");
   }
-  List<UserSessionModel> sessions=realm.getUserSessions(user);
+  List<UserSessionModel> sessions=session.sessions().getUserSessions(realm,user);
   List<UserSessionRepresentation> reps=new ArrayList<UserSessionRepresentation>();
   for (  UserSessionModel session : sessions) {
     UserSessionRepresentation rep=ModelToRepresentation.toRepresentation(session);

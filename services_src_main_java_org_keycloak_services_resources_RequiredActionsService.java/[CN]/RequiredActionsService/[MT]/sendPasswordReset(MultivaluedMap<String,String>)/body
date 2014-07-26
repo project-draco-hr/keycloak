@@ -4,7 +4,7 @@
   String state=uriInfo.getQueryParameters().getFirst(OAuth2Constants.STATE);
   String redirect=uriInfo.getQueryParameters().getFirst(OAuth2Constants.REDIRECT_URI);
   String clientId=uriInfo.getQueryParameters().getFirst(OAuth2Constants.CLIENT_ID);
-  AuthenticationManager authManager=new AuthenticationManager(session);
+  AuthenticationManager authManager=new AuthenticationManager();
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
     return Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Unknown login requester.");
@@ -13,21 +13,19 @@
     return Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
   }
   audit.event(EventType.SEND_RESET_PASSWORD).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
-  UserModel user=realm.getUser(username);
+  UserModel user=session.users().getUserByUsername(username,realm);
   if (user == null && username.contains("@")) {
-    user=realm.getUserByEmail(username);
+    user=session.users().getUserByEmail(username,realm);
   }
   if (user == null) {
     logger.warn("Failed to send password reset email: user not found");
     audit.error(Errors.USER_NOT_FOUND);
   }
  else {
-    Set<RequiredAction> requiredActions=new HashSet<RequiredAction>(user.getRequiredActions());
-    requiredActions.add(RequiredAction.UPDATE_PASSWORD);
-    AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,realm,client,user,null);
-    accessCode.setRequiredActions(requiredActions);
-    accessCode.setAuthMethod("form");
-    accessCode.setUsernameUsed(username);
+    UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"form",false);
+    audit.session(userSession);
+    AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,session,realm,client,user,userSession);
+    accessCode.setRequiredAction(RequiredAction.UPDATE_PASSWORD);
     try {
       UriBuilder builder=Urls.loginPasswordResetBuilder(uriInfo.getBaseUri());
       builder.queryParam("key",accessCode.getCode());

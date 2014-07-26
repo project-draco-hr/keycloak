@@ -1,0 +1,24 @@
+{
+  MultivaluedMap<String,String> formData=createFormData("john","password");
+  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(session,null,realm1,formData));
+  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(session,null,realm2,formData));
+  Assert.assertNull(realmManager.getSession().users().getUserByUsername("john",realm2));
+  setupAuthenticationProviders();
+  try {
+    ResteasyProviderFactory.pushContext(KeycloakSession.class,session);
+    Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(session,null,realm2,formData));
+    UserModel john2=realmManager.getSession().users().getUserByUsername("john",realm2);
+    Assert.assertNotNull(john2);
+    Assert.assertEquals("john",john2.getUsername());
+    Assert.assertEquals("John",john2.getFirstName());
+    Assert.assertEquals("Doe",john2.getLastName());
+    Assert.assertEquals("john@email.org",john2.getEmail());
+    AuthenticationLinkModel authLink=john2.getAuthenticationLink();
+    Assert.assertNotNull(authLink);
+    Assert.assertEquals(authLink.getAuthProvider(),AuthProviderConstants.PROVIDER_NAME_EXTERNAL_MODEL);
+    Assert.assertEquals(authLink.getAuthUserId(),realmManager.getSession().users().getUserByUsername("john",realm1).getId());
+  }
+  finally {
+    ResteasyProviderFactory.clearContextData();
+  }
+}

@@ -1,4 +1,8 @@
 {
-  AuthenticationLinkEntity authLinkEntity=user.getAuthenticationLink();
-  return authLinkEntity == null ? null : new AuthenticationLinkModel(authLinkEntity.getAuthProvider(),authLinkEntity.getAuthUserId());
+  Collection<AuthenticationLinkEntity> col=user.getAuthenticationLink();
+  if (col == null || col.isEmpty()) {
+    return null;
+  }
+  AuthenticationLinkEntity authLinkEntity=col.iterator().next();
+  return new AuthenticationLinkModel(authLinkEntity.getAuthProvider(),authLinkEntity.getAuthUserId());
 }

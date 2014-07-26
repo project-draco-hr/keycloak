@@ -1,0 +1,40 @@
+{
+  final UsersExportStrategy usersExportStrategy=ExportImportConfig.getUsersExportStrategy();
+  final int usersPerFile=ExportImportConfig.getUsersPerFile();
+  final UsersHolder usersHolder=new UsersHolder();
+  final boolean exportUsersIntoRealmFile=usersExportStrategy == UsersExportStrategy.REALM_FILE;
+  ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
+    @Override public void run(    KeycloakSession session) throws IOException {
+      RealmModel realm=session.realms().getRealmByName(realmName);
+      RealmRepresentation rep=ExportUtils.exportRealm(session,realm,exportUsersIntoRealmFile);
+      writeRealm(realmName + "-realm.json",rep);
+      logger.info("Realm '" + realmName + "' - data exported");
+      if (!exportUsersIntoRealmFile) {
+        usersHolder.totalCount=session.users().getUsersCount(realm);
+      }
+    }
+  }
+);
+  if (usersExportStrategy != UsersExportStrategy.SKIP && !exportUsersIntoRealmFile) {
+    usersHolder.currentPageStart=0;
+    final int countPerPage=(usersExportStrategy == UsersExportStrategy.SAME_FILE) ? usersHolder.totalCount : usersPerFile;
+    while (usersHolder.currentPageStart < usersHolder.totalCount) {
+      if (usersHolder.currentPageStart + countPerPage < usersHolder.totalCount) {
+        usersHolder.currentPageEnd=usersHolder.currentPageStart + countPerPage;
+      }
+ else {
+        usersHolder.currentPageEnd=usersHolder.totalCount;
+      }
+      ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
+        @Override public void run(        KeycloakSession session) throws IOException {
+          RealmModel realm=session.realms().getRealmByName(realmName);
+          usersHolder.users=session.users().getUsers(realm,usersHolder.currentPageStart,usersHolder.currentPageEnd - usersHolder.currentPageStart);
+          writeUsers(realmName + "-users-" + (usersHolder.currentPageStart / countPerPage)+ ".json",session,realm,usersHolder.users);
+          logger.info("Users " + usersHolder.currentPageStart + "-"+ (usersHolder.currentPageEnd - 1)+ " exported");
+        }
+      }
+);
+      usersHolder.currentPageStart=usersHolder.currentPageEnd;
+    }
+  }
+}

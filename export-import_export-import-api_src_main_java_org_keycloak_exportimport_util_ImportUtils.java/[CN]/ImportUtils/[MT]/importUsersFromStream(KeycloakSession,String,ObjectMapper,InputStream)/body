@@ -1,0 +1,36 @@
+{
+  RealmProvider model=session.realms();
+  JsonFactory factory=mapper.getJsonFactory();
+  JsonParser parser=factory.createJsonParser(is);
+  try {
+    parser.nextToken();
+    while (parser.nextToken() == JsonToken.FIELD_NAME) {
+      if ("realm".equals(parser.getText())) {
+        parser.nextToken();
+        String currRealmName=parser.getText();
+        if (!currRealmName.equals(realmName)) {
+          throw new IllegalStateException("Trying to import users into invalid realm. Realm name: " + realmName + ", Expected realm name: "+ realmName);
+        }
+      }
+ else       if ("users".equals(parser.getText())) {
+        parser.nextToken();
+        if (parser.getCurrentToken() == JsonToken.START_ARRAY) {
+          parser.nextToken();
+        }
+        List<UserRepresentation> userReps=new ArrayList<UserRepresentation>();
+        while (parser.getCurrentToken() == JsonToken.START_OBJECT) {
+          UserRepresentation user=parser.readValueAs(UserRepresentation.class);
+          userReps.add(user);
+          parser.nextToken();
+        }
+        importUsers(session,model,realmName,userReps);
+        if (parser.getCurrentToken() == JsonToken.END_ARRAY) {
+          parser.nextToken();
+        }
+      }
+    }
+  }
+  finally {
+    parser.close();
+  }
+}

@@ -1,0 +1,28 @@
+{
+  RealmModel juggler1=realmManager.createRealm("JUGGLER1");
+  realmManager.getSession().users().addUser(juggler1,"user1").setEmail("email@example.com");
+  RealmModel juggler2=realmManager.createRealm("JUGGLER2");
+  realmManager.getSession().users().addUser(juggler2,"user1").setEmail("email@example.com");
+  commit();
+  juggler1=realmManager.getRealmByName("JUGGLER1");
+  try {
+    realmManager.getSession().users().addUser(juggler1,"user2").setEmail("email@example.com");
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  resetSession();
+  juggler1=realmManager.getRealmByName("JUGGLER1");
+  realmManager.getSession().users().addUser(juggler1,"user3").setEmail("email2@example.com");
+  commit();
+  try {
+    juggler1=realmManager.getRealmByName("JUGGLER1");
+    realmManager.getSession().users().getUserByUsername("user3",juggler1).setEmail("email@example.com");
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  resetSession();
+}

@@ -1,0 +1,15 @@
+{
+  Set<RoleModel> requestedRoles=new HashSet<RoleModel>();
+  Set<RoleModel> roleMappings=user.getRoleMappings();
+  Set<RoleModel> scopeMappings=client.getScopeMappings();
+  if (client instanceof ApplicationModel) {
+    scopeMappings.addAll(((ApplicationModel)client).getRoles());
+  }
+  for (  RoleModel role : roleMappings) {
+    for (    RoleModel desiredRole : scopeMappings) {
+      Set<RoleModel> visited=new HashSet<RoleModel>();
+      applyScope(role,desiredRole,visited,requestedRoles);
+    }
+  }
+  return requestedRoles;
+}

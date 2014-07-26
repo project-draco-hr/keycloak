@@ -1,0 +1,78 @@
+{
+  RealmRepresentation rep=new RealmRepresentation();
+  rep.setId(realm.getId());
+  rep.setRealm(realm.getName());
+  rep.setEnabled(realm.isEnabled());
+  rep.setSocial(realm.isSocial());
+  rep.setNotBefore(realm.getNotBefore());
+  rep.setUpdateProfileOnInitialSocialLogin(realm.isUpdateProfileOnInitialSocialLogin());
+  rep.setSslNotRequired(realm.isSslNotRequired());
+  rep.setPublicKey(realm.getPublicKeyPem());
+  rep.setPrivateKey(realm.getPrivateKeyPem());
+  rep.setPasswordCredentialGrantAllowed(realm.isPasswordCredentialGrantAllowed());
+  rep.setRegistrationAllowed(realm.isRegistrationAllowed());
+  rep.setRememberMe(realm.isRememberMe());
+  rep.setBruteForceProtected(realm.isBruteForceProtected());
+  rep.setMaxFailureWaitSeconds(realm.getMaxFailureWaitSeconds());
+  rep.setMinimumQuickLoginWaitSeconds(realm.getMinimumQuickLoginWaitSeconds());
+  rep.setWaitIncrementSeconds(realm.getWaitIncrementSeconds());
+  rep.setQuickLoginCheckMilliSeconds(realm.getQuickLoginCheckMilliSeconds());
+  rep.setMaxDeltaTimeSeconds(realm.getMaxDeltaTimeSeconds());
+  rep.setFailureFactor(realm.getFailureFactor());
+  rep.setVerifyEmail(realm.isVerifyEmail());
+  rep.setResetPasswordAllowed(realm.isResetPasswordAllowed());
+  rep.setAccessTokenLifespan(realm.getAccessTokenLifespan());
+  rep.setSsoSessionIdleTimeout(realm.getSsoSessionIdleTimeout());
+  rep.setSsoSessionMaxLifespan(realm.getSsoSessionMaxLifespan());
+  rep.setAccessCodeLifespan(realm.getAccessCodeLifespan());
+  rep.setAccessCodeLifespanUserAction(realm.getAccessCodeLifespanUserAction());
+  rep.setSmtpServer(realm.getSmtpConfig());
+  rep.setSocialProviders(realm.getSocialConfig());
+  rep.setLdapServer(realm.getLdapServerConfig());
+  rep.setAccountTheme(realm.getAccountTheme());
+  rep.setLoginTheme(realm.getLoginTheme());
+  rep.setAdminTheme(realm.getAdminTheme());
+  rep.setEmailTheme(realm.getEmailTheme());
+  if (realm.getPasswordPolicy() != null) {
+    rep.setPasswordPolicy(realm.getPasswordPolicy().toString());
+  }
+  ApplicationModel accountManagementApplication=realm.getApplicationNameMap().get(Constants.ACCOUNT_MANAGEMENT_APP);
+  List<String> defaultRoles=realm.getDefaultRoles();
+  if (!defaultRoles.isEmpty()) {
+    List<String> roleStrings=new ArrayList<String>();
+    roleStrings.addAll(defaultRoles);
+    rep.setDefaultRoles(roleStrings);
+  }
+  List<RequiredCredentialModel> requiredCredentialModels=realm.getRequiredCredentials();
+  if (requiredCredentialModels.size() > 0) {
+    rep.setRequiredCredentials(new HashSet<String>());
+    for (    RequiredCredentialModel cred : requiredCredentialModels) {
+      rep.getRequiredCredentials().add(cred.getType());
+    }
+  }
+  List<AuthenticationProviderModel> authProviderModels=realm.getAuthenticationProviders();
+  if (authProviderModels.size() > 0) {
+    List<AuthenticationProviderRepresentation> authProviderReps=new ArrayList<AuthenticationProviderRepresentation>();
+    for (    AuthenticationProviderModel model : authProviderModels) {
+      AuthenticationProviderRepresentation authProvRep=new AuthenticationProviderRepresentation();
+      authProvRep.setProviderName(model.getProviderName());
+      authProvRep.setPasswordUpdateSupported(model.isPasswordUpdateSupported());
+      authProvRep.setConfig(model.getConfig());
+      authProviderReps.add(authProvRep);
+    }
+    rep.setAuthenticationProviders(authProviderReps);
+  }
+  List<UserFederationProviderModel> fedProviderModels=realm.getUserFederationProviders();
+  if (fedProviderModels.size() > 0) {
+    List<UserFederationProviderRepresentation> fedProviderReps=new ArrayList<UserFederationProviderRepresentation>();
+    for (    UserFederationProviderModel model : fedProviderModels) {
+      UserFederationProviderRepresentation fedProvRep=new UserFederationProviderRepresentation();
+      fedProvRep.setId(model.getId());
+      fedProvRep.setProviderName(model.getProviderName());
+      fedProvRep.setConfig(model.getConfig());
+      fedProviderReps.add(fedProvRep);
+    }
+    rep.setUserFederationProviders(fedProviderReps);
+  }
+  return rep;
+}

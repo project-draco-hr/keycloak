@@ -1,0 +1,18 @@
+{
+  List<String> realmNames=new ArrayList<String>();
+  for (  ExtZipEntry entry : this.decrypter.getEntryList()) {
+    String entryName=entry.getName();
+    if (entryName.endsWith("-realm.json")) {
+      String realmName=entryName.substring(0,entryName.length() - 11);
+      if (Config.getAdminRealm().equals(realmName)) {
+        realmNames.add(0,realmName);
+      }
+ else {
+        realmNames.add(realmName);
+      }
+    }
+  }
+  for (  String realmName : realmNames) {
+    importRealm(factory,realmName,strategy);
+  }
+}

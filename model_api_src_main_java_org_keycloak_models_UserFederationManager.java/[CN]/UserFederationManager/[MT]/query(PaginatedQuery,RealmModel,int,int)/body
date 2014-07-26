@@ -1,0 +1,22 @@
+{
+  List<UserModel> results=new LinkedList<UserModel>();
+  if (maxResults <= 0)   return results;
+  int first=firstResult;
+  int max=maxResults;
+  do {
+    List<UserModel> query=pagedQuery.query(realm,first,max);
+    if (query == null || query.size() == 0)     return results;
+    int added=0;
+    for (    UserModel user : query) {
+      user=validateAndProxyUser(realm,user);
+      if (user == null)       continue;
+      results.add(user);
+      added++;
+    }
+    if (results.size() == maxResults)     return results;
+    if (query.size() < max)     return results;
+    first=query.size();
+    max-=added;
+  }
+ while (true);
+}

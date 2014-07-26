@@ -1,0 +1,16 @@
+{
+  RealmModel realm=realmManager.createRealm("original");
+  KeycloakSession session=realmManager.getSession();
+  UserModel user=session.users().addUser(realm,"user");
+  user.setFirstName("first-name");
+  user.setLastName("last-name");
+  user.setEmail("email");
+  user.addRequiredAction(RequiredAction.CONFIGURE_TOTP);
+  user.addRequiredAction(RequiredAction.UPDATE_PASSWORD);
+  RealmModel searchRealm=realmManager.getRealm(realm.getId());
+  UserModel persisted=session.users().getUserByUsername("user",searchRealm);
+  assertEquals(user,persisted);
+  searchRealm=realmManager.getRealm(realm.getId());
+  UserModel persisted2=session.users().getUserById(user.getId(),searchRealm);
+  assertEquals(user,persisted2);
+}

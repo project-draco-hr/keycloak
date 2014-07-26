@@ -3,6 +3,7 @@
   int counter=1;
   for (  AuthenticationProviderModel model : authenticationProviders) {
     AuthenticationProviderEntity entity=new AuthenticationProviderEntity();
+    entity.setRealm(realm);
     entity.setProviderName(model.getProviderName());
     entity.setPasswordUpdateSupported(model.isPasswordUpdateSupported());
     entity.setConfig(model.getConfig());
@@ -15,6 +16,7 @@
     existing.remove(apToRemove);
     em.remove(apToRemove);
   }
+  em.flush();
   for (  AuthenticationProviderEntity apToAdd : newEntities) {
     existing.add(apToAdd);
     em.persist(apToAdd);

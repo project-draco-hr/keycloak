@@ -1,8 +1,7 @@
 {
   if (uriInfo.getQueryParameters().containsKey("key")) {
-    AccessCodeEntry accessCode=tokenManager.parseCode(uriInfo.getQueryParameters().getFirst("key"),realm);
-    accessCode.setAuthMethod("form");
-    if (accessCode == null || accessCode.isExpired() || !accessCode.hasRequiredAction(RequiredAction.UPDATE_PASSWORD)) {
+    AccessCodeEntry accessCode=tokenManager.parseCode(uriInfo.getQueryParameters().getFirst("key"),session,realm);
+    if (accessCode == null || accessCode.isExpired() || !RequiredAction.UPDATE_PASSWORD.equals(accessCode.getRequiredAction())) {
       return unauthorized();
     }
     return Flows.forms(session,realm,uriInfo).setAccessCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);

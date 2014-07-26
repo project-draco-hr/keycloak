@@ -1,0 +1,22 @@
+{
+  RuntimeException exception=null;
+  for (  KeycloakTransaction tx : transactions) {
+    try {
+      tx.commit();
+    }
+ catch (    RuntimeException e) {
+      exception=exception == null ? e : exception;
+    }
+  }
+  for (  KeycloakTransaction tx : afterCompletion) {
+    try {
+      tx.commit();
+    }
+ catch (    RuntimeException e) {
+      exception=exception == null ? e : exception;
+    }
+  }
+  if (exception != null) {
+    throw exception;
+  }
+}

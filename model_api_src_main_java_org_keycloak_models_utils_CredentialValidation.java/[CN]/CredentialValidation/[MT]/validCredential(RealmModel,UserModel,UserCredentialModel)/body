@@ -1,0 +1,21 @@
+{
+  if (credential.getType().equals(UserCredentialModel.PASSWORD)) {
+    if (!validPassword(realm,user,credential.getValue())) {
+      return false;
+    }
+  }
+ else   if (credential.getType().equals(UserCredentialModel.TOTP)) {
+    if (!validTOTP(realm,user,credential.getValue())) {
+      return false;
+    }
+  }
+ else   if (credential.getType().equals(UserCredentialModel.SECRET)) {
+    if (!validSecret(realm,user,credential.getValue())) {
+      return false;
+    }
+  }
+ else {
+    return false;
+  }
+  return true;
+}

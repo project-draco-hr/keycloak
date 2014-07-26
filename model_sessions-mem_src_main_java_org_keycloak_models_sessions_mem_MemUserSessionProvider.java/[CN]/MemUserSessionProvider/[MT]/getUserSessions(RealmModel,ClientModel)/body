@@ -1,0 +1,10 @@
+{
+  List<UserSessionModel> clientSessions=new LinkedList<UserSessionModel>();
+  for (  UserSessionEntity s : sessions.values()) {
+    if (s.getRealm().equals(realm.getId()) && s.getClients().contains(client.getClientId())) {
+      clientSessions.add(new UserSessionAdapter(session,realm,s));
+    }
+  }
+  Collections.sort(clientSessions,new UserSessionSort());
+  return clientSessions;
+}

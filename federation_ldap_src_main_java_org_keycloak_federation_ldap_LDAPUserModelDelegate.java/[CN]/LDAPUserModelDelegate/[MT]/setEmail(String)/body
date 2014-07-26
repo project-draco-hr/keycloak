@@ -1,0 +1,15 @@
+{
+  IdentityManager identityManager=provider.getIdentityManager();
+  try {
+    User picketlinkUser=BasicModel.getUser(identityManager,delegate.getUsername());
+    if (picketlinkUser == null) {
+      throw new IllegalStateException("User not found in LDAP storage!");
+    }
+    picketlinkUser.setEmail(email);
+    identityManager.update(picketlinkUser);
+  }
+ catch (  IdentityManagementException ie) {
+    throw new ModelException(ie);
+  }
+  delegate.setEmail(email);
+}

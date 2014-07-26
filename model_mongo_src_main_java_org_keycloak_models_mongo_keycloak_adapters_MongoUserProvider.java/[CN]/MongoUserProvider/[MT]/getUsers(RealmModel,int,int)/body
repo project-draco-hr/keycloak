@@ -1,0 +1,6 @@
+{
+  DBObject query=new QueryBuilder().and("realmId").is(realm.getId()).get();
+  DBObject sort=new BasicDBObject("username",1);
+  List<MongoUserEntity> users=getMongoStore().loadEntities(MongoUserEntity.class,query,sort,firstResult,maxResults,invocationContext);
+  return convertUserEntities(realm,users);
+}

@@ -1,0 +1,25 @@
+{
+  Map<String,String> attributes=new HashMap<String,String>();
+  int spaceIndex=search.lastIndexOf(' ');
+  if (spaceIndex > -1) {
+    String firstName=search.substring(0,spaceIndex).trim();
+    String lastName=search.substring(spaceIndex).trim();
+    attributes.put(UserModel.FIRST_NAME,firstName);
+    attributes.put(UserModel.LAST_NAME,lastName);
+  }
+ else   if (search.indexOf('@') > -1) {
+    attributes.put(UserModel.USERNAME,search.trim());
+    attributes.put(UserModel.EMAIL,search.trim());
+  }
+ else {
+    attributes.put(UserModel.LAST_NAME,search.trim());
+    attributes.put(UserModel.USERNAME,search.trim());
+  }
+  federationLoad(realm,attributes);
+  return query(new PaginatedQuery(){
+    @Override public List<UserModel> query(    RealmModel realm,    int first,    int max){
+      return session.userStorage().searchForUser(search,realm,first,max);
+    }
+  }
+,realm,firstResult,maxResults);
+}

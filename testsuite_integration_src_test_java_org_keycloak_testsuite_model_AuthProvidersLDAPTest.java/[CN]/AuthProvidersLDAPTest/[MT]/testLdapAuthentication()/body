@@ -1,0 +1,17 @@
+{
+  MultivaluedMap<String,String> formData=AuthProvidersExternalModelTest.createFormData("johnkeycloak","password");
+  LDAPTestUtils.setLdapPassword(session,realm,"johnkeycloak","password");
+  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.INVALID_USER,am.authenticateForm(session,null,realm,formData));
+  Assert.assertNull(session.users().getUserByUsername("johnkeycloak",realm));
+  setupAuthenticationProviders();
+  Assert.assertEquals(AuthenticationManager.AuthenticationStatus.SUCCESS,am.authenticateForm(session,null,realm,formData));
+  UserModel john=session.users().getUserByUsername("johnkeycloak",realm);
+  Assert.assertNotNull(john);
+  Assert.assertEquals("johnkeycloak",john.getUsername());
+  Assert.assertEquals("John",john.getFirstName());
+  Assert.assertEquals("Doe",john.getLastName());
+  Assert.assertEquals("john@email.org",john.getEmail());
+  AuthenticationLinkModel authLink=john.getAuthenticationLink();
+  Assert.assertNotNull(authLink);
+  Assert.assertEquals(authLink.getAuthProvider(),AuthProviderConstants.PROVIDER_NAME_PICKETLINK);
+}

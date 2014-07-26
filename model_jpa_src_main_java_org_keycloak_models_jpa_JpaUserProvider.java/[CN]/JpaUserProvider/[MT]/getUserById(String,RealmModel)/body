@@ -1,0 +1,8 @@
+{
+  TypedQuery<UserEntity> query=em.createNamedQuery("getRealmUserById",UserEntity.class);
+  query.setParameter("id",id);
+  query.setParameter("realmId",realm.getId());
+  List<UserEntity> entities=query.getResultList();
+  if (entities.size() == 0)   return null;
+  return new UserAdapter(realm,em,entities.get(0));
+}

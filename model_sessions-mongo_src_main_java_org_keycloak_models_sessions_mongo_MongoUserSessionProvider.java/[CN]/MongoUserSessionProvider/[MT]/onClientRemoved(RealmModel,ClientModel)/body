@@ -1,0 +1,7 @@
+{
+  DBObject query=new QueryBuilder().and("realmId").is(realm.getId()).get();
+  List<MongoUserSessionEntity> sessions=invocationContext.getMongoStore().loadEntities(MongoUserSessionEntity.class,query,invocationContext);
+  for (  MongoUserSessionEntity session : sessions) {
+    invocationContext.getMongoStore().pullItemFromList(session,"associatedClientIds",client.getClientId(),invocationContext);
+  }
+}

@@ -1,0 +1,14 @@
+{
+  IdentityManager identityManager=getIdentityManager();
+  try {
+    User picketlinkUser=new User(user.getUsername());
+    picketlinkUser.setFirstName(user.getFirstName());
+    picketlinkUser.setLastName(user.getLastName());
+    picketlinkUser.setEmail(user.getEmail());
+    identityManager.add(picketlinkUser);
+    return proxy(user);
+  }
+ catch (  IdentityManagementException ie) {
+    throw convertIDMException(ie);
+  }
+}

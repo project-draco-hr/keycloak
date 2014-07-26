@@ -1,8 +1,10 @@
 {
-  Map<String,String> attributes=user.getAttributes();
-  if (attributes == null) {
-    attributes=new HashMap<String,String>();
+  Iterator<UserAttributeEntity> it=user.getAttributes().iterator();
+  while (it.hasNext()) {
+    UserAttributeEntity attr=it.next();
+    if (attr.getName().equals(name)) {
+      it.remove();
+      em.remove(attr);
+    }
   }
-  attributes.remove(name);
-  user.setAttributes(attributes);
 }

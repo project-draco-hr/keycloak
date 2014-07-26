@@ -1,0 +1,12 @@
+{
+  if (realm.removeOAuthClient(client.getId())) {
+    UserSessionProvider sessions=realmManager.getSession().sessions();
+    if (sessions != null) {
+      realmManager.getSession().sessions().onClientRemoved(realm,client);
+    }
+    return true;
+  }
+ else {
+    return false;
+  }
+}

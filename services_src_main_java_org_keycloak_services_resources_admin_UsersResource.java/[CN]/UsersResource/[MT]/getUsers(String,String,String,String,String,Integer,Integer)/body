@@ -1,0 +1,36 @@
+{
+  auth.requireView();
+  firstResult=firstResult != null ? firstResult : -1;
+  maxResults=maxResults != null ? maxResults : -1;
+  List<UserRepresentation> results=new ArrayList<UserRepresentation>();
+  List<UserModel> userModels;
+  if (search != null) {
+    userModels=session.users().searchForUser(search.trim(),realm,firstResult,maxResults);
+  }
+ else   if (last != null || first != null || email != null || username != null) {
+    Map<String,String> attributes=new HashMap<String,String>();
+    if (last != null) {
+      attributes.put(UserModel.LAST_NAME,last);
+    }
+    if (first != null) {
+      attributes.put(UserModel.FIRST_NAME,first);
+    }
+    if (email != null) {
+      attributes.put(UserModel.EMAIL,email);
+    }
+    if (username != null) {
+      attributes.put(UserModel.USERNAME,username);
+    }
+    userModels=session.users().searchForUserByAttributes(attributes,realm,firstResult,maxResults);
+    for (    UserModel user : userModels) {
+      results.add(ModelToRepresentation.toRepresentation(user));
+    }
+  }
+ else {
+    userModels=session.users().getUsers(realm,firstResult,maxResults);
+  }
+  for (  UserModel user : userModels) {
+    results.add(ModelToRepresentation.toRepresentation(user));
+  }
+  return results;
+}

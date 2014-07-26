@@ -1,0 +1,25 @@
+{
+  test1CreateRealm();
+  RoleModel realmRole=realmModel.addRole("realm");
+  ApplicationModel app1=realmModel.addApplication("app1");
+  RoleModel appRole=app1.addRole("app");
+  ApplicationModel app2=realmModel.addApplication("app2");
+  app2.addScopeMapping(realmRole);
+  app2.addScopeMapping(appRole);
+  OAuthClientModel client=realmModel.addOAuthClient("client");
+  client.addScopeMapping(realmRole);
+  client.addScopeMapping(appRole);
+  commit();
+  realmModel=model.getRealmByName("JUGGLER");
+  app1=realmModel.getApplicationByName("app1");
+  app2=realmModel.getApplicationByName("app2");
+  client=realmModel.getOAuthClient("client");
+  Set<RoleModel> scopeMappings=app2.getScopeMappings();
+  Assert.assertEquals(2,scopeMappings.size());
+  Assert.assertTrue(scopeMappings.contains(realmModel.getRole("realm")));
+  Assert.assertTrue(scopeMappings.contains(app1.getRole("app")));
+  scopeMappings=client.getScopeMappings();
+  Assert.assertEquals(2,scopeMappings.size());
+  Assert.assertTrue(scopeMappings.contains(realmModel.getRole("realm")));
+  Assert.assertTrue(scopeMappings.contains(app1.getRole("app")));
+}

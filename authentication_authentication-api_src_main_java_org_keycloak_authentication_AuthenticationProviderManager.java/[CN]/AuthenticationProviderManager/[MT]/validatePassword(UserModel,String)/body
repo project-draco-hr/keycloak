@@ -1,7 +1,7 @@
 {
   AuthenticationLinkModel authLink=user.getAuthenticationLink();
   if (authLink == null) {
-    AuthUser authUser=getUser(user.getLoginName());
+    AuthUser authUser=getUser(user.getUsername());
     authLink=new AuthenticationLinkModel(authUser.getProviderName(),authUser.getId());
     user.setAuthenticationLink(authLink);
     logger.infof("User '%s' linked with provider '%s'",authUser.getUsername(),authUser.getProviderName());
@@ -13,9 +13,9 @@
     return AuthProviderStatus.FAILED;
   }
   try {
-    checkCorrectAuthLink(delegate,providerModel,authLink,user.getLoginName());
-    AuthProviderStatus currentResult=delegate.validatePassword(realm,providerModel.getConfig(),user.getLoginName(),password);
-    logger.debugf("Authentication provider '%s' finished with '%s' for authentication of '%s'",delegate.getName(),currentResult.toString(),user.getLoginName());
+    checkCorrectAuthLink(delegate,providerModel,authLink,user.getUsername());
+    AuthProviderStatus currentResult=delegate.validatePassword(realm,providerModel.getConfig(),user.getUsername(),password);
+    logger.debugf("Authentication provider '%s' finished with '%s' for authentication of '%s'",delegate.getName(),currentResult.toString(),user.getUsername());
     return currentResult;
   }
  catch (  AuthenticationProviderException ape) {

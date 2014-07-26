@@ -1,0 +1,11 @@
+{
+  Set<RoleModel> requestedRoles=new HashSet<RoleModel>();
+  for (  String roleId : accessCode.getRequestedRoles()) {
+    RoleModel role=realm.getRoleById(roleId);
+    if (role == null) {
+      new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid role " + roleId);
+    }
+    requestedRoles.add(realm.getRoleById(roleId));
+  }
+  return requestedRoles;
+}

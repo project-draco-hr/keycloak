@@ -1,0 +1,23 @@
+{
+  if (!cache.isEnabled())   return getDelegate().getUserByUsername(username,realm);
+  if (realmInvalidations.contains(realm.getId())) {
+    return getDelegate().getUserByUsername(username,realm);
+  }
+  CachedUser cached=cache.getCachedUserByUsername(realm.getId(),username);
+  if (cached == null) {
+    UserModel model=getDelegate().getUserByUsername(username,realm);
+    if (model == null)     return null;
+    if (userInvalidations.containsKey(model.getId()))     return model;
+    cached=new CachedUser(realm,model);
+    cache.addCachedUser(realm.getId(),cached);
+  }
+ else   if (userInvalidations.containsKey(cached.getId())) {
+    return getDelegate().getUserById(cached.getId(),realm);
+  }
+ else   if (managedUsers.containsKey(cached.getId())) {
+    return managedUsers.get(cached.getId());
+  }
+  UserAdapter adapter=new UserAdapter(cached,this,session,realm);
+  managedUsers.put(cached.getId(),adapter);
+  return adapter;
+}

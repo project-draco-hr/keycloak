@@ -1,0 +1,14 @@
+{
+  if (provider.users().supports(Feature.VERIFY_CREDENTIALS)) {
+    User user=provider.mappings().unwrap(userModel);
+    return provider.users().verifyCredentials(user,new Credentials(UserCredentialModel.PASSWORD,password));
+  }
+ else {
+    for (    UserCredentialValueModel cred : userModel.getCredentialsDirectly()) {
+      if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
+        return new Pbkdf2PasswordEncoder(cred.getSalt()).verify(password,cred.getValue());
+      }
+    }
+    return false;
+  }
+}

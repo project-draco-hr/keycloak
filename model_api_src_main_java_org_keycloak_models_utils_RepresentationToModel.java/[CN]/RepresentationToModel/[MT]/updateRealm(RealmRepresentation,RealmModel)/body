@@ -1,0 +1,58 @@
+{
+  if (rep.getRealm() != null) {
+    realm.setName(rep.getRealm());
+  }
+  if (rep.isEnabled() != null)   realm.setEnabled(rep.isEnabled());
+  if (rep.isSocial() != null)   realm.setSocial(rep.isSocial());
+  if (rep.isBruteForceProtected() != null)   realm.setBruteForceProtected(rep.isBruteForceProtected());
+  if (rep.getMaxFailureWaitSeconds() != null)   realm.setMaxFailureWaitSeconds(rep.getMaxFailureWaitSeconds());
+  if (rep.getMinimumQuickLoginWaitSeconds() != null)   realm.setMinimumQuickLoginWaitSeconds(rep.getMinimumQuickLoginWaitSeconds());
+  if (rep.getWaitIncrementSeconds() != null)   realm.setWaitIncrementSeconds(rep.getWaitIncrementSeconds());
+  if (rep.getQuickLoginCheckMilliSeconds() != null)   realm.setQuickLoginCheckMilliSeconds(rep.getQuickLoginCheckMilliSeconds());
+  if (rep.getMaxDeltaTimeSeconds() != null)   realm.setMaxDeltaTimeSeconds(rep.getMaxDeltaTimeSeconds());
+  if (rep.getFailureFactor() != null)   realm.setFailureFactor(rep.getFailureFactor());
+  if (rep.isPasswordCredentialGrantAllowed() != null)   realm.setPasswordCredentialGrantAllowed(rep.isPasswordCredentialGrantAllowed());
+  if (rep.isRegistrationAllowed() != null)   realm.setRegistrationAllowed(rep.isRegistrationAllowed());
+  if (rep.isRememberMe() != null)   realm.setRememberMe(rep.isRememberMe());
+  if (rep.isVerifyEmail() != null)   realm.setVerifyEmail(rep.isVerifyEmail());
+  if (rep.isResetPasswordAllowed() != null)   realm.setResetPasswordAllowed(rep.isResetPasswordAllowed());
+  if (rep.isUpdateProfileOnInitialSocialLogin() != null)   realm.setUpdateProfileOnInitialSocialLogin(rep.isUpdateProfileOnInitialSocialLogin());
+  if (rep.isSslNotRequired() != null)   realm.setSslNotRequired((rep.isSslNotRequired()));
+  if (rep.getAccessCodeLifespan() != null)   realm.setAccessCodeLifespan(rep.getAccessCodeLifespan());
+  if (rep.getAccessCodeLifespanUserAction() != null)   realm.setAccessCodeLifespanUserAction(rep.getAccessCodeLifespanUserAction());
+  if (rep.getNotBefore() != null)   realm.setNotBefore(rep.getNotBefore());
+  if (rep.getAccessTokenLifespan() != null)   realm.setAccessTokenLifespan(rep.getAccessTokenLifespan());
+  if (rep.getSsoSessionIdleTimeout() != null)   realm.setSsoSessionIdleTimeout(rep.getSsoSessionIdleTimeout());
+  if (rep.getSsoSessionMaxLifespan() != null)   realm.setSsoSessionMaxLifespan(rep.getSsoSessionMaxLifespan());
+  if (rep.getRequiredCredentials() != null) {
+    realm.updateRequiredCredentials(rep.getRequiredCredentials());
+  }
+  if (rep.getLoginTheme() != null)   realm.setLoginTheme(rep.getLoginTheme());
+  if (rep.getAccountTheme() != null)   realm.setAccountTheme(rep.getAccountTheme());
+  if (rep.getAdminTheme() != null)   realm.setAdminTheme(rep.getAdminTheme());
+  if (rep.getEmailTheme() != null)   realm.setEmailTheme(rep.getEmailTheme());
+  if (rep.getPasswordPolicy() != null)   realm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
+  if (rep.getDefaultRoles() != null) {
+    realm.updateDefaultRoles(rep.getDefaultRoles().toArray(new String[rep.getDefaultRoles().size()]));
+  }
+  if (rep.getSmtpServer() != null) {
+    realm.setSmtpConfig(new HashMap(rep.getSmtpServer()));
+  }
+  if (rep.getSocialProviders() != null) {
+    realm.setSocialConfig(new HashMap(rep.getSocialProviders()));
+  }
+  if (rep.getLdapServer() != null) {
+    realm.setLdapServerConfig(new HashMap(rep.getLdapServer()));
+  }
+  if (rep.getAuthenticationProviders() != null) {
+    List<AuthenticationProviderModel> authProviderModels=convertAuthenticationProviders(rep.getAuthenticationProviders());
+    realm.setAuthenticationProviders(authProviderModels);
+  }
+  if (rep.getUserFederationProviders() != null) {
+    List<UserFederationProviderModel> providerModels=convertFederationProviders(rep.getUserFederationProviders());
+    realm.setUserFederationProviders(providerModels);
+  }
+  if ("GENERATE".equals(rep.getPublicKey())) {
+    KeycloakModelUtils.generateRealmKeys(realm);
+  }
+}

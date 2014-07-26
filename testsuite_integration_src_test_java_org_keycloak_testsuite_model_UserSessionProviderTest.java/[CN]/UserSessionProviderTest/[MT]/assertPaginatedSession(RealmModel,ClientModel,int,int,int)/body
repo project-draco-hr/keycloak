@@ -1,0 +1,12 @@
+{
+  List<UserSessionModel> sessions=session.sessions().getUserSessions(realm,client,start,max);
+  String[] actualIps=new String[sessions.size()];
+  for (int i=0; i < actualIps.length; i++) {
+    actualIps[i]=sessions.get(i).getIpAddress();
+  }
+  String[] expectedIps=new String[expectedSize];
+  for (int i=0; i < expectedSize; i++) {
+    expectedIps[i]="127.0.0." + (i + start);
+  }
+  assertArrayEquals(expectedIps,actualIps);
+}

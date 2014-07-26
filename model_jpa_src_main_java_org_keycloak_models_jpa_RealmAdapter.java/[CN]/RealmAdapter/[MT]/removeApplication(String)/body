@@ -2,7 +2,6 @@
   if (id == null)   return false;
   ApplicationModel application=getApplicationById(id);
   if (application == null)   return false;
-  ((ApplicationAdapter)application).deleteUserSessionAssociation();
   for (  RoleModel role : application.getRoles()) {
     application.removeRole(role);
   }
@@ -25,6 +24,7 @@
     return false;
   }
   em.remove(applicationEntity);
-  em.createQuery("delete from " + ScopeMappingEntity.class.getSimpleName() + " where client = :client").setParameter("client",applicationEntity).executeUpdate();
+  em.createNamedQuery("deleteScopeMappingByClient").setParameter("client",applicationEntity).executeUpdate();
+  em.flush();
   return true;
 }

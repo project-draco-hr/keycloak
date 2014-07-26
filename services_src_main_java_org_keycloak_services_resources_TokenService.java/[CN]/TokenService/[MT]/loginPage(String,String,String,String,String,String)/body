@@ -35,13 +35,13 @@
     return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
   }
   logger.info("Checking cookie...");
-  AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(realm,uriInfo,headers);
+  AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,headers);
   if (authResult != null) {
     UserModel user=authResult.getUser();
     UserSessionModel session=authResult.getSession();
-    logger.debug(user.getLoginName() + " already logged in.");
+    logger.debug(user.getUsername() + " already logged in.");
     audit.user(user).session(session).detail(Details.AUTH_METHOD,"sso");
-    return oauth.processAccessCode(scopeParam,state,redirect,client,user,session,null,false,"sso",audit);
+    return oauth.processAccessCode(scopeParam,state,redirect,client,user,session,audit);
   }
   if (prompt != null && prompt.equals("none")) {
     return oauth.redirectError(client,"access_denied",state,redirect);

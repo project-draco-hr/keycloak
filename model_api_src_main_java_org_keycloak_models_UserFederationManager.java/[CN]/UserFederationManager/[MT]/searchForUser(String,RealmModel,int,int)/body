@@ -1,28 +1,25 @@
 {
-  Map<String,UserModel> users=new HashMap<String,UserModel>();
-  List<UserModel> query=session.userStorage().searchForUser(search,realm,firstResult,maxResults);
-  for (  UserModel user : query) {
-    UserFederationProvider link=getFederationLink(realm,user);
-    if (link != null) {
-      users.put(user.getUsername(),link.proxy(user));
-    }
+  Map<String,String> attributes=new HashMap<String,String>();
+  int spaceIndex=search.lastIndexOf(' ');
+  if (spaceIndex > -1) {
+    String firstName=search.substring(0,spaceIndex).trim();
+    String lastName=search.substring(spaceIndex).trim();
+    attributes.put(UserModel.FIRST_NAME,firstName);
+    attributes.put(UserModel.LAST_NAME,lastName);
+  }
+ else   if (search.indexOf('@') > -1) {
+    attributes.put(UserModel.USERNAME,search.trim());
+    attributes.put(UserModel.EMAIL,search.trim());
+  }
  else {
-      users.put(user.getUsername(),user);
+    attributes.put(UserModel.LAST_NAME,search.trim());
+    attributes.put(UserModel.USERNAME,search.trim());
+  }
+  federationLoad(realm,attributes);
+  return query(new PaginatedQuery(){
+    @Override public List<UserModel> query(    RealmModel realm,    int first,    int max){
+      return session.userStorage().searchForUser(search,realm,first,max);
     }
   }
-  if (users.size() >= maxResults) {
-    List<UserModel> results=new ArrayList<UserModel>(users.size());
-    results.addAll(users.values());
-    return results;
-  }
-  List<UserFederationProviderModel> federationProviders=realm.getUserFederationProviders();
-  for (int i=federationProviders.size() - 1; i >= 0; i--) {
-    UserFederationProviderModel federation=federationProviders.get(i);
-    UserFederationProvider fed=getFederationProvider(federation);
-    query=fed.searchForUser(search,realm,firstResult,maxResults);
-    for (    UserModel user : query)     users.put(user.getUsername(),user);
-  }
-  List<UserModel> results=new ArrayList<UserModel>(users.size());
-  results.addAll(users.values());
-  return results;
+,realm,firstResult,maxResults);
 }

@@ -1,7 +1,5 @@
 {
-  UserFederationProvider link=getFederationLink(realm,user);
-  if (link != null) {
-    return link.getSocialLinks(user,realm);
-  }
+  validateUser(realm,user);
+  if (user == null)   throw new IllegalStateException("Federated user no longer valid");
   return session.userStorage().getSocialLinks(user,realm);
 }

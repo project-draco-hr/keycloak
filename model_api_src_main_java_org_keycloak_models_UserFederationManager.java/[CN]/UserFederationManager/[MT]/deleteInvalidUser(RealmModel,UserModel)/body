@@ -1,0 +1,13 @@
+{
+  KeycloakSession tx=session.getKeycloakSessionFactory().create();
+  try {
+    tx.getTransaction().begin();
+    RealmModel realmModel=tx.realms().getRealm(realm.getId());
+    UserModel deletedUser=tx.userStorage().getUserById(user.getId(),realmModel);
+    tx.userStorage().removeUser(realmModel,deletedUser);
+    tx.getTransaction().commit();
+  }
+  finally {
+    tx.close();
+  }
+}

@@ -1,0 +1,13 @@
+{
+  IdentityManager identityManager=getIdentityManager();
+  try {
+    User picketlinkUser=BasicModel.getUser(identityManager,local.getUsername());
+    if (picketlinkUser == null) {
+      return false;
+    }
+    return picketlinkUser.getId().equals(local.getAttribute(LDAP_ID));
+  }
+ catch (  IdentityManagementException ie) {
+    throw convertIDMException(ie);
+  }
+}

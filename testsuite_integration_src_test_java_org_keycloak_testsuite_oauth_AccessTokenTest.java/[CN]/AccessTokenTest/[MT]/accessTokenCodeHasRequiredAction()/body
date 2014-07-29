@@ -1,0 +1,21 @@
+{
+  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel defaultRealm,    RealmModel appRealm){
+      UserModel user=manager.getSession().users().getUserByUsername("test-user@localhost",appRealm);
+      user.addRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE);
+    }
+  }
+);
+  oauth.doLogin("test-user@localhost","password");
+  String code=driver.getPageSource().split("code=")[1].split("&")[0].split("\"")[0];
+  OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
+  Assert.assertEquals(400,response.getStatusCode());
+  Event event=events.poll();
+  assertNotNull(event.getDetails().get(Details.CODE_ID));
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      manager.getSession().users().getUserByUsername("test-user@localhost",appRealm).removeRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE);
+    }
+  }
+);
+}

@@ -1,0 +1,24 @@
+{
+  UserSessionEntity userSessionEntity=em.find(UserSessionEntity.class,userSession.getId());
+  ClientSessionEntity entity=new ClientSessionEntity();
+  entity.setId(KeycloakModelUtils.generateId());
+  entity.setTimestamp(Time.currentTime());
+  entity.setClientId(client.getId());
+  entity.setSession(userSessionEntity);
+  entity.setRedirectUri(redirectUri);
+  entity.setState(state);
+  em.persist(entity);
+  if (roles != null) {
+    List<ClientSessionRoleEntity> roleEntities=new LinkedList<ClientSessionRoleEntity>();
+    for (    String r : roles) {
+      ClientSessionRoleEntity roleEntity=new ClientSessionRoleEntity();
+      roleEntity.setClientSession(entity);
+      roleEntity.setRoleId(r);
+      em.persist(roleEntity);
+      roleEntities.add(roleEntity);
+    }
+    entity.setRoles(roleEntities);
+  }
+  userSessionEntity.getClientSessions().add(entity);
+  return new ClientSessionAdapter(session,em,realm,entity);
+}

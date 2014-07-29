@@ -1,0 +1,14 @@
+{
+  MongoUserSessionEntity userSessionEntity=getUserSessionEntity(realm,userSession.getId());
+  MongoClientSessionEntity entity=new MongoClientSessionEntity();
+  entity.setId(KeycloakModelUtils.generateId());
+  entity.setTimestamp(Time.currentTime());
+  entity.setClientId(client.getId());
+  entity.setRedirectUri(redirectUri);
+  entity.setState(state);
+  if (roles != null) {
+    entity.setRoles(new LinkedList<String>(roles));
+  }
+  mongoStore.pushItemToList(userSessionEntity,"clientSessions",entity,false,invocationContext);
+  return new ClientSessionAdapter(session,this,realm,entity,userSessionEntity,invocationContext);
+}

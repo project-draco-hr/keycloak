@@ -2,7 +2,7 @@
   isTotpConfigurationRequired(user);
   isEmailVerificationRequired(user);
   boolean isResource=client instanceof ApplicationModel;
-  AccessCodeEntry accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,this.session,realm,client,user,session);
+  AccessCode accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,this.session,realm,client,user,session);
   log.debugv("processAccessCode: isResource: {0}",isResource);
   log.debugv("processAccessCode: go to oauth page?: {0}",!isResource);
   audit.detail(Details.CODE_ID,accessCode.getCodeId());
@@ -16,7 +16,7 @@
     return Flows.forms(this.session,realm,uriInfo).setAccessCode(accessCode.getCode()).setUser(user).createResponse(action);
   }
   if (!isResource) {
-    accessCode.setAction(AccessCode.Action.OAUTH_GRANT);
+    accessCode.setAction(ClientSessionModel.Action.OAUTH_GRANT);
     List<RoleModel> realmRoles=new LinkedList<RoleModel>();
     MultivaluedMap<String,RoleModel> resourceRoles=new MultivaluedMapImpl<String,RoleModel>();
     for (    RoleModel r : accessCode.getRequestedRoles()) {
@@ -31,6 +31,7 @@
   }
   if (redirect != null) {
     audit.success();
+    accessCode.setAction(ClientSessionModel.Action.CODE_TO_TOKEN);
     return redirectAccessCode(accessCode,session,state,redirect);
   }
  else {

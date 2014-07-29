@@ -5,7 +5,8 @@
   rep.setLastAccess(((long)session.getLastSessionRefresh()) * 1000L);
   rep.setUser(session.getUser().getUsername());
   rep.setIpAddress(session.getIpAddress());
-  for (  ClientModel client : session.getClientAssociations()) {
+  for (  ClientSessionModel clientSession : session.getClientSessions()) {
+    ClientModel client=clientSession.getClient();
     if (client instanceof ApplicationModel) {
       rep.getApplications().add(client.getClientId());
     }

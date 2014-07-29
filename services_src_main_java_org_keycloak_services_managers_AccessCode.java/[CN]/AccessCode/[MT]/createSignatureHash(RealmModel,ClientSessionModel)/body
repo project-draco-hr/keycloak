@@ -1,0 +1,18 @@
+{
+  try {
+    Signature signature=Signature.getInstance(RSAProvider.getJavaAlgorithm(Algorithm.RS256));
+    signature.initSign(realm.getPrivateKey());
+    signature.update(clientSession.getId().getBytes());
+    signature.update(ByteBuffer.allocate(4).putInt(clientSession.getTimestamp()));
+    if (clientSession.getAction() != null) {
+      signature.update(clientSession.getAction().toString().getBytes());
+    }
+    byte[] sign=signature.sign();
+    MessageDigest digest=MessageDigest.getInstance("sha-1");
+    digest.update(sign);
+    return Base64Url.encode(digest.digest());
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

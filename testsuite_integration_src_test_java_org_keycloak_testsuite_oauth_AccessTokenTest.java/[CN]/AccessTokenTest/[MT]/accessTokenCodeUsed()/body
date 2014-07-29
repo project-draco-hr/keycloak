@@ -1,0 +1,22 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  Event loginEvent=events.expectLogin().assertEvent();
+  String codeId=loginEvent.getDetails().get(Details.CODE_ID);
+  loginEvent.getSessionId();
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
+  Assert.assertEquals(200,response.getStatusCode());
+  events.clear();
+  response=oauth.doAccessTokenRequest(code,"password");
+  Assert.assertEquals(400,response.getStatusCode());
+  AssertEvents.ExpectedEvent expectedEvent=events.expectCodeToToken(codeId,null);
+  expectedEvent.error("invalid_code").removeDetail(Details.TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_ID).client((String)null).user((String)null);
+  expectedEvent.assertEvent();
+  events.clear();
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.setAccessCodeLifespan(60);
+    }
+  }
+);
+}

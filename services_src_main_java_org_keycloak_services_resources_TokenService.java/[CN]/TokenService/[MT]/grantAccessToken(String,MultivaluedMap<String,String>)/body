@@ -50,7 +50,6 @@ return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_J
 }
 String scope=form.getFirst(OAuth2Constants.SCOPE);
 UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"oauth_credentials",false);
-userSession.associateClient(client);
 audit.session(userSession);
 AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).generateAccessToken(scope,client,user,userSession).generateRefreshToken().generateIDToken().build();
 audit.success();

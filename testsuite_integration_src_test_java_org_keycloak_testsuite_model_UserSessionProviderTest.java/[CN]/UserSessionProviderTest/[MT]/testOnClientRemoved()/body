@@ -1,0 +1,32 @@
+{
+  UserSessionModel[] sessions=createSessions();
+  List<String> clientSessionsRemoved=new LinkedList<String>();
+  List<String> clientSessionsKept=new LinkedList<String>();
+  for (  UserSessionModel s : sessions) {
+    s=session.sessions().getUserSession(realm,s.getId());
+    for (    ClientSessionModel c : s.getClientSessions()) {
+      if (c.getClient().getClientId().equals("third-party")) {
+        clientSessionsRemoved.add(c.getId());
+      }
+ else {
+        clientSessionsKept.add(c.getId());
+      }
+    }
+  }
+  session.sessions().onClientRemoved(realm,realm.findClient("third-party"));
+  resetSession();
+  for (  String c : clientSessionsRemoved) {
+    assertNull(session.sessions().getClientSession(realm,c));
+  }
+  for (  String c : clientSessionsKept) {
+    assertNotNull(session.sessions().getClientSession(realm,c));
+  }
+  session.sessions().onClientRemoved(realm,realm.findClient("test-app"));
+  resetSession();
+  for (  String c : clientSessionsRemoved) {
+    assertNull(session.sessions().getClientSession(realm,c));
+  }
+  for (  String c : clientSessionsKept) {
+    assertNull(session.sessions().getClientSession(realm,c));
+  }
+}

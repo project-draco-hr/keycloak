@@ -1,0 +1,13 @@
+{
+  UserSessionModel userSession=createSessions()[0];
+  List<String> clientSessionsRemoved=new LinkedList<String>();
+  for (  ClientSessionModel c : userSession.getClientSessions()) {
+    clientSessionsRemoved.add(c.getId());
+  }
+  session.sessions().removeUserSession(realm,userSession);
+  resetSession();
+  assertNull(session.sessions().getUserSession(realm,userSession.getId()));
+  for (  String c : clientSessionsRemoved) {
+    assertNull(session.sessions().getClientSession(realm,c));
+  }
+}

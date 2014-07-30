@@ -46,6 +46,11 @@
   if (prompt != null && prompt.equals("none")) {
     return oauth.redirectError(client,"access_denied",state,redirect);
   }
-  logger.info("createLogin() now...");
-  return Flows.forms(session,realm,uriInfo).createLogin();
+  LoginFormsProvider forms=Flows.forms(session,realm,uriInfo);
+  if (loginHint != null) {
+    MultivaluedMap<String,String> formData=new MultivaluedMapImpl<String,String>();
+    formData.add(AuthenticationManager.FORM_USERNAME,loginHint);
+    forms.setFormData(formData);
+  }
+  return forms.createLogin();
 }

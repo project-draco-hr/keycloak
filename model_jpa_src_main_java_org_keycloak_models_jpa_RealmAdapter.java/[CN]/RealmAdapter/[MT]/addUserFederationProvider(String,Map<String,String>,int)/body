@@ -1,0 +1,13 @@
+{
+  String id=KeycloakModelUtils.generateId();
+  UserFederationProviderEntity entity=new UserFederationProviderEntity();
+  entity.setId(id);
+  entity.setRealm(realm);
+  entity.setProviderName(providerName);
+  entity.setConfig(config);
+  entity.setPriority(priority);
+  em.persist(entity);
+  realm.getUserFederationProviders().add(entity);
+  em.flush();
+  return new UserFederationProviderModel(entity.getId(),providerName,config,priority);
+}

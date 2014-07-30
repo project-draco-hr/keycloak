@@ -1,0 +1,12 @@
+{
+  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      adminstrationRealm.setPasswordCredentialGrantAllowed(false);
+      RealmModel realm=manager.getRealmByName(REALM_NAME);
+      if (realm != null) {
+        manager.removeRealm(realm);
+      }
+    }
+  }
+);
+}

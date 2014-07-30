@@ -1,0 +1,19 @@
+{
+  if (providers == null) {
+    providers=new LinkedList();
+    for (    ThemeProvider p : session.getAllProviders(ThemeProvider.class)) {
+      if (!(p instanceof ExtendingThemeManager)) {
+        if (!p.getClass().equals(ExtendingThemeManager.class)) {
+          providers.add(p);
+        }
+      }
+    }
+    Collections.sort(providers,new Comparator<ThemeProvider>(){
+      @Override public int compare(      ThemeProvider o1,      ThemeProvider o2){
+        return o2.getProviderPriority() - o1.getProviderPriority();
+      }
+    }
+);
+  }
+  return providers;
+}

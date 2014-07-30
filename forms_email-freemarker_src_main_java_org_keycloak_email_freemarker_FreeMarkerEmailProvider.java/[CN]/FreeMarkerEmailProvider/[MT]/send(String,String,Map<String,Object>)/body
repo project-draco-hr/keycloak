@@ -1,7 +1,7 @@
 {
   try {
-    ExtendingThemeManager themeManager=new ExtendingThemeManager(session);
-    Theme theme=themeManager.createTheme(realm.getEmailTheme(),Theme.Type.EMAIL);
+    ThemeProvider themeProvider=session.getProvider(ThemeProvider.class,"extending");
+    Theme theme=themeProvider.getTheme(realm.getEmailTheme(),Theme.Type.EMAIL);
     String subject=theme.getMessages().getProperty(subjectKey);
     String body=freeMarker.processTemplate(attributes,template,theme);
     send(subject,body);

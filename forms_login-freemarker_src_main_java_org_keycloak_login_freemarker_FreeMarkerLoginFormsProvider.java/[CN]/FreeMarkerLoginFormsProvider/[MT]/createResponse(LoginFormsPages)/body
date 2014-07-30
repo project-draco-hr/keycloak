@@ -11,10 +11,10 @@
     uriBuilder.replaceQueryParam(OAuth2Constants.CODE,accessCode);
   }
   Map<String,Object> attributes=new HashMap<String,Object>();
-  ExtendingThemeManager themeManager=new ExtendingThemeManager(session);
+  ThemeProvider themeProvider=session.getProvider(ThemeProvider.class,"extending");
   Theme theme;
   try {
-    theme=themeManager.createTheme(realm.getLoginTheme(),Theme.Type.LOGIN);
+    theme=themeProvider.getTheme(realm.getLoginTheme(),Theme.Type.LOGIN);
   }
  catch (  IOException e) {
     logger.error("Failed to create theme",e);

@@ -6,7 +6,9 @@
       template=cache.get(key);
       if (template == null) {
         template=getTemplate(templateName,theme);
-        cache.put(key,template);
+        if (cache.putIfAbsent(key,template) != null) {
+          template=cache.get(key);
+        }
       }
     }
  else {

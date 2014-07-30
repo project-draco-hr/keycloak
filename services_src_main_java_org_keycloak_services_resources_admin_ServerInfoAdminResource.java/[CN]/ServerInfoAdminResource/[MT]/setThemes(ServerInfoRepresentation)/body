@@ -1,8 +1,8 @@
 {
-  ExtendingThemeManager themeManager=new ExtendingThemeManager(session);
+  ThemeProvider themeProvider=session.getProvider(ThemeProvider.class,"extending");
   info.themes=new HashMap<String,List<String>>();
   for (  Theme.Type type : Theme.Type.values()) {
-    List<String> themes=new LinkedList<String>(themeManager.nameSet(type));
+    List<String> themes=new LinkedList<String>(themeProvider.nameSet(type));
     Collections.sort(themes);
     info.themes.put(type.toString().toLowerCase(),themes);
   }

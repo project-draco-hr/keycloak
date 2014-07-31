@@ -6,8 +6,12 @@
   entity.setProviderName(providerName);
   entity.setConfig(config);
   entity.setPriority(priority);
+  if (displayName == null) {
+    displayName=id;
+  }
+  entity.setDisplayName(displayName);
   em.persist(entity);
   realm.getUserFederationProviders().add(entity);
   em.flush();
-  return new UserFederationProviderModel(entity.getId(),providerName,config,priority);
+  return new UserFederationProviderModel(entity.getId(),providerName,config,priority,displayName);
 }

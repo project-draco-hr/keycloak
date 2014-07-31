@@ -1,6 +1,10 @@
 {
   logger.info("updateProvider");
   auth.requireManage();
-  UserFederationProviderModel model=new UserFederationProviderModel(id,rep.getProviderName(),rep.getConfig(),rep.getPriority());
+  String displayName=rep.getDisplayName();
+  if (displayName != null && displayName.trim().equals("")) {
+    displayName=null;
+  }
+  UserFederationProviderModel model=new UserFederationProviderModel(id,rep.getProviderName(),rep.getConfig(),rep.getPriority(),displayName);
   realm.updateUserFederationProvider(model);
 }

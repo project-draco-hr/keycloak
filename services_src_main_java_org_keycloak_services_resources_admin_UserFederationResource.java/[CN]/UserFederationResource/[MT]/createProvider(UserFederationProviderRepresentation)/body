@@ -1,6 +1,10 @@
 {
   logger.info("createProvider");
   auth.requireManage();
-  UserFederationProviderModel model=realm.addUserFederationProvider(rep.getProviderName(),rep.getConfig(),rep.getPriority());
+  String displayName=rep.getDisplayName();
+  if (displayName != null && displayName.trim().equals("")) {
+    displayName=null;
+  }
+  UserFederationProviderModel model=realm.addUserFederationProvider(rep.getProviderName(),rep.getConfig(),rep.getPriority(),displayName);
   return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
 }

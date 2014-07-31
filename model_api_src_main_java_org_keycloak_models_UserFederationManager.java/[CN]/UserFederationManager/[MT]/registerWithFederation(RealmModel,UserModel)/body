@@ -1,0 +1,10 @@
+{
+  for (  UserFederationProviderModel federation : realm.getUserFederationProviders()) {
+    UserFederationProvider fed=getFederationProvider(federation);
+    if (fed.synchronizeRegistrations()) {
+      user.setFederationLink(federation.getId());
+      return fed.register(realm,user);
+    }
+  }
+  return user;
+}

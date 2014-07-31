@@ -1,10 +1,14 @@
 {
-  logger.info("getProvider");
+  logger.info("get provider list");
   auth.requireView();
-  for (  UserFederationProviderModel model : realm.getUserFederationProviders()) {
-    if (model.getId().equals(id)) {
-      return ModelToRepresentation.toRepresentation(model);
+  for (  ProviderFactory factory : session.getKeycloakSessionFactory().getProviderFactories(UserFederationProvider.class)) {
+    if (!factory.getId().equals(id)) {
+      continue;
     }
+    UserFederationProviderFactoryRepresentation rep=new UserFederationProviderFactoryRepresentation();
+    rep.setId(factory.getId());
+    rep.setOptions(((UserFederationProviderFactory)factory).getConfigurationOptions());
+    return rep;
   }
-  throw new NotFoundException("could not find provider");
+  throw new NotFoundException("Could not find provider");
 }

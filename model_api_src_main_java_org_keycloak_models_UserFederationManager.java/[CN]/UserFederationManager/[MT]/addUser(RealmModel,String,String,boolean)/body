@@ -1,10 +1,4 @@
 {
   UserModel user=session.userStorage().addUser(realm,id,username,addDefaultRoles);
-  for (  UserFederationProviderModel federation : realm.getUserFederationProviders()) {
-    UserFederationProvider fed=session.getProvider(UserFederationProvider.class,federation.getProviderName());
-    if (fed.isRegistrationSupported()) {
-      return fed.register(realm,user);
-    }
-  }
-  return user;
+  return registerWithFederation(realm,user);
 }

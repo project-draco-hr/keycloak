@@ -1,3 +1,11 @@
 {
-  return new LDAPUserModelDelegate(local,this);
+switch (editMode) {
+case READ_ONLY:
+    return new ReadonlyLDAPUserModelDelegate(local,this);
+case WRITABLE:
+  return new WritableLDAPUserModelDelegate(local,this);
+case UNSYNCED:
+return new UnsyncedLDAPUserModelDelegate(local,this);
+}
+return local;
 }

@@ -1,0 +1,16 @@
+{
+  embeddedServer=new LDAPEmbeddedServer();
+  embeddedServer.setup();
+  embeddedServer.importLDIF("ldap/users.ldif");
+  Runtime.getRuntime().addShutdownHook(new Thread(){
+    @Override public void run(){
+      try {
+        embeddedServer.tearDown();
+      }
+ catch (      Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+);
+}

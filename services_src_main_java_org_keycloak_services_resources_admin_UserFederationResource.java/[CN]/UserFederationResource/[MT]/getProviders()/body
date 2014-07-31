@@ -1,0 +1,12 @@
+{
+  logger.info("get provider list");
+  auth.requireView();
+  List<Map<String,String>> providers=new LinkedList<Map<String,String>>();
+  for (  ProviderFactory factory : session.getKeycloakSessionFactory().getProviderFactories(UserFederationProvider.class)) {
+    Map<String,String> provider=new HashMap<String,String>();
+    provider.put("name",factory.getId());
+    providers.add(provider);
+  }
+  logger.info("provider list.size() " + providers.size());
+  return providers;
+}

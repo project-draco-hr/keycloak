@@ -9,6 +9,10 @@
         entity.setPriority(model.getPriority());
         entity.setProviderName(model.getProviderName());
         entity.setPriority(model.getPriority());
+        String displayName=model.getDisplayName();
+        if (displayName != null) {
+          entity.setDisplayName(model.getDisplayName());
+        }
         found=true;
         break;
       }
@@ -28,7 +32,7 @@
     }
     if (!found)     add.add(model);
   }
-  for (  UserFederationProviderModel model : providers) {
+  for (  UserFederationProviderModel model : add) {
     UserFederationProviderEntity entity=new UserFederationProviderEntity();
     if (model.getId() != null)     entity.setId(model.getId());
  else     entity.setId(KeycloakModelUtils.generateId());
@@ -36,6 +40,10 @@
     entity.setPriority(model.getPriority());
     entity.setProviderName(model.getProviderName());
     entity.setPriority(model.getPriority());
+    String displayName=model.getDisplayName();
+    if (displayName == null) {
+      entity.setDisplayName(entity.getId());
+    }
     em.persist(entity);
     realm.getUserFederationProviders().add(entity);
   }

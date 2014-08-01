@@ -9,7 +9,7 @@
   if (authRequest.getAttributes() != null) {
     String cookiePath=Urls.socialBase(uriInfo.getBaseUri()).build().getRawPath().toString();
     String encoded=new JWSBuilder().jsonContent(authRequest.getAttributes()).rsa256(realm.getPrivateKey());
-    CookieHelper.addCookie("KEYCLOAK_SOCIAL",encoded,cookiePath,null,null,-1,!realm.isSslNotRequired(),true);
+    CookieHelper.addCookie("KEYCLOAK_SOCIAL",encoded,cookiePath,null,null,-1,realm.getSslRequired().isRequired(clientConnection),true);
   }
   return Response.status(302).location(authRequest.getAuthUri()).build();
 }

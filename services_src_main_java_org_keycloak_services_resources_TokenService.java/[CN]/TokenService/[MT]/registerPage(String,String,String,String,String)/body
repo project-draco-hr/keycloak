@@ -1,7 +1,7 @@
 {
   logger.info("**********registerPage()");
   audit.event(EventType.REGISTER).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code");
-  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager);
+  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
@@ -31,6 +31,6 @@
     audit.error(Errors.REGISTRATION_DISABLED);
     return oauth.forwardToSecurityFailure("Registration not allowed");
   }
-  authManager.expireIdentityCookie(realm,uriInfo);
+  authManager.expireIdentityCookie(realm,uriInfo,clientConnection);
   return Flows.forms(session,realm,uriInfo).createRegistration();
 }

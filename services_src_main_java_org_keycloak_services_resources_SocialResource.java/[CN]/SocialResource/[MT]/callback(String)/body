@@ -14,7 +14,7 @@
   RealmModel realm=realmManager.getRealmByName(realmName);
   Audit audit=new AuditManager(realm,session,clientConnection).createAudit().event(EventType.LOGIN).detail(Details.RESPONSE_TYPE,initialRequest.get(OAuth2Constants.RESPONSE_TYPE)).detail(Details.AUTH_METHOD,authMethod);
   AuthenticationManager authManager=new AuthenticationManager();
-  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager);
+  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!realm.isEnabled()) {
     audit.error(Errors.REALM_DISABLED);
     return oauth.forwardToSecurityFailure("Realm not enabled.");

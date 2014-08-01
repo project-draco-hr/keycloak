@@ -1,8 +1,9 @@
 {
-  if (!isSet(attributes,SSL_NOT_REQUIRED) && !isSet(attributes,DISABLE_TRUST_MANAGER)) {
-    if (!(isSet(attributes,TRUSTSTORE) && isSet(attributes,TRUSTSTORE_PASSWORD))) {
-      return false;
-    }
+  if (isSet(attributes,DISABLE_TRUST_MANAGER)) {
+    return true;
   }
-  return true;
+  if (isSet(attributes,SSL_REQUIRED) && attributes.get(SSL_REQUIRED.getName()).asString().equals("none")) {
+    return true;
+  }
+  return isSet(attributes,TRUSTSTORE) && isSet(attributes,TRUSTSTORE_PASSWORD);
 }

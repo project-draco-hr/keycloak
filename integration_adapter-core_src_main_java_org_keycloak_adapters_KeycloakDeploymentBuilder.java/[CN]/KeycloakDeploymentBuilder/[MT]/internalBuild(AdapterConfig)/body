@@ -15,7 +15,12 @@
     }
     deployment.setRealmKey(realmKey);
   }
-  deployment.setSslRequired(!adapterConfig.isSslNotRequired());
+  if (adapterConfig.getSslRequired() != null) {
+    deployment.setSslRequired(SslRequired.valueOf(adapterConfig.getSslRequired().toUpperCase()));
+  }
+ else {
+    deployment.setSslRequired(SslRequired.EXTERNAL);
+  }
   deployment.setResourceCredentials(adapterConfig.getCredentials());
   deployment.setPublicClient(adapterConfig.isPublicClient());
   deployment.setUseResourceRoleMappings(adapterConfig.isUseResourceRoleMappings());

@@ -1,0 +1,11 @@
+{
+  try {
+    PartitionManager partitionManager=PartitionManagerRegistry.createPartitionManager(ldapConfig);
+    IdentityManager identityManager=partitionManager.createIdentityManager();
+    User user=BasicModel.getUser(identityManager,username);
+    identityManager.updateCredential(user,new Password(password.toCharArray()));
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

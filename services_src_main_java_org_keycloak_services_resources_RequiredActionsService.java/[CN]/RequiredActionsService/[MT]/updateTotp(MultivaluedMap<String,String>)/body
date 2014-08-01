@@ -17,7 +17,7 @@
   UserCredentialModel credentials=new UserCredentialModel();
   credentials.setType(CredentialRepresentation.TOTP);
   credentials.setValue(totpSecret);
-  user.updateCredential(credentials);
+  session.users().updateCredential(realm,user,credentials);
   user.setTotp(true);
   user.removeRequiredAction(RequiredAction.CONFIGURE_TOTP);
   audit.clone().event(EventType.UPDATE_TOTP).success();

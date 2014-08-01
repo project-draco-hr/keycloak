@@ -28,7 +28,6 @@
   rep.setAccessCodeLifespanUserAction(realm.getAccessCodeLifespanUserAction());
   rep.setSmtpServer(realm.getSmtpConfig());
   rep.setSocialProviders(realm.getSocialConfig());
-  rep.setLdapServer(realm.getLdapServerConfig());
   rep.setAccountTheme(realm.getAccountTheme());
   rep.setLoginTheme(realm.getLoginTheme());
   rep.setAdminTheme(realm.getAdminTheme());
@@ -49,18 +48,6 @@
     for (    RequiredCredentialModel cred : requiredCredentialModels) {
       rep.getRequiredCredentials().add(cred.getType());
     }
-  }
-  List<AuthenticationProviderModel> authProviderModels=realm.getAuthenticationProviders();
-  if (authProviderModels.size() > 0) {
-    List<AuthenticationProviderRepresentation> authProviderReps=new ArrayList<AuthenticationProviderRepresentation>();
-    for (    AuthenticationProviderModel model : authProviderModels) {
-      AuthenticationProviderRepresentation authProvRep=new AuthenticationProviderRepresentation();
-      authProvRep.setProviderName(model.getProviderName());
-      authProvRep.setPasswordUpdateSupported(model.isPasswordUpdateSupported());
-      authProvRep.setConfig(model.getConfig());
-      authProviderReps.add(authProvRep);
-    }
-    rep.setAuthenticationProviders(authProviderReps);
   }
   List<UserFederationProviderModel> fedProviderModels=realm.getUserFederationProviders();
   if (fedProviderModels.size() > 0) {

@@ -1,0 +1,16 @@
+{
+  String constraintUrl="/*";
+  DeploymentInfo di=createDeploymentInfo(name,contextPath,servletClass);
+  di.addInitParameter("keycloak.config.file",adapterConfigPath);
+  if (isConstrained) {
+    SecurityConstraint constraint=new SecurityConstraint();
+    WebResourceCollection collection=new WebResourceCollection();
+    collection.addUrlPattern(constraintUrl);
+    constraint.addWebResourceCollection(collection);
+    constraint.addRoleAllowed(role);
+    di.addSecurityConstraint(constraint);
+  }
+  LoginConfig loginConfig=new LoginConfig("KEYCLOAK","demo");
+  di.setLoginConfig(loginConfig);
+  server.getServer().deploy(di);
+}

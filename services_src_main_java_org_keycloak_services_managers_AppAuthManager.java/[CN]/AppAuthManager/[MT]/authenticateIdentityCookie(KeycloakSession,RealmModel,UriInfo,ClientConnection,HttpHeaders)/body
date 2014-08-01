@@ -1,0 +1,7 @@
+{
+  AuthResult authResult=super.authenticateIdentityCookie(session,realm,uriInfo,connection,headers);
+  if (authResult == null)   return null;
+  createLoginCookie(realm,authResult.getUser(),authResult.getSession(),uriInfo,connection);
+  if (authResult.getSession().isRememberMe())   createRememberMeCookie(realm,uriInfo,connection);
+  return authResult;
+}

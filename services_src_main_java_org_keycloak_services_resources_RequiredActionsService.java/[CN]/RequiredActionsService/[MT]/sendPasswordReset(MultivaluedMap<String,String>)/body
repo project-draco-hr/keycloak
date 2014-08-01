@@ -7,10 +7,10 @@
   AuthenticationManager authManager=new AuthenticationManager();
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
-    return Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Unknown login requester.");
+    return Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager).forwardToSecurityFailure("Unknown login requester.");
   }
   if (!client.isEnabled()) {
-    return Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
+    return Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
   }
   audit.event(EventType.SEND_RESET_PASSWORD).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
   UserModel user=session.users().getUserByUsername(username,realm);

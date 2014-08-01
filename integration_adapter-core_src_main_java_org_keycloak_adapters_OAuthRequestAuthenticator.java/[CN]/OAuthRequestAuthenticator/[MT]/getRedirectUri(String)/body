@@ -1,7 +1,7 @@
 {
   String url=getRequestUrl();
   log.infof("callback uri: %s",url);
-  if (!isRequestSecure() && deployment.isSslRequired()) {
+  if (!facade.getRequest().isSecure() && deployment.getSslRequired().isRequired(facade.getRequest().getRemoteAddr())) {
     int port=sslRedirectPort();
     if (port < 0) {
       return null;

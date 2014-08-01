@@ -1,7 +1,7 @@
 {
   logger.info("TokenService.loginPage");
   audit.event(EventType.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code");
-  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager);
+  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
@@ -35,7 +35,7 @@
     return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
   }
   logger.info("Checking cookie...");
-  AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,headers);
+  AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers);
   if (authResult != null) {
     UserModel user=authResult.getUser();
     UserSessionModel session=authResult.getSession();

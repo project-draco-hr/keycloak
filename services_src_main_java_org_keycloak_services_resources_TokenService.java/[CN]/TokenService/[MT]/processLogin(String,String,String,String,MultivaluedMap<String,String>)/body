@@ -8,7 +8,7 @@
   if (remember) {
     audit.detail(Details.REMEMBER_ME,"true");
   }
-  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager);
+  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
@@ -36,10 +36,10 @@
   }
   AuthenticationStatus status=authManager.authenticateForm(session,clientConnection,realm,formData);
   if (remember) {
-    authManager.createRememberMeCookie(realm,uriInfo);
+    authManager.createRememberMeCookie(realm,uriInfo,clientConnection);
   }
  else {
-    authManager.expireRememberMeCookie(realm,uriInfo);
+    authManager.expireRememberMeCookie(realm,uriInfo,clientConnection);
   }
   UserModel user=KeycloakModelUtils.findUserByNameOrEmail(session,realm,username);
   if (user != null) {

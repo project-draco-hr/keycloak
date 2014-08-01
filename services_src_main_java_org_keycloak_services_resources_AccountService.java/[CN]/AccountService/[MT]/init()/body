@@ -1,7 +1,6 @@
 {
   auditProvider=session.getProvider(AuditProvider.class);
   account=session.getProvider(AccountProvider.class).setRealm(realm).setUriInfo(uriInfo);
-  boolean passwordUpdateSupported=false;
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers);
   if (authResult != null) {
     auth=new Auth(realm,authResult.getToken(),authResult.getUser(),application,true);
@@ -27,12 +26,7 @@
       }
     }
     account.setUser(auth.getUser());
-    AuthenticationLinkModel authLinkModel=auth.getUser().getAuthenticationLink();
-    if (authLinkModel != null) {
-      AuthenticationProviderModel authProviderModel=AuthenticationProviderManager.getConfiguredProviderModel(realm,authLinkModel.getAuthProvider());
-      passwordUpdateSupported=authProviderModel.isPasswordUpdateSupported();
-    }
   }
   boolean auditEnabled=auditProvider != null && realm.isAuditEnabled();
-  account.setFeatures(realm.isSocial(),auditEnabled,passwordUpdateSupported);
+  account.setFeatures(realm.isSocial(),auditEnabled,true);
 }

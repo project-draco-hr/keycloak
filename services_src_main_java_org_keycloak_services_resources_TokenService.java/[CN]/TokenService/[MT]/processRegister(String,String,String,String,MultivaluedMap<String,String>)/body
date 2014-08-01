@@ -41,8 +41,7 @@
     audit.error(Errors.INVALID_REGISTRATION);
     return Flows.forms(session,realm,uriInfo).setError(error).setFormData(formData).createRegistration();
   }
-  AuthenticationProviderManager authenticationProviderManager=AuthenticationProviderManager.getManager(realm,session);
-  if (session.users().getUserByUsername(username,realm) != null || authenticationProviderManager.getUser(username) != null) {
+  if (session.users().getUserByUsername(username,realm) != null) {
     audit.error(Errors.USERNAME_IN_USE);
     return Flows.forms(session,realm,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).createRegistration();
   }
@@ -56,12 +55,12 @@
     credentials.setType(CredentialRepresentation.PASSWORD);
     credentials.setValue(formData.getFirst("password"));
     boolean passwordUpdateSuccessful;
-    String passwordUpdateError;
+    String passwordUpdateError=null;
     try {
-      passwordUpdateSuccessful=AuthenticationProviderManager.getManager(realm,session).updatePassword(user,formData.getFirst("password"));
-      passwordUpdateError="Password update failed";
+      session.users().updateCredential(realm,user,UserCredentialModel.password(formData.getFirst("password")));
+      passwordUpdateSuccessful=true;
     }
- catch (    AuthenticationProviderException ape) {
+ catch (    Exception ape) {
       passwordUpdateSuccessful=false;
       passwordUpdateError=ape.getMessage();
     }

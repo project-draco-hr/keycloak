@@ -18,14 +18,13 @@
   realm.setSslRequired(SslRequired.EXTERNAL);
   realm.setRegistrationAllowed(false);
   KeycloakModelUtils.generateRealmKeys(realm);
-  realm.setAuthenticationProviders(Arrays.asList(AuthenticationProviderModel.DEFAULT_PROVIDER));
   realm.setAuditListeners(Collections.singleton("jboss-logging"));
   UserModel adminUser=session.users().addUser(realm,"admin");
   adminUser.setEnabled(true);
   UserCredentialModel password=new UserCredentialModel();
   password.setType(UserCredentialModel.PASSWORD);
   password.setValue("admin");
-  adminUser.updateCredential(password);
+  session.users().updateCredential(realm,adminUser,password);
   adminUser.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
   RoleModel adminRole=realm.getRole(AdminRoles.ADMIN);
   adminUser.grantRole(adminRole);

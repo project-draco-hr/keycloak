@@ -1,20 +1,8 @@
 {
   UserModel user=KeycloakModelUtils.findUserByNameOrEmail(session,realm,username);
   if (user == null) {
-    AuthUser authUser=AuthenticationProviderManager.getManager(realm,session).getUser(username);
-    if (authUser != null) {
-      user=session.users().addUser(realm,authUser.getUsername());
-      user.setEnabled(true);
-      user.setFirstName(authUser.getFirstName());
-      user.setLastName(authUser.getLastName());
-      user.setEmail(authUser.getEmail());
-      user.setAuthenticationLink(new AuthenticationLinkModel(authUser.getProviderName(),authUser.getId()));
-      logger.info("User " + authUser.getUsername() + " created in Keycloak and linked with provider "+ authUser.getProviderName());
-    }
- else {
-      logger.warn("User " + username + " not found");
-      return AuthenticationStatus.INVALID_USER;
-    }
+    logger.warn("User " + username + " not found");
+    return AuthenticationStatus.INVALID_USER;
   }
   if (!checkEnabled(user)) {
     return AuthenticationStatus.ACCOUNT_DISABLED;
@@ -24,30 +12,24 @@
     types.add(credential.getType());
   }
   if (types.contains(CredentialRepresentation.PASSWORD)) {
+    List<UserCredentialModel> credentials=new LinkedList<UserCredentialModel>();
     String password=formData.getFirst(CredentialRepresentation.PASSWORD);
     if (password == null) {
       logger.warn("Password not provided");
       return AuthenticationStatus.MISSING_PASSWORD;
     }
+    credentials.add(UserCredentialModel.password(password));
     if (user.isTotp()) {
       String token=formData.getFirst(CredentialRepresentation.TOTP);
       if (token == null) {
         logger.warn("TOTP token not provided");
         return AuthenticationStatus.MISSING_TOTP;
       }
-      logger.debug("validating TOTP");
-      if (!session.users().validCredentials(realm,user,UserCredentialModel.totp(token))) {
-        return AuthenticationStatus.INVALID_CREDENTIALS;
-      }
+      credentials.add(UserCredentialModel.totp(token));
     }
     logger.debug("validating password for user: " + username);
-    AuthProviderStatus authStatus=AuthenticationProviderManager.getManager(realm,session).validatePassword(user,password);
-    if (authStatus == AuthProviderStatus.INVALID_CREDENTIALS) {
-      logger.debug("invalid password for user: " + username);
+    if (!session.users().validCredentials(realm,user,credentials)) {
       return AuthenticationStatus.INVALID_CREDENTIALS;
-    }
- else     if (authStatus == AuthProviderStatus.FAILED) {
-      return AuthenticationStatus.FAILED;
     }
     if (!user.getRequiredActions().isEmpty()) {
       return AuthenticationStatus.ACTIONS_REQUIRED;
@@ -61,6 +43,9 @@
     if (secret == null) {
       logger.warn("Secret not provided");
       return AuthenticationStatus.MISSING_PASSWORD;
+    }
+    if (!session.users().validCredentials(realm,user,UserCredentialModel.secret(secret))) {
+      return AuthenticationStatus.INVALID_CREDENTIALS;
     }
     if (!user.getRequiredActions().isEmpty()) {
       return AuthenticationStatus.ACTIONS_REQUIRED;

@@ -30,7 +30,7 @@ case ADD:
 case REMOVE:
 SocialLinkModel link=session.users().getSocialLink(user,providerId,realm);
 if (link != null) {
-if (session.users().getSocialLinks(user,realm).size() > 1 || user.getAuthenticationLink() != null) {
+if (session.users().getSocialLinks(user,realm).size() > 1 || user.getFederationLink() != null) {
   session.users().removeSocialLink(realm,user,providerId);
   logger.debug("Social provider " + providerId + " removed successfully from user "+ user.getUsername());
   audit.event(EventType.REMOVE_SOCIAL_LINK).client(auth.getClient()).user(auth.getUser()).detail(Details.USERNAME,link.getSocialUserId() + "@" + link.getSocialProvider()).success();

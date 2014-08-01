@@ -1,6 +1,6 @@
 {
   audit.event(EventType.LOGIN).detail(Details.RESPONSE_TYPE,"code");
-  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager);
+  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
@@ -23,7 +23,7 @@
     }
   }
   if (!AuthenticationManager.isSessionValid(realm,userSession)) {
-    AuthenticationManager.logout(session,realm,userSession,uriInfo);
+    AuthenticationManager.logout(session,realm,userSession,uriInfo,clientConnection);
     audit.error(Errors.INVALID_CODE);
     return oauth.forwardToSecurityFailure("Session not active");
   }

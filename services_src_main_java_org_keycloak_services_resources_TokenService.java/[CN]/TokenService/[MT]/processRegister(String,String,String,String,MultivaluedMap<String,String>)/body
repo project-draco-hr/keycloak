@@ -2,7 +2,7 @@
   String username=formData.getFirst("username");
   String email=formData.getFirst("email");
   audit.event(EventType.REGISTER).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.USERNAME,username).detail(Details.EMAIL,email).detail(Details.REGISTER_METHOD,"form");
-  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,authManager,tokenManager);
+  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!realm.isEnabled()) {
     logger.warn("Realm not enabled");
     audit.error(Errors.REALM_DISABLED);

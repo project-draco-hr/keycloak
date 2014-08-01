@@ -13,11 +13,11 @@
     AuthenticationManager authManager=new AuthenticationManager();
     UserSessionModel userSession=session.sessions().getUserSession(realm,accessCode.getSessionState());
     if (!AuthenticationManager.isSessionValid(realm,userSession)) {
-      AuthenticationManager.logout(session,realm,userSession,uriInfo);
-      return Flows.oauth(this.session,realm,request,uriInfo,authManager,tokenManager).redirectError(accessCode.getClient(),"access_denied",accessCode.getState(),accessCode.getRedirectUri());
+      AuthenticationManager.logout(session,realm,userSession,uriInfo,clientConnection);
+      return Flows.oauth(this.session,realm,request,uriInfo,clientConnection,authManager,tokenManager).redirectError(accessCode.getClient(),"access_denied",accessCode.getState(),accessCode.getRedirectUri());
     }
     audit.session(userSession);
     audit.success();
-    return Flows.oauth(this.session,realm,request,uriInfo,authManager,tokenManager).redirectAccessCode(accessCode,userSession,accessCode.getState(),accessCode.getRedirectUri());
+    return Flows.oauth(this.session,realm,request,uriInfo,clientConnection,authManager,tokenManager).redirectAccessCode(accessCode,userSession,accessCode.getState(),accessCode.getRedirectUri());
   }
 }

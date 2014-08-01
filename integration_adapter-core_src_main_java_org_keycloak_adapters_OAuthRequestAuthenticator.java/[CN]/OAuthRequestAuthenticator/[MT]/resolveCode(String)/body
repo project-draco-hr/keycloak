@@ -1,5 +1,5 @@
 {
-  if (deployment.isSslRequired() && !isRequestSecure()) {
+  if (!isRequestSecure() && deployment.getSslRequired().isRequired(facade.getRequest().getRemoteAddr())) {
     log.error("Adapter requires SSL. Request: " + facade.getRequest().getURI());
     return challenge(403);
   }

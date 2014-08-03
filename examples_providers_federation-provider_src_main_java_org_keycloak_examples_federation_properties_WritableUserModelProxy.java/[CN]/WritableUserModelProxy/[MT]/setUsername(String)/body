@@ -1,0 +1,16 @@
+{
+  if (delegate.getUsername().equals(username))   return;
+  delegate.setUsername(username);
+  Properties properties=provider.getProperties();
+synchronized (properties) {
+    if (properties.containsKey(username)) {
+      throw new IllegalStateException("Can't change username to existing user");
+    }
+    String password=(String)properties.remove(username);
+    if (password == null) {
+      throw new IllegalStateException("User doesn't exist");
+    }
+    properties.setProperty(username,password);
+    provider.save();
+  }
+}

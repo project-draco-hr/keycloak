@@ -1,0 +1,22 @@
+{
+  String path=model.getConfig().get("path");
+  if (path == null) {
+    throw new IllegalStateException("Path attribute not configured for provider");
+  }
+  Properties props=files.get(path);
+  if (props != null)   return createProvider(session,model,props);
+  props=new Properties();
+  InputStream is=Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+  if (is == null) {
+    throw new IllegalStateException("Path attribute not configured for provider");
+  }
+  try {
+    props.load(is);
+    is.close();
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  props.put(path,props);
+  return createProvider(session,model,props);
+}

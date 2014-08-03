@@ -2,7 +2,8 @@
   String password=properties.getProperty(username);
   if (password != null) {
     UserModel userModel=session.userStorage().addUser(realm,username);
-    userModel.updateCredential(UserCredentialModel.password(password));
+    userModel.setEnabled(true);
+    userModel.setFederationLink(model.getId());
     return userModel;
   }
   return null;

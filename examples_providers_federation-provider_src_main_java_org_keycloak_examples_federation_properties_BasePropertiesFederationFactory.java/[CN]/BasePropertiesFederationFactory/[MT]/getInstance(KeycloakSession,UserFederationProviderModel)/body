@@ -6,10 +6,7 @@
   Properties props=files.get(path);
   if (props != null)   return createProvider(session,model,props);
   props=new Properties();
-  InputStream is=Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-  if (is == null) {
-    throw new IllegalStateException("Path attribute not configured for provider");
-  }
+  InputStream is=getPropertiesFileStream(path);
   try {
     props.load(is);
     is.close();
@@ -17,6 +14,6 @@
  catch (  IOException e) {
     throw new RuntimeException(e);
   }
-  props.put(path,props);
+  files.put(path,props);
   return createProvider(session,model,props);
 }

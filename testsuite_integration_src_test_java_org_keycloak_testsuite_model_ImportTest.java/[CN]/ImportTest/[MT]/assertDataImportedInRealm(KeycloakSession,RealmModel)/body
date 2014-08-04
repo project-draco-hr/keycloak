@@ -105,4 +105,11 @@
   Assert.assertTrue(socialConfig.size() == 2);
   Assert.assertEquals("abc",socialConfig.get("google.key"));
   Assert.assertEquals("def",socialConfig.get("google.secret"));
+  List<UserFederationProviderModel> fedProviders=realm.getUserFederationProviders();
+  Assert.assertTrue(fedProviders.size() == 1);
+  UserFederationProviderModel ldap=fedProviders.get(0);
+  Assert.assertEquals("MyLDAPProvider",ldap.getDisplayName());
+  Assert.assertEquals("dummy",ldap.getProviderName());
+  Assert.assertEquals(1,ldap.getPriority());
+  Assert.assertEquals("ldap://foo",ldap.getConfig().get("important.config"));
 }

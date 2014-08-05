@@ -116,6 +116,9 @@
   if (rep.getScopeMappings() != null) {
     for (    ScopeMappingRepresentation scope : rep.getScopeMappings()) {
       ClientModel client=newRealm.findClient(scope.getClient());
+      if (client == null) {
+        throw new RuntimeException("Unknown client specification in realm scope mappings");
+      }
       for (      String roleString : scope.getRoles()) {
         RoleModel role=newRealm.getRole(roleString.trim());
         if (role == null) {

@@ -39,11 +39,11 @@
   }
   if (error != null) {
     audit.error(Errors.INVALID_REGISTRATION);
-    return Flows.forms(session,realm,uriInfo).setError(error).setFormData(formData).createRegistration();
+    return Flows.forms(session,realm,client,uriInfo).setError(error).setFormData(formData).createRegistration();
   }
   if (session.users().getUserByUsername(username,realm) != null) {
     audit.error(Errors.USERNAME_IN_USE);
-    return Flows.forms(session,realm,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).createRegistration();
+    return Flows.forms(session,realm,client,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).createRegistration();
   }
   UserModel user=session.users().addUser(realm,username);
   user.setEnabled(true);
@@ -66,7 +66,7 @@
     }
     if (!passwordUpdateSuccessful) {
       user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
-      return Flows.forms(session,realm,uriInfo).setError(passwordUpdateError).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
+      return Flows.forms(session,realm,client,uriInfo).setError(passwordUpdateError).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
     }
   }
   audit.user(user).success();

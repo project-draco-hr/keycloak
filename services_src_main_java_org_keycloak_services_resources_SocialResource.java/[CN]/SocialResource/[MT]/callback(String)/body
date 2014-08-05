@@ -5,7 +5,7 @@
   }
  catch (  Throwable t) {
     logger.warn("Invalid social callback",t);
-    return Flows.forms(session,null,uriInfo).setError("Unexpected callback").createErrorPage();
+    return Flows.forms(session,null,null,uriInfo).setError("Unexpected callback").createErrorPage();
   }
   SocialProvider provider=SocialLoader.load(initialRequest.getProvider());
   String realmName=initialRequest.getRealm();
@@ -53,7 +53,7 @@
     queryParms.putSingle(OAuth2Constants.REDIRECT_URI,redirectUri);
     queryParms.putSingle(OAuth2Constants.RESPONSE_TYPE,responseType);
     audit.error(Errors.REJECTED_BY_USER);
-    return Flows.forms(session,realm,uriInfo).setQueryParams(queryParms).setWarning("Access denied").createLogin();
+    return Flows.forms(session,realm,client,uriInfo).setQueryParams(queryParms).setWarning("Access denied").createLogin();
   }
 catch (  SocialProviderException e) {
     logger.error("Failed to process social callback",e);

@@ -56,7 +56,23 @@ HttpConnectionParams.setSoTimeout(params,(int)socketTimeoutUnits.toMillis(socket
 if (establishConnectionTimeout > -1) {
 HttpConnectionParams.setConnectionTimeout(params,(int)establishConnectionTimeoutUnits.toMillis(establishConnectionTimeout));
 }
-return new DefaultHttpClient(cm,params);
+DefaultHttpClient client=new DefaultHttpClient(cm,params);
+if (disableCookieCache) {
+client.setCookieStore(new CookieStore(){
+@Override public void addCookie(Cookie cookie){
+}
+@Override public List<Cookie> getCookies(){
+return Collections.emptyList();
+}
+@Override public boolean clearExpired(Date date){
+return false;
+}
+@Override public void clear(){
+}
+}
+);
+}
+return client;
 }
  catch (Exception e) {
 throw new RuntimeException(e);

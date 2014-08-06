@@ -1,0 +1,15 @@
+{
+  Client client=ClientBuilder.newClient();
+  UriBuilder builder=UriBuilder.fromUri(org.keycloak.testsuite.Constants.AUTH_SERVER_ROOT);
+  URI uri=TokenService.refreshUrl(builder).build("test");
+  WebTarget target=client.target(uri);
+  org.keycloak.representations.AccessTokenResponse tokenResponse=null;
+{
+    String header=BasicAuthHelper.createHeader("test-app","password");
+    Form form=new Form();
+    Response response=target.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
+    Assert.assertEquals(400,response.getStatus());
+    response.close();
+  }
+  events.clear();
+}

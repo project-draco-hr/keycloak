@@ -7,7 +7,7 @@
     RealmProvider realmProvider=session.realms();
     UserProvider userProvider=session.users();
     new RealmManager(session).removeRealm(realmProvider.getRealmByName("test"));
-    Assert.assertEquals(1,realmProvider.getRealms().size());
+    Assert.assertEquals(2,realmProvider.getRealms().size());
     RealmModel master=realmProvider.getRealmByName(Config.getAdminRealm());
     UserModel admin2=session.users().getUserByUsername("admin2",master);
     session.users().removeUser(master,admin2);
@@ -26,12 +26,14 @@
   try {
     RealmProvider model=session.realms();
     UserProvider userProvider=session.users();
-    Assert.assertEquals(2,model.getRealms().size());
+    Assert.assertEquals(3,model.getRealms().size());
     assertAuthenticated(userProvider,model,Config.getAdminRealm(),"admin2","admin2");
     assertAuthenticated(userProvider,model,"test","test-user@localhost","password");
     assertAuthenticated(userProvider,model,"test","user1","password");
     assertAuthenticated(userProvider,model,"test","user2","password");
     assertAuthenticated(userProvider,model,"test","user3","password");
+    RealmModel testRealmRealm=model.getRealm("test-realm");
+    ImportTest.assertDataImportedInRealm(session,testRealmRealm);
   }
   finally {
     keycloakRule.stopSession(session,true);

@@ -7,7 +7,7 @@
     RealmProvider realmProvider=session.realms();
     UserProvider userProvider=session.users();
     new RealmManager(session).removeRealm(realmProvider.getRealmByName("test"));
-    Assert.assertEquals(1,realmProvider.getRealms().size());
+    Assert.assertEquals(2,realmProvider.getRealms().size());
     RealmModel master=realmProvider.getRealmByName(Config.getAdminRealm());
     UserModel admin2=session.users().getUserByUsername("admin2",master);
     session.users().removeUser(master,admin2);
@@ -26,7 +26,7 @@
   try {
     RealmProvider realmProvider=session.realms();
     UserProvider userProvider=session.users();
-    Assert.assertEquals(2,realmProvider.getRealms().size());
+    Assert.assertEquals(3,realmProvider.getRealms().size());
     assertNotAuthenticated(userProvider,realmProvider,Config.getAdminRealm(),"admin2","admin2");
     assertAuthenticated(userProvider,realmProvider,"test","test-user@localhost","password");
     assertAuthenticated(userProvider,realmProvider,"test","user1","password");

@@ -112,4 +112,6 @@
   Assert.assertEquals("dummy",ldap.getProviderName());
   Assert.assertEquals(1,ldap.getPriority());
   Assert.assertEquals("ldap://foo",ldap.getConfig().get("important.config"));
+  UserFederationProviderFactory factory=(UserFederationProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(UserFederationProvider.class,"dummy");
+  Assert.assertNull(factory.getInstance(session,null).getUserByUsername(realm,"wburke"));
 }

@@ -1,0 +1,31 @@
+{
+  loginLdap();
+{
+    KeycloakSession session=keycloakRule.startSession();
+    try {
+      RealmManager manager=new RealmManager(session);
+      RealmModel appRealm=manager.getRealm("test");
+      appRealm.removeUserFederationProvider(ldapModel);
+      Assert.assertEquals(0,appRealm.getUserFederationProviders().size());
+    }
+  finally {
+      keycloakRule.stopSession(session,true);
+    }
+  }
+  loginPage.open();
+  loginPage.login("johnkeycloak","password");
+  loginPage.assertCurrent();
+  Assert.assertEquals("Invalid username or password.",loginPage.getError());
+{
+    KeycloakSession session=keycloakRule.startSession();
+    try {
+      RealmManager manager=new RealmManager(session);
+      RealmModel appRealm=manager.getRealm("test");
+      ldapModel=appRealm.addUserFederationProvider(ldapModel.getProviderName(),ldapModel.getConfig(),ldapModel.getPriority(),ldapModel.getDisplayName());
+    }
+  finally {
+      keycloakRule.stopSession(session,true);
+    }
+  }
+  loginLdap();
+}

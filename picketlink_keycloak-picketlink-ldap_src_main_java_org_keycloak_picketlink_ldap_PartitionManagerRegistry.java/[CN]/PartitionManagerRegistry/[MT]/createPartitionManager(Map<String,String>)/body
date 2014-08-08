@@ -1,7 +1,9 @@
 {
   IdentityConfigurationBuilder builder=new IdentityConfigurationBuilder();
   Properties connectionProps=new Properties();
-  connectionProps.put("com.sun.jndi.ldap.connect.pool","true");
+  if (ldapConfig.containsKey(LDAPConstants.CONNECTION_POOLING)) {
+    connectionProps.put("com.sun.jndi.ldap.connect.pool",ldapConfig.get(LDAPConstants.CONNECTION_POOLING));
+  }
   checkSystemProperty("com.sun.jndi.ldap.connect.pool.authentication","none simple");
   checkSystemProperty("com.sun.jndi.ldap.connect.pool.initsize","1");
   checkSystemProperty("com.sun.jndi.ldap.connect.pool.maxsize","1000");
@@ -17,7 +19,8 @@
   }
   String ldapFirstNameMapping=activeDirectory ? "givenName" : CN;
   String[] userObjectClasses=getUserObjectClasses(ldapConfig);
-  LDAPStoreConfigurationBuilder ldapStoreBuilder=builder.named("SIMPLE_LDAP_STORE_CONFIG").stores().ldap().connectionProperties(connectionProps).addCredentialHandler(LDAPKeycloakCredentialHandler.class).baseDN(ldapConfig.get(LDAPConstants.BASE_DN)).bindDN(ldapConfig.get(LDAPConstants.BIND_DN)).bindCredential(ldapConfig.get(LDAPConstants.BIND_CREDENTIAL)).url(ldapConfig.get(LDAPConstants.CONNECTION_URL)).activeDirectory(activeDirectory).supportAllFeatures();
+  boolean pagination=ldapConfig.containsKey(LDAPConstants.PAGINATION) ? Boolean.parseBoolean(ldapConfig.get(LDAPConstants.PAGINATION)) : false;
+  LDAPStoreConfigurationBuilder ldapStoreBuilder=builder.named("SIMPLE_LDAP_STORE_CONFIG").stores().ldap().connectionProperties(connectionProps).addCredentialHandler(LDAPKeycloakCredentialHandler.class).baseDN(ldapConfig.get(LDAPConstants.BASE_DN)).bindDN(ldapConfig.get(LDAPConstants.BIND_DN)).bindCredential(ldapConfig.get(LDAPConstants.BIND_CREDENTIAL)).url(ldapConfig.get(LDAPConstants.CONNECTION_URL)).activeDirectory(activeDirectory).supportAllFeatures().pagination(pagination);
   if (vendor != null && vendor.equals(LDAPConstants.VENDOR_RHDS)) {
     ldapStoreBuilder.uniqueIdentifierAttributeName("nsuniqueid");
   }

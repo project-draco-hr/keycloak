@@ -18,13 +18,15 @@
     ldapLoginNameMapping=activeDirectory ? CN : UID;
   }
   String ldapFirstNameMapping=activeDirectory ? "givenName" : CN;
+  String createTimestampMapping=activeDirectory ? "whenCreated" : CREATE_TIMESTAMP;
+  String modifyTimestampMapping=activeDirectory ? "whenChanged" : MODIFY_TIMESTAMP;
   String[] userObjectClasses=getUserObjectClasses(ldapConfig);
   boolean pagination=ldapConfig.containsKey(LDAPConstants.PAGINATION) ? Boolean.parseBoolean(ldapConfig.get(LDAPConstants.PAGINATION)) : false;
   LDAPStoreConfigurationBuilder ldapStoreBuilder=builder.named("SIMPLE_LDAP_STORE_CONFIG").stores().ldap().connectionProperties(connectionProps).addCredentialHandler(LDAPKeycloakCredentialHandler.class).baseDN(ldapConfig.get(LDAPConstants.BASE_DN)).bindDN(ldapConfig.get(LDAPConstants.BIND_DN)).bindCredential(ldapConfig.get(LDAPConstants.BIND_CREDENTIAL)).url(ldapConfig.get(LDAPConstants.CONNECTION_URL)).activeDirectory(activeDirectory).supportAllFeatures().pagination(pagination);
   if (vendor != null && vendor.equals(LDAPConstants.VENDOR_RHDS)) {
     ldapStoreBuilder.uniqueIdentifierAttributeName("nsuniqueid");
   }
-  LDAPMappingConfigurationBuilder ldapUserMappingBuilder=ldapStoreBuilder.mapping(User.class).baseDN(ldapConfig.get(LDAPConstants.USER_DN_SUFFIX)).objectClasses(userObjectClasses).attribute("loginName",ldapLoginNameMapping,true).attribute("firstName",ldapFirstNameMapping).attribute("lastName",SN).attribute("email",EMAIL);
+  LDAPMappingConfigurationBuilder ldapUserMappingBuilder=ldapStoreBuilder.mapping(User.class).baseDN(ldapConfig.get(LDAPConstants.USER_DN_SUFFIX)).objectClasses(userObjectClasses).attribute("loginName",ldapLoginNameMapping,true).attribute("firstName",ldapFirstNameMapping).attribute("lastName",SN).attribute("email",EMAIL).readOnlyAttribute("createdDate",createTimestampMapping).readOnlyAttribute("modifyDate",modifyTimestampMapping);
   if (activeDirectory && ldapLoginNameMapping.equals("sAMAccountName")) {
     ldapUserMappingBuilder.bindingAttribute("fullName",CN);
     logger.infof("Using 'cn' attribute for DN of user and 'sAMAccountName' for username");

@@ -1,0 +1,10 @@
+{
+  logger.infof("Sync changed users from LDAP to local store: realm: %s, federation provider: %s, current time: " + new Date() + ", last sync time: "+ lastSync,realmId,model.getDisplayName());
+  PartitionManagerProvider idmProvider=sessionFactory.create().getProvider(PartitionManagerProvider.class);
+  PartitionManager partitionMgr=idmProvider.getPartitionManager(model);
+  IdentityManager identityManager=partitionMgr.createIdentityManager();
+  IdentityQuery<User> userQuery=identityManager.createIdentityQuery(User.class).setParameter(IdentityType.CREATED_AFTER,lastSync);
+  syncImpl(sessionFactory,userQuery,realmId,model);
+  userQuery=identityManager.createIdentityQuery(User.class).setParameter(IdentityType.MODIFIED_AFTER,lastSync);
+  syncImpl(sessionFactory,userQuery,realmId,model);
+}

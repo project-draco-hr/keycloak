@@ -1,0 +1,17 @@
+{
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      RealmModel realm=session.realms().getRealm(realmId);
+      UserProvider localProvider=session.userStorage();
+      BasePropertiesFederationProvider federationProvider=(BasePropertiesFederationProvider)getInstance(session,model);
+      Set<String> allUsernames=federationProvider.getProperties().stringPropertyNames();
+      for (      String username : allUsernames) {
+        UserModel localUser=localProvider.getUserByUsername(username,realm);
+        if (localUser == null) {
+          federationProvider.getUserByUsername(realm,username);
+        }
+      }
+    }
+  }
+);
+}

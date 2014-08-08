@@ -8,16 +8,16 @@
 );
   FileInputStream is=new FileInputStream(realmFile);
   final RealmRepresentation realmRep=JsonSerialization.readValue(is,RealmRepresentation.class);
-  ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
-    @Override public void run(    KeycloakSession session) throws IOException {
+  KeycloakModelUtils.runJobInTransaction(factory,new ExportImportSessionTask(){
+    @Override public void runExportImportTask(    KeycloakSession session) throws IOException {
       ImportUtils.importRealm(session,realmRep,strategy);
     }
   }
 );
   for (  File userFile : userFiles) {
     final FileInputStream fis=new FileInputStream(userFile);
-    ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
-      @Override public void run(      KeycloakSession session) throws IOException {
+    KeycloakModelUtils.runJobInTransaction(factory,new ExportImportSessionTask(){
+      @Override protected void runExportImportTask(      KeycloakSession session) throws IOException {
         ImportUtils.importUsersFromStream(session,realmName,JsonSerialization.mapper,fis);
       }
     }

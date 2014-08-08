@@ -1,0 +1,22 @@
+{
+  final UserFederationProviderFactory fedProviderFactory=(UserFederationProviderFactory)sessionFactory.getProviderFactory(UserFederationProvider.class,fedProvider.getProviderName());
+  if (fedProvider.getFullSyncPeriod() > 0) {
+    timer.schedule(new Runnable(){
+      @Override public void run(){
+        updateLastSyncInterval(sessionFactory,fedProvider,realmId);
+        fedProviderFactory.syncAllUsers(sessionFactory,realmId,fedProvider);
+      }
+    }
+,fedProvider.getFullSyncPeriod() * 1000,fedProvider.getId() + "-FULL");
+  }
+  if (fedProvider.getChangedSyncPeriod() > 0) {
+    timer.schedule(new Runnable(){
+      @Override public void run(){
+        int oldLastSync=fedProvider.getLastSync();
+        updateLastSyncInterval(sessionFactory,fedProvider,realmId);
+        fedProviderFactory.syncChangedUsers(sessionFactory,realmId,fedProvider,Time.toDate(oldLastSync));
+      }
+    }
+,fedProvider.getChangedSyncPeriod() * 1000,fedProvider.getId() + "-CHANGED");
+  }
+}

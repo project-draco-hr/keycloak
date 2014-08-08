@@ -1,10 +1,15 @@
 {
+  List<UserFederationProviderModel> federationProviders=realm.getUserFederationProviders();
   boolean removed=model.removeRealm(realm.getId());
   if (removed) {
     new ApplicationManager(this).removeApplication(getKeycloakAdminstrationRealm(),realm.getMasterAdminApp());
     UserSessionProvider sessions=session.sessions();
     if (sessions != null) {
       sessions.onRealmRemoved(realm);
+    }
+    PeriodicSyncManager periodicSyncManager=new PeriodicSyncManager();
+    for (    final UserFederationProviderModel fedProvider : federationProviders) {
+      periodicSyncManager.removePeriodicSyncForProvider(session.getProvider(TimerProvider.class),fedProvider);
     }
   }
   return removed;

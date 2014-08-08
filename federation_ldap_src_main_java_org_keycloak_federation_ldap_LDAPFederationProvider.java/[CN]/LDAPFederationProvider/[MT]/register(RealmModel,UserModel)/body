@@ -2,14 +2,8 @@
   if (editMode == EditMode.READ_ONLY || editMode == EditMode.UNSYNCED)   throw new IllegalStateException("Registration is not supported by this ldap server");
   ;
   if (!synchronizeRegistrations())   throw new IllegalStateException("Registration is not supported by this ldap server");
-  IdentityManager identityManager=getIdentityManager();
   try {
-    User picketlinkUser=new User(user.getUsername());
-    picketlinkUser.setFirstName(user.getFirstName());
-    picketlinkUser.setLastName(user.getLastName());
-    picketlinkUser.setEmail(user.getEmail());
-    picketlinkUser.setAttribute(new Attribute("fullName",getFullName(user)));
-    identityManager.add(picketlinkUser);
+    User picketlinkUser=LDAPUtils.addUser(this.partitionManager,user.getUsername(),user.getFirstName(),user.getLastName(),user.getEmail());
     user.setAttribute(LDAP_ID,picketlinkUser.getId());
     return proxy(user);
   }

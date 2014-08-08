@@ -3,24 +3,14 @@
   if (redirectUri != null) {
     audit.detail(Details.REDIRECT_URI,redirectUri);
   }
-  if (sessionState != null) {
-    audit.session(sessionState);
-  }
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers,false);
   if (authResult != null) {
     logout(authResult.getSession());
   }
- else   if (sessionState != null) {
-    UserSessionModel userSession=session.sessions().getUserSession(realm,sessionState);
-    if (userSession != null) {
-      logout(userSession);
-    }
- else {
-      audit.error(Errors.USER_SESSION_NOT_FOUND);
-    }
-  }
  else {
     audit.error(Errors.USER_NOT_LOGGED_IN);
+    OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
+    return oauth.forwardToSecurityFailure("Not logged in.");
   }
   if (redirectUri != null) {
     if (redirectUri.startsWith("/")) {

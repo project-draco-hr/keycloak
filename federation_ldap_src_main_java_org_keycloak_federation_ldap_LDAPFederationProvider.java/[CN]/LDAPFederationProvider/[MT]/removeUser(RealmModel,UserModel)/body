@@ -1,13 +1,7 @@
 {
   if (editMode == EditMode.READ_ONLY || editMode == EditMode.UNSYNCED)   return false;
-  IdentityManager identityManager=getIdentityManager();
   try {
-    User picketlinkUser=BasicModel.getUser(identityManager,user.getUsername());
-    if (picketlinkUser == null) {
-      return false;
-    }
-    identityManager.remove(picketlinkUser);
-    return true;
+    return LDAPUtils.removeUser(partitionManager,user.getUsername());
   }
  catch (  IdentityManagementException ie) {
     throw convertIDMException(ie);

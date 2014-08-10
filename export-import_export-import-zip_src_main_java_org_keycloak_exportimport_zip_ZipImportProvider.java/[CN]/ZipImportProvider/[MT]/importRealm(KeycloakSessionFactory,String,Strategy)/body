@@ -4,8 +4,8 @@
     this.decrypter.extractEntry(this.decrypter.getEntry(realmName + "-realm.json"),bos,this.password);
     ByteArrayInputStream bis=new ByteArrayInputStream(bos.toByteArray());
     final RealmRepresentation realmRep=JsonSerialization.mapper.readValue(bis,RealmRepresentation.class);
-    ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
-      @Override public void run(      KeycloakSession session) throws IOException {
+    KeycloakModelUtils.runJobInTransaction(factory,new ExportImportSessionTask(){
+      @Override protected void runExportImportTask(      KeycloakSession session) throws IOException {
         ImportUtils.importRealm(session,realmRep,strategy);
       }
     }
@@ -16,8 +16,8 @@
         bos=new ByteArrayOutputStream();
         this.decrypter.extractEntry(entry,bos,this.password);
         final ByteArrayInputStream bis2=new ByteArrayInputStream(bos.toByteArray());
-        ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
-          @Override public void run(          KeycloakSession session) throws IOException {
+        KeycloakModelUtils.runJobInTransaction(factory,new ExportImportSessionTask(){
+          @Override protected void runExportImportTask(          KeycloakSession session) throws IOException {
             ImportUtils.importUsersFromStream(session,realmName,JsonSerialization.mapper,bis2);
           }
         }

@@ -1,7 +1,7 @@
 {
   logger.infof("Exporting model into file %s",this.file.getAbsolutePath());
-  ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
-    @Override public void run(    KeycloakSession session) throws IOException {
+  KeycloakModelUtils.runJobInTransaction(factory,new ExportImportSessionTask(){
+    @Override protected void runExportImportTask(    KeycloakSession session) throws IOException {
       List<RealmModel> realms=session.realms().getRealms();
       List<RealmRepresentation> reps=new ArrayList<RealmRepresentation>();
       for (      RealmModel realm : realms) {

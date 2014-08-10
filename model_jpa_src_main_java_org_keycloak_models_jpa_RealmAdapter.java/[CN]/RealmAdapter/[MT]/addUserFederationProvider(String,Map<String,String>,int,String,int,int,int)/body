@@ -1,0 +1,20 @@
+{
+  String id=KeycloakModelUtils.generateId();
+  UserFederationProviderEntity entity=new UserFederationProviderEntity();
+  entity.setId(id);
+  entity.setRealm(realm);
+  entity.setProviderName(providerName);
+  entity.setConfig(config);
+  entity.setPriority(priority);
+  if (displayName == null) {
+    displayName=id;
+  }
+  entity.setDisplayName(displayName);
+  entity.setFullSyncPeriod(fullSyncPeriod);
+  entity.setChangedSyncPeriod(changedSyncPeriod);
+  entity.setLastSync(lastSync);
+  em.persist(entity);
+  realm.getUserFederationProviders().add(entity);
+  em.flush();
+  return new UserFederationProviderModel(entity.getId(),providerName,config,priority,displayName,fullSyncPeriod,changedSyncPeriod,lastSync);
+}

@@ -1,0 +1,28 @@
+{
+  boolean pagination=Boolean.parseBoolean(fedModel.getConfig().get(LDAPConstants.PAGINATION));
+  if (pagination) {
+    String pageSizeConfig=fedModel.getConfig().get(LDAPConstants.BATCH_SIZE_FOR_SYNC);
+    int pageSize=pageSizeConfig != null ? Integer.parseInt(pageSizeConfig) : LDAPConstants.DEFAULT_BATCH_SIZE_FOR_SYNC;
+    boolean nextPage=true;
+    while (nextPage) {
+      userQuery.setLimit(pageSize);
+      final List<User> users=userQuery.getResultList();
+      nextPage=userQuery.getPaginationContext() != null;
+      KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+        @Override public void run(        KeycloakSession session){
+          importPicketlinkUsers(session,realmId,fedModel,users);
+        }
+      }
+);
+    }
+  }
+ else {
+    final List<User> users=userQuery.getResultList();
+    KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+      @Override public void run(      KeycloakSession session){
+        importPicketlinkUsers(session,realmId,fedModel,users);
+      }
+    }
+);
+  }
+}

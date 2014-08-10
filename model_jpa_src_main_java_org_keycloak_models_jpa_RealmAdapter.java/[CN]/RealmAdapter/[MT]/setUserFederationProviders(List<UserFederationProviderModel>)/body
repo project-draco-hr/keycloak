@@ -13,12 +13,15 @@
         if (displayName != null) {
           entity.setDisplayName(model.getDisplayName());
         }
+        entity.setFullSyncPeriod(model.getFullSyncPeriod());
+        entity.setChangedSyncPeriod(model.getChangedSyncPeriod());
+        entity.setLastSync(model.getLastSync());
         found=true;
         break;
       }
     }
     if (found)     continue;
-    session.users().preRemove(this,new UserFederationProviderModel(entity.getId(),entity.getProviderName(),entity.getConfig(),entity.getPriority(),entity.getDisplayName()));
+    session.users().preRemove(this,new UserFederationProviderModel(entity.getId(),entity.getProviderName(),entity.getConfig(),entity.getPriority(),entity.getDisplayName(),entity.getFullSyncPeriod(),entity.getChangedSyncPeriod(),entity.getLastSync()));
     it.remove();
     em.remove(entity);
   }
@@ -46,6 +49,9 @@
       displayName=entity.getId();
     }
     entity.setDisplayName(displayName);
+    entity.setFullSyncPeriod(model.getFullSyncPeriod());
+    entity.setChangedSyncPeriod(model.getChangedSyncPeriod());
+    entity.setLastSync(model.getLastSync());
     em.persist(entity);
     realm.getUserFederationProviders().add(entity);
   }

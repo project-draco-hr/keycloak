@@ -1,0 +1,15 @@
+{
+  TimerTask task=new TimerTask(){
+    @Override public void run(){
+      runnable.run();
+    }
+  }
+;
+  TimerTask existingTask=factory.putTask(taskName,task);
+  if (existingTask != null) {
+    logger.infof("Existing timer task '%s' found. Cancelling it",taskName);
+    existingTask.cancel();
+  }
+  logger.infof("Starting task '%s' with interval '%d'",taskName,interval);
+  timer.schedule(task,interval,interval);
+}

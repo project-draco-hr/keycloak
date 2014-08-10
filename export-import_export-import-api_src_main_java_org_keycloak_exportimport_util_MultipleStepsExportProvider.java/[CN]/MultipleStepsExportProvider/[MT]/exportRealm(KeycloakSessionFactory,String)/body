@@ -3,8 +3,8 @@
   final int usersPerFile=ExportImportConfig.getUsersPerFile();
   final UsersHolder usersHolder=new UsersHolder();
   final boolean exportUsersIntoRealmFile=usersExportStrategy == UsersExportStrategy.REALM_FILE;
-  ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
-    @Override public void run(    KeycloakSession session) throws IOException {
+  KeycloakModelUtils.runJobInTransaction(factory,new ExportImportSessionTask(){
+    @Override protected void runExportImportTask(    KeycloakSession session) throws IOException {
       RealmModel realm=session.realms().getRealmByName(realmName);
       RealmRepresentation rep=ExportUtils.exportRealm(session,realm,exportUsersIntoRealmFile);
       writeRealm(realmName + "-realm.json",rep);
@@ -25,8 +25,8 @@
  else {
         usersHolder.currentPageEnd=usersHolder.totalCount;
       }
-      ExportImportUtils.runJobInTransaction(factory,new ExportImportJob(){
-        @Override public void run(        KeycloakSession session) throws IOException {
+      KeycloakModelUtils.runJobInTransaction(factory,new ExportImportSessionTask(){
+        @Override protected void runExportImportTask(        KeycloakSession session) throws IOException {
           RealmModel realm=session.realms().getRealmByName(realmName);
           usersHolder.users=session.users().getUsers(realm,usersHolder.currentPageStart,usersHolder.currentPageEnd - usersHolder.currentPageStart);
           writeUsers(realmName + "-users-" + (usersHolder.currentPageStart / countPerPage)+ ".json",session,realm,usersHolder.users);

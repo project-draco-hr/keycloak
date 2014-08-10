@@ -1,0 +1,22 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+    DummyUserFederationProviderFactory dummyFedFactory=(DummyUserFederationProviderFactory)sessionFactory.getProviderFactory(UserFederationProvider.class,DummyUserFederationProviderFactory.PROVIDER_NAME);
+    int full=dummyFedFactory.getFullSyncCounter();
+    int changed=dummyFedFactory.getChangedSyncCounter();
+    PeriodicSyncManager periodicSyncManager=new PeriodicSyncManager();
+    periodicSyncManager.bootstrap(sessionFactory,session.getProvider(TimerProvider.class));
+    sleep(1800);
+    periodicSyncManager.removePeriodicSyncForProvider(session.getProvider(TimerProvider.class),dummyModel);
+    int newChanged=dummyFedFactory.getChangedSyncCounter();
+    Assert.assertEquals(full,dummyFedFactory.getFullSyncCounter());
+    Assert.assertTrue(newChanged > changed);
+    sleep(1800);
+    Assert.assertEquals(full,dummyFedFactory.getFullSyncCounter());
+    Assert.assertEquals(newChanged,dummyFedFactory.getChangedSyncCounter());
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

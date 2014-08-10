@@ -1,0 +1,14 @@
+{
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      List<RealmModel> realms=session.realms().getRealms();
+      for (      final RealmModel realm : realms) {
+        List<UserFederationProviderModel> federationProviders=realm.getUserFederationProviders();
+        for (        final UserFederationProviderModel fedProvider : federationProviders) {
+          startPeriodicSyncForProvider(sessionFactory,timer,fedProvider,realm.getId());
+        }
+      }
+    }
+  }
+);
+}

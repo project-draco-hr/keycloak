@@ -1,0 +1,7 @@
+{
+  logger.infof("Sync all users from LDAP to local store: realm: %s, federation provider: %s, current time: " + new Date(),realmId,model.getDisplayName());
+  PartitionManagerProvider idmProvider=sessionFactory.create().getProvider(PartitionManagerProvider.class);
+  PartitionManager partitionMgr=idmProvider.getPartitionManager(model);
+  IdentityQuery<User> userQuery=partitionMgr.createIdentityManager().createIdentityQuery(User.class);
+  syncImpl(sessionFactory,userQuery,realmId,model);
+}

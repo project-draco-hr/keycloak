@@ -1,0 +1,12 @@
+{
+  Client client=ClientBuilder.newClient();
+  Response response=client.target(oauth.getLoginFormUrl()).request().get();
+  Assert.assertEquals(200,response.getStatus());
+  for (  Map.Entry<String,String> entry : BrowserSecurityHeaders.defaultHeaders.entrySet()) {
+    String headerName=BrowserSecurityHeaders.headerAttributeMap.get(entry.getKey());
+    String headerValue=response.getHeaderString(headerName);
+    Assert.assertNotNull(headerValue);
+    Assert.assertEquals(headerValue,entry.getValue());
+  }
+  response.close();
+}

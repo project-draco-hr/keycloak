@@ -88,10 +88,6 @@ catch (  SocialProviderException e) {
     return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
   }
   if (user == null) {
-    if (!realm.isRegistrationAllowed()) {
-      audit.error(Errors.REGISTRATION_DISABLED);
-      return oauth.forwardToSecurityFailure("Registration not allowed");
-    }
     user=session.users().addUser(realm,KeycloakModelUtils.generateId());
     user.setEnabled(true);
     user.setFirstName(socialUser.getFirstName());

@@ -6,6 +6,6 @@
     displayName=null;
   }
   UserFederationProviderModel model=realm.addUserFederationProvider(rep.getProviderName(),rep.getConfig(),rep.getPriority(),displayName,rep.getFullSyncPeriod(),rep.getChangedSyncPeriod(),rep.getLastSync());
-  new PeriodicSyncManager().startPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),model,realm.getId());
+  new UsersSyncManager().refreshPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),model,realm.getId());
   return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
 }

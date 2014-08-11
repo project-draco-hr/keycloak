@@ -1,8 +1,8 @@
 {
   RepresentationToModel.importRealm(session,rep,newRealm);
   List<UserFederationProviderModel> federationProviders=newRealm.getUserFederationProviders();
-  PeriodicSyncManager periodicSyncManager=new PeriodicSyncManager();
+  UsersSyncManager usersSyncManager=new UsersSyncManager();
   for (  final UserFederationProviderModel fedProvider : federationProviders) {
-    periodicSyncManager.startPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),fedProvider,newRealm.getId());
+    usersSyncManager.refreshPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),fedProvider,newRealm.getId());
   }
 }

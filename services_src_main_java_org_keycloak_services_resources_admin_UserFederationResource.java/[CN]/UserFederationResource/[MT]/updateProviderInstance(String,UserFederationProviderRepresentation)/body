@@ -7,5 +7,5 @@
   }
   UserFederationProviderModel model=new UserFederationProviderModel(id,rep.getProviderName(),rep.getConfig(),rep.getPriority(),displayName,rep.getFullSyncPeriod(),rep.getChangedSyncPeriod(),rep.getLastSync());
   realm.updateUserFederationProvider(model);
-  new PeriodicSyncManager().startPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),model,realm.getId());
+  new UsersSyncManager().refreshPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),model,realm.getId());
 }

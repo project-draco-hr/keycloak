@@ -1,0 +1,14 @@
+{
+  for (  RealmAttributeEntity attr : realm.getAttributes()) {
+    if (attr.getName().equals(name)) {
+      attr.setValue(value);
+      return;
+    }
+  }
+  RealmAttributeEntity attr=new RealmAttributeEntity();
+  attr.setName(name);
+  attr.setValue(value);
+  attr.setRealm(realm);
+  em.persist(attr);
+  realm.getAttributes().add(attr);
+}

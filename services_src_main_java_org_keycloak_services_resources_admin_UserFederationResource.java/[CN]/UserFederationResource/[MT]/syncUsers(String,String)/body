@@ -1,0 +1,17 @@
+{
+  logger.info("triggerSync");
+  auth.requireManage();
+  for (  UserFederationProviderModel model : realm.getUserFederationProviders()) {
+    if (model.getId().equals(providerId)) {
+      UsersSyncManager syncManager=new UsersSyncManager();
+      if ("triggerFullSync".equals(action)) {
+        syncManager.syncAllUsers(session.getKeycloakSessionFactory(),realm.getId(),model);
+      }
+ else       if ("triggerChangedUsersSync".equals(action)) {
+        syncManager.syncChangedUsers(session.getKeycloakSessionFactory(),realm.getId(),model);
+      }
+      return Response.noContent().build();
+    }
+  }
+  throw new NotFoundException("could not find provider");
+}

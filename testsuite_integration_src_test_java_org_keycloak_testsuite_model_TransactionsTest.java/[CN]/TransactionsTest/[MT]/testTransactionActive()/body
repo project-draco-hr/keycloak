@@ -1,0 +1,11 @@
+{
+  KeycloakSession session=kc.startSession();
+  Assert.assertTrue(session.getTransaction().isActive());
+  session.getTransaction().commit();
+  Assert.assertFalse(session.getTransaction().isActive());
+  session.getTransaction().begin();
+  Assert.assertTrue(session.getTransaction().isActive());
+  session.getTransaction().rollback();
+  Assert.assertFalse(session.getTransaction().isActive());
+  session.close();
+}

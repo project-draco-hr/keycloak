@@ -3,5 +3,5 @@
   TimerProvider timer=sessionFactory.create().getProvider(TimerProvider.class);
   timer.schedule(new ScheduledTaskRunner(sessionFactory,new ClearExpiredAuditEvents()),interval,"ClearExpiredAuditEvents");
   timer.schedule(new ScheduledTaskRunner(sessionFactory,new ClearExpiredUserSessions()),interval,"ClearExpiredUserSessions");
-  new PeriodicSyncManager().bootstrap(sessionFactory,timer);
+  new UsersSyncManager().bootstrapPeriodic(sessionFactory,timer);
 }

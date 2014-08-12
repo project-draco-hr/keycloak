@@ -5,10 +5,10 @@
     DummyUserFederationProviderFactory dummyFedFactory=(DummyUserFederationProviderFactory)sessionFactory.getProviderFactory(UserFederationProvider.class,DummyUserFederationProviderFactory.PROVIDER_NAME);
     int full=dummyFedFactory.getFullSyncCounter();
     int changed=dummyFedFactory.getChangedSyncCounter();
-    PeriodicSyncManager periodicSyncManager=new PeriodicSyncManager();
-    periodicSyncManager.bootstrap(sessionFactory,session.getProvider(TimerProvider.class));
+    UsersSyncManager usersSyncManager=new UsersSyncManager();
+    usersSyncManager.bootstrapPeriodic(sessionFactory,session.getProvider(TimerProvider.class));
     sleep(1800);
-    periodicSyncManager.removePeriodicSyncForProvider(session.getProvider(TimerProvider.class),dummyModel);
+    usersSyncManager.removePeriodicSyncForProvider(session.getProvider(TimerProvider.class),dummyModel);
     int newChanged=dummyFedFactory.getChangedSyncCounter();
     Assert.assertEquals(full,dummyFedFactory.getFullSyncCounter());
     Assert.assertTrue(newChanged > changed);

@@ -12,9 +12,9 @@
       cache.setEnabled(rep.isUserCacheEnabled());
     }
     List<UserFederationProviderModel> federationProviders=realm.getUserFederationProviders();
-    PeriodicSyncManager periodicSyncManager=new PeriodicSyncManager();
+    UsersSyncManager usersSyncManager=new UsersSyncManager();
     for (    final UserFederationProviderModel fedProvider : federationProviders) {
-      periodicSyncManager.startPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),fedProvider,realm.getId());
+      usersSyncManager.refreshPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),fedProvider,realm.getId());
     }
     return Response.noContent().build();
   }

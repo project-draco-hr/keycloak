@@ -1,0 +1,34 @@
+{
+  if (fedProvider.getFullSyncPeriod() > 0) {
+    timer.schedule(new Runnable(){
+      @Override public void run(){
+        try {
+          syncAllUsers(sessionFactory,realmId,fedProvider);
+        }
+ catch (        Throwable t) {
+          logger.error("Error occured during full sync of users",t);
+        }
+      }
+    }
+,fedProvider.getFullSyncPeriod() * 1000,fedProvider.getId() + "-FULL");
+  }
+ else {
+    timer.cancelTask(fedProvider.getId() + "-FULL");
+  }
+  if (fedProvider.getChangedSyncPeriod() > 0) {
+    timer.schedule(new Runnable(){
+      @Override public void run(){
+        try {
+          syncChangedUsers(sessionFactory,realmId,fedProvider);
+        }
+ catch (        Throwable t) {
+          logger.error("Error occured during sync of changed users",t);
+        }
+      }
+    }
+,fedProvider.getChangedSyncPeriod() * 1000,fedProvider.getId() + "-CHANGED");
+  }
+ else {
+    timer.cancelTask(fedProvider.getId() + "-CHANGED");
+  }
+}

@@ -1,9 +1,10 @@
 {
+  UsersSyncManager usersSyncManager=new UsersSyncManager();
+  sleep(1000);
   KeycloakSession session=keycloakRule.startSession();
   try {
     KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
-    UserFederationProviderFactory ldapFedFactory=(UserFederationProviderFactory)sessionFactory.getProviderFactory(UserFederationProvider.class,LDAPFederationProviderFactory.PROVIDER_NAME);
-    ldapFedFactory.syncAllUsers(sessionFactory,"test",ldapModel);
+    usersSyncManager.syncAllUsers(sessionFactory,"test",ldapModel);
   }
   finally {
     keycloakRule.stopSession(session,false);
@@ -17,16 +18,23 @@
     assertUserImported(userProvider,testRealm,"user3","User3FN","User3LN","user3@email.org");
     assertUserImported(userProvider,testRealm,"user4","User4FN","User4LN","user4@email.org");
     assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5@email.org");
+    Assert.assertTrue(ldapModel.getLastSync() > 0);
+    for (    UserFederationProviderModel persistentFedModel : testRealm.getUserFederationProviders()) {
+      if (LDAPFederationProviderFactory.PROVIDER_NAME.equals(persistentFedModel.getProviderName())) {
+        Assert.assertTrue(persistentFedModel.getLastSync() > 0);
+      }
+ else {
+        Assert.assertEquals(0,persistentFedModel.getLastSync());
+      }
+    }
     sleep(1000);
-    Date beforeLDAPUpdate=new Date();
     PartitionManager partitionManager=FederationProvidersIntegrationTest.getPartitionManager(session,ldapModel);
     LDAPUtils.addUser(partitionManager,"user6","User6FN","User6LN","user6@email.org");
     LDAPUtils.updateUser(partitionManager,"user5","User5FNUpdated","User5LNUpdated","user5Updated@email.org");
     assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5@email.org");
     Assert.assertNull(userProvider.getUserByUsername("user6",testRealm));
     KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
-    UserFederationProviderFactory ldapFedFactory=(UserFederationProviderFactory)sessionFactory.getProviderFactory(UserFederationProvider.class,LDAPFederationProviderFactory.PROVIDER_NAME);
-    ldapFedFactory.syncChangedUsers(sessionFactory,"test",ldapModel,beforeLDAPUpdate);
+    usersSyncManager.syncChangedUsers(sessionFactory,"test",ldapModel);
   }
   finally {
     keycloakRule.stopSession(session,false);

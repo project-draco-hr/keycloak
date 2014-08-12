@@ -4,8 +4,12 @@
       RealmModel realm=session.realms().getRealm(realmId);
       BasePropertiesFederationProvider federationProvider=(BasePropertiesFederationProvider)getInstance(session,model);
       Set<String> allUsernames=federationProvider.getProperties().stringPropertyNames();
+      UserProvider localProvider=session.userStorage();
       for (      String username : allUsernames) {
-        federationProvider.getUserByUsername(realm,username);
+        UserModel localUser=localProvider.getUserByUsername(username,realm);
+        if (localUser == null) {
+          federationProvider.getUserByUsername(realm,username);
+        }
       }
     }
   }

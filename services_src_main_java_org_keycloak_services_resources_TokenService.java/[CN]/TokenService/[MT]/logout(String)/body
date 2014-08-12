@@ -7,18 +7,13 @@
   if (authResult != null) {
     logout(authResult.getSession());
   }
- else {
-    audit.error(Errors.USER_NOT_LOGGED_IN);
-    OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
-    return oauth.forwardToSecurityFailure("Not logged in.");
-  }
   if (redirectUri != null) {
-    if (redirectUri.startsWith("/")) {
-      UriBuilder builder=uriInfo.getAbsolutePathBuilder();
-      builder.replacePath(redirectUri);
-      return Response.status(302).location(builder.build()).build();
+    String validatedRedirect=verifyRealmRedirectUri(uriInfo,redirectUri,realm);
+    if (validatedRedirect == null) {
+      OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
+      return oauth.forwardToSecurityFailure("Invalid redirect uri.");
     }
-    return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
+    return Response.status(302).location(UriBuilder.fromUri(validatedRedirect).build()).build();
   }
  else {
     return Response.ok().build();

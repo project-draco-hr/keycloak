@@ -6,6 +6,9 @@
       throw new NotFoundException("User not found");
     }
     updateUserFromRep(user,rep);
+    if (session.getTransaction().isActive()) {
+      session.getTransaction().commit();
+    }
     return Response.noContent().build();
   }
  catch (  ModelDuplicateException e) {

@@ -27,6 +27,9 @@
       r=sb.toString();
       valid=matchesRedirects(resolveValidRedirects,r);
     }
+    if (valid && redirectUri.startsWith("/")) {
+      redirectUri=relativeToAbsoluteURI(uriInfo,redirectUri);
+    }
     redirectUri=valid ? redirectUri : null;
   }
   if (Constants.INSTALLED_APP_URN.equals(redirectUri)) {

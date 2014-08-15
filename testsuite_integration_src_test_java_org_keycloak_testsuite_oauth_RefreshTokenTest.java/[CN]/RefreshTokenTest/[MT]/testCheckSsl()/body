@@ -1,0 +1,52 @@
+{
+  Client client=ClientBuilder.newClient();
+  UriBuilder builder=UriBuilder.fromUri(org.keycloak.testsuite.Constants.AUTH_SERVER_ROOT);
+  URI grantUri=TokenService.grantAccessTokenUrl(builder).build("test");
+  WebTarget grantTarget=client.target(grantUri);
+  builder=UriBuilder.fromUri(org.keycloak.testsuite.Constants.AUTH_SERVER_ROOT);
+  URI uri=TokenService.refreshUrl(builder).build("test");
+  WebTarget refreshTarget=client.target(uri);
+  String refreshToken=null;
+{
+    Response response=executeGrantAccessTokenRequest(grantTarget);
+    Assert.assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    refreshToken=tokenResponse.getRefreshToken();
+    response.close();
+  }
+{
+    Response response=executeRefreshToken(refreshTarget,refreshToken);
+    Assert.assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    refreshToken=tokenResponse.getRefreshToken();
+    response.close();
+  }
+{
+{
+      KeycloakSession session=keycloakRule.startSession();
+      RealmModel realm=session.realms().getRealmByName("test");
+      realm.setSslRequired(SslRequired.ALL);
+      session.getTransaction().commit();
+      session.close();
+    }
+    Response response=executeRefreshToken(refreshTarget,refreshToken);
+    Assert.assertEquals(403,response.getStatus());
+    response.close();
+{
+      KeycloakSession session=keycloakRule.startSession();
+      RealmModel realm=session.realms().getRealmByName("test");
+      realm.setSslRequired(SslRequired.EXTERNAL);
+      session.getTransaction().commit();
+      session.close();
+    }
+  }
+{
+    Response response=executeRefreshToken(refreshTarget,refreshToken);
+    Assert.assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    refreshToken=tokenResponse.getRefreshToken();
+    response.close();
+  }
+  client.close();
+  events.clear();
+}

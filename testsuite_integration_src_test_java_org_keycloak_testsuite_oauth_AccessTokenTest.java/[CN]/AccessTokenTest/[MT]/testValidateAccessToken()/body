@@ -16,10 +16,7 @@
   }
   org.keycloak.representations.AccessTokenResponse tokenResponse=null;
 {
-    String header=BasicAuthHelper.createHeader("test-app","password");
-    Form form=new Form();
-    form.param("username","test-user@localhost").param("password","password");
-    Response response=grantTarget.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
+    Response response=executeGrantAccessTokenRequest(grantTarget);
     Assert.assertEquals(200,response.getStatus());
     tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
     response.close();

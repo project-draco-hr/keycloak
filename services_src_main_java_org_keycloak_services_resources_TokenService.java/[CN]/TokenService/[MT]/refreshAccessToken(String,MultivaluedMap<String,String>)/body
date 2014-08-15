@@ -1,7 +1,7 @@
 {
   logger.info("--> refreshAccessToken");
   if (!checkSsl()) {
-    throw new NotAcceptableException("HTTPS required");
+    return createError("https_required","HTTPS required",Response.Status.FORBIDDEN);
   }
   audit.event(EventType.REFRESH_TOKEN);
   ClientModel client=authorizeClient(authorizationHeader,form,audit);

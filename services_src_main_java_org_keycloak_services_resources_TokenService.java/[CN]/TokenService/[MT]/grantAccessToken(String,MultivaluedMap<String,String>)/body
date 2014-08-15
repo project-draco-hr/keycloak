@@ -15,10 +15,6 @@
   UserModel user=session.users().getUserByUsername(username,realm);
   if (user != null)   audit.user(user);
   ClientModel client=authorizeClient(authorizationHeader,form,audit);
-  if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
-    audit.error(Errors.NOT_ALLOWED);
-    return createError("not_allowed","Bearer-only applications are not allowed to invoke grants/access",Response.Status.FORBIDDEN);
-  }
   if (!realm.isEnabled()) {
     audit.error(Errors.REALM_DISABLED);
     return createError("realm_disabled","Realm is disabled",Response.Status.UNAUTHORIZED);

@@ -1,0 +1,24 @@
+{
+  if (value == null || value.length() == 0) {
+    buf.append("\"\"");
+  }
+ else   if (containsCTL(value,version))   throw new IllegalArgumentException("Control character in cookie value, consider BASE64 encoding your value");
+ else   if (alreadyQuoted(value)) {
+    buf.append('"');
+    buf.append(escapeDoubleQuotes(value,1,value.length() - 1));
+    buf.append('"');
+  }
+ else   if (version == 0 && !isToken(value)) {
+    buf.append('"');
+    buf.append(escapeDoubleQuotes(value,0,value.length()));
+    buf.append('"');
+  }
+ else   if (version == 1 && !isToken2(value)) {
+    buf.append('"');
+    buf.append(escapeDoubleQuotes(value,0,value.length()));
+    buf.append('"');
+  }
+ else {
+    buf.append(value);
+  }
+}

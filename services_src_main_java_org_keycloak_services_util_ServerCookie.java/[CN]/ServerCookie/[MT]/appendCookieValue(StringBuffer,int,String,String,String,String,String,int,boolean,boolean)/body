@@ -1,0 +1,35 @@
+{
+  StringBuffer buf=new StringBuffer();
+  buf.append(name);
+  buf.append("=");
+  buf.append(value);
+  if (version == 1) {
+    buf.append("; Version=1");
+    if (comment != null) {
+      buf.append("; Comment=");
+      buf.append(comment);
+    }
+  }
+  if (domain != null) {
+    buf.append("; Domain=");
+    buf.append(domain);
+  }
+  if (maxAge >= 0) {
+    buf.append("; Expires=");
+    if (maxAge == 0)     buf.append(ancientDate);
+ else     formatOldCookie(new Date(System.currentTimeMillis() + maxAge * 1000L),buf,new FieldPosition(0));
+    buf.append("; Max-Age=");
+    buf.append(maxAge);
+  }
+  if (path != null) {
+    buf.append("; Path=");
+    buf.append(path);
+  }
+  if (isSecure) {
+    buf.append("; Secure");
+  }
+  if (httpOnly) {
+    buf.append("; HttpOnly");
+  }
+  headerBuf.append(buf);
+}

@@ -1,0 +1,17 @@
+{
+  if (s == null || s.length() == 0 || s.indexOf('"') == -1) {
+    return s;
+  }
+  StringBuffer b=new StringBuffer();
+  for (int i=beginIndex; i < endIndex; i++) {
+    char c=s.charAt(i);
+    if (c == '\\') {
+      b.append(c);
+      if (++i >= endIndex)       throw new IllegalArgumentException("Invalid escape character in cookie value.");
+      b.append(s.charAt(i));
+    }
+ else     if (c == '"')     b.append('\\').append('"');
+ else     b.append(c);
+  }
+  return b.toString();
+}

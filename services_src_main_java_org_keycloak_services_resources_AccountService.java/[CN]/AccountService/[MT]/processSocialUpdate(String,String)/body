@@ -5,17 +5,21 @@
   require(AccountRoles.MANAGE_ACCOUNT);
   UserModel user=auth.getUser();
   if (Validation.isEmpty(providerId)) {
+    setReferrerOnPage();
     return account.setError(Messages.MISSING_SOCIAL_PROVIDER).createResponse(AccountPages.SOCIAL);
   }
   AccountSocialAction accountSocialAction=AccountSocialAction.getAction(action);
   if (accountSocialAction == null) {
+    setReferrerOnPage();
     return account.setError(Messages.INVALID_SOCIAL_ACTION).createResponse(AccountPages.SOCIAL);
   }
   SocialProvider provider=SocialLoader.load(providerId);
   if (provider == null) {
+    setReferrerOnPage();
     return account.setError(Messages.SOCIAL_PROVIDER_NOT_FOUND).createResponse(AccountPages.SOCIAL);
   }
   if (!user.isEnabled()) {
+    setReferrerOnPage();
     return account.setError(Messages.ACCOUNT_DISABLED).createResponse(AccountPages.SOCIAL);
   }
 switch (accountSocialAction) {
@@ -25,6 +29,7 @@ case ADD:
     return Flows.social(realm,uriInfo,clientConnection,provider).user(user).putClientAttribute(OAuth2Constants.CLIENT_ID,Constants.ACCOUNT_MANAGEMENT_APP).putClientAttribute(OAuth2Constants.STATE,UUID.randomUUID().toString()).putClientAttribute(OAuth2Constants.REDIRECT_URI,redirectUri).redirectToSocialProvider();
   }
  catch (  SocialProviderException spe) {
+    setReferrerOnPage();
     return account.setError(Messages.SOCIAL_REDIRECT_ERROR).createResponse(AccountPages.SOCIAL);
   }
 case REMOVE:
@@ -34,13 +39,16 @@ if (session.users().getSocialLinks(user,realm).size() > 1 || user.getFederationL
   session.users().removeSocialLink(realm,user,providerId);
   logger.debug("Social provider " + providerId + " removed successfully from user "+ user.getUsername());
   audit.event(EventType.REMOVE_SOCIAL_LINK).client(auth.getClient()).user(auth.getUser()).detail(Details.USERNAME,link.getSocialUserId() + "@" + link.getSocialProvider()).success();
+  setReferrerOnPage();
   return account.setSuccess(Messages.SOCIAL_PROVIDER_REMOVED).createResponse(AccountPages.SOCIAL);
 }
  else {
+  setReferrerOnPage();
   return account.setError(Messages.SOCIAL_REMOVING_LAST_PROVIDER).createResponse(AccountPages.SOCIAL);
 }
 }
  else {
+setReferrerOnPage();
 return account.setError(Messages.SOCIAL_LINK_NOT_ACTIVE).createResponse(AccountPages.SOCIAL);
 }
 default :

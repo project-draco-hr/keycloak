@@ -3,9 +3,15 @@
     return login(null);
   }
   require(AccountRoles.MANAGE_ACCOUNT);
+  String action=formData.getFirst("submitAction");
+  if (action != null && action.equals("Cancel")) {
+    setReferrerOnPage();
+    return account.createResponse(AccountPages.ACCOUNT);
+  }
   UserModel user=auth.getUser();
   String error=Validation.validateUpdateProfileForm(formData);
   if (error != null) {
+    setReferrerOnPage();
     return account.setError(error).createResponse(AccountPages.ACCOUNT);
   }
   user.setFirstName(formData.getFirst("firstName"));
@@ -19,5 +25,6 @@
     user.setEmailVerified(false);
     audit.clone().event(EventType.UPDATE_EMAIL).detail(Details.PREVIOUS_EMAIL,oldEmail).detail(Details.UPDATED_EMAIL,email).success();
   }
+  setReferrerOnPage();
   return account.setSuccess("accountUpdated").createResponse(AccountPages.ACCOUNT);
 }

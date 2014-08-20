@@ -3,13 +3,20 @@
     return login("totp");
   }
   require(AccountRoles.MANAGE_ACCOUNT);
+  String action=formData.getFirst("submitAction");
+  if (action != null && action.equals("Cancel")) {
+    setReferrerOnPage();
+    return account.createResponse(AccountPages.TOTP);
+  }
   UserModel user=auth.getUser();
   String totp=formData.getFirst("totp");
   String totpSecret=formData.getFirst("totpSecret");
   if (Validation.isEmpty(totp)) {
+    setReferrerOnPage();
     return account.setError(Messages.MISSING_TOTP).createResponse(AccountPages.TOTP);
   }
  else   if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
+    setReferrerOnPage();
     return account.setError(Messages.INVALID_TOTP).createResponse(AccountPages.TOTP);
   }
   UserCredentialModel credentials=new UserCredentialModel();
@@ -18,5 +25,6 @@
   session.users().updateCredential(realm,user,credentials);
   user.setTotp(true);
   audit.event(EventType.UPDATE_TOTP).client(auth.getClient()).user(auth.getUser()).success();
+  setReferrerOnPage();
   return account.setSuccess("successTotp").createResponse(AccountPages.TOTP);
 }

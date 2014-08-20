@@ -3,22 +3,31 @@
     return login("password");
   }
   require(AccountRoles.MANAGE_ACCOUNT);
+  String action=formData.getFirst("submitAction");
+  if (action != null && action.equals("Cancel")) {
+    setReferrerOnPage();
+    return account.createResponse(AccountPages.PASSWORD);
+  }
   UserModel user=auth.getUser();
   String password=formData.getFirst("password");
   String passwordNew=formData.getFirst("password-new");
   String passwordConfirm=formData.getFirst("password-confirm");
   if (Validation.isEmpty(passwordNew)) {
+    setReferrerOnPage();
     return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
   }
  else   if (!passwordNew.equals(passwordConfirm)) {
+    setReferrerOnPage();
     return account.setError(Messages.INVALID_PASSWORD_CONFIRM).createResponse(AccountPages.PASSWORD);
   }
   UserCredentialModel cred=UserCredentialModel.password(password);
   if (Validation.isEmpty(password)) {
+    setReferrerOnPage();
     return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
   }
  else {
     if (!session.users().validCredentials(realm,user,cred)) {
+      setReferrerOnPage();
       return account.setError(Messages.INVALID_PASSWORD_EXISTING).createResponse(AccountPages.PASSWORD);
     }
   }
@@ -27,8 +36,10 @@
   }
  catch (  Exception ape) {
     logger.error("Failed to update password",ape);
+    setReferrerOnPage();
     return account.setError(ape.getMessage()).createResponse(AccountPages.PASSWORD);
   }
   audit.event(EventType.UPDATE_PASSWORD).client(auth.getClient()).user(auth.getUser()).success();
+  setReferrerOnPage();
   return account.setSuccess("accountPasswordUpdated").createResponse(AccountPages.PASSWORD);
 }

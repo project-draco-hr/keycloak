@@ -5,5 +5,11 @@
   require(AccountRoles.MANAGE_ACCOUNT);
   UserModel user=auth.getUser();
   session.sessions().removeUserSessions(realm,user);
-  return Response.seeOther(Urls.accountSessionsPage(uriInfo.getBaseUri(),realm.getName())).build();
+  UriBuilder builder=Urls.accountBase(uriInfo.getBaseUri()).path(AccountService.class,"sessionsPage");
+  String referrer=uriInfo.getQueryParameters().getFirst("referrer");
+  if (referrer != null) {
+    builder.queryParam("referrer",referrer);
+  }
+  URI location=builder.build(realm.getName());
+  return Response.seeOther(location).build();
 }

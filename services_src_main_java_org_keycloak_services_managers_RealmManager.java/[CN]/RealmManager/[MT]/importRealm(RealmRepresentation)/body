@@ -3,7 +3,21 @@
   if (id == null) {
     id=KeycloakModelUtils.generateId();
   }
-  RealmModel realm=createRealm(id,rep.getRealm());
-  importRealm(rep,realm);
+  RealmModel realm=model.createRealm(id,rep.getRealm());
+  realm.setName(rep.getRealm());
+  setupRealmDefaults(realm);
+  setupMasterAdminManagement(realm);
+  if (!hasRealmAdminManagementApp(rep))   setupRealmAdminManagement(realm);
+  if (!hasAccountManagementApp(rep))   setupAccountManagement(realm);
+  if (!hasAdminConsoleApp(rep))   setupAdminConsole(realm);
+  RepresentationToModel.importRealm(session,rep,realm);
+  if (realm.getAuditListeners().size() == 0) {
+    realm.setAuditListeners(Collections.singleton("jboss-logging"));
+  }
+  List<UserFederationProviderModel> federationProviders=realm.getUserFederationProviders();
+  UsersSyncManager usersSyncManager=new UsersSyncManager();
+  for (  final UserFederationProviderModel fedProvider : federationProviders) {
+    usersSyncManager.refreshPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),fedProvider,realm.getId());
+  }
   return realm;
 }

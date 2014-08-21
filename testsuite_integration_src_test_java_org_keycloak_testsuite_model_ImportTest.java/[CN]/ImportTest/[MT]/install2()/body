@@ -1,8 +1,8 @@
 {
   RealmManager manager=realmManager;
   RealmRepresentation rep=AbstractModelTest.loadJson("model/testrealm-demo.json");
-  RealmModel realm=manager.createRealm("demo",rep.getRealm());
-  manager.importRealm(rep,realm);
+  rep.setId("demo");
+  RealmModel realm=manager.importRealm(rep);
   Assert.assertFalse(realm.isUpdateProfileOnInitialSocialLogin());
   Assert.assertEquals(600,realm.getAccessCodeLifespanUserAction());
   verifyRequiredCredentials(realm.getRequiredCredentials(),"password");

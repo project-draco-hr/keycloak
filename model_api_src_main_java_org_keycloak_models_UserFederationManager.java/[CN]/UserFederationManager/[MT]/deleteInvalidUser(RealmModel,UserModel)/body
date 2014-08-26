@@ -5,6 +5,7 @@
     RealmModel realmModel=tx.realms().getRealm(realm.getId());
     UserModel deletedUser=tx.userStorage().getUserById(user.getId(),realmModel);
     tx.userStorage().removeUser(realmModel,deletedUser);
+    logger.debugf("Removed invalid user '%s'",user.getUsername());
     tx.getTransaction().commit();
   }
   finally {

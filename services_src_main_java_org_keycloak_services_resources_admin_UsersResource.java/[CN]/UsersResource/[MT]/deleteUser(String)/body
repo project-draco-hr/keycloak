@@ -4,5 +4,11 @@
   if (user == null) {
     throw new NotFoundException("User not found");
   }
-  new UserManager(session).removeUser(realm,user);
+  boolean removed=new UserManager(session).removeUser(realm,user);
+  if (removed) {
+    return Response.noContent().build();
+  }
+ else {
+    return Flows.errors().error("User couldn't be deleted",Response.Status.BAD_REQUEST);
+  }
 }

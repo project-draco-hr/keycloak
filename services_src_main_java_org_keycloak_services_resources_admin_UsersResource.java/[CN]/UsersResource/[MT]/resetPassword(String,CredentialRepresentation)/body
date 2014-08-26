@@ -8,6 +8,11 @@
     throw new BadRequestException("No password provided");
   }
   UserCredentialModel cred=RepresentationToModel.convertCredential(pass);
-  session.users().updateCredential(realm,user,cred);
+  try {
+    session.users().updateCredential(realm,user,cred);
+  }
+ catch (  ModelReadOnlyException mre) {
+    throw new BadRequestException("Can't reset password as account is read only");
+  }
   if (pass.isTemporary())   user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
 }

@@ -1,0 +1,10 @@
+{
+  LDAPMappingConfiguration userMappingConfig=ldapIdentityStore.getConfig().getMappingConfig(User.class);
+  SearchResult sr=ldapIdentityStore.getOperationManager().lookupById(userMappingConfig.getBaseDN(),user.getId(),userMappingConfig);
+  if (sr != null) {
+    return sr.getNameInNamespace();
+  }
+ else {
+    return ldapIdentityStore.getBindingDN(user,true);
+  }
+}

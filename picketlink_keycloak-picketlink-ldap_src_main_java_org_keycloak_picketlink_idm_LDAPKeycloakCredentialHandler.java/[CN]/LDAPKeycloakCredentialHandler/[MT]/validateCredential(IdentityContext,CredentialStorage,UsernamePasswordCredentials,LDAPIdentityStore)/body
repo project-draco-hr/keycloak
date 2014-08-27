@@ -1,0 +1,12 @@
+{
+  Account account=getAccount(context,credentials.getUsername());
+  char[] password=credentials.getPassword().getValue();
+  String userDN=getDNOfUser(ldapIdentityStore,account);
+  if (CREDENTIAL_LOGGER.isDebugEnabled()) {
+    CREDENTIAL_LOGGER.debugf("Using DN [%s] for authentication of user [%s]",userDN,credentials.getUsername());
+  }
+  if (ldapIdentityStore.getOperationManager().authenticate(userDN,new String(password))) {
+    return true;
+  }
+  return false;
+}

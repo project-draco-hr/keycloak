@@ -1,9 +1,9 @@
 {
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=locateRealm(name,realmManager);
-  Audit audit=new AuditManager(realm,session,clientConnection).createAudit();
+  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder();
   AuthenticationManager authManager=new AuthenticationManager(protector);
-  TokenService tokenService=new TokenService(realm,tokenManager,audit,authManager);
+  TokenService tokenService=new TokenService(realm,tokenManager,event,authManager);
   ResteasyProviderFactory.getInstance().injectProperties(tokenService);
   return tokenService;
 }

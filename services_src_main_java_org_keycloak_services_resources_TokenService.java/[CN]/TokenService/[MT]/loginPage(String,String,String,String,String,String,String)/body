@@ -1,41 +1,41 @@
 {
-  audit.event(EventType.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code");
+  event.event(EventType.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code");
   OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
   if (!realm.isEnabled()) {
-    audit.error(Errors.REALM_DISABLED);
+    event.error(Errors.REALM_DISABLED);
     return oauth.forwardToSecurityFailure("Realm not enabled");
   }
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
-    audit.error(Errors.CLIENT_NOT_FOUND);
+    event.error(Errors.CLIENT_NOT_FOUND);
     return oauth.forwardToSecurityFailure("Unknown login requester.");
   }
   if (!client.isEnabled()) {
-    audit.error(Errors.CLIENT_DISABLED);
+    event.error(Errors.CLIENT_DISABLED);
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
   if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
-    audit.error(Errors.NOT_ALLOWED);
+    event.error(Errors.NOT_ALLOWED);
     return oauth.forwardToSecurityFailure("Bearer-only applications are not allowed to initiate browser login");
   }
   if (client.isDirectGrantsOnly()) {
-    audit.error(Errors.NOT_ALLOWED);
+    event.error(Errors.NOT_ALLOWED);
     return oauth.forwardToSecurityFailure("direct-grants-only clients are not allowed to initiate browser login");
   }
   redirect=verifyRedirectUri(uriInfo,redirect,realm,client);
   if (redirect == null) {
-    audit.error(Errors.INVALID_REDIRECT_URI);
+    event.error(Errors.INVALID_REDIRECT_URI);
     return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
   }
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers);
   if (authResult != null) {
     UserModel user=authResult.getUser();
     UserSessionModel session=authResult.getSession();
-    audit.user(user).session(session).detail(Details.AUTH_METHOD,"sso");
-    return oauth.processAccessCode(scopeParam,state,redirect,client,user,session,audit);
+    event.user(user).session(session).detail(Details.AUTH_METHOD,"sso");
+    return oauth.processAccessCode(scopeParam,state,redirect,client,user,session,event);
   }
   if (prompt != null && prompt.equals("none")) {
     return oauth.redirectError(client,"access_denied",state,redirect);

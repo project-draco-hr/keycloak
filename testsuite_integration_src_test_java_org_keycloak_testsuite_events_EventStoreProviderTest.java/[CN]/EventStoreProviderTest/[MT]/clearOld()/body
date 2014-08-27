@@ -1,0 +1,10 @@
+{
+  eventStore.onEvent(create(System.currentTimeMillis() - 30000,EventType.LOGIN,"realmId","clientId","userId","127.0.0.1","error"));
+  eventStore.onEvent(create(System.currentTimeMillis() - 20000,EventType.LOGIN,"realmId","clientId","userId","127.0.0.1","error"));
+  eventStore.onEvent(create(System.currentTimeMillis(),EventType.LOGIN,"realmId","clientId","userId","127.0.0.1","error"));
+  eventStore.onEvent(create(System.currentTimeMillis(),EventType.LOGIN,"realmId","clientId","userId","127.0.0.1","error"));
+  eventStore.onEvent(create(System.currentTimeMillis() - 30000,EventType.LOGIN,"realmId2","clientId","userId","127.0.0.1","error"));
+  resetSession();
+  eventStore.clear("realmId",System.currentTimeMillis() - 10000);
+  Assert.assertEquals(3,eventStore.createQuery().getResultList().size());
+}

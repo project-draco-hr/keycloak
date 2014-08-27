@@ -5,10 +5,10 @@
       return unauthorized();
     }
     UserModel user=getUser(accessCode);
-    initAudit(accessCode);
+    initEvent(accessCode);
     user.setEmailVerified(true);
     user.removeRequiredAction(RequiredAction.VERIFY_EMAIL);
-    audit.clone().event(EventType.VERIFY_EMAIL).detail(Details.EMAIL,accessCode.getUser().getEmail()).success();
+    event.clone().event(EventType.VERIFY_EMAIL).detail(Details.EMAIL,accessCode.getUser().getEmail()).success();
     return redirectOauth(user,accessCode);
   }
  else {
@@ -16,7 +16,7 @@
     if (accessCode == null) {
       return unauthorized();
     }
-    initAudit(accessCode);
+    initEvent(accessCode);
     return Flows.forms(session,realm,null,uriInfo).setAccessCode(accessCode.getCode()).setUser(accessCode.getUser()).createResponse(RequiredAction.VERIFY_EMAIL);
   }
 }

@@ -1,0 +1,6 @@
+{
+  MongoConnectionProvider connection=session.getProvider(MongoConnectionProvider.class);
+  DBCollection collection=connection.getDB().getCollection("events");
+  collection.setWriteConcern(WriteConcern.UNACKNOWLEDGED);
+  return new MongoEventStoreProvider(collection,includedEvents);
+}

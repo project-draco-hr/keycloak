@@ -12,17 +12,17 @@
   if (!client.isEnabled()) {
     return Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager).forwardToSecurityFailure("Login requester not enabled.");
   }
-  audit.event(EventType.SEND_RESET_PASSWORD).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
+  event.event(EventType.SEND_RESET_PASSWORD).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
   UserModel user=session.users().getUserByUsername(username,realm);
   if (user == null && username.contains("@")) {
     user=session.users().getUserByEmail(username,realm);
   }
   if (user == null) {
-    audit.error(Errors.USER_NOT_FOUND);
+    event.error(Errors.USER_NOT_FOUND);
   }
  else {
     UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"form",false);
-    audit.session(userSession);
+    event.session(userSession);
     AccessCode accessCode=tokenManager.createAccessCode(scopeParam,state,redirect,session,realm,client,user,userSession);
     accessCode.setRequiredAction(RequiredAction.UPDATE_PASSWORD);
     try {
@@ -31,7 +31,7 @@
       String link=builder.build(realm.getName()).toString();
       long expiration=TimeUnit.SECONDS.toMinutes(realm.getAccessCodeLifespanUserAction());
       this.session.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendPasswordReset(link,expiration);
-      audit.user(user).detail(Details.EMAIL,user.getEmail()).detail(Details.CODE_ID,accessCode.getCodeId()).success();
+      event.user(user).detail(Details.EMAIL,user.getEmail()).detail(Details.CODE_ID,accessCode.getCodeId()).success();
     }
  catch (    EmailException e) {
       logger.error("Failed to send password reset email",e);

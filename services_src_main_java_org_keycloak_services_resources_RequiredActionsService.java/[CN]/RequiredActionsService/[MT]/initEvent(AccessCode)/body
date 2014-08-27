@@ -1,0 +1,11 @@
+{
+  event.event(EventType.LOGIN).client(accessCode.getClient()).user(accessCode.getUser()).session(accessCode.getSessionState()).detail(Details.CODE_ID,accessCode.getCodeId()).detail(Details.REDIRECT_URI,accessCode.getRedirectUri()).detail(Details.RESPONSE_TYPE,"code");
+  UserSessionModel userSession=accessCode.getSessionState() != null ? session.sessions().getUserSession(realm,accessCode.getSessionState()) : null;
+  if (userSession != null) {
+    event.detail(Details.AUTH_METHOD,userSession.getAuthMethod());
+    event.detail(Details.USERNAME,userSession.getLoginUsername());
+    if (userSession.isRememberMe()) {
+      event.detail(Details.REMEMBER_ME,"true");
+    }
+  }
+}

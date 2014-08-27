@@ -1,5 +1,5 @@
 {
-  audit.event(EventType.LOGIN).detail(Details.RESPONSE_TYPE,"code");
+  event.event(EventType.LOGIN).detail(Details.RESPONSE_TYPE,"code");
   OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
@@ -7,32 +7,32 @@
   String code=formData.getFirst(OAuth2Constants.CODE);
   AccessCode accessCode=AccessCode.parse(code,session,realm);
   if (accessCode == null || !accessCode.isValid(ClientSessionModel.Action.OAUTH_GRANT)) {
-    audit.error(Errors.INVALID_CODE);
+    event.error(Errors.INVALID_CODE);
     return oauth.forwardToSecurityFailure("Invalid access code.");
   }
-  audit.detail(Details.CODE_ID,accessCode.getCodeId());
+  event.detail(Details.CODE_ID,accessCode.getCodeId());
   String redirect=accessCode.getRedirectUri();
   String state=accessCode.getState();
-  audit.client(accessCode.getClient()).user(accessCode.getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.REDIRECT_URI,redirect);
+  event.client(accessCode.getClient()).user(accessCode.getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.REDIRECT_URI,redirect);
   UserSessionModel userSession=session.sessions().getUserSession(realm,accessCode.getSessionState());
   if (userSession != null) {
-    audit.detail(Details.AUTH_METHOD,userSession.getAuthMethod());
-    audit.detail(Details.USERNAME,userSession.getLoginUsername());
+    event.detail(Details.AUTH_METHOD,userSession.getAuthMethod());
+    event.detail(Details.USERNAME,userSession.getLoginUsername());
     if (userSession.isRememberMe()) {
-      audit.detail(Details.REMEMBER_ME,"true");
+      event.detail(Details.REMEMBER_ME,"true");
     }
   }
   if (!AuthenticationManager.isSessionValid(realm,userSession)) {
     AuthenticationManager.logout(session,realm,userSession,uriInfo,clientConnection);
-    audit.error(Errors.INVALID_CODE);
+    event.error(Errors.INVALID_CODE);
     return oauth.forwardToSecurityFailure("Session not active");
   }
-  audit.session(userSession);
+  event.session(userSession);
   if (formData.containsKey("cancel")) {
-    audit.error(Errors.REJECTED_BY_USER);
+    event.error(Errors.REJECTED_BY_USER);
     return redirectAccessDenied(redirect,state);
   }
-  audit.success();
+  event.success();
   accessCode.setAction(ClientSessionModel.Action.CODE_TO_TOKEN);
   return oauth.redirectAccessCode(accessCode,userSession,state,redirect);
 }

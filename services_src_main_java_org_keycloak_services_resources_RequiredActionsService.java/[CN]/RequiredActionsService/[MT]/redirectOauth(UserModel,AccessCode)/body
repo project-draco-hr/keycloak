@@ -16,8 +16,8 @@
       AuthenticationManager.logout(session,realm,userSession,uriInfo,clientConnection);
       return Flows.oauth(this.session,realm,request,uriInfo,clientConnection,authManager,tokenManager).redirectError(accessCode.getClient(),"access_denied",accessCode.getState(),accessCode.getRedirectUri());
     }
-    audit.session(userSession);
-    audit.success();
+    event.session(userSession);
+    event.success();
     return Flows.oauth(this.session,realm,request,uriInfo,clientConnection,authManager,tokenManager).redirectAccessCode(accessCode,userSession,accessCode.getState(),accessCode.getRedirectUri());
   }
 }

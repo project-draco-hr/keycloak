@@ -1,5 +1,5 @@
 {
-  auditProvider=session.getProvider(AuditProvider.class);
+  eventStore=session.getProvider(EventStoreProvider.class);
   account=session.getProvider(AccountProvider.class).setRealm(realm).setUriInfo(uriInfo);
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers);
   if (authResult != null) {
@@ -27,6 +27,6 @@
     }
     account.setUser(auth.getUser());
   }
-  boolean auditEnabled=auditProvider != null && realm.isAuditEnabled();
-  account.setFeatures(realm.isSocial(),auditEnabled,true);
+  boolean eventsEnabled=eventStore != null && realm.isEventsEnabled();
+  account.setFeatures(realm.isSocial(),eventsEnabled,true);
 }

@@ -1,0 +1,31 @@
+{
+  RefreshToken refreshToken=verifyRefreshToken(realm,encodedRefreshToken);
+  event.user(refreshToken.getSubject()).session(refreshToken.getSessionState()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId());
+  UserModel user=session.users().getUserById(refreshToken.getSubject(),realm);
+  if (user == null) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid refresh token","Unknown user");
+  }
+  if (!user.isEnabled()) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"User disabled","User disabled");
+  }
+  UserSessionModel userSession=session.sessions().getUserSession(realm,refreshToken.getSessionState());
+  int currentTime=Time.currentTime();
+  if (!AuthenticationManager.isSessionValid(realm,userSession)) {
+    AuthenticationManager.logout(session,realm,userSession,uriInfo,connection);
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Session not active","Session not active");
+  }
+  if (!client.getClientId().equals(refreshToken.getIssuedFor())) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Unmatching clients","Unmatching clients");
+  }
+  if (refreshToken.getIssuedAt() < client.getNotBefore()) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale refresh token");
+  }
+  verifyAccess(refreshToken,realm,client,user);
+  AccessToken accessToken=initToken(realm,client,user,userSession);
+  accessToken.setRealmAccess(refreshToken.getRealmAccess());
+  accessToken.setResourceAccess(refreshToken.getResourceAccess());
+  if (currentTime + realm.getAccessTokenLifespan() > userSession.getLastSessionRefresh() + realm.getSsoSessionIdleTimeout()) {
+    userSession.setLastSessionRefresh(currentTime);
+  }
+  return accessToken;
+}

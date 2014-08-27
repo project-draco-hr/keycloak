@@ -21,10 +21,10 @@
     String oldEmail=user.getEmail();
     boolean emailChanged=oldEmail != null ? !oldEmail.equals(email) : email != null;
     user.setEmail(formData.getFirst("email"));
-    audit.event(EventType.UPDATE_PROFILE).client(auth.getClient()).user(auth.getUser()).success();
+    event.event(EventType.UPDATE_PROFILE).client(auth.getClient()).user(auth.getUser()).success();
     if (emailChanged) {
       user.setEmailVerified(false);
-      audit.clone().event(EventType.UPDATE_EMAIL).detail(Details.PREVIOUS_EMAIL,oldEmail).detail(Details.UPDATED_EMAIL,email).success();
+      event.clone().event(EventType.UPDATE_EMAIL).detail(Details.PREVIOUS_EMAIL,oldEmail).detail(Details.UPDATED_EMAIL,email).success();
     }
     setReferrerOnPage();
     return account.setSuccess("accountUpdated").createResponse(AccountPages.ACCOUNT);

@@ -41,6 +41,10 @@
     audit.error(Errors.USERNAME_IN_USE);
     return Flows.forms(session,realm,client,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).createRegistration();
   }
+  if (session.users().getUserByEmail(email,realm) != null) {
+    audit.error(Errors.EMAIL_IN_USE);
+    return Flows.forms(session,realm,client,uriInfo).setError(Messages.EMAIL_EXISTS).setFormData(formData).createRegistration();
+  }
   UserModel user=session.users().addUser(realm,username);
   user.setEnabled(true);
   user.setFirstName(formData.getFirst("firstName"));

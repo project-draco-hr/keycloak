@@ -1,10 +1,16 @@
 {
-  IdentityManager idmManager=getIdentityManager(partitionManager);
+  IdentityManager identityManager=getIdentityManager(partitionManager);
+  if (BasicModel.getUser(identityManager,username) != null) {
+    throw new ModelDuplicateException("User with same username already exists");
+  }
+  if (getUserByEmail(identityManager,email) != null) {
+    throw new ModelDuplicateException("User with same email already exists");
+  }
   User picketlinkUser=new User(username);
   picketlinkUser.setFirstName(firstName);
   picketlinkUser.setLastName(lastName);
   picketlinkUser.setEmail(email);
   picketlinkUser.setAttribute(new Attribute("fullName",getFullName(username,firstName,lastName)));
-  idmManager.add(picketlinkUser);
+  identityManager.add(picketlinkUser);
   return picketlinkUser;
 }

@@ -1,5 +1,11 @@
 {
   auth.requireManage();
+  if (session.users().getUserByUsername(rep.getUsername(),realm) != null) {
+    return Flows.errors().exists("User exists with same username");
+  }
+  if (session.users().getUserByEmail(rep.getEmail(),realm) != null) {
+    return Flows.errors().exists("User exists with same email");
+  }
   try {
     UserModel user=session.users().addUser(realm,rep.getUsername());
     updateUserFromRep(user,rep);
@@ -9,6 +15,9 @@
     return Response.created(uriInfo.getAbsolutePathBuilder().path(user.getUsername()).build()).build();
   }
  catch (  ModelDuplicateException e) {
+    if (session.getTransaction().isActive()) {
+      session.getTransaction().setRollbackOnly();
+    }
     return Flows.errors().exists("User exists with same username or email");
   }
 }

@@ -3,7 +3,7 @@
   if (managementUrl != null) {
     UserStatsAction adminAction=new UserStatsAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,application.getName(),user.getId());
     String token=new TokenManager().encodeToken(realm,adminAction);
-    logger.infov("session stats for application: {0} url: {1}",application.getName(),managementUrl);
+    logger.debugv("session stats for application: {0} url: {1}",application.getName(),managementUrl);
     ClientRequest request=client.createRequest(UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_GET_USER_STATS).build().toString());
     ClientResponse<UserStats> response=null;
     try {
@@ -25,7 +25,7 @@
     }
   }
  else {
-    logger.info("no management url.");
+    logger.debug("no management url.");
     return null;
   }
 }

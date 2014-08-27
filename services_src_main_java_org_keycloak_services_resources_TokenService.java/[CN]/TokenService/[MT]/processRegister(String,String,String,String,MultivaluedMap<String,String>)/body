@@ -4,18 +4,15 @@
   audit.event(EventType.REGISTER).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.USERNAME,username).detail(Details.EMAIL,email).detail(Details.REGISTER_METHOD,"form");
   OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!realm.isEnabled()) {
-    logger.warn("Realm not enabled");
     audit.error(Errors.REALM_DISABLED);
     return oauth.forwardToSecurityFailure("Realm not enabled");
   }
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
-    logger.warn("Unknown login requester.");
     audit.error(Errors.CLIENT_NOT_FOUND);
     return oauth.forwardToSecurityFailure("Unknown login requester.");
   }
   if (!client.isEnabled()) {
-    logger.warn("Login requester not enabled.");
     audit.error(Errors.CLIENT_DISABLED);
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
@@ -25,7 +22,6 @@
     return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
   }
   if (!realm.isRegistrationAllowed()) {
-    logger.warn("Registration not allowed");
     audit.error(Errors.REGISTRATION_DISABLED);
     return oauth.forwardToSecurityFailure("Registration not allowed");
   }

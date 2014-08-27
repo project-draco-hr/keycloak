@@ -1,15 +1,13 @@
 {
-  logger.info("createLoginCookie");
   String cookiePath=getIdentityCookiePath(realm,uriInfo);
   AccessToken identityToken=createIdentityToken(realm,user,session);
   String encoded=encodeToken(realm,identityToken);
   boolean secureOnly=realm.getSslRequired().isRequired(connection);
-  logger.debugv("creatingLoginCookie - name: {0} path: {1}",KEYCLOAK_IDENTITY_COOKIE,cookiePath);
   int maxAge=NewCookie.DEFAULT_MAX_AGE;
   if (session.isRememberMe()) {
     maxAge=realm.getSsoSessionIdleTimeout();
-    logger.info("createLoginCookie maxAge: " + maxAge);
   }
+  logger.debugv("Create login cookie - name: {0}, path: {1}, max-age: {2}",KEYCLOAK_IDENTITY_COOKIE,cookiePath,maxAge);
   CookieHelper.addCookie(KEYCLOAK_IDENTITY_COOKIE,encoded,cookiePath,null,null,maxAge,secureOnly,true);
   String sessionCookieValue=realm.getName() + "/" + user.getId();
   if (session != null) {

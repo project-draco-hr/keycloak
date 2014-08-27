@@ -10,12 +10,10 @@
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
     audit.error(Errors.CLIENT_NOT_FOUND);
-    logger.warn("Unknown login requester: " + clientId);
     return Flows.forms(session,realm,null,uriInfo).setError("Unknown login requester.").createErrorPage();
   }
   if (!client.isEnabled()) {
     audit.error(Errors.CLIENT_DISABLED);
-    logger.warn("Login requester not enabled.");
     return Flows.forms(session,realm,null,uriInfo).setError("Login requester not enabled.").createErrorPage();
   }
   redirectUri=TokenService.verifyRedirectUri(uriInfo,redirectUri,realm,client);

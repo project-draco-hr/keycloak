@@ -1,9 +1,7 @@
 {
-  logger.debug("TokenService.processLogin");
   String username=formData.getFirst(AuthenticationManager.FORM_USERNAME);
   String rememberMe=formData.getFirst("rememberMe");
   boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("on");
-  logger.debug("*** Remember me: " + remember);
   audit.event(EventType.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
   if (remember) {
     audit.detail(Details.REMEMBER_ME,"true");

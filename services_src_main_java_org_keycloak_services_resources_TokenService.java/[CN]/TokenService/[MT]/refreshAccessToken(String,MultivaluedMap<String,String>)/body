@@ -1,5 +1,4 @@
 {
-  logger.info("--> refreshAccessToken");
   if (!checkSsl()) {
     return createError("https_required","HTTPS required",Response.Status.FORBIDDEN);
   }
@@ -11,7 +10,6 @@
     error.put(OAuth2Constants.ERROR,OAuthErrorException.INVALID_REQUEST);
     error.put(OAuth2Constants.ERROR_DESCRIPTION,"No refresh token");
     audit.error(Errors.INVALID_TOKEN);
-    logger.error("OAuth Error: no refresh token");
     return Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build();
   }
   AccessToken accessToken;
@@ -23,7 +21,6 @@
     error.put(OAuth2Constants.ERROR,e.getError());
     if (e.getDescription() != null)     error.put(OAuth2Constants.ERROR_DESCRIPTION,e.getDescription());
     audit.error(Errors.INVALID_TOKEN);
-    logger.error("OAuth Error",e);
     return Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build();
   }
   AccessTokenResponse res=tokenManager.responseBuilder(realm,client,audit).accessToken(accessToken).generateIDToken().generateRefreshToken().build();

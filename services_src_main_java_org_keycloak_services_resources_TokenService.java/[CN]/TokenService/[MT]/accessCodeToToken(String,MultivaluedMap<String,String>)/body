@@ -1,5 +1,4 @@
 {
-  logger.debug("accessRequest <---");
   if (!checkSsl()) {
     throw new ForbiddenException("HTTPS required");
   }
@@ -75,7 +74,6 @@
     audit.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  logger.debug("accessRequest SUCCESS");
   AccessToken token=tokenManager.createClientAccessToken(accessCode.getRequestedRoles(),realm,client,user,userSession);
   try {
     tokenManager.verifyAccess(token,realm,client,user);

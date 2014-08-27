@@ -1,23 +1,19 @@
 {
-  logger.info("TokenService.loginPage");
   audit.event(EventType.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code");
   OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!checkSsl()) {
     return oauth.forwardToSecurityFailure("HTTPS required");
   }
   if (!realm.isEnabled()) {
-    logger.warn("Realm not enabled");
     audit.error(Errors.REALM_DISABLED);
     return oauth.forwardToSecurityFailure("Realm not enabled");
   }
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
-    logger.warn("Unknown login requester: " + clientId);
     audit.error(Errors.CLIENT_NOT_FOUND);
     return oauth.forwardToSecurityFailure("Unknown login requester.");
   }
   if (!client.isEnabled()) {
-    logger.warn("Login requester not enabled.");
     audit.error(Errors.CLIENT_DISABLED);
     return oauth.forwardToSecurityFailure("Login requester not enabled.");
   }
@@ -34,12 +30,10 @@
     audit.error(Errors.INVALID_REDIRECT_URI);
     return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
   }
-  logger.info("Checking cookie...");
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers);
   if (authResult != null) {
     UserModel user=authResult.getUser();
     UserSessionModel session=authResult.getSession();
-    logger.debug(user.getUsername() + " already logged in.");
     audit.user(user).session(session).detail(Details.AUTH_METHOD,"sso");
     return oauth.processAccessCode(scopeParam,state,redirect,client,user,session,audit);
   }

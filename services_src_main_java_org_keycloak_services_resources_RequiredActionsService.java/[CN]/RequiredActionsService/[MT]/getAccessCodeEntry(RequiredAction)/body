@@ -1,17 +1,16 @@
 {
   String code=uriInfo.getQueryParameters().getFirst(OAuth2Constants.CODE);
   if (code == null) {
-    logger.debug("getAccessCodeEntry code as not in query param");
+    logger.debug("Code query param not found");
     return null;
   }
   AccessCode accessCode=AccessCode.parse(code,session,realm);
   if (accessCode == null) {
-    logger.debug("getAccessCodeEntry access code entry null");
+    logger.debug("Access code not found");
     return null;
   }
   if (!accessCode.isValid(requiredAction)) {
-    logger.debugv("getAccessCodeEntry: access code id: {0}",accessCode.getCodeId());
-    logger.debugv("getAccessCodeEntry access code not valid");
+    logger.debugv("Invalid access code");
     return null;
   }
   return accessCode;

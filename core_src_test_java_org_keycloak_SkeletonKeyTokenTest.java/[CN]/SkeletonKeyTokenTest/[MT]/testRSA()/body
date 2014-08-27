@@ -5,7 +5,6 @@
   token.addAccess("bar").addRole("user");
   KeyPair keyPair=KeyPairGenerator.getInstance("RSA").generateKeyPair();
   String encoded=new JWSBuilder().jsonContent(token).rsa256(keyPair.getPrivate());
-  System.out.println(encoded);
   JWSInput input=new JWSInput(encoded);
   token=input.readJsonContent(AccessToken.class);
   Assert.assertEquals("111",token.getId());

@@ -1,10 +1,10 @@
 {
   UserModel user=KeycloakModelUtils.findUserByNameOrEmail(session,realm,username);
   if (user == null) {
-    logger.warn("User " + username + " not found");
+    logger.debugv("User {0} not found",username);
     return AuthenticationStatus.INVALID_USER;
   }
-  if (!checkEnabled(user)) {
+  if (!user.isEnabled()) {
     return AuthenticationStatus.ACCOUNT_DISABLED;
   }
   Set<String> types=new HashSet<String>();
@@ -15,14 +15,14 @@
     List<UserCredentialModel> credentials=new LinkedList<UserCredentialModel>();
     String password=formData.getFirst(CredentialRepresentation.PASSWORD);
     if (password == null) {
-      logger.warn("Password not provided");
+      logger.debug("Password not provided");
       return AuthenticationStatus.MISSING_PASSWORD;
     }
     credentials.add(UserCredentialModel.password(password));
     if (user.isTotp()) {
       String token=formData.getFirst(CredentialRepresentation.TOTP);
       if (token == null) {
-        logger.warn("TOTP token not provided");
+        logger.debug("TOTP token not provided");
         return AuthenticationStatus.MISSING_TOTP;
       }
       credentials.add(UserCredentialModel.totp(token));
@@ -41,7 +41,7 @@
  else   if (types.contains(CredentialRepresentation.SECRET)) {
     String secret=formData.getFirst(CredentialRepresentation.SECRET);
     if (secret == null) {
-      logger.warn("Secret not provided");
+      logger.debug("Secret not provided");
       return AuthenticationStatus.MISSING_PASSWORD;
     }
     if (!session.users().validCredentials(realm,user,UserCredentialModel.secret(secret))) {

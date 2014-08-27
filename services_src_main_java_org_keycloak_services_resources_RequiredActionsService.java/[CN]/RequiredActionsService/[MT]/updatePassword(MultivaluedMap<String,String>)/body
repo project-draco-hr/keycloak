@@ -1,11 +1,8 @@
 {
-  logger.debug("updatePassword");
   AccessCode accessCode=getAccessCodeEntry(RequiredAction.UPDATE_PASSWORD);
   if (accessCode == null) {
-    logger.debug("updatePassword access code is null");
     return unauthorized();
   }
-  logger.debug("updatePassword has access code");
   UserModel user=getUser(accessCode);
   initAudit(accessCode);
   String passwordNew=formData.getFirst("password-new");
@@ -23,7 +20,6 @@
  catch (  Exception ape) {
     return loginForms.setError(ape.getMessage()).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
-  logger.debug("updatePassword updated credential");
   user.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
   audit.clone().event(EventType.UPDATE_PASSWORD).success();
   if (accessCode.getSessionState() == null) {

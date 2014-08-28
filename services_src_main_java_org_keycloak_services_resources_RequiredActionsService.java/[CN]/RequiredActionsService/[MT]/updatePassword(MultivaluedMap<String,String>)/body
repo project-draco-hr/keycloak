@@ -4,7 +4,7 @@
     return unauthorized();
   }
   UserModel user=getUser(accessCode);
-  initAudit(accessCode);
+  initEvent(accessCode);
   String passwordNew=formData.getFirst("password-new");
   String passwordConfirm=formData.getFirst("password-confirm");
   LoginFormsProvider loginForms=Flows.forms(session,realm,null,uriInfo).setUser(user);
@@ -21,7 +21,7 @@
     return loginForms.setError(ape.getMessage()).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
   user.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
-  audit.clone().event(EventType.UPDATE_PASSWORD).success();
+  event.clone().event(EventType.UPDATE_PASSWORD).success();
   if (accessCode.getSessionState() == null) {
     return Response.seeOther(Urls.accountPage(uriInfo.getBaseUri(),realm.getId())).build();
   }

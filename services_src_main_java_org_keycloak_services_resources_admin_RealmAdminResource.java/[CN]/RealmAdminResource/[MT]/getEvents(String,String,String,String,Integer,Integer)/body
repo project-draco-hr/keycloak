@@ -1,0 +1,24 @@
+{
+  auth.init(RealmAuth.Resource.EVENTS).requireView();
+  EventStoreProvider eventStore=session.getProvider(EventStoreProvider.class);
+  EventQuery query=eventStore.createQuery().realm(realm.getId());
+  if (client != null) {
+    query.client(client);
+  }
+  if (type != null) {
+    query.type(EventType.valueOf(type));
+  }
+  if (user != null) {
+    query.user(user);
+  }
+  if (ipAddress != null) {
+    query.ipAddress(ipAddress);
+  }
+  if (firstResult != null) {
+    query.firstResult(firstResult);
+  }
+  if (maxResults != null) {
+    query.maxResults(maxResults);
+  }
+  return query.getResultList();
+}

@@ -1,24 +1,24 @@
 {
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=realmManager.getRealmByName(realmName);
-  Audit audit=new AuditManager(realm,session,clientConnection).createAudit().event(EventType.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirectUri).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"social@" + providerId);
+  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.LOGIN).client(clientId).detail(Details.REDIRECT_URI,redirectUri).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"social@" + providerId);
   SocialProvider provider=SocialLoader.load(providerId);
   if (provider == null) {
-    audit.error(Errors.SOCIAL_PROVIDER_NOT_FOUND);
+    event.error(Errors.SOCIAL_PROVIDER_NOT_FOUND);
     return Flows.forms(session,realm,null,uriInfo).setError("Social provider not found").createErrorPage();
   }
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
-    audit.error(Errors.CLIENT_NOT_FOUND);
+    event.error(Errors.CLIENT_NOT_FOUND);
     return Flows.forms(session,realm,null,uriInfo).setError("Unknown login requester.").createErrorPage();
   }
   if (!client.isEnabled()) {
-    audit.error(Errors.CLIENT_DISABLED);
+    event.error(Errors.CLIENT_DISABLED);
     return Flows.forms(session,realm,null,uriInfo).setError("Login requester not enabled.").createErrorPage();
   }
   redirectUri=TokenService.verifyRedirectUri(uriInfo,redirectUri,realm,client);
   if (redirectUri == null) {
-    audit.error(Errors.INVALID_REDIRECT_URI);
+    event.error(Errors.INVALID_REDIRECT_URI);
     return Flows.forms(session,realm,null,uriInfo).setError("Invalid redirect_uri.").createErrorPage();
   }
   try {

@@ -1,0 +1,9 @@
+{
+  authFormWithTotpPasswordToken();
+  formData.remove(CredentialRepresentation.PASSWORD_TOKEN);
+  String passwordToken=new JWSBuilder().jsonContent(new PasswordToken(realm.getName(),user.getId())).rsa256(realm.getPrivateKey());
+  formData.add(CredentialRepresentation.PASSWORD_TOKEN,passwordToken);
+  KeycloakModelUtils.generateRealmKeys(realm);
+  AuthenticationStatus status=am.authenticateForm(session,dummyConnection,realm,formData);
+  Assert.assertEquals(AuthenticationStatus.INVALID_CREDENTIALS,status);
+}

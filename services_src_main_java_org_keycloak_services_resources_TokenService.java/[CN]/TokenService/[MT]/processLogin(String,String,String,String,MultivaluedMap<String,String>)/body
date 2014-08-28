@@ -56,6 +56,9 @@ case ACCOUNT_DISABLED:
 event.error(Errors.USER_DISABLED);
 return Flows.forms(this.session,realm,client,uriInfo).setError(Messages.ACCOUNT_DISABLED).setFormData(formData).createLogin();
 case MISSING_TOTP:
+formData.remove(CredentialRepresentation.PASSWORD);
+String passwordToken=new JWSBuilder().jsonContent(new PasswordToken(realm.getName(),user.getId())).rsa256(realm.getPrivateKey());
+formData.add(CredentialRepresentation.PASSWORD_TOKEN,passwordToken);
 return Flows.forms(this.session,realm,client,uriInfo).setFormData(formData).createLoginTotp();
 case INVALID_USER:
 event.error(Errors.USER_NOT_FOUND);

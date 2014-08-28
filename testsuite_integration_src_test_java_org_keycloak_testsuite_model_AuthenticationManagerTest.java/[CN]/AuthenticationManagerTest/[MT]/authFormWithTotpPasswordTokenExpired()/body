@@ -1,0 +1,16 @@
+{
+  int lifespan=realm.getAccessCodeLifespanUserAction();
+  try {
+    authFormWithTotpPasswordToken();
+    realm.setAccessCodeLifespanUserAction(1);
+    formData.remove(CredentialRepresentation.PASSWORD_TOKEN);
+    String passwordToken=new JWSBuilder().jsonContent(new PasswordToken(realm.getName(),"invalid")).rsa256(realm.getPrivateKey());
+    formData.add(CredentialRepresentation.PASSWORD_TOKEN,passwordToken);
+    Thread.sleep(2000);
+    AuthenticationStatus status=am.authenticateForm(session,dummyConnection,realm,formData);
+    Assert.assertEquals(AuthenticationStatus.INVALID_CREDENTIALS,status);
+  }
+  finally {
+    realm.setAccessCodeLifespanUserAction(lifespan);
+  }
+}

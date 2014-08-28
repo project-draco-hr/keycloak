@@ -1,0 +1,22 @@
+{
+  JWSInput jws=new JWSInput(encodedPasswordToken);
+  if (!RSAProvider.verify(jws,realm.getPublicKey())) {
+    return false;
+  }
+  try {
+    PasswordToken passwordToken=jws.readJsonContent(PasswordToken.class);
+    if (!passwordToken.getRealm().equals(realm.getName())) {
+      return false;
+    }
+    if (!passwordToken.getUser().equals(user.getId())) {
+      return false;
+    }
+    if (Time.currentTime() - passwordToken.getTimestamp() > realm.getAccessCodeLifespanUserAction()) {
+      return false;
+    }
+    return true;
+  }
+ catch (  IOException e) {
+    return false;
+  }
+}

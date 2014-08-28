@@ -1,10 +1,13 @@
 {
-  if (event.getType() == Lifecycle.START_EVENT) {
+  if (Lifecycle.START_EVENT.equals(event.getType())) {
     try {
       startDeployment();
     }
  catch (    LifecycleException e) {
-      e.printStackTrace();
+      log.severe("Error starting deployment. " + e.getMessage());
     }
+  }
+ else   if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
+    initInternal();
   }
 }

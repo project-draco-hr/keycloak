@@ -15,7 +15,7 @@
   String passwordNew=formData.getFirst("password-new");
   String passwordConfirm=formData.getFirst("password-confirm");
   if (requireCurrent) {
-    if (Validation.isEmpty(passwordNew)) {
+    if (Validation.isEmpty(password)) {
       setReferrerOnPage();
       return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
     }
@@ -24,6 +24,10 @@
       setReferrerOnPage();
       return account.setError(Messages.INVALID_PASSWORD_EXISTING).createResponse(AccountPages.PASSWORD);
     }
+  }
+  if (Validation.isEmpty(passwordNew)) {
+    setReferrerOnPage();
+    return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
   }
   if (!passwordNew.equals(passwordConfirm)) {
     setReferrerOnPage();

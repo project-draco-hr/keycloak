@@ -9,27 +9,25 @@
     return account.createResponse(AccountPages.PASSWORD);
   }
   UserModel user=auth.getUser();
+  boolean requireCurrent=isPasswordSet(user);
+  account.setPasswordSet(requireCurrent);
   String password=formData.getFirst("password");
   String passwordNew=formData.getFirst("password-new");
   String passwordConfirm=formData.getFirst("password-confirm");
-  if (Validation.isEmpty(passwordNew)) {
-    setReferrerOnPage();
-    return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
-  }
- else   if (!passwordNew.equals(passwordConfirm)) {
-    setReferrerOnPage();
-    return account.setError(Messages.INVALID_PASSWORD_CONFIRM).createResponse(AccountPages.PASSWORD);
-  }
-  UserCredentialModel cred=UserCredentialModel.password(password);
-  if (Validation.isEmpty(password)) {
-    setReferrerOnPage();
-    return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
-  }
- else {
+  if (requireCurrent) {
+    if (Validation.isEmpty(passwordNew)) {
+      setReferrerOnPage();
+      return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
+    }
+    UserCredentialModel cred=UserCredentialModel.password(password);
     if (!session.users().validCredentials(realm,user,cred)) {
       setReferrerOnPage();
       return account.setError(Messages.INVALID_PASSWORD_EXISTING).createResponse(AccountPages.PASSWORD);
     }
+  }
+  if (!passwordNew.equals(passwordConfirm)) {
+    setReferrerOnPage();
+    return account.setError(Messages.INVALID_PASSWORD_CONFIRM).createResponse(AccountPages.PASSWORD);
   }
   try {
     session.users().updateCredential(realm,user,UserCredentialModel.password(passwordNew));
@@ -45,5 +43,5 @@ catch (  Exception ape) {
   }
   event.event(EventType.UPDATE_PASSWORD).client(auth.getClient()).user(auth.getUser()).success();
   setReferrerOnPage();
-  return account.setSuccess("accountPasswordUpdated").createResponse(AccountPages.PASSWORD);
+  return account.setPasswordSet(true).setSuccess("accountPasswordUpdated").createResponse(AccountPages.PASSWORD);
 }

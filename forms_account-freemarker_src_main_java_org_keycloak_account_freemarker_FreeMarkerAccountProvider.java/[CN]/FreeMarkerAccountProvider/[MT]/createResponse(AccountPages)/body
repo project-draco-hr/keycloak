@@ -30,13 +30,16 @@
     baseUriBuilder.queryParam(e.getKey(),e.getValue().toArray());
   }
   URI baseQueryUri=baseUriBuilder.build();
+  if (stateChecker != null) {
+    attributes.put("stateChecker",stateChecker);
+  }
   if (message != null) {
     attributes.put("message",new MessageBean(messages.containsKey(message) ? messages.getProperty(message) : message,messageType));
   }
   if (referrer != null) {
     attributes.put("referrer",new ReferrerBean(referrer));
   }
-  attributes.put("url",new UrlBean(realm,theme,baseUri,baseQueryUri,uriInfo.getRequestUri()));
+  attributes.put("url",new UrlBean(realm,theme,baseUri,baseQueryUri,uriInfo.getRequestUri(),stateChecker));
   attributes.put("features",new FeaturesBean(socialEnabled,eventsEnabled,passwordUpdateSupported));
 switch (page) {
 case ACCOUNT:
@@ -46,7 +49,7 @@ case TOTP:
 attributes.put("totp",new TotpBean(user,baseUri));
 break;
 case SOCIAL:
-attributes.put("social",new AccountSocialBean(session,realm,user,uriInfo.getBaseUri()));
+attributes.put("social",new AccountSocialBean(session,realm,user,uriInfo.getBaseUri(),stateChecker));
 break;
 case LOG:
 attributes.put("log",new LogBean(events));

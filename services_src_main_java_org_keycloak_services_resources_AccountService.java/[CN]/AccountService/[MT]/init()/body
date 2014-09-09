@@ -3,17 +3,23 @@
   account=session.getProvider(AccountProvider.class).setRealm(realm).setUriInfo(uriInfo);
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers);
   if (authResult != null) {
-    auth=new Auth(realm,authResult.getToken(),authResult.getUser(),application,true);
+    auth=new Auth(realm,authResult.getToken(),authResult.getUser(),application,authResult.getSession(),true);
   }
  else {
     authResult=authManager.authenticateBearerToken(session,realm,uriInfo,clientConnection,headers);
     if (authResult != null) {
-      auth=new Auth(realm,authResult.getToken(),authResult.getUser(),application,false);
+      auth=new Auth(realm,authResult.getToken(),authResult.getUser(),application,authResult.getSession(),false);
+    }
+  }
+  if (auth != null && auth.isCookieAuthenticated()) {
+    if (headers.getRequestHeaders().containsKey("Origin")) {
+      throw new ForbiddenException();
     }
   }
   if (authResult != null) {
     UserSessionModel userSession=authResult.getSession();
     if (userSession != null) {
+      account.setStateChecker(authResult.getSession().getId());
       boolean associated=false;
       for (      ClientSessionModel c : userSession.getClientSessions()) {
         if (c.getClient().equals(application)) {

@@ -1,5 +1,7 @@
 {
-  log.info("K_LOGOUT sent");
+  if (log.isTraceEnabled()) {
+    log.trace("K_LOGOUT sent");
+  }
   try {
     JWSInput token=verifyAdminRequest();
     if (token == null) {
@@ -9,14 +11,14 @@
     if (!validateAction(action))     return;
     String user=action.getUser();
     if (user != null) {
-      log.info("logout of session for: " + user);
+      log.debug("logout of session for: " + user);
       userSessionManagement.logoutUser(user);
     }
  else     if (action.getSession() != null) {
       userSessionManagement.logoutKeycloakSession(action.getSession());
     }
  else {
-      log.info("logout of all sessions");
+      log.debug("logout of all sessions");
       if (action.getNotBefore() > deployment.getNotBefore()) {
         deployment.setNotBefore(action.getNotBefore());
       }

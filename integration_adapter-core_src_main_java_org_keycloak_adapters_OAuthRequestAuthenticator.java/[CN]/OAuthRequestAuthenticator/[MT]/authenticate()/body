@@ -1,7 +1,7 @@
 {
   String code=getCode();
   if (code == null) {
-    log.info("there was no code");
+    log.debug("there was no code");
     String error=getError();
     if (error != null) {
       log.warn("There was an error: " + error);
@@ -9,14 +9,14 @@
       return AuthOutcome.FAILED;
     }
  else {
-      log.info("redirecting to auth server");
+      log.debug("redirecting to auth server");
       challenge=loginRedirect();
       saveRequest();
       return AuthOutcome.NOT_ATTEMPTED;
     }
   }
  else {
-    log.info("there was a code, resolving");
+    log.debug("there was a code, resolving");
     challenge=resolveCode(code);
     if (challenge != null) {
       return AuthOutcome.FAILED;

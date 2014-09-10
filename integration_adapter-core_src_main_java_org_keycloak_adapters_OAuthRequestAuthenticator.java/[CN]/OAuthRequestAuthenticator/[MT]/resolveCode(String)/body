@@ -3,7 +3,7 @@
     log.error("Adapter requires SSL. Request: " + facade.getRequest().getURI());
     return challenge(403);
   }
-  log.info("checking state cookie for after code");
+  log.debug("checking state cookie for after code");
   AuthChallenge challenge=checkStateCookie();
   if (challenge != null)   return challenge;
   AccessTokenResponse tokenResponse=null;
@@ -50,6 +50,6 @@ catch (  IOException e) {
     log.error("Stale token");
     return challenge(403);
   }
-  log.info("successful authenticated");
+  log.debug("successful authenticated");
   return null;
 }

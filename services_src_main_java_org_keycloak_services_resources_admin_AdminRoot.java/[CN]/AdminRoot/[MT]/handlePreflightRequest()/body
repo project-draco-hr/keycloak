@@ -1,0 +1,7 @@
+{
+  if (request.getHttpMethod().equalsIgnoreCase("OPTIONS")) {
+    logger.debug("Cors admin pre-flight");
+    Response response=Cors.add(request,Response.ok()).preflight().allowedMethods("GET","PUT","POST","DELETE").auth().build();
+    throw new NoLogWebApplicationException(response);
+  }
+}

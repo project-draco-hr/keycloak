@@ -1,4 +1,7 @@
 {
   config=new Config(serverUrl,realm,username,password,clientId,clientSecret);
   tokenManager=new TokenManager(config);
+  client=new ResteasyClientBuilder().build();
+  target=client.target(config.getServerUrl());
+  target.register(new BearerAuthFilter(tokenManager.getAccessTokenString()));
 }

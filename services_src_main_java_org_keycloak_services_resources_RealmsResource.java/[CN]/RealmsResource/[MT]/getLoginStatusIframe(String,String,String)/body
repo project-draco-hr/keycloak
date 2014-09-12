@@ -30,7 +30,11 @@
   }
   try {
     String file=StreamUtil.readString(is);
-    return file.replace("ORIGIN",origin);
+    file=file.replace("ORIGIN",origin);
+    CacheControl cacheControl=new CacheControl();
+    cacheControl.setNoTransform(false);
+    cacheControl.setMaxAge(Config.scope("theme").getInt("staticMaxAge",-1));
+    return Response.ok(file).cacheControl(cacheControl).build();
   }
  catch (  IOException e) {
     throw new RuntimeException(e);

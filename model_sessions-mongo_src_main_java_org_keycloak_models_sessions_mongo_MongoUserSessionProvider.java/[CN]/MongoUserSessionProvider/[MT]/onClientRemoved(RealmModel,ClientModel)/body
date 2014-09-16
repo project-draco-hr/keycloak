@@ -2,6 +2,9 @@
   DBObject query=new QueryBuilder().and("clientSessions.clientId").is(client.getId()).get();
   List<MongoUserSessionEntity> userSessionEntities=mongoStore.loadEntities(MongoUserSessionEntity.class,query,invocationContext);
   for (  MongoUserSessionEntity e : userSessionEntities) {
+    if (e.getClientSessions() == null) {
+      continue;
+    }
     List<MongoClientSessionEntity> remove=new LinkedList<MongoClientSessionEntity>();
     for (    MongoClientSessionEntity c : e.getClientSessions()) {
       if (c.getClientId().equals(client.getId())) {

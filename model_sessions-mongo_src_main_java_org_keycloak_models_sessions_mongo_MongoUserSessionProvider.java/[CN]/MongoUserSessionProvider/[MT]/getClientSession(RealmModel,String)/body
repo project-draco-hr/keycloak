@@ -6,6 +6,9 @@
   }
   MongoUserSessionEntity userSessionEntity=entities.get(0);
   List<MongoClientSessionEntity> sessions=userSessionEntity.getClientSessions();
+  if (sessions == null) {
+    return null;
+  }
   for (  MongoClientSessionEntity s : sessions) {
     if (s.getId().equals(id)) {
       return new ClientSessionAdapter(session,this,realm,s,userSessionEntity,invocationContext);

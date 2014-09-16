@@ -1,0 +1,32 @@
+{
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.setRememberMe(true);
+    }
+  }
+);
+  try {
+    loginPage.open();
+    Assert.assertFalse(loginPage.isRememberMeChecked());
+    loginPage.setRememberMe(true);
+    Assert.assertTrue(loginPage.isRememberMeChecked());
+    loginPage.login("login-test","password");
+    Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+    Assert.assertNotNull(oauth.getCurrentQuery().get(OAuth2Constants.CODE));
+    Event loginEvent=events.expectLogin().user(userId).detail(Details.USERNAME,"login-test").detail(Details.REMEMBER_ME,"true").assertEvent();
+    String sessionId=loginEvent.getSessionId();
+    keycloakRule.removeUserSession(sessionId);
+    loginPage.open();
+    Assert.assertTrue(loginPage.isRememberMeChecked());
+    Assert.assertEquals("login-test",loginPage.getUsername());
+    loginPage.setRememberMe(false);
+  }
+  finally {
+    keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        appRealm.setRememberMe(false);
+      }
+    }
+);
+  }
+}

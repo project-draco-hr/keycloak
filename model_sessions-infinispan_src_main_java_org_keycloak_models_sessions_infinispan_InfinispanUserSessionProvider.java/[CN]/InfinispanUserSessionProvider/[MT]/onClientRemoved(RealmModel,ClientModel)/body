@@ -1,0 +1,6 @@
+{
+  Map<String,String> map=new MapReduceTask(sessionCache).mappedWith(ClientSessionMapper.create(realm.getId()).client(client.getId()).emitKey()).reducedWith(new FirstResultReducer()).execute();
+  for (  String id : map.keySet()) {
+    tx.remove(sessionCache,id);
+  }
+}

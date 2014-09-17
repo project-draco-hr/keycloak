@@ -1,0 +1,11 @@
+{
+  if (userCache == null) {
+synchronized (this) {
+      if (userCache == null) {
+        Cache<String,CachedUser> cache=session.getProvider(InfinispanConnectionProvider.class).getCache("users");
+        cache.addListener(new CacheListener());
+        userCache=new InfinispanUserCache(cache,usernameLookup,emailLookup);
+      }
+    }
+  }
+}

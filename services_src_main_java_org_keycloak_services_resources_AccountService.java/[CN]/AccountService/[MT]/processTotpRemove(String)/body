@@ -3,6 +3,7 @@
     return login("totp");
   }
   require(AccountRoles.MANAGE_ACCOUNT);
+  csrfCheck(stateChecker);
   UserModel user=auth.getUser();
   user.setTotp(false);
   event.event(EventType.REMOVE_TOTP).client(auth.getClient()).user(auth.getUser()).success();

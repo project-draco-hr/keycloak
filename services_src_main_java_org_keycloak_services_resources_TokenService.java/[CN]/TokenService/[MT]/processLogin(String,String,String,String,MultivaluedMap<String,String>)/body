@@ -8,25 +8,25 @@
   }
   OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!checkSsl()) {
-    return oauth.forwardToSecurityFailure("HTTPS required");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
   }
   if (!realm.isEnabled()) {
     event.error(Errors.REALM_DISABLED);
-    return oauth.forwardToSecurityFailure("Realm not enabled.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled.");
   }
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
     event.error(Errors.CLIENT_NOT_FOUND);
-    return oauth.forwardToSecurityFailure("Unknown login requester.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown login requester.");
   }
   if (!client.isEnabled()) {
     event.error(Errors.CLIENT_NOT_FOUND);
-    return oauth.forwardToSecurityFailure("Login requester not enabled.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Login requester not enabled.");
   }
   redirect=verifyRedirectUri(uriInfo,redirect,realm,client);
   if (redirect == null) {
     event.error(Errors.INVALID_REDIRECT_URI);
-    return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid redirect_uri.");
   }
   if (formData.containsKey("cancel")) {
     event.error(Errors.REJECTED_BY_USER);

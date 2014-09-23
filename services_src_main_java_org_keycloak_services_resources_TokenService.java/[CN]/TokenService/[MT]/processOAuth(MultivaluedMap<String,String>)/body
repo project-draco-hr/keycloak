@@ -2,13 +2,13 @@
   event.event(EventType.LOGIN).detail(Details.RESPONSE_TYPE,"code");
   OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!checkSsl()) {
-    return oauth.forwardToSecurityFailure("HTTPS required");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
   }
   String code=formData.getFirst(OAuth2Constants.CODE);
   AccessCode accessCode=AccessCode.parse(code,session,realm);
   if (accessCode == null || !accessCode.isValid(ClientSessionModel.Action.OAUTH_GRANT)) {
     event.error(Errors.INVALID_CODE);
-    return oauth.forwardToSecurityFailure("Invalid access code.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid access code.");
   }
   event.detail(Details.CODE_ID,accessCode.getCodeId());
   String redirect=accessCode.getRedirectUri();
@@ -25,7 +25,7 @@
   if (!AuthenticationManager.isSessionValid(realm,userSession)) {
     AuthenticationManager.logout(session,realm,userSession,uriInfo,clientConnection);
     event.error(Errors.INVALID_CODE);
-    return oauth.forwardToSecurityFailure("Session not active");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Session not active");
   }
   event.session(userSession);
   if (formData.containsKey("cancel")) {

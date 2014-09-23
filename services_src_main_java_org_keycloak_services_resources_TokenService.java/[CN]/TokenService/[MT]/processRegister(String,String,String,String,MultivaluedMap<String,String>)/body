@@ -5,25 +5,25 @@
   OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!realm.isEnabled()) {
     event.error(Errors.REALM_DISABLED);
-    return oauth.forwardToSecurityFailure("Realm not enabled");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled");
   }
   ClientModel client=realm.findClient(clientId);
   if (client == null) {
     event.error(Errors.CLIENT_NOT_FOUND);
-    return oauth.forwardToSecurityFailure("Unknown login requester.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown login requester.");
   }
   if (!client.isEnabled()) {
     event.error(Errors.CLIENT_DISABLED);
-    return oauth.forwardToSecurityFailure("Login requester not enabled.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Login requester not enabled.");
   }
   redirect=verifyRedirectUri(uriInfo,redirect,realm,client);
   if (redirect == null) {
     event.error(Errors.INVALID_REDIRECT_URI);
-    return oauth.forwardToSecurityFailure("Invalid redirect_uri.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid redirect_uri.");
   }
   if (!realm.isRegistrationAllowed()) {
     event.error(Errors.REGISTRATION_DISABLED);
-    return oauth.forwardToSecurityFailure("Registration not allowed");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Registration not allowed");
   }
   List<String> requiredCredentialTypes=new LinkedList<String>();
   for (  RequiredCredentialModel m : realm.getRequiredCredentials()) {

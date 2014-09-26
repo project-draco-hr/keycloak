@@ -1,4 +1,6 @@
 {
   DBObject query=new BasicDBObject("realmId",realm.getId());
   mongoStore.removeEntities(MongoUserSessionEntity.class,query,invocationContext);
+  query=new QueryBuilder().and("realmId").is(realm.getId()).get();
+  mongoStore.removeEntities(MongoClientSessionEntity.class,query,invocationContext);
 }

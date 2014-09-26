@@ -15,7 +15,7 @@
     event.error(Errors.INVALID_CODE);
     throw new BadRequestException("Code not specified",Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build());
   }
-  AccessCode accessCode=AccessCode.parse(code,session,realm);
+  ClientSessionCode accessCode=ClientSessionCode.parse(code,session,realm);
   if (accessCode == null) {
     String[] parts=code.split("\\.");
     if (parts.length == 2) {
@@ -31,7 +31,8 @@
     event.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  event.detail(Details.CODE_ID,accessCode.getCodeId());
+  ClientSessionModel clientSession=accessCode.getClientSession();
+  event.detail(Details.CODE_ID,clientSession.getId());
   if (!accessCode.isValid(ClientSessionModel.Action.CODE_TO_TOKEN)) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
@@ -40,17 +41,18 @@
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
   accessCode.setAction(null);
-  event.user(accessCode.getUser());
-  event.session(accessCode.getSessionState());
+  UserSessionModel userSession=clientSession.getUserSession();
+  event.user(userSession.getUser());
+  event.session(userSession.getId());
   ClientModel client=authorizeClient(authorizationHeader,formData,event);
-  if (!client.getClientId().equals(accessCode.getClient().getClientId())) {
+  if (!client.getClientId().equals(clientSession.getClient().getClientId())) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
     res.put(OAuth2Constants.ERROR_DESCRIPTION,"Auth error");
     event.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  UserModel user=session.users().getUserById(accessCode.getUser().getId(),realm);
+  UserModel user=session.users().getUserById(userSession.getUser().getId(),realm);
   if (user == null) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");
@@ -65,7 +67,6 @@
     event.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
-  UserSessionModel userSession=session.sessions().getUserSession(realm,accessCode.getSessionState());
   if (!AuthenticationManager.isSessionValid(realm,userSession)) {
     AuthenticationManager.logout(session,realm,userSession,uriInfo,clientConnection);
     Map<String,String> res=new HashMap<String,String>();

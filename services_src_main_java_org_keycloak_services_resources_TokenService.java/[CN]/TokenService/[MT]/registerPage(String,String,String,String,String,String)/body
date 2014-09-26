@@ -1,0 +1,19 @@
+{
+  event.event(EventType.REGISTER);
+  if (!realm.isRegistrationAllowed()) {
+    event.error(Errors.REGISTRATION_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Registration not allowed");
+  }
+  FrontPageInitializer pageInitializer=new FrontPageInitializer();
+  pageInitializer.code=code;
+  pageInitializer.responseType=responseType;
+  pageInitializer.redirect=redirect;
+  pageInitializer.clientId=clientId;
+  pageInitializer.scopeParam=scopeParam;
+  pageInitializer.state=state;
+  Response response=pageInitializer.processInput();
+  if (response != null)   return response;
+  ClientSessionModel clientSession=pageInitializer.clientSession;
+  authManager.expireIdentityCookie(realm,uriInfo,clientConnection);
+  return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setAccessCode(new ClientSessionCode(realm,clientSession).getCode()).createRegistration();
+}

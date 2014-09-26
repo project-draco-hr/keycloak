@@ -1,18 +1,4 @@
 {
-  DBObject query=new QueryBuilder().and("clientSessions.clientId").is(client.getId()).get();
-  List<MongoUserSessionEntity> userSessionEntities=mongoStore.loadEntities(MongoUserSessionEntity.class,query,invocationContext);
-  for (  MongoUserSessionEntity e : userSessionEntities) {
-    if (e.getClientSessions() == null) {
-      continue;
-    }
-    List<MongoClientSessionEntity> remove=new LinkedList<MongoClientSessionEntity>();
-    for (    MongoClientSessionEntity c : e.getClientSessions()) {
-      if (c.getClientId().equals(client.getId())) {
-        remove.add(c);
-      }
-    }
-    for (    MongoClientSessionEntity c : remove) {
-      mongoStore.pullItemFromList(e,"clientSessions",c,invocationContext);
-    }
-  }
+  DBObject query=new QueryBuilder().and("clientId").is(client.getId()).get();
+  mongoStore.removeEntities(MongoUserSessionEntity.class,query,invocationContext);
 }

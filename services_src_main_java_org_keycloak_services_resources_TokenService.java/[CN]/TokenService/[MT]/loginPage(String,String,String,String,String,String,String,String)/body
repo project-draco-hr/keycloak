@@ -1,0 +1,55 @@
+{
+  event.event(EventType.LOGIN);
+  FrontPageInitializer pageInitializer=new FrontPageInitializer();
+  pageInitializer.code=code;
+  pageInitializer.responseType=responseType;
+  pageInitializer.redirect=redirect;
+  pageInitializer.clientId=clientId;
+  pageInitializer.scopeParam=scopeParam;
+  pageInitializer.state=state;
+  pageInitializer.prompt=prompt;
+  pageInitializer.loginHint=loginHint;
+  Response response=pageInitializer.processInput();
+  if (response != null)   return response;
+  ClientSessionModel clientSession=pageInitializer.clientSession;
+  code=pageInitializer.code;
+  responseType=pageInitializer.responseType;
+  redirect=pageInitializer.redirect;
+  clientId=pageInitializer.clientId;
+  scopeParam=pageInitializer.scopeParam;
+  state=pageInitializer.state;
+  prompt=pageInitializer.prompt;
+  loginHint=pageInitializer.loginHint;
+  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
+  AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers);
+  if (authResult != null) {
+    UserModel user=authResult.getUser();
+    UserSessionModel session=authResult.getSession();
+    TokenManager.attachClientSession(session,clientSession);
+    event.user(user).session(session).detail(Details.AUTH_METHOD,"sso");
+    return oauth.processAccessCode(clientSession,session,event);
+  }
+  if (prompt != null && prompt.equals("none")) {
+    return oauth.redirectError(clientSession.getClient(),"access_denied",state,redirect);
+  }
+  LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo).setAccessCode(new ClientSessionCode(realm,clientSession).getCode());
+  String rememberMeUsername=null;
+  if (realm.isRememberMe()) {
+    Cookie rememberMeCookie=headers.getCookies().get(AuthenticationManager.KEYCLOAK_REMEMBER_ME);
+    if (rememberMeCookie != null && !"".equals(rememberMeCookie.getValue())) {
+      rememberMeUsername=rememberMeCookie.getValue();
+    }
+  }
+  if (loginHint != null || rememberMeUsername != null) {
+    MultivaluedMap<String,String> formData=new MultivaluedMapImpl<String,String>();
+    if (loginHint != null) {
+      formData.add(AuthenticationManager.FORM_USERNAME,loginHint);
+    }
+ else {
+      formData.add(AuthenticationManager.FORM_USERNAME,rememberMeUsername);
+      formData.add("rememberMe","on");
+    }
+    forms.setFormData(formData);
+  }
+  return forms.createLogin();
+}

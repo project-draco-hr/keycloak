@@ -1,0 +1,29 @@
+{
+  event.event(EventType.UPDATE_PROFILE);
+  Checks checks=new Checks();
+  if (!checks.check(code,ClientSessionModel.Action.UPDATE_PROFILE)) {
+    return checks.response;
+  }
+  ClientSessionCode accessCode=checks.clientCode;
+  ClientSessionModel clientSession=accessCode.getClientSession();
+  UserSessionModel userSession=clientSession.getUserSession();
+  UserModel user=userSession.getUser();
+  initEvent(clientSession);
+  String error=Validation.validateUpdateProfileForm(formData);
+  if (error != null) {
+    return Flows.forms(session,realm,null,uriInfo).setUser(user).setError(error).setAccessCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PROFILE);
+  }
+  user.setFirstName(formData.getFirst("firstName"));
+  user.setLastName(formData.getFirst("lastName"));
+  String email=formData.getFirst("email");
+  String oldEmail=user.getEmail();
+  boolean emailChanged=oldEmail != null ? !oldEmail.equals(email) : email != null;
+  user.setEmail(email);
+  user.removeRequiredAction(RequiredAction.UPDATE_PROFILE);
+  event.clone().event(EventType.UPDATE_PROFILE).success();
+  if (emailChanged) {
+    user.setEmailVerified(false);
+    event.clone().event(EventType.UPDATE_EMAIL).detail(Details.PREVIOUS_EMAIL,oldEmail).detail(Details.UPDATED_EMAIL,email).success();
+  }
+  return redirectOauth(user,accessCode,clientSession,userSession);
+}

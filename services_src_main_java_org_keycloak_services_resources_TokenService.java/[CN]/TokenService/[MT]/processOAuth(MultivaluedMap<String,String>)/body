@@ -5,16 +5,16 @@
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
   }
   String code=formData.getFirst(OAuth2Constants.CODE);
-  AccessCode accessCode=AccessCode.parse(code,session,realm);
+  ClientSessionCode accessCode=ClientSessionCode.parse(code,session,realm);
   if (accessCode == null || !accessCode.isValid(ClientSessionModel.Action.OAUTH_GRANT)) {
     event.error(Errors.INVALID_CODE);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid access code.");
   }
-  event.detail(Details.CODE_ID,accessCode.getCodeId());
-  String redirect=accessCode.getRedirectUri();
-  String state=accessCode.getState();
-  event.client(accessCode.getClient()).user(accessCode.getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.REDIRECT_URI,redirect);
-  UserSessionModel userSession=session.sessions().getUserSession(realm,accessCode.getSessionState());
+  ClientSessionModel clientSession=accessCode.getClientSession();
+  event.detail(Details.CODE_ID,clientSession.getId());
+  String redirect=clientSession.getRedirectUri();
+  event.client(clientSession.getClient()).user(clientSession.getUserSession().getUser()).detail(Details.RESPONSE_TYPE,"code").detail(Details.REDIRECT_URI,redirect);
+  UserSessionModel userSession=clientSession.getUserSession();
   if (userSession != null) {
     event.detail(Details.AUTH_METHOD,userSession.getAuthMethod());
     event.detail(Details.USERNAME,userSession.getLoginUsername());
@@ -30,9 +30,9 @@
   event.session(userSession);
   if (formData.containsKey("cancel")) {
     event.error(Errors.REJECTED_BY_USER);
-    return redirectAccessDenied(redirect,state);
+    return redirectAccessDenied(redirect,clientSession.getNote(OpenIdConnectProtocol.STATE_PARAM));
   }
   event.success();
   accessCode.setAction(ClientSessionModel.Action.CODE_TO_TOKEN);
-  return oauth.redirectAccessCode(accessCode,userSession,state,redirect);
+  return oauth.redirectAccessCode(accessCode,userSession,clientSession.getNote(OpenIdConnectProtocol.STATE_PARAM),redirect);
 }

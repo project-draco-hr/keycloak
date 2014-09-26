@@ -18,7 +18,7 @@
     Assert.assertEquals("Bob",profilePage.getFirstName());
     Assert.assertEquals("Builder",profilePage.getLastName());
     Assert.assertEquals("bob@builder.com",profilePage.getEmail());
-    String userId=events.expect(EventType.REGISTER).user(AssertEvents.isUUID()).detail(Details.EMAIL,"bob@builder.com").detail(Details.RESPONSE_TYPE,"code").detail(Details.REGISTER_METHOD,"social@dummy").detail(Details.REDIRECT_URI,AssertEvents.DEFAULT_REDIRECT_URI).detail(Details.USERNAME,"2@dummy").assertEvent().getUserId();
+    String userId=events.expect(EventType.REGISTER).user(AssertEvents.isUUID()).detail(Details.EMAIL,"bob@builder.com").detail(Details.REGISTER_METHOD,"social@dummy").detail(Details.REDIRECT_URI,AssertEvents.DEFAULT_REDIRECT_URI).detail(Details.USERNAME,"2@dummy").assertEvent().getUserId();
     profilePage.update("Dummy","User","dummy-user-reg@dummy-social");
     events.expectRequiredAction(EventType.UPDATE_PROFILE).user(userId).detail(Details.AUTH_METHOD,"social@dummy").detail(Details.USERNAME,"2@dummy").assertEvent();
     events.expectRequiredAction(EventType.UPDATE_EMAIL).user(userId).detail(Details.AUTH_METHOD,"social@dummy").detail(Details.USERNAME,"2@dummy").detail(Details.PREVIOUS_EMAIL,"bob@builder.com").detail(Details.UPDATED_EMAIL,"dummy-user-reg@dummy-social").assertEvent();

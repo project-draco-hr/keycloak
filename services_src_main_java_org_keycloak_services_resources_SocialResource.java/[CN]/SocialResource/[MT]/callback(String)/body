@@ -1,59 +1,43 @@
 {
-  State initialRequest;
+  ClientSessionCode clientCode=null;
+  ClientSessionModel clientSession=null;
   try {
-    initialRequest=new JWSInput(encodedState).readJsonContent(State.class);
+    clientCode=ClientSessionCode.parse(encodedState,session);
+    if (clientCode == null) {
+      return Flows.forms(session,null,null,uriInfo).setError("Unexpected callback").createErrorPage();
+    }
+    clientSession=clientCode.getClientSession();
+    if (!clientCode.isValid(ClientSessionModel.Action.SOCIAL_CALLBACK)) {
+      return Flows.forwardToSecurityFailurePage(session,clientSession.getRealm(),uriInfo,"Invalid code, please login again through your application.");
+    }
   }
  catch (  Throwable t) {
     logger.error("Invalid social callback",t);
     return Flows.forms(session,null,null,uriInfo).setError("Unexpected callback").createErrorPage();
   }
-  SocialProvider provider=SocialLoader.load(initialRequest.getProvider());
-  String realmName=initialRequest.getRealm();
+  String providerId=clientSession.getNote("social_provider");
+  SocialProvider provider=SocialLoader.load(providerId);
   String authMethod="social@" + provider.getId();
-  RealmManager realmManager=new RealmManager(session);
-  RealmModel realm=realmManager.getRealmByName(realmName);
-  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.LOGIN).detail(Details.RESPONSE_TYPE,initialRequest.get(OAuth2Constants.RESPONSE_TYPE)).detail(Details.AUTH_METHOD,authMethod);
-  AuthenticationManager authManager=new AuthenticationManager();
-  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
+  RealmModel realm=clientSession.getRealm();
+  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.SOCIAL_LOGIN).client(clientSession.getClient()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.AUTH_METHOD,authMethod);
   if (!realm.isEnabled()) {
     event.error(Errors.REALM_DISABLED);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled.");
-  }
-  String clientId=initialRequest.get(OAuth2Constants.CLIENT_ID);
-  String redirectUri=initialRequest.get(OAuth2Constants.REDIRECT_URI);
-  String scope=initialRequest.get(OAuth2Constants.SCOPE);
-  String state=initialRequest.get(OAuth2Constants.STATE);
-  String responseType=initialRequest.get(OAuth2Constants.RESPONSE_TYPE);
-  event.client(clientId).detail(Details.REDIRECT_URI,redirectUri);
-  ClientModel client=realm.findClient(clientId);
-  if (client == null) {
-    event.error(Errors.CLIENT_NOT_FOUND);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown login requester.");
-  }
-  if (!client.isEnabled()) {
-    event.error(Errors.CLIENT_DISABLED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Login requester not enabled.");
   }
   String key=realm.getSocialConfig().get(provider.getId() + ".key");
   String secret=realm.getSocialConfig().get(provider.getId() + ".secret");
   String callbackUri=Urls.socialCallback(uriInfo.getBaseUri()).toString();
   SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
   Map<String,String[]> queryParams=getQueryParams();
-  Map<String,String> attributes=getAttributes();
-  AuthCallback callback=new AuthCallback(queryParams,attributes);
+  AuthCallback callback=new AuthCallback(queryParams);
   SocialUser socialUser;
   try {
-    socialUser=provider.processCallback(config,callback);
+    socialUser=provider.processCallback(clientSession,config,callback);
   }
  catch (  SocialAccessDeniedException e) {
-    MultivaluedMap<String,String> queryParms=new MultivaluedMapImpl<String,String>();
-    queryParms.putSingle(OAuth2Constants.CLIENT_ID,clientId);
-    queryParms.putSingle(OAuth2Constants.STATE,state);
-    queryParms.putSingle(OAuth2Constants.SCOPE,scope);
-    queryParms.putSingle(OAuth2Constants.REDIRECT_URI,redirectUri);
-    queryParms.putSingle(OAuth2Constants.RESPONSE_TYPE,responseType);
     event.error(Errors.REJECTED_BY_USER);
-    return Flows.forms(session,realm,client,uriInfo).setQueryParams(queryParms).setWarning("Access denied").createLogin();
+    clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE);
+    return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setAccessCode(clientCode.getCode()).setWarning("Access denied").createLogin();
   }
 catch (  SocialProviderException e) {
     logger.error("Failed to process social callback",e);
@@ -63,10 +47,9 @@ catch (  SocialProviderException e) {
   try {
     SocialLinkModel socialLink=new SocialLinkModel(provider.getId(),socialUser.getId(),socialUser.getUsername());
     UserModel user=session.users().getUserBySocialLink(socialLink,realm);
-    String userId=initialRequest.getUser();
-    if (userId != null) {
-      UserModel authenticatedUser=session.users().getUserById(userId,realm);
-      event.event(EventType.SOCIAL_LINK).user(userId);
+    if (clientSession.getUserSession() != null) {
+      UserModel authenticatedUser=clientSession.getUserSession().getUser();
+      event.event(EventType.SOCIAL_LINK).user(authenticatedUser.getId());
       if (user != null) {
         event.error(Errors.SOCIAL_ID_IN_USE);
         return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"This social account is already linked to other user");
@@ -79,14 +62,10 @@ catch (  SocialProviderException e) {
         event.error(Errors.NOT_ALLOWED);
         return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Insufficient permissions to link social account");
       }
-      if (redirectUri == null) {
-        event.error(Errors.INVALID_REDIRECT_URI);
-        return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown redirectUri");
-      }
       session.users().addSocialLink(realm,authenticatedUser,socialLink);
       logger.debugv("Social provider {0} linked with user {1}",provider.getId(),authenticatedUser.getUsername());
       event.success();
-      return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
+      return Response.status(302).location(UriBuilder.fromUri(clientSession.getRedirectUri()).build()).build();
     }
     if (user == null) {
       user=session.users().addUser(realm,KeycloakModelUtils.generateId());
@@ -108,13 +87,15 @@ catch (  SocialProviderException e) {
     String username=socialLink.getSocialUserId() + "@" + socialLink.getSocialProvider();
     UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),authMethod,false);
     event.session(userSession);
-    Response response=oauth.processAccessCode(scope,state,redirectUri,client,user,userSession,event);
+    TokenManager.attachClientSession(userSession,clientSession);
+    OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,new AuthenticationManager(),tokenManager);
+    Response response=oauth.processAccessCode(clientSession,userSession,event);
     if (session.getTransaction().isActive()) {
       session.getTransaction().commit();
     }
     return response;
   }
  catch (  ModelDuplicateException e) {
-    return returnToLogin(realm,client,initialRequest.getAttributes(),"socialEmailExists");
+    return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setAccessCode(clientCode.getCode()).setError("socialEmailExists").createLogin();
   }
 }

@@ -1,0 +1,11 @@
+{
+  code.setAction(ClientSessionModel.Action.SOCIAL_CALLBACK);
+  code.getClientSession().setNote("social_provider",socialProvider.getId());
+  String socialProviderId=socialProvider.getId();
+  String key=realm.getSocialConfig().get(socialProviderId + ".key");
+  String secret=realm.getSocialConfig().get(socialProviderId + ".secret");
+  String callbackUri=Urls.socialCallback(uriInfo.getBaseUri()).toString();
+  SocialProviderConfig config=new SocialProviderConfig(key,secret,callbackUri);
+  AuthRequest authRequest=socialProvider.getAuthUrl(code.getClientSession(),config,code.getCode());
+  return Response.status(302).location(authRequest.getAuthUri()).build();
+}

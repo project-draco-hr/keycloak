@@ -1,0 +1,48 @@
+{
+  UserModel user=session.getUser();
+  isTotpConfigurationRequired(user);
+  isEmailVerificationRequired(user);
+  ClientModel client=clientSession.getClient();
+  boolean isResource=client instanceof ApplicationModel;
+  ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
+  log.debugv("processAccessCode: isResource: {0}",isResource);
+  log.debugv("processAccessCode: go to oauth page?: {0}",!isResource);
+  event.detail(Details.CODE_ID,clientSession.getId());
+  Set<RequiredAction> requiredActions=user.getRequiredActions();
+  if (!requiredActions.isEmpty()) {
+    RequiredAction action=user.getRequiredActions().iterator().next();
+    accessCode.setRequiredAction(action);
+    LoginFormsProvider loginFormsProvider=Flows.forms(this.session,realm,client,uriInfo).setAccessCode(accessCode.getCode()).setUser(user);
+    if (action.equals(RequiredAction.VERIFY_EMAIL)) {
+      String key=UUID.randomUUID().toString();
+      clientSession.setNote("key",key);
+      loginFormsProvider.setVerifyCode(key);
+      event.clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
+    }
+    return loginFormsProvider.createResponse(action);
+  }
+  if (!isResource) {
+    accessCode.setAction(ClientSessionModel.Action.OAUTH_GRANT);
+    List<RoleModel> realmRoles=new LinkedList<RoleModel>();
+    MultivaluedMap<String,RoleModel> resourceRoles=new MultivaluedMapImpl<String,RoleModel>();
+    for (    RoleModel r : accessCode.getRequestedRoles()) {
+      if (r.getContainer() instanceof RealmModel) {
+        realmRoles.add(r);
+      }
+ else {
+        resourceRoles.add(((ApplicationModel)r.getContainer()).getName(),r);
+      }
+    }
+    return Flows.forms(this.session,realm,client,uriInfo).setAccessCode(accessCode.getCode()).setAccessRequest(realmRoles,resourceRoles).setClient(client).createOAuthGrant();
+  }
+  String redirect=clientSession.getRedirectUri();
+  if (redirect != null) {
+    event.success();
+    String state=clientSession.getNote(OpenIdConnectProtocol.STATE_PARAM);
+    accessCode.setAction(ClientSessionModel.Action.CODE_TO_TOKEN);
+    return redirectAccessCode(accessCode,session,state,redirect);
+  }
+ else {
+    return null;
+  }
+}

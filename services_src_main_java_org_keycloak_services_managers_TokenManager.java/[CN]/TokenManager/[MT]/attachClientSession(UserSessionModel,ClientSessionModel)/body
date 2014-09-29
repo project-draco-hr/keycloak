@@ -1,0 +1,9 @@
+{
+  UserModel user=session.getUser();
+  clientSession.setUserSession(session);
+  Set<String> requestedRoles=new HashSet<String>();
+  for (  RoleModel r : TokenManager.getAccess(null,clientSession.getClient(),user)) {
+    requestedRoles.add(r.getId());
+  }
+  clientSession.setRoles(requestedRoles);
+}

@@ -1,0 +1,79 @@
+{
+  event.event(EventType.LOGIN);
+  if (!checkSsl()) {
+    event.error(Errors.SSL_REQUIRED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
+  }
+  if (!realm.isEnabled()) {
+    event.error(Errors.REALM_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled.");
+  }
+  ClientSessionCode clientCode=ClientSessionCode.parse(code,session,realm);
+  if (clientCode == null) {
+    event.error(Errors.INVALID_CODE);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown code, please login again through your application.");
+  }
+  ClientSessionModel clientSession=clientCode.getClientSession();
+  if (!clientCode.isValid(ClientSessionModel.Action.AUTHENTICATE)) {
+    clientCode.setAction(ClientSessionModel.Action.AUTHENTICATE);
+    event.client(clientSession.getClient()).error(Errors.INVALID_USER_CREDENTIALS);
+    return Flows.forms(this.session,realm,clientSession.getClient(),uriInfo).setError(Messages.INVALID_USER).setAccessCode(clientCode.getCode()).createLogin();
+  }
+  String username=formData.getFirst(AuthenticationManager.FORM_USERNAME);
+  String rememberMe=formData.getFirst("rememberMe");
+  boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("on");
+  event.client(clientSession.getClient().getClientId()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
+  if (remember) {
+    event.detail(Details.REMEMBER_ME,"true");
+  }
+  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
+  ClientModel client=clientSession.getClient();
+  if (client == null) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown login requester.");
+  }
+  if (!client.isEnabled()) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Login requester not enabled.");
+  }
+  if (formData.containsKey("cancel")) {
+    event.error(Errors.REJECTED_BY_USER);
+    return oauth.redirectError(client,"access_denied",clientSession.getNote(OpenIdConnectProtocol.STATE_PARAM),clientSession.getRedirectUri());
+  }
+  AuthenticationStatus status=authManager.authenticateForm(session,clientConnection,realm,formData);
+  if (remember) {
+    authManager.createRememberMeCookie(realm,username,uriInfo,clientConnection);
+  }
+ else {
+    authManager.expireRememberMeCookie(realm,uriInfo,clientConnection);
+  }
+  UserModel user=KeycloakModelUtils.findUserByNameOrEmail(session,realm,username);
+  if (user != null) {
+    event.user(user);
+  }
+switch (status) {
+case SUCCESS:
+case ACTIONS_REQUIRED:
+    UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"form",remember);
+  TokenManager.attachClientSession(userSession,clientSession);
+event.session(userSession);
+return oauth.processAccessCode(clientSession,userSession,event);
+case ACCOUNT_TEMPORARILY_DISABLED:
+event.error(Errors.USER_TEMPORARILY_DISABLED);
+return Flows.forms(this.session,realm,client,uriInfo).setError(Messages.ACCOUNT_TEMPORARILY_DISABLED).setFormData(formData).setAccessCode(clientCode.getCode()).createLogin();
+case ACCOUNT_DISABLED:
+event.error(Errors.USER_DISABLED);
+return Flows.forms(this.session,realm,client,uriInfo).setError(Messages.ACCOUNT_DISABLED).setAccessCode(clientCode.getCode()).setFormData(formData).createLogin();
+case MISSING_TOTP:
+formData.remove(CredentialRepresentation.PASSWORD);
+String passwordToken=new JWSBuilder().jsonContent(new PasswordToken(realm.getName(),user.getId())).rsa256(realm.getPrivateKey());
+formData.add(CredentialRepresentation.PASSWORD_TOKEN,passwordToken);
+return Flows.forms(this.session,realm,client,uriInfo).setFormData(formData).setAccessCode(clientCode.getCode()).createLoginTotp();
+case INVALID_USER:
+event.error(Errors.USER_NOT_FOUND);
+return Flows.forms(this.session,realm,client,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).setAccessCode(clientCode.getCode()).createLogin();
+default :
+event.error(Errors.INVALID_USER_CREDENTIALS);
+return Flows.forms(this.session,realm,client,uriInfo).setError(Messages.INVALID_USER).setFormData(formData).setAccessCode(clientCode.getCode()).createLogin();
+}
+}

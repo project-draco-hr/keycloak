@@ -39,12 +39,15 @@
       boolean associated=false;
       for (      ClientSessionModel c : userSession.getClientSessions()) {
         if (c.getClient().equals(application)) {
+          auth.setClientSession(c);
           associated=true;
           break;
         }
       }
       if (!associated) {
-        session.sessions().createClientSession(realm,application,userSession,null,null,null);
+        ClientSessionModel clientSession=session.sessions().createClientSession(realm,application);
+        clientSession.setUserSession(userSession);
+        auth.setClientSession(clientSession);
       }
     }
     account.setUser(auth.getUser());

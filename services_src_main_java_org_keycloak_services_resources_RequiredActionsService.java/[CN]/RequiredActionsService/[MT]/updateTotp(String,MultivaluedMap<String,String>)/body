@@ -1,0 +1,29 @@
+{
+  event.event(EventType.UPDATE_TOTP);
+  Checks checks=new Checks();
+  if (!checks.check(code,ClientSessionModel.Action.CONFIGURE_TOTP)) {
+    return checks.response;
+  }
+  ClientSessionCode accessCode=checks.clientCode;
+  ClientSessionModel clientSession=accessCode.getClientSession();
+  UserSessionModel userSession=clientSession.getUserSession();
+  UserModel user=userSession.getUser();
+  initEvent(clientSession);
+  String totp=formData.getFirst("totp");
+  String totpSecret=formData.getFirst("totpSecret");
+  LoginFormsProvider loginForms=Flows.forms(session,realm,null,uriInfo).setUser(user);
+  if (Validation.isEmpty(totp)) {
+    return loginForms.setError(Messages.MISSING_TOTP).setAccessCode(accessCode.getCode()).createResponse(RequiredAction.CONFIGURE_TOTP);
+  }
+ else   if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
+    return loginForms.setError(Messages.INVALID_TOTP).setAccessCode(accessCode.getCode()).createResponse(RequiredAction.CONFIGURE_TOTP);
+  }
+  UserCredentialModel credentials=new UserCredentialModel();
+  credentials.setType(CredentialRepresentation.TOTP);
+  credentials.setValue(totpSecret);
+  session.users().updateCredential(realm,user,credentials);
+  user.setTotp(true);
+  user.removeRequiredAction(RequiredAction.CONFIGURE_TOTP);
+  event.clone().event(EventType.UPDATE_TOTP).success();
+  return redirectOauth(user,accessCode,clientSession,userSession);
+}

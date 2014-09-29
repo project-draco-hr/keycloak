@@ -2,7 +2,11 @@
   for (int i=0; i < 25; i++) {
     UserSessionModel userSession=session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0." + i,"form",false);
     userSession.setStarted(Time.currentTime() + i);
-    session.sessions().createClientSession(realm,realm.findClient("test-app"),userSession,"http://redirect","state",new HashSet<String>());
+    ClientSessionModel clientSession=session.sessions().createClientSession(realm,realm.findClient("test-app"));
+    clientSession.setUserSession(userSession);
+    clientSession.setRedirectUri("http://redirect");
+    clientSession.setRoles(new HashSet<String>());
+    clientSession.setNote(OpenIdConnectProtocol.STATE_PARAM,"state");
   }
   resetSession();
   assertPaginatedSession(realm,realm.findClient("test-app"),0,1,1);

@@ -1,0 +1,22 @@
+{
+  if (accessCode == null) {
+    return null;
+  }
+  Set<RequiredAction> requiredActions=user.getRequiredActions();
+  if (!requiredActions.isEmpty()) {
+    accessCode.setRequiredAction(requiredActions.iterator().next());
+    return Flows.forms(session,realm,null,uriInfo).setAccessCode(accessCode.getCode()).setUser(user).createResponse(requiredActions.iterator().next());
+  }
+ else {
+    logger.debugv("Redirecting to: {0}",clientSession.getRedirectUri());
+    accessCode.setAction(ClientSessionModel.Action.CODE_TO_TOKEN);
+    AuthenticationManager authManager=new AuthenticationManager();
+    if (!AuthenticationManager.isSessionValid(realm,userSession)) {
+      AuthenticationManager.logout(session,realm,userSession,uriInfo,clientConnection);
+      return Flows.oauth(this.session,realm,request,uriInfo,clientConnection,authManager,tokenManager).redirectError(clientSession.getClient(),"access_denied",clientSession.getNote(OpenIdConnectProtocol.STATE_PARAM),clientSession.getRedirectUri());
+    }
+    event.session(userSession);
+    event.success();
+    return Flows.oauth(this.session,realm,request,uriInfo,clientConnection,authManager,tokenManager).redirectAccessCode(accessCode,userSession,clientSession.getNote(OpenIdConnectProtocol.STATE_PARAM),clientSession.getRedirectUri());
+  }
+}

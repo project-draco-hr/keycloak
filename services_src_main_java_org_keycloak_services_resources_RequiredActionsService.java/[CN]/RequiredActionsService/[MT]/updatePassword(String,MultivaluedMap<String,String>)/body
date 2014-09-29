@@ -1,0 +1,30 @@
+{
+  event.event(EventType.UPDATE_PASSWORD);
+  Checks checks=new Checks();
+  if (!checks.check(code,ClientSessionModel.Action.UPDATE_PASSWORD)) {
+    return checks.response;
+  }
+  ClientSessionCode accessCode=checks.clientCode;
+  ClientSessionModel clientSession=accessCode.getClientSession();
+  UserSessionModel userSession=clientSession.getUserSession();
+  UserModel user=userSession.getUser();
+  initEvent(clientSession);
+  String passwordNew=formData.getFirst("password-new");
+  String passwordConfirm=formData.getFirst("password-confirm");
+  LoginFormsProvider loginForms=Flows.forms(session,realm,null,uriInfo).setUser(user);
+  if (Validation.isEmpty(passwordNew)) {
+    return loginForms.setError(Messages.MISSING_PASSWORD).setAccessCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
+  }
+ else   if (!passwordNew.equals(passwordConfirm)) {
+    return loginForms.setError(Messages.NOTMATCH_PASSWORD).setAccessCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
+  }
+  try {
+    session.users().updateCredential(realm,user,UserCredentialModel.password(passwordNew));
+  }
+ catch (  Exception ape) {
+    return loginForms.setError(ape.getMessage()).setAccessCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
+  }
+  user.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
+  event.clone().event(EventType.UPDATE_PASSWORD).success();
+  return redirectOauth(user,accessCode,clientSession,userSession);
+}

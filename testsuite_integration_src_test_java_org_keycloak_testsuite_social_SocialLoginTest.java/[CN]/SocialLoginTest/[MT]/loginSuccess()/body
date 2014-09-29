@@ -8,8 +8,8 @@
   driver.findElement(By.id("email")).sendKeys("bob@builder.com");
   driver.findElement(By.id("login")).click();
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
-  String userId=events.expect(EventType.REGISTER).user(AssertEvents.isUUID()).detail(Details.EMAIL,"bob@builder.com").detail(Details.RESPONSE_TYPE,"code").detail(Details.REGISTER_METHOD,"social@dummy").detail(Details.REDIRECT_URI,AssertEvents.DEFAULT_REDIRECT_URI).detail(Details.USERNAME,"1@dummy").session((String)null).assertEvent().getUserId();
-  Event loginEvent=events.expectLogin().user(userId).detail(Details.USERNAME,"1@dummy").detail(Details.AUTH_METHOD,"social@dummy").assertEvent();
+  String userId=events.expect(EventType.REGISTER).user(AssertEvents.isUUID()).detail(Details.EMAIL,"bob@builder.com").detail(Details.REGISTER_METHOD,"social@dummy").detail(Details.REDIRECT_URI,AssertEvents.DEFAULT_REDIRECT_URI).detail(Details.USERNAME,"1@dummy").session((String)null).assertEvent().getUserId();
+  Event loginEvent=events.expectSocialLogin().user(userId).detail(Details.USERNAME,"1@dummy").detail(Details.AUTH_METHOD,"social@dummy").assertEvent();
   String sessionId=loginEvent.getSessionId();
   String codeId=loginEvent.getDetails().get(Details.CODE_ID);
   AccessTokenResponse response=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get(OAuth2Constants.CODE),"password");
@@ -29,5 +29,5 @@
   driver.findElement(By.id("id")).sendKeys("1");
   driver.findElement(By.id("username")).sendKeys("dummy-user1");
   driver.findElement(By.id("login")).click();
-  events.expectLogin().user(userId).detail(Details.USERNAME,"1@dummy").detail(Details.AUTH_METHOD,"social@dummy").assertEvent();
+  events.expectSocialLogin().user(userId).detail(Details.USERNAME,"1@dummy").detail(Details.AUTH_METHOD,"social@dummy").assertEvent();
 }

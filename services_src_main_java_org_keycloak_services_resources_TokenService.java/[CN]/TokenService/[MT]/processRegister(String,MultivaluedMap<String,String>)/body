@@ -1,0 +1,89 @@
+{
+  event.event(EventType.REGISTER);
+  if (!checkSsl()) {
+    event.error(Errors.SSL_REQUIRED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
+  }
+  if (!realm.isEnabled()) {
+    event.error(Errors.REALM_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled.");
+  }
+  if (!realm.isRegistrationAllowed()) {
+    event.error(Errors.REGISTRATION_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Registration not allowed");
+  }
+  ClientSessionCode clientCode=ClientSessionCode.parse(code,session,realm);
+  if (clientCode == null) {
+    event.error(Errors.INVALID_CODE);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown code, please login again through your application.");
+  }
+  if (!clientCode.isValid(ClientSessionModel.Action.AUTHENTICATE)) {
+    event.error(Errors.INVALID_CODE);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid code, please login again through your application.");
+  }
+  String username=formData.getFirst("username");
+  String email=formData.getFirst("email");
+  ClientSessionModel clientSession=clientCode.getClientSession();
+  event.client(clientSession.getClient()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.RESPONSE_TYPE,"code").detail(Details.USERNAME,username).detail(Details.EMAIL,email).detail(Details.REGISTER_METHOD,"form");
+  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
+  if (!realm.isEnabled()) {
+    event.error(Errors.REALM_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled");
+  }
+  ClientModel client=clientSession.getClient();
+  if (client == null) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown login requester.");
+  }
+  if (!client.isEnabled()) {
+    event.error(Errors.CLIENT_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Login requester not enabled.");
+  }
+  List<String> requiredCredentialTypes=new LinkedList<String>();
+  for (  RequiredCredentialModel m : realm.getRequiredCredentials()) {
+    requiredCredentialTypes.add(m.getType());
+  }
+  String error=Validation.validateRegistrationForm(formData,requiredCredentialTypes);
+  if (error == null) {
+    error=Validation.validatePassword(formData,realm.getPasswordPolicy());
+  }
+  if (error != null) {
+    event.error(Errors.INVALID_REGISTRATION);
+    return Flows.forms(session,realm,client,uriInfo).setError(error).setFormData(formData).setAccessCode(clientCode.getCode()).createRegistration();
+  }
+  if (session.users().getUserByUsername(username,realm) != null) {
+    event.error(Errors.USERNAME_IN_USE);
+    return Flows.forms(session,realm,client,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).setAccessCode(clientCode.getCode()).createRegistration();
+  }
+  if (session.users().getUserByEmail(email,realm) != null) {
+    event.error(Errors.EMAIL_IN_USE);
+    return Flows.forms(session,realm,client,uriInfo).setError(Messages.EMAIL_EXISTS).setFormData(formData).setAccessCode(clientCode.getCode()).createRegistration();
+  }
+  UserModel user=session.users().addUser(realm,username);
+  user.setEnabled(true);
+  user.setFirstName(formData.getFirst("firstName"));
+  user.setLastName(formData.getFirst("lastName"));
+  user.setEmail(email);
+  if (requiredCredentialTypes.contains(CredentialRepresentation.PASSWORD)) {
+    UserCredentialModel credentials=new UserCredentialModel();
+    credentials.setType(CredentialRepresentation.PASSWORD);
+    credentials.setValue(formData.getFirst("password"));
+    boolean passwordUpdateSuccessful;
+    String passwordUpdateError=null;
+    try {
+      session.users().updateCredential(realm,user,UserCredentialModel.password(formData.getFirst("password")));
+      passwordUpdateSuccessful=true;
+    }
+ catch (    Exception ape) {
+      passwordUpdateSuccessful=false;
+      passwordUpdateError=ape.getMessage();
+    }
+    if (!passwordUpdateSuccessful) {
+      user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+      return Flows.forms(session,realm,client,uriInfo).setError(passwordUpdateError).setAccessCode(clientCode.getCode()).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
+    }
+  }
+  event.user(user).success();
+  event.reset();
+  return processLogin(code,formData);
+}

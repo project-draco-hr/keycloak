@@ -1,6 +1,5 @@
 {
   event.event(EventType.LOGIN).detail(Details.RESPONSE_TYPE,"code");
-  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!checkSsl()) {
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
   }
@@ -28,11 +27,12 @@
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Session not active");
   }
   event.session(userSession);
+  LoginProtocol protocol=session.getProvider(LoginProtocol.class,clientSession.getAuthMethod());
+  protocol.setRealm(realm).setRequest(request).setUriInfo(uriInfo).setClientConnection(clientConnection);
   if (formData.containsKey("cancel")) {
     event.error(Errors.REJECTED_BY_USER);
-    return redirectAccessDenied(redirect,clientSession.getNote(OpenIdConnectProtocol.STATE_PARAM));
+    return protocol.consentDenied(clientSession);
   }
   event.success();
-  accessCode.setAction(ClientSessionModel.Action.CODE_TO_TOKEN);
-  return oauth.redirectAccessCode(accessCode,userSession,clientSession.getNote(OpenIdConnectProtocol.STATE_PARAM),redirect);
+  return authManager.redirectAfterSuccessfulFlow(session,realm,userSession,clientSession,request,uriInfo,clientConnection);
 }

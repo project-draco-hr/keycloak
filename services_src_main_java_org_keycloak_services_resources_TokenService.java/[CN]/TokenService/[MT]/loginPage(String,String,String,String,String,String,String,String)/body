@@ -20,19 +20,19 @@
   state=pageInitializer.state;
   prompt=pageInitializer.prompt;
   loginHint=pageInitializer.loginHint;
-  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers);
   if (authResult != null) {
     UserModel user=authResult.getUser();
-    UserSessionModel session=authResult.getSession();
-    TokenManager.attachClientSession(session,clientSession);
-    event.user(user).session(session).detail(Details.AUTH_METHOD,"sso");
-    return oauth.processAccessCode(clientSession,session,event);
+    UserSessionModel userSession=authResult.getSession();
+    TokenManager.attachClientSession(userSession,clientSession);
+    event.user(user).session(userSession).detail(Details.AUTH_METHOD,"sso");
+    return authManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
   }
   if (prompt != null && prompt.equals("none")) {
-    return oauth.redirectError(clientSession.getClient(),"access_denied",state,redirect);
+    OAuthFlows oauth=new OAuthFlows(session,realm,request,uriInfo,clientConnection);
+    return oauth.cancelLogin(clientSession);
   }
-  LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo).setAccessCode(new ClientSessionCode(realm,clientSession).getCode());
+  LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(new ClientSessionCode(realm,clientSession).getCode());
   String rememberMeUsername=null;
   if (realm.isRememberMe()) {
     Cookie rememberMeCookie=headers.getCookies().get(AuthenticationManager.KEYCLOAK_REMEMBER_ME);

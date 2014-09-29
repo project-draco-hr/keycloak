@@ -25,7 +25,6 @@
   String email=formData.getFirst("email");
   ClientSessionModel clientSession=clientCode.getClientSession();
   event.client(clientSession.getClient()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.RESPONSE_TYPE,"code").detail(Details.USERNAME,username).detail(Details.EMAIL,email).detail(Details.REGISTER_METHOD,"form");
-  OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
   if (!realm.isEnabled()) {
     event.error(Errors.REALM_DISABLED);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled");
@@ -49,15 +48,15 @@
   }
   if (error != null) {
     event.error(Errors.INVALID_REGISTRATION);
-    return Flows.forms(session,realm,client,uriInfo).setError(error).setFormData(formData).setAccessCode(clientCode.getCode()).createRegistration();
+    return Flows.forms(session,realm,client,uriInfo).setError(error).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
   }
   if (session.users().getUserByUsername(username,realm) != null) {
     event.error(Errors.USERNAME_IN_USE);
-    return Flows.forms(session,realm,client,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).setAccessCode(clientCode.getCode()).createRegistration();
+    return Flows.forms(session,realm,client,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
   }
   if (session.users().getUserByEmail(email,realm) != null) {
     event.error(Errors.EMAIL_IN_USE);
-    return Flows.forms(session,realm,client,uriInfo).setError(Messages.EMAIL_EXISTS).setFormData(formData).setAccessCode(clientCode.getCode()).createRegistration();
+    return Flows.forms(session,realm,client,uriInfo).setError(Messages.EMAIL_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
   }
   UserModel user=session.users().addUser(realm,username);
   user.setEnabled(true);
@@ -80,7 +79,7 @@
     }
     if (!passwordUpdateSuccessful) {
       user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
-      return Flows.forms(session,realm,client,uriInfo).setError(passwordUpdateError).setAccessCode(clientCode.getCode()).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
+      return Flows.forms(session,realm,client,uriInfo).setError(passwordUpdateError).setClientSessionCode(clientCode.getCode()).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
     }
   }
   event.user(user).success();

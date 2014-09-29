@@ -14,9 +14,9 @@
     if (key == null || !key.equals(keyNote)) {
       return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Somebody is trying to illegally change your password.");
     }
-    return Flows.forms(session,realm,null,uriInfo).setAccessCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
+    return Flows.forms(session,realm,null,uriInfo).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
  else {
-    return Flows.forms(session,realm,null,uriInfo).setAccessCode(code).createPasswordReset();
+    return Flows.forms(session,realm,null,uriInfo).setClientSessionCode(code).createPasswordReset();
   }
 }

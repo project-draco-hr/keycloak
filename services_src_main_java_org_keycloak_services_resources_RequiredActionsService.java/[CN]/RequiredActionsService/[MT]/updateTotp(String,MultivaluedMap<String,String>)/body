@@ -13,10 +13,10 @@
   String totpSecret=formData.getFirst("totpSecret");
   LoginFormsProvider loginForms=Flows.forms(session,realm,null,uriInfo).setUser(user);
   if (Validation.isEmpty(totp)) {
-    return loginForms.setError(Messages.MISSING_TOTP).setAccessCode(accessCode.getCode()).createResponse(RequiredAction.CONFIGURE_TOTP);
+    return loginForms.setError(Messages.MISSING_TOTP).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.CONFIGURE_TOTP);
   }
  else   if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
-    return loginForms.setError(Messages.INVALID_TOTP).setAccessCode(accessCode.getCode()).createResponse(RequiredAction.CONFIGURE_TOTP);
+    return loginForms.setError(Messages.INVALID_TOTP).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.CONFIGURE_TOTP);
   }
   UserCredentialModel credentials=new UserCredentialModel();
   credentials.setType(CredentialRepresentation.TOTP);

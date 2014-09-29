@@ -1,0 +1,41 @@
+{
+  RealmModel realm=clientSession.getRealm();
+  UserModel user=userSession.getUser();
+  isTotpConfigurationRequired(realm,user);
+  isEmailVerificationRequired(realm,user);
+  ClientModel client=clientSession.getClient();
+  boolean isResource=client instanceof ApplicationModel;
+  ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
+  logger.debugv("processAccessCode: isResource: {0}",isResource);
+  logger.debugv("processAccessCode: go to oauth page?: {0}",!isResource);
+  event.detail(Details.CODE_ID,clientSession.getId());
+  Set<UserModel.RequiredAction> requiredActions=user.getRequiredActions();
+  if (!requiredActions.isEmpty()) {
+    UserModel.RequiredAction action=user.getRequiredActions().iterator().next();
+    accessCode.setRequiredAction(action);
+    LoginFormsProvider loginFormsProvider=Flows.forms(session,realm,client,uriInfo).setClientSessionCode(accessCode.getCode()).setUser(user);
+    if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL)) {
+      String key=UUID.randomUUID().toString();
+      clientSession.setNote("key",key);
+      loginFormsProvider.setVerifyCode(key);
+      event.clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
+    }
+    return loginFormsProvider.createResponse(action);
+  }
+  if (!isResource) {
+    accessCode.setAction(ClientSessionModel.Action.OAUTH_GRANT);
+    List<RoleModel> realmRoles=new LinkedList<RoleModel>();
+    MultivaluedMap<String,RoleModel> resourceRoles=new MultivaluedMapImpl<String,RoleModel>();
+    for (    RoleModel r : accessCode.getRequestedRoles()) {
+      if (r.getContainer() instanceof RealmModel) {
+        realmRoles.add(r);
+      }
+ else {
+        resourceRoles.add(((ApplicationModel)r.getContainer()).getName(),r);
+      }
+    }
+    return Flows.forms(session,realm,client,uriInfo).setClientSessionCode(accessCode.getCode()).setAccessRequest(realmRoles,resourceRoles).setClient(client).createOAuthGrant();
+  }
+  event.success();
+  return redirectAfterSuccessfulFlow(session,realm,userSession,clientSession,request,uriInfo,clientConnection);
+}

@@ -37,7 +37,7 @@
  catch (  SocialAccessDeniedException e) {
     event.error(Errors.REJECTED_BY_USER);
     clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE);
-    return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setAccessCode(clientCode.getCode()).setWarning("Access denied").createLogin();
+    return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(clientCode.getCode()).setWarning("Access denied").createLogin();
   }
 catch (  SocialProviderException e) {
     logger.error("Failed to process social callback",e);
@@ -88,14 +88,14 @@ catch (  SocialProviderException e) {
     UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),authMethod,false);
     event.session(userSession);
     TokenManager.attachClientSession(userSession,clientSession);
-    OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,new AuthenticationManager(),tokenManager);
-    Response response=oauth.processAccessCode(clientSession,userSession,event);
+    AuthenticationManager authManager=new AuthenticationManager();
+    Response response=authManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
     if (session.getTransaction().isActive()) {
       session.getTransaction().commit();
     }
     return response;
   }
  catch (  ModelDuplicateException e) {
-    return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setAccessCode(clientCode.getCode()).setError("socialEmailExists").createLogin();
+    return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(clientCode.getCode()).setError("socialEmailExists").createLogin();
   }
 }

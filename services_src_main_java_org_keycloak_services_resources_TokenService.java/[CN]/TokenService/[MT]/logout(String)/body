@@ -10,7 +10,6 @@
   if (redirectUri != null) {
     String validatedRedirect=verifyRealmRedirectUri(uriInfo,redirectUri,realm);
     if (validatedRedirect == null) {
-      OAuthFlows oauth=Flows.oauth(session,realm,request,uriInfo,clientConnection,authManager,tokenManager);
       return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid redirect uri.");
     }
     return Response.status(302).location(UriBuilder.fromUri(validatedRedirect).build()).build();

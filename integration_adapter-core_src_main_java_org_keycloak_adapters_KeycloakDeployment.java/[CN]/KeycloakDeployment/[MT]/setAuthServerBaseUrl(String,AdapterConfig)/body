@@ -1,0 +1,23 @@
+{
+  this.authServerBaseUrl=authServerBaseUrl;
+  if (authServerBaseUrl == null)   return;
+  URI uri=URI.create(authServerBaseUrl);
+  if (uri.getHost() == null) {
+    if (config.isUseHostnameForLocalRequests()) {
+      relativeUrls=RelativeUrlsUsed.BROWSER_ONLY;
+      KeycloakUriBuilder serverBuilder=KeycloakUriBuilder.fromUri(authServerBaseUrl);
+      serverBuilder.host(UriUtils.getHostName()).port(config.getLocalRequestsPort()).scheme(config.getLocalRequestsScheme());
+      resolveNonBrowserUrls(serverBuilder);
+    }
+ else {
+      relativeUrls=RelativeUrlsUsed.ALL_REQUESTS;
+      return;
+    }
+  }
+ else {
+    relativeUrls=RelativeUrlsUsed.NEVER;
+    KeycloakUriBuilder serverBuilder=KeycloakUriBuilder.fromUri(authServerBaseUrl);
+    resolveBrowserUrls(serverBuilder);
+    resolveNonBrowserUrls(serverBuilder);
+  }
+}

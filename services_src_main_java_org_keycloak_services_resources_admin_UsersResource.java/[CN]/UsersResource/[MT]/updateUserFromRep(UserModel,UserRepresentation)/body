@@ -20,10 +20,10 @@
     for (    Map.Entry<String,String> attr : rep.getAttributes().entrySet()) {
       user.setAttribute(attr.getKey(),attr.getValue());
     }
-    for (    String key : user.getAttributes().keySet()) {
-      if (!rep.getAttributes().containsKey(key)) {
-        user.removeAttribute(key);
-      }
+    Set<String> attrToRemove=new HashSet<String>(user.getAttributes().keySet());
+    attrToRemove.removeAll(rep.getAttributes().keySet());
+    for (    String attr : attrToRemove) {
+      user.removeAttribute(attr);
     }
   }
 }

@@ -1,10 +1,11 @@
 {
-  DBObject query=new QueryBuilder().and("clientSessions.clientId").is(client.getId()).get();
-  DBObject sort=new BasicDBObject("started",1).append("id",1);
-  List<MongoUserSessionEntity> sessions=mongoStore.loadEntities(MongoUserSessionEntity.class,query,sort,firstResult,maxResults,invocationContext);
+  DBObject query=new QueryBuilder().and("clientId").is(client.getId()).get();
+  DBObject sort=new BasicDBObject("timestamp",1).append("id",1);
+  List<MongoClientSessionEntity> clientSessions=mongoStore.loadEntities(MongoClientSessionEntity.class,query,sort,firstResult,maxResults,invocationContext);
   List<UserSessionModel> result=new LinkedList<UserSessionModel>();
-  for (  MongoUserSessionEntity session : sessions) {
-    result.add(new UserSessionAdapter(this.session,this,session,realm,invocationContext));
+  for (  MongoClientSessionEntity clientSession : clientSessions) {
+    MongoUserSessionEntity userSession=mongoStore.loadEntity(MongoUserSessionEntity.class,clientSession.getSessionId(),invocationContext);
+    result.add(new UserSessionAdapter(session,this,userSession,realm,invocationContext));
   }
   return result;
 }

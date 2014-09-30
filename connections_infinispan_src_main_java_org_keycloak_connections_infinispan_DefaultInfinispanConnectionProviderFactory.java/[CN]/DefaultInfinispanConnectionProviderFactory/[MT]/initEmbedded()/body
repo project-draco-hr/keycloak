@@ -1,0 +1,11 @@
+{
+  GlobalConfigurationBuilder gcb=new GlobalConfigurationBuilder();
+  if (config.getBoolean("transport",false)) {
+    gcb.transport().defaultTransport();
+  }
+  cacheManager=new DefaultCacheManager(gcb.build());
+  containerManaged=false;
+  logger.debug("Started embedded Infinispan cache container");
+  cacheManager.defineConfiguration("sessions",createConfiguration("sessions"));
+  cacheManager.defineConfiguration("realms",createConfiguration("realms"));
+}

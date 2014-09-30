@@ -1,0 +1,8 @@
+{
+  int expired=Time.currentTime() - realm.getSsoSessionMaxLifespan();
+  int expiredRefresh=Time.currentTime() - realm.getSsoSessionIdleTimeout();
+  Map<String,String> map=new MapReduceTask(sessionCache).mappedWith(UserSessionMapper.create(realm.getId()).expired(expired,expiredRefresh).emitKey()).reducedWith(new FirstResultReducer()).execute();
+  for (  String id : map.keySet()) {
+    removeUserSession(realm,id);
+  }
+}

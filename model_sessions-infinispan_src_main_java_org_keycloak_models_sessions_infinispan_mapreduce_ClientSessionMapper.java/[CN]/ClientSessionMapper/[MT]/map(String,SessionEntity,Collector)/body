@@ -1,0 +1,26 @@
+{
+  if (!realm.equals(e.getRealm())) {
+    return;
+  }
+  if (!(e instanceof ClientSessionEntity)) {
+    return;
+  }
+  ClientSessionEntity entity=(ClientSessionEntity)e;
+  if (client != null && !entity.getClient().equals(client)) {
+    return;
+  }
+  if (userSession != null && !userSession.equals(entity.getUserSession())) {
+    return;
+  }
+switch (emit) {
+case KEY:
+    collector.emit(key,key);
+  break;
+case ENTITY:
+collector.emit(key,entity);
+break;
+case USER_SESSION_AND_TIMESTAMP:
+collector.emit(entity.getUserSession(),entity.getTimestamp());
+break;
+}
+}

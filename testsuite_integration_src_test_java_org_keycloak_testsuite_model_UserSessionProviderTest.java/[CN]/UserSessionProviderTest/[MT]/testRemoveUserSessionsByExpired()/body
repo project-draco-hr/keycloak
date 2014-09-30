@@ -1,11 +1,26 @@
 {
-  UserSessionModel[] sessions=createSessions();
-  session.sessions().getUserSession(realm,sessions[0].getId()).setStarted(Time.currentTime() - realm.getSsoSessionMaxLifespan() - 1);
-  session.sessions().getUserSession(realm,sessions[1].getId()).setLastSessionRefresh(Time.currentTime() - realm.getSsoSessionIdleTimeout() - 1);
-  resetSession();
-  session.sessions().removeExpiredUserSessions(realm);
-  resetSession();
-  assertNull(session.sessions().getUserSession(realm,sessions[0].getId()));
-  assertNull(session.sessions().getUserSession(realm,sessions[1].getId()));
-  assertNotNull(session.sessions().getUserSession(realm,sessions[2].getId()));
+  session.sessions().getUserSessions(realm,session.users().getUserByUsername("user1",realm));
+  try {
+    Set<String> expired=new HashSet<String>();
+    Time.setOffset(-(realm.getSsoSessionMaxLifespan() + 1));
+    expired.add(session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0.1","form",true).getId());
+    Time.setOffset(0);
+    UserSessionModel s=session.sessions().createUserSession(realm,session.users().getUserByUsername("user2",realm),"user2","127.0.0.1","form",true);
+    s.setLastSessionRefresh(0);
+    expired.add(s.getId());
+    Set<String> valid=new HashSet<String>();
+    valid.add(session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0.1","form",true).getId());
+    resetSession();
+    session.sessions().removeExpiredUserSessions(realm);
+    resetSession();
+    for (    String e : expired) {
+      assertNull(session.sessions().getUserSession(realm,e));
+    }
+    for (    String v : valid) {
+      assertNotNull(session.sessions().getUserSession(realm,v));
+    }
+  }
+  finally {
+    Time.setOffset(0);
+  }
 }

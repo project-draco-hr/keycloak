@@ -1,0 +1,23 @@
+{
+  if (!(e instanceof UserSessionEntity)) {
+    return;
+  }
+  UserSessionEntity entity=(UserSessionEntity)e;
+  if (!realm.equals(entity.getRealm())) {
+    return;
+  }
+  if (user != null && !entity.getUser().equals(user)) {
+    return;
+  }
+  if (expired != null && expiredRefresh != null && entity.getStarted() > expired && entity.getLastSessionRefresh() > expiredRefresh) {
+    return;
+  }
+switch (emit) {
+case KEY:
+    collector.emit(key,key);
+  break;
+case ENTITY:
+collector.emit(key,entity);
+break;
+}
+}

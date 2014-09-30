@@ -1,0 +1,11 @@
+{
+  ConcurrentHashMap<String,String> map=lookup.get(realm);
+  if (map == null) {
+    map=new ConcurrentHashMap<String,String>();
+    ConcurrentHashMap<String,String> p=lookup.putIfAbsent(realm,map);
+    if (p != null) {
+      map=p;
+    }
+  }
+  map.put(key,value);
+}

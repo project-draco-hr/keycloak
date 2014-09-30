@@ -1,0 +1,16 @@
+{
+  CacheTask current=tasks.get(key);
+  if (current != null) {
+switch (current.operation) {
+case ADD:
+case REPLACE:
+      current.value=value;
+    return;
+case REMOVE:
+  throw new IllegalStateException("Can't remove session: task in progress for session");
+}
+}
+ else {
+tasks.put(key,new CacheTask(cache,CacheOperation.ADD,key,value));
+}
+}

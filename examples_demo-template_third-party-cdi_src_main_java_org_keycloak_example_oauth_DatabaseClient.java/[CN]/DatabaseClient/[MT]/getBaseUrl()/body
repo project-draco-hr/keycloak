@@ -1,4 +1,12 @@
 {
-  String url=request.getRequestURL().toString();
-  return url.substring(0,url.indexOf('/',8));
+switch (oauthClient.getRelativeUrlsUsed()) {
+case ALL_REQUESTS:
+    return UriUtils.getOrigin(request.getRequestURL().toString());
+case BROWSER_ONLY:
+  return UriUtils.getOrigin(oauthClient.getCodeUrl());
+case NEVER:
+return "";
+default :
+return "";
+}
 }

@@ -1,0 +1,18 @@
+{
+  if (session instanceof RefreshableKeycloakSecurityContext) {
+    KeycloakDeployment deployment=((RefreshableKeycloakSecurityContext)session).getDeployment();
+switch (deployment.getRelativeUrls()) {
+case ALL_REQUESTS:
+      return UriUtils.getOrigin(browserRequestURL);
+case BROWSER_ONLY:
+    return UriUtils.getOrigin(deployment.getCodeUrl());
+case NEVER:
+  return "";
+default :
+return "";
+}
+}
+ else {
+return UriUtils.getOrigin(browserRequestURL);
+}
+}

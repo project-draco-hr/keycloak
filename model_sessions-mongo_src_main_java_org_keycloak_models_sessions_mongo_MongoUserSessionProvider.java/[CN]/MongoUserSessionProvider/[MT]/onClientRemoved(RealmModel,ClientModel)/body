@@ -1,4 +1,10 @@
 {
   DBObject query=new QueryBuilder().and("clientId").is(client.getId()).get();
-  mongoStore.removeEntities(MongoUserSessionEntity.class,query,invocationContext);
+  DBObject sort=new BasicDBObject("timestamp",1).append("id",1);
+  List<MongoClientSessionEntity> clientSessions=mongoStore.loadEntities(MongoClientSessionEntity.class,query,sort,-1,-1,invocationContext);
+  for (  MongoClientSessionEntity clientSession : clientSessions) {
+    MongoUserSessionEntity userSession=mongoStore.loadEntity(MongoUserSessionEntity.class,clientSession.getSessionId(),invocationContext);
+    getMongoStore().pullItemFromList(userSession,"clientSessions",clientSession.getId(),invocationContext);
+    mongoStore.removeEntity(clientSession,invocationContext);
+  }
 }

@@ -1,5 +1,4 @@
 {
-  AuthenticationManager auth=new AuthenticationManager();
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=locateRealm(name,realmManager);
   ClientModel client=realm.findClient(client_id);
@@ -15,7 +14,7 @@
       break;
     }
   }
-  for (  String r : TokenService.resolveValidRedirects(uriInfo,client.getRedirectUris())) {
+  for (  String r : OpenIDConnectService.resolveValidRedirects(uriInfo,client.getRedirectUris())) {
     int i=r.indexOf('/',8);
     if (i != -1) {
       r=r.substring(0,i);

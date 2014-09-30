@@ -1,12 +1,18 @@
 {
-  for (int i=0; i < 25; i++) {
-    UserSessionModel userSession=session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0." + i,"form",false);
-    userSession.setStarted(Time.currentTime() + i);
-    ClientSessionModel clientSession=session.sessions().createClientSession(realm,realm.findClient("test-app"));
-    clientSession.setUserSession(userSession);
-    clientSession.setRedirectUri("http://redirect");
-    clientSession.setRoles(new HashSet<String>());
-    clientSession.setNote(OpenIDConnect.STATE_PARAM,"state");
+  try {
+    for (int i=0; i < 25; i++) {
+      UserSessionModel userSession=session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0." + i,"form",false);
+      Time.setOffset(i);
+      ClientSessionModel clientSession=session.sessions().createClientSession(realm,realm.findClient("test-app"));
+      clientSession.setUserSession(userSession);
+      clientSession.setRedirectUri("http://redirect");
+      clientSession.setRoles(new HashSet<String>());
+      clientSession.setNote(OpenIDConnect.STATE_PARAM,"state");
+      clientSession.setTimestamp(Time.currentTime() + i);
+    }
+  }
+  finally {
+    Time.setOffset(0);
   }
   resetSession();
   assertPaginatedSession(realm,realm.findClient("test-app"),0,1,1);

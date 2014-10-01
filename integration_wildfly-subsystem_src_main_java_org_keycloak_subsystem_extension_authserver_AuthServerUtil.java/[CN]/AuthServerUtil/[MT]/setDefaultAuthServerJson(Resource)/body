@@ -1,0 +1,21 @@
+{
+  JarInputStream jarStream=null;
+  try {
+    jarStream=new JarInputStream(rsc.openStream());
+    JarEntry je;
+    while ((je=jarStream.getNextJarEntry()) != null) {
+      if (!je.getName().equals("WEB-INF/classes/META-INF/keycloak-server.json"))       continue;
+      int len=0;
+      byte[] buffer=new byte[1024];
+      ByteArrayOutputStream baos=new ByteArrayOutputStream();
+      while ((len=jarStream.read(buffer)) != -1) {
+        baos.write(buffer,0,len);
+      }
+      defaultAuthServerJson=baos.toString();
+      return;
+    }
+  }
+  finally {
+    jarStream.close();
+  }
+}

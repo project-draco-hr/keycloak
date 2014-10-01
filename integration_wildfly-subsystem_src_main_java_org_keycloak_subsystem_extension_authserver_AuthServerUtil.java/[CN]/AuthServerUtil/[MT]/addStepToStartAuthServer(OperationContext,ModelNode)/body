@@ -1,0 +1,32 @@
+{
+  PathAddress authServerAddr=PathAddress.pathAddress(operation.get(ADDRESS));
+  String deploymentName=authServerAddr.getElement(1).getValue();
+  if (!deploymentName.toLowerCase().endsWith(".war")) {
+    deploymentName+=".war";
+  }
+  PathAddress deploymentAddress=PathAddress.pathAddress(PathElement.pathElement(DEPLOYMENT,deploymentName));
+  ModelNode op=Util.createOperation(ADD,deploymentAddress);
+  op.get(ENABLED).set(true);
+  op.get(PERSISTENT).set(false);
+  URL warUrl=null;
+  try {
+    warUrl=getWarUrl();
+  }
+ catch (  IllegalStateException e) {
+    throw new OperationFailedException(e);
+  }
+  if (warUrl == null) {
+    throw new OperationFailedException("Keycloak Auth Server WAR not found in keycloak-auth-server module");
+  }
+  String urlString=warUrl.toExternalForm();
+  System.out.println(warUrl);
+  ModelNode contentItem=new ModelNode();
+  contentItem.get(URL).set(urlString);
+  op.get(CONTENT).add(contentItem);
+  System.out.println("****** operation ************");
+  System.out.println(op.toString());
+  ImmutableManagementResourceRegistration rootResourceRegistration=context.getRootResourceRegistration();
+  OperationStepHandler handler=rootResourceRegistration.getOperationHandler(deploymentAddress,ADD);
+  context.addStep(op,handler,OperationContext.Stage.MODEL);
+  return deploymentName;
+}

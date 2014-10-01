@@ -1,4 +1,11 @@
 {
   final DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
-  addModules(deploymentUnit);
+  String deploymentName=deploymentUnit.getName();
+  KeycloakAdapterConfigService service=KeycloakAdapterConfigService.find(phaseContext.getServiceRegistry());
+  if (service.isKeycloakDeployment(deploymentName)) {
+    addModules(deploymentUnit);
+  }
+  for (  ResourceRoot root : deploymentUnit.getAttachment(Attachments.RESOURCE_ROOTS)) {
+    System.out.println("*** resource root=" + root);
+  }
 }

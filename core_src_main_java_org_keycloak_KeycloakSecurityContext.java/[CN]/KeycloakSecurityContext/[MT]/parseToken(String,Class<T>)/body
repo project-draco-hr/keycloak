@@ -1,0 +1,7 @@
+{
+  if (encoded == null)   return null;
+  String[] parts=encoded.split("\\.");
+  if (parts.length < 2 || parts.length > 3)   throw new IllegalArgumentException("Parsing error");
+  byte[] bytes=Base64Url.decode(parts[1]);
+  return JsonSerialization.readValue(bytes,clazz);
+}

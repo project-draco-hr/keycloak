@@ -25,7 +25,7 @@
       return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid code, please login again through your application.");
     }
     clientSession=clientCode.getClientSession();
-    if (!clientSession.getAuthMethod().equals(OpenIDConnect.LOGIN_PAGE_PROTOCOL)) {
+    if (!clientSession.getAuthMethod().equals(OpenIDConnect.LOGIN_PROTOCOL)) {
       event.error(Errors.INVALID_CODE);
       return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid protocol, please login again through your application.");
     }
@@ -63,7 +63,7 @@
       return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid redirect_uri.");
     }
     clientSession=session.sessions().createClientSession(realm,client);
-    clientSession.setAuthMethod(OpenIDConnect.LOGIN_PAGE_PROTOCOL);
+    clientSession.setAuthMethod(OpenIDConnect.LOGIN_PROTOCOL);
     clientSession.setRedirectUri(redirect);
     clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE);
     clientSession.setNote(OpenIDConnect.STATE_PARAM,state);

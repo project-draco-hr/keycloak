@@ -1,9 +1,3 @@
 {
-  RealmManager realmManager=new RealmManager(session);
-  RealmModel realm=locateRealm(name,realmManager);
-  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder();
-  AuthenticationManager authManager=new AuthenticationManager(protector);
-  OpenIDConnectService tokenService=new OpenIDConnectService(realm,tokenManager,event,authManager);
-  ResteasyProviderFactory.getInstance().injectProperties(tokenService);
-  return tokenService;
+  return getProtocol(name,"openid-connect");
 }

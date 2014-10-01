@@ -1,0 +1,11 @@
+{
+  AuthResult authResult=authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers,true);
+  if (authResult != null) {
+    UserModel user=authResult.getUser();
+    UserSessionModel userSession=authResult.getSession();
+    TokenManager.attachClientSession(userSession,clientSession);
+    event.user(user).session(userSession).detail(Details.AUTH_METHOD,"sso");
+    return nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
+  }
+  return null;
+}

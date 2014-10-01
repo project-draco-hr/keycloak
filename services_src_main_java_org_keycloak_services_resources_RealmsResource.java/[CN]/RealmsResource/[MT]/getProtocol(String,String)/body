@@ -3,8 +3,8 @@
   RealmModel realm=locateRealm(name,realmManager);
   EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder();
   AuthenticationManager authManager=new AuthenticationManager(protector);
-  LoginProtocolFactory factory=(LoginProtocolFactory)session.getKeycloakSessionFactory().getProviderFactory(LoginProtocol.class,OpenIDConnect.LOGIN_PROTOCOL);
-  OpenIDConnectService endpoint=(OpenIDConnectService)factory.createProtocolEndpoint(realm,event,authManager);
+  LoginProtocolFactory factory=(LoginProtocolFactory)session.getKeycloakSessionFactory().getProviderFactory(LoginProtocol.class,protocol);
+  Object endpoint=factory.createProtocolEndpoint(realm,event,authManager);
   ResteasyProviderFactory.getInstance().injectProperties(endpoint);
-  return endpoint.getLoginStatusIframe(client_id,origin);
+  return endpoint;
 }

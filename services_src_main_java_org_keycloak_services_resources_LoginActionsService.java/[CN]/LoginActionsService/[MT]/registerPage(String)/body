@@ -1,0 +1,16 @@
+{
+  event.event(EventType.REGISTER);
+  if (!realm.isRegistrationAllowed()) {
+    event.error(Errors.REGISTRATION_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Registration not allowed");
+  }
+  Checks checks=new Checks();
+  if (!checks.check(code)) {
+    return checks.response;
+  }
+  event.detail(Details.CODE_ID,code);
+  ClientSessionCode clientSessionCode=checks.clientCode;
+  ClientSessionModel clientSession=clientSessionCode.getClientSession();
+  authManager.expireIdentityCookie(realm,uriInfo,clientConnection);
+  return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(clientSessionCode.getCode()).createRegistration();
+}

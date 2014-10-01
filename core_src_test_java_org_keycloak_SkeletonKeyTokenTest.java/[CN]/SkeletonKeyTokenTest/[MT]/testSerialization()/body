@@ -1,0 +1,30 @@
+{
+  AccessToken token=createSimpleToken();
+  IDToken idToken=new IDToken();
+  idToken.setEmail("joe@email.cz");
+  KeyPair keyPair=KeyPairGenerator.getInstance("RSA").generateKeyPair();
+  String encoded=new JWSBuilder().jsonContent(token).rsa256(keyPair.getPrivate());
+  String encodedIdToken=new JWSBuilder().jsonContent(idToken).rsa256(keyPair.getPrivate());
+  KeycloakSecurityContext ctx=new KeycloakSecurityContext(encoded,token,encodedIdToken,idToken);
+  KeycloakPrincipal principal=new KeycloakPrincipal("joe",ctx);
+  ByteArrayOutputStream bso=new ByteArrayOutputStream();
+  ObjectOutputStream oos=new ObjectOutputStream(bso);
+  oos.writeObject(principal);
+  oos.close();
+  byte[] bytes=bso.toByteArray();
+  ByteArrayInputStream bis=new ByteArrayInputStream(bytes);
+  ObjectInputStream ois=new ObjectInputStream(bis);
+  principal=(KeycloakPrincipal)ois.readObject();
+  ctx=principal.getKeycloakSecurityContext();
+  token=ctx.getToken();
+  idToken=ctx.getIdToken();
+  System.out.println("Size of serialized principal: " + bytes.length);
+  Assert.assertEquals(encoded,ctx.getTokenString());
+  Assert.assertEquals(encodedIdToken,ctx.getIdTokenString());
+  Assert.assertEquals("111",token.getId());
+  Assert.assertEquals("111",token.getId());
+  Assert.assertTrue(token.getResourceAccess("foo").isUserInRole("admin"));
+  Assert.assertTrue(token.getResourceAccess("bar").isUserInRole("user"));
+  Assert.assertEquals("joe@email.cz",idToken.getEmail());
+  ois.close();
+}

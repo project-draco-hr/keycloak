@@ -1,5 +1,6 @@
 {
   Set<String> roles=null;
+  RefreshableKeycloakSecurityContext session=getKeycloakSecurityContext();
   if (session.getDeployment().isUseResourceRoleMappings()) {
     if (log.isTraceEnabled()) {
       log.trace("useResourceRoleMappings");
@@ -15,5 +16,11 @@
     if (access != null)     roles=access.getRoles();
   }
   if (roles == null)   roles=Collections.emptySet();
+  if (log.isTraceEnabled()) {
+    log.trace("Setting roles: ");
+    for (    String role : roles) {
+      log.trace("   role: " + role);
+    }
+  }
   this.accountRoles=roles;
 }

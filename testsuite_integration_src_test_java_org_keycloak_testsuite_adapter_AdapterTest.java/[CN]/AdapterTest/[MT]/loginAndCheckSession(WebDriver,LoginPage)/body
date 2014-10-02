@@ -1,0 +1,12 @@
+{
+  driver.navigate().to("http://localhost:8081/session-portal");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  loginPage.login("bburke@redhat.com","password");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/session-portal");
+  String pageSource=driver.getPageSource();
+  Assert.assertTrue(pageSource.contains("Counter=1"));
+  driver.navigate().to("http://localhost:8081/session-portal");
+  pageSource=driver.getPageSource();
+  Assert.assertTrue(pageSource.contains("Counter=2"));
+}

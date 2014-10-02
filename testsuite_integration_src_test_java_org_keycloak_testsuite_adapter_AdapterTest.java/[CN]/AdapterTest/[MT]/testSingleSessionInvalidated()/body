@@ -1,0 +1,23 @@
+{
+  AdapterTest browser1=this;
+  AdapterTest browser2=new AdapterTest();
+  loginAndCheckSession(browser1.driver,browser1.loginPage);
+  browser2.webRule.before();
+  try {
+    browser2.loginAndCheckSession(browser2.driver,browser2.loginPage);
+    String logoutUri=OpenIDConnectService.logoutUrl(UriBuilder.fromUri("http://localhost:8081/auth")).queryParam(OAuth2Constants.REDIRECT_URI,"http://localhost:8081/session-portal").build("demo").toString();
+    browser1.driver.navigate().to(logoutUri);
+    Assert.assertTrue(browser1.driver.getCurrentUrl().startsWith(LOGIN_URL));
+    browser1.driver.navigate().to("http://localhost:8081/session-portal");
+    Assert.assertTrue(browser1.driver.getCurrentUrl().startsWith(LOGIN_URL));
+    browser2.driver.navigate().to("http://localhost:8081/session-portal");
+    Assert.assertEquals(browser2.driver.getCurrentUrl(),"http://localhost:8081/session-portal");
+    String pageSource=browser2.driver.getPageSource();
+    Assert.assertTrue(pageSource.contains("Counter=3"));
+    browser2.driver.navigate().to(logoutUri);
+    Assert.assertTrue(browser2.driver.getCurrentUrl().startsWith(LOGIN_URL));
+  }
+  finally {
+    browser2.webRule.after();
+  }
+}

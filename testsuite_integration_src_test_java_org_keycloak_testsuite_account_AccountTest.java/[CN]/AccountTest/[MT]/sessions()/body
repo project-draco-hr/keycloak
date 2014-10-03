@@ -11,14 +11,19 @@
   Assert.assertEquals(1,sessions.size());
   Assert.assertEquals("127.0.0.1",sessions.get(0).get(0));
   WebDriver driver2=WebRule.createWebDriver();
-  OAuthClient oauth2=new OAuthClient(driver2);
-  oauth2.state("mystate");
-  oauth2.doLogin("view-sessions","password");
-  Event login2Event=events.expectLogin().user(userId).detail(Details.USERNAME,"view-sessions").assertEvent();
-  sessionsPage.open();
-  sessions=sessionsPage.getSessions();
-  Assert.assertEquals(2,sessions.size());
-  sessionsPage.logoutAll();
-  events.expectLogout(registerEvent.getSessionId());
-  events.expectLogout(login2Event.getSessionId());
+  try {
+    OAuthClient oauth2=new OAuthClient(driver2);
+    oauth2.state("mystate");
+    oauth2.doLogin("view-sessions","password");
+    Event login2Event=events.expectLogin().user(userId).detail(Details.USERNAME,"view-sessions").assertEvent();
+    sessionsPage.open();
+    sessions=sessionsPage.getSessions();
+    Assert.assertEquals(2,sessions.size());
+    sessionsPage.logoutAll();
+    events.expectLogout(registerEvent.getSessionId());
+    events.expectLogout(login2Event.getSessionId());
+  }
+  finally {
+    driver2.close();
+  }
 }

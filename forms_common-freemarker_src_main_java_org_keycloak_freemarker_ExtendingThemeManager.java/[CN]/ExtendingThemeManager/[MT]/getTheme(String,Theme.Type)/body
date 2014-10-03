@@ -7,7 +7,14 @@
     Theme theme=themeCache.get(key);
     if (theme == null) {
       theme=loadTheme(name,type);
-      if (themeCache.putIfAbsent(key,theme) != null) {
+      if (theme == null) {
+        theme=loadTheme("keycloak",type);
+        if (theme == null) {
+          theme=loadTheme("base",type);
+        }
+        log.errorv("Failed to find {0} theme {1}, using built-in themes",type,name);
+      }
+ else       if (themeCache.putIfAbsent(key,theme) != null) {
         theme=themeCache.get(key);
       }
     }

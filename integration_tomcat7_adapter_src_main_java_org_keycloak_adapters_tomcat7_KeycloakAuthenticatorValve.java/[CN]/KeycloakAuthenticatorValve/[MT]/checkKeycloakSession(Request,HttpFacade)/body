@@ -3,9 +3,9 @@
   RefreshableKeycloakSecurityContext session=(RefreshableKeycloakSecurityContext)request.getSessionInternal().getNote(KeycloakSecurityContext.class.getName());
   if (session == null)   return;
   if (session.getDeployment() == null)   session.setDeployment(deploymentContext.resolveDeployment(facade));
-  if (session.isActive())   return;
-  session.refreshExpiredToken();
-  if (session.isActive())   return;
+  if (session.isActive() && !session.getDeployment().isAlwaysRefreshToken())   return;
+  boolean success=session.refreshExpiredToken(false);
+  if (success && session.isActive())   return;
   request.getSessionInternal().removeNote(KeycloakSecurityContext.class.getName());
   request.setUserPrincipal(null);
   request.setAuthType(null);

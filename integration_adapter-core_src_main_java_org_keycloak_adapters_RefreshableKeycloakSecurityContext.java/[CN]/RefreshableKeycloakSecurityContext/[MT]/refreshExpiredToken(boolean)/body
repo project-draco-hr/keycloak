@@ -1,9 +1,11 @@
 {
-  if (log.isTraceEnabled()) {
-    log.trace("checking whether to refresh.");
+  if (checkActive) {
+    if (log.isTraceEnabled()) {
+      log.trace("checking whether to refresh.");
+    }
+    if (isActive())     return true;
   }
-  if (isActive())   return;
-  if (this.deployment == null || refreshToken == null)   return;
+  if (this.deployment == null || refreshToken == null)   return false;
   if (log.isTraceEnabled()) {
     log.trace("Doing refresh");
   }
@@ -13,11 +15,11 @@
   }
  catch (  IOException e) {
     log.error("Refresh token failure",e);
-    return;
+    return false;
   }
 catch (  ServerRequest.HttpFailure httpFailure) {
     log.error("Refresh token failure status: " + httpFailure.getStatus() + " "+ httpFailure.getError());
-    return;
+    return false;
   }
   if (log.isTraceEnabled()) {
     log.trace("received refresh response");
@@ -37,4 +39,5 @@ catch (  ServerRequest.HttpFailure httpFailure) {
   this.token=token;
   this.refreshToken=response.getRefreshToken();
   this.tokenString=tokenString;
+  return true;
 }

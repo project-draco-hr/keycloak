@@ -9,16 +9,11 @@
     }
     LogoutAction action=JsonSerialization.readValue(token.getContent(),LogoutAction.class);
     if (!validateAction(action))     return;
-    String user=action.getUser();
-    if (user != null) {
-      log.debug("logout of session for: " + user);
-      userSessionManagement.logoutUser(user);
-    }
- else     if (action.getSession() != null) {
-      userSessionManagement.logoutKeycloakSession(action.getSession());
+    if (action.getAdapterSessionIds() != null) {
+      userSessionManagement.logoutHttpSessions(action.getAdapterSessionIds());
     }
  else {
-      log.debug("logout of all sessions");
+      log.infof("logout of all sessions for application '%s'",action.getResource());
       if (action.getNotBefore() > deployment.getNotBefore()) {
         deployment.setNotBefore(action.getNotBefore());
       }

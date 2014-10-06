@@ -1,20 +1,4 @@
 {
   String username=getUsernameFromSession(session);
   log.debugf("Session destroyed for user: %s, sessionId: %s",username,session.getId());
-  if (username == null)   return;
-  String sessionId=session.getId();
-  UserSessions userSessions=userSessionMap.get(username);
-  if (userSessions == null) {
-    return;
-  }
-synchronized (this) {
-    String keycloakSessionId=userSessions.httpSessionToKeycloakSession.remove(sessionId);
-    if (keycloakSessionId != null) {
-      userSessions.keycloakSessionToHttpSession.remove(keycloakSessionId);
-      keycloakSessionMap.remove(keycloakSessionId);
-    }
-    if (userSessions.httpSessionToKeycloakSession.size() == 0) {
-      userSessionMap.remove(username);
-    }
-  }
 }

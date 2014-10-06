@@ -25,7 +25,7 @@
   session=keycloakRule.startSession();
   realm=session.realms().getRealmByName("demo");
   UserModel user=session.users().getUserByUsername("bburke@redhat.com",realm);
-  new ResourceAdminManager().logoutUser(null,realm,user.getId(),null);
+  new ResourceAdminManager().logoutUser(null,realm,user,session);
   realm.setSsoSessionIdleTimeout(originalIdle);
   session.getTransaction().commit();
   session.close();

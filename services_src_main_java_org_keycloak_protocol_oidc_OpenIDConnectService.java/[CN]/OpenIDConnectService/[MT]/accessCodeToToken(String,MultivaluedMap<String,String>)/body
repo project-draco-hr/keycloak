@@ -75,6 +75,12 @@
     event.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
   }
+  String httpSessionId=formData.getFirst(AdapterConstants.HTTP_SESSION_ID);
+  if (httpSessionId != null) {
+    logger.infof("Http Session '%s' saved in ClientSession for client '%s'",httpSessionId,client.getClientId());
+    event.detail(AdapterConstants.HTTP_SESSION_ID,httpSessionId);
+    clientSession.setNote(AdapterConstants.HTTP_SESSION_ID,httpSessionId);
+  }
   AccessToken token=tokenManager.createClientAccessToken(accessCode.getRequestedRoles(),realm,client,user,userSession);
   try {
     tokenManager.verifyAccess(token,realm,client,user);

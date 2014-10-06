@@ -9,7 +9,8 @@
   AccessTokenResponse tokenResponse=null;
   strippedOauthParametersRequestUri=stripOauthParametersFromRedirect();
   try {
-    tokenResponse=ServerRequest.invokeAccessCodeToToken(deployment,code,strippedOauthParametersRequestUri);
+    String httpSessionId=reqAuthenticator.getHttpSessionId(true);
+    tokenResponse=ServerRequest.invokeAccessCodeToToken(deployment,code,strippedOauthParametersRequestUri,httpSessionId);
   }
  catch (  ServerRequest.HttpFailure failure) {
     log.error("failed to turn code into token");

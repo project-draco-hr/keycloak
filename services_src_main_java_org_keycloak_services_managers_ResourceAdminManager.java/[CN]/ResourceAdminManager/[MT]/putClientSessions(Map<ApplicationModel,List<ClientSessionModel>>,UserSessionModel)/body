@@ -1,0 +1,13 @@
+{
+  for (  ClientSessionModel clientSession : userSession.getClientSessions()) {
+    ClientModel client=clientSession.getClient();
+    if (client instanceof ApplicationModel) {
+      List<ClientSessionModel> curClientSessions=clientSessions.get(client);
+      if (curClientSessions == null) {
+        curClientSessions=new ArrayList<ClientSessionModel>();
+        clientSessions.put((ApplicationModel)client,curClientSessions);
+      }
+      curClientSessions.add(clientSession);
+    }
+  }
+}

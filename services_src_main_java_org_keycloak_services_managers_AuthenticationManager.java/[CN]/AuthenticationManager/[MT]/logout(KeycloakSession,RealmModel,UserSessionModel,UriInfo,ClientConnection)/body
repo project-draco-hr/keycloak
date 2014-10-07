@@ -4,6 +4,15 @@
   logger.debugv("Logging out: {0} ({1})",user.getUsername(),userSession.getId());
   expireIdentityCookie(realm,uriInfo,connection);
   expireRememberMeCookie(realm,uriInfo,connection);
-  new ResourceAdminManager().logoutUser(uriInfo.getRequestUri(),realm,user.getId(),userSession);
+  for (  ClientSessionModel clientSession : userSession.getClientSessions()) {
+    ClientModel client=clientSession.getClient();
+    if (client instanceof ApplicationModel) {
+      String authMethod=clientSession.getAuthMethod();
+      if (authMethod == null)       continue;
+      LoginProtocol protocol=session.getProvider(LoginProtocol.class,authMethod);
+      protocol.setRealm(realm).setUriInfo(uriInfo);
+      protocol.backchannelLogout(userSession,clientSession);
+    }
+  }
   session.sessions().removeUserSession(realm,userSession);
 }

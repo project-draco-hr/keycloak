@@ -24,6 +24,8 @@
   Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
   session=keycloakRule.startSession();
   realm=session.realms().getRealmByName("demo");
+  UserModel user=session.users().getUserByUsername("bburke@redhat.com",realm);
+  new ResourceAdminManager().logoutUser(null,realm,user.getId(),null);
   realm.setSsoSessionIdleTimeout(originalIdle);
   session.getTransaction().commit();
   session.close();

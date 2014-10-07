@@ -14,7 +14,7 @@
   response=authManager.checkNonFormAuthentication(session,clientSession,realm,uriInfo,request,clientConnection,headers,event);
   if (response != null)   return response;
   if (prompt != null && prompt.equals("none")) {
-    OpenIDConnect oauth=new OpenIDConnect(session,realm,request,uriInfo,clientConnection);
+    OpenIDConnect oauth=new OpenIDConnect(session,realm,uriInfo);
     return oauth.cancelLogin(clientSession);
   }
   LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(new ClientSessionCode(realm,clientSession).getCode());

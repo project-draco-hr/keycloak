@@ -1,0 +1,34 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  Event loginEvent=events.expectLogin().assertEvent();
+  String sessionId=loginEvent.getSessionId();
+  String codeId=loginEvent.getDetails().get(Details.CODE_ID);
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
+  String refreshTokenString=response.getRefreshToken();
+  RefreshToken refreshToken=oauth.verifyRefreshToken(refreshTokenString);
+  events.expectCodeToToken(codeId,sessionId).assertEvent();
+  try {
+    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        privateKey=appRealm.getPrivateKey();
+        publicKey=appRealm.getPublicKey();
+        KeycloakModelUtils.generateRealmKeys(appRealm);
+      }
+    }
+);
+    response=oauth.doRefreshTokenRequest(refreshTokenString,"password");
+    assertEquals(400,response.getStatusCode());
+    assertEquals("invalid_grant",response.getError());
+    events.expectRefresh(refreshToken.getId(),sessionId).user((String)null).session((String)null).clearDetails().error(Errors.INVALID_TOKEN).assertEvent();
+  }
+  finally {
+    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        appRealm.setPrivateKey(privateKey);
+        appRealm.setPublicKey(publicKey);
+      }
+    }
+);
+  }
+}

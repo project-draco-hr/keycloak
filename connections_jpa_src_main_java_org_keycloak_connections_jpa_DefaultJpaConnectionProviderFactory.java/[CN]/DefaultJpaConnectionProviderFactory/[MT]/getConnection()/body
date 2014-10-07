@@ -1,0 +1,16 @@
+{
+  try {
+    String dataSourceLookup=config.get("dataSource");
+    if (dataSourceLookup != null) {
+      DataSource dataSource=(DataSource)new InitialContext().lookup(dataSourceLookup);
+      return dataSource.getConnection();
+    }
+ else {
+      Class.forName(config.get("driver"));
+      return DriverManager.getConnection(config.get("url"),config.get("user"),config.get("password"));
+    }
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Failed to connect to database",e);
+  }
+}

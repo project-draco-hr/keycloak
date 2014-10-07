@@ -1,5 +1,5 @@
 {
-  oauth.realm("Test");
+  oauth.realm("test");
   oauth.realmPublicKey(realmPublicKey);
   oauth.clientId("APP_COMPOSITE_APPLICATION");
   oauth.doLogin("APP_COMPOSITE_USER","password");
@@ -8,7 +8,7 @@
   Assert.assertEquals(200,response.getStatusCode());
   Assert.assertEquals("bearer",response.getTokenType());
   AccessToken token=oauth.verifyToken(response.getAccessToken());
-  Assert.assertEquals(keycloakRule.getUser("Test","APP_COMPOSITE_USER").getId(),token.getSubject());
+  Assert.assertEquals(keycloakRule.getUser("test","APP_COMPOSITE_USER").getId(),token.getSubject());
   Assert.assertEquals(1,token.getResourceAccess("APP_ROLE_APPLICATION").getRoles().size());
   Assert.assertEquals(1,token.getRealmAccess().getRoles().size());
   Assert.assertTrue(token.getResourceAccess("APP_ROLE_APPLICATION").isUserInRole("APP_ROLE_1"));

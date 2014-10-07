@@ -6,7 +6,6 @@ synchronized (this) {
           String host=config.get("host",ServerAddress.defaultHost());
           int port=config.getInt("port",ServerAddress.defaultPort());
           String dbName=config.get("db","keycloak");
-          boolean clearOnStartup=config.getBoolean("clearOnStartup",false);
           String user=config.get("user");
           String password=config.get("password");
           if (user != null && password != null) {
@@ -17,8 +16,17 @@ synchronized (this) {
             client=new MongoClient(host,port);
           }
           this.db=client.getDB(dbName);
-          this.mongoStore=new MongoStoreImpl(db,clearOnStartup,getManagedEntities());
-          logger.infof("Initialized mongo model. host: %s, port: %d, db: %s, clearOnStartup: %b",host,port,dbName,clearOnStartup);
+          String databaseSchema=config.get("databaseSchema");
+          if (databaseSchema != null) {
+            if (databaseSchema.equals("update")) {
+              new DefaultMongoUpdaterProvider().update(db);
+            }
+ else {
+              throw new RuntimeException("Invalid value for databaseSchema: " + databaseSchema);
+            }
+          }
+          this.mongoStore=new MongoStoreImpl(db,getManagedEntities());
+          logger.debugv("Initialized mongo model. host: %s, port: %d, db: %s",host,port,dbName);
         }
  catch (        Exception e) {
           throw new RuntimeException(e);

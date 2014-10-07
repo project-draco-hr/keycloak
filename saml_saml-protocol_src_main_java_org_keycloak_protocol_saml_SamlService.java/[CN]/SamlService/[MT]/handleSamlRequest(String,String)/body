@@ -1,0 +1,24 @@
+{
+  SAMLDocumentHolder documentHolder=SAMLRequestParser.parsePostBinding(samlRequest);
+  if (documentHolder == null) {
+    event.event(EventType.LOGIN_ERROR);
+    event.error(Errors.INVALID_TOKEN);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
+  }
+  SAML2Object samlObject=documentHolder.getSamlObject();
+  if (samlObject instanceof AuthnRequestType) {
+    event.event(EventType.LOGIN);
+    AuthnRequestType requestAbstractType=(AuthnRequestType)samlObject;
+    return loginRequest(relayState,requestAbstractType);
+  }
+ else   if (samlObject instanceof LogoutRequestType) {
+    event.event(EventType.LOGOUT);
+    LogoutRequestType requestAbstractType=(LogoutRequestType)samlObject;
+    return logoutRequest(relayState,requestAbstractType);
+  }
+ else {
+    event.event(EventType.LOGIN_ERROR);
+    event.error(Errors.INVALID_TOKEN);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
+  }
+}

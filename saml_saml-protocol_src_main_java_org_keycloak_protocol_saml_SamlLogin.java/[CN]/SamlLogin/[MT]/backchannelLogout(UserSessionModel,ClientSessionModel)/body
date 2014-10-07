@@ -1,0 +1,34 @@
+{
+  ClientModel client=clientSession.getClient();
+  if (!(client instanceof ApplicationModel))   return;
+  ApplicationModel app=(ApplicationModel)client;
+  if (app.getManagementUrl() == null)   return;
+  String logoutRequestString=null;
+  try {
+    LogoutRequestType logoutRequest=createLogoutRequest(userSession.getUser(),client);
+    Document logoutRequestDocument=new SAML2Request().convert(logoutRequest);
+    byte[] responseBytes=DocumentUtil.getDocumentAsString(logoutRequestDocument).getBytes("UTF-8");
+    logoutRequestString=PostBindingUtil.base64Encode(new String(responseBytes));
+  }
+ catch (  Exception e) {
+    logger.warn("failed to send saml logout",e);
+  }
+  String adminUrl=ResourceAdminManager.getManagementUrl(uriInfo.getRequestUri(),app);
+  ApacheHttpClient4Executor executor=ResourceAdminManager.createExecutor();
+  try {
+    ClientRequest request=executor.createRequest(adminUrl);
+    request.formParameter(GeneralConstants.SAML_REQUEST_KEY,logoutRequestString);
+    request.formParameter(SAML2LogOutHandler.BACK_CHANNEL_LOGOUT,SAML2LogOutHandler.BACK_CHANNEL_LOGOUT);
+    ClientResponse response=null;
+    try {
+      response=request.post();
+    }
+ catch (    Exception e) {
+      logger.warn("failed to send saml logout",e);
+    }
+    response.releaseConnection();
+  }
+  finally {
+    executor.getHttpClient().getConnectionManager().shutdown();
+  }
+}

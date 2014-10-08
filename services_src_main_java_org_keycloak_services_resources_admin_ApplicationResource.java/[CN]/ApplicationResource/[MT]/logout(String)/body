@@ -4,5 +4,6 @@
   if (user == null) {
     throw new NotFoundException("User not found");
   }
-  new ResourceAdminManager().logoutApplication(uriInfo.getRequestUri(),realm,application,user.getId(),null);
+  List<UserSessionModel> userSessions=session.sessions().getUserSessions(realm,user);
+  new ResourceAdminManager().logoutApplication(uriInfo.getRequestUri(),realm,application,userSessions);
 }

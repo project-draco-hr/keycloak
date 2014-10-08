@@ -1,16 +1,11 @@
 {
   ApacheHttpClient4Executor executor=createExecutor();
   try {
-    List<ApplicationModel> resources=new LinkedList<ApplicationModel>();
-    for (    ClientSessionModel clientSession : session.getClientSessions()) {
-      ClientModel client=clientSession.getClient();
-      if (client instanceof ApplicationModel) {
-        resources.add((ApplicationModel)client);
-      }
-    }
-    logger.debugv("logging out {0} resources ",resources.size());
-    for (    ApplicationModel resource : resources) {
-      logoutApplication(requestUri,realm,resource,null,session.getId(),executor,0);
+    Map<ApplicationModel,List<ClientSessionModel>> clientSessions=new HashMap<ApplicationModel,List<ClientSessionModel>>();
+    putClientSessions(clientSessions,session);
+    logger.debugv("logging out {0} resources ",clientSessions.size());
+    for (    Map.Entry<ApplicationModel,List<ClientSessionModel>> entry : clientSessions.entrySet()) {
+      logoutApplication(requestUri,realm,entry.getKey(),entry.getValue(),executor,0);
     }
   }
   finally {

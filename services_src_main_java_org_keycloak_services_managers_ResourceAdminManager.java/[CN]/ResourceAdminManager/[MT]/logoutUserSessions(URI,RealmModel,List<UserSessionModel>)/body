@@ -1,0 +1,17 @@
+{
+  ApacheHttpClient4Executor executor=createExecutor();
+  try {
+    Map<ApplicationModel,List<ClientSessionModel>> clientSessions=new HashMap<ApplicationModel,List<ClientSessionModel>>();
+    for (    UserSessionModel userSession : userSessions) {
+      putClientSessions(clientSessions,userSession);
+    }
+    logger.debugv("logging out {0} resources ",clientSessions.size());
+    logger.infov("logging out resources: " + clientSessions);
+    for (    Map.Entry<ApplicationModel,List<ClientSessionModel>> entry : clientSessions.entrySet()) {
+      logoutApplication(requestUri,realm,entry.getKey(),entry.getValue(),executor,0);
+    }
+  }
+  finally {
+    executor.getHttpClient().getConnectionManager().shutdown();
+  }
+}

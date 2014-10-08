@@ -4,7 +4,9 @@
       log.trace("invoke");
     }
     CatalinaHttpFacade facade=new CatalinaHttpFacade(request,response);
-    PreAuthActionsHandler handler=new PreAuthActionsHandler(userSessionManagement,deploymentContext,facade);
+    Manager sessionManager=request.getContext().getManager();
+    CatalinaUserSessionManagementWrapper sessionManagementWrapper=new CatalinaUserSessionManagementWrapper(userSessionManagement,sessionManager);
+    PreAuthActionsHandler handler=new PreAuthActionsHandler(sessionManagementWrapper,deploymentContext,facade);
     if (handler.handleRequest()) {
       return;
     }

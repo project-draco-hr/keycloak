@@ -1,35 +1,36 @@
 {
   String managementUrl=getManagementUrl(requestUri,resource);
   if (managementUrl != null) {
-    List<String> adapterSessionIds=null;
+    MultivaluedHashMap<String,String> adapterSessionIds=null;
     if (clientSessions != null && clientSessions.size() > 0) {
-      adapterSessionIds=new ArrayList<String>();
+      adapterSessionIds=new MultivaluedHashMap<String,String>();
       for (      ClientSessionModel clientSession : clientSessions) {
         String adapterSessionId=clientSession.getNote(AdapterConstants.HTTP_SESSION_ID);
         if (adapterSessionId != null) {
-          adapterSessionIds.add(adapterSessionId);
+          String host=clientSession.getNote(AdapterConstants.HTTP_SESSION_HOST);
+          adapterSessionIds.add(host,adapterSessionId);
         }
       }
     }
-    LogoutAction adminAction=new LogoutAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,resource.getName(),adapterSessionIds,notBefore);
-    String token=new TokenManager().encodeToken(realm,adminAction);
-    logger.debugv("logout resource {0} url: {1} sessionIds: " + adapterSessionIds,resource.getName(),managementUrl);
-    ClientRequest request=client.createRequest(UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_LOGOUT).build().toString());
-    ClientResponse response;
-    try {
-      response=request.body(MediaType.TEXT_PLAIN_TYPE,token).post(UserStats.class);
+    if (managementUrl.contains(KC_SESSION_HOST) && adapterSessionIds != null) {
+      boolean allPassed=true;
+      for (      Map.Entry<String,List<String>> entry : adapterSessionIds.entrySet()) {
+        String host=entry.getKey();
+        List<String> sessionIds=entry.getValue();
+        String currentHostMgmtUrl=managementUrl.replace(KC_SESSION_HOST,host);
+        allPassed=logoutApplicationOnHost(realm,resource,sessionIds,client,notBefore,currentHostMgmtUrl) && allPassed;
+      }
+      return allPassed;
     }
- catch (    Exception e) {
-      logger.warn("Logout for application '" + resource.getName() + "' failed",e);
-      return false;
-    }
-    try {
-      boolean success=response.getStatus() == 204;
-      logger.debug("logout success.");
-      return success;
-    }
-  finally {
-      response.releaseConnection();
+ else {
+      List<String> allSessionIds=null;
+      if (adapterSessionIds != null) {
+        allSessionIds=new ArrayList<String>();
+        for (        List<String> currentIds : adapterSessionIds.values()) {
+          allSessionIds.addAll(currentIds);
+        }
+      }
+      return logoutApplicationOnHost(realm,resource,allSessionIds,client,notBefore,managementUrl);
     }
   }
  else {

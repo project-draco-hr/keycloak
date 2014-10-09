@@ -1,0 +1,57 @@
+{
+  List<NameValuePair> formparams=new ArrayList<NameValuePair>();
+  redirectUri=stripOauthParametersFromRedirect(redirectUri);
+  formparams.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,"authorization_code"));
+  formparams.add(new BasicNameValuePair(OAuth2Constants.CODE,code));
+  formparams.add(new BasicNameValuePair(OAuth2Constants.REDIRECT_URI,redirectUri));
+  if (sessionId != null) {
+    formparams.add(new BasicNameValuePair(AdapterConstants.HTTP_SESSION_ID,sessionId));
+    formparams.add(new BasicNameValuePair(AdapterConstants.HTTP_SESSION_HOST,HostUtils.getIpAddress()));
+  }
+  HttpResponse response=null;
+  HttpPost post=new HttpPost(codeUrl);
+  if (!publicClient) {
+    String clientSecret=credentials.get(CredentialRepresentation.SECRET);
+    if (clientSecret != null) {
+      String authorization=BasicAuthHelper.createHeader(client_id,clientSecret);
+      post.setHeader("Authorization",authorization);
+    }
+  }
+ else {
+    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,client_id));
+  }
+  UrlEncodedFormEntity form=new UrlEncodedFormEntity(formparams,"UTF-8");
+  post.setEntity(form);
+  response=client.execute(post);
+  int status=response.getStatusLine().getStatusCode();
+  HttpEntity entity=response.getEntity();
+  if (status != 200) {
+    error(status,entity);
+  }
+  if (entity == null) {
+    throw new HttpFailure(status,null);
+  }
+  InputStream is=entity.getContent();
+  try {
+    ByteArrayOutputStream os=new ByteArrayOutputStream();
+    int c;
+    while ((c=is.read()) != -1) {
+      os.write(c);
+    }
+    byte[] bytes=os.toByteArray();
+    String json=new String(bytes);
+    try {
+      return JsonSerialization.readValue(json,AccessTokenResponse.class);
+    }
+ catch (    IOException e) {
+      throw new IOException(json,e);
+    }
+  }
+  finally {
+    try {
+      is.close();
+    }
+ catch (    IOException ignored) {
+    }
+  }
+}

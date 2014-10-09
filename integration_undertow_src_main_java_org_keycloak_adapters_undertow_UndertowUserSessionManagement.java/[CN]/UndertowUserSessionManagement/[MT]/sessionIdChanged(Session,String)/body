@@ -1,17 +1,2 @@
 {
-  String username=getUsernameFromSession(session);
-  if (username == null)   return;
-  String sessionId=session.getId();
-  UserSessions userSessions=userSessionMap.get(username);
-  if (userSessions == null) {
-    return;
-  }
-synchronized (this) {
-    String keycloakSessionId=userSessions.httpSessionToKeycloakSession.remove(oldSessionId);
-    if (keycloakSessionId != null) {
-      userSessions.keycloakSessionToHttpSession.remove(keycloakSessionId);
-      userSessions.keycloakSessionToHttpSession.put(keycloakSessionId,sessionId);
-      userSessions.httpSessionToKeycloakSession.put(sessionId,keycloakSessionId);
-    }
-  }
 }

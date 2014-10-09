@@ -1,7 +1,6 @@
 {
   final ServletRequestContext servletRequestContext=exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
-  HttpServletRequest req=(HttpServletRequest)servletRequestContext.getServletRequest();
-  HttpSession session=req.getSession(true);
+  HttpSession session=getSession(true);
   session.setAttribute(KeycloakUndertowAccount.class.getName(),account);
-  userSessionManagement.login(servletRequestContext.getDeployment().getSessionManager(),session.getId(),account.getPrincipal().getName(),account.getKeycloakSecurityContext().getToken().getSessionState());
+  userSessionManagement.login(servletRequestContext.getDeployment().getSessionManager());
 }

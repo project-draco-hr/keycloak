@@ -1,0 +1,22 @@
+{
+  LogoutAction adminAction=new LogoutAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,resource.getName(),adapterSessionIds,notBefore);
+  String token=new TokenManager().encodeToken(realm,adminAction);
+  logger.infov("logout resource {0} url: {1} sessionIds: " + adapterSessionIds,resource.getName(),managementUrl);
+  ClientRequest request=client.createRequest(UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_LOGOUT).build().toString());
+  ClientResponse response;
+  try {
+    response=request.body(MediaType.TEXT_PLAIN_TYPE,token).post(UserStats.class);
+  }
+ catch (  Exception e) {
+    logger.warn("Logout for application '" + resource.getName() + "' failed",e);
+    return false;
+  }
+  try {
+    boolean success=response.getStatus() == 204;
+    logger.debug("logout success.");
+    return success;
+  }
+  finally {
+    response.releaseConnection();
+  }
+}

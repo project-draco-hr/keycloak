@@ -4,9 +4,9 @@
   if (managementUrl != null) {
     PushNotBeforeAction adminAction=new PushNotBeforeAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,resource.getName(),notBefore);
     String token=new TokenManager().encodeToken(realm,adminAction);
-    logger.debugv("pushRevocation resource: {0} url: {1}",resource.getName(),managementUrl);
+    logger.infov("pushRevocation resource: {0} url: {1}",resource.getName(),managementUrl);
     ClientRequest request=client.createRequest(UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_PUSH_NOT_BEFORE).build().toString());
-    ClientResponse response=null;
+    ClientResponse response;
     try {
       response=request.body(MediaType.TEXT_PLAIN_TYPE,token).post();
     }

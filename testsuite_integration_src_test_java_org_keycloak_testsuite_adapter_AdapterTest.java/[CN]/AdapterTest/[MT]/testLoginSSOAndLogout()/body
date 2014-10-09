@@ -17,15 +17,15 @@
   Client client=ClientBuilder.newClient();
   UriBuilder authBase=UriBuilder.fromUri("http://localhost:8081/auth");
   WebTarget adminTarget=client.target(AdminRoot.realmsUrl(authBase)).path("demo");
-  Map<String,SessionStats> stats=adminTarget.path("session-stats").request().header(HttpHeaders.AUTHORIZATION,"Bearer " + adminToken).get(new GenericType<Map<String,SessionStats>>(){
+  Map<String,Integer> stats=adminTarget.path("application-session-stats").request().header(HttpHeaders.AUTHORIZATION,"Bearer " + adminToken).get(new GenericType<Map<String,Integer>>(){
   }
 );
-  SessionStats custStats=stats.get("customer-portal");
-  Assert.assertNotNull(custStats);
-  Assert.assertEquals(1,custStats.getActiveSessions());
-  SessionStats prodStats=stats.get("product-portal");
-  Assert.assertNotNull(prodStats);
-  Assert.assertEquals(1,prodStats.getActiveSessions());
+  Integer custSessionsCount=stats.get("customer-portal");
+  Assert.assertNotNull(custSessionsCount);
+  Assert.assertTrue(1 == custSessionsCount);
+  Integer prodStatsCount=stats.get("product-portal");
+  Assert.assertNotNull(prodStatsCount);
+  Assert.assertTrue(1 == prodStatsCount);
   client.close();
   String logoutUri=OpenIDConnectService.logoutUrl(UriBuilder.fromUri("http://localhost:8081/auth")).queryParam(OAuth2Constants.REDIRECT_URI,"http://localhost:8081/customer-portal").build("demo").toString();
   driver.navigate().to(logoutUri);

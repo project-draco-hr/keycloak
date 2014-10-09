@@ -1,0 +1,18 @@
+{
+  ApacheHttpClient4Executor executor=createExecutor();
+  try {
+    resource.setNotBefore(Time.currentTime());
+    List<ClientSessionModel> ourAppClientSessions=null;
+    if (userSessions != null) {
+      MultivaluedHashMap<ApplicationModel,ClientSessionModel> clientSessions=new MultivaluedHashMap<ApplicationModel,ClientSessionModel>();
+      for (      UserSessionModel userSession : userSessions) {
+        putClientSessions(clientSessions,userSession);
+      }
+      ourAppClientSessions=clientSessions.get(resource);
+    }
+    logoutApplication(requestUri,realm,resource,ourAppClientSessions,executor,resource.getNotBefore());
+  }
+  finally {
+    executor.getHttpClient().getConnectionManager().shutdown();
+  }
+}

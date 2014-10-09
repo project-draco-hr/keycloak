@@ -1,13 +1,7 @@
 {
-  auth.requireView();
   ApplicationModel app=realm.getApplicationByName(appName);
   if (app == null) {
     throw new NotFoundException("Role not found");
   }
-  Set<RoleModel> mappings=app.getApplicationScopeMappings(client);
-  List<RoleRepresentation> mapRep=new ArrayList<RoleRepresentation>();
-  for (  RoleModel roleModel : mappings) {
-    mapRep.add(ModelToRepresentation.toRepresentation(roleModel));
-  }
-  return mapRep;
+  return new ScopeMappedApplicationResource(realm,auth,client,session,app);
 }

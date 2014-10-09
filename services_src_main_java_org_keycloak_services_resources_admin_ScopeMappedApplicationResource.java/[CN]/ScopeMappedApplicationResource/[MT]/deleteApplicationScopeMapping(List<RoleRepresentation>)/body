@@ -1,16 +1,16 @@
 {
   auth.requireManage();
   if (roles == null) {
-    Set<RoleModel> roleModels=client.getRealmScopeMappings();
+    Set<RoleModel> roleModels=app.getApplicationScopeMappings(client);
     for (    RoleModel roleModel : roleModels) {
       client.deleteScopeMapping(roleModel);
     }
   }
  else {
     for (    RoleRepresentation role : roles) {
-      RoleModel roleModel=realm.getRoleById(role.getId());
+      RoleModel roleModel=app.getRole(role.getName());
       if (roleModel == null) {
-        throw new NotFoundException("Application not found");
+        throw new NotFoundException("Role not found");
       }
       client.deleteScopeMapping(roleModel);
     }

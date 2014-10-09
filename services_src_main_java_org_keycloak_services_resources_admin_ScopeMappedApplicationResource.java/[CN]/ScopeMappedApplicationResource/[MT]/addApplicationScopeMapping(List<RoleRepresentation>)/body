@@ -1,0 +1,10 @@
+{
+  auth.requireManage();
+  for (  RoleRepresentation role : roles) {
+    RoleModel roleModel=app.getRole(role.getName());
+    if (roleModel == null) {
+      throw new NotFoundException("Role not found");
+    }
+    client.addScopeMapping(roleModel);
+  }
+}

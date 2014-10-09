@@ -1,0 +1,12 @@
+{
+  auth.requireManage();
+  RoleModel role=roleContainer.getRole(roleName);
+  if (role == null) {
+    throw new NotFoundException("Could not find role: " + roleName);
+  }
+  ApplicationModel app=realm.getApplicationById(appId);
+  if (app == null) {
+    throw new NotFoundException("Could not find application: " + appId);
+  }
+  return getApplicationRoleComposites(app,role);
+}

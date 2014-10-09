@@ -4,5 +4,9 @@
   if (role == null) {
     throw new NotFoundException("Could not find role: " + roleName);
   }
-  return getApplicationRoleComposites(appName,role);
+  ApplicationModel app=realm.getApplicationByName(appName);
+  if (app == null) {
+    throw new NotFoundException("Could not find application: " + appName);
+  }
+  return getApplicationRoleComposites(app,role);
 }

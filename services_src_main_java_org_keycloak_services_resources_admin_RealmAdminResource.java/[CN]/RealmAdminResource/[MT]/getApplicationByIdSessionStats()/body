@@ -1,0 +1,14 @@
+{
+  auth.requireView();
+  List<Map<String,String>> data=new LinkedList<Map<String,String>>();
+  for (  ApplicationModel application : realm.getApplications()) {
+    int size=session.sessions().getActiveUserSessions(application.getRealm(),application);
+    if (size == 0)     continue;
+    Map<String,String> map=new HashMap<String,String>();
+    map.put("id",application.getId());
+    map.put("name",application.getName());
+    map.put("active",size + "");
+    data.add(map);
+  }
+  return data;
+}

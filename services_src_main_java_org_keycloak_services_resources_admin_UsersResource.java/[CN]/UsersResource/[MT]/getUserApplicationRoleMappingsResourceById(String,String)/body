@@ -1,0 +1,11 @@
+{
+  UserModel user=session.users().getUserByUsername(username,realm);
+  if (user == null) {
+    throw new NotFoundException("User not found");
+  }
+  ApplicationModel application=realm.getApplicationById(appId);
+  if (application == null) {
+    throw new NotFoundException("Application not found");
+  }
+  return new UserApplicationRoleMappingsResource(realm,auth,user,application);
+}

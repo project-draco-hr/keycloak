@@ -1,0 +1,11 @@
+{
+  auth.requireView();
+  logger.debug("getCompositeApplicationRoleMappings");
+  Set<RoleModel> roles=application.getRoles();
+  List<RoleRepresentation> mapRep=new ArrayList<RoleRepresentation>();
+  for (  RoleModel roleModel : roles) {
+    if (user.hasRole(roleModel))     mapRep.add(ModelToRepresentation.toRepresentation(roleModel));
+  }
+  logger.debugv("getCompositeApplicationRoleMappings.size() = {0}",mapRep.size());
+  return mapRep;
+}

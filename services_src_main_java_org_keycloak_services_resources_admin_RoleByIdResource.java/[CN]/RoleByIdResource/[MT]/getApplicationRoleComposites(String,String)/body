@@ -1,5 +1,9 @@
 {
   RoleModel role=getRoleModel(id);
   auth.requireView();
-  return getApplicationRoleComposites(appName,role);
+  ApplicationModel app=realm.getApplicationByName(appName);
+  if (app == null) {
+    throw new NotFoundException("Could not find application: " + appName);
+  }
+  return getApplicationRoleComposites(app,role);
 }

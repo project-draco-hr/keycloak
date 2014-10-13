@@ -28,9 +28,11 @@
     if (origin != null && !requestOrigin.equals(origin)) {
       throw new ForbiddenException();
     }
-    String referrer=headers.getRequestHeaders().getFirst("Referer");
-    if (referrer != null && !requestOrigin.equals(UriUtils.getOrigin(referrer))) {
-      throw new ForbiddenException();
+    if (!request.getHttpMethod().equals("GET")) {
+      String referrer=headers.getRequestHeaders().getFirst("Referer");
+      if (referrer != null && !requestOrigin.equals(UriUtils.getOrigin(referrer))) {
+        throw new ForbiddenException();
+      }
     }
   }
   if (authResult != null) {

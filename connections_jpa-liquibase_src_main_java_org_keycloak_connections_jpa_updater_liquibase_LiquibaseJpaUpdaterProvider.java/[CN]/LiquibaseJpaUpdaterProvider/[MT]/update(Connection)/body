@@ -1,0 +1,34 @@
+{
+  logger.debug("Starting database update");
+  try {
+    Liquibase liquibase=getLiquibase(connection);
+    List<ChangeSet> changeSets=liquibase.listUnrunChangeSets((Contexts)null);
+    if (!changeSets.isEmpty()) {
+      if (changeSets.get(0).getId().equals(FIRST_VERSION)) {
+        Statement statement=connection.createStatement();
+        try {
+          statement.executeQuery("SELECT id FROM REALM");
+          logger.infov("Updating database from {0} to {1}",FIRST_VERSION,changeSets.get(changeSets.size() - 1).getId());
+          liquibase.markNextChangeSetRan((Contexts)null);
+        }
+ catch (        SQLException e) {
+          logger.info("Initializing database schema");
+        }
+      }
+ else {
+        if (logger.isDebugEnabled()) {
+          List<RanChangeSet> ranChangeSets=liquibase.getDatabase().getRanChangeSetList();
+          logger.debugv("Updating database from {0} to {1}",ranChangeSets.get(ranChangeSets.size() - 1).getId(),changeSets.get(changeSets.size() - 1).getId());
+        }
+ else {
+          logger.infov("Updating database");
+        }
+      }
+      liquibase.update((Contexts)null);
+    }
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Failed to update database",e);
+  }
+  logger.debug("Completed database update");
+}

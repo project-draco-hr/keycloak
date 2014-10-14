@@ -1,0 +1,8 @@
+{
+  if (!System.getProperties().containsKey("liquibase.scan.packages")) {
+    System.setProperty("liquibase.scan.packages","liquibase.change,liquibase.changelog,liquibase.database,liquibase.parser,liquibase.precondition,liquibase.datatype,liquibase.serializer,liquibase.sqlgenerator,liquibase.executor,liquibase.snapshot,liquibase.logging,liquibase.diff,liquibase.structure,liquibase.structurecompare,liquibase.lockservice");
+  }
+  LogFactory.setInstance(new LogWrapper());
+  Database database=DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+  return new Liquibase(CHANGELOG,new ClassLoaderResourceAccessor(getClass().getClassLoader()),database);
+}

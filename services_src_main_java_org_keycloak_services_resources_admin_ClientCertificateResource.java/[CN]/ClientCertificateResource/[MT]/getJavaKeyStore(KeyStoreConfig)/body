@@ -1,0 +1,45 @@
+{
+  auth.requireView();
+  if (config.getFormat() != null && !config.getFormat().equals("jks")) {
+    throw new NotAcceptableException("Only support jks format.");
+  }
+  if (client.getAttribute(ClientModel.PRIVATE_KEY) == null) {
+    throw new NotFoundException("keypair not generated for client");
+  }
+  if (config.getKeyPassword() == null) {
+    throw new BadRequestException("Need to specify a key password for jks download");
+  }
+  if (config.getStorePassword() == null) {
+    throw new BadRequestException("Need to specify a store password for jks download");
+  }
+  final KeyStore keyStore;
+  try {
+    keyStore=KeyStore.getInstance("JKS");
+    keyStore.load(null,null);
+    String keyAlias=config.getKeyAlias();
+    if (keyAlias == null)     keyAlias=client.getClientId();
+    PrivateKey privateKey=PemUtils.decodePrivateKey(client.getAttribute(ClientModel.PRIVATE_KEY));
+    X509Certificate clientCert=PemUtils.decodeCertificate(client.getAttribute(ClientModel.X509CERTIFICATE));
+    Certificate[] chain={clientCert};
+    keyStore.setKeyEntry(keyAlias,privateKey,config.getKeyPassword().trim().toCharArray(),chain);
+    if (config.isRealmCertificate() == null || config.isRealmCertificate().booleanValue()) {
+      X509Certificate certificate=realm.getCertificate();
+      if (certificate == null) {
+        KeycloakModelUtils.generateRealmCertificate(realm);
+        certificate=realm.getCertificate();
+      }
+      String certificateAlias=config.getRealmAlias();
+      if (certificateAlias == null)       certificateAlias=realm.getName();
+      keyStore.setCertificateEntry(certificateAlias,certificate);
+    }
+    ByteArrayOutputStream stream=new ByteArrayOutputStream();
+    keyStore.store(stream,config.getStorePassword().trim().toCharArray());
+    stream.flush();
+    stream.close();
+    byte[] rtn=stream.toByteArray();
+    return rtn;
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

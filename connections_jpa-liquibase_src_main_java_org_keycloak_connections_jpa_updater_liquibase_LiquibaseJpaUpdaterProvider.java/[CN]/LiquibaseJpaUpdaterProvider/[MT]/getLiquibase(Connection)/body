@@ -1,0 +1,19 @@
+{
+  ServiceLocator sl=ServiceLocator.getInstance();
+  if (!System.getProperties().containsKey("liquibase.scan.packages")) {
+    if (sl.getPackages().remove("liquibase.core")) {
+      sl.addPackageToScan("liquibase.core.xml");
+    }
+    if (sl.getPackages().remove("liquibase.parser")) {
+      sl.addPackageToScan("liquibase.parser.core.xml");
+    }
+    if (sl.getPackages().remove("liquibase.serializer")) {
+      sl.addPackageToScan("liquibase.serializer.core.xml");
+    }
+    sl.getPackages().remove("liquibase.ext");
+    sl.getPackages().remove("liquibase.sdk");
+  }
+  LogFactory.setInstance(new LogWrapper());
+  Database database=DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+  return new Liquibase(CHANGELOG,new ClassLoaderResourceAccessor(getClass().getClassLoader()),database);
+}

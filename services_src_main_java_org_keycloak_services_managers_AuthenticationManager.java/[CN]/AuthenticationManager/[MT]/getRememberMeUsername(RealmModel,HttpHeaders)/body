@@ -1,0 +1,13 @@
+{
+  if (realm.isRememberMe()) {
+    Cookie cookie=headers.getCookies().get(AuthenticationManager.KEYCLOAK_REMEMBER_ME);
+    if (cookie != null) {
+      String value=cookie.getValue();
+      String[] s=value.split(":");
+      if (s[0].equals("username") && s.length == 2) {
+        return s[1];
+      }
+    }
+  }
+  return null;
+}

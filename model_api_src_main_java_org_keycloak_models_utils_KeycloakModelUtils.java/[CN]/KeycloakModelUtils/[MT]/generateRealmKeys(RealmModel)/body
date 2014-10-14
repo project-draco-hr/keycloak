@@ -8,4 +8,12 @@
   }
   realm.setPrivateKey(keyPair.getPrivate());
   realm.setPublicKey(keyPair.getPublic());
+  X509Certificate certificate=null;
+  try {
+    certificate=CertificateUtils.generateV1SelfSignedCertificate(keyPair,realm.getName());
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  realm.setCertificate(certificate);
 }

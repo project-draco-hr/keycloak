@@ -1,29 +1,15 @@
 {
-  if (notBefore <= 0)   return false;
-  String managementUrl=getManagementUrl(requestUri,resource);
-  if (managementUrl != null) {
-    PushNotBeforeAction adminAction=new PushNotBeforeAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,resource.getName(),notBefore);
-    String token=new TokenManager().encodeToken(realm,adminAction);
-    logger.infov("pushRevocation resource: {0} url: {1}",resource.getName(),managementUrl);
-    ClientRequest request=client.createRequest(UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_PUSH_NOT_BEFORE).build().toString());
-    ClientResponse response;
-    try {
-      response=request.body(MediaType.TEXT_PLAIN_TYPE,token).post();
-    }
- catch (    Exception e) {
-      throw new RuntimeException(e);
-    }
-    try {
-      boolean success=response.getStatus() == 204;
-      logger.debug("pushRevocation success.");
-      return success;
-    }
-  finally {
-      response.releaseConnection();
-    }
-  }
- else {
-    logger.debug("no management URL for application: " + resource.getName());
+  List<String> mgmtUrls=getAllManagementUrls(requestUri,resource);
+  if (mgmtUrls.isEmpty()) {
+    logger.debug("No management URL or no registered cluster nodes for the application " + resource.getName());
     return false;
   }
+  logger.info("Sending push revocation to URLS: " + mgmtUrls);
+  boolean anyFailed=false;
+  for (  String mgmtUrl : mgmtUrls) {
+    if (!sendPushRevocationPolicyRequest(realm,resource,notBefore,executor,mgmtUrl)) {
+      anyFailed=true;
+    }
+  }
+  return !anyFailed;
 }

@@ -1,0 +1,18 @@
+{
+  List<NameValuePair> formparams=new ArrayList<NameValuePair>();
+  formparams.add(new BasicNameValuePair(AdapterConstants.APPLICATION_CLUSTER_HOST,host));
+  HttpPost post=new HttpPost(endpointUrl);
+  String clientSecret=credentials.get(CredentialRepresentation.SECRET);
+  if (clientSecret != null) {
+    String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
+    post.setHeader("Authorization",authorization);
+  }
+  UrlEncodedFormEntity form=new UrlEncodedFormEntity(formparams,"UTF-8");
+  post.setEntity(form);
+  HttpResponse response=client.execute(post);
+  int status=response.getStatusLine().getStatusCode();
+  if (status != 204) {
+    HttpEntity entity=response.getEntity();
+    error(status,entity);
+  }
+}

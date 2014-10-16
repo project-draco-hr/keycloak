@@ -6,15 +6,42 @@
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
   }
   SAML2Object samlObject=documentHolder.getSamlObject();
+  RequestAbstractType requestAbstractType=(RequestAbstractType)samlObject;
+  String issuer=requestAbstractType.getIssuer().getValue();
+  ClientModel client=realm.findClient(issuer);
+  if (client == null) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown login requester.");
+  }
+  if (!client.isEnabled()) {
+    event.error(Errors.CLIENT_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Login requester not enabled.");
+  }
+  if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
+    event.error(Errors.NOT_ALLOWED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Bearer-only applications are not allowed to initiate browser login");
+  }
+  if (client.isDirectGrantsOnly()) {
+    event.error(Errors.NOT_ALLOWED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"direct-grants-only clients are not allowed to initiate browser login");
+  }
+  try {
+    SamlProtocolUtils.verifyPostBindingSignature(client,documentHolder.getSamlDocument());
+  }
+ catch (  VerificationException e) {
+    logger.error("request validation failed",e);
+    event.error(Errors.INVALID_CLIENT);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid requester.");
+  }
   if (samlObject instanceof AuthnRequestType) {
     event.event(EventType.LOGIN);
-    AuthnRequestType requestAbstractType=(AuthnRequestType)samlObject;
-    return loginRequest(relayState,requestAbstractType);
+    AuthnRequestType authn=(AuthnRequestType)samlObject;
+    return loginRequest(relayState,authn,client);
   }
  else   if (samlObject instanceof LogoutRequestType) {
     event.event(EventType.LOGOUT);
-    LogoutRequestType requestAbstractType=(LogoutRequestType)samlObject;
-    return logoutRequest(relayState,requestAbstractType);
+    LogoutRequestType logout=(LogoutRequestType)samlObject;
+    return logoutRequest(logout,client);
   }
  else {
     event.event(EventType.LOGIN_ERROR);

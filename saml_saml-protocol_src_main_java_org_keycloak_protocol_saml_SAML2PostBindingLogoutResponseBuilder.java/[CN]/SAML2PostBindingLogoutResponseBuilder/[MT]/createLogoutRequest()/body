@@ -1,0 +1,12 @@
+{
+  LogoutRequestType lort=new SAML2Request().createLogoutRequest(responseIssuer);
+  NameIDType nameID=new NameIDType();
+  nameID.setValue(userPrincipal);
+  String nameIDFormat=JBossSAMLURIConstants.NAMEID_FORMAT_PERSISTENT.get();
+  nameID.setFormat(URI.create(nameIDFormat));
+  lort.setNameID(nameID);
+  long assertionValidity=PicketLinkCoreSTS.instance().getConfiguration().getIssuedTokenTimeout();
+  lort.setNotOnOrAfter(XMLTimeUtil.add(lort.getIssueInstant(),assertionValidity));
+  lort.setDestination(URI.create(destination));
+  return lort;
+}

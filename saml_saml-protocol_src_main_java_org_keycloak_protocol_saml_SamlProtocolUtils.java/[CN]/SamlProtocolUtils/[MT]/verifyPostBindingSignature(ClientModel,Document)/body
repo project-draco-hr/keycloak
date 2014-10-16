@@ -1,0 +1,23 @@
+{
+  if (!"true".equals(client.getAttribute("samlClientSignature"))) {
+    return;
+  }
+  SAML2Signature saml2Signature=new SAML2Signature();
+  String publicKeyPem=client.getAttribute(ClientModel.PUBLIC_KEY);
+  if (publicKeyPem == null)   throw new VerificationException("Client does not have a public key.");
+  PublicKey publicKey=null;
+  try {
+    publicKey=PemUtils.decodePublicKey(publicKeyPem);
+  }
+ catch (  Exception e) {
+    throw new VerificationException("Could not decode public key",e);
+  }
+  try {
+    if (!saml2Signature.validate(document,publicKey)) {
+      throw new VerificationException("Invalid signature on document");
+    }
+  }
+ catch (  ProcessingException e) {
+    throw new VerificationException("Error validating signature",e);
+  }
+}

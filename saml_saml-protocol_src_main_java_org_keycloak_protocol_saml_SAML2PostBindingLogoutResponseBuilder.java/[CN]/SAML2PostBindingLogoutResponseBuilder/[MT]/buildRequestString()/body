@@ -1,0 +1,13 @@
+{
+  try {
+    Document logoutRequestDocument=new SAML2Request().convert(createLogoutRequest());
+    if (signed) {
+      signDocument(logoutRequestDocument);
+    }
+    byte[] responseBytes=DocumentUtil.getDocumentAsString(logoutRequestDocument).getBytes("UTF-8");
+    return PostBindingUtil.base64Encode(new String(responseBytes));
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

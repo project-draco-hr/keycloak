@@ -1,11 +1,33 @@
 {
   GlobalConfigurationBuilder gcb=new GlobalConfigurationBuilder();
-  if (config.getBoolean("transport",false)) {
+  boolean clustered=config.getBoolean("clustered",false);
+  boolean async=config.getBoolean("async",true);
+  if (clustered) {
     gcb.transport().defaultTransport();
   }
   cacheManager=new DefaultCacheManager(gcb.build());
   containerManaged=false;
   logger.debug("Started embedded Infinispan cache container");
-  cacheManager.defineConfiguration("sessions",createConfiguration("sessions"));
-  cacheManager.defineConfiguration("realms",createConfiguration("realms"));
+  ConfigurationBuilder invalidationConfigBuilder=new ConfigurationBuilder();
+  if (clustered) {
+    invalidationConfigBuilder.clustering().cacheMode(async ? CacheMode.INVALIDATION_ASYNC : CacheMode.INVALIDATION_SYNC);
+  }
+  Configuration invalidationCacheConfiguration=invalidationConfigBuilder.build();
+  cacheManager.defineConfiguration("realms",invalidationCacheConfiguration);
+  cacheManager.defineConfiguration("users",invalidationCacheConfiguration);
+  ConfigurationBuilder sessionConfigBuilder=new ConfigurationBuilder();
+  if (clustered) {
+    String sessionsMode=config.get("sessionsMode","distributed");
+    if (sessionsMode.equalsIgnoreCase("replicated")) {
+      sessionConfigBuilder.clustering().cacheMode(async ? CacheMode.REPL_ASYNC : CacheMode.REPL_SYNC);
+    }
+ else     if (sessionsMode.equalsIgnoreCase("distributed")) {
+      sessionConfigBuilder.clustering().cacheMode(async ? CacheMode.DIST_ASYNC : CacheMode.DIST_SYNC);
+    }
+ else {
+      throw new RuntimeException("Invalid value for sessionsMode");
+    }
+    sessionConfigBuilder.clustering().hash().numOwners(config.getInt("sessionsOwners",2)).numSegments(config.getInt("sessionsSegments",60)).build();
+  }
+  cacheManager.defineConfiguration("sessions",sessionConfigBuilder.build());
 }

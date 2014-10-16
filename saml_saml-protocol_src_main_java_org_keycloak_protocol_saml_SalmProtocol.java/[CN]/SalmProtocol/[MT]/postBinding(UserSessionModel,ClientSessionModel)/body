@@ -16,6 +16,17 @@
   if (requiresRealmSignature(client)) {
     builder.sign(realm.getPrivateKey(),realm.getPublicKey());
   }
+  if (requiresEncryption(client)) {
+    PublicKey publicKey=null;
+    try {
+      publicKey=PemUtils.decodePublicKey(client.getAttribute(ClientModel.PUBLIC_KEY));
+    }
+ catch (    Exception e) {
+      logger.error("failed",e);
+      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Failed to process response");
+    }
+    builder.encrypt(publicKey);
+  }
   try {
     return builder.buildLoginResponse();
   }

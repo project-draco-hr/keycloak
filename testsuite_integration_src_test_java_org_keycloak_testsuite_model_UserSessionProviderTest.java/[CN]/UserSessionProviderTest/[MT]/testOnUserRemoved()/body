@@ -1,0 +1,14 @@
+{
+  createSessions();
+  session.sessions().addUserLoginFailure(realm,"user1");
+  session.sessions().addUserLoginFailure(realm,"user1@localhost");
+  session.sessions().addUserLoginFailure(realm,"user2");
+  resetSession();
+  session.sessions().onUserRemoved(realm,session.users().getUserByUsername("user1",realm));
+  resetSession();
+  assertTrue(session.sessions().getUserSessions(realm,session.users().getUserByUsername("user1",realm)).isEmpty());
+  assertFalse(session.sessions().getUserSessions(realm,session.users().getUserByUsername("user2",realm)).isEmpty());
+  assertNull(session.sessions().getUserLoginFailure(realm,"user1"));
+  assertNull(session.sessions().getUserLoginFailure(realm,"user1@localhost"));
+  assertNotNull(session.sessions().getUserLoginFailure(realm,"user2"));
+}

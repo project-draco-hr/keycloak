@@ -1,7 +1,12 @@
 {
-  SAML2PostBindingErrorResponseBuilder builder=new SAML2PostBindingErrorResponseBuilder().relayState(clientSession.getNote(GeneralConstants.RELAY_STATE)).destination(clientSession.getRedirectUri()).responseIssuer(getResponseIssuer(realm));
+  SAML2ErrorResponseBuilder builder=new SAML2ErrorResponseBuilder().relayState(clientSession.getNote(GeneralConstants.RELAY_STATE)).destination(clientSession.getRedirectUri()).responseIssuer(getResponseIssuer(realm));
   try {
-    return builder.buildErrorResponse(status);
+    if (isPostBinding(clientSession)) {
+      return builder.binding(status).postResponse();
+    }
+ else {
+      return builder.binding(status).redirectResponse();
+    }
   }
  catch (  Exception e) {
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Failed to process response");

@@ -1,0 +1,18 @@
+{
+  if (!checkSsl()) {
+    event.event(EventType.LOGIN_ERROR);
+    event.error(Errors.SSL_REQUIRED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
+  }
+  if (!realm.isEnabled()) {
+    event.event(EventType.LOGIN_ERROR);
+    event.error(Errors.REALM_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled");
+  }
+  if (samlRequest == null && samlResponse == null) {
+    event.event(EventType.LOGIN_ERROR);
+    event.error(Errors.INVALID_TOKEN);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
+  }
+  return null;
+}

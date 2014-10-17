@@ -3,7 +3,7 @@
   if (!(client instanceof ApplicationModel))   return;
   ApplicationModel app=(ApplicationModel)client;
   if (app.getManagementUrl() == null)   return;
-  SAML2PostBindingLogoutResponseBuilder logoutBuilder=new SAML2PostBindingLogoutResponseBuilder().userPrincipal(userSession.getUser().getUsername()).destination(client.getClientId());
+  SAML2LogoutRequestBuilder logoutBuilder=new SAML2LogoutRequestBuilder().userPrincipal(userSession.getUser().getUsername()).destination(client.getClientId());
   if (requiresRealmSignature(client)) {
     logoutBuilder.sign(realm.getPrivateKey(),realm.getPublicKey());
   }

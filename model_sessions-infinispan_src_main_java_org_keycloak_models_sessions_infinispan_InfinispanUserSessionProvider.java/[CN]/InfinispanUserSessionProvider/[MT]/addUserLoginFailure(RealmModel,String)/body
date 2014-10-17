@@ -1,7 +1,8 @@
 {
+  LoginFailureKey key=new LoginFailureKey(realm.getId(),username);
   LoginFailureEntity entity=new LoginFailureEntity();
   entity.setRealm(realm.getId());
   entity.setUsername(username);
-  tx.put(loginFailureCache,entity.getId(),entity);
-  return wrap(entity);
+  tx.put(loginFailureCache,key,entity);
+  return wrap(key,entity);
 }

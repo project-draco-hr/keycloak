@@ -7,6 +7,7 @@
   if (rep.getAdminUrl() != null)   resource.setManagementUrl(rep.getAdminUrl());
   if (rep.getBaseUrl() != null)   resource.setBaseUrl(rep.getBaseUrl());
   if (rep.isSurrogateAuthRequired() != null)   resource.setSurrogateAuthRequired(rep.isSurrogateAuthRequired());
+  if (rep.getNodeReRegistrationTimeout() != null)   resource.setNodeReRegistrationTimeout(rep.getNodeReRegistrationTimeout());
   resource.updateApplication();
   if (rep.getProtocol() != null)   resource.setProtocol(rep.getProtocol());
   if (rep.getAttributes() != null) {
@@ -27,6 +28,11 @@
   List<String> webOrigins=rep.getWebOrigins();
   if (webOrigins != null) {
     resource.setWebOrigins(new HashSet<String>(webOrigins));
+  }
+  if (rep.getRegisteredNodes() != null) {
+    for (    Map.Entry<String,Integer> entry : rep.getRegisteredNodes().entrySet()) {
+      resource.registerNode(entry.getKey(),entry.getValue());
+    }
   }
   if (rep.getClaims() != null) {
     setClaims(resource,rep.getClaims());

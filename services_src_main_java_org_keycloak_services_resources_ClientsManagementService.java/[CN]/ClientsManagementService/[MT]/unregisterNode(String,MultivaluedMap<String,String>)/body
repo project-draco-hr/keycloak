@@ -1,0 +1,15 @@
+{
+  if (!checkSsl()) {
+    throw new ForbiddenException("HTTPS required");
+  }
+  event.event(EventType.UNREGISTER_NODE);
+  if (!realm.isEnabled()) {
+    event.error(Errors.REALM_DISABLED);
+    throw new UnauthorizedException("Realm not enabled");
+  }
+  ApplicationModel application=authorizeApplication(authorizationHeader,formData);
+  String nodeHost=getApplicationClusterHost(formData);
+  logger.infof("Unregistering cluster host '%s' for client '%s'",nodeHost,application.getName());
+  application.unregisterNode(nodeHost);
+  return Response.noContent().build();
+}

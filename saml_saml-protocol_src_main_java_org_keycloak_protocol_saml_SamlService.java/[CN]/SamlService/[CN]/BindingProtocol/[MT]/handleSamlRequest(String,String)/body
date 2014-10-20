@@ -1,7 +1,7 @@
 {
   SAMLDocumentHolder documentHolder=extractDocument(samlRequest);
   if (documentHolder == null) {
-    event.event(EventType.LOGIN_ERROR);
+    event.event(EventType.LOGIN);
     event.error(Errors.INVALID_TOKEN);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
   }
@@ -10,22 +10,22 @@
   String issuer=requestAbstractType.getIssuer().getValue();
   ClientModel client=realm.findClient(issuer);
   if (client == null) {
-    event.event(EventType.LOGIN_ERROR);
+    event.event(EventType.LOGIN);
     event.error(Errors.CLIENT_NOT_FOUND);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown login requester.");
   }
   if (!client.isEnabled()) {
-    event.event(EventType.LOGIN_ERROR);
+    event.event(EventType.LOGIN);
     event.error(Errors.CLIENT_DISABLED);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Login requester not enabled.");
   }
   if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
-    event.event(EventType.LOGIN_ERROR);
+    event.event(EventType.LOGIN);
     event.error(Errors.NOT_ALLOWED);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Bearer-only applications are not allowed to initiate browser login");
   }
   if (client.isDirectGrantsOnly()) {
-    event.event(EventType.LOGIN_ERROR);
+    event.event(EventType.LOGIN);
     event.error(Errors.NOT_ALLOWED);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"direct-grants-only clients are not allowed to initiate browser login");
   }
@@ -34,7 +34,7 @@
   }
  catch (  VerificationException e) {
     SamlService.logger.error("request validation failed",e);
-    event.event(EventType.LOGIN_ERROR);
+    event.event(EventType.LOGIN);
     event.error(Errors.INVALID_SIGNATURE);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid requester.");
   }
@@ -49,7 +49,7 @@
     return logoutRequest(logout,client);
   }
  else {
-    event.event(EventType.LOGIN_ERROR);
+    event.event(EventType.LOGIN);
     event.error(Errors.INVALID_TOKEN);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
   }

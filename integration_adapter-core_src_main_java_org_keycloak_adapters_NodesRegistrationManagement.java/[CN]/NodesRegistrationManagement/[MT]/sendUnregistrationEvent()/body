@@ -1,0 +1,21 @@
+{
+  log.info("Sending Unregistration event right now");
+  String host=HostUtils.getIpAddress();
+  try {
+    ServerRequest.invokeUnregisterNode(deployment,host);
+    log.infof("Node '%s' successfully unregistered from Keycloak",host);
+    return true;
+  }
+ catch (  ServerRequest.HttpFailure failure) {
+    log.error("failed to unregister node from keycloak");
+    log.error("status from server: " + failure.getStatus());
+    if (failure.getError() != null) {
+      log.error("   " + failure.getError());
+    }
+    return false;
+  }
+catch (  IOException e) {
+    log.error("failed to unregister node from keycloak",e);
+    return false;
+  }
+}

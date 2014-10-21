@@ -9,7 +9,9 @@
   }
   ApplicationModel application=authorizeApplication(authorizationHeader,formData);
   String nodeHost=getApplicationClusterHost(formData);
+  event.client(application).detail(Details.NODE_HOST,nodeHost);
   logger.infof("Unregistering cluster host '%s' for client '%s'",nodeHost,application.getName());
   application.unregisterNode(nodeHost);
+  event.success();
   return Response.noContent().build();
 }

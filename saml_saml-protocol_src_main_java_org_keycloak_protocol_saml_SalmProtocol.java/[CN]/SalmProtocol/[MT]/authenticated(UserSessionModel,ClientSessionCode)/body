@@ -15,6 +15,7 @@
   }
   ClientModel client=clientSession.getClient();
   if (requiresRealmSignature(client)) {
+    builder.signatureAlgorithm(getSignatureAlgorithm(client));
     builder.sign(realm.getPrivateKey(),realm.getPublicKey());
   }
   if (requiresEncryption(client)) {

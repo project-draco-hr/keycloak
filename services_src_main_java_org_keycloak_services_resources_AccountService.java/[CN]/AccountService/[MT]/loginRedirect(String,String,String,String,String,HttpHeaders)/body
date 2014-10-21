@@ -4,6 +4,9 @@
       logger.debug("error from oauth");
       throw new ForbiddenException("error");
     }
+    if (path != null && !VALID_PATHS.contains(path)) {
+      throw new BadRequestException("Invalid path");
+    }
     if (!realm.isEnabled()) {
       logger.debug("realm not enabled");
       throw new ForbiddenException();

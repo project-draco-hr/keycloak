@@ -1,0 +1,32 @@
+{
+  try {
+    Iterator<org.jboss.modules.Resource> rscIterator=this.subsysModule.iterateResources(new PathFilter(){
+      @Override public boolean accept(      String string){
+        return string.equals("");
+      }
+    }
+);
+    while (rscIterator.hasNext()) {
+      Resource rsc=rscIterator.next();
+      System.out.println("rsc.getName()=" + rsc.getName());
+      URL url=rsc.getURL();
+      String parent="";
+      try {
+        parent=new File(url.toURI()).getParent();
+      }
+ catch (      URISyntaxException e) {
+        continue;
+      }
+catch (      IllegalArgumentException e) {
+        continue;
+      }
+      if (isAuthServer(rsc,parent)) {
+        this.authServerUrl=url;
+        break;
+      }
+    }
+  }
+ catch (  ModuleLoadException e) {
+    throw new IllegalStateException(e);
+  }
+}

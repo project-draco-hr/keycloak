@@ -1,0 +1,31 @@
+{
+  if (!context.isNormalServer() || attribNotChanging(attributeName,newValue,oldValue)) {
+    super.finishModelStage(context,operation,attributeName,newValue,oldValue,model);
+    return;
+  }
+  System.out.println("**** finishModelStage *****");
+  System.out.println("** operation **");
+  System.out.println(operation.toString());
+  System.out.println("** attributeName=" + attributeName);
+  System.out.println("** oldValue=" + oldValue);
+  System.out.println("** newValue=" + newValue);
+  AuthServerUtil authServerUtil=new AuthServerUtil(operation);
+  boolean isEnabled=isEnabled(model);
+  if (attributeName.equals(AuthServerDefinition.WEB_CONTEXT.getName())) {
+    String deploymentName=AuthServerUtil.getDeploymentName(operation);
+    KeycloakAdapterConfigService.INSTANCE.removeServerDeployment(deploymentName);
+    KeycloakAdapterConfigService.INSTANCE.addServerDeployment(deploymentName,newValue.asString());
+    if (isEnabled) {
+      authServerUtil.addStepToRedeployAuthServer(context);
+    }
+  }
+  if (attributeName.equals(AuthServerDefinition.ENABLED.getName())) {
+    if (!isEnabled) {
+      authServerUtil.addStepToUndeployAuthServer(context);
+    }
+ else {
+      authServerUtil.addStepToDeployAuthServer(context);
+    }
+  }
+  super.finishModelStage(context,operation,attributeName,newValue,oldValue,model);
+}

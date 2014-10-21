@@ -1,0 +1,16 @@
+{
+  PathAddress deploymentAddress=deploymentAddress();
+  ModelNode op=Util.createOperation(ADD,deploymentAddress);
+  op.get(ENABLED).set(isEnabled);
+  op.get(PERSISTENT).set(false);
+  if (authServerUrl == null) {
+    throw new OperationFailedException("Keycloak Auth Server WAR not found in keycloak-wildfly-subsystem module");
+  }
+  String urlString=authServerUrl.toExternalForm();
+  ModelNode contentItem=new ModelNode();
+  contentItem.get(URL).set(urlString);
+  op.get(CONTENT).add(contentItem);
+  System.out.println("*** add auth server operation");
+  System.out.println(op.toString());
+  context.addStep(op,getHandler(context,deploymentAddress,ADD),OperationContext.Stage.MODEL);
+}

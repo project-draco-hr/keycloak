@@ -1,0 +1,34 @@
+{
+  auth.requireManage();
+  Map<String,List<InputPart>> uploadForm=input.getFormDataMap();
+  List<InputPart> inputParts=uploadForm.get("file");
+  String keystoreFormat=uploadForm.get("keystoreFormat").get(0).getBodyAsString();
+  String keyAlias=uploadForm.get("keyAlias").get(0).getBodyAsString();
+  String keyPassword=uploadForm.get("keyPassword").get(0).getBodyAsString();
+  String storePassword=uploadForm.get("storePassword").get(0).getBodyAsString();
+  System.out.println("format = '" + keystoreFormat + "'");
+  PrivateKey privateKey=null;
+  X509Certificate certificate=null;
+  try {
+    KeyStore keyStore=null;
+    if (keystoreFormat.equals("JKS"))     keyStore=KeyStore.getInstance("JKS");
+ else     keyStore=KeyStore.getInstance(keystoreFormat,"BC");
+    keyStore.load(inputParts.get(0).getBody(InputStream.class,null),storePassword.toCharArray());
+    privateKey=(PrivateKey)keyStore.getKey(keyAlias,keyPassword.toCharArray());
+    certificate=(X509Certificate)keyStore.getCertificate(keyAlias);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  String privateKeyPem=KeycloakModelUtils.getPemFromKey(privateKey);
+  String publicKeyPem=KeycloakModelUtils.getPemFromKey(certificate.getPublicKey());
+  String certPem=KeycloakModelUtils.getPemFromCertificate(certificate);
+  client.setAttribute(ClientModel.PRIVATE_KEY,privateKeyPem);
+  client.setAttribute(ClientModel.PUBLIC_KEY,publicKeyPem);
+  client.setAttribute(ClientModel.X509CERTIFICATE,certPem);
+  ClientKeyPairInfo info=new ClientKeyPairInfo();
+  info.setCertificate(client.getAttribute(ClientModel.X509CERTIFICATE));
+  info.setPrivateKey(client.getAttribute(ClientModel.PRIVATE_KEY));
+  info.setPublicKey(client.getAttribute(ClientModel.PUBLIC_KEY));
+  return info;
+}

@@ -1,0 +1,14 @@
+{
+  String path=request.getURI();
+  String realm=path.substring(path.indexOf("multitenant/")).split("/")[1];
+  if (realm.contains("?")) {
+    realm=realm.split("\\?")[0];
+  }
+  KeycloakDeployment deployment=cache.get(realm);
+  if (null == deployment) {
+    InputStream is=getClass().getResourceAsStream("/" + realm + "-keycloak.json");
+    deployment=KeycloakDeploymentBuilder.build(is);
+    cache.put(realm,deployment);
+  }
+  return deployment;
+}

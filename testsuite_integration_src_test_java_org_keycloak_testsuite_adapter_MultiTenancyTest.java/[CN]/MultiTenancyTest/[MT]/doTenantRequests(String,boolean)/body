@@ -1,0 +1,16 @@
+{
+  String tenantLoginUrl=OpenIDConnectService.loginPageUrl(UriBuilder.fromUri("http://localhost:8081/auth")).build(tenant).toString();
+  driver.navigate().to("http://localhost:8081/multi-tenant?realm=" + tenant);
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(tenantLoginUrl));
+  loginPage.login("bburke@redhat.com","password");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertEquals("http://localhost:8081/multi-tenant?realm=" + tenant,driver.getCurrentUrl());
+  String pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("Username: bburke@redhat.com"));
+  Assert.assertTrue(pageSource.contains("Realm: " + tenant));
+  if (logout) {
+    driver.manage().deleteAllCookies();
+  }
+}

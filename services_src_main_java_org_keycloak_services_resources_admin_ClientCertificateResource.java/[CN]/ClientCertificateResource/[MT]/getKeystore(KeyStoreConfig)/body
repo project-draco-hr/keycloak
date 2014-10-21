@@ -1,8 +1,9 @@
 {
   auth.requireView();
-  if (config.getFormat() != null && !config.getFormat().equals("jks")) {
+  if (config.getFormat() != null && !config.getFormat().equals("JKS") && !config.getFormat().equals("PKCS12")) {
     throw new NotAcceptableException("Only support jks format.");
   }
+  String format=config.getFormat();
   if (client.getAttribute(ClientModel.PRIVATE_KEY) == null) {
     throw new NotFoundException("keypair not generated for client");
   }
@@ -14,7 +15,8 @@
   }
   final KeyStore keyStore;
   try {
-    keyStore=KeyStore.getInstance("JKS");
+    if (format.equals("JKS"))     keyStore=KeyStore.getInstance("JKS");
+ else     keyStore=KeyStore.getInstance(format,"BC");
     keyStore.load(null,null);
     String keyAlias=config.getKeyAlias();
     if (keyAlias == null)     keyAlias=client.getClientId();

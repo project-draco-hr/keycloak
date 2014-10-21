@@ -1,0 +1,19 @@
+{
+  log.info("Sending registration event right now");
+  String host=HostUtils.getIpAddress();
+  try {
+    ServerRequest.invokeRegisterNode(deployment,host);
+    log.infof("Node '%s' successfully registered in Keycloak",host);
+    registered=true;
+  }
+ catch (  ServerRequest.HttpFailure failure) {
+    log.error("failed to register node to keycloak");
+    log.error("status from server: " + failure.getStatus());
+    if (failure.getError() != null) {
+      log.error("   " + failure.getError());
+    }
+  }
+catch (  IOException e) {
+    log.error("failed to register node to keycloak",e);
+  }
+}

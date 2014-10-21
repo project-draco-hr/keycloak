@@ -1,0 +1,11 @@
+{
+  TimerTask task=new TimerTask(){
+    @Override public void run(){
+      sendRegistrationEvent(deployment);
+    }
+  }
+;
+  long interval=deployment.getRegisterNodePeriod() * 1000;
+  log.info("Setup of periodic re-registration event sending each " + interval + " ms");
+  timer.schedule(task,interval,interval);
+}

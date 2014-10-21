@@ -1,0 +1,16 @@
+{
+  if (log.isTraceEnabled()) {
+    log.trace("K_TEST_AVAILABLE sent");
+  }
+  try {
+    JWSInput token=verifyAdminRequest();
+    if (token == null) {
+      return;
+    }
+    TestAvailabilityAction action=JsonSerialization.readValue(token.getContent(),TestAvailabilityAction.class);
+    validateAction(action);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

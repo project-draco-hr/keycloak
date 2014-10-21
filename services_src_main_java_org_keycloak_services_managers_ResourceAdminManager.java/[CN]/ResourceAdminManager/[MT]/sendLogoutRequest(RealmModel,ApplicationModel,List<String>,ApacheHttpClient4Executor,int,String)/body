@@ -5,15 +5,15 @@
   ClientRequest request=client.createRequest(UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_LOGOUT).build().toString());
   ClientResponse response;
   try {
-    response=request.body(MediaType.TEXT_PLAIN_TYPE,token).post(UserStats.class);
+    response=request.body(MediaType.TEXT_PLAIN_TYPE,token).post();
   }
  catch (  Exception e) {
     logger.warn("Logout for application '" + resource.getName() + "' failed",e);
     return false;
   }
   try {
-    boolean success=response.getStatus() == 204;
-    logger.debug("logout success.");
+    boolean success=response.getStatus() == 204 || response.getStatus() == 200;
+    logger.debugf("logout success for %s: %s",managementUrl,success);
     return success;
   }
   finally {

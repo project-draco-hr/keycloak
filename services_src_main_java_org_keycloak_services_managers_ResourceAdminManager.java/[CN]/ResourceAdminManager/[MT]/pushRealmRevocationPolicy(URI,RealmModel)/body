@@ -1,9 +1,12 @@
 {
   ApacheHttpClient4Executor executor=createExecutor();
   try {
+    GlobalRequestResult finalResult=new GlobalRequestResult();
     for (    ApplicationModel application : realm.getApplications()) {
-      pushRevocationPolicy(requestUri,realm,application,realm.getNotBefore(),executor);
+      GlobalRequestResult currentResult=pushRevocationPolicy(requestUri,realm,application,realm.getNotBefore(),executor);
+      finalResult.addAll(currentResult);
     }
+    return finalResult;
   }
   finally {
     executor.getHttpClient().getConnectionManager().shutdown();

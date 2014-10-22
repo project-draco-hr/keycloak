@@ -16,7 +16,8 @@
   AdapterDeploymentContext deploymentContext=new AdapterDeploymentContext(deployment);
   servletContext.setAttribute(AdapterDeploymentContext.class.getName(),deploymentContext);
   UndertowUserSessionManagement userSessionManagement=new UndertowUserSessionManagement();
-  final ServletKeycloakAuthMech mech=createAuthenticationMechanism(deploymentInfo,deploymentContext,userSessionManagement);
+  final NodesRegistrationManagement nodesRegistrationManagement=new NodesRegistrationManagement();
+  final ServletKeycloakAuthMech mech=createAuthenticationMechanism(deploymentInfo,deploymentContext,userSessionManagement,nodesRegistrationManagement);
   UndertowAuthenticatedActionsHandler.Wrapper actions=new UndertowAuthenticatedActionsHandler.Wrapper(deploymentContext);
   deploymentInfo.addOuterHandlerChainWrapper(new ServletPreAuthActionsHandler.Wrapper(deploymentContext,userSessionManagement));
   deploymentInfo.addAuthenticationMechanism("KEYCLOAK",new AuthenticationMechanismFactory(){
@@ -42,11 +43,10 @@
   ServletSessionConfig cookieConfig=new ServletSessionConfig();
   cookieConfig.setPath(deploymentInfo.getContextPath());
   deploymentInfo.setServletSessionConfig(cookieConfig);
-  deploymentInfo.addListener(new ListenerInfo(UndertowNodesRegistrationLifecycleWrapper.class,new InstanceFactory<UndertowNodesRegistrationLifecycleWrapper>(){
-    @Override public InstanceHandle<UndertowNodesRegistrationLifecycleWrapper> createInstance() throws InstantiationException {
-      NodesRegistrationLifecycle nodesRegistration=new NodesRegistrationLifecycle(deployment);
-      UndertowNodesRegistrationLifecycleWrapper listener=new UndertowNodesRegistrationLifecycleWrapper(nodesRegistration);
-      return new ImmediateInstanceHandle<UndertowNodesRegistrationLifecycleWrapper>(listener);
+  deploymentInfo.addListener(new ListenerInfo(UndertowNodesRegistrationManagementWrapper.class,new InstanceFactory<UndertowNodesRegistrationManagementWrapper>(){
+    @Override public InstanceHandle<UndertowNodesRegistrationManagementWrapper> createInstance() throws InstantiationException {
+      UndertowNodesRegistrationManagementWrapper listener=new UndertowNodesRegistrationManagementWrapper(nodesRegistrationManagement);
+      return new ImmediateInstanceHandle<UndertowNodesRegistrationManagementWrapper>(listener);
     }
   }
 ));

@@ -1,9 +1,16 @@
 {
-  if (resolvedDeployment.isRegisterNodeAtStartup() && !registered) {
-synchronized (this) {
-      if (!registered) {
-        sendRegistrationEvent(resolvedDeployment);
+  if (resolvedDeployment.isRegisterNodeAtStartup()) {
+    final String registrationUri=resolvedDeployment.getRegisterNodeUrl();
+    if (needRefreshRegistration(registrationUri,resolvedDeployment)) {
+      Runnable runnable=new Runnable(){
+        @Override public void run(){
+          if (needRefreshRegistration(registrationUri,resolvedDeployment)) {
+            sendRegistrationEvent(resolvedDeployment);
+          }
+        }
       }
+;
+      executor.execute(runnable);
     }
   }
 }

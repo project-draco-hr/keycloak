@@ -5,8 +5,7 @@
   if (app.getManagementUrl() == null)   return;
   SAML2LogoutRequestBuilder logoutBuilder=new SAML2LogoutRequestBuilder().userPrincipal(userSession.getUser().getUsername()).destination(client.getClientId());
   if (requiresRealmSignature(client)) {
-    logoutBuilder.signatureAlgorithm(getSignatureAlgorithm(client));
-    logoutBuilder.sign(realm.getPrivateKey(),realm.getPublicKey());
+    logoutBuilder.signatureAlgorithm(getSignatureAlgorithm(client)).signWith(realm.getPrivateKey(),realm.getPublicKey()).signDocument();
   }
   String logoutRequestString=null;
   try {

@@ -6,10 +6,10 @@
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid redirect_uri.");
   }
   ClientSessionModel clientSession=session.sessions().createClientSession(realm,client);
-  clientSession.setAuthMethod(SalmProtocol.LOGIN_PROTOCOL);
+  clientSession.setAuthMethod(SamlProtocol.LOGIN_PROTOCOL);
   clientSession.setRedirectUri(redirect);
   clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE);
-  clientSession.setNote(SalmProtocol.SAML_BINDING,getBindingType());
+  clientSession.setNote(SamlProtocol.SAML_BINDING,getBindingType());
   clientSession.setNote(GeneralConstants.RELAY_STATE,relayState);
   clientSession.setNote("REQUEST_ID",requestAbstractType.getID());
   Response response=authManager.checkNonFormAuthentication(session,clientSession,realm,uriInfo,request,clientConnection,headers,event);

@@ -21,6 +21,12 @@
  else {
     deployment.setSslRequired(SslRequired.EXTERNAL);
   }
+  if (adapterConfig.getTokenStore() != null) {
+    deployment.setTokenStore(TokenStore.valueOf(adapterConfig.getTokenStore().toUpperCase()));
+  }
+ else {
+    deployment.setTokenStore(TokenStore.SESSION);
+  }
   deployment.setResourceCredentials(adapterConfig.getCredentials());
   deployment.setPublicClient(adapterConfig.isPublicClient());
   deployment.setUseResourceRoleMappings(adapterConfig.isUseResourceRoleMappings());

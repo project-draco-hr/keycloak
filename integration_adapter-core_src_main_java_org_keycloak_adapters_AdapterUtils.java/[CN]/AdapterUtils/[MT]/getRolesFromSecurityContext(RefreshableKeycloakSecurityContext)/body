@@ -1,0 +1,26 @@
+{
+  Set<String> roles=null;
+  AccessToken accessToken=session.getToken();
+  if (session.getDeployment().isUseResourceRoleMappings()) {
+    if (log.isTraceEnabled()) {
+      log.trace("useResourceRoleMappings");
+    }
+    AccessToken.Access access=accessToken.getResourceAccess(session.getDeployment().getResourceName());
+    if (access != null)     roles=access.getRoles();
+  }
+ else {
+    if (log.isTraceEnabled()) {
+      log.trace("use realm role mappings");
+    }
+    AccessToken.Access access=accessToken.getRealmAccess();
+    if (access != null)     roles=access.getRoles();
+  }
+  if (roles == null)   roles=Collections.emptySet();
+  if (log.isTraceEnabled()) {
+    log.trace("Setting roles: ");
+    for (    String role : roles) {
+      log.trace("   role: " + role);
+    }
+  }
+  return roles;
+}

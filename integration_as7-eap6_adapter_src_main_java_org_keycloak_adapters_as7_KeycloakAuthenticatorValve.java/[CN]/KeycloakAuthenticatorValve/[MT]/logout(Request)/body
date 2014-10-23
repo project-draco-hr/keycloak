@@ -2,14 +2,10 @@
   KeycloakSecurityContext ksc=(KeycloakSecurityContext)request.getAttribute(KeycloakSecurityContext.class.getName());
   if (ksc != null) {
     request.removeAttribute(KeycloakSecurityContext.class.getName());
-    Session session=request.getSessionInternal(false);
-    if (session != null) {
-      session.removeNote(KeycloakSecurityContext.class.getName());
-      if (ksc instanceof RefreshableKeycloakSecurityContext) {
-        CatalinaHttpFacade facade=new CatalinaHttpFacade(request,null);
-        ((RefreshableKeycloakSecurityContext)ksc).logout(deploymentContext.resolveDeployment(facade));
-      }
-    }
+    CatalinaHttpFacade facade=new CatalinaHttpFacade(request,null);
+    KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
+    AdapterTokenStore tokenStore=getTokenStore(request,facade,deployment);
+    tokenStore.logout();
   }
   super.logout(request);
 }

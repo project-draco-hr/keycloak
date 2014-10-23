@@ -2,15 +2,10 @@
   final NotificationReceiver logoutReceiver=new NotificationReceiver(){
     @Override public void handleNotification(    SecurityNotification notification){
       if (notification.getEventType() != SecurityNotification.EventType.LOGGED_OUT)       return;
-      Session session=Sessions.getSession(notification.getExchange());
-      if (session == null)       return;
-      KeycloakUndertowAccount account=(KeycloakUndertowAccount)session.getAttribute(KeycloakUndertowAccount.class.getName());
-      if (account == null)       return;
-      session.removeAttribute(KeycloakUndertowAccount.class.getName());
-      if (account.getKeycloakSecurityContext() != null) {
-        UndertowHttpFacade facade=new UndertowHttpFacade(notification.getExchange());
-        account.getKeycloakSecurityContext().logout(deploymentContext.resolveDeployment(facade));
-      }
+      UndertowHttpFacade facade=new UndertowHttpFacade(notification.getExchange());
+      KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
+      AdapterTokenStore tokenStore=getTokenStore(notification.getExchange(),facade,deployment,securityContext);
+      tokenStore.logout();
     }
   }
 ;

@@ -1,0 +1,15 @@
+{
+  final ServletRequestContext servletRequestContext=exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+  HttpServletRequest req=(HttpServletRequest)servletRequestContext.getServletRequest();
+  req.removeAttribute(KeycloakUndertowAccount.class.getName());
+  req.removeAttribute(KeycloakSecurityContext.class.getName());
+  HttpSession session=req.getSession(false);
+  if (session == null)   return;
+  KeycloakUndertowAccount account=(KeycloakUndertowAccount)session.getAttribute(KeycloakUndertowAccount.class.getName());
+  if (account == null)   return;
+  session.removeAttribute(KeycloakSecurityContext.class.getName());
+  session.removeAttribute(KeycloakUndertowAccount.class.getName());
+  if (account.getKeycloakSecurityContext() != null) {
+    account.getKeycloakSecurityContext().logout(deployment);
+  }
+}

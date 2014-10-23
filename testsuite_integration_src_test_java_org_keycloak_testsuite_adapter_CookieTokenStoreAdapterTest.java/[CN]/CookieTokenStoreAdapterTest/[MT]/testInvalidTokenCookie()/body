@@ -1,0 +1,11 @@
+{
+  String tokenCookie=loginToCustomerCookiePortal();
+  String changedTokenCookie=tokenCookie.replace("a","b");
+  driver.manage().addCookie(new Cookie(AdapterConstants.KEYCLOAK_ADAPTER_STATE_COOKIE,changedTokenCookie,"/customer-cookie-portal"));
+  driver.navigate().to("http://localhost:8081/customer-cookie-portal");
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/customer-cookie-portal");
+  String currentCookie=driver.manage().getCookieNamed(AdapterConstants.KEYCLOAK_ADAPTER_STATE_COOKIE).getValue();
+  Assert.assertNotEquals(currentCookie,tokenCookie);
+  Assert.assertNotEquals(currentCookie,changedTokenCookie);
+  logoutFromCustomerCookiePortal();
+}

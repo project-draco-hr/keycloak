@@ -1,0 +1,12 @@
+{
+  String tokenCookie=loginToCustomerCookiePortal();
+  driver.navigate().to("http://localhost:8081/customer-portal");
+  assertLogged();
+  driver.navigate().to("http://localhost:8081/customer-cookie-portal");
+  assertLogged();
+  String tokenCookie2=driver.manage().getCookieNamed(AdapterConstants.KEYCLOAK_ADAPTER_STATE_COOKIE).getValue();
+  Assert.assertEquals(tokenCookie,tokenCookie2);
+  logoutFromCustomerCookiePortal();
+  driver.navigate().to("http://localhost:8081/customer-portal");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+}

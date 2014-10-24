@@ -2,7 +2,7 @@
   InputStream configInputStream=getConfigInputStream(context);
   KeycloakDeployment kd=null;
   if (configInputStream == null) {
-    log.warning("No adapter configuration.  Keycloak is unconfigured and will deny all requests.");
+    log.warn("No adapter configuration.  Keycloak is unconfigured and will deny all requests.");
     kd=new KeycloakDeployment();
   }
  else {
@@ -10,7 +10,7 @@
   }
   deploymentContext=new AdapterDeploymentContext(kd);
   context.getServletContext().setAttribute(AdapterDeploymentContext.class.getName(),deploymentContext);
-  AuthenticatedActionsValve actions=new AuthenticatedActionsValve(deploymentContext,getNext(),getContainer(),getObjectName());
+  AuthenticatedActionsValve actions=new AuthenticatedActionsValve(deploymentContext,getNext(),getContainer());
   setNext(actions);
   nodesRegistrationManagement=new NodesRegistrationManagement();
 }

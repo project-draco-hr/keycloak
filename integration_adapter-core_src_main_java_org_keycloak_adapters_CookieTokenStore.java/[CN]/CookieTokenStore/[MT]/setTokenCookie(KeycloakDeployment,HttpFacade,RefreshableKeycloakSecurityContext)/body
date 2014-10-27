@@ -1,0 +1,9 @@
+{
+  log.infof("Set new %s cookie now",AdapterConstants.KEYCLOAK_ADAPTER_STATE_COOKIE);
+  String accessToken=session.getTokenString();
+  String idToken=session.getIdTokenString();
+  String refreshToken=session.getRefreshToken();
+  String cookie=new StringBuilder(accessToken).append(DELIM).append(idToken).append(DELIM).append(refreshToken).toString();
+  String cookiePath=getContextPath(facade);
+  facade.getResponse().setCookie(AdapterConstants.KEYCLOAK_ADAPTER_STATE_COOKIE,cookie,cookiePath,null,-1,deployment.getSslRequired().isRequired(facade.getRequest().getRemoteAddr()),true);
+}

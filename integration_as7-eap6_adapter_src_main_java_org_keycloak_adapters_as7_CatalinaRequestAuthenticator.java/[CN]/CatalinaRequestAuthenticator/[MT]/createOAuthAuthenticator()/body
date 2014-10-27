@@ -2,7 +2,9 @@
   return new OAuthRequestAuthenticator(this,facade,deployment,sslRedirectPort){
     @Override protected void saveRequest(){
       try {
-        valve.keycloakSaveRequest(request);
+        if (deployment.getTokenStore() == TokenStore.SESSION) {
+          valve.keycloakSaveRequest(request);
+        }
       }
  catch (      IOException e) {
         throw new RuntimeException(e);

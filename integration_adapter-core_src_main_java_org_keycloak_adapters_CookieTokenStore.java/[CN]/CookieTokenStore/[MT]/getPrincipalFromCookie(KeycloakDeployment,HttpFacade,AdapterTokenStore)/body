@@ -1,0 +1,39 @@
+{
+  HttpFacade.Cookie cookie=facade.getRequest().getCookie(AdapterConstants.KEYCLOAK_ADAPTER_STATE_COOKIE);
+  if (cookie == null) {
+    log.debug("Not found adapter state cookie in current request");
+    return null;
+  }
+  String cookieVal=cookie.getValue();
+  String[] tokens=cookieVal.split(DELIM);
+  if (tokens.length != 3) {
+    log.warnf("Invalid format of %s cookie. Count of tokens: %s, expected 3",AdapterConstants.KEYCLOAK_ADAPTER_STATE_COOKIE,tokens.length);
+    return null;
+  }
+  String accessTokenString=tokens[0];
+  String idTokenString=tokens[1];
+  String refreshTokenString=tokens[2];
+  try {
+    AccessToken accessToken=RSATokenVerifier.verifyToken(accessTokenString,deployment.getRealmKey(),deployment.getRealm(),false);
+    IDToken idToken;
+    if (idTokenString != null && idTokenString.length() > 0) {
+      JWSInput input=new JWSInput(idTokenString);
+      try {
+        idToken=input.readJsonContent(IDToken.class);
+      }
+ catch (      IOException e) {
+        throw new VerificationException(e);
+      }
+    }
+ else {
+      idToken=null;
+    }
+    log.debug("Token Verification succeeded!");
+    RefreshableKeycloakSecurityContext secContext=new RefreshableKeycloakSecurityContext(deployment,tokenStore,accessTokenString,accessToken,idTokenString,idToken,refreshTokenString);
+    return new KeycloakPrincipal<RefreshableKeycloakSecurityContext>(accessToken.getSubject(),secContext);
+  }
+ catch (  VerificationException ve) {
+    log.warn("Failed verify token",ve);
+    return null;
+  }
+}

@@ -1,0 +1,9 @@
+{
+  driver.navigate().to("http://localhost:8081/customer-cookie-portal");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  loginPage.login("bburke@redhat.com","password");
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/customer-cookie-portal");
+  assertLogged();
+  Assert.assertNull(driver.manage().getCookieNamed("JSESSIONID"));
+  return driver.manage().getCookieNamed(AdapterConstants.KEYCLOAK_ADAPTER_STATE_COOKIE).getValue();
+}

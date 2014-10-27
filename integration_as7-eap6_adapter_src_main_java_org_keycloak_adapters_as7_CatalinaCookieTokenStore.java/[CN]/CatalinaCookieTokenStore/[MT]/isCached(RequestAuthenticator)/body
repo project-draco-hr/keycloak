@@ -1,0 +1,16 @@
+{
+  if (authenticatedPrincipal != null) {
+    log.debug("remote logged in already. Establish state from cookie");
+    RefreshableKeycloakSecurityContext securityContext=authenticatedPrincipal.getKeycloakSecurityContext();
+    securityContext.setCurrentRequestInfo(deployment,this);
+    Set<String> roles=AdapterUtils.getRolesFromSecurityContext(securityContext);
+    GenericPrincipal principal=new CatalinaSecurityContextHelper().createPrincipal(request.getContext().getRealm(),authenticatedPrincipal,roles,securityContext);
+    request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);
+    request.setUserPrincipal(principal);
+    request.setAuthType("KEYCLOAK");
+    return true;
+  }
+ else {
+    return false;
+  }
+}

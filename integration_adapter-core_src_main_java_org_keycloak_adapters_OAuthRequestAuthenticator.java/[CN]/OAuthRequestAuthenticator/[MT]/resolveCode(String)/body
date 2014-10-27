@@ -9,7 +9,7 @@
   AccessTokenResponse tokenResponse=null;
   strippedOauthParametersRequestUri=stripOauthParametersFromRedirect();
   try {
-    String httpSessionId=reqAuthenticator.getHttpSessionId(true);
+    String httpSessionId=deployment.getTokenStore() == TokenStore.SESSION ? reqAuthenticator.getHttpSessionId(true) : null;
     tokenResponse=ServerRequest.invokeAccessCodeToToken(deployment,code,strippedOauthParametersRequestUri,httpSessionId);
   }
  catch (  ServerRequest.HttpFailure failure) {

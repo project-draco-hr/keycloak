@@ -1,13 +1,18 @@
 {
-  RefreshableKeycloakSecurityContext securityContext=skp.getKeycloakSecurityContext();
+  final RefreshableKeycloakSecurityContext securityContext=skp.getKeycloakSecurityContext();
+  final Set<String> roles=AdapterUtils.getRolesFromSecurityContext(securityContext);
+  KeycloakAccount account=new KeycloakAccount(){
+    @Override public Principal getPrincipal(){
+      return skp;
+    }
+    @Override public Set<String> getRoles(){
+      return roles;
+    }
+    @Override public KeycloakSecurityContext getKeycloakSecurityContext(){
+      return securityContext;
+    }
+  }
+;
   request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);
-  Set<String> roles=getRolesFromToken(securityContext);
-  GenericPrincipal principal=new CatalinaSecurityContextHelper().createPrincipal(request.getContext().getRealm(),skp,roles,securityContext);
-  Session session=request.getSessionInternal(true);
-  session.setPrincipal(principal);
-  session.setAuthType("OAUTH");
-  session.setNote(KeycloakSecurityContext.class.getName(),securityContext);
-  String username=securityContext.getToken().getSubject();
-  log.debug("userSessionManage.login: " + username);
-  userSessionManagement.login(session);
+  this.tokenStore.saveAccountInfo(account);
 }

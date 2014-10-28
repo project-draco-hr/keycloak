@@ -1,0 +1,14 @@
+{
+  if (request.getSessionInternal(false) == null || request.getSessionInternal().getPrincipal() == null)   return false;
+  log.fine("remote logged in already. Establish state from session");
+  GenericPrincipal principal=(GenericPrincipal)request.getSessionInternal().getPrincipal();
+  request.setUserPrincipal(principal);
+  request.setAuthType("KEYCLOAK");
+  RefreshableKeycloakSecurityContext securityContext=(RefreshableKeycloakSecurityContext)request.getSessionInternal().getNote(KeycloakSecurityContext.class.getName());
+  if (securityContext != null) {
+    securityContext.setCurrentRequestInfo(deployment,this);
+    request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);
+  }
+  ((CatalinaRequestAuthenticator)authenticator).restoreRequest();
+  return true;
+}

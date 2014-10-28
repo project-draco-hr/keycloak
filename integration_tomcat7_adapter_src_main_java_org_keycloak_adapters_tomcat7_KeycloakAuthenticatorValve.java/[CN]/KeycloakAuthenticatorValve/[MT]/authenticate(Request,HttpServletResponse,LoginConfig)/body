@@ -1,15 +1,12 @@
 {
-  if (log.isTraceEnabled()) {
-    log.trace("*** authenticate");
-  }
   CatalinaHttpFacade facade=new CatalinaHttpFacade(request,response);
   KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
   if (deployment == null || !deployment.isConfigured()) {
-    log.info("*** deployment isn't configured return false");
     return false;
   }
+  AdapterTokenStore tokenStore=getTokenStore(request,facade,deployment);
   nodesRegistrationManagement.tryRegister(deployment);
-  CatalinaRequestAuthenticator authenticator=new CatalinaRequestAuthenticator(deployment,this,userSessionManagement,facade,request);
+  CatalinaRequestAuthenticator authenticator=new CatalinaRequestAuthenticator(deployment,this,tokenStore,facade,request);
   AuthOutcome outcome=authenticator.authenticate();
   if (outcome == AuthOutcome.AUTHENTICATED) {
     if (facade.isEnded()) {

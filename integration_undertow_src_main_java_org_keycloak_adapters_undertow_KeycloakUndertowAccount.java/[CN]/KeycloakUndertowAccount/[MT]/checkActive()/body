@@ -1,0 +1,16 @@
+{
+  RefreshableKeycloakSecurityContext session=getKeycloakSecurityContext();
+  if (session.isActive() && !session.getDeployment().isAlwaysRefreshToken()) {
+    log.debug("session is active");
+    return true;
+  }
+  log.debug("session is not active or refresh is enforced. Try refresh");
+  boolean success=session.refreshExpiredToken(false);
+  if (!success || !session.isActive()) {
+    log.debug("session is not active return with failure");
+    return false;
+  }
+  log.debug("refresh succeeded");
+  setRoles(session);
+  return true;
+}

@@ -1,0 +1,25 @@
+{
+  HttpSession session=getSession(false);
+  if (session == null) {
+    log.debug("session was null, returning null");
+    return false;
+  }
+  KeycloakUndertowAccount account=(KeycloakUndertowAccount)session.getAttribute(KeycloakUndertowAccount.class.getName());
+  if (account == null) {
+    log.debug("Account was not in session, returning null");
+    return false;
+  }
+  account.setCurrentRequestInfo(deployment,this);
+  if (account.checkActive()) {
+    log.debug("Cached account found");
+    securityContext.authenticationComplete(account,"KEYCLOAK",false);
+    ((UndertowRequestAuthenticator)authenticator).propagateKeycloakContext(account);
+    return true;
+  }
+ else {
+    log.debug("Refresh failed. Account was not active. Returning null and invalidating Http session");
+    session.setAttribute(KeycloakUndertowAccount.class.getName(),null);
+    session.invalidate();
+    return false;
+  }
+}

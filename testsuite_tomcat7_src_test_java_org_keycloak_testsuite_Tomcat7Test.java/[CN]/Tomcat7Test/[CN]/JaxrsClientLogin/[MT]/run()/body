@@ -1,0 +1,32 @@
+{
+  String state="42";
+  String loginFormUrl=getLoginFormUrl(state);
+  String html=client.target(loginFormUrl).request().get(String.class);
+  Matcher matcher=actionParser.matcher(html);
+  matcher.find();
+  String actionUrl=matcher.group(1);
+  if (!actionUrl.startsWith("http")) {
+    actionUrl=UriBuilder.fromUri(actionUrl).scheme("http").host("localhost").port(8081).build().toString();
+  }
+  Form form=new Form();
+  form.param("username","test-user@localhost");
+  form.param("password","password");
+  Response response=client.target(actionUrl).request().post(Entity.form(form));
+  URI uri=null;
+  Assert.assertEquals(302,response.getStatus());
+  uri=response.getLocation();
+  for (  String header : response.getHeaders().keySet()) {
+    for (    Object value : response.getHeaders().get(header)) {
+      System.out.println(header + ": " + value);
+    }
+  }
+  response.close();
+  Assert.assertNotNull(uri);
+  String code=getCode(uri);
+  Assert.assertNotNull(code);
+  form=new Form();
+  form.param(OAuth2Constants.GRANT_TYPE,grantType).param(OAuth2Constants.CODE,code).param(OAuth2Constants.REDIRECT_URI,redirectUri);
+  String authorization=BasicAuthHelper.createHeader(clientId,"password");
+  String res=client.target(OpenIDConnectService.accessCodeToTokenUrl(UriBuilder.fromUri(baseUrl)).build(realm)).request().header(HttpHeaders.AUTHORIZATION,authorization).post(Entity.form(form),String.class);
+  count.incrementAndGet();
+}

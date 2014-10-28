@@ -1,0 +1,61 @@
+{
+  Object metadata=null;
+  try {
+    metadata=new SAMLParser().parse(is);
+  }
+ catch (  ParsingException e) {
+    throw new RuntimeException(e);
+  }
+  EntitiesDescriptorType entities;
+  if (EntitiesDescriptorType.class.isInstance(metadata)) {
+    entities=(EntitiesDescriptorType)metadata;
+  }
+ else {
+    entities=new EntitiesDescriptorType();
+    entities.addEntityDescriptor(metadata);
+  }
+  for (  Object o : entities.getEntityDescriptor()) {
+    EntityDescriptorType entity=(EntityDescriptorType)o;
+    String entityId=entity.getEntityID();
+    ApplicationModel app=realm.addApplication(entityId);
+    app.setFullScopeAllowed(true);
+    app.setProtocol(SamlProtocol.LOGIN_PROTOCOL);
+    app.setAttribute(SamlProtocol.SAML_SERVER_SIGNATURE,SamlProtocol.ATTRIBUTE_TRUE_VALUE);
+    app.setAttribute(SamlProtocol.SAML_SIGNATURE_ALGORITHM,SignatureAlgorithm.RSA_SHA256.toString());
+    app.setAttribute(SamlProtocol.SAML_AUTHNSTATEMENT,SamlProtocol.ATTRIBUTE_TRUE_VALUE);
+    SPSSODescriptorType spDescriptorType=CoreConfigUtil.getSPDescriptor(entity);
+    if (spDescriptorType.isWantAssertionsSigned()) {
+      app.setAttribute(SamlProtocol.SAML_ASSERTION_SIGNATURE,SamlProtocol.ATTRIBUTE_TRUE_VALUE);
+    }
+    String adminUrl=getLogoutLocation(spDescriptorType,JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get());
+    if (adminUrl != null)     app.setManagementUrl(adminUrl);
+    String urlPattern=CoreConfigUtil.getServiceURL(spDescriptorType,JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get());
+    if (urlPattern == null) {
+      urlPattern=CoreConfigUtil.getServiceURL(spDescriptorType,JBossSAMLURIConstants.SAML_HTTP_REDIRECT_BINDING.get());
+    }
+    if (urlPattern != null) {
+      app.addRedirectUri(urlPattern);
+    }
+    for (    KeyDescriptorType keyDescriptor : spDescriptorType.getKeyDescriptor()) {
+      X509Certificate cert=null;
+      try {
+        cert=SAMLMetadataUtil.getCertificate(keyDescriptor);
+      }
+ catch (      ConfigurationException e) {
+        throw new RuntimeException(e);
+      }
+catch (      ProcessingException e) {
+        throw new RuntimeException(e);
+      }
+      String certPem=KeycloakModelUtils.getPemFromCertificate(cert);
+      if (keyDescriptor.getUse() == KeyTypes.SIGNING) {
+        app.setAttribute(SamlProtocol.SAML_CLIENT_SIGNATURE_ATTRIBUTE,SamlProtocol.ATTRIBUTE_TRUE_VALUE);
+        app.setAttribute(SamlProtocol.SAML_SIGNING_CERTIFICATE_ATTRIBUTE,certPem);
+      }
+ else       if (keyDescriptor.getUse() == KeyTypes.ENCRYPTION) {
+        app.setAttribute(SamlProtocol.SAML_ENCRYPT,SamlProtocol.ATTRIBUTE_TRUE_VALUE);
+        app.setAttribute(SamlProtocol.SAML_ENCRYPTION_CERTIFICATE_ATTRIBUTE,certPem);
+      }
+    }
+  }
+}

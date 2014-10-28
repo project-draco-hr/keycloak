@@ -1,7 +1,7 @@
 {
   ClientSessionModel clientSession=accessCode.getClientSession();
   ClientModel client=clientSession.getClient();
-  String requestID=clientSession.getNote(REQUEST_ID);
+  String requestID=clientSession.getNote(SAML_REQUEST_ID);
   String relayState=clientSession.getNote(GeneralConstants.RELAY_STATE);
   String redirectUri=clientSession.getRedirectUri();
   String responseIssuer=getResponseIssuer(realm);
@@ -29,7 +29,7 @@
   if (requiresEncryption(client)) {
     PublicKey publicKey=null;
     try {
-      publicKey=PemUtils.decodePublicKey(client.getAttribute(ClientModel.PUBLIC_KEY));
+      publicKey=SamlProtocolUtils.getEncryptionValidationKey(client);
     }
  catch (    Exception e) {
       logger.error("failed",e);

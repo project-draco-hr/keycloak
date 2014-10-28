@@ -1,0 +1,16 @@
+{
+  String logoutResponseLocation=null;
+  List<EndpointType> endpoints=idp.getSingleLogoutService();
+  for (  EndpointType endpoint : endpoints) {
+    if (endpoint.getBinding().toString().equals(bindingURI)) {
+      if (endpoint.getLocation() != null) {
+        logoutResponseLocation=endpoint.getLocation().toString();
+      }
+ else {
+        logoutResponseLocation=null;
+      }
+      break;
+    }
+  }
+  return logoutResponseLocation;
+}

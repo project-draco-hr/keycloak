@@ -1,0 +1,10 @@
+{
+  InputStream is=getClass().getResourceAsStream("/idp-metadata-template.xml");
+  String template=StreamUtil.readString(is);
+  template=template.replace("${idp.entityID}",RealmsResource.realmBaseUrl(uriInfo).build(realm.getName()).toString());
+  template=template.replace("${idp.sso.HTTP-POST}",RealmsResource.protocolUrl(uriInfo).build(realm.getName(),SamlProtocol.LOGIN_PROTOCOL).toString());
+  template=template.replace("${idp.sso.HTTP-Redirect}",RealmsResource.protocolUrl(uriInfo).build(realm.getName(),SamlProtocol.LOGIN_PROTOCOL).toString());
+  template=template.replace("${idp.sls.HTTP-POST}",RealmsResource.protocolUrl(uriInfo).build(realm.getName(),SamlProtocol.LOGIN_PROTOCOL).toString());
+  template=template.replace("${idp.signing.certificate}",realm.getCertificatePem());
+  return template;
+}

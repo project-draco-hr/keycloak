@@ -19,7 +19,7 @@
   SocialProvider provider=SocialLoader.load(providerId);
   String authMethod="social@" + provider.getId();
   RealmModel realm=clientSession.getRealm();
-  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.SOCIAL_LOGIN).client(clientSession.getClient()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.AUTH_METHOD,authMethod);
+  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.LOGIN).client(clientSession.getClient()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.AUTH_METHOD,authMethod);
   if (!realm.isEnabled()) {
     event.error(Errors.REALM_DISABLED);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled.");

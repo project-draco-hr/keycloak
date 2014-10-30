@@ -1,5 +1,7 @@
 {
-  KeycloakDeployment deployment=this.deployment;
+  if (null != configResolver) {
+    return configResolver.resolve(facade.getRequest());
+  }
   if (deployment == null)   return null;
   if (deployment.getAuthServerBaseUrl() == null)   return deployment;
   deployment=resolveUrls(deployment,facade);

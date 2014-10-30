@@ -12,6 +12,12 @@
   if (userSession != null && !userSession.equals(entity.getUserSession())) {
     return;
   }
+  if (requireNullUserSession && entity.getUserSession() != null) {
+    return;
+  }
+  if (expiredRefresh != null && entity.getTimestamp() > expiredRefresh) {
+    return;
+  }
 switch (emit) {
 case KEY:
     collector.emit(key,key);

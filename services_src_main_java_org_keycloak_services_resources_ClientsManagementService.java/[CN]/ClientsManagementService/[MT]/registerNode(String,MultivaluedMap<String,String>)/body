@@ -10,7 +10,7 @@
   ApplicationModel application=authorizeApplication(authorizationHeader,formData);
   String nodeHost=getApplicationClusterHost(formData);
   event.client(application).detail(Details.NODE_HOST,nodeHost);
-  logger.infof("Registering cluster host '%s' for client '%s'",nodeHost,application.getName());
+  logger.debugf("Registering cluster host '%s' for client '%s'",nodeHost,application.getName());
   application.registerNode(nodeHost,Time.currentTime());
   event.success();
   return Response.noContent().build();

@@ -4,7 +4,7 @@
     logger.debug("No management URL or no registered cluster nodes for the application " + resource.getName());
     return new GlobalRequestResult();
   }
-  logger.info("Send logoutApplication for URLs: " + mgmtUrls);
+  if (logger.isDebugEnabled())   logger.debug("Send logoutApplication for URLs: " + mgmtUrls);
   GlobalRequestResult result=new GlobalRequestResult();
   for (  String mgmtUrl : mgmtUrls) {
     if (sendLogoutRequest(realm,resource,null,executor,notBefore,mgmtUrl)) {

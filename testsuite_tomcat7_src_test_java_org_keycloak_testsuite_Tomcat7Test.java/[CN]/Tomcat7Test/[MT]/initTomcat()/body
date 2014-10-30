@@ -1,8 +1,9 @@
 {
-  String webappDirLocation="src/test/resources/tomcat-test/webapp/";
   URL dir=Tomcat7Test.class.getResource("/tomcat-test/webapp/META-INF/context.xml");
   File webappDir=new File(dir.getFile()).getParentFile().getParentFile();
   tomcat=new Tomcat();
+  String baseDir=getBaseDirectory();
+  tomcat.setBaseDir(baseDir);
   tomcat.setPort(8080);
   tomcat.addWebapp("/customer-portal",webappDir.toString());
   System.out.println("configuring app with basedir: " + webappDir.toString());

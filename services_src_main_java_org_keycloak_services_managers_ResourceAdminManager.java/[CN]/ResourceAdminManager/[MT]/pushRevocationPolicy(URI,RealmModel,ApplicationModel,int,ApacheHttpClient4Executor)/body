@@ -4,7 +4,7 @@
     logger.debugf("No management URL or no registered cluster nodes for the application %s",resource.getName());
     return new GlobalRequestResult();
   }
-  logger.info("Sending push revocation to URLS: " + mgmtUrls);
+  if (logger.isDebugEnabled())   logger.info("Sending push revocation to URLS: " + mgmtUrls);
   GlobalRequestResult result=new GlobalRequestResult();
   for (  String mgmtUrl : mgmtUrls) {
     if (sendPushRevocationPolicyRequest(realm,resource,notBefore,executor,mgmtUrl)) {

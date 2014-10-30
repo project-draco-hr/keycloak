@@ -1,0 +1,12 @@
+{
+  Integer val=config.getInt(optionName);
+  if (val != null) {
+    try {
+      Method m=MongoClientOptions.Builder.class.getMethod(optionName,int.class);
+      m.invoke(builder,val);
+    }
+ catch (    Exception e) {
+      throw new IllegalStateException("Problem configuring int option " + optionName + " for mongo client. Ensure you used correct value (number) and if this option is supported by mongo driver",e);
+    }
+  }
+}

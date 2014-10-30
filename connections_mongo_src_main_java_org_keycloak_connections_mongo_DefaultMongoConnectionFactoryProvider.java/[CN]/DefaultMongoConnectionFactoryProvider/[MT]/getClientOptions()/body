@@ -1,0 +1,14 @@
+{
+  MongoClientOptions.Builder builder=MongoClientOptions.builder();
+  checkIntOption("connectionsPerHost",builder);
+  checkIntOption("threadsAllowedToBlockForConnectionMultiplier",builder);
+  checkIntOption("maxWaitTime",builder);
+  checkIntOption("connectTimeout",builder);
+  checkIntOption("socketTimeout",builder);
+  checkBooleanOption("socketKeepAlive",builder);
+  checkBooleanOption("autoConnectRetry",builder);
+  if (config.getLong("maxAutoConnectRetryTime") != null) {
+    builder.maxAutoConnectRetryTime(config.getLong("maxAutoConnectRetryTime"));
+  }
+  return builder.build();
+}

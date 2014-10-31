@@ -1,12 +1,11 @@
 {
-  String realm="acme";
   AccessToken token=createSimpleToken();
   IDToken idToken=new IDToken();
   idToken.setEmail("joe@email.cz");
   KeyPair keyPair=KeyPairGenerator.getInstance("RSA").generateKeyPair();
   String encoded=new JWSBuilder().jsonContent(token).rsa256(keyPair.getPrivate());
   String encodedIdToken=new JWSBuilder().jsonContent(idToken).rsa256(keyPair.getPrivate());
-  KeycloakSecurityContext ctx=new KeycloakSecurityContext(encoded,token,encodedIdToken,idToken,realm);
+  KeycloakSecurityContext ctx=new KeycloakSecurityContext(encoded,token,encodedIdToken,idToken);
   KeycloakPrincipal principal=new KeycloakPrincipal("joe",ctx);
   ByteArrayOutputStream bso=new ByteArrayOutputStream();
   ObjectOutputStream oos=new ObjectOutputStream(bso);

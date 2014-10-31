@@ -1,12 +1,12 @@
 {
   try {
     String[] parts=code.split("\\.");
-    String id=new String(Base64Url.decode(parts[1]));
+    String id=parts[1];
     ClientSessionModel clientSession=session.sessions().getClientSession(id);
     if (clientSession == null) {
       return null;
     }
-    String hash=createSignatureHash(clientSession.getRealm(),clientSession);
+    String hash=createHash(clientSession.getRealm(),clientSession);
     if (!hash.equals(parts[0])) {
       return null;
     }

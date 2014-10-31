@@ -33,13 +33,10 @@
     UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"form",false);
     event.session(userSession);
     TokenManager.attachClientSession(userSession,clientSession);
-    accessCode.setRequiredAction(RequiredAction.UPDATE_PASSWORD);
+    accessCode.setAction(ClientSessionModel.Action.RECOVER_PASSWORD);
     try {
       UriBuilder builder=Urls.loginPasswordResetBuilder(uriInfo.getBaseUri());
-      builder.queryParam("code",accessCode.getCode());
-      String verifyCode=UUID.randomUUID().toString();
-      clientSession.setNote("key",verifyCode);
-      builder.queryParam("key",verifyCode);
+      builder.queryParam("key",accessCode.getCode());
       String link=builder.build(realm.getName()).toString();
       long expiration=TimeUnit.SECONDS.toMinutes(realm.getAccessCodeLifespanUserAction());
       this.session.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendPasswordReset(link,expiration);
@@ -50,5 +47,5 @@
       return Flows.forms(this.session,realm,client,uriInfo).setError("emailSendError").setClientSessionCode(accessCode.getCode()).createErrorPage();
     }
   }
-  return Flows.forms(session,realm,client,uriInfo).setSuccess("emailSent").createPasswordReset();
+  return Flows.forms(session,realm,client,uriInfo).setSuccess("emailSent").setClientSessionCode(accessCode.getCode()).createPasswordReset();
 }

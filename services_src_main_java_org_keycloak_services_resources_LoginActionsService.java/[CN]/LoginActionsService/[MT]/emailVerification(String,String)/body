@@ -1,0 +1,29 @@
+{
+  event.event(EventType.VERIFY_EMAIL);
+  if (key != null) {
+    Checks checks=new Checks();
+    if (!checks.check(key,ClientSessionModel.Action.VERIFY_EMAIL)) {
+      return checks.response;
+    }
+    ClientSessionCode accessCode=checks.clientCode;
+    ClientSessionModel clientSession=accessCode.getClientSession();
+    UserSessionModel userSession=clientSession.getUserSession();
+    UserModel user=userSession.getUser();
+    initEvent(clientSession);
+    user.setEmailVerified(true);
+    user.removeRequiredAction(RequiredAction.VERIFY_EMAIL);
+    event.clone().event(EventType.VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
+    return redirectOauth(user,accessCode,clientSession,userSession);
+  }
+ else {
+    Checks checks=new Checks();
+    if (!checks.check(code,ClientSessionModel.Action.VERIFY_EMAIL)) {
+      return checks.response;
+    }
+    ClientSessionCode accessCode=checks.clientCode;
+    ClientSessionModel clientSession=accessCode.getClientSession();
+    UserSessionModel userSession=clientSession.getUserSession();
+    initEvent(clientSession);
+    return Flows.forms(session,realm,null,uriInfo).setClientSessionCode(accessCode.getCode()).setUser(userSession.getUser()).createResponse(RequiredAction.VERIFY_EMAIL);
+  }
+}

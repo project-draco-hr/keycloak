@@ -1,0 +1,14 @@
+{
+  try {
+    MessageDigest digest=MessageDigest.getInstance("sha-256");
+    digest.update(realm.getCodeSecret().getBytes());
+    digest.update(HASH_SEPERATOR);
+    digest.update(clientSession.getId().getBytes());
+    digest.update(HASH_SEPERATOR);
+    digest.update(clientSession.getNote(ACTION_KEY).getBytes());
+    return Base64Url.encode(digest.digest());
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

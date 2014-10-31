@@ -1,5 +1,8 @@
 {
   String email=(picketlinkUser.getEmail() != null && picketlinkUser.getEmail().trim().length() > 0) ? picketlinkUser.getEmail() : null;
+  if (picketlinkUser.getLoginName() == null) {
+    throw new ModelException("User returned from LDAP has null username! Check configuration of your LDAP mappings. ID of user from LDAP: " + picketlinkUser.getId());
+  }
   UserModel imported=session.userStorage().addUser(realm,picketlinkUser.getLoginName());
   imported.setEnabled(true);
   imported.setEmail(email);

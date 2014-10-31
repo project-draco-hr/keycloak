@@ -1,11 +1,11 @@
 {
   KeycloakSecurityContext ksc=(KeycloakSecurityContext)request.getAttribute(KeycloakSecurityContext.class.getName());
   if (ksc != null) {
-    request.removeAttribute(KeycloakSecurityContext.class.getName());
     CatalinaHttpFacade facade=new CatalinaHttpFacade(request,null);
     KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
     AdapterTokenStore tokenStore=getTokenStore(request,facade,deployment);
     tokenStore.logout();
+    request.removeAttribute(KeycloakSecurityContext.class.getName());
   }
   super.logout(request);
 }

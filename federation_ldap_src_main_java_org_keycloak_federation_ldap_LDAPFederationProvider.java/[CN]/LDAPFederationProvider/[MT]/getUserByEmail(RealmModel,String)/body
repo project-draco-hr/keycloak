@@ -5,6 +5,10 @@
     if (picketlinkUser == null) {
       return null;
     }
+    if (!email.equals(picketlinkUser.getEmail())) {
+      logger.warnf("User found in LDAP but with different email. LDAP email: %s, Searched email: %s",email,picketlinkUser.getEmail());
+      return null;
+    }
     return importUserFromPicketlink(realm,picketlinkUser);
   }
  catch (  IdentityManagementException ie) {

@@ -4,6 +4,10 @@
     if (picketlinkUser == null) {
       return null;
     }
+    if (!username.equals(picketlinkUser.getLoginName())) {
+      logger.warnf("User found in LDAP but with different username. LDAP username: %s, Searched username: %s",username,picketlinkUser.getLoginName());
+      return null;
+    }
     return importUserFromPicketlink(realm,picketlinkUser);
   }
  catch (  IdentityManagementException ie) {

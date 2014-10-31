@@ -1,0 +1,11 @@
+{
+  DBCollection realms=db.getCollection("realms");
+  DBObject query=new QueryBuilder().and("codeSecret").is(null).get();
+  DBCursor objects=realms.find(query);
+  while (objects.hasNext()) {
+    DBObject object=objects.next();
+    object.put("codeSecret",KeycloakModelUtils.generateCodeSecret());
+    realms.save(object);
+    log.debugv("Added realm.codeSecret, id={0}",object.get("id"));
+  }
+}

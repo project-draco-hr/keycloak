@@ -36,10 +36,7 @@
     accessCode.setRequiredAction(RequiredAction.UPDATE_PASSWORD);
     try {
       UriBuilder builder=Urls.loginPasswordResetBuilder(uriInfo.getBaseUri());
-      builder.queryParam("code",accessCode.getCode());
-      String verifyCode=UUID.randomUUID().toString();
-      clientSession.setNote("key",verifyCode);
-      builder.queryParam("key",verifyCode);
+      builder.queryParam("key",accessCode.getCode());
       String link=builder.build(realm.getName()).toString();
       long expiration=TimeUnit.SECONDS.toMinutes(realm.getAccessCodeLifespanUserAction());
       this.session.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendPasswordReset(link,expiration);

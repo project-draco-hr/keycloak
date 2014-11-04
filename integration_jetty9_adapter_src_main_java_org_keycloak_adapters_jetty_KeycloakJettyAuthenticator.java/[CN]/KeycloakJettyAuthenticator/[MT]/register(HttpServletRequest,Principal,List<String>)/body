@@ -1,0 +1,19 @@
+{
+  if (roles == null) {
+    roles=new ArrayList<String>();
+  }
+  HttpSession session=httpServletRequest.getSession(false);
+  session.setAttribute(FORM_PRINCIPAL_NOTE,principal);
+  session.setAttribute(FORM_ROLES_NOTE,roles);
+  Request request=(Request)httpServletRequest;
+  Authentication authentication=request.getAuthentication();
+  if (!(authentication instanceof UserAuthentication)) {
+    Subject theSubject=new Subject();
+    String[] theRoles=new String[roles.size()];
+    roles.toArray(theRoles);
+    UserIdentity userIdentity=new DefaultUserIdentity(theSubject,principal,theRoles);
+    authentication=new UserAuthentication(getAuthMethod(),userIdentity);
+    request.setAuthentication(authentication);
+  }
+  return authentication;
+}

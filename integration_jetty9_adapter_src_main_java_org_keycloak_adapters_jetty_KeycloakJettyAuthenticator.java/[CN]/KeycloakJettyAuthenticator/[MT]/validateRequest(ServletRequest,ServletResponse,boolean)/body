@@ -1,0 +1,70 @@
+{
+  String contextPath=ContextHandler.getCurrentContext().getContextPath();
+  theServletContext=ContextHandler.getCurrentContext().getContext(contextPath);
+  HttpServletRequest request=(HttpServletRequest)servletRequest;
+  HttpServletResponse response=(HttpServletResponse)servletResponse;
+  HttpSession session=request.getSession();
+  System.out.println("Request ID=" + servletRequest.toString());
+  System.out.println("Session ID=" + session.getId());
+  if (saveRestoreRequest && matchRequest(request)) {
+    Principal savedPrincipal=(Principal)session.getAttribute(FORM_PRINCIPAL_NOTE);
+    List<String> savedRoles=(List<String>)session.getAttribute(FORM_ROLES_NOTE);
+    Authentication registeredAuthentication=register(request,savedPrincipal,savedRoles);
+    if (restoreRequest(request,session)) {
+      return registeredAuthentication;
+    }
+ else {
+      return Authentication.UNAUTHENTICATED;
+    }
+  }
+  ServiceProviderSAMLWorkflow serviceProviderSAMLWorkflow=new ServiceProviderSAMLWorkflow();
+  serviceProviderSAMLWorkflow.setRedirectionHandler(new JettyRedirectionHandler());
+  boolean localLogout=serviceProviderSAMLWorkflow.isLocalLogoutRequest(request);
+  if (localLogout) {
+    try {
+      serviceProviderSAMLWorkflow.sendToLogoutPage(request,response,session,theServletContext,logoutPage);
+    }
+ catch (    ServletException e) {
+      logger.samlLogoutError(e);
+      throw new RuntimeException(e);
+    }
+catch (    IOException e1) {
+      logger.samlLogoutError(e1);
+      throw new RuntimeException(e1);
+    }
+    return Authentication.UNAUTHENTICATED;
+  }
+  String samlRequest=request.getParameter(GeneralConstants.SAML_REQUEST_KEY);
+  String samlResponse=request.getParameter(GeneralConstants.SAML_RESPONSE_KEY);
+  Principal principal=request.getUserPrincipal();
+  try {
+    if (principal != null && !(serviceProviderSAMLWorkflow.isLocalLogoutRequest(request) || isNotNull(samlRequest) || isNotNull(samlResponse)))     return Authentication.SEND_SUCCESS;
+    if (!isNotNull(samlRequest) && !isNotNull(samlResponse)) {
+      return generalUserRequest(servletRequest,servletResponse,mandatory);
+    }
+    if (isNotNull(samlResponse)) {
+      return handleSAMLResponse(servletRequest,servletResponse,mandatory);
+    }
+    if (isNotNull(samlRequest)) {
+      return handleSAMLRequest(servletRequest,servletResponse,mandatory);
+    }
+    return localAuthentication(servletRequest,servletResponse,mandatory);
+  }
+ catch (  IOException e) {
+    if (StringUtil.isNotNull(spConfiguration.getErrorPage())) {
+      try {
+        request.getRequestDispatcher(spConfiguration.getErrorPage()).forward(request,response);
+      }
+ catch (      ServletException e1) {
+        logger.samlErrorPageForwardError(spConfiguration.getErrorPage(),e1);
+      }
+catch (      IOException e1) {
+        logger.samlErrorPageForwardError(spConfiguration.getErrorPage(),e1);
+      }
+      return Authentication.UNAUTHENTICATED;
+    }
+ else {
+      throw new RuntimeException(e);
+    }
+  }
+}

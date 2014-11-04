@@ -1,0 +1,60 @@
+{
+  if (!mandatory) {
+    Request request=(Request)servletRequest;
+    return request.getAuthentication();
+  }
+  ServiceProviderSAMLWorkflow serviceProviderSAMLWorkflow=new ServiceProviderSAMLWorkflow();
+  serviceProviderSAMLWorkflow.setRedirectionHandler(new JettyRedirectionHandler());
+  HttpServletRequest request=(HttpServletRequest)servletRequest;
+  HttpServletResponse response=(HttpServletResponse)servletResponse;
+  HttpSession session=request.getSession(false);
+  boolean willSendRequest=false;
+  HTTPContext httpContext=new HTTPContext(request,response,theServletContext);
+  Set<SAML2Handler> handlers=chain.handlers();
+  boolean postBinding=spConfiguration.getBindingType().equals("POST");
+  SAML2HandlerResponse saml2HandlerResponse=null;
+  try {
+    ServiceProviderBaseProcessor baseProcessor=new ServiceProviderBaseProcessor(postBinding,serviceURL,this.picketLinkConfiguration);
+    if (issuerID != null)     baseProcessor.setIssuer(issuerID);
+    baseProcessor.setIdentityURL(identityURL);
+    baseProcessor.setAuditHelper(auditHelper);
+    saml2HandlerResponse=baseProcessor.process(httpContext,handlers,chainLock);
+  }
+ catch (  ProcessingException pe) {
+    logger.samlSPHandleRequestError(pe);
+    throw new RuntimeException(pe);
+  }
+catch (  ParsingException pe) {
+    logger.samlSPHandleRequestError(pe);
+    throw new RuntimeException(pe);
+  }
+catch (  ConfigurationException pe) {
+    logger.samlSPHandleRequestError(pe);
+    throw new RuntimeException(pe);
+  }
+  willSendRequest=saml2HandlerResponse.getSendRequest();
+  Document samlResponseDocument=saml2HandlerResponse.getResultingDocument();
+  String relayState=saml2HandlerResponse.getRelayState();
+  String destination=saml2HandlerResponse.getDestination();
+  String destinationQueryStringWithSignature=saml2HandlerResponse.getDestinationQueryStringWithSignature();
+  if (destination != null && samlResponseDocument != null) {
+    try {
+      if (saveRestoreRequest) {
+        this.saveRequest(request,session);
+      }
+      if (enableAudit) {
+        PicketLinkAuditEvent auditEvent=new PicketLinkAuditEvent(AuditLevel.INFO);
+        auditEvent.setType(PicketLinkAuditEventType.REQUEST_TO_IDP);
+        auditEvent.setWhoIsAuditing(theServletContext.getContextPath());
+        auditHelper.audit(auditEvent);
+      }
+      serviceProviderSAMLWorkflow.sendRequestToIDP(destination,samlResponseDocument,relayState,response,willSendRequest,destinationQueryStringWithSignature,isHttpPostBinding());
+      return Authentication.SEND_CONTINUE;
+    }
+ catch (    Exception e) {
+      logger.samlSPHandleRequestError(e);
+      throw logger.samlSPProcessingExceptionError(e);
+    }
+  }
+  return localAuthentication(servletRequest,servletResponse,mandatory);
+}

@@ -1,3 +1,10 @@
 {
-  assertNames(keycloak.realms().findAll(),"master","test",REALM_NAME);
+  List<RealmRepresentation> realms=keycloak.realms().findAll();
+  assertNames(realms,"master","test",REALM_NAME);
+  for (  RealmRepresentation rep : realms) {
+    assertNull(rep.getPrivateKey());
+    assertNull(rep.getCodeSecret());
+    assertNotNull(rep.getPublicKey());
+    assertNotNull(rep.getCertificate());
+  }
 }

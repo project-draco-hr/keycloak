@@ -1,0 +1,14 @@
+{
+  KeycloakPrincipal<RefreshableKeycloakSecurityContext> principal=CookieTokenStore.getPrincipalFromCookie(deployment,facade,this);
+  if (principal == null) {
+    log.debug("Account was not in cookie or was invalid");
+    return null;
+  }
+  RefreshableKeycloakSecurityContext session=principal.getKeycloakSecurityContext();
+  if (session.isActive() && !session.getDeployment().isAlwaysRefreshToken())   return principal;
+  boolean success=session.refreshExpiredToken(false);
+  if (success && session.isActive())   return principal;
+  log.debugf("Cleanup and expire cookie for user %s after failed refresh",principal.getName());
+  CookieTokenStore.removeCookie(facade);
+  return null;
+}

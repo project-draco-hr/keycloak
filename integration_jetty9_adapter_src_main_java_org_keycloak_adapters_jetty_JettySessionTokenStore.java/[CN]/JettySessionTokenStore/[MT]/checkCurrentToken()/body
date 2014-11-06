@@ -1,0 +1,10 @@
+{
+  if (request.getSession(false) == null)   return;
+  RefreshableKeycloakSecurityContext session=(RefreshableKeycloakSecurityContext)request.getSession().getAttribute(KeycloakSecurityContext.class.getName());
+  if (session == null)   return;
+  if (session.getDeployment() == null)   session.setCurrentRequestInfo(deployment,this);
+  if (session.isActive() && !session.getDeployment().isAlwaysRefreshToken())   return;
+  boolean success=session.refreshExpiredToken(false);
+  if (success && session.isActive())   return;
+  request.getSession().removeAttribute(KeycloakSecurityContext.class.getName());
+}

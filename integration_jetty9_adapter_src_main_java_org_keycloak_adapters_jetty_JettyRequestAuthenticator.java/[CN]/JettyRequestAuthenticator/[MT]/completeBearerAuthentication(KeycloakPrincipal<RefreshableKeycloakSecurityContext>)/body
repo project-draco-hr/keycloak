@@ -1,0 +1,9 @@
+{
+  this.principal=principal;
+  RefreshableKeycloakSecurityContext securityContext=principal.getKeycloakSecurityContext();
+  Set<String> roles=AdapterUtils.getRolesFromSecurityContext(securityContext);
+  if (log.isDebugEnabled()) {
+    log.debug("Completing bearer authentication. Bearer roles: " + roles);
+  }
+  request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);
+}

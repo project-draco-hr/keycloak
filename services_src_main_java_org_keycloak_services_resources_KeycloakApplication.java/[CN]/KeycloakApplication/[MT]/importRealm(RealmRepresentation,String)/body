@@ -12,9 +12,15 @@
       log.info("Not importing realm " + rep.getRealm() + " from "+ from+ ".  It already exists.");
       return;
     }
-    RealmModel realm=manager.importRealm(rep);
-    log.info("Imported realm " + realm.getName() + " from "+ from);
-    session.getTransaction().commit();
+    try {
+      RealmModel realm=manager.importRealm(rep);
+      session.getTransaction().commit();
+      log.info("Imported realm " + realm.getName() + " from "+ from);
+    }
+ catch (    Throwable t) {
+      session.getTransaction().rollback();
+      log.warn("Unable to import realm " + rep.getRealm() + " from "+ from+ ". Cause: "+ t.getMessage());
+    }
   }
   finally {
     session.close();

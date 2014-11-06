@@ -1,0 +1,19 @@
+{
+  if (!operation.get(OP).asString().equals(ADD)) {
+    throw new OperationFailedException("Unexpected operation for add Auth Server. operation=" + operation.toString());
+  }
+  ModelNode model=resource.getModel();
+  for (  AttributeDefinition attr : AuthServerDefinition.ALL_ATTRIBUTES) {
+    attr.validateAndSet(operation,model);
+  }
+  if (!requiresRuntime(context))   return;
+  if (!context.isNormalServer())   return;
+  ModelNode webContextNode=model.get(AuthServerDefinition.WEB_CONTEXT.getName());
+  if (!webContextNode.isDefined())   webContextNode=AuthServerDefinition.WEB_CONTEXT.getDefaultValue();
+  String webContext=webContextNode.asString();
+  ModelNode isEnabled=model.get("enabled");
+  boolean enabled=isEnabled.isDefined() && isEnabled.asBoolean();
+  AuthServerUtil authServerUtil=new AuthServerUtil(operation);
+  authServerUtil.addStepToUploadAuthServer(context,enabled);
+  KeycloakAdapterConfigService.INSTANCE.addServerDeployment(authServerUtil.getDeploymentName(),webContext);
+}

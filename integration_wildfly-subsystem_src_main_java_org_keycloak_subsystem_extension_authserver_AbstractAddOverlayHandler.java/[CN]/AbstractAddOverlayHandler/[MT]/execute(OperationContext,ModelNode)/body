@@ -1,0 +1,22 @@
+{
+  String uploadFileName=operation.get(UPLOADED_FILE_OP_NAME).asString();
+  String overlayPath=getOverlayPath(uploadFileName);
+  String overlayName=AuthServerUtil.getAuthServerName(operation) + "-keycloak-overlay";
+  PathAddress overlayAddress=PathAddress.pathAddress(PathElement.pathElement(DEPLOYMENT_OVERLAY,overlayName));
+  boolean isOverlayExists=isOverlayExists(context,overlayName,PathAddress.EMPTY_ADDRESS);
+  if (!isOverlayExists) {
+    addOverlay(context,overlayAddress);
+    if (!isHostController(context)) {
+      addDeploymentToOverlay(context,overlayAddress,AuthServerUtil.getDeploymentName(operation));
+    }
+  }
+  if (isHostController(context)) {
+    addOverlayToServerGroups(context,overlayAddress,operation,overlayName);
+  }
+  if (isOverlayExists && isContentExists(context,overlayAddress,overlayPath)) {
+    throw new OperationFailedException(pathExistsMessage(overlayAddress,overlayPath));
+  }
+  addContent(context,overlayAddress,operation.get(BYTES_TO_UPLOAD.getName()).asBytes(),overlayPath);
+  context.restartRequired();
+  context.completeStep(OperationContext.ResultHandler.NOOP_RESULT_HANDLER);
+}

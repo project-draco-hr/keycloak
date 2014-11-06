@@ -1,0 +1,14 @@
+{
+  if (!context.getModelNode().get(AuthServerDefinition.TAG_NAME).isDefined()) {
+    return;
+  }
+  for (  Property authServer : context.getModelNode().get(AuthServerDefinition.TAG_NAME).asPropertyList()) {
+    writer.writeStartElement(AuthServerDefinition.TAG_NAME);
+    writer.writeAttribute("name",authServer.getName());
+    ModelNode authServerElements=authServer.getValue();
+    for (    AttributeDefinition element : AuthServerDefinition.ALL_ATTRIBUTES) {
+      element.marshallAsElement(authServerElements,writer);
+    }
+    writer.writeEndElement();
+  }
+}

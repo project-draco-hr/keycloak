@@ -1,0 +1,25 @@
+{
+  if (!context.isNormalServer() || attribNotChanging(attributeName,newValue,oldValue)) {
+    super.finishModelStage(context,operation,attributeName,newValue,oldValue,model);
+    return;
+  }
+  AuthServerUtil authServerUtil=new AuthServerUtil(operation);
+  boolean isEnabled=isEnabled(model);
+  if (attributeName.equals(AuthServerDefinition.WEB_CONTEXT.getName())) {
+    String deploymentName=AuthServerUtil.getDeploymentName(operation);
+    KeycloakAdapterConfigService.INSTANCE.removeServerDeployment(deploymentName);
+    KeycloakAdapterConfigService.INSTANCE.addServerDeployment(deploymentName,newValue.asString());
+    if (isEnabled) {
+      authServerUtil.addStepToRedeployAuthServer(context);
+    }
+  }
+  if (attributeName.equals(AuthServerDefinition.ENABLED.getName())) {
+    if (!isEnabled) {
+      authServerUtil.addStepToUndeployAuthServer(context);
+    }
+ else {
+      authServerUtil.addStepToDeployAuthServer(context);
+    }
+  }
+  super.finishModelStage(context,operation,attributeName,newValue,oldValue,model);
+}

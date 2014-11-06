@@ -1,7 +1,6 @@
 {
   KeyStore trustStore=KeyStore.getInstance(KeyStore.getDefaultType());
-  File truststoreFile=new File(filename);
-  FileInputStream trustStream=new FileInputStream(truststoreFile);
+  InputStream trustStream=(filename.startsWith(PROTOCOL_CLASSPATH)) ? KeystoreUtil.class.getResourceAsStream(filename.replace(PROTOCOL_CLASSPATH,"")) : new FileInputStream(new File(filename));
   trustStore.load(trustStream,password.toCharArray());
   trustStream.close();
   return trustStore;

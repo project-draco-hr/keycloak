@@ -1,0 +1,17 @@
+{
+  Set<String> roles=AdapterUtils.getRolesFromSecurityContext(principal.getKeycloakSecurityContext());
+  if (roles == null) {
+    roles=new HashSet<String>();
+  }
+  Request request=(Request)httpServletRequest;
+  Authentication authentication=request.getAuthentication();
+  if (!(authentication instanceof UserAuthentication)) {
+    Subject theSubject=new Subject();
+    String[] theRoles=new String[roles.size()];
+    roles.toArray(theRoles);
+    UserIdentity userIdentity=new DefaultUserIdentity(theSubject,principal,theRoles);
+    authentication=new UserAuthentication(getAuthMethod(),userIdentity);
+    request.setAuthentication(authentication);
+  }
+  return authentication;
+}

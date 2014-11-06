@@ -1,0 +1,19 @@
+{
+  principal=skp;
+  final RefreshableKeycloakSecurityContext securityContext=skp.getKeycloakSecurityContext();
+  final Set<String> roles=AdapterUtils.getRolesFromSecurityContext(securityContext);
+  KeycloakAccount account=new KeycloakAccount(){
+    @Override public Principal getPrincipal(){
+      return skp;
+    }
+    @Override public Set<String> getRoles(){
+      return roles;
+    }
+    @Override public KeycloakSecurityContext getKeycloakSecurityContext(){
+      return securityContext;
+    }
+  }
+;
+  request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);
+  this.tokenStore.saveAccountInfo(account);
+}

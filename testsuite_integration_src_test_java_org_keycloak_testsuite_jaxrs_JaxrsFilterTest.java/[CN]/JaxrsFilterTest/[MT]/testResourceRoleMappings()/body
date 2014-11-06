@@ -1,0 +1,18 @@
+{
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      Map<String,String> initParams=new TreeMap<String,String>();
+      initParams.put(CONFIG_FILE_INIT_PARAM,"classpath:jaxrs-test/jaxrs-keycloak-resource-mappings.json");
+      keycloakRule.deployJaxrsApplication("JaxrsSimpleApp","/jaxrs-simple",JaxrsTestApplication.class,initParams);
+    }
+  }
+);
+  OAuthClient.AccessTokenResponse accessTokenResp=retrieveAccessToken();
+  String authHeader="Bearer " + accessTokenResp.getAccessToken();
+  JaxrsTestResource.SimpleRepresentation getRep=client.target(JAXRS_APP_URL).request().header(HttpHeaders.AUTHORIZATION,authHeader).get(JaxrsTestResource.SimpleRepresentation.class);
+  Assert.assertEquals("get",getRep.getMethod());
+  Assert.assertEquals("test-user@localhost",getRep.getPrincipal());
+  Assert.assertFalse(getRep.getHasUserRole());
+  Assert.assertFalse(getRep.getHasAdminRole());
+  Assert.assertTrue(getRep.getHasJaxrsAppRole());
+}

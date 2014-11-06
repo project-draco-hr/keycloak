@@ -1,0 +1,22 @@
+{
+  BearerTokenRequestAuthenticator bearer=new BearerTokenRequestAuthenticator(resolvedDeployment);
+  AuthOutcome outcome=bearer.authenticate(facade);
+  if (outcome == AuthOutcome.FAILED || outcome == AuthOutcome.NOT_ATTEMPTED) {
+    AuthChallenge challenge=bearer.getChallenge();
+    log.fine("Authentication outcome: " + outcome);
+    boolean challengeSent=challenge.challenge(facade);
+    if (!challengeSent) {
+      facade.getResponse().setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
+    }
+    if (!facade.isResponseFinished()) {
+      request.abortWith(facade.getResponseBuilder().build());
+    }
+    return;
+  }
+ else {
+    if (verifySslFailed(facade,resolvedDeployment)) {
+      return;
+    }
+  }
+  propagateSecurityContext(facade,request,resolvedDeployment,bearer);
+}

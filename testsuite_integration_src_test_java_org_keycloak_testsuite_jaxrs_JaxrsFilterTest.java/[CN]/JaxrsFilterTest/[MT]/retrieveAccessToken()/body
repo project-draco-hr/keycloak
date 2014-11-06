@@ -1,0 +1,8 @@
+{
+  OAuthClient oauth=new OAuthClient(driver);
+  oauth.doLogin("test-user@localhost","password");
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
+  Assert.assertEquals(200,response.getStatusCode());
+  return response;
+}

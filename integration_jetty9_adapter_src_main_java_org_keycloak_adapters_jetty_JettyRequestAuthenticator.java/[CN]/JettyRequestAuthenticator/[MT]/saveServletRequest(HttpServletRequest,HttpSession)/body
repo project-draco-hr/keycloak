@@ -7,8 +7,9 @@ synchronized (session) {
       session.setAttribute(FormAuthenticator.__J_METHOD,request.getMethod());
       if (MimeTypes.Type.FORM_ENCODED.is(request.getContentType()) && HttpMethod.POST.is(request.getMethod())) {
         Request base_request=(request instanceof Request) ? (Request)request : HttpChannel.getCurrentHttpChannel().getRequest();
-        base_request.extractParameters();
-        session.setAttribute(FormAuthenticator.__J_POST,new MultiMap<String>(base_request.getParameters()));
+        MultiMap<String> formParameters=new MultiMap<String>();
+        base_request.extractFormParameters(formParameters);
+        session.setAttribute(FormAuthenticator.__J_POST,formParameters);
       }
     }
   }

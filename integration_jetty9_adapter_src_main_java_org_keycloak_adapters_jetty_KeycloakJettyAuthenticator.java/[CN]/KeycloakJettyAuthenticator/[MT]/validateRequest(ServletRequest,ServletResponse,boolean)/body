@@ -2,6 +2,7 @@
   if (log.isTraceEnabled()) {
     log.trace("*** authenticate");
   }
+  if (!mandatory)   return new DeferredAuthentication(this);
   Request request=HttpChannel.getCurrentHttpChannel().getRequest();
   JettyHttpFacade facade=new JettyHttpFacade(request,(HttpServletResponse)res);
   KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);

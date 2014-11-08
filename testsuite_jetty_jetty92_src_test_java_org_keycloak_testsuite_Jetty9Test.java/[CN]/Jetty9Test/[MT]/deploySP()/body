@@ -1,0 +1,11 @@
+{
+  appContext=new WebAppContext();
+  appContext.setResourceBase(Jetty9Test.class.getClassLoader().getResource("jetty-test/webapp").toExternalForm());
+  appContext.setContextPath("/customer-portal");
+  appContext.setParentLoaderPriority(true);
+  appContext.addServlet(new ServletHolder(new SendUsernameServlet()),"/*");
+  ConstraintSecurityHandler securityHandler=formHandler();
+  AbstractKeycloakJettyAuthenticator authenticator=new KeycloakJettyAuthenticator();
+  securityHandler.setAuthenticator(authenticator);
+  appContext.setSecurityHandler(securityHandler);
+}

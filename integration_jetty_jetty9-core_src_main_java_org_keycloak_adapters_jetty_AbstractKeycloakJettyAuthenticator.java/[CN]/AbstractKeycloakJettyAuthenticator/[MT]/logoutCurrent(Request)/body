@@ -1,0 +1,14 @@
+{
+  AdapterDeploymentContext deploymentContext=(AdapterDeploymentContext)request.getAttribute(AdapterDeploymentContext.class.getName());
+  KeycloakSecurityContext ksc=(KeycloakSecurityContext)request.getAttribute(KeycloakSecurityContext.class.getName());
+  if (ksc != null) {
+    JettyHttpFacade facade=new JettyHttpFacade(request,null);
+    KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
+    if (ksc instanceof RefreshableKeycloakSecurityContext) {
+      ((RefreshableKeycloakSecurityContext)ksc).logout(deployment);
+    }
+    AdapterTokenStore tokenStore=getTokenStore(request,facade,deployment);
+    tokenStore.logout();
+    request.removeAttribute(KeycloakSecurityContext.class.getName());
+  }
+}

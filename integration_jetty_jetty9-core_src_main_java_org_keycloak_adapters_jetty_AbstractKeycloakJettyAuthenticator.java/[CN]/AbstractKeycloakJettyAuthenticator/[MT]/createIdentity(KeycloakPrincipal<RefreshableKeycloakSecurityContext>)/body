@@ -1,0 +1,10 @@
+{
+  Set<String> roles=AdapterUtils.getRolesFromSecurityContext(principal.getKeycloakSecurityContext());
+  if (roles == null) {
+    roles=new HashSet<String>();
+  }
+  Subject theSubject=new Subject();
+  String[] theRoles=new String[roles.size()];
+  roles.toArray(theRoles);
+  return new DefaultUserIdentity(theSubject,principal,theRoles);
+}

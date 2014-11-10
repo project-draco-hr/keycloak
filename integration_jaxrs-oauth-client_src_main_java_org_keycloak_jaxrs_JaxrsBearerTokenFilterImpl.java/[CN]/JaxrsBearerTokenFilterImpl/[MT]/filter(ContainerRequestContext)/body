@@ -1,0 +1,10 @@
+{
+  SecurityContext securityContext=getRequestSecurityContext(request);
+  JaxrsHttpFacade facade=new JaxrsHttpFacade(request,securityContext);
+  if (handlePreauth(facade)) {
+    return;
+  }
+  KeycloakDeployment resolvedDeployment=deploymentContext.resolveDeployment(facade);
+  nodesRegistrationManagement.tryRegister(resolvedDeployment);
+  bearerAuthentication(facade,request,resolvedDeployment);
+}

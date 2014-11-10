@@ -1,0 +1,10 @@
+{
+  String uri="http://localhost:9000/customerservice/customers/123";
+  Response resp=client.target(uri).request().get();
+  Assert.assertEquals(resp.getStatus(),401);
+  resp.close();
+  OAuthClient.AccessTokenResponse accessTokenResp=retrieveAccessToken();
+  String authHeader="Bearer " + accessTokenResp.getAccessToken();
+  String resp2=client.target(uri).request().header(HttpHeaders.AUTHORIZATION,authHeader).get(String.class);
+  System.out.println(resp2);
+}

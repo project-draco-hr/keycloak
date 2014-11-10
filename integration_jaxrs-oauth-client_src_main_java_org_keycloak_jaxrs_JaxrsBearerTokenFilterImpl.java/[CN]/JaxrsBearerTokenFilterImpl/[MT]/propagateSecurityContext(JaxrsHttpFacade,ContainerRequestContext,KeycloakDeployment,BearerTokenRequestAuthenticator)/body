@@ -1,0 +1,25 @@
+{
+  RefreshableKeycloakSecurityContext skSession=new RefreshableKeycloakSecurityContext(resolvedDeployment,null,bearer.getTokenString(),bearer.getToken(),null,null,null);
+  facade.setSecurityContext(skSession);
+  String principalName=AdapterUtils.getPrincipalName(resolvedDeployment,bearer.getToken());
+  final KeycloakPrincipal<RefreshableKeycloakSecurityContext> principal=new KeycloakPrincipal<RefreshableKeycloakSecurityContext>(principalName,skSession);
+  SecurityContext anonymousSecurityContext=getRequestSecurityContext(request);
+  final boolean isSecure=anonymousSecurityContext.isSecure();
+  final Set<String> roles=AdapterUtils.getRolesFromSecurityContext(skSession);
+  SecurityContext ctx=new SecurityContext(){
+    @Override public Principal getUserPrincipal(){
+      return principal;
+    }
+    @Override public boolean isUserInRole(    String role){
+      return roles.contains(role);
+    }
+    @Override public boolean isSecure(){
+      return isSecure;
+    }
+    @Override public String getAuthenticationScheme(){
+      return "OAUTH_BEARER";
+    }
+  }
+;
+  request.setSecurityContext(ctx);
+}

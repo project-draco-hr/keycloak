@@ -1,0 +1,10 @@
+{
+  request.setAttribute(AdapterDeploymentContext.class.getName(),deploymentContext);
+  Authentication authentication=request.getAuthentication();
+  if (!(authentication instanceof KeycloakAuthentication)) {
+    UserIdentity userIdentity=createIdentity(principal);
+    authentication=createAuthentication(userIdentity);
+    request.setAuthentication(authentication);
+  }
+  return authentication;
+}

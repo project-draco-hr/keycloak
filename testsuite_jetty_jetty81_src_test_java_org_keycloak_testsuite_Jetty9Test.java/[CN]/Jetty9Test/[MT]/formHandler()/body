@@ -1,0 +1,15 @@
+{
+  Constraint constraint=new Constraint();
+  constraint.setName(Constraint.__FORM_AUTH);
+  ;
+  constraint.setRoles(new String[]{"user","admin"});
+  constraint.setAuthenticate(true);
+  ConstraintMapping constraintMapping=new ConstraintMapping();
+  constraintMapping.setConstraint(constraint);
+  constraintMapping.setPathSpec("/*");
+  ConstraintSecurityHandler securityHandler=new ConstraintSecurityHandler();
+  securityHandler.setConstraintMappings(new ConstraintMapping[]{constraintMapping});
+  HashLoginService loginService=new HashLoginService();
+  securityHandler.setLoginService(loginService);
+  return securityHandler;
+}

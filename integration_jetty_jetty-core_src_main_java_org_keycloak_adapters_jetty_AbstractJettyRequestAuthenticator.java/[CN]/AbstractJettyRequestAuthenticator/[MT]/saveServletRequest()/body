@@ -1,0 +1,15 @@
+{
+  HttpSession session=request.getSession();
+synchronized (session) {
+    if (session.getAttribute(FormAuthenticator.__J_URI) == null) {
+      StringBuffer buf=request.getRequestURL();
+      if (request.getQueryString() != null)       buf.append("?").append(request.getQueryString());
+      session.setAttribute(FormAuthenticator.__J_URI,buf.toString());
+      session.setAttribute(__J_METHOD,request.getMethod());
+      if ("application/x-www-form-urlencoded".equals(request.getContentType()) && "POST".equalsIgnoreCase(request.getMethod())) {
+        MultiMap<String> formParameters=extractFormParameters(request);
+        session.setAttribute(FormAuthenticator.__J_POST,formParameters);
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  if (req.getPathInfo().endsWith("logout")) {
+    req.logout();
+    resp.setContentType("text/plain");
+    OutputStream stream=resp.getOutputStream();
+    stream.write("logout".getBytes());
+    return;
+  }
+  resp.setContentType("text/plain");
+  OutputStream stream=resp.getOutputStream();
+  Principal principal=req.getUserPrincipal();
+  if (principal == null) {
+    stream.write("null".getBytes());
+    return;
+  }
+  String name=principal.getName();
+  stream.write(name.getBytes());
+  stream.write("\n".getBytes());
+  KeycloakSecurityContext context=(KeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
+  stream.write(context.getIdToken().getName().getBytes());
+  stream.write("\n".getBytes());
+  stream.write(logoutUri.getBytes());
+}

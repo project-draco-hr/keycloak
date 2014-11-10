@@ -1,0 +1,10 @@
+{
+  String resolverClass=getKeycloakConfigResolverClass();
+  try {
+    return (Class<? extends KeycloakConfigResolver>)bundleContext.getBundle().loadClass(resolverClass);
+  }
+ catch (  ClassNotFoundException cnfe) {
+    log.warning("Not able to find class from bundleContext. Fallback to current classloader");
+    return super.loadResolverClass();
+  }
+}

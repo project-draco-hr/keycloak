@@ -9,7 +9,7 @@
       facade.getResponse().setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
     }
     if (!facade.isResponseFinished()) {
-      request.abortWith(facade.getResponseBuilder().build());
+      facade.getResponse().end();
     }
     return;
   }
@@ -19,4 +19,5 @@
     }
   }
   propagateSecurityContext(facade,request,resolvedDeployment,bearer);
+  handleAuthActions(facade,resolvedDeployment);
 }

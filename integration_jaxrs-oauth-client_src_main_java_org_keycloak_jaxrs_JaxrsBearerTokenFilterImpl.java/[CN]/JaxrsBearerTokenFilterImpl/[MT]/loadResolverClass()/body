@@ -1,0 +1,13 @@
+{
+  try {
+    return (Class<? extends KeycloakConfigResolver>)getClass().getClassLoader().loadClass(keycloakConfigResolverClass);
+  }
+ catch (  ClassNotFoundException cnfe) {
+    try {
+      return (Class<? extends KeycloakConfigResolver>)Thread.currentThread().getContextClassLoader().loadClass(keycloakConfigResolverClass);
+    }
+ catch (    ClassNotFoundException cnfe2) {
+      throw new RuntimeException("Unable to find resolver class: " + keycloakConfigResolverClass);
+    }
+  }
+}

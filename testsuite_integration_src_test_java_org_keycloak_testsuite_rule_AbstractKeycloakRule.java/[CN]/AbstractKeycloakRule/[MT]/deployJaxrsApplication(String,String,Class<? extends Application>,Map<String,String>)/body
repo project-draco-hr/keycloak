@@ -1,0 +1,12 @@
+{
+  ResteasyDeployment deployment=new ResteasyDeployment();
+  deployment.setApplicationClass(applicationClass.getName());
+  DeploymentInfo di=server.getServer().undertowDeployment(deployment,"");
+  di.setClassLoader(getClass().getClassLoader());
+  di.setContextPath(contextPath);
+  di.setDeploymentName(name);
+  for (  Map.Entry<String,String> param : initParams.entrySet()) {
+    di.addInitParameter(param.getKey(),param.getValue());
+  }
+  server.getServer().deploy(di);
+}

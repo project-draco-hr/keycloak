@@ -1,0 +1,8 @@
+{
+  if (!facade.getRequest().isSecure() && deployment.getSslRequired().isRequired(facade.getRequest().getRemoteAddr())) {
+    log.warning("SSL is required to authenticate, but request is not secured");
+    facade.getResponse().sendError(403,"SSL required!");
+    return true;
+  }
+  return false;
+}

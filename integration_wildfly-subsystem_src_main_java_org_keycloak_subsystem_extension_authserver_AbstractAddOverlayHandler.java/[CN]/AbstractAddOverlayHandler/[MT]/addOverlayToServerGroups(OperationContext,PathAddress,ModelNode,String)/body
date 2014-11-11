@@ -5,7 +5,7 @@
     ModelNode serverGroupModel=context.readResourceFromRoot(address).getModel();
     if (serverGroupModel.get("profile").asString().equals(myProfile)) {
       PathAddress serverGroupOverlayAddress=address.append(overlayAddress);
-      boolean isOverlayExists=isOverlayExists(context,overlayName,address);
+      boolean isOverlayExists=AuthServerUtil.isOverlayExists(context,overlayName,address);
       if (!isOverlayExists) {
         addOverlay(context,serverGroupOverlayAddress);
         addDeploymentToOverlay(context,serverGroupOverlayAddress,AuthServerUtil.getDeploymentName(operation));

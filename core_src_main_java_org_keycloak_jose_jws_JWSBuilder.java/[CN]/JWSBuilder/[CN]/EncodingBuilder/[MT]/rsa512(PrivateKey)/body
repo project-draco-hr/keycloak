@@ -1,5 +1,13 @@
 {
+  StringBuffer buffer=new StringBuffer();
   byte[] data=marshalContent();
-  byte[] signature=RSAProvider.sign(data,Algorithm.RS512,privateKey);
-  return encode(Algorithm.RS512,data,signature);
+  encode(Algorithm.RS512,data,buffer);
+  byte[] signature=null;
+  try {
+    signature=RSAProvider.sign(buffer.toString().getBytes("UTF-8"),Algorithm.RS512,privateKey);
+  }
+ catch (  UnsupportedEncodingException e) {
+    throw new RuntimeException(e);
+  }
+  return encodeAll(buffer,signature);
 }

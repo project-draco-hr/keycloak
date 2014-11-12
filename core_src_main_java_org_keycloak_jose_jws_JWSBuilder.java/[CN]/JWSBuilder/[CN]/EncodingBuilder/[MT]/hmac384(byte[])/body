@@ -1,5 +1,13 @@
 {
+  StringBuffer buffer=new StringBuffer();
   byte[] data=marshalContent();
-  byte[] signature=HMACProvider.sign(data,Algorithm.HS384,sharedSecret);
-  return encode(Algorithm.HS384,data,signature);
+  encode(Algorithm.HS384,data,buffer);
+  byte[] signature=null;
+  try {
+    signature=HMACProvider.sign(buffer.toString().getBytes("UTF-8"),Algorithm.HS384,sharedSecret);
+  }
+ catch (  UnsupportedEncodingException e) {
+    throw new RuntimeException(e);
+  }
+  return encodeAll(buffer,signature);
 }

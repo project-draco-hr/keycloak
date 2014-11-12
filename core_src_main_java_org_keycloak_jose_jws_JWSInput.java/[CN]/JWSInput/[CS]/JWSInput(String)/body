@@ -4,6 +4,7 @@
   if (parts.length < 2 || parts.length > 3)   throw new IllegalArgumentException("Parsing error");
   encodedHeader=parts[0];
   encodedContent=parts[1];
+  encodedSignatureInput=encodedHeader + '.' + encodedContent;
   try {
     content=Base64Url.decode(encodedContent);
     if (parts.length > 2) {

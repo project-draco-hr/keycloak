@@ -5,8 +5,10 @@
   String relayState=clientSession.getNote(GeneralConstants.RELAY_STATE);
   String redirectUri=clientSession.getRedirectUri();
   String responseIssuer=getResponseIssuer(realm);
+  String nameIdFormat=getNameIdFormat(clientSession);
+  String nameId=getNameId(nameIdFormat,clientSession,userSession);
   SALM2LoginResponseBuilder builder=new SALM2LoginResponseBuilder();
-  builder.requestID(requestID).relayState(relayState).destination(redirectUri).responseIssuer(responseIssuer).requestIssuer(clientSession.getClient().getClientId()).userPrincipal(userSession.getUser().getUsername()).attribute(X500SAMLProfileConstants.USERID.getFriendlyName(),userSession.getUser().getId()).authMethod(JBossSAMLURIConstants.AC_UNSPECIFIED.get());
+  builder.requestID(requestID).relayState(relayState).destination(redirectUri).responseIssuer(responseIssuer).requestIssuer(clientSession.getClient().getClientId()).nameIdentifier(nameIdFormat,nameId).authMethod(JBossSAMLURIConstants.AC_UNSPECIFIED.get());
   initClaims(builder,clientSession.getClient(),userSession.getUser());
   if (clientSession.getRoles() != null) {
     if (multivaluedRoles(client)) {
@@ -18,10 +20,10 @@
     }
   }
   if (requiresRealmSignature(client)) {
-    builder.signatureAlgorithm(getSignatureAlgorithm(client)).signWith(realm.getPrivateKey(),realm.getPublicKey()).signDocument();
+    builder.signatureAlgorithm(getSignatureAlgorithm(client)).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
   }
   if (requiresAssertionSignature(client)) {
-    builder.signatureAlgorithm(getSignatureAlgorithm(client)).signWith(realm.getPrivateKey(),realm.getPublicKey()).signAssertions();
+    builder.signatureAlgorithm(getSignatureAlgorithm(client)).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signAssertions();
   }
   if (!includeAuthnStatement(client)) {
     builder.disableAuthnStatement(true);

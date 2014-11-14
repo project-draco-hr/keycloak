@@ -1,0 +1,15 @@
+{
+  Set<Principal> principals=new HashSet<Principal>(subject.getPrincipals());
+  for (  Principal principal : principals) {
+    if (principal.getClass().equals(KeycloakPrincipal.class) || principal.getClass().equals(RolePrincipal.class)) {
+      subject.getPrincipals().remove(principal);
+    }
+  }
+  Set<Object> creds=subject.getPrivateCredentials();
+  for (  Object cred : creds) {
+    subject.getPrivateCredentials().remove(cred);
+  }
+  subject=null;
+  callbackHandler=null;
+  return true;
+}

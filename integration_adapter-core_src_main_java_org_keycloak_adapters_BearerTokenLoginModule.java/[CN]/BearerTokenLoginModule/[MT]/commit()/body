@@ -4,9 +4,11 @@
   }
   this.subject.getPrincipals().add(auth.getPrincipal());
   this.subject.getPrivateCredentials().add(auth.getTokenString());
-  for (  String roleName : auth.getRoles()) {
-    RolePrincipal rolePrinc=new RolePrincipal(roleName);
-    this.subject.getPrincipals().add(rolePrinc);
+  if (auth.getRoles() != null) {
+    for (    String roleName : auth.getRoles()) {
+      RolePrincipal rolePrinc=new RolePrincipal(roleName);
+      this.subject.getPrincipals().add(rolePrinc);
+    }
   }
   return true;
 }

@@ -1,0 +1,48 @@
+{
+  this.subject=subject;
+  this.callbackHandler=callbackHandler;
+  if (deployment == null) {
+    KeycloakDeployment kd;
+    String configFile=(String)options.get(KEYCLOAK_CONFIG_FILE_OPTION);
+    if (configFile != null) {
+      InputStream is=loadKeycloakConfigFile(configFile);
+      kd=KeycloakDeploymentBuilder.build(is);
+    }
+ else {
+      String realm=(String)options.get(REALM_OPTION);
+      if (realm == null) {
+        throw new IllegalArgumentException("Realm is mandatory if you didn't provide keycloak-config-file");
+      }
+      String authServerUrl=(String)options.get(AUTH_SERVER_URL_OPTION);
+      String publicKey=(String)options.get(PUBLIC_KEY_OPTION);
+      if (publicKey == null && authServerUrl == null) {
+        throw new IllegalArgumentException("Option " + PUBLIC_KEY_OPTION + " is mandatory if you didn't provide keycloak-config-file or auth-server-url to resolver public key");
+      }
+      String resource=(String)options.get(RESOURCE_OPTION);
+      String resRoleMappings=(String)options.get(USE_RESOURCE_ROLE_MAPPINGS_OPTION);
+      boolean useResourceRoleMappings=resRoleMappings == null ? false : Boolean.parseBoolean(resRoleMappings);
+      if (useResourceRoleMappings && resource == null) {
+        throw new IllegalArgumentException("You want resource-role-mappings, but you didn't provide resource in configuration");
+      }
+      String principalAttribute=(String)options.get(PRINCIPAL_ATTRIBUTE_OPTION);
+      kd=new KeycloakDeployment();
+      kd.setRealm(realm);
+      kd.setResourceName(resource);
+      kd.setUseResourceRoleMappings(useResourceRoleMappings);
+      kd.setPrincipalAttribute(principalAttribute);
+      if (publicKey != null) {
+        try {
+          PublicKey pk=PemUtils.decodePublicKey(publicKey);
+          kd.setRealmKey(pk);
+        }
+ catch (        Exception e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+    if (kd.getRealmKey() == null) {
+      new AdapterDeploymentContext().resolveRealmKey(kd);
+    }
+    deployment=kd;
+  }
+}

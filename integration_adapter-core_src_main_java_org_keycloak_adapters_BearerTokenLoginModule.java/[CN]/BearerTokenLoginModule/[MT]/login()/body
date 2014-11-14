@@ -1,0 +1,30 @@
+{
+  Callback[] callbacks=new Callback[2];
+  callbacks[0]=new NameCallback("username");
+  callbacks[1]=new PasswordCallback("password",false);
+  try {
+    callbackHandler.handle(callbacks);
+    String username=((NameCallback)callbacks[0]).getName();
+    char[] tmpPassword=((PasswordCallback)callbacks[1]).getPassword();
+    String password=new String(tmpPassword);
+    ((PasswordCallback)callbacks[1]).clearPassword();
+    Auth auth=bearerAuth(username,password);
+    if (auth != null) {
+      this.auth=auth;
+      return true;
+    }
+ else {
+      return false;
+    }
+  }
+ catch (  UnsupportedCallbackException uce) {
+    LoginException le=new LoginException("Error: " + uce.getCallback().toString() + " not available to gather authentication information from the user");
+    le.initCause(uce);
+    throw le;
+  }
+catch (  Exception ioe) {
+    LoginException le=new LoginException(ioe.toString());
+    le.initCause(ioe);
+    throw le;
+  }
+}

@@ -1,0 +1,22 @@
+{
+  if ("Bearer".equalsIgnoreCase(username)) {
+    log.fine("Username is expected to be bearer but is " + username + ". Ignoring login module");
+    return null;
+  }
+  AccessToken token=RSATokenVerifier.verifyToken(tokenString,deployment.getRealmKey(),deployment.getRealm());
+  boolean verifyCaller;
+  if (deployment.isUseResourceRoleMappings()) {
+    verifyCaller=token.isVerifyCaller(deployment.getResourceName());
+  }
+ else {
+    verifyCaller=token.isVerifyCaller();
+  }
+  if (verifyCaller) {
+    throw new IllegalStateException("VerifyCaller not supported yet in login module");
+  }
+  RefreshableKeycloakSecurityContext skSession=new RefreshableKeycloakSecurityContext(deployment,null,tokenString,token,null,null,null);
+  String principalName=AdapterUtils.getPrincipalName(deployment,token);
+  final KeycloakPrincipal<RefreshableKeycloakSecurityContext> principal=new KeycloakPrincipal<RefreshableKeycloakSecurityContext>(principalName,skSession);
+  final Set<String> roles=AdapterUtils.getRolesFromSecurityContext(skSession);
+  return new Auth(principal,roles,tokenString);
+}

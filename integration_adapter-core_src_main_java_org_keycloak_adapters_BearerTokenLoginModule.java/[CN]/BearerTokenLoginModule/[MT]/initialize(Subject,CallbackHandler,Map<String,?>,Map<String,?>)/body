@@ -25,20 +25,15 @@
         throw new IllegalArgumentException("You want resource-role-mappings, but you didn't provide resource in configuration");
       }
       String principalAttribute=(String)options.get(PRINCIPAL_ATTRIBUTE_OPTION);
-      kd=new KeycloakDeployment();
-      kd.setRealm(realm);
-      kd.setResourceName(resource);
-      kd.setUseResourceRoleMappings(useResourceRoleMappings);
-      kd.setPrincipalAttribute(principalAttribute);
-      if (publicKey != null) {
-        try {
-          PublicKey pk=PemUtils.decodePublicKey(publicKey);
-          kd.setRealmKey(pk);
-        }
- catch (        Exception e) {
-          throw new RuntimeException(e);
-        }
-      }
+      AdapterConfig cfg=new AdapterConfig();
+      cfg.setRealm(realm);
+      cfg.setResource(resource);
+      cfg.setUseResourceRoleMappings(useResourceRoleMappings);
+      cfg.setAuthServerUrl(authServerUrl);
+      cfg.setBearerOnly(true);
+      cfg.setPrincipalAttribute(principalAttribute);
+      cfg.setRealmKey(publicKey);
+      kd=KeycloakDeploymentBuilder.build(cfg);
     }
     if (kd.getRealmKey() == null) {
       new AdapterDeploymentContext().resolveRealmKey(kd);

@@ -6,7 +6,7 @@
   }
   AdapterTokenStore tokenStore=getTokenStore(request,facade,deployment);
   nodesRegistrationManagement.tryRegister(deployment);
-  CatalinaRequestAuthenticator authenticator=new CatalinaRequestAuthenticator(deployment,this,tokenStore,facade,request);
+  CatalinaRequestAuthenticator authenticator=new CatalinaRequestAuthenticator(deployment,this,tokenStore,facade,request,createPrincipalFactory());
   AuthOutcome outcome=authenticator.authenticate();
   if (outcome == AuthOutcome.AUTHENTICATED) {
     if (facade.isEnded()) {

@@ -1,0 +1,21 @@
+{
+  Subject subject=new Subject();
+  Set<Principal> principals=subject.getPrincipals();
+  principals.add(identity);
+  Group[] roleSets=getRoleSets(roleSet);
+  for (int g=0; g < roleSets.length; g++) {
+    Group group=roleSets[g];
+    String name=group.getName();
+    Group subjectGroup=createGroup(name,principals);
+    Enumeration<? extends Principal> members=group.members();
+    while (members.hasMoreElements()) {
+      Principal role=(Principal)members.nextElement();
+      subjectGroup.addMember(role);
+    }
+  }
+  Principal userPrincipal=getPrincipal(subject);
+  List<String> rolesAsStringList=new ArrayList<String>();
+  rolesAsStringList.addAll(roleSet);
+  GenericPrincipal principal=createPrincipal(userPrincipal,rolesAsStringList);
+  return principal;
+}

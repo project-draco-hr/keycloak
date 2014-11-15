@@ -4,7 +4,7 @@
   if (log.isLoggable(Level.FINE)) {
     log.fine("Completing bearer authentication. Bearer roles: " + roles);
   }
-  Principal generalPrincipal=new CatalinaSecurityContextHelper().createPrincipal(request.getContext().getRealm(),principal,roles,securityContext);
+  Principal generalPrincipal=principalFactory.createPrincipal(request.getContext().getRealm(),principal,roles,securityContext);
   request.setUserPrincipal(generalPrincipal);
   request.setAuthType("KEYCLOAK");
   request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);

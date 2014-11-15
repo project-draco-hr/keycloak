@@ -1,7 +1,7 @@
 {
   RefreshableKeycloakSecurityContext securityContext=(RefreshableKeycloakSecurityContext)account.getKeycloakSecurityContext();
   Set<String> roles=account.getRoles();
-  GenericPrincipal principal=new CatalinaSecurityContextHelper().createPrincipal(request.getContext().getRealm(),account.getPrincipal(),roles,securityContext);
+  GenericPrincipal principal=principalFactory.createPrincipal(request.getContext().getRealm(),account.getPrincipal(),roles,securityContext);
   Session session=request.getSessionInternal(true);
   session.setPrincipal(principal);
   session.setAuthType("OAUTH");

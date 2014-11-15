@@ -4,10 +4,10 @@
     return store;
   }
   if (resolvedDeployment.getTokenStore() == TokenStore.SESSION) {
-    store=new CatalinaSessionTokenStore(request,resolvedDeployment,userSessionManagement);
+    store=new CatalinaSessionTokenStore(request,resolvedDeployment,userSessionManagement,createPrincipalFactory());
   }
  else {
-    store=new CatalinaCookieTokenStore(request,facade,resolvedDeployment);
+    store=new CatalinaCookieTokenStore(request,facade,resolvedDeployment,createPrincipalFactory());
   }
   request.setNote(TOKEN_STORE_NOTE,store);
   return store;

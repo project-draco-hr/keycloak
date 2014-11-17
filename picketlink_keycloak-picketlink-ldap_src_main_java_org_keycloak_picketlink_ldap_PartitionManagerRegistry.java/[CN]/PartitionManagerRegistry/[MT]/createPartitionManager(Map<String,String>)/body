@@ -26,6 +26,9 @@
   if (vendor != null && vendor.equals(LDAPConstants.VENDOR_RHDS)) {
     ldapStoreBuilder.uniqueIdentifierAttributeName("nsuniqueid");
   }
+ else   if (LDAPConstants.VENDOR_TIVOLI.equals(vendor)) {
+    ldapStoreBuilder.uniqueIdentifierAttributeName("uniqueidentifier");
+  }
   LDAPMappingConfigurationBuilder ldapUserMappingBuilder=ldapStoreBuilder.mapping(User.class).baseDN(ldapConfig.get(LDAPConstants.USER_DN_SUFFIX)).objectClasses(userObjectClasses).attribute("loginName",ldapLoginNameMapping,true).attribute("firstName",ldapFirstNameMapping).attribute("lastName",SN).attribute("email",EMAIL).readOnlyAttribute("createdDate",createTimestampMapping).readOnlyAttribute("modifyDate",modifyTimestampMapping);
   if (activeDirectory && ldapLoginNameMapping.equals("sAMAccountName")) {
     ldapUserMappingBuilder.bindingAttribute("fullName",CN);

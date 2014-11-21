@@ -5,8 +5,17 @@
     return;
   }
   if (match.getRequiredRoles().isEmpty() && match.getEmptyRoleSemantic() == SecurityInfo.EmptyRoleSemantic.DENY) {
-    exchange.setResponseCode(403);
-    exchange.endExchange();
+    if (errorPage != null) {
+      exchange.setRequestPath(errorPage);
+      exchange.setRelativePath(errorPage);
+      exchange.setResolvedPath(errorPage);
+      unsecuredHandler.handleRequest(exchange);
+    }
+ else {
+      exchange.setResponseCode(403);
+      exchange.endExchange();
+    }
+    return;
   }
   exchange.getSecurityContext().setAuthenticationRequired();
   exchange.putAttachment(CONSTRAINT_KEY,match);

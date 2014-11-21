@@ -1,8 +1,17 @@
 {
   HttpHandler handler=toWrap;
   handler=new UndertowAuthenticatedActionsHandler(deploymentContext,toWrap);
+  if (errorPage != null) {
+    if (base.endsWith("/")) {
+      errorPage=base + errorPage;
+    }
+ else {
+      errorPage=base + "/" + errorPage;
+    }
+  }
+  handler=new ConstraintAuthorizationHandler(errorPage,handler);
   handler=new AuthenticationCallHandler(handler);
-  handler=new ConstraintMatcherHandler(matches,handler,toWrap);
+  handler=new ConstraintMatcherHandler(matches,handler,toWrap,errorPage);
   final List<AuthenticationMechanism> mechanisms=new LinkedList<AuthenticationMechanism>();
   mechanisms.add(new CachedAuthenticatedSessionMechanism());
   mechanisms.add(new UndertowAuthenticationMechanism(deploymentContext,userSessionManagement,nodesRegistrationManagement,-1));

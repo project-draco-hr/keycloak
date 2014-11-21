@@ -1,0 +1,26 @@
+{
+  final SecurityInformation securityInformation=new SecurityInformation(roles,emptyRoleSemantic);
+  if (pattern.endsWith("/*") || pattern.endsWith("/")) {
+    String part=pattern.substring(0,pattern.lastIndexOf('/'));
+    PathSecurityInformation info=prefixPathRoleInformation.get(part);
+    if (info == null) {
+      prefixPathRoleInformation.put(part,info=new PathSecurityInformation());
+    }
+    setupPathSecurityInformation(info,securityInformation,httpMethods,excludedMethods);
+  }
+ else   if (pattern.startsWith("*.")) {
+    String part=pattern.substring(2,pattern.length());
+    PathSecurityInformation info=extensionRoleInformation.get(part);
+    if (info == null) {
+      extensionRoleInformation.put(part,info=new PathSecurityInformation());
+    }
+    setupPathSecurityInformation(info,securityInformation,httpMethods,excludedMethods);
+  }
+ else {
+    PathSecurityInformation info=exactPathRoleInformation.get(pattern);
+    if (info == null) {
+      exactPathRoleInformation.put(pattern,info=new PathSecurityInformation());
+    }
+    setupPathSecurityInformation(info,securityInformation,httpMethods,excludedMethods);
+  }
+}

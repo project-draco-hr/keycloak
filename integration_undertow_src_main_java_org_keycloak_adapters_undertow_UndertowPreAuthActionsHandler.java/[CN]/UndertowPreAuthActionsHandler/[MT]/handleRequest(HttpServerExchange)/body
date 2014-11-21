@@ -1,0 +1,7 @@
+{
+  UndertowHttpFacade facade=new UndertowHttpFacade(exchange);
+  SessionManagementBridge bridge=new SessionManagementBridge(userSessionManagement,sessionManager);
+  PreAuthActionsHandler handler=new PreAuthActionsHandler(bridge,deploymentContext,facade);
+  if (handler.handleRequest())   return;
+  next.handleRequest(exchange);
+}

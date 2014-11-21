@@ -1,0 +1,11 @@
+{
+  UndertowHttpFacade facade=new UndertowHttpFacade(exchange);
+  KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
+  if (!deployment.isConfigured()) {
+    return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  }
+  nodesRegistrationManagement.tryRegister(deployment);
+  AdapterTokenStore tokenStore=getTokenStore(exchange,facade,deployment,securityContext);
+  RequestAuthenticator authenticator=new UndertowRequestAuthenticator(facade,deployment,confidentialPort,securityContext,exchange,tokenStore);
+  return keycloakAuthenticate(exchange,securityContext,authenticator);
+}

@@ -1,0 +1,24 @@
+{
+  HttpHandler handler=toWrap;
+  handler=new UndertowAuthenticatedActionsHandler(deploymentContext,toWrap);
+  handler=new AuthenticationCallHandler(handler);
+  handler=new ConstraintMatcherHandler(matches,handler,toWrap);
+  final List<AuthenticationMechanism> mechanisms=new LinkedList<AuthenticationMechanism>();
+  mechanisms.add(new CachedAuthenticatedSessionMechanism());
+  mechanisms.add(new UndertowAuthenticationMechanism(deploymentContext,userSessionManagement,nodesRegistrationManagement,-1));
+  handler=new AuthenticationMechanismsHandler(handler,mechanisms);
+  IdentityManager identityManager=new IdentityManager(){
+    @Override public Account verify(    Account account){
+      return account;
+    }
+    @Override public Account verify(    String id,    Credential credential){
+      throw new IllegalStateException("Should never be called in Keycloak flow");
+    }
+    @Override public Account verify(    Credential credential){
+      throw new IllegalStateException("Should never be called in Keycloak flow");
+    }
+  }
+;
+  handler=new UndertowPreAuthActionsHandler(deploymentContext,userSessionManagement,sessionManager,handler);
+  return new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE,identityManager,handler);
+}

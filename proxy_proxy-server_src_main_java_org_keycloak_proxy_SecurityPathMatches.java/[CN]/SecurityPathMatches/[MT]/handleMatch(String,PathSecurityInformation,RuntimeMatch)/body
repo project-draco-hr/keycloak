@@ -1,0 +1,22 @@
+{
+  List<SecurityInformation> roles=exact.defaultRequiredRoles;
+  for (  SecurityInformation role : roles) {
+    currentMatch.constraints.add(new SingleConstraintMatch(role.emptyRoleSemantic,role.roles));
+    if (role.emptyRoleSemantic == SecurityInfo.EmptyRoleSemantic.DENY || !role.roles.isEmpty()) {
+      currentMatch.uncovered=false;
+    }
+  }
+  List<SecurityInformation> methodInfo=exact.perMethodRequiredRoles.get(method);
+  if (methodInfo != null) {
+    currentMatch.uncovered=false;
+    for (    SecurityInformation role : methodInfo) {
+      currentMatch.constraints.add(new SingleConstraintMatch(role.emptyRoleSemantic,role.roles));
+    }
+  }
+  for (  ExcludedMethodRoles excluded : exact.excludedMethodRoles) {
+    if (!excluded.methods.contains(method)) {
+      currentMatch.uncovered=false;
+      currentMatch.constraints.add(new SingleConstraintMatch(excluded.securityInformation.emptyRoleSemantic,excluded.securityInformation.roles));
+    }
+  }
+}

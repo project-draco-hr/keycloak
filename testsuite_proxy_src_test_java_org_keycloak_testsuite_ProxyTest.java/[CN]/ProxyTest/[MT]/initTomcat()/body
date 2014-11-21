@@ -1,0 +1,11 @@
+{
+  URL dir=ProxyTest.class.getResource("/tomcat-test/webapp/WEB-INF/web.xml");
+  File webappDir=new File(dir.getFile()).getParentFile().getParentFile();
+  tomcat=new Tomcat();
+  String baseDir=getBaseDirectory();
+  tomcat.setBaseDir(baseDir);
+  tomcat.setPort(8082);
+  tomcat.addWebapp("/customer-portal",webappDir.toString());
+  System.out.println("configuring app with basedir: " + webappDir.toString());
+  tomcat.start();
+}

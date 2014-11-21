@@ -1,0 +1,18 @@
+{
+  SimpleProxyClientProvider provider=null;
+  try {
+    provider=new SimpleProxyClientProvider(new URI(uri));
+  }
+ catch (  URISyntaxException e) {
+    throw new RuntimeException(e);
+  }
+  final HttpHandler handler=new ProxyHandler(provider,30000,ResponseCodeHandler.HANDLE_404);
+  proxyHandler=new HttpHandler(){
+    @Override public void handleRequest(    HttpServerExchange exchange) throws Exception {
+      exchange.setRelativePath(exchange.getResolvedPath());
+      handler.handleRequest(exchange);
+    }
+  }
+;
+  return this;
+}

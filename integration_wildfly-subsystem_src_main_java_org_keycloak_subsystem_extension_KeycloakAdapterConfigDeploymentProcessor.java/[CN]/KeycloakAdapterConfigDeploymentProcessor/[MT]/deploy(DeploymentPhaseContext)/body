@@ -5,10 +5,4 @@
   if (service.isSecureDeployment(deploymentName)) {
     addKeycloakAuthData(phaseContext,deploymentName,service);
   }
-  if (service.isKeycloakServerDeployment(deploymentName)) {
-    final EEModuleDescription description=deploymentUnit.getAttachment(org.jboss.as.ee.component.Attachments.EE_MODULE_DESCRIPTION);
-    String webContext=service.getWebContext(deploymentName);
-    if (webContext == null)     throw new DeploymentUnitProcessingException("Can't determine web context/module for Keycloak Auth Server");
-    description.setModuleName(webContext);
-  }
 }

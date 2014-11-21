@@ -1,6 +1,7 @@
 {
   final DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
-  String deploymentName=deploymentUnit.getName();
-  KeycloakAdapterConfigService service=KeycloakAdapterConfigService.find(phaseContext.getServiceRegistry());
-  addModules(deploymentUnit);
+  final ModuleSpecification moduleSpecification=deploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
+  final ModuleLoader moduleLoader=Module.getBootModuleLoader();
+  addCommonModules(moduleSpecification,moduleLoader);
+  addPlatformSpecificModules(moduleSpecification,moduleLoader);
 }

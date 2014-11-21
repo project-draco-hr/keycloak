@@ -1,0 +1,18 @@
+{
+  KeycloakUndertowAccount account=(KeycloakUndertowAccount)exchange.getSecurityContext().getAuthenticatedAccount();
+  SingleConstraintMatch match=exchange.getAttachment(ConstraintMatcherHandler.CONSTRAINT_KEY);
+  if (match == null || (match.getRequiredRoles().isEmpty() && match.getEmptyRoleSemantic() == SecurityInfo.EmptyRoleSemantic.AUTHENTICATE)) {
+    next.handleRequest(exchange);
+    return;
+  }
+  if (match != null) {
+    for (    String role : match.getRequiredRoles()) {
+      if (account.getRoles().contains(role)) {
+        next.handleRequest(exchange);
+        return;
+      }
+    }
+  }
+  exchange.setResponseCode(403);
+  exchange.endExchange();
+}

@@ -1,0 +1,10 @@
+{
+  resp.setContentType("text/plain");
+  OutputStream stream=resp.getOutputStream();
+  stream.write(req.getRequestURL().toString().getBytes());
+  stream.write("\n".getBytes());
+  Integer count=(Integer)req.getSession().getAttribute("counter");
+  if (count == null)   count=new Integer(0);
+  req.getSession().setAttribute("counter",new Integer(count.intValue() + 1));
+  stream.write(count.toString().getBytes());
+}

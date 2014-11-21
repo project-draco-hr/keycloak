@@ -1,0 +1,14 @@
+{
+  SingleConstraintMatch match=matcher.getSecurityInfo(exchange.getRelativePath(),exchange.getRequestMethod().toString()).getMergedConstraint();
+  if (match == null || (match.getRequiredRoles().isEmpty() && match.getEmptyRoleSemantic() == SecurityInfo.EmptyRoleSemantic.PERMIT)) {
+    unsecuredHandler.handleRequest(exchange);
+    return;
+  }
+  if (match.getRequiredRoles().isEmpty() && match.getEmptyRoleSemantic() == SecurityInfo.EmptyRoleSemantic.DENY) {
+    exchange.setResponseCode(403);
+    exchange.endExchange();
+  }
+  exchange.getSecurityContext().setAuthenticationRequired();
+  exchange.putAttachment(CONSTRAINT_KEY,match);
+  securedHandler.handleRequest(exchange);
+}

@@ -1,0 +1,25 @@
+{
+  initProxy();
+  driver.navigate().to("http://localhost:8080/customer-portal");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  loginPage.login("bburke@redhat.com","password");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8080/customer-portal");
+  String pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("customer-portal"));
+  Assert.assertTrue(pageSource.contains("0"));
+  driver.navigate().to("http://localhost:8080/customer-portal");
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8080/customer-portal");
+  pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("customer-portal"));
+  Assert.assertTrue(pageSource.contains("1"));
+  String logoutUri=OpenIDConnectService.logoutUrl(UriBuilder.fromUri("http://localhost:8081/auth")).queryParam(OAuth2Constants.REDIRECT_URI,"http://localhost:8080/customer-portal").build("demo").toString();
+  driver.navigate().to(logoutUri);
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  driver.navigate().to("http://localhost:8080/customer-portal");
+  String currentUrl=driver.getCurrentUrl();
+  Assert.assertTrue(currentUrl.startsWith(LOGIN_URL));
+}

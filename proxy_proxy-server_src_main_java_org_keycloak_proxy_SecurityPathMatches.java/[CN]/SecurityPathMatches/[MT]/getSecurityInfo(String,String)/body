@@ -1,0 +1,56 @@
+{
+  RuntimeMatch currentMatch=new RuntimeMatch();
+  handleMatch(method,defaultPathSecurityInformation,currentMatch);
+  PathSecurityInformation match=exactPathRoleInformation.get(path);
+  if (match != null) {
+    handleMatch(method,match,currentMatch);
+    return new SecurityPathMatch(mergeConstraints(currentMatch));
+  }
+  match=prefixPathRoleInformation.get(path);
+  if (match != null) {
+    handleMatch(method,match,currentMatch);
+    return new SecurityPathMatch(mergeConstraints(currentMatch));
+  }
+  int qsPos=-1;
+  boolean extension=false;
+  for (int i=path.length() - 1; i >= 0; --i) {
+    final char c=path.charAt(i);
+    if (c == '?') {
+      final String part=path.substring(0,i);
+      match=exactPathRoleInformation.get(part);
+      if (match != null) {
+        handleMatch(method,match,currentMatch);
+        return new SecurityPathMatch(mergeConstraints(currentMatch));
+      }
+      qsPos=i;
+      extension=false;
+    }
+ else     if (c == '/') {
+      extension=true;
+      final String part=path.substring(0,i);
+      match=prefixPathRoleInformation.get(part);
+      if (match != null) {
+        handleMatch(method,match,currentMatch);
+        return new SecurityPathMatch(mergeConstraints(currentMatch));
+      }
+    }
+ else     if (c == '.') {
+      if (!extension) {
+        extension=true;
+        final String ext;
+        if (qsPos == -1) {
+          ext=path.substring(i + 1,path.length());
+        }
+ else {
+          ext=path.substring(i + 1,qsPos);
+        }
+        match=extensionRoleInformation.get(ext);
+        if (match != null) {
+          handleMatch(method,match,currentMatch);
+          return new SecurityPathMatch(mergeConstraints(currentMatch));
+        }
+      }
+    }
+  }
+  return new SecurityPathMatch(mergeConstraints(currentMatch));
+}

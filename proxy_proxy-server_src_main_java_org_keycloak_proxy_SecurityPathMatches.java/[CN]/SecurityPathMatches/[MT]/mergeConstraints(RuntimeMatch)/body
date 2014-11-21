@@ -1,0 +1,15 @@
+{
+  if (currentMatch.uncovered && denyUncoveredHttpMethods) {
+    return new SingleConstraintMatch(SecurityInfo.EmptyRoleSemantic.DENY,Collections.<String>emptySet());
+  }
+  final Set<String> allowedRoles=new HashSet<String>();
+  for (  SingleConstraintMatch match : currentMatch.constraints) {
+    if (match.getRequiredRoles().isEmpty()) {
+      return new SingleConstraintMatch(match.getEmptyRoleSemantic(),Collections.<String>emptySet());
+    }
+ else {
+      allowedRoles.addAll(match.getRequiredRoles());
+    }
+  }
+  return new SingleConstraintMatch(SecurityInfo.EmptyRoleSemantic.PERMIT,allowedRoles);
+}

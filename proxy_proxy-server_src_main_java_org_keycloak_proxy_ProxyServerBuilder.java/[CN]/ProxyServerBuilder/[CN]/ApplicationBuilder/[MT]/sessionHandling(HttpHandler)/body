@@ -1,0 +1,8 @@
+{
+  SessionCookieConfig sessionConfig=new SessionCookieConfig();
+  sessionConfig.setCookieName("keycloak." + deployment.getResourceName() + ".session");
+  sessionConfig.setPath(base);
+  if (deployment.getSslRequired() == SslRequired.ALL)   sessionConfig.setSecure(true);
+  toWrap=new SessionAttachmentHandler(toWrap,sessionManager,sessionConfig);
+  return toWrap;
+}

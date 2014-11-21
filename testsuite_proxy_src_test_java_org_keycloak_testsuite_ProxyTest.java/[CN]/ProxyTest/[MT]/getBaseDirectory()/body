@@ -1,0 +1,17 @@
+{
+  String dirPath=null;
+  String relativeDirPath="testsuite" + File.separator + "proxy"+ File.separator+ "target";
+  if (System.getProperties().containsKey("maven.home")) {
+    dirPath=System.getProperty("user.dir").replaceFirst("testsuite.proxy.*",Matcher.quoteReplacement(relativeDirPath));
+  }
+ else {
+    for (    String c : System.getProperty("java.class.path").split(File.pathSeparator)) {
+      if (c.contains(File.separator + "testsuite" + File.separator+ "proxy")) {
+        dirPath=c.replaceFirst("testsuite.proxy.*",Matcher.quoteReplacement(relativeDirPath));
+        break;
+      }
+    }
+  }
+  String absolutePath=new File(dirPath).getAbsolutePath();
+  return absolutePath;
+}

@@ -1,0 +1,9 @@
+{
+  initTomcat();
+  ProxyServerBuilder builder=new ProxyServerBuilder().addHttpListener(8080,"localhost");
+  InputStream is=ProxyTest.class.getResourceAsStream("/keycloak.json");
+  AdapterConfig config=KeycloakDeploymentBuilder.loadAdapterConfig(is);
+  builder.target("http://localhost:8082").application(config).base("/customer-portal").constraint("/*").add().add();
+  proxyServer=builder.build();
+  proxyServer.start();
+}

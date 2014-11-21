@@ -1,0 +1,17 @@
+{
+  if (httpMethods.isEmpty() && excludedMethods.isEmpty()) {
+    info.defaultRequiredRoles.add(securityConstraint);
+  }
+ else   if (!httpMethods.isEmpty()) {
+    for (    String method : httpMethods) {
+      List<SecurityInformation> securityInformations=info.perMethodRequiredRoles.get(method);
+      if (securityInformations == null) {
+        info.perMethodRequiredRoles.put(method,securityInformations=new ArrayList<SecurityInformation>());
+      }
+      securityInformations.add(securityConstraint);
+    }
+  }
+ else   if (!excludedMethods.isEmpty()) {
+    info.excludedMethodRoles.add(new ExcludedMethodRoles(excludedMethods,securityConstraint));
+  }
+}

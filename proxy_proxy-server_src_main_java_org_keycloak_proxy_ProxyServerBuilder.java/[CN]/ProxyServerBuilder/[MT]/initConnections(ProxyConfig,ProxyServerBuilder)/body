@@ -1,0 +1,56 @@
+{
+  if (config.getHttpPort() == null && config.getHttpsPort() == null) {
+    log.warn("You have not set up HTTP or HTTPS");
+  }
+  if (config.getHttpPort() != null) {
+    String bindAddress="localhost";
+    if (config.getBindAddress() != null)     bindAddress=config.getBindAddress();
+    builder.addHttpListener(config.getHttpPort(),bindAddress);
+  }
+  if (config.getHttpsPort() != null) {
+    String bindAddress="localhost";
+    if (config.getBindAddress() != null)     bindAddress=config.getBindAddress();
+    if (config.getKeystore() != null) {
+      InputStream is=FindFile.findFile(config.getKeystore());
+      SSLContext sslContext=null;
+      try {
+        KeyStore keystore=KeyStore.getInstance("jks");
+        keystore.load(is,config.getKeystorePassword().toCharArray());
+        sslContext=SslUtil.createSSLContext(keystore,config.getKeyPassword(),null);
+      }
+ catch (      Exception e) {
+        throw new RuntimeException(e);
+      }
+      builder.addHttpsListener(config.getHttpsPort().intValue(),bindAddress,sslContext);
+    }
+ else {
+      log.warn("Generating temporary SSL cert");
+      KeyPair keyPair=null;
+      try {
+        keyPair=KeyPairGenerator.getInstance("RSA").generateKeyPair();
+      }
+ catch (      NoSuchAlgorithmException e) {
+        throw new RuntimeException(e);
+      }
+      X509Certificate certificate=null;
+      try {
+        certificate=CertificateUtils.generateV1SelfSignedCertificate(keyPair,bindAddress);
+      }
+ catch (      Exception e) {
+        throw new RuntimeException(e);
+      }
+      try {
+        KeyStore keyStore=KeyStore.getInstance("JKS");
+        keyStore.load(null,null);
+        PrivateKey privateKey=keyPair.getPrivate();
+        Certificate[] chain={certificate};
+        keyStore.setKeyEntry(bindAddress,privateKey,"password".toCharArray(),chain);
+        SSLContext sslContext=SslUtil.createSSLContext(keyStore,"password",null);
+        builder.addHttpsListener(config.getHttpsPort().intValue(),bindAddress,sslContext);
+      }
+ catch (      Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+}

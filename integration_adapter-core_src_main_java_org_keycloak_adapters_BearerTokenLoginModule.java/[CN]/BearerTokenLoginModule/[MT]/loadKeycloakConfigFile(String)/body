@@ -1,26 +1,3 @@
 {
-  if (keycloakConfigFile.startsWith(GenericConstants.PROTOCOL_CLASSPATH)) {
-    String classPathLocation=keycloakConfigFile.replace(GenericConstants.PROTOCOL_CLASSPATH,"");
-    log.info("Loading config from classpath on location: " + classPathLocation);
-    InputStream is=getClass().getClassLoader().getResourceAsStream(classPathLocation);
-    if (is == null) {
-      is=Thread.currentThread().getContextClassLoader().getResourceAsStream(classPathLocation);
-    }
-    if (is != null) {
-      return is;
-    }
- else {
-      throw new RuntimeException("Unable to find config from classpath: " + keycloakConfigFile);
-    }
-  }
- else {
-    try {
-      log.info("Loading config from file: " + keycloakConfigFile);
-      return new FileInputStream(keycloakConfigFile);
-    }
- catch (    FileNotFoundException fnfe) {
-      log.severe("Config not found on " + keycloakConfigFile);
-      throw new RuntimeException(fnfe);
-    }
-  }
+  return FindFile.findFile(keycloakConfigFile);
 }

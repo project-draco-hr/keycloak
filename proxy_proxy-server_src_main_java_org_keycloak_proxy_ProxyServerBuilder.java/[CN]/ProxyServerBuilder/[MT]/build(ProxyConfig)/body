@@ -1,0 +1,37 @@
+{
+  ProxyServerBuilder builder=new ProxyServerBuilder();
+  if (config.getTargetUrl() == null) {
+    log.error("Must set Target URL");
+    return null;
+  }
+  builder.target(config.getTargetUrl());
+  if (config.getApplications() == null || config.getApplications().size() == 0) {
+    log.error("No applications defined");
+    return null;
+  }
+  initConnections(config,builder);
+  initOptions(config,builder);
+  for (  ProxyConfig.Application application : config.getApplications()) {
+    ApplicationBuilder applicationBuilder=builder.application(application.getAdapterConfig()).base(application.getBasePath()).errorPage(application.getErrorPage());
+    if (application.getConstraints() != null) {
+      for (      ProxyConfig.Constraint constraint : application.getConstraints()) {
+        ApplicationBuilder.ConstraintBuilder constraintBuilder=applicationBuilder.constraint(constraint.getPattern());
+        if (constraint.getRolesAllowed() != null) {
+          constraintBuilder.roles(constraint.getRolesAllowed());
+        }
+        if (constraint.getMethods() != null) {
+          constraintBuilder.methods(constraint.getMethods());
+        }
+        if (constraint.getExcludedMethods() != null) {
+          constraintBuilder.excludedMethods(constraint.getExcludedMethods());
+        }
+        if (constraint.isDeny())         constraintBuilder.deny();
+        if (constraint.isPermit())         constraintBuilder.permit();
+        if (constraint.isAuthenticate())         constraintBuilder.authenticate();
+        constraintBuilder.add();
+      }
+    }
+    applicationBuilder.add();
+  }
+  return builder.build();
+}

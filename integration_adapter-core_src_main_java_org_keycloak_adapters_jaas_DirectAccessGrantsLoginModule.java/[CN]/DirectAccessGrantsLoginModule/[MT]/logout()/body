@@ -1,0 +1,43 @@
+{
+  if (refreshToken != null) {
+    try {
+      URI logoutUri=deployment.getLogoutUrl().clone().build();
+      HttpPost post=new HttpPost(logoutUri);
+      List<NameValuePair> formparams=new ArrayList<NameValuePair>();
+      if (deployment.isPublicClient()) {
+        formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,deployment.getResourceName()));
+      }
+ else {
+        String clientId=deployment.getResourceName();
+        String clientSecret=deployment.getResourceCredentials().get("secret");
+        String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
+        post.setHeader("Authorization",authorization);
+      }
+      formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN,refreshToken));
+      UrlEncodedFormEntity form=new UrlEncodedFormEntity(formparams,"UTF-8");
+      post.setEntity(form);
+      HttpClient client=deployment.getClient();
+      HttpResponse response=client.execute(post);
+      int status=response.getStatusLine().getStatusCode();
+      HttpEntity entity=response.getEntity();
+      if (status != 204) {
+        StringBuilder errorBuilder=new StringBuilder("Logout of refreshToken failed. Invalid status: " + status);
+        if (entity != null) {
+          InputStream is=entity.getContent();
+          if (status == 400) {
+            Map<String,String> errors=(Map<String,String>)JsonSerialization.readValue(is,Map.class);
+            errorBuilder.append(", OAuth2 error. Error: " + errors.get(OAuth2Constants.ERROR)).append(", Error description: " + errors.get(OAuth2Constants.ERROR_DESCRIPTION));
+          }
+ else {
+            if (is != null)             is.close();
+          }
+        }
+        log.warn(errorBuilder.toString());
+      }
+    }
+ catch (    IOException ioe) {
+      log.warn(ioe);
+    }
+  }
+  return super.logout();
+}

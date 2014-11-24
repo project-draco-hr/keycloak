@@ -1,0 +1,41 @@
+{
+  String authServerBaseUrl=deployment.getAuthServerBaseUrl();
+  URI directGrantUri=KeycloakUriBuilder.fromUri(authServerBaseUrl).path(ServiceUrlConstants.TOKEN_SERVICE_DIRECT_GRANT_PATH).build(deployment.getRealm());
+  HttpPost post=new HttpPost(directGrantUri);
+  List<NameValuePair> formparams=new ArrayList<NameValuePair>();
+  formparams.add(new BasicNameValuePair("username",username));
+  formparams.add(new BasicNameValuePair("password",password));
+  if (deployment.isPublicClient()) {
+    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,deployment.getResourceName()));
+  }
+ else {
+    String clientId=deployment.getResourceName();
+    String clientSecret=deployment.getResourceCredentials().get("secret");
+    String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
+    post.setHeader("Authorization",authorization);
+  }
+  UrlEncodedFormEntity form=new UrlEncodedFormEntity(formparams,"UTF-8");
+  post.setEntity(form);
+  HttpClient client=deployment.getClient();
+  HttpResponse response=client.execute(post);
+  int status=response.getStatusLine().getStatusCode();
+  HttpEntity entity=response.getEntity();
+  if (status != 200) {
+    StringBuilder errorBuilder=new StringBuilder("Login failed. Invalid status: " + status);
+    if (entity != null) {
+      InputStream is=entity.getContent();
+      Map<String,String> errors=(Map<String,String>)JsonSerialization.readValue(is,Map.class);
+      errorBuilder.append(", OAuth2 error. Error: " + errors.get(OAuth2Constants.ERROR)).append(", Error description: " + errors.get(OAuth2Constants.ERROR_DESCRIPTION));
+    }
+    String error=errorBuilder.toString();
+    log.warn(error);
+    throw new IOException(error);
+  }
+  if (entity == null) {
+    throw new IOException("No Entity");
+  }
+  InputStream is=entity.getContent();
+  AccessTokenResponse tokenResponse=JsonSerialization.readValue(is,AccessTokenResponse.class);
+  refreshToken=tokenResponse.getRefreshToken();
+  return bearerAuth(tokenResponse.getToken());
+}

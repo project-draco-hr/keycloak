@@ -1,0 +1,22 @@
+{
+  File home=getHome();
+  File lib=new File(home,"lib");
+  if (!lib.exists()) {
+    System.err.println("Could not find lib directory: " + lib.toString());
+    System.exit(1);
+  }
+  List<URL> jars=new ArrayList<URL>();
+  for (  File file : lib.listFiles()) {
+    jars.add(file.toURI().toURL());
+  }
+  URL[] urls=jars.toArray(new URL[jars.size()]);
+  URLClassLoader loader=new URLClassLoader(urls,Launcher.class.getClassLoader());
+  Class mainClass=loader.loadClass("org.keycloak.proxy.Main");
+  Method mainMethod=null;
+  for (  Method m : mainClass.getMethods())   if (m.getName().equals("main")) {
+    mainMethod=m;
+    break;
+  }
+  Object obj=args;
+  mainMethod.invoke(null,obj);
+}

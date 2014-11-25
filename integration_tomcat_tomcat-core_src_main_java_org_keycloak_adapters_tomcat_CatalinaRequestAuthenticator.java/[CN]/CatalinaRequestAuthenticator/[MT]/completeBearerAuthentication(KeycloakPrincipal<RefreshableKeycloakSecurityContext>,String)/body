@@ -1,0 +1,11 @@
+{
+  RefreshableKeycloakSecurityContext securityContext=principal.getKeycloakSecurityContext();
+  Set<String> roles=AdapterUtils.getRolesFromSecurityContext(securityContext);
+  if (log.isLoggable(Level.FINE)) {
+    log.fine("Completing bearer authentication. Bearer roles: " + roles);
+  }
+  Principal generalPrincipal=principalFactory.createPrincipal(request.getContext().getRealm(),principal,roles,securityContext);
+  request.setUserPrincipal(generalPrincipal);
+  request.setAuthType(method);
+  request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);
+}

@@ -1,0 +1,29 @@
+{
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      Map<String,String> initParams=new TreeMap<String,String>();
+      initParams.put(CONFIG_FILE_INIT_PARAM,"classpath:jaxrs-test/jaxrs-keycloak-basicauth.json");
+      keycloakRule.deployJaxrsApplication("JaxrsSimpleApp","/jaxrs-simple",JaxrsTestApplication.class,initParams);
+    }
+  }
+);
+  Response getResp=client.target(JAXRS_APP_URL).request().get();
+  Assert.assertEquals(getResp.getStatus(),401);
+  getResp.close();
+  Response postResp=client.target(JAXRS_APP_URL).request().post(Entity.form(new Form()));
+  Assert.assertEquals(postResp.getStatus(),401);
+  postResp.close();
+  String incorrectAuthHeader="Basic " + encodeCredentials("invalid-user","password");
+  getResp=client.target(JAXRS_APP_URL).request().header(HttpHeaders.AUTHORIZATION,incorrectAuthHeader).get();
+  Assert.assertEquals(getResp.getStatus(),401);
+  getResp.close();
+  String authHeader="Basic " + encodeCredentials("test-user@localhost","password");
+  JaxrsTestResource.SimpleRepresentation getRep=client.target(JAXRS_APP_URL).request().header(HttpHeaders.AUTHORIZATION,authHeader).get(JaxrsTestResource.SimpleRepresentation.class);
+  Assert.assertEquals("get",getRep.getMethod());
+  Assert.assertFalse(getRep.getHasAdminRole());
+  Assert.assertFalse(getRep.getHasJaxrsAppRole());
+  UUID.fromString(getRep.getPrincipal());
+  JaxrsTestResource.SimpleRepresentation postRep=client.target(JAXRS_APP_URL).request().header(HttpHeaders.AUTHORIZATION,authHeader).post(Entity.form(new Form()),JaxrsTestResource.SimpleRepresentation.class);
+  Assert.assertEquals("post",postRep.getMethod());
+  Assert.assertEquals(getRep.getPrincipal(),postRep.getPrincipal());
+}

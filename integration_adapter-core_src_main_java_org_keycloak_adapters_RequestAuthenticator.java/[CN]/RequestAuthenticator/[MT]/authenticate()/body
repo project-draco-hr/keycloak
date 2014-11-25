@@ -14,7 +14,7 @@
   }
  else   if (outcome == AuthOutcome.AUTHENTICATED) {
     if (verifySSL())     return AuthOutcome.FAILED;
-    completeAuthentication(bearer);
+    completeAuthentication(bearer,"KEYCLOAK");
     log.debug("Bearer AUTHENTICATED");
     return AuthOutcome.AUTHENTICATED;
   }
@@ -22,6 +22,23 @@
     challenge=bearer.getChallenge();
     log.debug("NOT_ATTEMPTED: bearer only");
     return AuthOutcome.NOT_ATTEMPTED;
+  }
+  if (deployment.isEnableBasicAuth()) {
+    BasicAuthRequestAuthenticator basicAuth=createBasicAuthAuthenticator();
+    if (log.isTraceEnabled()) {
+      log.trace("try basic auth");
+    }
+    outcome=basicAuth.authenticate(facade);
+    if (outcome == AuthOutcome.FAILED) {
+      challenge=basicAuth.getChallenge();
+      log.debug("BasicAuth FAILED");
+      return AuthOutcome.FAILED;
+    }
+ else     if (outcome == AuthOutcome.AUTHENTICATED) {
+      log.debug("BasicAuth AUTHENTICATED");
+      completeAuthentication(basicAuth,"BASIC");
+      return AuthOutcome.AUTHENTICATED;
+    }
   }
   if (log.isTraceEnabled()) {
     log.trace("try oauth");

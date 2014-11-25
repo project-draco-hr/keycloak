@@ -1,0 +1,12 @@
+{
+  this.subject=subject;
+  this.callbackHandler=callbackHandler;
+  String configFile=(String)options.get(KEYCLOAK_CONFIG_FILE_OPTION);
+  if (configFile != null) {
+    deployment=deployments.get(configFile);
+    if (deployment == null) {
+      deployment=resolveDeployment(configFile);
+      deployments.putIfAbsent(configFile,deployment);
+    }
+  }
+}

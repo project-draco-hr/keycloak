@@ -1,0 +1,8 @@
+{
+  InputStream is=FindFile.findFile(keycloakConfigFile);
+  KeycloakDeployment kd=KeycloakDeploymentBuilder.build(is);
+  if (kd.getRealmKey() == null) {
+    new AdapterDeploymentContext().resolveRealmKey(kd);
+  }
+  return kd;
+}

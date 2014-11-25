@@ -7,4 +7,9 @@
   if (count == null)   count=new Integer(0);
   req.getSession().setAttribute("counter",new Integer(count.intValue() + 1));
   stream.write(("count:" + count).getBytes());
+  Enumeration<String> headers=req.getHeaderNames();
+  while (headers.hasMoreElements()) {
+    String name=headers.nextElement();
+    System.out.println(name + ": " + req.getHeader(name));
+  }
 }

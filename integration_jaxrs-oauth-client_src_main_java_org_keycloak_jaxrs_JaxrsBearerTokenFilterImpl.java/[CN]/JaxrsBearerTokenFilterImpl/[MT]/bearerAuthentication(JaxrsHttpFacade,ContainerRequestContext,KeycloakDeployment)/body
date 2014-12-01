@@ -1,8 +1,12 @@
 {
-  BearerTokenRequestAuthenticator bearer=new BearerTokenRequestAuthenticator(resolvedDeployment);
-  AuthOutcome outcome=bearer.authenticate(facade);
+  BearerTokenRequestAuthenticator authenticator=new BearerTokenRequestAuthenticator(resolvedDeployment);
+  AuthOutcome outcome=authenticator.authenticate(facade);
+  if (outcome == AuthOutcome.NOT_ATTEMPTED && resolvedDeployment.isEnableBasicAuth()) {
+    authenticator=new BasicAuthRequestAuthenticator(resolvedDeployment);
+    outcome=authenticator.authenticate(facade);
+  }
   if (outcome == AuthOutcome.FAILED || outcome == AuthOutcome.NOT_ATTEMPTED) {
-    AuthChallenge challenge=bearer.getChallenge();
+    AuthChallenge challenge=authenticator.getChallenge();
     log.fine("Authentication outcome: " + outcome);
     boolean challengeSent=challenge.challenge(facade);
     if (!challengeSent) {
@@ -18,6 +22,6 @@
       return;
     }
   }
-  propagateSecurityContext(facade,request,resolvedDeployment,bearer);
+  propagateSecurityContext(facade,request,resolvedDeployment,authenticator);
   handleAuthActions(facade,resolvedDeployment);
 }

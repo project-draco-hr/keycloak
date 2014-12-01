@@ -20,6 +20,7 @@
   String authHeader="Basic " + encodeCredentials("test-user@localhost","password");
   JaxrsTestResource.SimpleRepresentation getRep=client.target(JAXRS_APP_URL).request().header(HttpHeaders.AUTHORIZATION,authHeader).get(JaxrsTestResource.SimpleRepresentation.class);
   Assert.assertEquals("get",getRep.getMethod());
+  Assert.assertTrue(getRep.getHasUserRole());
   Assert.assertFalse(getRep.getHasAdminRole());
   Assert.assertFalse(getRep.getHasJaxrsAppRole());
   UUID.fromString(getRep.getPrincipal());

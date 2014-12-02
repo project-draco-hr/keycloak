@@ -1,8 +1,17 @@
 {
-  server=new Server(8080);
-  deploySP();
+  server=new Server(8082);
+  List<Handler> list=new ArrayList<Handler>();
+  System.setProperty("app.server.base.url","http://localhost:8082");
+  System.setProperty("my.host.name","localhost");
+  URL dir=Jetty9Test.class.getResource("/adapter-test/demorealm.json");
+  File base=new File(dir.getFile()).getParentFile();
+  list.add(new WebAppContext(new File(base,"customer-portal").toString(),"/customer-portal"));
+  list.add(new WebAppContext(new File(base,"customer-db").toString(),"/customer-db"));
+  list.add(new WebAppContext(new File(base,"product-portal").toString(),"/product-portal"));
+  list.add(new WebAppContext(new File(base,"session-portal").toString(),"/session-portal"));
+  list.add(new WebAppContext(new File(base,"secure-portal").toString(),"/secure-portal"));
   HandlerCollection handlers=new HandlerCollection();
-  handlers.setHandlers(new Handler[]{appContext});
+  handlers.setHandlers(list.toArray(new Handler[list.size()]));
   server.setHandler(handlers);
   server.start();
 }

@@ -1,0 +1,13 @@
+{
+  Client client=ClientBuilder.newClient();
+  UriBuilder builder=UriBuilder.fromUri(AUTH_SERVER_URL);
+  URI uri=OpenIDConnectService.grantAccessTokenUrl(builder).build("demo");
+  WebTarget target=client.target(uri);
+  String header=BasicAuthHelper.createHeader("customer-portal","password");
+  Form form=new Form();
+  form.param("username","monkey@redhat.com").param("password","password");
+  Response response=target.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
+  Assert.assertEquals(400,response.getStatus());
+  response.close();
+  client.close();
+}

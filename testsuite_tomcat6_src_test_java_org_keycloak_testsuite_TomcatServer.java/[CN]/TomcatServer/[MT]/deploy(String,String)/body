@@ -1,0 +1,13 @@
+{
+  if (contextPath == null) {
+    throw new IllegalArgumentException("Context path or appbase should not be null");
+  }
+  if (!contextPath.startsWith("/")) {
+    contextPath="/" + contextPath;
+  }
+  StandardContext rootContext=(StandardContext)server.createContext(contextPath,appDir);
+  KeycloakAuthenticatorValve valve=new KeycloakAuthenticatorValve();
+  rootContext.addValve(valve);
+  rootContext.setDefaultWebXml("web.xml");
+  host.addChild(rootContext);
+}

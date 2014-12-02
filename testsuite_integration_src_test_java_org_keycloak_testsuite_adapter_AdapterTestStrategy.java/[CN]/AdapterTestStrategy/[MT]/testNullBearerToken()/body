@@ -1,0 +1,11 @@
+{
+  Client client=ClientBuilder.newClient();
+  WebTarget target=client.target(APP_SERVER_BASE_URL + "/customer-db/");
+  Response response=target.request().get();
+  Assert.assertEquals(401,response.getStatus());
+  response.close();
+  response=target.request().header(HttpHeaders.AUTHORIZATION,"Bearer null").get();
+  Assert.assertEquals(401,response.getStatus());
+  response.close();
+  client.close();
+}

@@ -1,0 +1,13 @@
+{
+  driver.navigate().to(APP_SERVER_BASE_URL + "/session-portal");
+  String currentUrl=driver.getCurrentUrl();
+  Assert.assertTrue(currentUrl.startsWith(LOGIN_URL));
+  loginPage.login("bburke@redhat.com","password");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/session-portal" + slash);
+  String pageSource=driver.getPageSource();
+  Assert.assertTrue(pageSource.contains("Counter=1"));
+  driver.navigate().to(APP_SERVER_BASE_URL + "/session-portal");
+  pageSource=driver.getPageSource();
+  Assert.assertTrue(pageSource.contains("Counter=2"));
+}

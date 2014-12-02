@@ -1,0 +1,29 @@
+{
+  driver.navigate().to(APP_SERVER_BASE_URL + "/customer-portal");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  loginPage.login("bburke@redhat.com","password");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/customer-portal" + slash);
+  String pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  driver.navigate().to(APP_SERVER_BASE_URL + "/product-portal");
+  Assert.assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/product-portal" + slash);
+  pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("iPhone") && pageSource.contains("iPad"));
+  driver.navigate().to(APP_SERVER_BASE_URL + "/customer-portal");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/customer-portal" + slash);
+  pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  driver.navigate().to(APP_SERVER_BASE_URL + "/customer-portal/logout");
+  Assert.assertTrue(driver.getPageSource().contains("servlet logout ok"));
+  driver.navigate().to(APP_SERVER_BASE_URL + "/customer-portal");
+  String currentUrl=driver.getCurrentUrl();
+  Assert.assertTrue(currentUrl.startsWith(LOGIN_URL));
+  driver.navigate().to(APP_SERVER_BASE_URL + "/product-portal");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+}

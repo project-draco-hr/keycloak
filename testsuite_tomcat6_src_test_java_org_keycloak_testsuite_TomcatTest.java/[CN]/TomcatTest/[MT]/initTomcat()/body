@@ -1,7 +1,14 @@
 {
-  URL dir=TomcatTest.class.getResource("/tomcat-test/webapp/META-INF/context.xml");
-  String baseDir=new File(dir.getFile()).getParentFile().getParentFile().getParentFile().toString();
+  URL dir=TomcatTest.class.getResource("/adapter-test/demorealm.json");
+  String baseDir=new File(dir.getFile()).getParentFile().toString();
   System.out.println("Tomcat basedir: " + baseDir);
-  tomcat=new TomcatServer("/customer-portal",8080,baseDir,false);
+  tomcat=new TomcatServer(8082,baseDir);
+  System.setProperty("app.server.base.url","http://localhost:8082");
+  System.setProperty("my.host.name","localhost");
+  tomcat.deploy("/customer-portal","customer-portal");
+  tomcat.deploy("/customer-db","customer-db");
+  tomcat.deploy("/product-portal","product-portal");
+  tomcat.deploy("/secure-portal","secure-portal");
+  tomcat.deploy("/session-portal","session-portal");
   tomcat.start();
 }

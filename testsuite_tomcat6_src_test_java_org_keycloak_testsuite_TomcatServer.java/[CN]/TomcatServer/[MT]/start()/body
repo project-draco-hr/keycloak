@@ -3,6 +3,13 @@
     LOG.warn("Tomcat server is already running @ port={}; ignoring the start",port);
     return;
   }
+  Engine engine=server.createEngine();
+  engine.setDefaultHost(host.getName());
+  engine.setName("TomcatEngine");
+  engine.addChild(host);
+  server.addEngine(engine);
+  Connector connector=server.createConnector(host.getName(),port,false);
+  server.addConnector(connector);
   if (isInfo)   LOG.info("Starting the Tomcat server @ port={}",port);
   server.setAwait(true);
   server.start();

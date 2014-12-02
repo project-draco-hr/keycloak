@@ -1,37 +1,3 @@
 {
-  driver.navigate().to("http://localhost:8081/customer-portal");
-  System.out.println("Current url: " + driver.getCurrentUrl());
-  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
-  loginPage.login("bburke@redhat.com","password");
-  System.out.println("Current url: " + driver.getCurrentUrl());
-  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/customer-portal");
-  String pageSource=driver.getPageSource();
-  System.out.println(pageSource);
-  Assert.assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
-  driver.navigate().to("http://localhost:8081/product-portal");
-  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/product-portal");
-  pageSource=driver.getPageSource();
-  System.out.println(pageSource);
-  Assert.assertTrue(pageSource.contains("iPhone") && pageSource.contains("iPad"));
-  String adminToken=createToken();
-  Client client=ClientBuilder.newClient();
-  UriBuilder authBase=UriBuilder.fromUri("http://localhost:8081/auth");
-  WebTarget adminTarget=client.target(AdminRoot.realmsUrl(authBase)).path("demo");
-  Map<String,Integer> stats=adminTarget.path("application-session-stats").request().header(HttpHeaders.AUTHORIZATION,"Bearer " + adminToken).get(new GenericType<Map<String,Integer>>(){
-  }
-);
-  Integer custSessionsCount=stats.get("customer-portal");
-  Assert.assertNotNull(custSessionsCount);
-  Assert.assertTrue(1 == custSessionsCount);
-  Integer prodStatsCount=stats.get("product-portal");
-  Assert.assertNotNull(prodStatsCount);
-  Assert.assertTrue(1 == prodStatsCount);
-  client.close();
-  String logoutUri=OpenIDConnectService.logoutUrl(UriBuilder.fromUri("http://localhost:8081/auth")).queryParam(OAuth2Constants.REDIRECT_URI,"http://localhost:8081/customer-portal").build("demo").toString();
-  driver.navigate().to(logoutUri);
-  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
-  driver.navigate().to("http://localhost:8081/product-portal");
-  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
-  driver.navigate().to("http://localhost:8081/customer-portal");
-  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  testStrategy.testLoginSSOAndLogout();
 }

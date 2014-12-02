@@ -1,0 +1,23 @@
+{
+  AdapterTestStrategy browser1=this;
+  AdapterTestStrategy browser2=new AdapterTestStrategy(AUTH_SERVER_URL,APP_SERVER_BASE_URL,keycloakRule);
+  loginAndCheckSession(browser1.driver,browser1.loginPage);
+  browser2.webRule.before();
+  try {
+    loginAndCheckSession(browser2.driver,browser2.loginPage);
+    String logoutUri=OpenIDConnectService.logoutUrl(UriBuilder.fromUri(AUTH_SERVER_URL)).queryParam(OAuth2Constants.REDIRECT_URI,APP_SERVER_BASE_URL + "/session-portal").build("demo").toString();
+    browser1.driver.navigate().to(logoutUri);
+    Assert.assertTrue(browser1.driver.getCurrentUrl().startsWith(LOGIN_URL));
+    browser1.driver.navigate().to(APP_SERVER_BASE_URL + "/session-portal");
+    Assert.assertTrue(browser1.driver.getCurrentUrl().startsWith(LOGIN_URL));
+    browser2.driver.navigate().to(APP_SERVER_BASE_URL + "/session-portal");
+    Assert.assertEquals(browser2.driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/session-portal" + slash);
+    String pageSource=browser2.driver.getPageSource();
+    Assert.assertTrue(pageSource.contains("Counter=3"));
+    browser2.driver.navigate().to(logoutUri);
+    Assert.assertTrue(browser2.driver.getCurrentUrl().startsWith(LOGIN_URL));
+  }
+  finally {
+    browser2.webRule.after();
+  }
+}

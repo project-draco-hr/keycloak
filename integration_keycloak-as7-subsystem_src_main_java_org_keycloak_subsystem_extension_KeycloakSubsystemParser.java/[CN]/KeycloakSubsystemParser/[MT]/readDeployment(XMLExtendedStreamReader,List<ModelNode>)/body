@@ -1,0 +1,20 @@
+{
+  String name=readNameAttribute(reader);
+  ModelNode addSecureDeployment=new ModelNode();
+  addSecureDeployment.get(ModelDescriptionConstants.OP).set(ModelDescriptionConstants.ADD);
+  PathAddress addr=PathAddress.pathAddress(PathElement.pathElement(ModelDescriptionConstants.SUBSYSTEM,KeycloakExtension.SUBSYSTEM_NAME),PathElement.pathElement(SecureDeploymentDefinition.TAG_NAME,name));
+  addSecureDeployment.get(ModelDescriptionConstants.OP_ADDR).set(addr.toModelNode());
+  List<ModelNode> credentialsToAdd=new ArrayList<ModelNode>();
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    String tagName=reader.getLocalName();
+    if (tagName.equals(CredentialDefinition.TAG_NAME)) {
+      readCredential(reader,addr,credentialsToAdd);
+      continue;
+    }
+    SimpleAttributeDefinition def=SecureDeploymentDefinition.lookup(tagName);
+    if (def == null)     throw new XMLStreamException("Unknown secure-deployment tag " + tagName);
+    def.parseAndSetParameter(reader.getElementText(),addSecureDeployment,reader);
+  }
+  resourcesToAdd.add(addSecureDeployment);
+  resourcesToAdd.addAll(credentialsToAdd);
+}

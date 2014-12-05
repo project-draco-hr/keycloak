@@ -1,4 +1,5 @@
 {
+  String requestURI=req.getRequestURI();
   resp.setContentType("text/plain");
   OutputStream stream=resp.getOutputStream();
   stream.write(req.getRequestURL().toString().getBytes());
@@ -11,5 +12,27 @@
   while (headers.hasMoreElements()) {
     String name=headers.nextElement();
     System.out.println(name + ": " + req.getHeader(name));
+  }
+  if (requestURI.contains("/bearer")) {
+    Client client=ClientBuilder.newClient();
+    try {
+      String appBase="http://localhost:8080/customer-portal";
+      WebTarget target=client.target(appBase + "/call-bearer");
+      Response response=null;
+      response=target.request().header(HttpHeaders.AUTHORIZATION,"Bearer CRAP").get();
+      Assert.assertEquals(401,response.getStatus());
+      response.close();
+      response=target.request().header(HttpHeaders.AUTHORIZATION,"Bearer " + req.getHeader("KEYCLOAK_ACCESS_TOKEN")).get();
+      Assert.assertEquals(200,response.getStatus());
+      String data=response.readEntity(String.class);
+      response.close();
+      stream.write(data.getBytes());
+    }
+  finally {
+      client.close();
+    }
+  }
+ else   if (requestURI.contains("/call-bearer")) {
+    stream.write("bearer called".getBytes());
   }
 }

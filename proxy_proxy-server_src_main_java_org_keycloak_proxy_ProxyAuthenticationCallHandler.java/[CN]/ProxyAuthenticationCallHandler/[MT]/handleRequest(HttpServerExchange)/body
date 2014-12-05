@@ -1,0 +1,11 @@
+{
+  SecurityContext context=exchange.getSecurityContext();
+  if (context.authenticate()) {
+    if (!exchange.isComplete()) {
+      next.handleRequest(exchange);
+    }
+  }
+ else {
+    exchange.endExchange();
+  }
+}

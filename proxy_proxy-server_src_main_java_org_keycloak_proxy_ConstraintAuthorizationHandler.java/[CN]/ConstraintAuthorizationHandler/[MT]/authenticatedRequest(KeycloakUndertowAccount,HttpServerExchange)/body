@@ -1,6 +1,7 @@
 {
   if (account != null) {
-    IDToken idToken=account.getKeycloakSecurityContext().getIdToken();
+    IDToken idToken=account.getKeycloakSecurityContext().getToken();
+    if (idToken == null)     return;
     if (idToken.getSubject() != null) {
       exchange.getRequestHeaders().put(KEYCLOAK_SUBJECT,idToken.getSubject());
     }
@@ -12,6 +13,9 @@
     }
     if (idToken.getName() != null) {
       exchange.getRequestHeaders().put(KEYCLOAK_NAME,idToken.getName());
+    }
+    if (sendAccessToken) {
+      exchange.getRequestHeaders().put(KEYCLOAK_ACCESS_TOKEN,account.getKeycloakSecurityContext().getTokenString());
     }
   }
   next.handleRequest(exchange);

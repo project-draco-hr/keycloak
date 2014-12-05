@@ -4,12 +4,12 @@
   PathSecurityInformation match=exactPathRoleInformation.get(path);
   if (match != null) {
     handleMatch(method,match,currentMatch);
-    return new SecurityPathMatch(mergeConstraints(currentMatch));
+    return mergeConstraints(currentMatch);
   }
   match=prefixPathRoleInformation.get(path);
   if (match != null) {
     handleMatch(method,match,currentMatch);
-    return new SecurityPathMatch(mergeConstraints(currentMatch));
+    return mergeConstraints(currentMatch);
   }
   int qsPos=-1;
   boolean extension=false;
@@ -20,7 +20,7 @@
       match=exactPathRoleInformation.get(part);
       if (match != null) {
         handleMatch(method,match,currentMatch);
-        return new SecurityPathMatch(mergeConstraints(currentMatch));
+        return mergeConstraints(currentMatch);
       }
       qsPos=i;
       extension=false;
@@ -31,7 +31,7 @@
       match=prefixPathRoleInformation.get(part);
       if (match != null) {
         handleMatch(method,match,currentMatch);
-        return new SecurityPathMatch(mergeConstraints(currentMatch));
+        return mergeConstraints(currentMatch);
       }
     }
  else     if (c == '.') {
@@ -47,10 +47,10 @@
         match=extensionRoleInformation.get(ext);
         if (match != null) {
           handleMatch(method,match,currentMatch);
-          return new SecurityPathMatch(mergeConstraints(currentMatch));
+          return mergeConstraints(currentMatch);
         }
       }
     }
   }
-  return new SecurityPathMatch(mergeConstraints(currentMatch));
+  return mergeConstraints(currentMatch);
 }

@@ -9,8 +9,8 @@
       errorPage=base + "/" + errorPage;
     }
   }
-  handler=new ConstraintAuthorizationHandler(errorPage,handler);
-  handler=new AuthenticationCallHandler(handler);
+  handler=new ConstraintAuthorizationHandler(handler,errorPage,sendAccessToken);
+  handler=new ProxyAuthenticationCallHandler(handler);
   handler=new ConstraintMatcherHandler(matches,handler,toWrap,errorPage);
   final List<AuthenticationMechanism> mechanisms=new LinkedList<AuthenticationMechanism>();
   mechanisms.add(new CachedAuthenticatedSessionMechanism());

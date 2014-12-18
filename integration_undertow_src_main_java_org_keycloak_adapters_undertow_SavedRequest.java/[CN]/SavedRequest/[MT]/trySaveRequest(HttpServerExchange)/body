@@ -1,0 +1,46 @@
+{
+  int maxSize=exchange.getConnection().getUndertowOptions().get(UndertowOptions.MAX_BUFFERED_REQUEST_SIZE,16384);
+  if (maxSize > 0) {
+    if (!exchange.isRequestComplete()) {
+      final long requestContentLength=exchange.getRequestContentLength();
+      if (requestContentLength > maxSize) {
+        UndertowLogger.REQUEST_LOGGER.debugf("Request to %s was to large to save",exchange.getRequestURI());
+        return;
+      }
+      byte[] buffer=new byte[maxSize];
+      int read=0;
+      int res=0;
+      InputStream in=exchange.getInputStream();
+      try {
+        while ((res=in.read(buffer,read,buffer.length - read)) > 0) {
+          read+=res;
+          if (read == maxSize) {
+            UndertowLogger.REQUEST_LOGGER.debugf("Request to %s was to large to save",exchange.getRequestURI());
+            return;
+          }
+        }
+        HeaderMap headers=new HeaderMap();
+        for (        HeaderValues entry : exchange.getRequestHeaders()) {
+          if (entry.getHeaderName().equals(Headers.CONTENT_LENGTH) || entry.getHeaderName().equals(Headers.TRANSFER_ENCODING) || entry.getHeaderName().equals(Headers.CONNECTION)) {
+            continue;
+          }
+          headers.putAll(entry.getHeaderName(),entry);
+        }
+        SavedRequest request=new SavedRequest(buffer,read,exchange.getRequestMethod(),exchange.getRequestURI(),exchange.getRequestHeaders());
+        final ServletRequestContext sc=exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+        HttpSessionImpl session=sc.getCurrentServletContext().getSession(exchange,true);
+        Session underlyingSession;
+        if (System.getSecurityManager() == null) {
+          underlyingSession=session.getSession();
+        }
+ else {
+          underlyingSession=AccessController.doPrivileged(new HttpSessionImpl.UnwrapSessionAction(session));
+        }
+        underlyingSession.setAttribute(SESSION_KEY,request);
+      }
+ catch (      IOException e) {
+        UndertowLogger.REQUEST_IO_LOGGER.ioException(e);
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  if (session instanceof HttpSessionImpl) {
+    Session underlyingSession;
+    if (System.getSecurityManager() == null) {
+      underlyingSession=((HttpSessionImpl)session).getSession();
+    }
+ else {
+      underlyingSession=AccessController.doPrivileged(new HttpSessionImpl.UnwrapSessionAction(session));
+    }
+    SavedRequest request=(SavedRequest)underlyingSession.getAttribute(SESSION_KEY);
+    if (request != null) {
+      if (request.requestUri.equals(exchange.getRequestURI()) && exchange.isRequestComplete()) {
+        UndertowLogger.REQUEST_LOGGER.debugf("restoring request body for request to %s",request.requestUri);
+        exchange.setRequestMethod(request.method);
+        Connectors.ungetRequestBytes(exchange,new ImmediatePooled<ByteBuffer>(ByteBuffer.wrap(request.data,0,request.dataLength)));
+        underlyingSession.removeAttribute(SESSION_KEY);
+        Iterator<HeaderValues> headerIterator=exchange.getRequestHeaders().iterator();
+        while (headerIterator.hasNext()) {
+          HeaderValues header=headerIterator.next();
+          if (!header.getHeaderName().equals(Headers.CONNECTION)) {
+            headerIterator.remove();
+          }
+        }
+        for (        HeaderValues header : request.headerMap) {
+          exchange.getRequestHeaders().putAll(header.getHeaderName(),header);
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  HttpSession session=myRequest.getSession(false);
+  if (session == null)   return false;
+synchronized (session) {
+    String j_uri=(String)session.getAttribute(FormAuthenticator.__J_URI);
+    if (j_uri != null) {
+      StringBuffer buf=myRequest.getRequestURL();
+      if (myRequest.getQueryString() != null)       buf.append("?").append(myRequest.getQueryString());
+      if (j_uri.equals(buf.toString())) {
+        String method=(String)session.getAttribute(__J_METHOD);
+        myRequest.setMethod(HttpMethod.valueOf(method.toUpperCase()),method);
+        MultivaluedHashMap<String,String> j_post=(MultivaluedHashMap<String,String>)session.getAttribute(CACHED_FORM_PARAMETERS);
+        if (j_post != null) {
+          MultiMap<String> map=new MultiMap<String>();
+          for (          String key : j_post.keySet()) {
+            for (            String val : j_post.getList(key)) {
+              map.add(key,val);
+            }
+          }
+          restoreFormParameters(map,myRequest);
+        }
+        session.removeAttribute(FormAuthenticator.__J_URI);
+        session.removeAttribute(__J_METHOD);
+        session.removeAttribute(FormAuthenticator.__J_POST);
+      }
+      return true;
+    }
+  }
+  return false;
+}

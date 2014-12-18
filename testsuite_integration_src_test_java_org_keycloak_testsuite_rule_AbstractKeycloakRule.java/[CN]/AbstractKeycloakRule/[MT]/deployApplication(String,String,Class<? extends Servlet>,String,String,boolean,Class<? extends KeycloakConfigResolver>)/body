@@ -1,21 +1,4 @@
 {
   String constraintUrl="/*";
-  DeploymentInfo di=createDeploymentInfo(name,contextPath,servletClass);
-  if (null == keycloakConfigResolver) {
-    di.addInitParameter("keycloak.config.file",adapterConfigPath);
-  }
- else {
-    di.addInitParameter("keycloak.config.resolver",keycloakConfigResolver.getCanonicalName());
-  }
-  if (isConstrained) {
-    SecurityConstraint constraint=new SecurityConstraint();
-    WebResourceCollection collection=new WebResourceCollection();
-    collection.addUrlPattern(constraintUrl);
-    constraint.addWebResourceCollection(collection);
-    constraint.addRoleAllowed(role);
-    di.addSecurityConstraint(constraint);
-  }
-  LoginConfig loginConfig=new LoginConfig("KEYCLOAK","demo");
-  di.setLoginConfig(loginConfig);
-  server.getServer().deploy(di);
+  deployApplication(name,contextPath,servletClass,adapterConfigPath,role,isConstrained,keycloakConfigResolver,constraintUrl);
 }

@@ -1,0 +1,27 @@
+{
+  ResteasyDeployment resteasyDeployment=new ResteasyDeployment();
+  DeploymentInfo deploymentInfo=new DeploymentInfo();
+  deploymentInfo.setDeploymentName("app");
+  deploymentInfo.setContextPath("/app");
+  deploymentInfo.setClassLoader(ExcludedResourceTest.class.getClassLoader());
+  ServletInfo servletInfo=new ServletInfo("post",PostServlet.class);
+  servletInfo.addMappings("/public");
+  servletInfo.addMappings("/secure");
+  deploymentInfo.addServlet(servletInfo);
+  SecurityConstraint publicConstraint=new SecurityConstraint();
+  WebResourceCollection publicResource=new WebResourceCollection();
+  publicResource.addUrlPattern("/public/*");
+  publicConstraint.addWebResourceCollection(publicResource);
+  publicConstraint.setEmptyRoleSemantic(SecurityInfo.EmptyRoleSemantic.PERMIT);
+  deploymentInfo.addSecurityConstraint(publicConstraint);
+  SecurityConstraint secureConstraint=new SecurityConstraint();
+  WebResourceCollection secureResources=new WebResourceCollection();
+  secureResources.addUrlPattern("/*");
+  secureConstraint.addWebResourceCollection(secureResources);
+  secureConstraint.addRoleAllowed("user");
+  deploymentInfo.addSecurityConstraint(secureConstraint);
+  deploymentInfo.addSecurityRole("user");
+  deploymentInfo.setLoginConfig(new LoginConfig("KEYCLOAK","test"));
+  deploymentInfo.addInitParameter("keycloak.config.file",ExcludedResourceTest.class.getResource("keycloak.json").getFile());
+  server.getServer().deploy(deploymentInfo);
+}

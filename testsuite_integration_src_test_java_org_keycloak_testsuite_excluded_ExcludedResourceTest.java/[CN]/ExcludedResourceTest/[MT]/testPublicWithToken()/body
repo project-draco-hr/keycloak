@@ -1,0 +1,10 @@
+{
+  Form form=new Form();
+  form.param("username","user");
+  form.param("password","password");
+  form.param("client_id","app");
+  AccessTokenResponse token=ClientBuilder.newClient().target("http://localhost:8081/auth").path("/realms/test/tokens/grants/access").request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form)).readEntity(AccessTokenResponse.class);
+  Response post=ClientBuilder.newClient().target("http://localhost:8081/app").path("public").request().header("Authorization","Bearer " + token.getToken()).post(Entity.entity("Hallo",MediaType.TEXT_PLAIN_TYPE));
+  String response=post.readEntity(String.class);
+  Assert.assertEquals("Hello user, you said: Hallo",response);
+}

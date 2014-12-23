@@ -1,0 +1,11 @@
+{
+  ServletInfo servlet=new ServletInfo("Error Page",ErrorServlet.class);
+  servlet.addMapping("/error.html");
+  SecurityConstraint constraint=new SecurityConstraint();
+  WebResourceCollection collection=new WebResourceCollection();
+  collection.addUrlPattern("/error.html");
+  constraint.addWebResourceCollection(collection);
+  constraint.setEmptyRoleSemantic(SecurityInfo.EmptyRoleSemantic.PERMIT);
+  di.addSecurityConstraint(constraint);
+  di.addServlet(servlet);
+}

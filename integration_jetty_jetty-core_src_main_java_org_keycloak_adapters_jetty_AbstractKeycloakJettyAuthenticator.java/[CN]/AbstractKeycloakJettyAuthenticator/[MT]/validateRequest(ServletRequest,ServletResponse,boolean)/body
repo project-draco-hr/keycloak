@@ -32,6 +32,15 @@
   }
   AuthChallenge challenge=authenticator.getChallenge();
   if (challenge != null) {
+    if (challenge.errorPage() && errorPage != null) {
+      Response response=(Response)res;
+      try {
+        response.sendRedirect(response.encodeRedirectURL(URIUtil.addPaths(request.getContextPath(),errorPage)));
+      }
+ catch (      IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
     challenge.challenge(facade);
   }
   return Authentication.SEND_CONTINUE;

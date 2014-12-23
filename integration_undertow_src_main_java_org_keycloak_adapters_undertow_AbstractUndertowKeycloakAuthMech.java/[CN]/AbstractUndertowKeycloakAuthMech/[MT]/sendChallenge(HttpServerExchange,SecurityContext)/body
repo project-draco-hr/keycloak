@@ -1,6 +1,10 @@
 {
   AuthChallenge challenge=exchange.getAttachment(KEYCLOAK_CHALLENGE_ATTACHMENT_KEY);
   if (challenge != null) {
+    if (challenge.errorPage() && errorPage != null) {
+      Integer code=servePage(exchange,errorPage);
+      return new ChallengeResult(true,code);
+    }
     UndertowHttpFacade facade=new UndertowHttpFacade(exchange);
     if (challenge.challenge(facade)) {
       return new ChallengeResult(true,exchange.getResponseCode());

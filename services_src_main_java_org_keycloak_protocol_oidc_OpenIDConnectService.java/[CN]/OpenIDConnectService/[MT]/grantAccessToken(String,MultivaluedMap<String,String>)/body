@@ -45,8 +45,12 @@ event.error(Errors.INVALID_USER_CREDENTIALS);
 return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(err).build();
 }
 String scope=form.getFirst(OAuth2Constants.SCOPE);
-UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"oauth_credentials",false);
+UserSessionProvider sessions=session.sessions();
+UserSessionModel userSession=sessions.createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"oauth_credentials",false);
 event.session(userSession);
+ClientSessionModel clientSession=sessions.createClientSession(realm,client);
+clientSession.setAuthMethod(OpenIDConnect.LOGIN_PROTOCOL);
+TokenManager.attachClientSession(userSession,clientSession);
 AccessTokenResponse res=tokenManager.responseBuilder(realm,client,event).generateAccessToken(scope,client,user,userSession).generateRefreshToken().generateIDToken().build();
 event.success();
 return Response.ok(res,MediaType.APPLICATION_JSON_TYPE).build();

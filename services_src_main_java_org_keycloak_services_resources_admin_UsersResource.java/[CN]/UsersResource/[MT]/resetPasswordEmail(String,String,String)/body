@@ -7,11 +7,25 @@
   if (user.getEmail() == null) {
     return Flows.errors().error("User email missing",Response.Status.BAD_REQUEST);
   }
-  String redirect=Urls.accountBase(uriInfo.getBaseUri()).path("/").build(realm.getName()).toString();
-  String clientId=Constants.ACCOUNT_MANAGEMENT_APP;
+  if (redirectUri != null && clientId == null) {
+    return Flows.errors().error("Client id missing",Response.Status.BAD_REQUEST);
+  }
+  if (clientId == null) {
+    clientId=Constants.ACCOUNT_MANAGEMENT_APP;
+  }
   ClientModel client=realm.findClient(clientId);
   if (client == null || !client.isEnabled()) {
-    return Flows.errors().error("AccountProvider management not enabled",Response.Status.INTERNAL_SERVER_ERROR);
+    return Flows.errors().error(clientId + " not enabled",Response.Status.INTERNAL_SERVER_ERROR);
+  }
+  String redirect;
+  if (redirectUri != null) {
+    redirect=OpenIDConnectService.verifyRedirectUri(uriInfo,redirectUri,realm,client);
+    if (redirect == null) {
+      return Flows.errors().error("Invalid redirect uri.",Response.Status.BAD_REQUEST);
+    }
+  }
+ else {
+    redirect=Urls.accountBase(uriInfo.getBaseUri()).path("/").build(realm.getName()).toString();
   }
   UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"form",false);
   ClientSessionModel clientSession=session.sessions().createClientSession(realm,client);

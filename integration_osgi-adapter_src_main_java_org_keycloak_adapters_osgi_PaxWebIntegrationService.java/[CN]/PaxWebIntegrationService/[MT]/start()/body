@@ -1,0 +1,15 @@
+{
+  ServiceTrackerCustomizer trackerCustomizer=new ServiceTrackerCustomizer(){
+    @Override public Object addingService(    ServiceReference reference){
+      return addingWebContainerCallback(reference);
+    }
+    @Override public void modifiedService(    ServiceReference reference,    Object service){
+    }
+    @Override public void removedService(    ServiceReference reference,    Object service){
+      removingWebContainerCallback(reference);
+    }
+  }
+;
+  webContainerTracker=new ServiceTracker(bundleContext,WebContainer.class.getName(),trackerCustomizer);
+  webContainerTracker.open();
+}

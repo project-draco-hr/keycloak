@@ -1,3 +1,11 @@
 {
-  return exchange.getSourceAddress().getAddress().getHostAddress();
+  InetSocketAddress sourceAddress=exchange.getSourceAddress();
+  if (sourceAddress == null) {
+    return "";
+  }
+  InetAddress address=sourceAddress.getAddress();
+  if (address == null) {
+    return sourceAddress.getHostString();
+  }
+  return address.getHostAddress();
 }

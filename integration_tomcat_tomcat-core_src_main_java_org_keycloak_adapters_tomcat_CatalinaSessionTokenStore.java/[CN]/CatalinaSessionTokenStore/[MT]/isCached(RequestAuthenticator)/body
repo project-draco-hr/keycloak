@@ -1,16 +1,25 @@
 {
-  if (request.getSessionInternal(false) == null || request.getSessionInternal().getPrincipal() == null)   return false;
-  log.fine("remote logged in already. Establish state from session");
-  RefreshableKeycloakSecurityContext securityContext=(RefreshableKeycloakSecurityContext)request.getSessionInternal().getNote(KeycloakSecurityContext.class.getName());
-  if (securityContext != null) {
-    if (!deployment.getRealm().equals(securityContext.getRealm())) {
-      log.fine("Account from cookie is from a different realm than for the request.");
-      return false;
-    }
-    securityContext.setCurrentRequestInfo(deployment,this);
-    request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);
+  Session session=request.getSessionInternal(false);
+  if (session == null)   return false;
+  SerializableKeycloakAccount account=(SerializableKeycloakAccount)session.getSession().getAttribute(SerializableKeycloakAccount.class.getName());
+  if (account == null) {
+    return false;
   }
-  GenericPrincipal principal=(GenericPrincipal)request.getSessionInternal().getPrincipal();
+  log.fine("remote logged in already. Establish state from session");
+  RefreshableKeycloakSecurityContext securityContext=account.getKeycloakSecurityContext();
+  if (!deployment.getRealm().equals(securityContext.getRealm())) {
+    log.fine("Account from cookie is from a different realm than for the request.");
+    cleanSession(session);
+    return false;
+  }
+  securityContext.setCurrentRequestInfo(deployment,this);
+  request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);
+  GenericPrincipal principal=(GenericPrincipal)session.getPrincipal();
+  if (principal == null) {
+    principal=principalFactory.createPrincipal(request.getContext().getRealm(),account.getPrincipal(),account.getRoles(),securityContext);
+    session.setPrincipal(principal);
+    session.setAuthType("KEYCLOAK");
+  }
   request.setUserPrincipal(principal);
   request.setAuthType("KEYCLOAK");
   restoreRequest();

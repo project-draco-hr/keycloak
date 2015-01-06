@@ -1,17 +1,19 @@
 {
-  if (request.getSessionInternal(false) == null || request.getSessionInternal().getPrincipal() == null)   return;
-  RefreshableKeycloakSecurityContext session=(RefreshableKeycloakSecurityContext)request.getSessionInternal().getNote(KeycloakSecurityContext.class.getName());
+  Session catalinaSession=request.getSessionInternal(false);
+  if (catalinaSession == null)   return;
+  SerializableKeycloakAccount account=(SerializableKeycloakAccount)catalinaSession.getSession().getAttribute(SerializableKeycloakAccount.class.getName());
+  if (account == null) {
+    return;
+  }
+  RefreshableKeycloakSecurityContext session=account.getKeycloakSecurityContext();
   if (session == null)   return;
   if (session.getDeployment() == null)   session.setCurrentRequestInfo(deployment,this);
   if (session.isActive() && !session.getDeployment().isAlwaysRefreshToken())   return;
   boolean success=session.refreshExpiredToken(false);
   if (success && session.isActive())   return;
-  Session catalinaSession=request.getSessionInternal();
   log.fine("Cleanup and expire session " + catalinaSession.getId() + " after failed refresh");
-  catalinaSession.removeNote(KeycloakSecurityContext.class.getName());
   request.setUserPrincipal(null);
   request.setAuthType(null);
-  catalinaSession.setPrincipal(null);
-  catalinaSession.setAuthType(null);
+  cleanSession(catalinaSession);
   catalinaSession.expire();
 }

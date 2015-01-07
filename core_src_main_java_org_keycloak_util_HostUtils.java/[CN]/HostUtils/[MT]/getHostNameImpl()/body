@@ -1,0 +1,25 @@
+{
+  String bindAddr=System.getProperty("jboss.bind.address");
+  if (bindAddr != null && !bindAddr.trim().equals("0.0.0.0")) {
+    return bindAddr;
+  }
+  String qualifiedHostName=System.getProperty("jboss.qualified.host.name");
+  if (qualifiedHostName != null) {
+    return qualifiedHostName;
+  }
+  qualifiedHostName=System.getenv("HOSTNAME");
+  if (qualifiedHostName != null) {
+    return qualifiedHostName;
+  }
+  qualifiedHostName=System.getenv("COMPUTERNAME");
+  if (qualifiedHostName != null) {
+    return qualifiedHostName;
+  }
+  try {
+    return NetworkUtils.canonize(getLocalHost().getHostName());
+  }
+ catch (  UnknownHostException uhe) {
+    uhe.printStackTrace();
+    return "unknown-host.unknown-domain";
+  }
+}

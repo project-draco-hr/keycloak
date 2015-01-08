@@ -7,6 +7,8 @@
   String responseIssuer=getResponseIssuer(realm);
   String nameIdFormat=getNameIdFormat(clientSession);
   String nameId=getNameId(nameIdFormat,clientSession,userSession);
+  clientSession.setNote(SAML_NAME_ID,nameId);
+  clientSession.setNote(SAML_NAME_ID_FORMAT,nameIdFormat);
   SALM2LoginResponseBuilder builder=new SALM2LoginResponseBuilder();
   builder.requestID(requestID).relayState(relayState).destination(redirectUri).responseIssuer(responseIssuer).requestIssuer(clientSession.getClient().getClientId()).nameIdentifier(nameIdFormat,nameId).authMethod(JBossSAMLURIConstants.AC_UNSPECIFIED.get());
   initClaims(builder,clientSession.getClient(),userSession.getUser());

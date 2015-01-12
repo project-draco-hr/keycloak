@@ -10,5 +10,11 @@
     if (port != 443)     secureUrl.port(port);
     url=secureUrl.build().toString();
   }
-  return deployment.getAuthUrl().clone().queryParam(OAuth2Constants.CLIENT_ID,deployment.getResourceName()).queryParam(OAuth2Constants.REDIRECT_URI,url).queryParam(OAuth2Constants.STATE,state).queryParam("login","true").build().toString();
+  String loginHint=getQueryParamValue("login_hint");
+  url=UriUtils.stripQueryParam(url,"login_hint");
+  KeycloakUriBuilder redirectUriBuilder=deployment.getAuthUrl().clone().queryParam(OAuth2Constants.CLIENT_ID,deployment.getResourceName()).queryParam(OAuth2Constants.REDIRECT_URI,url).queryParam(OAuth2Constants.STATE,state).queryParam("login","true");
+  if (loginHint != null && loginHint.length() > 0) {
+    redirectUriBuilder.queryParam("login_hint",loginHint);
+  }
+  return redirectUriBuilder.build().toString();
 }

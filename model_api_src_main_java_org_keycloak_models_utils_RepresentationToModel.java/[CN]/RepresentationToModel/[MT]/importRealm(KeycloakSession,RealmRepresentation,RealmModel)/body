@@ -1,7 +1,6 @@
 {
   newRealm.setName(rep.getRealm());
   if (rep.isEnabled() != null)   newRealm.setEnabled(rep.isEnabled());
-  if (rep.isSocial() != null)   newRealm.setSocial(rep.isSocial());
   if (rep.isBruteForceProtected() != null)   newRealm.setBruteForceProtected(rep.isBruteForceProtected());
   if (rep.getMaxFailureWaitSeconds() != null)   newRealm.setMaxFailureWaitSeconds(rep.getMaxFailureWaitSeconds());
   if (rep.getMinimumQuickLoginWaitSeconds() != null)   newRealm.setMinimumQuickLoginWaitSeconds(rep.getMinimumQuickLoginWaitSeconds());
@@ -29,7 +28,6 @@
   if (rep.isRememberMe() != null)   newRealm.setRememberMe(rep.isRememberMe());
   if (rep.isVerifyEmail() != null)   newRealm.setVerifyEmail(rep.isVerifyEmail());
   if (rep.isResetPasswordAllowed() != null)   newRealm.setResetPasswordAllowed(rep.isResetPasswordAllowed());
-  if (rep.isUpdateProfileOnInitialSocialLogin() != null)   newRealm.setUpdateProfileOnInitialSocialLogin(rep.isUpdateProfileOnInitialSocialLogin());
   if (rep.getPrivateKey() == null || rep.getPublicKey() == null) {
     KeycloakModelUtils.generateRealmKeys(newRealm);
   }
@@ -151,9 +149,6 @@
   }
  else {
     newRealm.setBrowserSecurityHeaders(BrowserSecurityHeaders.defaultHeaders);
-  }
-  if (rep.getSocialProviders() != null) {
-    newRealm.setSocialConfig(new HashMap(rep.getSocialProviders()));
   }
   if (rep.getUserFederationProviders() != null) {
     List<UserFederationProviderModel> providerModels=convertFederationProviders(rep.getUserFederationProviders());

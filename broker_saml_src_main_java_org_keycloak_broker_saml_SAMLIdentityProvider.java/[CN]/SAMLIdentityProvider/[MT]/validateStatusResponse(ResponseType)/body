@@ -1,0 +1,17 @@
+{
+  StatusType status=responseType.getStatus();
+  StatusCodeType statusCode=status.getStatusCode();
+  if (!JBossSAMLURIConstants.STATUS_SUCCESS.get().equals(statusCode.getValue().toString())) {
+    StatusDetailType statusDetailType=status.getStatusDetail();
+    StringBuilder detailMessage=new StringBuilder();
+    if (statusDetailType != null) {
+      for (      Object statusDetail : statusDetailType.getAny()) {
+        detailMessage.append(statusDetail);
+      }
+    }
+ else {
+      detailMessage.append("none");
+    }
+    throw new RuntimeException("Authentication failed with code [" + statusCode.getValue() + " and detail ["+ detailMessage.toString()+ ".");
+  }
+}

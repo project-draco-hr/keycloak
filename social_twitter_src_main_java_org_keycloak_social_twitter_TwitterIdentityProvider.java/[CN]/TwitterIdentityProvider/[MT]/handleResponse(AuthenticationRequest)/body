@@ -1,0 +1,24 @@
+{
+  MultivaluedMap<String,String> queryParameters=request.getUriInfo().getQueryParameters();
+  if (queryParameters.getFirst("denied") != null) {
+    throw new RuntimeException("Access denied.");
+  }
+  try {
+    Twitter twitter=new TwitterFactory().getInstance();
+    twitter.setOAuthConsumer(getConfig().getClientId(),getConfig().getClientSecret());
+    String verifier=queryParameters.getFirst("oauth_verifier");
+    ClientSessionModel clientSession=request.getClientSession();
+    String twitterToken=clientSession.getNote("twitter_token");
+    String twitterSecret=clientSession.getNote("twitter_tokenSecret");
+    RequestToken requestToken=new RequestToken(twitterToken,twitterSecret);
+    twitter.getOAuthAccessToken(requestToken,verifier);
+    twitter4j.User twitterUser=twitter.verifyCredentials();
+    FederatedIdentity user=new FederatedIdentity(Long.toString(twitterUser.getId()));
+    user.setUsername(twitterUser.getScreenName());
+    user.setName(twitterUser.getName());
+    return AuthenticationResponse.end(user);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

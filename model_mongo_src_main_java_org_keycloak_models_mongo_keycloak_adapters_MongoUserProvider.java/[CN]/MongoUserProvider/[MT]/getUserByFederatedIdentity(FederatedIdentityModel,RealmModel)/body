@@ -1,0 +1,5 @@
+{
+  DBObject query=new QueryBuilder().and("federatedIdentities.identityProvider").is(socialLink.getIdentityProvider()).and("federatedIdentities.userId").is(socialLink.getUserId()).and("realmId").is(realm.getId()).get();
+  MongoUserEntity userEntity=getMongoStore().loadSingleEntity(MongoUserEntity.class,query,invocationContext);
+  return userEntity == null ? null : new UserAdapter(session,realm,userEntity,invocationContext);
+}

@@ -1,0 +1,16 @@
+{
+  try {
+    Twitter twitter=new TwitterFactory().getInstance();
+    twitter.setOAuthConsumer(getConfig().getClientId(),getConfig().getClientSecret());
+    URI uri=new URI(request.getRedirectUri() + "?state=" + request.getState());
+    RequestToken requestToken=twitter.getOAuthRequestToken(uri.toString());
+    ClientSessionModel clientSession=request.getClientSession();
+    clientSession.setNote("twitter_token",requestToken.getToken());
+    clientSession.setNote("twitter_tokenSecret",requestToken.getTokenSecret());
+    URI authenticationUrl=URI.create(requestToken.getAuthenticationURL());
+    return AuthenticationResponse.temporaryRedirect(authenticationUrl);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

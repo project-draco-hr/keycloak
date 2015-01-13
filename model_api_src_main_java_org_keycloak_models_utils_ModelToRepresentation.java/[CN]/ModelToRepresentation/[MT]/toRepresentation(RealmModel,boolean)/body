@@ -3,9 +3,7 @@
   rep.setId(realm.getId());
   rep.setRealm(realm.getName());
   rep.setEnabled(realm.isEnabled());
-  rep.setSocial(realm.isSocial());
   rep.setNotBefore(realm.getNotBefore());
-  rep.setUpdateProfileOnInitialSocialLogin(realm.isUpdateProfileOnInitialSocialLogin());
   rep.setSslRequired(realm.getSslRequired().name().toLowerCase());
   rep.setPublicKey(realm.getPublicKeyPem());
   if (internal) {
@@ -35,7 +33,6 @@
   rep.setAccessCodeLifespan(realm.getAccessCodeLifespan());
   rep.setAccessCodeLifespanUserAction(realm.getAccessCodeLifespanUserAction());
   rep.setSmtpServer(realm.getSmtpConfig());
-  rep.setSocialProviders(realm.getSocialConfig());
   rep.setBrowserSecurityHeaders(realm.getBrowserSecurityHeaders());
   rep.setAccountTheme(realm.getAccountTheme());
   rep.setLoginTheme(realm.getLoginTheme());
@@ -65,6 +62,16 @@
       fedProviderReps.add(fedProvRep);
     }
     rep.setUserFederationProviders(fedProviderReps);
+  }
+  for (  IdentityProviderModel provider : realm.getIdentityProviders()) {
+    IdentityProviderRepresentation providerRep=new IdentityProviderRepresentation();
+    providerRep.setProviderId(provider.getProviderId());
+    providerRep.setId(provider.getId());
+    providerRep.setName(provider.getName());
+    providerRep.setEnabled(provider.isEnabled());
+    providerRep.setUpdateProfileFirstLogin(provider.isUpdateProfileFirstLogin());
+    providerRep.setConfig(provider.getConfig());
+    rep.addIdentityProvider(providerRep);
   }
   return rep;
 }

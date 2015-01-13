@@ -1,0 +1,9 @@
+{
+  user=getUserById(user.getId(),realm);
+  MongoUserEntity userEntity=((UserAdapter)user).getUser();
+  FederatedIdentityEntity federatedIdentityEntity=new FederatedIdentityEntity();
+  federatedIdentityEntity.setIdentityProvider(socialLink.getIdentityProvider());
+  federatedIdentityEntity.setUserId(socialLink.getUserId());
+  federatedIdentityEntity.setUserName(socialLink.getUserName());
+  getMongoStore().pushItemToList(userEntity,"federatedIdentities",federatedIdentityEntity,true,invocationContext);
+}

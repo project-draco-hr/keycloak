@@ -1,0 +1,58 @@
+{
+  ClientSessionModel clientSession=clientCode.getClientSession();
+  FederatedIdentityModel socialLink=new FederatedIdentityModel(providerId,socialUser.getId(),socialUser.getUsername());
+  UserModel federatedUser=session.users().getUserByFederatedIdentity(socialLink,realm);
+  IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(realm,providerId);
+  String authMethod=socialLink.getUserId() + "@" + identityProviderConfig.getId();
+  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.LOGIN).client(clientSession.getClient()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.AUTH_METHOD,authMethod);
+  event.detail(Details.USERNAME,authMethod);
+  if (clientSession.getUserSession() != null) {
+    UserModel authenticatedUser=clientSession.getUserSession().getUser();
+    if (federatedUser != null) {
+      String message="The identity returned by the Identity Provider [" + identityProviderConfig.getName() + "] is already linked to other user";
+      event.error(message);
+      return redirectToErrorPage(realm,message);
+    }
+    if (!authenticatedUser.isEnabled()) {
+      event.error(Errors.USER_DISABLED);
+      return redirectToErrorPage(realm,"User is disabled");
+    }
+    if (!authenticatedUser.hasRole(realm.getApplicationByName(ACCOUNT_MANAGEMENT_APP).getRole(MANAGE_ACCOUNT))) {
+      event.error(Errors.NOT_ALLOWED);
+      return redirectToErrorPage(realm,"Insufficient permissions to link identity");
+    }
+    session.users().addFederatedIdentity(realm,authenticatedUser,socialLink);
+    event.success();
+    return Response.status(302).location(UriBuilder.fromUri(clientSession.getRedirectUri()).build()).build();
+  }
+  UserModel user=session.users().getUserByEmail(socialUser.getEmail(),realm);
+  String errorMessage="federatedIdentityEmailExists";
+  if (user == null) {
+    user=session.users().getUserByUsername(socialUser.getUsername(),realm);
+    errorMessage="federatedIdentityUsernameExists";
+  }
+  if (user == null) {
+    federatedUser=session.users().addUser(realm,socialUser.getUsername());
+    federatedUser.setEnabled(true);
+    federatedUser.setFirstName(socialUser.getFirstName());
+    federatedUser.setLastName(socialUser.getLastName());
+    federatedUser.setEmail(socialUser.getEmail());
+    session.users().addFederatedIdentity(realm,federatedUser,socialLink);
+    event.clone().user(federatedUser).event(EventType.REGISTER).detail(Details.REGISTER_METHOD,authMethod).detail(Details.EMAIL,federatedUser.getEmail()).removeDetail("auth_method").success();
+    if (identityProviderConfig.isUpdateProfileFirstLogin()) {
+      federatedUser.addRequiredAction(UPDATE_PROFILE);
+    }
+  }
+ else {
+    if (federatedUser == null) {
+      return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(clientCode.getCode()).setError(errorMessage).createLogin();
+    }
+  }
+  event.user(federatedUser);
+  String username=socialLink.getUserId() + "@" + identityProviderConfig.getName();
+  UserSessionModel userSession=session.sessions().createUserSession(realm,federatedUser,username,clientConnection.getRemoteAddr(),"broker",false);
+  event.session(userSession);
+  TokenManager.attachClientSession(userSession,clientSession);
+  AuthenticationManager authManager=new AuthenticationManager();
+  return authManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
+}

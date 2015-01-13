@@ -1,0 +1,16 @@
+{
+  this.realm=realm;
+  List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
+  if (!identityProviders.isEmpty()) {
+    providers=new LinkedList<IdentityProvider>();
+    for (    IdentityProviderModel identityProvider : identityProviders) {
+      if (identityProvider.isEnabled()) {
+        String loginUrl=UriBuilder.fromUri(baseURI).path(AuthenticationBrokerResource.class).path(AuthenticationBrokerResource.class,"performLogin").replaceQueryParam("provider_id",identityProvider.getId()).build(realm.getName()).toString();
+        providers.add(new IdentityProvider(identityProvider.getId(),identityProvider.getName(),loginUrl));
+      }
+    }
+    if (!providers.isEmpty()) {
+      displaySocial=true;
+    }
+  }
+}

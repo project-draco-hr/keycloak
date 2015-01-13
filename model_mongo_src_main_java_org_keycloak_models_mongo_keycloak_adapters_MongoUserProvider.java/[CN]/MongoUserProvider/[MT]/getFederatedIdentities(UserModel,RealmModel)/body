@@ -1,0 +1,14 @@
+{
+  UserModel user=getUserById(userModel.getId(),realm);
+  MongoUserEntity userEntity=((UserAdapter)user).getUser();
+  List<FederatedIdentityEntity> linkEntities=userEntity.getSocialLinks();
+  if (linkEntities == null) {
+    return Collections.EMPTY_SET;
+  }
+  Set<FederatedIdentityModel> result=new HashSet<FederatedIdentityModel>();
+  for (  FederatedIdentityEntity federatedIdentityEntity : linkEntities) {
+    FederatedIdentityModel model=new FederatedIdentityModel(federatedIdentityEntity.getIdentityProvider(),federatedIdentityEntity.getUserId(),federatedIdentityEntity.getUserName());
+    result.add(model);
+  }
+  return result;
+}

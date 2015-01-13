@@ -1,0 +1,13 @@
+{
+  auth.requireManage();
+  UserModel user=session.users().getUserByUsername(username,realm);
+  if (user == null) {
+    throw new NotFoundException("User not found");
+  }
+  if (session.users().getFederatedIdentity(user,provider,realm) != null) {
+    return Flows.errors().exists("User is already linked with provider");
+  }
+  FederatedIdentityModel socialLink=new FederatedIdentityModel(provider,rep.getUserId(),rep.getUserName());
+  session.users().addFederatedIdentity(realm,user,socialLink);
+  return Response.noContent().build();
+}

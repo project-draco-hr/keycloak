@@ -1,0 +1,23 @@
+{
+  UriInfo uriInfo=request.getUriInfo();
+  String error=uriInfo.getQueryParameters().getFirst(OAuth2Constants.ERROR);
+  if (error != null) {
+    if (error.equals("access_denied")) {
+      throw new RuntimeException("Access denied.");
+    }
+ else {
+      throw new RuntimeException(error);
+    }
+  }
+  try {
+    String authorizationCode=uriInfo.getQueryParameters().getFirst(OAUTH2_PARAMETER_CODE);
+    if (authorizationCode != null) {
+      String response=SimpleHttp.doPost(getConfig().getTokenUrl()).param(OAUTH2_PARAMETER_CODE,authorizationCode).param(OAUTH2_PARAMETER_CLIENT_ID,getConfig().getClientId()).param(OAUTH2_PARAMETER_CLIENT_SECRET,getConfig().getClientSecret()).param(OAUTH2_PARAMETER_REDIRECT_URI,request.getRedirectUri()).param(OAUTH2_PARAMETER_GRANT_TYPE,OAUTH2_GRANT_TYPE_AUTHORIZATION_CODE).asString();
+      return doHandleResponse(response);
+    }
+    throw new RuntimeException("No authorization code from identity provider.");
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Could not process response from identity provider.",e);
+  }
+}

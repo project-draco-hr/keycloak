@@ -1,0 +1,30 @@
+{
+  String accessToken=extractTokenFromResponse(response,OAUTH2_PARAMETER_ACCESS_TOKEN);
+  if (accessToken == null) {
+    throw new RuntimeException("No access_token from server.");
+  }
+  String idToken=extractTokenFromResponse(response,OIDC_PARAMETER_ID_TOKEN);
+  validateIdToken(idToken);
+  try {
+    JsonNode userInfo=SimpleHttp.doGet(getConfig().getUserInfoUrl()).header("Authorization","Bearer " + accessToken).asJson();
+    String id=getJsonProperty(userInfo,"sub");
+    String name=getJsonProperty(userInfo,"name");
+    String preferredUsername=getJsonProperty(userInfo,"preferred_username");
+    String email=getJsonProperty(userInfo,"email");
+    FederatedIdentity identity=new FederatedIdentity(id);
+    identity.setId(id);
+    identity.setName(name);
+    identity.setEmail(email);
+    if (preferredUsername == null) {
+      preferredUsername=email;
+    }
+    if (preferredUsername == null) {
+      preferredUsername=id;
+    }
+    identity.setUsername(preferredUsername);
+    return AuthenticationResponse.end(identity);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Could not fetch attributes from userinfo endpoint.",e);
+  }
+}

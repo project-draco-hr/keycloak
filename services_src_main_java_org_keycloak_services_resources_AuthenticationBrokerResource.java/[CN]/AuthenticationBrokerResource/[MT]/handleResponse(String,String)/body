@@ -1,0 +1,38 @@
+{
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.getRealmByName(realmName);
+  try {
+    IdentityProvider provider=getIdentityProvider(realm,providerId);
+    if (provider == null) {
+      return Flows.forms(session,realm,null,uriInfo).setError("Social provider not found").createErrorPage();
+    }
+    String relayState=provider.getRelayState(createAuthenticationRequest(providerId,null,realm,null));
+    if (relayState == null) {
+      return redirectToErrorPage(realm,"No authorization code provided.");
+    }
+    ClientSessionCode clientCode=isValidAuthorizationCode(relayState,realm);
+    if (clientCode == null) {
+      return redirectToErrorPage(realm,"Invalid authorization code, please login again through your application.");
+    }
+    ClientSessionModel clientSession=clientCode.getClientSession();
+    AuthenticationResponse authenticationResponse=provider.handleResponse(createAuthenticationRequest(providerId,null,realm,clientSession));
+    Response response=authenticationResponse.getResponse();
+    if (response != null) {
+      return response;
+    }
+    FederatedIdentity socialUser=authenticationResponse.getUser();
+    return performLocalAuthentication(realm,providerId,socialUser,clientCode);
+  }
+ catch (  Exception e) {
+    if (session.getTransaction().isActive()) {
+      session.getTransaction().rollback();
+    }
+    IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(realm,providerId);
+    return Flows.forms(session,realm,null,uriInfo).setError("Authentication failed. Could not authenticate against Identity Provider [" + identityProviderConfig.getName() + "].").createErrorPage();
+  }
+ finally {
+    if (session.getTransaction().isActive()) {
+      session.getTransaction().commit();
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  if (idToken == null) {
+    throw new RuntimeException("No id_token from server.");
+  }
+  try {
+    JsonNode idTokenInfo=asJsonNode(decodeJWS(idToken));
+    String aud=getJsonProperty(idTokenInfo,"aud");
+    String iss=getJsonProperty(idTokenInfo,"iss");
+    if (aud != null && !aud.equals(getConfig().getClientId())) {
+      throw new RuntimeException("Wrong audience from id_token..");
+    }
+    String trustedIssuers=getConfig().getIssuer();
+    if (trustedIssuers != null) {
+      String[] issuers=trustedIssuers.split(",");
+      for (      String trustedIssuer : issuers) {
+        if (iss != null && iss.equals(trustedIssuer.trim())) {
+          return;
+        }
+      }
+      throw new RuntimeException("Wrong issuer from id_token..");
+    }
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Could not decode id token.",e);
+  }
+}

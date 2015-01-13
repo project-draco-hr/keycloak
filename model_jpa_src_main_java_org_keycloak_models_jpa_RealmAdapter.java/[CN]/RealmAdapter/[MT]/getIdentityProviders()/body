@@ -1,0 +1,10 @@
+{
+  List<IdentityProviderModel> identityProviders=new ArrayList<IdentityProviderModel>();
+  for (  IdentityProviderEntity entity : realm.getIdentityProviders()) {
+    IdentityProviderModel identityProviderModel=new IdentityProviderModel(entity.getProviderId(),entity.getId(),entity.getName(),entity.getConfig());
+    identityProviderModel.setEnabled(entity.isEnabled());
+    identityProviderModel.setUpdateProfileFirstLogin(entity.isUpdateProfileFirstLogin());
+    identityProviders.add(identityProviderModel);
+  }
+  return identityProviders;
+}

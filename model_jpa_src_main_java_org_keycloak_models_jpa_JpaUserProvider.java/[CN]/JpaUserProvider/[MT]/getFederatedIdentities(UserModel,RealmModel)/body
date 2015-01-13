@@ -1,0 +1,11 @@
+{
+  TypedQuery<FederatedIdentityEntity> query=em.createNamedQuery("findFederatedIdentityByUser",FederatedIdentityEntity.class);
+  UserEntity userEntity=em.getReference(UserEntity.class,user.getId());
+  query.setParameter("user",userEntity);
+  List<FederatedIdentityEntity> results=query.getResultList();
+  Set<FederatedIdentityModel> set=new HashSet<FederatedIdentityModel>();
+  for (  FederatedIdentityEntity entity : results) {
+    set.add(new FederatedIdentityModel(entity.getIdentityProvider(),entity.getUserId(),entity.getUserName()));
+  }
+  return set;
+}

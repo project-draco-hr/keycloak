@@ -1,0 +1,13 @@
+{
+  try {
+    JsonNode profile=SimpleHttp.doGet(PROFILE_URL).header("Authorization","Bearer " + accessToken).asJson();
+    FederatedIdentity user=new FederatedIdentity(getJsonProperty(profile,"id"));
+    user.setUsername(getJsonProperty(profile,"login"));
+    user.setName(getJsonProperty(profile,"name"));
+    user.setEmail(getJsonProperty(profile,"email"));
+    return user;
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

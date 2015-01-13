@@ -1,0 +1,12 @@
+{
+  if (response.startsWith("{")) {
+    return mapper.readTree(response).get(tokenName).getTextValue();
+  }
+ else {
+    Matcher matcher=Pattern.compile(tokenName + "=([^&]+)").matcher(response);
+    if (matcher.find()) {
+      return matcher.group(1);
+    }
+  }
+  return null;
+}

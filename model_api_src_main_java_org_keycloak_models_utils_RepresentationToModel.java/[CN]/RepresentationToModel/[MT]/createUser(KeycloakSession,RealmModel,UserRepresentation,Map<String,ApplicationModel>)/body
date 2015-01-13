@@ -20,10 +20,10 @@
       updateCredential(user,cred);
     }
   }
-  if (userRep.getSocialLinks() != null) {
-    for (    SocialLinkRepresentation socialLink : userRep.getSocialLinks()) {
-      SocialLinkModel mappingModel=new SocialLinkModel(socialLink.getSocialProvider(),socialLink.getSocialUserId(),socialLink.getSocialUsername());
-      session.users().addSocialLink(newRealm,user,mappingModel);
+  if (userRep.getFederatedIdentities() != null) {
+    for (    FederatedIdentityRepresentation identity : userRep.getFederatedIdentities()) {
+      FederatedIdentityModel mappingModel=new FederatedIdentityModel(identity.getIdentityProvider(),identity.getUserId(),identity.getUserName());
+      session.users().addFederatedIdentity(newRealm,user,mappingModel);
     }
   }
   if (userRep.getRealmRoles() != null) {

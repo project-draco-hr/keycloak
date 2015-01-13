@@ -22,11 +22,11 @@
       session.users().validCredentials(realm,user,UserCredentialModel.password(username));
     }
     if (readSocialLinks) {
-      session.users().getSocialLinks(user,realm);
+      session.users().getFederatedIdentities(user,realm);
     }
     if (searchBySocialLinks) {
-      SocialLinkModel socialLink=new SocialLinkModel("facebook",username,username);
-      session.users().getUserBySocialLink(socialLink,realm);
+      FederatedIdentityModel socialLink=new FederatedIdentityModel("facebook",username,username);
+      session.users().getUserByFederatedIdentity(socialLink,realm);
     }
   }
   log.info("Finished iteration " + ++iterationNumber + " in ReadUsers test for "+ realmId+ " worker. Last read user "+ lastUsername+ " in realm: "+ realmId);

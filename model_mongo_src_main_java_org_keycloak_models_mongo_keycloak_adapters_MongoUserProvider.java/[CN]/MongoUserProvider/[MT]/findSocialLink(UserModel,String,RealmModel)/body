@@ -1,13 +1,13 @@
 {
   UserModel user=getUserById(userModel.getId(),realm);
   MongoUserEntity userEntity=((UserAdapter)user).getUser();
-  List<SocialLinkEntity> linkEntities=userEntity.getSocialLinks();
+  List<FederatedIdentityEntity> linkEntities=userEntity.getSocialLinks();
   if (linkEntities == null) {
     return null;
   }
-  for (  SocialLinkEntity socialLinkEntity : linkEntities) {
-    if (socialLinkEntity.getSocialProvider().equals(socialProvider)) {
-      return socialLinkEntity;
+  for (  FederatedIdentityEntity federatedIdentityEntity : linkEntities) {
+    if (federatedIdentityEntity.getIdentityProvider().equals(socialProvider)) {
+      return federatedIdentityEntity;
     }
   }
   return null;

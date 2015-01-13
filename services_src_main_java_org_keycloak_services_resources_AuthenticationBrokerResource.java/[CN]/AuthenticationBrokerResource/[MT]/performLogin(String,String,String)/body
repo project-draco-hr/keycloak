@@ -1,0 +1,31 @@
+{
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.getRealmByName(realmName);
+  ClientSessionCode clientCode=isValidAuthorizationCode(code,realm);
+  if (clientCode == null) {
+    return redirectToErrorPage(realm,"Invalid code, please login again through your application.");
+  }
+  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.LOGIN).detail(Details.AUTH_METHOD,"unknown_id@" + providerId);
+  try {
+    ClientSessionModel clientSession=clientCode.getClientSession();
+    IdentityProvider identityProvider=getIdentityProvider(realm,providerId);
+    if (identityProvider == null) {
+      event.error(Errors.IDENTITY_PROVIDER_NOT_FOUND);
+      return Flows.forms(session,realm,null,uriInfo).setError("Identity Provider not found").createErrorPage();
+    }
+    AuthenticationResponse authenticationResponse=identityProvider.handleRequest(createAuthenticationRequest(providerId,code,realm,clientSession));
+    Response response=authenticationResponse.getResponse();
+    if (response != null) {
+      event.success();
+      return response;
+    }
+  }
+ catch (  Exception e) {
+    String message="Could not send authentication request to identity provider";
+    event.error(message);
+    return redirectToErrorPage(realm,message);
+  }
+  String message="Could not proceed with authentication request to identity provider.";
+  event.error(message);
+  return redirectToErrorPage(realm,message);
+}

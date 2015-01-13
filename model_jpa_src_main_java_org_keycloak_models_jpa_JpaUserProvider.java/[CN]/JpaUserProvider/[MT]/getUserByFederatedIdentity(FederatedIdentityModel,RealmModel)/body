@@ -1,0 +1,17 @@
+{
+  TypedQuery<UserEntity> query=em.createNamedQuery("findUserByFederatedIdentityAndRealm",UserEntity.class);
+  query.setParameter("realmId",realm.getId());
+  query.setParameter("identityProvider",identity.getIdentityProvider());
+  query.setParameter("userId",identity.getUserId());
+  List<UserEntity> results=query.getResultList();
+  if (results.isEmpty()) {
+    return null;
+  }
+ else   if (results.size() > 1) {
+    throw new IllegalStateException("More results found for identityProvider=" + identity.getIdentityProvider() + ", userId="+ identity.getUserId()+ ", results="+ results);
+  }
+ else {
+    UserEntity user=results.get(0);
+    return new UserAdapter(realm,em,user);
+  }
+}

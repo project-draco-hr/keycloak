@@ -1,0 +1,9 @@
+{
+  UserModel user=getUserById(userModel.getId(),realm);
+  MongoUserEntity userEntity=((UserAdapter)user).getUser();
+  FederatedIdentityEntity federatedIdentityEntity=findSocialLink(userEntity,socialProvider);
+  if (federatedIdentityEntity == null) {
+    return false;
+  }
+  return getMongoStore().pullItemFromList(userEntity,"federatedIdentities",federatedIdentityEntity,invocationContext);
+}

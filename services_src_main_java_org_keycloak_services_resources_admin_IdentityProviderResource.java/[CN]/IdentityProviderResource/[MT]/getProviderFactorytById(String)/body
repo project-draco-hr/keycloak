@@ -1,0 +1,11 @@
+{
+  List<ProviderFactory> allProviders=new ArrayList<ProviderFactory>();
+  allProviders.addAll(this.session.getKeycloakSessionFactory().getProviderFactories(IdentityProvider.class));
+  allProviders.addAll(this.session.getKeycloakSessionFactory().getProviderFactories(SocialIdentityProvider.class));
+  for (  ProviderFactory providerFactory : allProviders) {
+    if (providerFactory.getId().equals(providerId)) {
+      return (IdentityProviderFactory)providerFactory;
+    }
+  }
+  return null;
+}

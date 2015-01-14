@@ -1,0 +1,13 @@
+{
+  if (keycloakDeployment != null) {
+    return keycloakDeployment;
+  }
+  InputStream configInputStream=getClass().getResourceAsStream("/keycloak.json");
+  if (configInputStream == null) {
+    keycloakDeployment=new KeycloakDeployment();
+  }
+ else {
+    keycloakDeployment=KeycloakDeploymentBuilder.build(configInputStream);
+  }
+  return keycloakDeployment;
+}

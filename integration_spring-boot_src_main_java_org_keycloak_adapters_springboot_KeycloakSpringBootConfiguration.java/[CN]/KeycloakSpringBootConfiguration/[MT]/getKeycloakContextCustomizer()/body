@@ -1,0 +1,18 @@
+{
+  return new TomcatContextCustomizer(){
+    @Override public void customize(    Context context){
+      LoginConfig loginConfig=new LoginConfig();
+      loginConfig.setAuthMethod("KEYCLOAK");
+      context.setLoginConfig(loginConfig);
+      context.addSecurityRole("jimmiapprole");
+      SecurityConstraint constraint=new SecurityConstraint();
+      constraint.addAuthRole("jimmiapprole");
+      SecurityCollection collection=new SecurityCollection();
+      collection.addPattern("/*");
+      constraint.addCollection(collection);
+      context.addConstraint(constraint);
+      context.addParameter("keycloak.config.resolver",SpringBootKeycloakConfigResolver.class.getName());
+    }
+  }
+;
+}

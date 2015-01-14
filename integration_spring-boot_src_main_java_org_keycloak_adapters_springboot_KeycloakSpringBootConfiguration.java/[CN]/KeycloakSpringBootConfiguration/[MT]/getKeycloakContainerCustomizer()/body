@@ -1,0 +1,18 @@
+{
+  return new EmbeddedServletContainerCustomizer(){
+    @Override public void customize(    ConfigurableEmbeddedServletContainer configurableEmbeddedServletContainer){
+      if (configurableEmbeddedServletContainer instanceof TomcatEmbeddedServletContainerFactory) {
+        TomcatEmbeddedServletContainerFactory container=(TomcatEmbeddedServletContainerFactory)configurableEmbeddedServletContainer;
+        container.addContextValves(new KeycloakAuthenticatorValve());
+        container.addContextCustomizers(getKeycloakContextCustomizer());
+      }
+ else       if (configurableEmbeddedServletContainer instanceof UndertowEmbeddedServletContainerFactory) {
+        throw new IllegalArgumentException("Undertow Keycloak integration is not yet implemented");
+      }
+ else       if (configurableEmbeddedServletContainer instanceof JettyEmbeddedServletContainerFactory) {
+        throw new IllegalArgumentException("Jetty Keycloak integration is not yet implemented");
+      }
+    }
+  }
+;
+}

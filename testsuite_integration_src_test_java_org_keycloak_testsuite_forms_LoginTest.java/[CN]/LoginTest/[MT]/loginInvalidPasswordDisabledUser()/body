@@ -1,0 +1,23 @@
+{
+  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      session.users().getUserByUsername("login-test",appRealm).setEnabled(false);
+    }
+  }
+);
+  try {
+    loginPage.open();
+    loginPage.login("login-test","invalid");
+    loginPage.assertCurrent();
+    Assert.assertEquals("Invalid username or password.",loginPage.getError());
+    events.expectLogin().user(userId).session((String)null).error("invalid_user_credentials").detail(Details.USERNAME,"login-test").removeDetail(Details.CODE_ID).assertEvent();
+  }
+  finally {
+    keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        session.users().getUserByUsername("login-test",appRealm).setEnabled(true);
+      }
+    }
+);
+  }
+}

@@ -1,0 +1,17 @@
+{
+  String jettyWebXmlLoc;
+  if (this.jettyWebXmlLocation == null) {
+    jettyWebXmlLoc="/WEB-INF/jetty-web.xml";
+  }
+ else {
+    jettyWebXmlLoc=this.jettyWebXmlLocation;
+  }
+  URL jettyWebXml=bundleContext.getBundle().getResource(jettyWebXmlLoc);
+  if (jettyWebXml != null) {
+    log.debug("Found jetty-web XML configuration on bundle classpath on " + jettyWebXmlLoc);
+    service.registerJettyWebXml(jettyWebXml,httpContext);
+  }
+ else {
+    log.debug("Not found jetty-web XML configuration on bundle classpath on " + jettyWebXmlLoc);
+  }
+}

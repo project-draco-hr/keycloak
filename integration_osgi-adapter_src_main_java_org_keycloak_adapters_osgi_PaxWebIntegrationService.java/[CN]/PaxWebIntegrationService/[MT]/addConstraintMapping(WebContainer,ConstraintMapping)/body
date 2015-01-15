@@ -1,0 +1,27 @@
+{
+  Constraint constraint=constraintMapping.getConstraint();
+  String[] roles=constraint.getRoles();
+  String name="Constraint-" + new Random().nextInt();
+  int dataConstraint=constraint.getDataConstraint();
+  String dataConstraintStr;
+switch (dataConstraint) {
+case Constraint.DC_UNSET:
+    dataConstraintStr=null;
+  break;
+case Constraint.DC_NONE:
+dataConstraintStr="NONE";
+break;
+case Constraint.DC_CONFIDENTIAL:
+dataConstraintStr="CONFIDENTIAL";
+break;
+case Constraint.DC_INTEGRAL:
+dataConstraintStr="INTEGRAL";
+break;
+default :
+log.warnv("Unknown data constraint: " + dataConstraint);
+dataConstraintStr="CONFIDENTIAL";
+}
+List<String> rolesList=Arrays.asList(roles);
+log.debug("Adding security constraint name=" + name + ", url="+ constraintMapping.getPathSpec()+ ", dataConstraint="+ dataConstraintStr+ ", canAuthenticate="+ constraint.getAuthenticate()+ ", roles="+ rolesList);
+service.registerConstraintMapping(name,constraintMapping.getPathSpec(),null,dataConstraintStr,constraint.getAuthenticate(),rolesList,httpContext);
+}

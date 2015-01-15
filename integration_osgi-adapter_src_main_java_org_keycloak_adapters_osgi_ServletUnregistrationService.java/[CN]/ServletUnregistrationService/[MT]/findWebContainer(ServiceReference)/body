@@ -1,0 +1,11 @@
+{
+  BundleContext servletBundleContext=servletRef.getBundle().getBundleContext();
+  ServiceReference webContainerReference=servletBundleContext.getServiceReference(WebContainer.class.getName());
+  if (webContainerReference == null) {
+    log.warn("Not found webContainer reference for bundle " + servletBundleContext);
+    return null;
+  }
+ else {
+    return (WebContainer)servletBundleContext.getService(webContainerReference);
+  }
+}

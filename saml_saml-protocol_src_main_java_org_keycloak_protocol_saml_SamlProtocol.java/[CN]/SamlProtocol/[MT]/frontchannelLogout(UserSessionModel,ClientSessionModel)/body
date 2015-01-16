@@ -1,0 +1,28 @@
+{
+  ClientModel client=clientSession.getClient();
+  if (!(client instanceof ApplicationModel))   return null;
+  ApplicationModel app=(ApplicationModel)client;
+  String bindingUri=getBindingUri(client);
+  if (bindingUri == null)   return null;
+  SAML2LogoutRequestBuilder logoutBuilder=createLogoutRequest(clientSession,client);
+  try {
+    if (isLogoutPostBindingForClient(app)) {
+      return logoutBuilder.postBinding().response(bindingUri);
+    }
+ else {
+      return logoutBuilder.redirectBinding().response(bindingUri);
+    }
+  }
+ catch (  ConfigurationException e) {
+    throw new RuntimeException(e);
+  }
+catch (  ProcessingException e) {
+    throw new RuntimeException(e);
+  }
+catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+catch (  ParsingException e) {
+    throw new RuntimeException(e);
+  }
+}

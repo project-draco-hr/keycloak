@@ -1,0 +1,7 @@
+{
+  SAML2LogoutRequestBuilder logoutBuilder=new SAML2LogoutRequestBuilder().userPrincipal(clientSession.getNote(SAML_NAME_ID),clientSession.getNote(SAML_NAME_ID_FORMAT)).destination(client.getClientId());
+  if (requiresRealmSignature(client)) {
+    logoutBuilder.signatureAlgorithm(getSignatureAlgorithm(client)).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
+  }
+  return logoutBuilder;
+}

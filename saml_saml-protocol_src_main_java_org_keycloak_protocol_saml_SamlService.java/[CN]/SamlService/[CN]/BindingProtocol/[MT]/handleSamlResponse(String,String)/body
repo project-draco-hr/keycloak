@@ -1,5 +1,18 @@
 {
-  event.event(EventType.LOGIN);
-  event.error(Errors.INVALID_TOKEN);
-  return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
+  AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers,false);
+  if (authResult == null) {
+    logger.warn("Unknown saml response.");
+    event.event(EventType.LOGIN);
+    event.error(Errors.INVALID_TOKEN);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
+  }
+  UserSessionModel userSession=authResult.getSession();
+  if (userSession.getState() != UserSessionModel.State.LOGGING_OUT) {
+    logger.warn("Unknown saml response.");
+    logger.warn("UserSession is not tagged as logging out.");
+    event.event(EventType.LOGIN);
+    event.error(Errors.INVALID_TOKEN);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
+  }
+  return authManager.browserLogout(session,realm,userSession,uriInfo,clientConnection);
 }

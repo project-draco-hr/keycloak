@@ -1,0 +1,26 @@
+{
+  Document samlResponse=null;
+  try {
+    StatusResponseType statusResponse=new StatusResponseType(IDGenerator.create("ID_"),XMLTimeUtil.getIssueInstant());
+    StatusType statusType=new StatusType();
+    StatusCodeType statusCodeType=new StatusCodeType();
+    statusCodeType.setValue(URI.create(JBossSAMLURIConstants.STATUS_SUCCESS.get()));
+    statusType.setStatusCode(statusCodeType);
+    statusResponse.setStatus(statusType);
+    statusResponse.setInResponseTo(logoutRequestID);
+    NameIDType issuer=new NameIDType();
+    issuer.setValue(responseIssuer);
+    statusResponse.setIssuer(issuer);
+    statusResponse.setDestination(destination);
+    SAML2Response saml2Response=new SAML2Response();
+    samlResponse=saml2Response.convert(statusResponse);
+  }
+ catch (  ConfigurationException e) {
+    throw new ProcessingException(e);
+  }
+catch (  ParsingException e) {
+    throw new ProcessingException(e);
+  }
+  if (encrypt)   encryptDocument(samlResponse);
+  return samlResponse;
+}

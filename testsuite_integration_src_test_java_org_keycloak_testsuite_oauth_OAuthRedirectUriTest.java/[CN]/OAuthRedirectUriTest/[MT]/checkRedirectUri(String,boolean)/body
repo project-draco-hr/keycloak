@@ -8,4 +8,12 @@
     Assert.assertTrue(errorPage.isCurrent());
     Assert.assertEquals("Invalid redirect_uri.",errorPage.getError());
   }
+  if (expectValid) {
+    loginPage.login("test-user@localhost","password");
+    String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+    Assert.assertNotNull(code);
+    OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
+    Assert.assertEquals("Expected success, but got error: " + tokenResponse.getError(),200,tokenResponse.getStatusCode());
+    driver.manage().deleteAllCookies();
+  }
 }

@@ -45,7 +45,7 @@
   event.user(userSession.getUser());
   event.session(userSession.getId());
   ClientModel client=authorizeClient(authorizationHeader,formData,event);
-  String redirectUri=clientSession.getRedirectUri();
+  String redirectUri=clientSession.getNote(OpenIDConnect.REDIRECT_URI_PARAM);
   if (redirectUri != null && !redirectUri.equals(formData.getFirst(OAuth2Constants.REDIRECT_URI))) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");

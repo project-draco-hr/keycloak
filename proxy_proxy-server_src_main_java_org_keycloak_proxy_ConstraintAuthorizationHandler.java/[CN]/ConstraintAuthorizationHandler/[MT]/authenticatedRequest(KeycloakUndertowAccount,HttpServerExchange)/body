@@ -5,14 +5,15 @@
     if (idToken.getSubject() != null) {
       exchange.getRequestHeaders().put(KEYCLOAK_SUBJECT,idToken.getSubject());
     }
-    if (idToken.getPreferredUsername() != null) {
-      exchange.getRequestHeaders().put(KEYCLOAK_USERNAME,idToken.getPreferredUsername());
+    UserClaimSet claimSet=idToken.getUserClaimSet();
+    if (claimSet.getPreferredUsername() != null) {
+      exchange.getRequestHeaders().put(KEYCLOAK_USERNAME,claimSet.getPreferredUsername());
     }
-    if (idToken.getEmail() != null) {
-      exchange.getRequestHeaders().put(KEYCLOAK_EMAIL,idToken.getEmail());
+    if (claimSet.getEmail() != null) {
+      exchange.getRequestHeaders().put(KEYCLOAK_EMAIL,claimSet.getEmail());
     }
-    if (idToken.getName() != null) {
-      exchange.getRequestHeaders().put(KEYCLOAK_NAME,idToken.getName());
+    if (claimSet.getName() != null) {
+      exchange.getRequestHeaders().put(KEYCLOAK_NAME,claimSet.getName());
     }
     if (sendAccessToken) {
       exchange.getRequestHeaders().put(KEYCLOAK_ACCESS_TOKEN,account.getKeycloakSecurityContext().getTokenString());

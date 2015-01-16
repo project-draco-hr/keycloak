@@ -1,0 +1,21 @@
+{
+  try {
+    EventBuilder event=new EventsManager(this.realmModel,this.session,this.clientConnection).createEventBuilder().event(EventType.USER_INFO_REQUEST).detail(Details.AUTH_METHOD,Details.VALIDATE_ACCESS_TOKEN);
+    Response validationResponse=this.openIdConnectService.validateAccessToken(token);
+    if (!AccessToken.class.isInstance(validationResponse.getEntity())) {
+      event.error(EventType.USER_INFO_REQUEST.name());
+      return Response.fromResponse(validationResponse).status(Status.FORBIDDEN).build();
+    }
+    AccessToken accessToken=(AccessToken)validationResponse.getEntity();
+    UserSessionModel userSession=session.sessions().getUserSession(realmModel,accessToken.getSessionState());
+    ClientModel clientModel=realmModel.findClient(accessToken.getIssuedFor());
+    UserModel userModel=userSession.getUser();
+    UserClaimSet userInfo=new UserClaimSet();
+    this.tokenManager.initClaims(userInfo,clientModel,userModel);
+    event.detail(Details.USERNAME,userModel.getUsername()).client(clientModel).session(userSession).user(userModel).success();
+    return Cors.add(request,Response.ok(userInfo)).auth().allowedOrigins(accessToken).build();
+  }
+ catch (  Exception e) {
+    throw new UnauthorizedException("Could not retrieve user info.",e);
+  }
+}

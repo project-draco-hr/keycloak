@@ -1,0 +1,16 @@
+{
+  Client client=ClientBuilder.newClient();
+  UriBuilder builder=UriBuilder.fromUri(org.keycloak.testsuite.Constants.AUTH_SERVER_ROOT);
+  URI grantUri=OpenIDConnectService.grantAccessTokenUrl(builder).build("test");
+  WebTarget grantTarget=client.target(grantUri);
+  AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(grantTarget);
+  Response response=executeUserInfoRequest(accessTokenResponse.getToken());
+  assertEquals(Status.OK.getStatusCode(),response.getStatus());
+  UserInfo userInfo=response.readEntity(UserInfo.class);
+  response.close();
+  assertNotNull(userInfo);
+  assertNotNull(userInfo.getSubject());
+  assertEquals("test-user@localhost",userInfo.getEmail());
+  assertEquals("test-user@localhost",userInfo.getPreferredUsername());
+  client.close();
+}

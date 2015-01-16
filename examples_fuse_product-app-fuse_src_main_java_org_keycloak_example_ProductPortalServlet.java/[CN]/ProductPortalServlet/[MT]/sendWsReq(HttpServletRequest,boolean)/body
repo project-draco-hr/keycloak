@@ -1,0 +1,32 @@
+{
+  JaxWsProxyFactoryBean factory=new JaxWsProxyFactoryBean();
+  factory.setServiceClass(Person.class);
+  factory.setAddress("http://localhost:8282/PersonServiceCF");
+  Person simpleClient=(Person)factory.create();
+  java.lang.String _getPerson_personIdVal="1";
+  javax.xml.ws.Holder<java.lang.String> _getPerson_personId=new javax.xml.ws.Holder<java.lang.String>(_getPerson_personIdVal);
+  javax.xml.ws.Holder<java.lang.String> _getPerson_ssn=new javax.xml.ws.Holder<java.lang.String>();
+  javax.xml.ws.Holder<java.lang.String> _getPerson_name=new javax.xml.ws.Holder<java.lang.String>();
+  if (secured) {
+    Client clientProxy=ClientProxy.getClient(simpleClient);
+    KeycloakSecurityContext session=(KeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
+    Map<String,List<String>> headers=new HashMap<String,List<String>>();
+    headers.put("Authorization",Arrays.asList("Bearer " + session.getTokenString()));
+    clientProxy.getRequestContext().put(Message.PROTOCOL_HEADERS,headers);
+  }
+  try {
+    simpleClient.getPerson(_getPerson_personId,_getPerson_ssn,_getPerson_name);
+    return String.format("Person received: id=%s, name=%s, ssn=%s",_getPerson_personId.value,_getPerson_name.value,_getPerson_ssn.value);
+  }
+ catch (  UnknownPersonFault upf) {
+    return "UnknownPersonFault has occurred. Details: " + upf.toString();
+  }
+catch (  WebServiceException wse) {
+    String error="Can't receive person. Reason: " + wse.getMessage();
+    if (wse.getCause() != null) {
+      Throwable cause=wse.getCause();
+      error=error + " Details: " + cause.getClass().getName()+ ": "+ cause.getMessage();
+    }
+    return error;
+  }
+}

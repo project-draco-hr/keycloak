@@ -1,0 +1,13 @@
+{
+  WebContainer service=(WebContainer)bundleContext.getService(webContainerServiceReference);
+  httpContext=service.createDefaultHttpContext();
+  addJettyWebXml(service);
+  if (constraintMappings == null) {
+    throw new IllegalStateException("constraintMappings was null!");
+  }
+  for (  ConstraintMapping constraintMapping : constraintMappings) {
+    addConstraintMapping(service,constraintMapping);
+  }
+  service.registerLoginConfig("BASIC","does-not-matter",null,null,httpContext);
+  return service;
+}

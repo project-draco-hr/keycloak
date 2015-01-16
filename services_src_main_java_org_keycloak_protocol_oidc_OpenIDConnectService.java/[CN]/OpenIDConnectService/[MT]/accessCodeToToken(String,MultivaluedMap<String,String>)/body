@@ -45,6 +45,14 @@
   event.user(userSession.getUser());
   event.session(userSession.getId());
   ClientModel client=authorizeClient(authorizationHeader,formData,event);
+  String redirectUri=clientSession.getNote(OpenIDConnect.REDIRECT_URI_PARAM);
+  if (redirectUri != null && !redirectUri.equals(formData.getFirst(OAuth2Constants.REDIRECT_URI))) {
+    Map<String,String> res=new HashMap<String,String>();
+    res.put(OAuth2Constants.ERROR,"invalid_grant");
+    res.put(OAuth2Constants.ERROR_DESCRIPTION,"Incorrect redirect_uri");
+    event.error(Errors.INVALID_CODE);
+    return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(res).build();
+  }
   if (!client.getClientId().equals(clientSession.getClient().getClientId())) {
     Map<String,String> res=new HashMap<String,String>();
     res.put(OAuth2Constants.ERROR,"invalid_grant");

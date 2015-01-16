@@ -1,0 +1,17 @@
+{
+  if (servletReference == null) {
+    throw new IllegalStateException("No servlet reference provided");
+  }
+  Servlet servlet=(Servlet)bundleContext.getService(servletReference);
+  WebContainer webContainer=findWebContainer(servletReference);
+  if (webContainer == null) {
+    return;
+  }
+  try {
+    webContainer.unregisterServlet(servlet);
+    log.debugv("Original servlet with alias " + servletReference.getProperty("alias") + " unregistered successfully.");
+  }
+ catch (  IllegalStateException e) {
+    log.warnv("Can't unregister servlet due to: " + e.getMessage());
+  }
+}

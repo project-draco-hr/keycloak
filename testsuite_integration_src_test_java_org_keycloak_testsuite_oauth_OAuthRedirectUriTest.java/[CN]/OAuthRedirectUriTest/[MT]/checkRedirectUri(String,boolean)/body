@@ -14,6 +14,6 @@
     Assert.assertNotNull(code);
     OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
     Assert.assertEquals("Expected success, but got error: " + tokenResponse.getError(),200,tokenResponse.getStatusCode());
-    driver.manage().deleteAllCookies();
+    oauth.doLogout(tokenResponse.getRefreshToken(),"password");
   }
 }

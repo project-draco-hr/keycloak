@@ -1,0 +1,36 @@
+{
+  if (servletReference == null) {
+    throw new IllegalStateException("No servlet reference provided");
+  }
+  final Servlet servlet=(Servlet)bundleContext.getService(servletReference);
+  WebContainer externalWebContainer=findExternalWebContainer();
+  if (externalWebContainer == null) {
+    return;
+  }
+  try {
+    externalWebContainer.unregisterServlet(servlet);
+    log.debug("Original servlet with alias " + getAlias() + " unregistered successfully from external web container.");
+  }
+ catch (  IllegalStateException e) {
+    log.warn("Can't unregister servlet due to: " + e.getMessage());
+  }
+  ServiceTrackerCustomizer trackerCustomizer=new ServiceTrackerCustomizer(){
+    @Override public Object addingService(    ServiceReference webContainerServiceReference){
+      WebContainer ourWebContainer=(WebContainer)bundleContext.getService(webContainerServiceReference);
+      registerServlet(ourWebContainer,servlet);
+      log.debugv("Servlet with alias " + getAlias() + " registered to secured web container");
+      return ourWebContainer;
+    }
+    @Override public void modifiedService(    ServiceReference reference,    Object service){
+    }
+    @Override public void removedService(    ServiceReference webContainerServiceReference,    Object service){
+      WebContainer ourWebContainer=(WebContainer)bundleContext.getService(webContainerServiceReference);
+      String alias=getAlias();
+      ourWebContainer.unregister(alias);
+      log.debug("Servlet with alias " + getAlias() + " unregistered from secured web container");
+    }
+  }
+;
+  webContainerTracker=new ServiceTracker(bundleContext,WebContainer.class.getName(),trackerCustomizer);
+  webContainerTracker.open();
+}

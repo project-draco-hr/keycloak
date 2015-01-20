@@ -1,20 +1,17 @@
 {
   try {
-    Servlet servlet=(Servlet)bundleContext.getService(servletReference);
-    WebContainer webContainer=findWebContainer(servletReference);
-    if (webContainer == null) {
-      return;
-    }
     Hashtable<String,Object> servletInitParams=new Hashtable<String,Object>();
     String[] propNames=servletReference.getPropertyKeys();
     for (    String propName : propNames) {
-      servletInitParams.put(propName,servletReference.getProperty(propName));
+      if (!FILTERED_PROPERTIES.contains(propName)) {
+        servletInitParams.put(propName,servletReference.getProperty(propName));
+      }
     }
     HttpContext httpContext=webContainer.createDefaultHttpContext();
     String alias=(String)servletReference.getProperty("alias");
     webContainer.registerServlet(alias,servlet,servletInitParams,httpContext);
   }
  catch (  Exception e) {
-    log.warn("Can't register original servlet back",e);
+    log.error("Can't register servlet in web container",e);
   }
 }

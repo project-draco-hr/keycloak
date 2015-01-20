@@ -1,0 +1,37 @@
+{
+  AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers,false);
+  if (authResult != null) {
+    String bindingUri=client.getAttribute(SamlProtocol.SAML_LOGOUT_BINDING_URI);
+    if (bindingUri == null)     bindingUri=((ApplicationModel)client).getManagementUrl();
+    bindingUri=ResourceAdminManager.resolveUri(uriInfo.getRequestUri(),bindingUri);
+    UserSessionModel userSession=authResult.getSession();
+    userSession.setNote(SamlProtocol.SAML_LOGOUT_BINDING_URI,bindingUri);
+    if (SamlProtocol.requiresRealmSignature(client)) {
+      userSession.setNote(SamlProtocol.SAML_LOGOUT_SIGNATURE_ALGORITHM,SamlProtocol.getSignatureAlgorithm(client).toString());
+    }
+    if (relayState != null)     userSession.setNote(SamlProtocol.SAML_LOGOUT_RELAY_STATE,relayState);
+    userSession.setNote(SamlProtocol.SAML_LOGOUT_REQUEST_ID,logoutRequest.getID());
+    String logoutBinding=client.getAttribute(SamlProtocol.SAML_LOGOUT_BINDING);
+    if (logoutBinding == null)     logoutBinding=getBindingType();
+    userSession.setNote(SamlProtocol.SAML_LOGOUT_BINDING,logoutBinding);
+    userSession.setNote(SamlProtocol.SAML_LOGOUT_ISSUER,logoutRequest.getIssuer().getValue());
+    userSession.setNote(AuthenticationManager.KEYCLOAK_LOGOUT_PROTOCOL,SamlProtocol.LOGIN_PROTOCOL);
+    return authManager.browserLogout(session,realm,userSession,uriInfo,clientConnection);
+  }
+  String redirectUri=null;
+  if (client instanceof ApplicationModel) {
+    redirectUri=((ApplicationModel)client).getBaseUrl();
+  }
+  if (redirectUri != null) {
+    redirectUri=OpenIDConnectService.verifyRedirectUri(uriInfo,redirectUri,realm,client);
+    if (redirectUri == null) {
+      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid redirect uri.");
+    }
+  }
+  if (redirectUri != null) {
+    return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
+  }
+ else {
+    return Response.ok().build();
+  }
+}

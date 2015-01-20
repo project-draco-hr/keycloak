@@ -1,0 +1,27 @@
+{
+  SAML2LogoutResponseBuilder builder=new SAML2LogoutResponseBuilder();
+  builder.logoutRequestID(userSession.getNote(SAML_LOGOUT_REQUEST_ID));
+  builder.destination(userSession.getNote(SAML_LOGOUT_ISSUER));
+  String signingAlgorithm=userSession.getNote(SAML_LOGOUT_SIGNATURE_ALGORITHM);
+  if (signingAlgorithm != null) {
+    SignatureAlgorithm algorithm=SignatureAlgorithm.valueOf(signingAlgorithm);
+    builder.signatureAlgorithm(algorithm).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
+  }
+  try {
+    if (isLogoutPostBindingForInitiator(userSession)) {
+      return builder.postBinding().response(userSession.getNote(SAML_LOGOUT_BINDING_URI));
+    }
+ else {
+      return builder.redirectBinding().response(userSession.getNote(SAML_LOGOUT_BINDING_URI));
+    }
+  }
+ catch (  ConfigurationException e) {
+    throw new RuntimeException(e);
+  }
+catch (  ProcessingException e) {
+    throw new RuntimeException(e);
+  }
+catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+}

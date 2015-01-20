@@ -1,0 +1,14 @@
+{
+  for (  UserSessionNoteEntity attr : entity.getNotes()) {
+    if (attr.getName().equals(name)) {
+      attr.setValue(value);
+      return;
+    }
+  }
+  UserSessionNoteEntity attr=new UserSessionNoteEntity();
+  attr.setName(name);
+  attr.setValue(value);
+  attr.setUserSession(entity);
+  em.persist(attr);
+  entity.getNotes().add(attr);
+}

@@ -1,6 +1,15 @@
 {
-  MongoUserSessionEntity userSessionEntity=provider.getUserSessionEntity(realm,userSession.getId());
-  entity.setSessionId(userSessionEntity.getId());
-  updateMongoEntity();
-  provider.getMongoStore().pushItemToList(userSessionEntity,"clientSessions",entity.getId(),true,invocationContext);
+  if (userSession == null) {
+    if (entity.getSessionId() != null) {
+      MongoUserSessionEntity userSessionEntity=provider.getUserSessionEntity(realm,entity.getSessionId());
+      provider.getMongoStore().pullItemFromList(userSessionEntity,"clientSessions",entity.getSessionId(),invocationContext);
+    }
+    entity.setSessionId(null);
+  }
+ else {
+    MongoUserSessionEntity userSessionEntity=provider.getUserSessionEntity(realm,userSession.getId());
+    entity.setSessionId(userSessionEntity.getId());
+    updateMongoEntity();
+    provider.getMongoStore().pushItemToList(userSessionEntity,"clientSessions",entity.getId(),true,invocationContext);
+  }
 }

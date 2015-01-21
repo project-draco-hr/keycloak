@@ -1,15 +1,23 @@
 {
-  if (entity.getUserSession() != null) {
-    if (entity.getUserSession().equals(userSession.getId())) {
-      return;
+  if (userSession == null) {
+    if (entity.getUserSession() != null) {
+      provider.dettachSession(getUserSession(),this);
     }
- else {
-      provider.dettachSession(userSession,this);
-    }
+    entity.setUserSession(null);
   }
  else {
-    provider.attachSession(userSession,this);
+    if (entity.getUserSession() != null) {
+      if (entity.getUserSession().equals(userSession.getId())) {
+        return;
+      }
+ else {
+        provider.dettachSession(userSession,this);
+      }
+    }
+ else {
+      provider.attachSession(userSession,this);
+    }
+    entity.setUserSession(userSession.getId());
   }
-  entity.setUserSession(userSession.getId());
   update();
 }

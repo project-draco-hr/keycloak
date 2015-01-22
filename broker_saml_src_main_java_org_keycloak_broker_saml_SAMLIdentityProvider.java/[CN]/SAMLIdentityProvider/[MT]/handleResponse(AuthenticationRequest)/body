@@ -1,22 +1,15 @@
 {
-  HttpRequest httpRequest=request.getHttpRequest();
-  String samlResponse=httpRequest.getFormParameters().getFirst(SAML_RESPONSE_PARAMETER);
-  if (samlResponse == null) {
-    throw new RuntimeException("No response from SAML identity provider.");
-  }
   try {
-    SAML2Request saml2Request=new SAML2Request();
-    ResponseType responseType=(ResponseType)saml2Request.getSAML2ObjectFromStream(PostBindingUtil.base64DecodeAsStream(URLDecoder.decode(samlResponse,"UTF-8")));
-    AssertionType assertion=getAssertion(request,saml2Request,responseType);
+    AssertionType assertion=getAssertion(request);
     SubjectType subject=assertion.getSubject();
     STSubType subType=subject.getSubType();
     NameIDType subjectNameID=(NameIDType)subType.getBaseID();
-    FederatedIdentity user=new FederatedIdentity(subjectNameID.getValue());
-    user.setUsername(subjectNameID.getValue());
+    FederatedIdentity identity=new FederatedIdentity(subjectNameID.getValue());
+    identity.setUsername(subjectNameID.getValue());
     if (subjectNameID.getFormat().toString().equals(JBossSAMLURIConstants.NAMEID_FORMAT_EMAIL.get())) {
-      user.setEmail(subjectNameID.getValue());
+      identity.setEmail(subjectNameID.getValue());
     }
-    return AuthenticationResponse.end(user);
+    return AuthenticationResponse.end(identity);
   }
  catch (  Exception e) {
     throw new RuntimeException("Could not process response from SAML identity provider.",e);

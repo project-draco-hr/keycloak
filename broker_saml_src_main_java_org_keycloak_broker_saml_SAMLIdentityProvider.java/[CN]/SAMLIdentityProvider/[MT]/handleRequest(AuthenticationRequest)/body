@@ -3,16 +3,15 @@
     UriInfo uriInfo=request.getUriInfo();
     String issuerURL=UriBuilder.fromUri(uriInfo.getBaseUri()).build().toString();
     String destinationUrl=getConfig().getSingleSignOnServiceUrl();
-    SAML2Request samlRequest=new SAML2Request();
     String nameIDPolicyFormat=getConfig().getNameIDPolicyFormat();
     if (nameIDPolicyFormat == null) {
       nameIDPolicyFormat=JBossSAMLURIConstants.NAMEID_FORMAT_PERSISTENT.get();
     }
-    samlRequest.setNameIDFormat(nameIDPolicyFormat);
-    AuthnRequestType authn=samlRequest.createAuthnRequestType(IDGenerator.create("ID_"),request.getRedirectUri(),destinationUrl,issuerURL);
-    authn.setProtocolBinding(URI.create(JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get()));
-    authn.setForceAuthn(getConfig().isForceAuthn());
-    Document authnDoc=samlRequest.convert(authn);
+    String protocolBinding=JBossSAMLURIConstants.SAML_HTTP_REDIRECT_BINDING.get();
+    if (getConfig().isPostBindingResponse()) {
+      protocolBinding=JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get();
+    }
+    SAML2AuthnRequestBuilder authnRequestBuilder=new SAML2AuthnRequestBuilder().assertionConsumerUrl(request.getRedirectUri()).destination(destinationUrl).issuer(issuerURL).forceAuthn(getConfig().isForceAuthn()).protocolBinding(protocolBinding).nameIdPolicy(SAML2NameIDPolicyBuilder.format(nameIDPolicyFormat)).relayState(request.getState());
     if (getConfig().isWantAuthnRequestsSigned()) {
       PrivateKey privateKey=request.getRealm().getPrivateKey();
       PublicKey publicKey=request.getRealm().getPublicKey();
@@ -23,12 +22,14 @@
         throw new RuntimeException("Identity Provider [" + getConfig().getName() + "] wants a signed authentication request. But the Realm ["+ request.getRealm().getName()+ "] does not have a public key.");
       }
       KeyPair keypair=new KeyPair(publicKey,privateKey);
-      this.saml2Signature.signSAMLDocument(authnDoc,keypair);
+      authnRequestBuilder.signWith(keypair);
     }
-    byte[] responseBytes=DocumentUtil.getDocumentAsString(authnDoc).getBytes("UTF-8");
-    String urlEncodedResponse=RedirectBindingUtil.deflateBase64URLEncode(responseBytes);
-    URI redirectUri=UriBuilder.fromPath(destinationUrl).queryParam(SAML_REQUEST_PARAMETER,urlEncodedResponse).queryParam(RELAY_STATE_PARAMETER,request.getState()).build();
-    return AuthenticationResponse.temporaryRedirect(redirectUri);
+    if (getConfig().isPostBindingAuthnRequest()) {
+      return AuthenticationResponse.fromResponse(authnRequestBuilder.postBinding().request());
+    }
+ else {
+      return AuthenticationResponse.fromResponse(authnRequestBuilder.redirectBinding().request());
+    }
   }
  catch (  Exception e) {
     throw new RuntimeException("Could not create authentication request.",e);

@@ -1,0 +1,13 @@
+{
+  try {
+    AuthnRequestType authnRequestType=this.authnRequestType;
+    NameIDType nameIDType=new NameIDType();
+    nameIDType.setValue(this.issuer);
+    authnRequestType.setIssuer(nameIDType);
+    authnRequestType.setDestination(URI.create(this.destination));
+    return new SAML2Request().convert(authnRequestType);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Could not convert " + authnRequestType + " to a document.",e);
+  }
+}

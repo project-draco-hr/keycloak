@@ -1,0 +1,25 @@
+{
+  DBCollection users=db.getCollection("users");
+  DBCursor usersCursor=users.find();
+  while (usersCursor.hasNext()) {
+    BasicDBObject user=(BasicDBObject)usersCursor.next();
+    BasicDBList socialLinks=(BasicDBList)user.get("socialLinks");
+    if (socialLinks != null) {
+      BasicDBList federatedIdentities=(BasicDBList)user.get("federatedIdentities");
+      if (federatedIdentities == null) {
+        federatedIdentities=new BasicDBList();
+        user.put("federatedIdentities",federatedIdentities);
+      }
+      for (      Object socialLinkObj : socialLinks) {
+        BasicDBObject socialLink=(BasicDBObject)socialLinkObj;
+        BasicDBObject idFedLink=new BasicDBObject();
+        idFedLink.put("userName",socialLink.get("socialUsername"));
+        idFedLink.put("userId",socialLink.get("socialUserId"));
+        idFedLink.put("identityProvider",socialLink.get("socialProvider"));
+        federatedIdentities.add(idFedLink);
+      }
+      user.remove("socialLinks");
+      users.save(user);
+    }
+  }
+}

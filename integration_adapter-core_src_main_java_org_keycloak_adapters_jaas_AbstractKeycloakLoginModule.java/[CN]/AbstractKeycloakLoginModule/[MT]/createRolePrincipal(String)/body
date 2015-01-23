@@ -1,0 +1,13 @@
+{
+  if (rolePrincipalClass != null && rolePrincipalClass.length() > 0) {
+    try {
+      Class<Principal> clazz=Reflections.classForName(rolePrincipalClass,getClass().getClassLoader());
+      Constructor<Principal> constructor=clazz.getDeclaredConstructor(String.class);
+      return constructor.newInstance(roleName);
+    }
+ catch (    Exception e) {
+      getLogger().warn("Unable to create declared roleClass " + rolePrincipalClass + " due to "+ e.getMessage());
+    }
+  }
+  return new RolePrincipal(roleName);
+}

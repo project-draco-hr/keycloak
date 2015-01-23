@@ -1,0 +1,30 @@
+{
+  DBCollection realms=db.getCollection("realms");
+  DBCursor realmsCursor=realms.find();
+  while (realmsCursor.hasNext()) {
+    BasicDBObject realm=(BasicDBObject)realmsCursor.next();
+    boolean updateProfileOnInitialSocialLogin=realm.getBoolean("updateProfileOnInitialSocialLogin");
+    BasicDBObject socialConfig=(BasicDBObject)realm.get("socialConfig");
+    BasicDBList identityProviders=(BasicDBList)realm.get("identityProviders");
+    if (identityProviders == null) {
+      identityProviders=new BasicDBList();
+      realm.put("identityProviders",identityProviders);
+    }
+    if (socialConfig != null) {
+      for (      Map.Entry<String,Object> entry : socialConfig.entrySet()) {
+        if (entry.getKey().endsWith("###key")) {
+          String socialProviderId=entry.getKey().substring(0,entry.getKey().indexOf("###"));
+          String clientId=(String)entry.getValue();
+          String clientSecret=socialConfig.getString(socialProviderId + "###secret");
+          DBObject identityProviderConfig=new BasicDBObjectBuilder().add("clientId",clientId).add("clientSecret",clientSecret).get();
+          DBObject identityProvider=new BasicDBObjectBuilder().add("providerId",socialProviderId).add("name",socialProviderId).add("id",socialProviderId).add("updateProfileFirstLogin",updateProfileOnInitialSocialLogin).add("enabled",true).add("config",identityProviderConfig).get();
+          identityProviders.add(identityProvider);
+        }
+      }
+    }
+    realm.remove("social");
+    realm.remove("updateProfileOnInitialSocialLogin");
+    realm.remove("socialConfig");
+    realms.save(realm);
+  }
+}

@@ -1,31 +1,36 @@
 {
-  KeycloakSession session=keycloakRule.startSession();
-  RealmModel realm=session.realms().getRealmByName("demo");
-  int originalTokenTimeout=realm.getAccessTokenLifespan();
-  realm.setAccessTokenLifespan(3);
-  session.getTransaction().commit();
-  session.close();
-  String tokenCookie1=loginToCustomerCookiePortal();
-  Time.setOffset(4);
-  driver.navigate().to("http://localhost:8081/customer-cookie-portal");
-  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/customer-cookie-portal");
-  assertLogged();
-  String tokenCookie2=driver.manage().getCookieNamed(AdapterConstants.KEYCLOAK_ADAPTER_STATE_COOKIE).getValue();
-  Assert.assertNotEquals(tokenCookie1,tokenCookie2);
-  driver.navigate().to("http://localhost:8081/customer-portal");
-  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/customer-portal");
-  assertLogged();
-  driver.navigate().to("http://localhost:8081/customer-portal/logout");
-  Assert.assertTrue(driver.getPageSource().contains("servlet logout ok"));
-  driver.navigate().to("http://localhost:8081/customer-portal");
-  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
-  Time.setOffset(8);
-  driver.navigate().to("http://localhost:8081/customer-cookie-portal");
-  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
-  Time.setOffset(0);
-  session=keycloakRule.startSession();
-  realm=session.realms().getRealmByName("demo");
-  realm.setAccessTokenLifespan(originalTokenTimeout);
-  session.getTransaction().commit();
-  session.close();
+  try {
+    KeycloakSession session=keycloakRule.startSession();
+    RealmModel realm=session.realms().getRealmByName("demo");
+    int originalTokenTimeout=realm.getAccessTokenLifespan();
+    realm.setAccessTokenLifespan(3);
+    session.getTransaction().commit();
+    session.close();
+    String tokenCookie1=loginToCustomerCookiePortal();
+    Time.setOffset(4);
+    driver.navigate().to("http://localhost:8081/customer-cookie-portal");
+    Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/customer-cookie-portal");
+    assertLogged();
+    String tokenCookie2=driver.manage().getCookieNamed(AdapterConstants.KEYCLOAK_ADAPTER_STATE_COOKIE).getValue();
+    Assert.assertNotEquals(tokenCookie1,tokenCookie2);
+    driver.navigate().to("http://localhost:8081/customer-portal");
+    Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/customer-portal");
+    assertLogged();
+    driver.navigate().to("http://localhost:8081/customer-portal/logout");
+    Assert.assertTrue(driver.getPageSource().contains("servlet logout ok"));
+    driver.navigate().to("http://localhost:8081/customer-portal");
+    Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+    Time.setOffset(8);
+    driver.navigate().to("http://localhost:8081/customer-cookie-portal");
+    Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+    Time.setOffset(0);
+    session=keycloakRule.startSession();
+    realm=session.realms().getRealmByName("demo");
+    realm.setAccessTokenLifespan(originalTokenTimeout);
+    session.getTransaction().commit();
+    session.close();
+  }
+  finally {
+    Time.setOffset(0);
+  }
 }

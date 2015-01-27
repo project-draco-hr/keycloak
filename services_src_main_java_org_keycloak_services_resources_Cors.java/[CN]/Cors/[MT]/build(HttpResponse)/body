@@ -10,21 +10,27 @@
   }
   logger.debug("build CORS headers and return");
   response.getOutputHeaders().add(ACCESS_CONTROL_ALLOW_ORIGIN,origin);
-  if (allowedMethods != null) {
-    response.getOutputHeaders().add(ACCESS_CONTROL_ALLOW_METHODS,CollectionUtil.join(allowedMethods));
-  }
+  if (preflight) {
+    if (allowedMethods != null) {
+      response.getOutputHeaders().add(ACCESS_CONTROL_ALLOW_METHODS,CollectionUtil.join(allowedMethods));
+    }
  else {
-    response.getOutputHeaders().add(ACCESS_CONTROL_ALLOW_METHODS,DEFAULT_ALLOW_METHODS);
+      response.getOutputHeaders().add(ACCESS_CONTROL_ALLOW_METHODS,DEFAULT_ALLOW_METHODS);
+    }
   }
-  if (exposedHeaders != null) {
+  if (!preflight && exposedHeaders != null) {
     response.getOutputHeaders().add(ACCESS_CONTROL_EXPOSE_HEADERS,CollectionUtil.join(exposedHeaders));
   }
   response.getOutputHeaders().add(ACCESS_CONTROL_ALLOW_CREDENTIALS,Boolean.toString(auth));
-  if (auth) {
-    response.getOutputHeaders().add(ACCESS_CONTROL_ALLOW_HEADERS,String.format("%s, %s",DEFAULT_ALLOW_HEADERS,AUTHORIZATION_HEADER));
-  }
+  if (preflight) {
+    if (auth) {
+      response.getOutputHeaders().add(ACCESS_CONTROL_ALLOW_HEADERS,String.format("%s, %s",DEFAULT_ALLOW_HEADERS,AUTHORIZATION_HEADER));
+    }
  else {
-    response.getOutputHeaders().add(ACCESS_CONTROL_ALLOW_HEADERS,DEFAULT_ALLOW_HEADERS);
+      response.getOutputHeaders().add(ACCESS_CONTROL_ALLOW_HEADERS,DEFAULT_ALLOW_HEADERS);
+    }
   }
-  response.getOutputHeaders().add(ACCESS_CONTROL_MAX_AGE,DEFAULT_MAX_AGE);
+  if (preflight) {
+    response.getOutputHeaders().add(ACCESS_CONTROL_MAX_AGE,DEFAULT_MAX_AGE);
+  }
 }

@@ -16,6 +16,12 @@
     userSession.setNote(SamlProtocol.SAML_LOGOUT_BINDING,logoutBinding);
     userSession.setNote(SamlProtocol.SAML_LOGOUT_ISSUER,logoutRequest.getIssuer().getValue());
     userSession.setNote(AuthenticationManager.KEYCLOAK_LOGOUT_PROTOCOL,SamlProtocol.LOGIN_PROTOCOL);
+    for (    ClientSessionModel clientSession : userSession.getClientSessions()) {
+      if (clientSession.getClient().getId().equals(client.getId())) {
+        clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT);
+      }
+    }
+    logger.debug("browser Logout");
     return authManager.browserLogout(session,realm,userSession,uriInfo,clientConnection);
   }
   String redirectUri=null;

@@ -7,10 +7,11 @@
   SAML2LogoutRequestBuilder logoutBuilder=createLogoutRequest(clientSession,client);
   try {
     if (isLogoutPostBindingForClient(app)) {
-      return logoutBuilder.postBinding().response(bindingUri);
+      return logoutBuilder.postBinding().request(bindingUri);
     }
  else {
-      return logoutBuilder.redirectBinding().response(bindingUri);
+      logger.debug("frontchannel redirect binding");
+      return logoutBuilder.redirectBinding().request(bindingUri);
     }
   }
  catch (  ConfigurationException e) {

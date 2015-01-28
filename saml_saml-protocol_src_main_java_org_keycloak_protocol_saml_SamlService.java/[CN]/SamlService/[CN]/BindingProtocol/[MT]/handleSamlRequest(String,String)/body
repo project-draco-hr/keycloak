@@ -38,12 +38,15 @@
     event.error(Errors.INVALID_SIGNATURE);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid requester.");
   }
+  logger.debug("verified request");
   if (samlObject instanceof AuthnRequestType) {
+    logger.debug("** login request");
     event.event(EventType.LOGIN);
     AuthnRequestType authn=(AuthnRequestType)samlObject;
     return loginRequest(relayState,authn,client);
   }
  else   if (samlObject instanceof LogoutRequestType) {
+    logger.debug("** logout request");
     event.event(EventType.LOGOUT);
     LogoutRequestType logout=(LogoutRequestType)samlObject;
     return logoutRequest(logout,client,relayState);

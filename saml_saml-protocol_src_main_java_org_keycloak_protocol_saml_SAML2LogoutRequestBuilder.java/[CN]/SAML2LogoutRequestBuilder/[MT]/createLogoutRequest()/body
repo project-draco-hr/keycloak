@@ -5,6 +5,11 @@
   String nameIDFormat=userPrincipalFormat;
   nameID.setFormat(URI.create(nameIDFormat));
   lort.setNameID(nameID);
+  if (issuer != null) {
+    NameIDType issuerID=new NameIDType();
+    issuerID.setValue(issuer);
+    lort.setIssuer(issuerID);
+  }
   long assertionValidity=PicketLinkCoreSTS.instance().getConfiguration().getIssuedTokenTimeout();
   lort.setNotOnOrAfter(XMLTimeUtil.add(lort.getIssueInstant(),assertionValidity));
   lort.setDestination(URI.create(destination));

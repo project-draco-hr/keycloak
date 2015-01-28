@@ -1,0 +1,10 @@
+{
+  RealmRepresentation realmRepresentation=loadJson("model/test-realm-with-identity-provider.json");
+  assertNotNull(realmRepresentation);
+  assertEquals("test-realm-with-identity-provider",realmRepresentation.getRealm());
+  RealmModel realmModel=this.realmManager.importRealm(realmRepresentation);
+  commit();
+  realmModel=this.realmManager.getRealm(realmModel.getId());
+  assertNotNull(realmModel);
+  return realmModel;
+}

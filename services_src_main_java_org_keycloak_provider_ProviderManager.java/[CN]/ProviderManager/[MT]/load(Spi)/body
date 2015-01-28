@@ -1,0 +1,13 @@
+{
+  List<ProviderFactory> factories=cache.get(spi.getName());
+  if (factories == null) {
+    factories=new LinkedList<ProviderFactory>();
+    for (    ProviderLoader loader : loaders) {
+      List<ProviderFactory> f=loader.load(spi);
+      if (f != null) {
+        factories.addAll(f);
+      }
+    }
+  }
+  return factories;
+}

@@ -1,18 +1,22 @@
 {
+  ProviderManager pm=new ProviderManager(getClass().getClassLoader(),Config.scope().getArray("providers"));
   for (  Spi spi : ServiceLoader.load(Spi.class)) {
     Map<String,ProviderFactory> factories=new HashMap<String,ProviderFactory>();
     factoriesMap.put(spi.getProviderClass(),factories);
     String provider=Config.getProvider(spi.getName());
     if (provider != null) {
       this.provider.put(spi.getProviderClass(),provider);
-      ProviderFactory factory=loadProviderFactory(spi,provider);
+      ProviderFactory factory=pm.load(spi,provider);
+      if (factory == null) {
+        throw new RuntimeException("Failed to find provider " + provider + " for "+ spi.getName());
+      }
       Config.Scope scope=Config.scope(spi.getName(),provider);
       factory.init(scope);
       factories.put(factory.getId(),factory);
       log.debugv("Loaded SPI {0} (provider = {1})",spi.getName(),provider);
     }
  else {
-      for (      ProviderFactory factory : ServiceLoader.load(spi.getProviderFactoryClass())) {
+      for (      ProviderFactory factory : pm.load(spi)) {
         Config.Scope scope=Config.scope(spi.getName(),factory.getId());
         factory.init(scope);
         factories.put(factory.getId(),factory);

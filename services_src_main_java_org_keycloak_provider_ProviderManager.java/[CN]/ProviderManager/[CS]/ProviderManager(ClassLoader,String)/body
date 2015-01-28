@@ -1,0 +1,25 @@
+{
+  List<ProviderLoaderFactory> factories=new LinkedList<ProviderLoaderFactory>();
+  for (  ProviderLoaderFactory f : ServiceLoader.load(ProviderLoaderFactory.class)) {
+    factories.add(f);
+  }
+  log.debugv("Provider loaders {0}",factories);
+  loaders.add(new DefaultProviderLoader(baseClassLoader));
+  if (resources != null) {
+    for (    String r : resources) {
+      String type=r.substring(0,r.indexOf(':'));
+      String resource=r.substring(r.indexOf(':') + 1,r.length());
+      boolean found=false;
+      for (      ProviderLoaderFactory f : factories) {
+        if (f.supports(type)) {
+          loaders.add(f.create(baseClassLoader,resource));
+          found=true;
+          break;
+        }
+      }
+      if (!found) {
+        throw new RuntimeException("Provider loader for " + r + " not found");
+      }
+    }
+  }
+}

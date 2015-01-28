@@ -1,0 +1,23 @@
+{
+  try {
+    List<URL> urls=new LinkedList<URL>();
+    for (    String f : files) {
+      if (f.endsWith("*")) {
+        File dir=new File(f.substring(0,f.length() - 1));
+        if (dir.isDirectory()) {
+          for (          File file : dir.listFiles(new JarFilter())) {
+            urls.add(file.toURI().toURL());
+          }
+        }
+      }
+ else {
+        urls.add(new File(f).toURI().toURL());
+      }
+    }
+    log.debug("Loading providers from " + urls.toString());
+    return new URLClassLoader(urls.toArray(new URL[urls.size()]),parent);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

@@ -1,12 +1,11 @@
 {
-  for (  IdentityProviderModel model : realm.getIdentityProviders()) {
-    if (model.getId().equals(providerId)) {
-      IdentityProviderFactory providerFactory=getIdentityProviderFactory(model);
-      if (providerFactory == null) {
-        throw new RuntimeException("Could not find provider factory for identity provider [" + providerId + "].");
-      }
-      return providerFactory.create(model);
+  IdentityProviderModel identityProviderModel=realm.getIdentityProviderById(providerId);
+  if (identityProviderModel != null) {
+    IdentityProviderFactory providerFactory=getIdentityProviderFactory(identityProviderModel);
+    if (providerFactory == null) {
+      throw new RuntimeException("Could not find provider factory for identity provider [" + providerId + "].");
     }
+    return providerFactory.create(identityProviderModel);
   }
   return null;
 }

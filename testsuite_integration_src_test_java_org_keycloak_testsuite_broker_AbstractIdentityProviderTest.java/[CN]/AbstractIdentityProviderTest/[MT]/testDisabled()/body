@@ -1,0 +1,12 @@
+{
+  IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+  identityProviderModel.setEnabled(false);
+  this.driver.navigate().to("http://localhost:8081/test-app/");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/login"));
+  try {
+    this.driver.findElement(By.className(getProviderId()));
+    fail("Provider [" + getProviderId() + "] not disabled.");
+  }
+ catch (  NoSuchElementException nsee) {
+  }
+}

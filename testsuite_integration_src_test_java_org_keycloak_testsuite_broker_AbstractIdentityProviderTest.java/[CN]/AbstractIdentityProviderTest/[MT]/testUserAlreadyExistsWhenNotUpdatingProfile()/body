@@ -1,0 +1,13 @@
+{
+  IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+  identityProviderModel.setUpdateProfileFirstLogin(false);
+  this.driver.navigate().to("http://localhost:8081/test-app/");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/login"));
+  this.loginPage.clickSocial(getProviderId());
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8082/auth/"));
+  this.loginPage.login("pedroigor","password");
+  doAfterProviderAuthentication();
+  WebElement element=this.driver.findElement(By.className("kc-feedback-text"));
+  assertNotNull(element);
+  assertEquals("User with email already exists. Please login to account management to link the account.",element.getText());
+}

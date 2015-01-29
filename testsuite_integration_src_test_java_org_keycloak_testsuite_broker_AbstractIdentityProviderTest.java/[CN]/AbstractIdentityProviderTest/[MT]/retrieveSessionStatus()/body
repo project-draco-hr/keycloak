@@ -1,0 +1,13 @@
+{
+  UserSessionStatus sessionStatus=null;
+  try {
+    ObjectMapper objectMapper=new ObjectMapper();
+    String pageSource=this.driver.getPageSource();
+    sessionStatus=objectMapper.readValue(pageSource.getBytes(),UserSessionStatus.class);
+    assertNotNull(retrieveSessionStatus());
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Could not retrieve session status.",e);
+  }
+  return sessionStatus;
+}

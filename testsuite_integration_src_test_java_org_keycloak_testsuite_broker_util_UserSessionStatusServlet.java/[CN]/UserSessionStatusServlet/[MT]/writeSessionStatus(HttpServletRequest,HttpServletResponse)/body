@@ -1,0 +1,8 @@
+{
+  KeycloakSecurityContext context=(KeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
+  IDToken idToken=context.getIdToken();
+  JsonNode jsonNode=new ObjectMapper().valueToTree(new UserSessionStatus(idToken));
+  PrintWriter writer=resp.getWriter();
+  writer.println(jsonNode.toString());
+  writer.flush();
+}

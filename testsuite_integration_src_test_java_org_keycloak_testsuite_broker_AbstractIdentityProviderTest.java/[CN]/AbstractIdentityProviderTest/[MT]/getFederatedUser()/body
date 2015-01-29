@@ -1,13 +1,7 @@
 {
+  UserSessionStatus userSessionStatus=retrieveSessionStatus();
+  IDToken idToken=userSessionStatus.getIdToken();
   KeycloakSession samlServerSession=brokerServerRule.startSession();
   RealmModel brokerRealm=samlServerSession.realms().getRealm("realm-with-broker");
-  UserModel userModel=samlServerSession.users().getUserByUsername("test-user",brokerRealm);
-  if (userModel != null) {
-    return userModel;
-  }
-  userModel=samlServerSession.users().getUserByEmail("test-user@localhost",brokerRealm);
-  if (userModel == null) {
-    return samlServerSession.users().getUserByEmail("new@email.com",brokerRealm);
-  }
-  return userModel;
+  return samlServerSession.users().getUserById(idToken.getSubject(),brokerRealm);
 }

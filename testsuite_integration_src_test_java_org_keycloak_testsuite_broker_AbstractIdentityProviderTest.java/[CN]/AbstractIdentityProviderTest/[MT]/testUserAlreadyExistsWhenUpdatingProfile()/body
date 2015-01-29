@@ -1,0 +1,20 @@
+{
+  IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+  identityProviderModel.setUpdateProfileFirstLogin(true);
+  this.driver.navigate().to("http://localhost:8081/test-app/");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/login"));
+  this.loginPage.clickSocial(getProviderId());
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8082/auth/"));
+  this.loginPage.login("test-user","password");
+  doAfterProviderAuthentication();
+  this.updateProfilePage.assertCurrent();
+  this.updateProfilePage.update("Test","User","psilva@redhat.com");
+  WebElement element=this.driver.findElement(By.className("kc-feedback-text"));
+  assertNotNull(element);
+  assertEquals("Email already exists",element.getText());
+  this.updateProfilePage.assertCurrent();
+  this.updateProfilePage.update("Test","User","test-user@redhat.com");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
+  UserModel federatedUser=getFederatedUser();
+  assertNotNull(federatedUser);
+}

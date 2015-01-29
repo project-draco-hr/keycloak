@@ -2,9 +2,12 @@
   RealmRepresentation realmRepresentation=loadJson("broker-test/test-realm-with-broker.json");
   assertNotNull(realmRepresentation);
   assertEquals("realm-with-broker",realmRepresentation.getRealm());
-  RealmModel realmModel=this.realmManager.importRealm(realmRepresentation);
-  commit();
-  realmModel=this.realmManager.getRealm(realmModel.getId());
-  assertNotNull(realmModel);
+  RealmModel realmModel=this.realmManager.getRealm("realm-with-broker");
+  if (realmModel == null) {
+    realmModel=this.realmManager.importRealm(realmRepresentation);
+    commit();
+    realmModel=this.realmManager.getRealm(realmModel.getId());
+    assertNotNull(realmModel);
+  }
   return realmModel;
 }

@@ -1,0 +1,13 @@
+{
+  RealmModel realm=getRealm();
+  List<UserModel> users=this.session.users().getUsers(realm);
+  for (  UserModel user : users) {
+    Set<FederatedIdentityModel> identities=this.session.users().getFederatedIdentities(user,realm);
+    for (    FederatedIdentityModel fedIdentity : identities) {
+      this.session.users().removeFederatedIdentity(realm,user,fedIdentity.getIdentityProvider());
+    }
+    if (!user.getUsername().equals("pedroigor")) {
+      this.session.users().removeUser(realm,user);
+    }
+  }
+}

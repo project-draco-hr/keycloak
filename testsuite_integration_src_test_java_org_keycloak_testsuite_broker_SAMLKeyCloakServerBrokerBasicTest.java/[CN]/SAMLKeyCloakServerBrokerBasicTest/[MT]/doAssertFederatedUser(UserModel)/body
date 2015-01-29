@@ -1,0 +1,11 @@
+{
+  IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+  if (identityProviderModel.isUpdateProfileFirstLogin()) {
+    super.doAssertFederatedUser(federatedUser);
+  }
+ else {
+    assertEquals("test-user@localhost",federatedUser.getEmail());
+    assertNull(federatedUser.getFirstName());
+    assertNull(federatedUser.getLastName());
+  }
+}

@@ -18,6 +18,13 @@
     return oauth.cancelLogin(clientSession);
   }
   String accessCode=new ClientSessionCode(realm,clientSession).getCode();
+  if (idpHint != null && !"".equals(idpHint)) {
+    IdentityProviderModel identityProviderModel=realm.getIdentityProviderById(idpHint);
+    if (identityProviderModel == null) {
+      return Flows.forms(session,realm,null,uriInfo).setError("Could not find an identity provider with the identifier [" + idpHint + "].").createErrorPage();
+    }
+    return Response.temporaryRedirect(Urls.identityProviderAuthnRequest(this.uriInfo.getBaseUri(),identityProviderModel,realm,accessCode)).build();
+  }
   List<RequiredCredentialModel> requiredCredentials=realm.getRequiredCredentials();
   if (requiredCredentials.isEmpty()) {
     List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();

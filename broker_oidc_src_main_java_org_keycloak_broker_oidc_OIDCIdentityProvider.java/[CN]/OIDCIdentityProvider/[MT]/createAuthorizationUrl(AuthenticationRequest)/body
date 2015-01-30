@@ -1,3 +1,8 @@
 {
-  return super.createAuthorizationUrl(request).queryParam(OAUTH2_PARAMETER_PROMPT,getConfig().getPrompt());
+  UriBuilder authorizationUrl=super.createAuthorizationUrl(request);
+  String prompt=getConfig().getPrompt();
+  if (prompt != null && !prompt.isEmpty()) {
+    authorizationUrl.queryParam(OAUTH2_PARAMETER_PROMPT,prompt);
+  }
+  return authorizationUrl;
 }

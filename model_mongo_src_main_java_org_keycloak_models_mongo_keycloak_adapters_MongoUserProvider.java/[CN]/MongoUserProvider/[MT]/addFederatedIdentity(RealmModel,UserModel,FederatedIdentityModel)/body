@@ -2,8 +2,9 @@
   user=getUserById(user.getId(),realm);
   MongoUserEntity userEntity=((UserAdapter)user).getUser();
   FederatedIdentityEntity federatedIdentityEntity=new FederatedIdentityEntity();
-  federatedIdentityEntity.setIdentityProvider(socialLink.getIdentityProvider());
-  federatedIdentityEntity.setUserId(socialLink.getUserId());
-  federatedIdentityEntity.setUserName(socialLink.getUserName());
+  federatedIdentityEntity.setIdentityProvider(identity.getIdentityProvider());
+  federatedIdentityEntity.setUserId(identity.getUserId());
+  federatedIdentityEntity.setUserName(identity.getUserName());
+  federatedIdentityEntity.setToken(identity.getToken());
   getMongoStore().pushItemToList(userEntity,"federatedIdentities",federatedIdentityEntity,true,invocationContext);
 }

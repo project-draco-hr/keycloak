@@ -44,8 +44,8 @@
   URI baseUri=uriBuilder.build();
   if (realm != null) {
     attributes.put("realm",new RealmBean(realm));
-    attributes.put("social",new IdentityProviderBean(realm,baseUri));
-    attributes.put("url",new UrlBean(realm,theme,baseUri));
+    attributes.put("social",new IdentityProviderBean(realm,baseUri,this.uriInfo));
+    attributes.put("url",new UrlBean(realm,theme,baseUri,this.actionUri));
   }
   if (client != null) {
     attributes.put("client",new ClientBean(client));
@@ -62,7 +62,7 @@ case REGISTER:
 attributes.put("register",new RegisterBean(formData));
 break;
 case OAUTH_GRANT:
-attributes.put("oauth",new OAuthGrantBean(accessCode,client,realmRolesRequested,resourceRolesRequested));
+attributes.put("oauth",new OAuthGrantBean(accessCode,client,realmRolesRequested,resourceRolesRequested,this.accessRequestMessage));
 break;
 case CODE:
 attributes.put(OAuth2Constants.CODE,new CodeBean(accessCode,messageType == MessageType.ERROR ? message : null));

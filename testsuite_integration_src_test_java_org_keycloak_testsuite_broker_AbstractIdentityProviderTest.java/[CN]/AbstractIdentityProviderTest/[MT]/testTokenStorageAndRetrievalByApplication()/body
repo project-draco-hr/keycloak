@@ -1,0 +1,31 @@
+{
+  IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+  identityProviderModel.setStoreToken(true);
+  authenticateWithIdentityProvider(identityProviderModel);
+  UserModel federatedUser=getFederatedUser();
+  RealmModel realm=getRealm();
+  Set<FederatedIdentityModel> federatedIdentities=this.session.users().getFederatedIdentities(federatedUser,realm);
+  assertFalse(federatedIdentities.isEmpty());
+  assertEquals(1,federatedIdentities.size());
+  FederatedIdentityModel identityModel=federatedIdentities.iterator().next();
+  assertNotNull(identityModel.getToken());
+  UserSessionStatus userSessionStatus=retrieveSessionStatus();
+  String accessToken=userSessionStatus.getAccessTokenString();
+  String tokenEndpointUrl="http://localhost:8081/auth/broker/realm-with-broker/" + getProviderId() + "/token";
+  final String authHeader="Bearer " + accessToken;
+  ClientRequestFilter authFilter=new ClientRequestFilter(){
+    @Override public void filter(    ClientRequestContext requestContext) throws IOException {
+      requestContext.getHeaders().add(HttpHeaders.AUTHORIZATION,authHeader);
+    }
+  }
+;
+  Client client=ClientBuilder.newBuilder().register(authFilter).build();
+  UriBuilder authBase=UriBuilder.fromUri(tokenEndpointUrl);
+  WebTarget tokenEndpoint=client.target(authBase);
+  Response response=tokenEndpoint.request().get();
+  assertEquals(Response.Status.OK.getStatusCode(),response.getStatus());
+  assertNotNull(response.readEntity(String.class));
+  driver.navigate().to("http://localhost:8081/test-app/logout");
+  driver.navigate().to("http://localhost:8081/test-app");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/login"));
+}

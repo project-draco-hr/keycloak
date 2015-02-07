@@ -60,6 +60,7 @@
     addRequiredCredential(newRealm,CredentialRepresentation.PASSWORD);
   }
   if (rep.getPasswordPolicy() != null)   newRealm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
+  importIdentityProviders(rep,newRealm);
   if (rep.getApplications() != null) {
     Map<String,ApplicationModel> appMap=createApplications(rep,newRealm);
   }
@@ -157,18 +158,6 @@
   if (rep.getUsers() != null) {
     for (    UserRepresentation userRep : rep.getUsers()) {
       UserModel user=createUser(session,newRealm,userRep,appMap);
-    }
-  }
-  if (rep.getIdentityProviders() != null) {
-    for (    IdentityProviderRepresentation identityProviderRepresentation : rep.getIdentityProviders()) {
-      IdentityProviderModel identityProviderModel=new IdentityProviderModel();
-      identityProviderModel.setId(identityProviderRepresentation.getId());
-      identityProviderModel.setProviderId(identityProviderRepresentation.getProviderId());
-      identityProviderModel.setName(identityProviderRepresentation.getName());
-      identityProviderModel.setEnabled(identityProviderRepresentation.isEnabled());
-      identityProviderModel.setUpdateProfileFirstLogin(identityProviderRepresentation.isUpdateProfileFirstLogin());
-      identityProviderModel.setConfig(identityProviderRepresentation.getConfig());
-      newRealm.addIdentityProvider(identityProviderModel);
     }
   }
 }

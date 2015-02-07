@@ -15,13 +15,18 @@
       return redirectToErrorPage(realm,"Invalid authorization code, please login again through your application.");
     }
     ClientSessionModel clientSession=clientCode.getClientSession();
-    AuthenticationResponse authenticationResponse=provider.handleResponse(createAuthenticationRequest(providerId,null,realm,clientSession));
-    Response response=authenticationResponse.getResponse();
+    ClientModel clientModel=clientSession.getClient();
+    Response response=checkClientPermissions(clientModel,providerId);
     if (response != null) {
       return response;
     }
-    FederatedIdentity socialUser=authenticationResponse.getUser();
-    return performLocalAuthentication(realm,providerId,socialUser,clientCode);
+    AuthenticationResponse authenticationResponse=provider.handleResponse(createAuthenticationRequest(providerId,null,realm,clientSession));
+    response=authenticationResponse.getResponse();
+    if (response != null) {
+      return response;
+    }
+    FederatedIdentity identity=authenticationResponse.getUser();
+    return performLocalAuthentication(realm,providerId,identity,clientCode);
   }
  catch (  Exception e) {
     if (session.getTransaction().isActive()) {

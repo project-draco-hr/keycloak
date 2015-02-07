@@ -8,13 +8,18 @@
   EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.LOGIN).detail(Details.AUTH_METHOD,"unknown_id@" + providerId);
   try {
     ClientSessionModel clientSession=clientCode.getClientSession();
+    ClientModel clientModel=clientSession.getClient();
+    Response response=checkClientPermissions(clientModel,providerId);
+    if (response != null) {
+      return response;
+    }
     IdentityProvider identityProvider=getIdentityProvider(realm,providerId);
     if (identityProvider == null) {
       event.error(Errors.IDENTITY_PROVIDER_NOT_FOUND);
       return Flows.forms(session,realm,null,uriInfo).setError("Identity Provider not found").createErrorPage();
     }
     AuthenticationResponse authenticationResponse=identityProvider.handleRequest(createAuthenticationRequest(providerId,code,realm,clientSession));
-    Response response=authenticationResponse.getResponse();
+    response=authenticationResponse.getResponse();
     if (response != null) {
       event.success();
       return response;

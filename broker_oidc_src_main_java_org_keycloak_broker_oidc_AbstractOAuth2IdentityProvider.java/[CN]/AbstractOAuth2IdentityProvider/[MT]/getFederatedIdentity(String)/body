@@ -1,3 +1,7 @@
 {
-  throw new RuntimeException("Not implemented.");
+  String accessToken=extractTokenFromResponse(response,OAUTH2_PARAMETER_ACCESS_TOKEN);
+  if (accessToken == null) {
+    throw new RuntimeException("No access token from server.");
+  }
+  return doGetFederatedIdentity(accessToken);
 }

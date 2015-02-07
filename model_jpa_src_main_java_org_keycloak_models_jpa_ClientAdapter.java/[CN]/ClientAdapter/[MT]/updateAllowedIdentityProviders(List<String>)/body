@@ -1,0 +1,25 @@
+{
+  Collection<IdentityProviderEntity> entities=entity.getAllowedIdentityProviders();
+  Set<String> already=new HashSet<String>();
+  List<IdentityProviderEntity> remove=new ArrayList<IdentityProviderEntity>();
+  for (  IdentityProviderEntity rel : entities) {
+    if (!contains(rel.getId(),identityProviders.toArray(new String[identityProviders.size()]))) {
+      remove.add(rel);
+    }
+ else {
+      already.add(rel.getId());
+    }
+  }
+  for (  IdentityProviderEntity entity : remove) {
+    entities.remove(entity);
+  }
+  em.flush();
+  for (  String providerId : identityProviders) {
+    if (!already.contains(providerId)) {
+      TypedQuery<IdentityProviderEntity> query=em.createNamedQuery("findIdentityProviderById",IdentityProviderEntity.class).setParameter("id",providerId);
+      IdentityProviderEntity providerEntity=query.getSingleResult();
+      entities.add(providerEntity);
+    }
+  }
+  em.flush();
+}

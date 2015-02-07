@@ -10,7 +10,7 @@
   Assert.assertEquals("Your password has been updated",profilePage.getSuccess());
   events.expectAccount(EventType.UPDATE_PASSWORD).assertEvent();
   changePasswordPage.logout();
-  events.expectLogout(sessionId).detail(Details.REDIRECT_URI,AccountPasswordPage.PATH).assertEvent();
+  events.expectLogout(sessionId).detail(Details.REDIRECT_URI,changePasswordPage.getPath()).assertEvent();
   loginPage.open();
   loginPage.login("test-user@localhost","password");
   Assert.assertEquals("Invalid username or password.",loginPage.getError());

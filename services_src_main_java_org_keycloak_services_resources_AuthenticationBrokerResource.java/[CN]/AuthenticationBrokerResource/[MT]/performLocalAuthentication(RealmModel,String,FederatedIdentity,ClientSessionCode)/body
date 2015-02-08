@@ -1,15 +1,15 @@
 {
   ClientSessionModel clientSession=clientCode.getClientSession();
-  FederatedIdentityModel identityModel=new FederatedIdentityModel(providerId,identity.getId(),identity.getUsername(),identity.getToken());
-  UserModel federatedUser=session.users().getUserByFederatedIdentity(identityModel,realm);
+  FederatedIdentityModel federatedIdentityModel=new FederatedIdentityModel(providerId,updatedIdentity.getId(),updatedIdentity.getUsername(),updatedIdentity.getToken());
+  UserModel federatedUser=session.users().getUserByFederatedIdentity(federatedIdentityModel,realm);
   IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(realm,providerId);
-  String authMethod=identityModel.getUserId() + "@" + identityProviderConfig.getId();
+  String authMethod=federatedIdentityModel.getUserId() + "@" + identityProviderConfig.getId();
   EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.LOGIN).client(clientSession.getClient()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.AUTH_METHOD,authMethod);
   event.detail(Details.USERNAME,authMethod);
   if (clientSession.getUserSession() != null) {
     UserModel authenticatedUser=clientSession.getUserSession().getUser();
     if (federatedUser != null) {
-      String message="The identity returned by the Identity Provider [" + identityProviderConfig.getName() + "] is already linked to other user";
+      String message="The updatedIdentity returned by the Identity Provider [" + identityProviderConfig.getName() + "] is already linked to other user";
       event.error(message);
       return redirectToErrorPage(realm,message);
     }
@@ -19,25 +19,25 @@
     }
     if (!authenticatedUser.hasRole(realm.getApplicationByName(ACCOUNT_MANAGEMENT_APP).getRole(MANAGE_ACCOUNT))) {
       event.error(Errors.NOT_ALLOWED);
-      return redirectToErrorPage(realm,"Insufficient permissions to link identity");
+      return redirectToErrorPage(realm,"Insufficient permissions to link updatedIdentity");
     }
-    session.users().addFederatedIdentity(realm,authenticatedUser,identityModel);
+    session.users().addFederatedIdentity(realm,authenticatedUser,federatedIdentityModel);
     event.success();
     return Response.status(302).location(UriBuilder.fromUri(clientSession.getRedirectUri()).build()).build();
   }
-  UserModel user=session.users().getUserByEmail(identity.getEmail(),realm);
+  UserModel user=session.users().getUserByEmail(updatedIdentity.getEmail(),realm);
   String errorMessage="federatedIdentityEmailExists";
   if (user == null) {
-    user=session.users().getUserByUsername(identity.getUsername(),realm);
+    user=session.users().getUserByUsername(updatedIdentity.getUsername(),realm);
     errorMessage="federatedIdentityUsernameExists";
   }
   if (user == null) {
-    federatedUser=session.users().addUser(realm,identity.getUsername());
+    federatedUser=session.users().addUser(realm,updatedIdentity.getUsername());
     federatedUser.setEnabled(true);
-    federatedUser.setFirstName(identity.getFirstName());
-    federatedUser.setLastName(identity.getLastName());
-    federatedUser.setEmail(identity.getEmail());
-    session.users().addFederatedIdentity(realm,federatedUser,identityModel);
+    federatedUser.setFirstName(updatedIdentity.getFirstName());
+    federatedUser.setLastName(updatedIdentity.getLastName());
+    federatedUser.setEmail(updatedIdentity.getEmail());
+    session.users().addFederatedIdentity(realm,federatedUser,federatedIdentityModel);
     event.clone().user(federatedUser).event(EventType.REGISTER).detail(Details.REGISTER_METHOD,authMethod).detail(Details.EMAIL,federatedUser.getEmail()).removeDetail("auth_method").success();
     if (identityProviderConfig.isUpdateProfileFirstLogin()) {
       federatedUser.addRequiredAction(UPDATE_PROFILE);
@@ -48,8 +48,11 @@
       return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(clientCode.getCode()).setError(errorMessage).createLogin();
     }
   }
+  federatedIdentityModel=this.session.users().getFederatedIdentity(federatedUser,providerId,realm);
+  federatedIdentityModel.setToken(updatedIdentity.getToken());
+  this.session.users().updateFederatedIdentity(realm,federatedUser,federatedIdentityModel);
   event.user(federatedUser);
-  String username=identityModel.getUserId() + "@" + identityProviderConfig.getName();
+  String username=federatedIdentityModel.getUserId() + "@" + identityProviderConfig.getName();
   UserSessionModel userSession=session.sessions().createUserSession(realm,federatedUser,username,clientConnection.getRemoteAddr(),"broker",false);
   event.session(userSession);
   TokenManager.attachClientSession(userSession,clientSession);

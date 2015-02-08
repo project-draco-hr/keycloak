@@ -7,21 +7,21 @@
     String audience=authResult.getToken().getAudience();
     ClientModel clientModel=realm.findClient(audience);
     if (clientModel == null) {
-      return Flows.errors().error("Invalid client.",Response.Status.FORBIDDEN);
+      return corsResponse(Flows.errors().error("Invalid client.",Response.Status.FORBIDDEN),clientModel);
     }
     if (!clientModel.hasIdentityProvider(providerId)) {
-      return Flows.errors().error("Client [" + audience + "] not authorized.",Response.Status.FORBIDDEN);
+      return corsResponse(Flows.errors().error("Client [" + audience + "] not authorized.",Response.Status.FORBIDDEN),clientModel);
     }
     if (OAuthClientModel.class.isInstance(clientModel) && !forceRetrieval) {
-      return Flows.forms(session,realm,clientModel,uriInfo).setClientSessionCode(authManager.extractAuthorizationHeaderToken(request.getHttpHeaders())).setAccessRequest("Your information from " + providerId + " identity provider.").setClient(clientModel).setUriInfo(this.uriInfo).setActionUri(this.uriInfo.getRequestUri()).createOAuthGrant();
+      return corsResponse(Flows.forms(session,realm,clientModel,uriInfo).setClientSessionCode(authManager.extractAuthorizationHeaderToken(request.getHttpHeaders())).setAccessRequest("Your information from " + providerId + " identity provider.").setClient(clientModel).setUriInfo(this.uriInfo).setActionUri(this.uriInfo.getRequestUri()).createOAuthGrant(),clientModel);
     }
     IdentityProvider identityProvider=getIdentityProvider(realm,providerId);
     IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(realm,providerId);
     if (identityProviderConfig.isStoreToken()) {
       FederatedIdentityModel identity=this.session.users().getFederatedIdentity(authResult.getUser(),providerId,realm);
-      return identityProvider.retrieveToken(identity);
+      return corsResponse(identityProvider.retrieveToken(identity),clientModel);
     }
-    return Flows.errors().error("Identity Provider [" + providerId + "] does not support this operation.",Response.Status.FORBIDDEN);
+    return corsResponse(Flows.errors().error("Identity Provider [" + providerId + "] does not support this operation.",Response.Status.FORBIDDEN),clientModel);
   }
   return Flows.errors().error("Invalid code.",Response.Status.FORBIDDEN);
 }

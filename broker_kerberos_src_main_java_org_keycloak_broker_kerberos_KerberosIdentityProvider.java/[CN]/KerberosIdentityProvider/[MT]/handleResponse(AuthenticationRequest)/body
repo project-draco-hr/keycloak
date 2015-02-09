@@ -1,0 +1,27 @@
+{
+  String authHeader=request.getHttpRequest().getHttpHeaders().getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+  if (authHeader == null) {
+    return sendNegotiateResponse(null);
+  }
+  String[] tokens=authHeader.split(" ");
+  if (tokens.length != 2) {
+    logger.warn("Invalid length of tokens: " + tokens.length);
+    return sendNegotiateResponse(null);
+  }
+ else   if (!KerberosConstants.NEGOTIATE.equalsIgnoreCase(tokens[0])) {
+    logger.warn("Unknown scheme " + tokens[0]);
+    return sendNegotiateResponse(null);
+  }
+ else {
+    String spnegoToken=tokens[1];
+    SPNEGOAuthenticator spnegoAuthenticator=createSPNEGOAuthenticator(spnegoToken);
+    spnegoAuthenticator.authenticate();
+    if (spnegoAuthenticator.isAuthenticated()) {
+      FederatedIdentity federatedIdentity=getFederatedIdentity(spnegoAuthenticator);
+      return AuthenticationResponse.end(federatedIdentity);
+    }
+ else {
+      return sendNegotiateResponse(spnegoAuthenticator.getResponseToken());
+    }
+  }
+}

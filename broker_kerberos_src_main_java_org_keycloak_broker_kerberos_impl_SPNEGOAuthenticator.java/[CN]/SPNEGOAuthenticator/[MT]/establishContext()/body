@@ -1,0 +1,9 @@
+{
+  Oid spnegoOid=new Oid(KerberosConstants.SPNEGO_OID);
+  GSSCredential credential=GSS_MANAGER.createCredential(null,GSSCredential.DEFAULT_LIFETIME,spnegoOid,GSSCredential.ACCEPT_ONLY);
+  GSSContext gssContext=GSS_MANAGER.createContext(credential);
+  byte[] inputToken=Base64.decode(spnegoToken);
+  byte[] respToken=gssContext.acceptSecContext(inputToken,0,inputToken.length);
+  responseToken=Base64.encodeBytes(respToken);
+  return gssContext;
+}

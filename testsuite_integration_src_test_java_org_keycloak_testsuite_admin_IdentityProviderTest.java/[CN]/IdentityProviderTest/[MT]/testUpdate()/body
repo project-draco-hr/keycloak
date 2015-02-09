@@ -1,0 +1,22 @@
+{
+  IdentityProviderRepresentation newIdentityProvider=create("update-identity-provider","oidc","Update Identity Provider");
+  newIdentityProvider.getConfig().put("clientId","clientId");
+  newIdentityProvider.getConfig().put("clientSecret","clientSecret");
+  realm.identityProviders().create(newIdentityProvider);
+  IdentityProviderResource identityProviderResource=realm.identityProviders().get("update-identity-provider");
+  assertNotNull(identityProviderResource);
+  IdentityProviderRepresentation representation=identityProviderResource.toRepresentation();
+  assertNotNull(representation);
+  assertEquals("update-identity-provider",representation.getId());
+  representation.setId("changed-alias");
+  representation.setEnabled(false);
+  representation.setStoreToken(true);
+  representation.getConfig().put("clientId","changedClientId");
+  identityProviderResource.update(representation);
+  identityProviderResource=realm.identityProviders().get(representation.getInternalId());
+  assertNotNull(identityProviderResource);
+  representation=identityProviderResource.toRepresentation();
+  assertFalse(representation.isEnabled());
+  assertTrue(representation.isStoreToken());
+  assertEquals("changedClientId",representation.getConfig().get("clientId"));
+}

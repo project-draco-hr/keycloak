@@ -19,6 +19,9 @@
     IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(realm,providerId);
     if (identityProviderConfig.isStoreToken()) {
       FederatedIdentityModel identity=this.session.users().getFederatedIdentity(authResult.getUser(),providerId,realm);
+      if (identity == null) {
+        return corsResponse(Flows.errors().error("User [" + authResult.getUser().getId() + "] is not associated with identity provider ["+ providerId+ "].",Response.Status.FORBIDDEN),clientModel);
+      }
       return corsResponse(identityProvider.retrieveToken(identity),clientModel);
     }
     return corsResponse(Flows.errors().error("Identity Provider [" + providerId + "] does not support this operation.",Response.Status.FORBIDDEN),clientModel);

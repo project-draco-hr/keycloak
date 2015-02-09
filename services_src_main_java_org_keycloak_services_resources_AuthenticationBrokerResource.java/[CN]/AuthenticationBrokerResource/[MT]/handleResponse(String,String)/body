@@ -1,14 +1,15 @@
 {
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=realmManager.getRealmByName(realmName);
+  IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(realm,providerId);
   try {
-    IdentityProvider provider=getIdentityProvider(realm,providerId);
-    if (provider == null) {
-      return Flows.forms(session,realm,null,uriInfo).setError("Social provider not found").createErrorPage();
+    IdentityProvider identityProvider=getIdentityProvider(realm,providerId);
+    if (identityProvider == null) {
+      return Flows.forms(session,realm,null,uriInfo).setError("Social identityProvider not found").createErrorPage();
     }
-    String relayState=provider.getRelayState(createAuthenticationRequest(providerId,null,realm,null));
+    String relayState=identityProvider.getRelayState(createAuthenticationRequest(providerId,null,realm,null));
     if (relayState == null) {
-      return redirectToErrorPage(realm,"No relay state from identity provider.");
+      return redirectToErrorPage(realm,"No relay state from identity identityProvider.");
     }
     ClientSessionCode clientCode=isValidAuthorizationCode(relayState,realm);
     if (clientCode == null) {
@@ -20,19 +21,21 @@
     if (response != null) {
       return response;
     }
-    AuthenticationResponse authenticationResponse=provider.handleResponse(createAuthenticationRequest(providerId,null,realm,clientSession));
+    AuthenticationResponse authenticationResponse=identityProvider.handleResponse(createAuthenticationRequest(providerId,null,realm,clientSession));
     response=authenticationResponse.getResponse();
     if (response != null) {
       return response;
     }
     FederatedIdentity identity=authenticationResponse.getUser();
+    if (!identityProviderConfig.isStoreToken()) {
+      identity.setToken(null);
+    }
     return performLocalAuthentication(realm,providerId,identity,clientCode);
   }
  catch (  Exception e) {
     if (session.getTransaction().isActive()) {
       session.getTransaction().rollback();
     }
-    IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(realm,providerId);
     return Flows.forms(session,realm,null,uriInfo).setError("Authentication failed. Could not authenticate against Identity Provider [" + identityProviderConfig.getName() + "].").createErrorPage();
   }
  finally {

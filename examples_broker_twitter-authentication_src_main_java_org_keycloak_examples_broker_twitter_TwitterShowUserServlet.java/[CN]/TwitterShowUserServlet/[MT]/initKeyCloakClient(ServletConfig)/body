@@ -1,0 +1,16 @@
+{
+  ServletContext servletContext=config.getServletContext();
+  JsonNode keycloakConfig;
+  try {
+    keycloakConfig=new ObjectMapper().readTree(servletContext.getResourceAsStream("WEB-INF/keycloak.json"));
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Could not parse keycloak config.",e);
+  }
+  this.authServer=keycloakConfig.get("auth-server-url").asText();
+  this.realmName=keycloakConfig.get("realm").asText();
+  this.keycloak=Keycloak.getInstance(authServer,realmName,"admin","password","admin-client","password");
+  IdentityProvidersResource providersResource=keycloak.realm(realmName).identityProviders();
+  this.identityProvider=providersResource.get("twitter").toRepresentation();
+  this.keycloak=Keycloak.getInstance(authServer,realmName,"admin","password","admin-client","password");
+}

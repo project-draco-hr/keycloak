@@ -1,18 +1,26 @@
 {
-  X509V3CertificateGenerator certGen=new X509V3CertificateGenerator();
-  X500Principal subjectName=new X500Principal("CN=" + subject);
-  BigInteger serialNumber=BigInteger.valueOf(System.currentTimeMillis());
-  certGen.setSerialNumber(serialNumber);
-  certGen.setIssuerDN(caCert.getSubjectX500Principal());
-  certGen.setNotBefore(new Date(System.currentTimeMillis() - 100000));
-  Calendar calendar=Calendar.getInstance();
-  calendar.add(Calendar.YEAR,10);
-  certGen.setNotAfter(calendar.getTime());
-  certGen.setSubjectDN(subjectName);
-  certGen.setPublicKey(keyPair.getPublic());
-  certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
-  certGen.addExtension(X509Extensions.AuthorityKeyIdentifier,false,new AuthorityKeyIdentifierStructure(caCert));
-  certGen.addExtension(X509Extensions.SubjectKeyIdentifier,false,new SubjectKeyIdentifierStructure(keyPair.getPublic()));
-  X509Certificate cert=certGen.generate(caPrivateKey,"BC");
-  return cert;
+  try {
+    X500Name subjectDN=new X500Name("CN=" + subject);
+    SecureRandom random=SecureRandom.getInstance("SHA1PRNG");
+    BigInteger serialNumber=BigInteger.valueOf(Math.abs(random.nextInt()));
+    Date notBefore=new Date(System.currentTimeMillis());
+    Date notAfter=new Date(System.currentTimeMillis() + (((1000L * 60 * 60* 24* 30)) * 12) * 3);
+    SubjectPublicKeyInfo subjPubKeyInfo=new SubjectPublicKeyInfo(ASN1Sequence.getInstance(keyPair.getPublic().getEncoded()));
+    X509v3CertificateBuilder certGen=new X509v3CertificateBuilder(new X500Name(caCert.getSubjectDN().getName()),serialNumber,notBefore,notAfter,subjectDN,subjPubKeyInfo);
+    DigestCalculator digCalc=new BcDigestCalculatorProvider().get(new AlgorithmIdentifier(OIWObjectIdentifiers.idSHA1));
+    X509ExtensionUtils x509ExtensionUtils=new X509ExtensionUtils(digCalc);
+    certGen.addExtension(Extension.subjectKeyIdentifier,false,x509ExtensionUtils.createSubjectKeyIdentifier(subjPubKeyInfo));
+    certGen.addExtension(Extension.authorityKeyIdentifier,false,x509ExtensionUtils.createAuthorityKeyIdentifier(subjPubKeyInfo));
+    certGen.addExtension(Extension.keyUsage,false,new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign));
+    KeyPurposeId[] EKU=new KeyPurposeId[2];
+    EKU[0]=KeyPurposeId.id_kp_emailProtection;
+    EKU[1]=KeyPurposeId.id_kp_serverAuth;
+    certGen.addExtension(Extension.extendedKeyUsage,false,new ExtendedKeyUsage(EKU));
+    certGen.addExtension(Extension.basicConstraints,true,new BasicConstraints(0));
+    ContentSigner sigGen=new JcaContentSignerBuilder("SHA1WithRSAEncryption").setProvider("BC").build(caPrivateKey);
+    return new JcaX509CertificateConverter().setProvider("BC").getCertificate(certGen.build(sigGen));
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Error creating X509v3Certificate.",e);
+  }
 }

@@ -1,0 +1,16 @@
+{
+  ClientModel client=clientSession.getClient();
+  String logoutPostUrl=client.getAttribute(SAML_SINGLE_LOGOUT_SERVICE_URL_POST_ATTRIBUTE);
+  String logoutRedirectUrl=client.getAttribute(SAML_SINGLE_LOGOUT_SERVICE_URL_REDIRECT_ATTRIBUTE);
+  if (logoutPostUrl == null) {
+    if (logoutRedirectUrl == null)     return true;
+    return false;
+  }
+  if (forcePostBinding(client)) {
+    return true;
+  }
+  String bindingType=clientSession.getNote(SAML_BINDING);
+  if (SAML_POST_BINDING.equals(bindingType))   return true;
+  if (logoutRedirectUrl == null)   return true;
+  return false;
+}

@@ -1,16 +1,15 @@
 {
   ClientModel client=clientSession.getClient();
   if (!(client instanceof ApplicationModel))   return null;
-  ApplicationModel app=(ApplicationModel)client;
-  String bindingUri=getBindingUri(client);
-  if (bindingUri == null)   return null;
   SAML2LogoutRequestBuilder logoutBuilder=createLogoutRequest(clientSession,client);
   try {
-    if (isLogoutPostBindingForClient(app)) {
+    if (isLogoutPostBindingForClient(clientSession)) {
+      String bindingUri=getLogoutServiceUrl(uriInfo,client,SAML_POST_BINDING);
       return logoutBuilder.postBinding().request(bindingUri);
     }
  else {
       logger.debug("frontchannel redirect binding");
+      String bindingUri=getLogoutServiceUrl(uriInfo,client,SAML_REDIRECT_BINDING);
       return logoutBuilder.redirectBinding().request(bindingUri);
     }
   }

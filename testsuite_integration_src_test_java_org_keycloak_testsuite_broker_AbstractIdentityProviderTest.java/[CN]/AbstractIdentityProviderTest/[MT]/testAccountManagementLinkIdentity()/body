@@ -1,0 +1,20 @@
+{
+  accountFederatedIdentityPage.realm("realm-with-broker");
+  accountFederatedIdentityPage.open();
+  assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
+  loginPage.login("pedroigor","password");
+  assertTrue(accountFederatedIdentityPage.isCurrent());
+  IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+  accountFederatedIdentityPage.clickAddProvider(identityProviderModel.getId());
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8082/auth/"));
+  this.loginPage.login("test-user","password");
+  doAfterProviderAuthentication();
+  assertTrue(accountFederatedIdentityPage.isCurrent());
+  assertTrue(driver.getPageSource().contains("id=\"remove-" + identityProviderModel.getId() + "\""));
+  accountFederatedIdentityPage.logout();
+  assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
+  loginPage.clickSocial(identityProviderModel.getId());
+  doAfterProviderAuthentication();
+  assertTrue(accountFederatedIdentityPage.isCurrent());
+  assertTrue(driver.getPageSource().contains("id=\"remove-" + identityProviderModel.getId() + "\""));
+}

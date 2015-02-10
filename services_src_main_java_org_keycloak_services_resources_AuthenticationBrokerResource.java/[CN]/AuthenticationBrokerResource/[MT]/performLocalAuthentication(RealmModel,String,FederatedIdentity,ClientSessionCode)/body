@@ -25,26 +25,27 @@
     event.success();
     return Response.status(302).location(UriBuilder.fromUri(clientSession.getRedirectUri()).build()).build();
   }
-  UserModel user=session.users().getUserByEmail(updatedIdentity.getEmail(),realm);
-  String errorMessage="federatedIdentityEmailExists";
-  if (user == null) {
-    user=session.users().getUserByUsername(updatedIdentity.getUsername(),realm);
-    errorMessage="federatedIdentityUsernameExists";
-  }
-  if (user == null) {
-    federatedUser=session.users().addUser(realm,updatedIdentity.getUsername());
-    federatedUser.setEnabled(true);
-    federatedUser.setFirstName(updatedIdentity.getFirstName());
-    federatedUser.setLastName(updatedIdentity.getLastName());
-    federatedUser.setEmail(updatedIdentity.getEmail());
-    session.users().addFederatedIdentity(realm,federatedUser,federatedIdentityModel);
-    event.clone().user(federatedUser).event(EventType.REGISTER).detail(Details.REGISTER_METHOD,authMethod).detail(Details.EMAIL,federatedUser.getEmail()).removeDetail("auth_method").success();
-    if (identityProviderConfig.isUpdateProfileFirstLogin()) {
-      federatedUser.addRequiredAction(UPDATE_PROFILE);
+  if (federatedUser == null) {
+    UserModel existingUser=session.users().getUserByEmail(updatedIdentity.getEmail(),realm);
+    String errorMessage="federatedIdentityEmailExists";
+    if (existingUser == null) {
+      existingUser=session.users().getUserByUsername(updatedIdentity.getUsername(),realm);
+      errorMessage="federatedIdentityUsernameExists";
     }
-  }
+    if (existingUser == null) {
+      logger.debug("Creating user " + updatedIdentity.getUsername() + " and linking to federation provider "+ providerId);
+      federatedUser=session.users().addUser(realm,updatedIdentity.getUsername());
+      federatedUser.setEnabled(true);
+      federatedUser.setFirstName(updatedIdentity.getFirstName());
+      federatedUser.setLastName(updatedIdentity.getLastName());
+      federatedUser.setEmail(updatedIdentity.getEmail());
+      session.users().addFederatedIdentity(realm,federatedUser,federatedIdentityModel);
+      event.clone().user(federatedUser).event(EventType.REGISTER).detail(Details.REGISTER_METHOD,authMethod).detail(Details.EMAIL,federatedUser.getEmail()).removeDetail("auth_method").success();
+      if (identityProviderConfig.isUpdateProfileFirstLogin()) {
+        federatedUser.addRequiredAction(UPDATE_PROFILE);
+      }
+    }
  else {
-    if (federatedUser == null) {
       return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(clientCode.getCode()).setError(errorMessage).createLogin();
     }
   }

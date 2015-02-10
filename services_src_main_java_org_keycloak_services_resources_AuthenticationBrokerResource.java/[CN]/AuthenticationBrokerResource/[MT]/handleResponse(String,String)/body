@@ -33,6 +33,7 @@
     return performLocalAuthentication(realm,providerId,identity,clientCode);
   }
  catch (  Exception e) {
+    logger.error("Could not authenticate user against provider " + providerId,e);
     if (session.getTransaction().isActive()) {
       session.getTransaction().rollback();
     }

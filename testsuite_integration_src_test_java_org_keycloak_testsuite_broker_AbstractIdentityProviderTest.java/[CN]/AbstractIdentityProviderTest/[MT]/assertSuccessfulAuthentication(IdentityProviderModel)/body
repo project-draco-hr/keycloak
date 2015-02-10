@@ -1,21 +1,9 @@
 {
-  driver.navigate().to("http://localhost:8081/test-app");
-  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/login"));
-  this.loginPage.clickSocial(getProviderId());
-  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8082/auth/"));
-  this.loginPage.login("test-user","password");
-  doAfterProviderAuthentication();
-  if (identityProviderModel.isUpdateProfileFirstLogin()) {
-    String userEmail="new@email.com";
-    String userFirstName="New first";
-    String userLastName="New last";
-    this.updateProfilePage.assertCurrent();
-    this.updateProfilePage.update(userFirstName,userLastName,userEmail);
-  }
+  authenticateWithIdentityProvider(identityProviderModel);
   assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
   UserModel federatedUser=getFederatedUser();
   assertNotNull(federatedUser);
-  doAssertFederatedUser(federatedUser);
+  doAssertFederatedUser(federatedUser,identityProviderModel);
   RealmModel realm=getRealm();
   Set<FederatedIdentityModel> federatedIdentities=this.session.users().getFederatedIdentities(federatedUser,realm);
   assertEquals(1,federatedIdentities.size());

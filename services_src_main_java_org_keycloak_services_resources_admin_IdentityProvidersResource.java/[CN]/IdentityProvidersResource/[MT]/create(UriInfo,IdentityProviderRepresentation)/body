@@ -1,0 +1,10 @@
+{
+  this.auth.requireManage();
+  try {
+    this.realm.addIdentityProvider(RepresentationToModel.toModel(representation));
+    return Response.created(uriInfo.getAbsolutePathBuilder().path(representation.getProviderId()).build()).build();
+  }
+ catch (  ModelDuplicateException e) {
+    return Flows.errors().exists("Identity Provider " + representation.getId() + " already exists");
+  }
+}

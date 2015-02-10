@@ -1,0 +1,11 @@
+{
+  try {
+    SAML2Request saml2Request=new SAML2Request();
+    ResponseType responseType=(ResponseType)saml2Request.getSAML2ObjectFromStream(PostBindingUtil.base64DecodeAsStream(URLDecoder.decode(pageSource,"UTF-8")));
+    assertNotNull(responseType);
+    assertFalse(responseType.getAssertions().isEmpty());
+  }
+ catch (  Exception e) {
+    fail("Could not parse token.");
+  }
+}

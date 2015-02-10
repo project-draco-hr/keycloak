@@ -1,0 +1,13 @@
+{
+  ClientRequestFilter authFilter=new ClientRequestFilter(){
+    @Override public void filter(    ClientRequestContext requestContext) throws IOException {
+      KeycloakSecurityContext securityContext=(KeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
+      String accessToken=securityContext.getTokenString();
+      requestContext.getHeaders().add(HttpHeaders.AUTHORIZATION,"Bearer " + accessToken);
+    }
+  }
+;
+  Client client=ClientBuilder.newBuilder().register(authFilter).build();
+  WebTarget target=client.target(getIdentityProviderTokenUrl());
+  return target.request().get().readEntity(TwitterOAuthResponse.class);
+}

@@ -1,0 +1,17 @@
+{
+  TwitterOAuthResponse twitterOAuthResponse=getTwitterOAuthResponse(request);
+  ConfigurationBuilder cb=new ConfigurationBuilder();
+  cb.setDebugEnabled(true).setOAuthConsumerKey(this.identityProvider.getConfig().get("clientId")).setOAuthConsumerSecret(this.identityProvider.getConfig().get("clientSecret")).setOAuthAccessToken(twitterOAuthResponse.getToken()).setOAuthAccessTokenSecret(twitterOAuthResponse.getTokenSecret());
+  TwitterFactory tf=new TwitterFactory(cb.build());
+  Twitter twitter=tf.getInstance();
+  try {
+    User user=twitter.users().showUser(twitterOAuthResponse.getScreenName());
+    response.setContentType(MediaType.APPLICATION_JSON);
+    PrintWriter writer=response.getWriter();
+    writer.println(new ObjectMapper().writeValueAsString(user));
+    writer.flush();
+  }
+ catch (  TwitterException e) {
+    throw new RuntimeException("Could not load social profile.",e);
+  }
+}

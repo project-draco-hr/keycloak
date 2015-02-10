@@ -1,0 +1,30 @@
+{
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.getRealmByName(realmName);
+  AppAuthManager authManager=new AppAuthManager();
+  AuthResult authResult=authManager.authenticateBearerToken(session,realm,uriInfo,clientConnection,request.getHttpHeaders());
+  if (authResult != null) {
+    String audience=authResult.getToken().getAudience();
+    ClientModel clientModel=realm.findClient(audience);
+    if (clientModel == null) {
+      return corsResponse(Flows.errors().error("Invalid client.",Response.Status.FORBIDDEN),clientModel);
+    }
+    if (!clientModel.hasIdentityProvider(providerId)) {
+      return corsResponse(Flows.errors().error("Client [" + audience + "] not authorized.",Response.Status.FORBIDDEN),clientModel);
+    }
+    if (OAuthClientModel.class.isInstance(clientModel) && !forceRetrieval) {
+      return corsResponse(Flows.forms(session,realm,clientModel,uriInfo).setClientSessionCode(authManager.extractAuthorizationHeaderToken(request.getHttpHeaders())).setAccessRequest("Your information from " + providerId + " identity provider.").setClient(clientModel).setUriInfo(this.uriInfo).setActionUri(this.uriInfo.getRequestUri()).createOAuthGrant(),clientModel);
+    }
+    IdentityProvider identityProvider=getIdentityProvider(realm,providerId);
+    IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(realm,providerId);
+    if (identityProviderConfig.isStoreToken()) {
+      FederatedIdentityModel identity=this.session.users().getFederatedIdentity(authResult.getUser(),providerId,realm);
+      if (identity == null) {
+        return corsResponse(Flows.errors().error("User [" + authResult.getUser().getId() + "] is not associated with identity provider ["+ providerId+ "].",Response.Status.FORBIDDEN),clientModel);
+      }
+      return corsResponse(identityProvider.retrieveToken(identity),clientModel);
+    }
+    return corsResponse(Flows.errors().error("Identity Provider [" + providerId + "] does not support this operation.",Response.Status.FORBIDDEN),clientModel);
+  }
+  return Flows.errors().error("Invalid code.",Response.Status.FORBIDDEN);
+}

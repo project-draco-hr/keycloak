@@ -1,6 +1,10 @@
 {
+  String samlResponse=getRequestParameter(request,SAML_RESPONSE_PARAMETER);
+  if (samlResponse == null) {
+    throw new RuntimeException("No response from SAML identity provider.");
+  }
   try {
-    AssertionType assertion=getAssertion(request);
+    AssertionType assertion=getAssertion(samlResponse,request);
     SubjectType subject=assertion.getSubject();
     STSubType subType=subject.getSubType();
     NameIDType subjectNameID=(NameIDType)subType.getBaseID();
@@ -8,6 +12,9 @@
     identity.setUsername(subjectNameID.getValue());
     if (subjectNameID.getFormat().toString().equals(JBossSAMLURIConstants.NAMEID_FORMAT_EMAIL.get())) {
       identity.setEmail(subjectNameID.getValue());
+    }
+    if (getConfig().isStoreToken()) {
+      identity.setToken(samlResponse);
     }
     return AuthenticationResponse.end(identity);
   }

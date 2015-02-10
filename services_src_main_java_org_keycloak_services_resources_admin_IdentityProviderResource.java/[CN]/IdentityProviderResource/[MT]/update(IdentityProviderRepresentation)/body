@@ -1,0 +1,9 @@
+{
+  try {
+    this.realm.updateIdentityProvider(RepresentationToModel.toModel(model));
+    return Response.noContent().build();
+  }
+ catch (  ModelDuplicateException e) {
+    return Flows.errors().exists("Identity Provider " + model.getId() + " already exists");
+  }
+}

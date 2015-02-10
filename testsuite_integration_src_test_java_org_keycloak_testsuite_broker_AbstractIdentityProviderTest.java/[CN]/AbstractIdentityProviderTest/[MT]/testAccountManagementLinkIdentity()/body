@@ -17,4 +17,11 @@
   doAfterProviderAuthentication();
   assertTrue(accountFederatedIdentityPage.isCurrent());
   assertTrue(driver.getPageSource().contains("id=\"remove-" + identityProviderModel.getId() + "\""));
+  accountFederatedIdentityPage.clickRemoveProvider(identityProviderModel.getId());
+  assertTrue(driver.getPageSource().contains("id=\"add-" + identityProviderModel.getId() + "\""));
+  accountFederatedIdentityPage.logout();
+  assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
+  this.loginPage.clickSocial(identityProviderModel.getId());
+  doAfterProviderAuthentication();
+  this.updateProfilePage.assertCurrent();
 }

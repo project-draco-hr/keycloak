@@ -1,0 +1,11 @@
+{
+  String logoutServiceUrl=null;
+  if (SAML_POST_BINDING.equals(bindingType)) {
+    logoutServiceUrl=client.getAttribute(SAML_SINGLE_LOGOUT_SERVICE_URL_POST_ATTRIBUTE);
+  }
+ else {
+    logoutServiceUrl=client.getAttribute(SAML_SINGLE_LOGOUT_SERVICE_URL_REDIRECT_ATTRIBUTE);
+  }
+  if (logoutServiceUrl == null && client instanceof ApplicationModel)   logoutServiceUrl=((ApplicationModel)client).getManagementUrl();
+  return ResourceAdminManager.resolveUri(uriInfo.getRequestUri(),logoutServiceUrl);
+}

@@ -1,9 +1,9 @@
 {
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers,false);
   if (authResult != null) {
-    String bindingUri=client.getAttribute(SamlProtocol.SAML_LOGOUT_BINDING_URI);
-    if (bindingUri == null)     bindingUri=((ApplicationModel)client).getManagementUrl();
-    bindingUri=ResourceAdminManager.resolveUri(uriInfo.getRequestUri(),bindingUri);
+    String logoutBinding=getBindingType();
+    if ("true".equals(client.getAttribute(SamlProtocol.SAML_FORCE_POST_BINDING)))     logoutBinding=SamlProtocol.SAML_POST_BINDING;
+    String bindingUri=SamlProtocol.getLogoutServiceUrl(uriInfo,client,logoutBinding);
     UserSessionModel userSession=authResult.getSession();
     userSession.setNote(SamlProtocol.SAML_LOGOUT_BINDING_URI,bindingUri);
     if (SamlProtocol.requiresRealmSignature(client)) {
@@ -11,8 +11,6 @@
     }
     if (relayState != null)     userSession.setNote(SamlProtocol.SAML_LOGOUT_RELAY_STATE,relayState);
     userSession.setNote(SamlProtocol.SAML_LOGOUT_REQUEST_ID,logoutRequest.getID());
-    String logoutBinding=client.getAttribute(SamlProtocol.SAML_LOGOUT_BINDING);
-    if (logoutBinding == null)     logoutBinding=getBindingType();
     userSession.setNote(SamlProtocol.SAML_LOGOUT_BINDING,logoutBinding);
     userSession.setNote(SamlProtocol.SAML_LOGOUT_ISSUER,logoutRequest.getIssuer().getValue());
     userSession.setNote(AuthenticationManager.KEYCLOAK_LOGOUT_PROTOCOL,SamlProtocol.LOGIN_PROTOCOL);

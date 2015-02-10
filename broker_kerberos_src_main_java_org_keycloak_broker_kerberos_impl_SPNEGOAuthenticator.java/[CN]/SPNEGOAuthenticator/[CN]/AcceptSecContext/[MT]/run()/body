@@ -1,0 +1,23 @@
+{
+  GSSContext gssContext=null;
+  try {
+    logger.info("Going to establish security context");
+    gssContext=establishContext();
+    logAuthDetails(gssContext);
+    if (gssContext.getCredDelegState()) {
+      delegationCredential=gssContext.getDelegCred();
+    }
+    if (gssContext.isEstablished()) {
+      principal=gssContext.getSrcName().toString();
+      return true;
+    }
+ else {
+      return false;
+    }
+  }
+  finally {
+    if (gssContext != null) {
+      gssContext.dispose();
+    }
+  }
+}

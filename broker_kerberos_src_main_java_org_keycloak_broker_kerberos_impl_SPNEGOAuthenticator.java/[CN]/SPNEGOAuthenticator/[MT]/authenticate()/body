@@ -1,0 +1,16 @@
+{
+  logger.info("SPNEGO Login with token: " + spnegoToken);
+  try {
+    Subject serverSubject=kerberosSubjectAuthenticator.authenticateServerSubject();
+    authenticated=Subject.doAs(serverSubject,new AcceptSecContext());
+  }
+ catch (  Exception e) {
+    logger.warn("SPNEGO login failed: " + e.getMessage());
+    if (logger.isInfoEnabled()) {
+      logger.info("SPNEGO login failed: " + e.getMessage(),e);
+    }
+  }
+ finally {
+    kerberosSubjectAuthenticator.logoutServerSubject();
+  }
+}

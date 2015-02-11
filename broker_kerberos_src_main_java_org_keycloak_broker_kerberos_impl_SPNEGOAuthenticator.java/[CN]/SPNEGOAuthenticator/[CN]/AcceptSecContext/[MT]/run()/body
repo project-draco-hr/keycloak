@@ -1,14 +1,16 @@
 {
   GSSContext gssContext=null;
   try {
-    logger.info("Going to establish security context");
+    if (log.isTraceEnabled()) {
+      log.trace("Going to establish security context");
+    }
     gssContext=establishContext();
     logAuthDetails(gssContext);
-    if (gssContext.getCredDelegState()) {
-      delegationCredential=gssContext.getDelegCred();
-    }
     if (gssContext.isEstablished()) {
       principal=gssContext.getSrcName().toString();
+      if (gssContext.getCredDelegState()) {
+        delegationCredential=gssContext.getDelegCred();
+      }
       return true;
     }
  else {

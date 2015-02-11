@@ -1,5 +1,8 @@
 {
   String negotiateHeader=negotiateToken == null ? KerberosConstants.NEGOTIATE : KerberosConstants.NEGOTIATE + " " + negotiateToken;
+  if (logger.isTraceEnabled()) {
+    logger.trace("Sending back " + HttpHeaders.WWW_AUTHENTICATE + ": "+ negotiateHeader);
+  }
   Response response=Response.status(Response.Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE,negotiateHeader).build();
   return AuthenticationResponse.fromResponse(response);
 }

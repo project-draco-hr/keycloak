@@ -1,0 +1,9 @@
+{
+  String negotiateHeader=negotiateToken == null ? KerberosConstants.NEGOTIATE : KerberosConstants.NEGOTIATE + " " + negotiateToken;
+  if (logger.isTraceEnabled()) {
+    logger.trace("Sending back " + HttpHeaders.WWW_AUTHENTICATE + ": "+ negotiateHeader);
+  }
+  Response response=request.getSession().getProvider(LoginFormsProvider.class).setRealm(request.getRealm()).setUriInfo(request.getUriInfo()).setError("errorKerberosLogin").setStatus(Response.Status.UNAUTHORIZED).createErrorPage();
+  response.getMetadata().putSingle(HttpHeaders.WWW_AUTHENTICATE,negotiateHeader);
+  return AuthenticationResponse.fromResponse(response);
+}

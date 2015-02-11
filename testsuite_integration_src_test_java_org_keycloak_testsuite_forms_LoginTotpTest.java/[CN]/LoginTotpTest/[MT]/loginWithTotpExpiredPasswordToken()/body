@@ -13,8 +13,8 @@
     Thread.sleep(2000);
     loginTotpPage.login(totp.generate("totpSecret"));
     loginPage.assertCurrent();
-    Assert.assertEquals("Invalid username or password.",loginPage.getError());
-    AssertEvents.ExpectedEvent expectedEvent=events.expectLogin().error("invalid_code").user((String)null).clearDetails().session((String)null);
+    Assert.assertEquals("Login timeout or unknown action. Please login again",loginPage.getError());
+    AssertEvents.ExpectedEvent expectedEvent=events.expectLogin().error("expired_code").user((String)null).clearDetails().session((String)null);
     expectedEvent.assertEvent();
   }
   finally {

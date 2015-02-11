@@ -1,0 +1,13 @@
+{
+  try {
+    loginPage.open();
+    Time.setOffset(5000);
+    loginPage.login("login@test.com","password");
+    loginPage.assertCurrent();
+    Assert.assertEquals("Login timeout or unknown action. Please login again",loginPage.getError());
+    events.expectLogin().user((String)null).session((String)null).error("expired_code").clearDetails().assertEvent();
+  }
+  finally {
+    Time.setOffset(0);
+  }
+}

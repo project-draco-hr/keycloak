@@ -3,7 +3,7 @@
   if (logger.isTraceEnabled()) {
     logger.trace("Sending back " + HttpHeaders.WWW_AUTHENTICATE + ": "+ negotiateHeader);
   }
-  Response response=request.getSession().getProvider(LoginFormsProvider.class).setRealm(request.getRealm()).setUriInfo(request.getUriInfo()).setError("errorKerberosLogin").setStatus(Response.Status.UNAUTHORIZED).createErrorPage();
+  Response response=request.getSession().getProvider(LoginFormsProvider.class).setRealm(request.getRealm()).setUriInfo(request.getUriInfo()).setClient(request.getClientSession().getClient()).setClientSessionCode(getRelayState(request)).setWarning("errorKerberosLogin").setStatus(Response.Status.UNAUTHORIZED).createLogin();
   response.getMetadata().putSingle(HttpHeaders.WWW_AUTHENTICATE,negotiateHeader);
   return AuthenticationResponse.fromResponse(response);
 }

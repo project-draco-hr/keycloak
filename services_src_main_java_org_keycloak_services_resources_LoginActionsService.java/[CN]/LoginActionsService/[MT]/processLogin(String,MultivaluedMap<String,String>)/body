@@ -16,8 +16,8 @@
   ClientSessionModel clientSession=clientCode.getClientSession();
   if (!clientCode.isValid(ClientSessionModel.Action.AUTHENTICATE) || clientSession.getUserSession() != null) {
     clientCode.setAction(ClientSessionModel.Action.AUTHENTICATE);
-    event.client(clientSession.getClient()).error(Errors.INVALID_CODE);
-    return Flows.forms(this.session,realm,clientSession.getClient(),uriInfo).setError(Messages.INVALID_USER).setClientSessionCode(clientCode.getCode()).createLogin();
+    event.client(clientSession.getClient()).error(Errors.EXPIRED_CODE);
+    return Flows.forms(this.session,realm,clientSession.getClient(),uriInfo).setError(Messages.EXPIRED_CODE).setClientSessionCode(clientCode.getCode()).createLogin();
   }
   String username=formData.getFirst(AuthenticationManager.FORM_USERNAME);
   String rememberMe=formData.getFirst("rememberMe");

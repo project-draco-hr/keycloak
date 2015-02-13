@@ -1,0 +1,52 @@
+{
+  if (isDebugEnabled()) {
+    LOGGER.debugf("Handling authentication response from identity provider [%s].",providerId);
+  }
+  this.event.event(EventType.IDENTITY_PROVIDER_RESPONSE);
+  this.event.detail(Details.IDENTITY_PROVIDER,providerId);
+  IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(providerId);
+  try {
+    IdentityProvider identityProvider=getIdentityProvider(providerId);
+    String relayState=identityProvider.getRelayState(createAuthenticationRequest(providerId,null));
+    if (relayState == null) {
+      return redirectToErrorPage("No relay state in response from identity identity [" + providerId + ".");
+    }
+    if (isDebugEnabled()) {
+      LOGGER.debugf("Relay state is valid: [%s].",relayState);
+    }
+    ClientSessionCode clientSessionCode=parseClientSessionCode(relayState,providerId);
+    AuthenticationResponse authenticationResponse=identityProvider.handleResponse(createAuthenticationRequest(providerId,clientSessionCode));
+    Response response=authenticationResponse.getResponse();
+    if (response != null) {
+      if (isDebugEnabled()) {
+        LOGGER.debugf("Identity provider [%s] is going to send a response [%s].",identityProvider,response);
+      }
+      return response;
+    }
+    FederatedIdentity identity=authenticationResponse.getUser();
+    if (isDebugEnabled()) {
+      LOGGER.debugf("Identity provider [%s] returned with identity [%s].",providerId,identity);
+    }
+    if (!identityProviderConfig.isStoreToken()) {
+      if (isDebugEnabled()) {
+        LOGGER.debugf("Token will not be stored for identity provider [%s].",providerId);
+      }
+      identity.setToken(null);
+    }
+    identity.setIdentityProviderId(providerId);
+    return performLocalAuthentication(identity,clientSessionCode);
+  }
+ catch (  IdentityBrokerException e) {
+    rollback();
+    return redirectToErrorPage("Authentication failed. Could not authenticate with identity provider [" + providerId + "].",e);
+  }
+catch (  Exception e) {
+    rollback();
+    return redirectToErrorPage("Unexpected error when handling response from identity provider [" + providerId + "].",e);
+  }
+ finally {
+    if (this.session.getTransaction().isActive()) {
+      this.session.getTransaction().commit();
+    }
+  }
+}

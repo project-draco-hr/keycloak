@@ -1,0 +1,31 @@
+{
+  FederatedIdentityModel federatedIdentityModel=new FederatedIdentityModel(updatedIdentity.getIdentityProviderId(),updatedIdentity.getId(),updatedIdentity.getUsername(),updatedIdentity.getToken());
+  UserModel existingUser=this.session.users().getUserByEmail(updatedIdentity.getEmail(),this.realmModel);
+  if (existingUser != null) {
+    fireErrorEvent(Errors.FEDERATED_IDENTITY_EMAIL_EXISTS);
+    throw new IdentityBrokerException("federatedIdentityEmailExists");
+  }
+  existingUser=this.session.users().getUserByUsername(updatedIdentity.getUsername(),this.realmModel);
+  if (existingUser != null) {
+    fireErrorEvent(Errors.FEDERATED_IDENTITY_USERNAME_EXISTS);
+    throw new IdentityBrokerException("federatedIdentityUsernameExists");
+  }
+  if (!this.realmModel.isRegistrationAllowed()) {
+    fireErrorEvent(Errors.FEDERATED_IDENTITY_DISABLED_REGISTRATION);
+    throw new IdentityBrokerException("federatedIdentityDisabledRegistration");
+  }
+  if (isDebugEnabled()) {
+    LOGGER.debugf("Creating account from identity [%s].",federatedIdentityModel);
+  }
+  UserModel federatedUser=this.session.users().addUser(this.realmModel,updatedIdentity.getUsername());
+  if (isDebugEnabled()) {
+    LOGGER.debugf("Account [%s] created.",federatedUser);
+  }
+  federatedUser.setEnabled(true);
+  federatedUser.setFirstName(updatedIdentity.getFirstName());
+  federatedUser.setLastName(updatedIdentity.getLastName());
+  federatedUser.setEmail(updatedIdentity.getEmail());
+  this.session.users().addFederatedIdentity(this.realmModel,federatedUser,federatedIdentityModel);
+  this.event.clone().user(federatedUser).event(EventType.REGISTER).detail(Details.IDENTITY_PROVIDER,federatedIdentityModel.getIdentityProvider()).detail(Details.IDENTITY_PROVIDER_IDENTITY,updatedIdentity.getUsername()).removeDetail("auth_method").success();
+  return federatedUser;
+}

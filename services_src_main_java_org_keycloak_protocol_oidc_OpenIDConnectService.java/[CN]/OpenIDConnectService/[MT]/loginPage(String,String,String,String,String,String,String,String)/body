@@ -17,7 +17,7 @@
     if (identityProviderModel == null) {
       return Flows.forms(session,realm,null,uriInfo).setError("Could not find an identity provider with the identifier [" + idpHint + "].").createErrorPage();
     }
-    return Response.temporaryRedirect(Urls.identityProviderAuthnRequest(this.uriInfo.getBaseUri(),identityProviderModel,realm,accessCode)).build();
+    return Response.temporaryRedirect(Urls.identityProviderAuthnRequest(this.uriInfo.getBaseUri(),idpHint,this.realm.getName(),accessCode)).build();
   }
   response=authManager.checkNonFormAuthentication(session,clientSession,realm,uriInfo,request,clientConnection,headers,event);
   if (response != null)   return response;
@@ -30,7 +30,7 @@
     List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
     if (!identityProviders.isEmpty()) {
       if (identityProviders.size() == 1) {
-        return Response.temporaryRedirect(Urls.identityProviderAuthnRequest(this.uriInfo.getBaseUri(),identityProviders.get(0),this.realm,accessCode)).build();
+        return Response.temporaryRedirect(Urls.identityProviderAuthnRequest(this.uriInfo.getBaseUri(),identityProviders.get(0).getId(),this.realm.getName(),accessCode)).build();
       }
       return Flows.forms(session,realm,null,uriInfo).setError("Realm [" + this.realm.getName() + "] supports multiple identity providers. Could not determine which identity provider should be used to authenticate with.").createErrorPage();
     }

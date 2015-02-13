@@ -1,7 +1,7 @@
 {
   MultivaluedMap<String,String> queryParameters=request.getUriInfo().getQueryParameters();
   if (queryParameters.getFirst("denied") != null) {
-    throw new RuntimeException("Access denied.");
+    throw new IdentityBrokerException("Access denied.");
   }
   try {
     Twitter twitter=new TwitterFactory().getInstance();
@@ -27,6 +27,6 @@
     return AuthenticationResponse.end(identity);
   }
  catch (  Exception e) {
-    throw new RuntimeException(e);
+    throw new IdentityBrokerException("Could get user profile from twitter.",e);
   }
 }

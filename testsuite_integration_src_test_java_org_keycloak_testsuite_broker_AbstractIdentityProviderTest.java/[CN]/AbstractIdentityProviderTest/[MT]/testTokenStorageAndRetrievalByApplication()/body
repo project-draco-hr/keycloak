@@ -11,7 +11,7 @@
   assertNotNull(identityModel.getToken());
   UserSessionStatus userSessionStatus=retrieveSessionStatus();
   String accessToken=userSessionStatus.getAccessTokenString();
-  String tokenEndpointUrl="http://localhost:8081/auth/broker/realm-with-broker/" + getProviderId() + "/token";
+  URI tokenEndpointUrl=Urls.identityProviderRetrieveToken(BASE_URI,getProviderId(),realm.getName());
   final String authHeader="Bearer " + accessToken;
   ClientRequestFilter authFilter=new ClientRequestFilter(){
     @Override public void filter(    ClientRequestContext requestContext) throws IOException {
@@ -20,10 +20,9 @@
   }
 ;
   Client client=ClientBuilder.newBuilder().register(authFilter).build();
-  UriBuilder authBase=UriBuilder.fromUri(tokenEndpointUrl);
-  WebTarget tokenEndpoint=client.target(authBase);
+  WebTarget tokenEndpoint=client.target(tokenEndpointUrl);
   Response response=tokenEndpoint.request().get();
-  assertEquals(Response.Status.OK.getStatusCode(),response.getStatus());
+  assertEquals(Status.OK.getStatusCode(),response.getStatus());
   assertNotNull(response.readEntity(String.class));
   driver.navigate().to("http://localhost:8081/test-app/logout");
   driver.navigate().to("http://localhost:8081/test-app");

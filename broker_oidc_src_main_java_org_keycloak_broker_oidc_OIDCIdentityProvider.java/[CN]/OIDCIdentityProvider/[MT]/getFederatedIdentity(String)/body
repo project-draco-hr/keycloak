@@ -1,7 +1,7 @@
 {
   String accessToken=extractTokenFromResponse(response,OAUTH2_PARAMETER_ACCESS_TOKEN);
   if (accessToken == null) {
-    throw new RuntimeException("No access_token from server.");
+    throw new IdentityBrokerException("No access_token from server.");
   }
   String idToken=extractTokenFromResponse(response,OIDC_PARAMETER_ID_TOKEN);
   validateIdToken(idToken);
@@ -28,6 +28,6 @@
     return identity;
   }
  catch (  Exception e) {
-    throw new RuntimeException("Could not fetch attributes from userinfo endpoint.",e);
+    throw new IdentityBrokerException("Could not fetch attributes from userinfo endpoint.",e);
   }
 }

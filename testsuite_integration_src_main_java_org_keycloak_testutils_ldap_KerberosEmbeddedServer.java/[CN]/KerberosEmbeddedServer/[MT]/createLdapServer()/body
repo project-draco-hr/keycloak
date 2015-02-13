@@ -1,0 +1,12 @@
+{
+  LdapServer ldapServer=super.createLdapServer();
+  ldapServer.setSaslHost(this.bindHost);
+  ldapServer.setSaslPrincipal("ldap/" + this.bindHost + "@"+ this.kerberosRealm);
+  ldapServer.addSaslMechanismHandler(SupportedSaslMechanisms.PLAIN,new PlainMechanismHandler());
+  ldapServer.addSaslMechanismHandler(SupportedSaslMechanisms.CRAM_MD5,new CramMd5MechanismHandler());
+  ldapServer.addSaslMechanismHandler(SupportedSaslMechanisms.DIGEST_MD5,new DigestMd5MechanismHandler());
+  ldapServer.addSaslMechanismHandler(SupportedSaslMechanisms.GSSAPI,new GssapiMechanismHandler());
+  ldapServer.addSaslMechanismHandler(SupportedSaslMechanisms.NTLM,new NtlmMechanismHandler());
+  ldapServer.addSaslMechanismHandler(SupportedSaslMechanisms.GSS_SPNEGO,new NtlmMechanismHandler());
+  return ldapServer;
+}

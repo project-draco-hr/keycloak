@@ -16,10 +16,10 @@
       PrivateKey privateKey=request.getRealm().getPrivateKey();
       PublicKey publicKey=request.getRealm().getPublicKey();
       if (privateKey == null) {
-        throw new RuntimeException("Identity Provider [" + getConfig().getName() + "] wants a signed authentication request. But the Realm ["+ request.getRealm().getName()+ "] does not have a private key.");
+        throw new IdentityBrokerException("Identity Provider [" + getConfig().getName() + "] wants a signed authentication request. But the Realm ["+ request.getRealm().getName()+ "] does not have a private key.");
       }
       if (publicKey == null) {
-        throw new RuntimeException("Identity Provider [" + getConfig().getName() + "] wants a signed authentication request. But the Realm ["+ request.getRealm().getName()+ "] does not have a public key.");
+        throw new IdentityBrokerException("Identity Provider [" + getConfig().getName() + "] wants a signed authentication request. But the Realm ["+ request.getRealm().getName()+ "] does not have a public key.");
       }
       KeyPair keypair=new KeyPair(publicKey,privateKey);
       authnRequestBuilder.signWith(keypair);
@@ -33,6 +33,6 @@
     }
   }
  catch (  Exception e) {
-    throw new RuntimeException("Could not create authentication request.",e);
+    throw new IdentityBrokerException("Could not create authentication request.",e);
   }
 }

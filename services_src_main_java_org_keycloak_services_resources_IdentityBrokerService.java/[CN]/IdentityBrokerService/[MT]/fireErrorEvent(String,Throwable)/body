@@ -1,0 +1,24 @@
+{
+  if (!this.event.getEvent().getType().toString().endsWith("_ERROR")) {
+    boolean newTransaction=!this.session.getTransaction().isActive();
+    try {
+      if (newTransaction) {
+        this.session.getTransaction().begin();
+      }
+      this.event.error(message);
+      if (newTransaction) {
+        this.session.getTransaction().commit();
+      }
+    }
+ catch (    Exception e) {
+      LOGGER.error("Could not fire event.",e);
+      rollback();
+    }
+  }
+  if (throwable != null) {
+    LOGGER.error(message,throwable);
+  }
+ else {
+    LOGGER.error(message);
+  }
+}

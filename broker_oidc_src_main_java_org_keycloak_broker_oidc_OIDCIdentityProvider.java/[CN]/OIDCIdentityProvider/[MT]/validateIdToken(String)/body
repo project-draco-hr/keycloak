@@ -1,6 +1,6 @@
 {
   if (idToken == null) {
-    throw new RuntimeException("No id_token from server.");
+    throw new IdentityBrokerException("No id_token from server.");
   }
   try {
     JsonNode idTokenInfo=asJsonNode(decodeJWS(idToken));
@@ -17,10 +17,10 @@
           return;
         }
       }
-      throw new RuntimeException("Wrong issuer from id_token..");
+      throw new IdentityBrokerException("Wrong issuer from id_token..");
     }
   }
  catch (  IOException e) {
-    throw new RuntimeException("Could not decode id token.",e);
+    throw new IdentityBrokerException("Could not decode id token.",e);
   }
 }

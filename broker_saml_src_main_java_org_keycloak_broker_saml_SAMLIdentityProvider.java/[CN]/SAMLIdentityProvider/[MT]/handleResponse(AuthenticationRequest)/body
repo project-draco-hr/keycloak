@@ -1,7 +1,7 @@
 {
   String samlResponse=getRequestParameter(request,SAML_RESPONSE_PARAMETER);
   if (samlResponse == null) {
-    throw new RuntimeException("No response from SAML identity provider.");
+    throw new IdentityBrokerException("No response from SAML identity provider.");
   }
   try {
     AssertionType assertion=getAssertion(samlResponse,request);
@@ -19,6 +19,6 @@
     return AuthenticationResponse.end(identity);
   }
  catch (  Exception e) {
-    throw new RuntimeException("Could not process response from SAML identity provider.",e);
+    throw new IdentityBrokerException("Could not process response from SAML identity provider.",e);
   }
 }

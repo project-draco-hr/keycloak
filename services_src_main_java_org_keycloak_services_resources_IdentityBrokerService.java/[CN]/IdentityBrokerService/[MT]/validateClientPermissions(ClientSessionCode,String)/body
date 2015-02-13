@@ -1,0 +1,10 @@
+{
+  ClientSessionModel clientSession=clientSessionCode.getClientSession();
+  ClientModel clientModel=clientSession.getClient();
+  if (clientModel == null) {
+    throw new IdentityBrokerException("Invalid client.");
+  }
+  if (!clientModel.hasIdentityProvider(providerId)) {
+    throw new IdentityBrokerException("Client [" + clientModel.getClientId() + "] not authorized to authenticate with identity provider ["+ providerId+ "].");
+  }
+}

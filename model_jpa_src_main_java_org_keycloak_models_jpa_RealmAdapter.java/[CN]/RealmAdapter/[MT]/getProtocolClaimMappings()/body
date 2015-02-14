@@ -1,0 +1,14 @@
+{
+  Set<ProtocolClaimMappingModel> mappings=new HashSet<ProtocolClaimMappingModel>();
+  for (  ProtocolClaimMappingEntity entity : realm.getProtocolClaimMappings()) {
+    ProtocolClaimMappingModel mapping=new ProtocolClaimMappingModel();
+    mapping.setId(entity.getId());
+    mapping.setProtocol(entity.getProtocol());
+    mapping.setProtocolClaim(entity.getProtocolClaim());
+    mapping.setAppliedByDefault(entity.isAppliedByDefault());
+    mapping.setSource(ProtocolClaimMappingModel.Source.valueOf(entity.getSource()));
+    mapping.setSourceAttribute(entity.getSourceAttribute());
+    mappings.add(mapping);
+  }
+  return mappings;
+}

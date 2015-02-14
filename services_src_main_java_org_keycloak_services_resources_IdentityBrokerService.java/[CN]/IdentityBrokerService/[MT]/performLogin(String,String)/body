@@ -1,0 +1,26 @@
+{
+  this.event.detail(Details.IDENTITY_PROVIDER,providerId);
+  if (isDebugEnabled()) {
+    LOGGER.debugf("Sending authentication request to identity provider [%s].",providerId);
+  }
+  try {
+    ClientSessionCode clientSessionCode=parseClientSessionCode(code,providerId);
+    IdentityProvider identityProvider=getIdentityProvider(providerId);
+    AuthenticationResponse authenticationResponse=identityProvider.handleRequest(createAuthenticationRequest(providerId,clientSessionCode));
+    Response response=authenticationResponse.getResponse();
+    if (response != null) {
+      this.event.success();
+      if (isDebugEnabled()) {
+        LOGGER.debugf("Identity provider [%s] is going to send a request [%s].",identityProvider,response);
+      }
+      return response;
+    }
+  }
+ catch (  IdentityBrokerException e) {
+    return redirectToErrorPage("Could not send authentication request to identity provider [" + providerId + "].",e);
+  }
+catch (  Exception e) {
+    return redirectToErrorPage("Unexpected error when handling authentication request to identity provider [" + providerId + "].",e);
+  }
+  return redirectToErrorPage("Could not proceed with authentication request to identity provider.");
+}

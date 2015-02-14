@@ -1,0 +1,38 @@
+{
+  this.event.event(EventType.IDENTITY_PROVIDER_RETRIEVE_TOKEN);
+  try {
+    AppAuthManager authManager=new AppAuthManager();
+    AuthResult authResult=authManager.authenticateBearerToken(this.session,this.realmModel,this.uriInfo,this.clientConnection,this.request.getHttpHeaders());
+    if (authResult != null) {
+      String audience=authResult.getToken().getAudience();
+      ClientModel clientModel=this.realmModel.findClient(audience);
+      if (clientModel == null) {
+        return badRequest("Invalid client.");
+      }
+      if (!clientModel.hasIdentityProvider(providerId)) {
+        return corsResponse(badRequest("Client [" + audience + "] not authorized."),clientModel);
+      }
+      if (OAuthClientModel.class.isInstance(clientModel) && !forceRetrieval) {
+        return corsResponse(Flows.forms(this.session,this.realmModel,clientModel,this.uriInfo).setClientSessionCode(authManager.extractAuthorizationHeaderToken(this.request.getHttpHeaders())).setAccessRequest("Your information from " + providerId + " identity provider.").setClient(clientModel).setUriInfo(this.uriInfo).setActionUri(this.uriInfo.getRequestUri()).createOAuthGrant(),clientModel);
+      }
+      IdentityProvider identityProvider=getIdentityProvider(providerId);
+      IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(providerId);
+      if (identityProviderConfig.isStoreToken()) {
+        FederatedIdentityModel identity=this.session.users().getFederatedIdentity(authResult.getUser(),providerId,this.realmModel);
+        if (identity == null) {
+          return corsResponse(badRequest("User [" + authResult.getUser().getId() + "] is not associated with identity provider ["+ providerId+ "]."),clientModel);
+        }
+        this.event.success();
+        return corsResponse(identityProvider.retrieveToken(identity),clientModel);
+      }
+      return corsResponse(badRequest("Identity Provider [" + providerId + "] does not support this operation."),clientModel);
+    }
+    return badRequest("Invalid token.");
+  }
+ catch (  IdentityBrokerException e) {
+    return redirectToErrorPage("Could not obtain token fron identity provider [" + providerId + "].",e);
+  }
+catch (  Exception e) {
+    return redirectToErrorPage("Unexpected error when retrieving token from identity provider [" + providerId + "].",e);
+  }
+}

@@ -3,10 +3,10 @@
   String error=uriInfo.getQueryParameters().getFirst(OAuth2Constants.ERROR);
   if (error != null) {
     if (error.equals("access_denied")) {
-      throw new RuntimeException("Access denied.");
+      throw new IdentityBrokerException("Access denied.");
     }
  else {
-      throw new RuntimeException(error);
+      throw new IdentityBrokerException(error);
     }
   }
   try {
@@ -19,9 +19,9 @@
       }
       return AuthenticationResponse.end(federatedIdentity);
     }
-    throw new RuntimeException("No authorization code from identity provider.");
+    throw new IdentityBrokerException("No authorization code from identity provider.");
   }
  catch (  Exception e) {
-    throw new RuntimeException("Could not process response from identity provider.",e);
+    throw new IdentityBrokerException("Could not process response from identity provider.",e);
   }
 }

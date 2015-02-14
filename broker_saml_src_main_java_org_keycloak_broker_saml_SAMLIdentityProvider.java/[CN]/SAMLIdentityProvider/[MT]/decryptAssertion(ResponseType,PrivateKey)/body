@@ -4,7 +4,7 @@
     Document doc=saml2Response.convert(responseType);
     Element enc=DocumentUtil.getElement(doc,new QName(JBossSAMLConstants.ENCRYPTED_ASSERTION.get()));
     if (enc == null) {
-      throw new RuntimeException("No encrypted assertion found.");
+      throw new IdentityBrokerException("No encrypted assertion found.");
     }
     String oldID=enc.getAttribute(JBossSAMLConstants.ID.get());
     Document newDoc=DocumentUtil.createDocument();
@@ -18,6 +18,6 @@
     return responseType;
   }
  catch (  Exception e) {
-    throw new RuntimeException("Could not decrypt assertion.",e);
+    throw new IdentityBrokerException("Could not decrypt assertion.",e);
   }
 }

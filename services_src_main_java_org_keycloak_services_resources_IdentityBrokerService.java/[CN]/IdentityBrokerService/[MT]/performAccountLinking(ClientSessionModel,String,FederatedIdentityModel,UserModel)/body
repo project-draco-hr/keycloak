@@ -1,0 +1,21 @@
+{
+  this.event.event(EventType.IDENTITY_PROVIDER_ACCCOUNT_LINKING);
+  if (federatedUser != null) {
+    return redirectToErrorPage("The identity returned by the identity provider [" + providerId + "] is already linked to other user.");
+  }
+  UserModel authenticatedUser=clientSession.getUserSession().getUser();
+  if (isDebugEnabled()) {
+    LOGGER.debugf("Linking account [%s] from identity provider [%s] to user [%s].",federatedIdentityModel,providerId,authenticatedUser);
+  }
+  if (!authenticatedUser.isEnabled()) {
+    fireErrorEvent(Errors.USER_DISABLED);
+    return redirectToErrorPage("User is disabled.");
+  }
+  if (!authenticatedUser.hasRole(this.realmModel.getApplicationByName(ACCOUNT_MANAGEMENT_APP).getRole(MANAGE_ACCOUNT))) {
+    fireErrorEvent(Errors.NOT_ALLOWED);
+    return redirectToErrorPage("Insufficient permissions to link identities.");
+  }
+  this.session.users().addFederatedIdentity(this.realmModel,authenticatedUser,federatedIdentityModel);
+  this.event.success();
+  return Response.status(302).location(UriBuilder.fromUri(clientSession.getRedirectUri()).build()).build();
+}

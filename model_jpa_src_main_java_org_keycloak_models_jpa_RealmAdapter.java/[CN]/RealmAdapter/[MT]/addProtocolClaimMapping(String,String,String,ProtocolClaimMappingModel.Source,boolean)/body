@@ -1,0 +1,19 @@
+{
+  ProtocolClaimMappingEntity entity=new ProtocolClaimMappingEntity();
+  entity.setId(KeycloakModelUtils.generateId());
+  entity.setSourceAttribute(sourceAttribute);
+  entity.setProtocol(protocol);
+  entity.setProtocolClaim(protocolClaim);
+  entity.setSource(source.name());
+  entity.setAppliedByDefault(appliedByDefault);
+  entity.setRealm(realm);
+  em.persist(entity);
+  ProtocolClaimMappingModel mapping=new ProtocolClaimMappingModel();
+  mapping.setId(entity.getId());
+  mapping.setProtocol(entity.getProtocol());
+  mapping.setProtocolClaim(entity.getProtocolClaim());
+  mapping.setAppliedByDefault(entity.isAppliedByDefault());
+  mapping.setSource(ProtocolClaimMappingModel.Source.valueOf(entity.getSource()));
+  mapping.setSourceAttribute(entity.getSourceAttribute());
+  return mapping;
+}

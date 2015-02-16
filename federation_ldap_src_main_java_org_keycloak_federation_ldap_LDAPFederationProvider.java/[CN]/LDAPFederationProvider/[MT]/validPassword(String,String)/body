@@ -1,8 +1,14 @@
 {
-  try {
-    return LDAPUtils.validatePassword(partitionManager,username,password);
+  if (kerberosConfig.isAllowKerberosAuthentication() && kerberosConfig.isUseKerberosForPasswordAuthentication()) {
+    KerberosUsernamePasswordAuthenticator authenticator=factory.createKerberosUsernamePasswordAuthenticator(kerberosConfig);
+    return authenticator.validUser(username,password);
   }
- catch (  IdentityManagementException ie) {
-    throw convertIDMException(ie);
+ else {
+    try {
+      return LDAPUtils.validatePassword(partitionManager,username,password);
+    }
+ catch (    IdentityManagementException ie) {
+      throw convertIDMException(ie);
+    }
   }
 }

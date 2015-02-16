@@ -1,0 +1,18 @@
+{
+  Set<String> supportedCredTypes=new HashSet<String>();
+  supportedCredTypes.add(UserCredentialModel.KERBEROS);
+  if (kerberosConfig.isAllowPasswordAuthentication()) {
+    boolean passwordSupported=true;
+    if (kerberosConfig.getEditMode() == EditMode.UNSYNCED) {
+      for (      UserCredentialValueModel cred : local.getCredentialsDirectly()) {
+        if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
+          passwordSupported=false;
+        }
+      }
+    }
+    if (passwordSupported) {
+      supportedCredTypes.add(UserCredentialModel.PASSWORD);
+    }
+  }
+  return supportedCredTypes;
+}

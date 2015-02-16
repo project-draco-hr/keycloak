@@ -1,0 +1,20 @@
+{
+  String id=model.getId() == null ? KeycloakModelUtils.generateId() : model.getId();
+  ProtocolClaimMappingEntity entity=new ProtocolClaimMappingEntity();
+  entity.setId(id);
+  entity.setSourceAttribute(model.getSourceAttribute());
+  entity.setProtocol(model.getProtocol());
+  entity.setProtocolClaim(model.getProtocolClaim());
+  entity.setSource(model.getSource().name());
+  entity.setAppliedByDefault(model.isAppliedByDefault());
+  entity.setRealm(realm);
+  em.persist(entity);
+  ProtocolClaimMappingModel mapping=new ProtocolClaimMappingModel();
+  mapping.setId(entity.getId());
+  mapping.setProtocol(entity.getProtocol());
+  mapping.setProtocolClaim(entity.getProtocolClaim());
+  mapping.setAppliedByDefault(entity.isAppliedByDefault());
+  mapping.setSource(ProtocolClaimMappingModel.Source.valueOf(entity.getSource()));
+  mapping.setSourceAttribute(entity.getSourceAttribute());
+  return mapping;
+}

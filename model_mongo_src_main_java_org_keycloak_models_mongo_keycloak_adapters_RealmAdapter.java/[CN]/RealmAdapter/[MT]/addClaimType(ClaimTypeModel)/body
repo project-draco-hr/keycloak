@@ -1,0 +1,12 @@
+{
+  String id=model.getId() == null ? KeycloakModelUtils.generateId() : model.getId();
+  ClaimTypeModel claim=new ClaimTypeModel(id,model.getName(),model.isBuiltIn(),model.getType());
+  ClaimTypeEntity entity=new ClaimTypeEntity();
+  entity.setId(claim.getId());
+  entity.setType(model.getType());
+  entity.setBuiltIn(model.isBuiltIn());
+  entity.setName(model.getName());
+  realm.getClaimTypes().add(entity);
+  updateRealm();
+  return claim;
+}

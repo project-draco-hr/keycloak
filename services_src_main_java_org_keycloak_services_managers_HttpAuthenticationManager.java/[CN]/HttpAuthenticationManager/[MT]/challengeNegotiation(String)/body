@@ -1,0 +1,14 @@
+{
+  return new HttpAuthOutput(null,new HttpAuthChallenge(){
+    @Override public void sendChallenge(    LoginFormsProvider loginFormsProvider){
+      String negotiateHeader=negotiateToken == null ? KerberosConstants.NEGOTIATE : KerberosConstants.NEGOTIATE + " " + negotiateToken;
+      if (logger.isTraceEnabled()) {
+        logger.trace("Sending back " + HttpHeaders.WWW_AUTHENTICATE + ": "+ negotiateHeader);
+      }
+      loginFormsProvider.setStatus(Response.Status.UNAUTHORIZED);
+      loginFormsProvider.setResponseHeader(HttpHeaders.WWW_AUTHENTICATE,negotiateHeader);
+      loginFormsProvider.setWarning("errorKerberosLogin");
+    }
+  }
+);
+}

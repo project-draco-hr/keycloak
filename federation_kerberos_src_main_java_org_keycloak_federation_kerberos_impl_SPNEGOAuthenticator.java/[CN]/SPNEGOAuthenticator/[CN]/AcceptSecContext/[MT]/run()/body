@@ -1,0 +1,25 @@
+{
+  GSSContext gssContext=null;
+  try {
+    if (log.isTraceEnabled()) {
+      log.trace("Going to establish security context");
+    }
+    gssContext=establishContext();
+    logAuthDetails(gssContext);
+    if (gssContext.isEstablished()) {
+      authenticatedKerberosPrincipal=gssContext.getSrcName().toString();
+      if (gssContext.getCredDelegState()) {
+        delegationCredential=gssContext.getDelegCred();
+      }
+      return true;
+    }
+ else {
+      return false;
+    }
+  }
+  finally {
+    if (gssContext != null) {
+      gssContext.dispose();
+    }
+  }
+}

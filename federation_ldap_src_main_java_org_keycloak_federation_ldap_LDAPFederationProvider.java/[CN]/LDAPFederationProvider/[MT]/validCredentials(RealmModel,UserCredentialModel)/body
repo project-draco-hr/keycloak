@@ -1,0 +1,22 @@
+{
+  if (credential.getType().equals(UserCredentialModel.KERBEROS)) {
+    if (kerberosConfig.isAllowKerberosAuthentication()) {
+      String spnegoToken=credential.getValue();
+      SPNEGOAuthenticator spnegoAuthenticator=factory.createSPNEGOAuthenticator(spnegoToken,kerberosConfig);
+      spnegoAuthenticator.authenticate();
+      if (spnegoAuthenticator.isAuthenticated()) {
+        Map<String,Object> state=new HashMap<String,Object>();
+        state.put(KerberosConstants.GSS_DELEGATION_CREDENTIAL,spnegoAuthenticator.getDelegationCredential());
+        String username=spnegoAuthenticator.getAuthenticatedUsername();
+        UserModel user=findOrCreateAuthenticatedUser(realm,username);
+        return new CredentialValidationOutput(user,CredentialValidationOutput.Status.AUTHENTICATED,state);
+      }
+ else {
+        Map<String,Object> state=new HashMap<String,Object>();
+        state.put(KerberosConstants.RESPONSE_TOKEN,spnegoAuthenticator.getResponseToken());
+        return new CredentialValidationOutput(null,CredentialValidationOutput.Status.CONTINUE,state);
+      }
+    }
+  }
+  return CredentialValidationOutput.failed();
+}

@@ -1,0 +1,24 @@
+{
+  List<UserFederationProviderModel> fedProviderModels=realm.getUserFederationProviders();
+  List<UserFederationProvider> fedProviders=new ArrayList<UserFederationProvider>();
+  for (  UserFederationProviderModel fedProviderModel : fedProviderModels) {
+    fedProviders.add(getFederationProvider(fedProviderModel));
+  }
+  CredentialValidationOutput result=null;
+  for (  UserCredentialModel cred : input) {
+    UserFederationProvider providerSupportingCreds=null;
+    for (    UserFederationProvider fedProvider : fedProviders) {
+      if (fedProvider.getSupportedCredentialTypes().contains(cred.getType())) {
+        providerSupportingCreds=fedProvider;
+        break;
+      }
+    }
+    if (providerSupportingCreds == null) {
+      logger.warn("Don't have provider supporting credentials of type " + cred.getType());
+      return CredentialValidationOutput.failed();
+    }
+    CredentialValidationOutput currentResult=providerSupportingCreds.validCredentials(realm,cred);
+    result=(result == null) ? currentResult : result.merge(currentResult);
+  }
+  return (result != null) ? result : CredentialValidationOutput.failed();
+}

@@ -75,6 +75,9 @@ try {
 String result=freeMarker.processTemplate(attributes,Templates.getTemplate(page),theme);
 Response.ResponseBuilder builder=Response.status(status).type(MediaType.TEXT_HTML).entity(result);
 BrowserSecurityHeaderSetup.headers(builder,realm);
+for (Map.Entry<String,String> entry : httpResponseHeaders.entrySet()) {
+builder.header(entry.getKey(),entry.getValue());
+}
 return builder.build();
 }
  catch (FreeMarkerException e) {

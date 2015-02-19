@@ -1,0 +1,11 @@
+{
+  KeycloakRule keycloakRule=getKeycloakRule();
+  AssertEvents events=getAssertEvents();
+  Response spnegoResponse=spnegoLogin("hnelson","secret");
+  Assert.assertEquals(302,spnegoResponse.getStatus());
+  events.expectLogin().user(keycloakRule.getUser("test","hnelson").getId()).detail(Details.AUTH_METHOD,"spnego").detail(Details.USERNAME,"hnelson").assertEvent();
+  String location=spnegoResponse.getLocation().toString();
+  driver.navigate().to(location);
+  Assert.assertEquals(AppPage.RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  Assert.assertNotNull(oauth.getCurrentQuery().get(OAuth2Constants.CODE));
+}

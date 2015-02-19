@@ -1,0 +1,24 @@
+{
+  KeycloakRule keycloakRule=getKeycloakRule();
+  AssertEvents events=getAssertEvents();
+  updateProviderEditMode(UserFederationProvider.EditMode.READ_ONLY);
+  changePasswordPage.open();
+  loginPage.assertCurrent();
+  loginPage.login("jduke","theduke");
+  changePasswordPage.assertCurrent();
+  changePasswordPage.changePassword("theduke","newPass","newPass");
+  Assert.assertTrue(driver.getPageSource().contains("You can't update your password as your account is read only"));
+  updateProviderEditMode(UserFederationProvider.EditMode.UNSYNCED);
+  changePasswordPage.changePassword("theduke","newPass","newPass");
+  Assert.assertTrue(driver.getPageSource().contains("Your password has been updated"));
+  changePasswordPage.logout();
+  loginPage.login("jduke","theduke");
+  loginPage.assertCurrent();
+  loginPage.login("jduke","newPass");
+  changePasswordPage.assertCurrent();
+  changePasswordPage.logout();
+  events.clear();
+  Response spnegoResponse=spnegoLogin("jduke","theduke");
+  Assert.assertEquals(302,spnegoResponse.getStatus());
+  events.expectLogin().user(keycloakRule.getUser("test","jduke").getId()).detail(Details.AUTH_METHOD,"spnego").detail(Details.USERNAME,"jduke").assertEvent();
+}

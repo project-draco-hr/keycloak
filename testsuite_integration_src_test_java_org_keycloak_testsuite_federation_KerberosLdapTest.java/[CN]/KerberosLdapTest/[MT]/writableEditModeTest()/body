@@ -1,0 +1,27 @@
+{
+  KeycloakRule keycloakRule=getKeycloakRule();
+  AssertEvents events=getAssertEvents();
+  updateProviderEditMode(UserFederationProvider.EditMode.WRITABLE);
+  changePasswordPage.open();
+  loginPage.assertCurrent();
+  loginPage.login("jduke","theduke");
+  changePasswordPage.assertCurrent();
+  changePasswordPage.changePassword("theduke","newPass","newPass");
+  Assert.assertTrue(driver.getPageSource().contains("Your password has been updated"));
+  changePasswordPage.logout();
+  loginPage.login("jduke","theduke");
+  loginPage.assertCurrent();
+  loginPage.login("jduke","newPass");
+  changePasswordPage.assertCurrent();
+  changePasswordPage.logout();
+  events.clear();
+  Response spnegoResponse=spnegoLogin("jduke","newPass");
+  Assert.assertEquals(302,spnegoResponse.getStatus());
+  events.expectLogin().user(keycloakRule.getUser("test","jduke").getId()).detail(Details.AUTH_METHOD,"spnego").detail(Details.USERNAME,"jduke").assertEvent();
+  loginPage.login("jduke","newPass");
+  changePasswordPage.assertCurrent();
+  changePasswordPage.changePassword("newPass","theduke","theduke");
+  Assert.assertTrue(driver.getPageSource().contains("Your password has been updated"));
+  changePasswordPage.logout();
+  events.clear();
+}

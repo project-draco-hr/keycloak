@@ -1,0 +1,22 @@
+{
+  ProtocolMapperEntity entity=new ProtocolMapperEntity();
+  if (model.getId() != null)   entity.setId(model.getId());
+ else   entity.setId(KeycloakModelUtils.generateId());
+  entity.setSourceAttribute(model.getSourceAttribute());
+  entity.setProtocol(model.getProtocol());
+  entity.setProtocolClaim(model.getProtocolClaim());
+  entity.setSource(model.getSource());
+  entity.setAppliedByDefault(model.isAppliedByDefault());
+  entity.setProtocolMapper(model.getProtocolMapper());
+  realm.getClaimMappings().add(entity);
+  updateRealm();
+  ProtocolMapperModel mapping=new ProtocolMapperModel();
+  mapping.setId(entity.getId());
+  mapping.setProtocol(entity.getProtocol());
+  mapping.setProtocolClaim(entity.getProtocolClaim());
+  mapping.setAppliedByDefault(entity.isAppliedByDefault());
+  mapping.setSource(entity.getSource());
+  mapping.setSourceAttribute(entity.getSourceAttribute());
+  mapping.setProtocolMapper(entity.getProtocolMapper());
+  return mapping;
+}

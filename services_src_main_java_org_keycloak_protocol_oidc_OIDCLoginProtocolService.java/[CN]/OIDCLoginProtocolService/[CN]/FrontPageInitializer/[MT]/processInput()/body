@@ -1,0 +1,47 @@
+{
+  event.client(clientId).detail(Details.REDIRECT_URI,redirect).detail(Details.RESPONSE_TYPE,"code");
+  if (!checkSsl()) {
+    event.error(Errors.SSL_REQUIRED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
+  }
+  if (!realm.isEnabled()) {
+    event.error(Errors.REALM_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled");
+  }
+  clientSession=null;
+  ClientModel client=realm.findClient(clientId);
+  if (client == null) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown login requester.");
+  }
+  if (!client.isEnabled()) {
+    event.error(Errors.CLIENT_DISABLED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Login requester not enabled.");
+  }
+  if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
+    event.error(Errors.NOT_ALLOWED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Bearer-only applications are not allowed to initiate browser login");
+  }
+  if (client.isDirectGrantsOnly()) {
+    event.error(Errors.NOT_ALLOWED);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"direct-grants-only clients are not allowed to initiate browser login");
+  }
+  String redirectUriParam=redirect;
+  redirect=verifyRedirectUri(uriInfo,redirect,realm,client);
+  if (redirect == null) {
+    event.error(Errors.INVALID_REDIRECT_URI);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid redirect_uri.");
+  }
+  clientSession=session.sessions().createClientSession(realm,client);
+  clientSession.setAuthMethod(OIDCLoginProtocol.LOGIN_PROTOCOL);
+  clientSession.setRedirectUri(redirect);
+  clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE);
+  clientSession.setNote(ClientSessionCode.ACTION_KEY,KeycloakModelUtils.generateCodeSecret());
+  clientSession.setNote(OIDCLoginProtocol.STATE_PARAM,state);
+  clientSession.setNote(OIDCLoginProtocol.REDIRECT_URI_PARAM,redirectUriParam);
+  if (scopeParam != null)   clientSession.setNote(OIDCLoginProtocol.SCOPE_PARAM,scopeParam);
+  if (responseType != null)   clientSession.setNote(OIDCLoginProtocol.RESPONSE_TYPE_PARAM,responseType);
+  if (loginHint != null)   clientSession.setNote(OIDCLoginProtocol.LOGIN_HINT_PARAM,loginHint);
+  if (prompt != null)   clientSession.setNote(OIDCLoginProtocol.PROMPT_PARAM,prompt);
+  return null;
+}

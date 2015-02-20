@@ -29,7 +29,7 @@
   pageSource=driver.getPageSource();
   System.out.println(pageSource);
   Assert.assertTrue(pageSource.contains("access error"));
-  String logoutUri=OpenIDConnectService.logoutUrl(UriBuilder.fromUri("http://localhost:8081/auth")).queryParam(OAuth2Constants.REDIRECT_URI,baseUrl + "/customer-portal/users").build("demo").toString();
+  String logoutUri=OIDCLoginProtocolService.logoutUrl(UriBuilder.fromUri("http://localhost:8081/auth")).queryParam(OAuth2Constants.REDIRECT_URI,baseUrl + "/customer-portal/users").build("demo").toString();
   driver.navigate().to(logoutUri);
   Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
   driver.navigate().to(baseUrl + "/customer-portal/users");

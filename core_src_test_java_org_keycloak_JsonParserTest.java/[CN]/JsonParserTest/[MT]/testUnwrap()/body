@@ -1,0 +1,16 @@
+{
+  IDToken test=new IDToken();
+  test.getOtherClaims().put("phone_number","978-666-0000");
+  test.getOtherClaims().put("email_verified","true");
+  Map<String,String> nested=new HashMap<String,String>();
+  nested.put("foo","bar");
+  test.getOtherClaims().put("nested",nested);
+  String json=JsonSerialization.writeValueAsPrettyString(test);
+  System.out.println(json);
+  test=JsonSerialization.readValue(json,IDToken.class);
+  System.out.println("email_verified property: " + test.getUserClaimSet().getEmailVerified());
+  System.out.println("property: " + test.getUserClaimSet().getPhoneNumber());
+  System.out.println("map: " + test.getOtherClaims().get("phone_number"));
+  Assert.assertNotNull(test.getUserClaimSet().getPhoneNumber());
+  Assert.assertNull(test.getOtherClaims().get("phone_number"));
+}

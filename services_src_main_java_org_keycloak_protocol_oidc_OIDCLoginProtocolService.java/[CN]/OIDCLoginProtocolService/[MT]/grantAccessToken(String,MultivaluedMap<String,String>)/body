@@ -1,0 +1,57 @@
+{
+  if (!checkSsl()) {
+    return createError("https_required","HTTPS required",Response.Status.FORBIDDEN);
+  }
+  if (!realm.isPasswordCredentialGrantAllowed()) {
+    return createError("not_enabled","Direct Grant REST API not enabled",Response.Status.FORBIDDEN);
+  }
+  event.event(EventType.LOGIN).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token");
+  String username=form.getFirst(AuthenticationManager.FORM_USERNAME);
+  if (username == null) {
+    event.error(Errors.USERNAME_MISSING);
+    throw new UnauthorizedException("No username");
+  }
+  event.detail(Details.USERNAME,username);
+  UserModel user=KeycloakModelUtils.findUserByNameOrEmail(session,realm,username);
+  if (user != null)   event.user(user);
+  ClientModel client=authorizeClient(authorizationHeader,form,event);
+  if (!realm.isEnabled()) {
+    event.error(Errors.REALM_DISABLED);
+    return createError("realm_disabled","Realm is disabled",Response.Status.UNAUTHORIZED);
+  }
+  AuthenticationStatus authenticationStatus=authManager.authenticateForm(session,clientConnection,realm,form);
+  Map<String,String> err;
+switch (authenticationStatus) {
+case SUCCESS:
+    break;
+case ACCOUNT_TEMPORARILY_DISABLED:
+case ACTIONS_REQUIRED:
+  err=new HashMap<String,String>();
+err.put(OAuth2Constants.ERROR,"invalid_grant");
+err.put(OAuth2Constants.ERROR_DESCRIPTION,"AccountProvider temporarily disabled");
+event.error(Errors.USER_TEMPORARILY_DISABLED);
+return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(err).build();
+case ACCOUNT_DISABLED:
+err=new HashMap<String,String>();
+err.put(OAuth2Constants.ERROR,"invalid_grant");
+err.put(OAuth2Constants.ERROR_DESCRIPTION,"AccountProvider disabled");
+event.error(Errors.USER_DISABLED);
+return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(err).build();
+default :
+err=new HashMap<String,String>();
+err.put(OAuth2Constants.ERROR,"invalid_grant");
+err.put(OAuth2Constants.ERROR_DESCRIPTION,"Invalid user credentials");
+event.error(Errors.INVALID_USER_CREDENTIALS);
+return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(err).build();
+}
+String scope=form.getFirst(OAuth2Constants.SCOPE);
+UserSessionProvider sessions=session.sessions();
+UserSessionModel userSession=sessions.createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"oauth_credentials",false);
+event.session(userSession);
+ClientSessionModel clientSession=sessions.createClientSession(realm,client);
+clientSession.setAuthMethod(OIDCLoginProtocol.LOGIN_PROTOCOL);
+TokenManager.attachClientSession(userSession,clientSession);
+AccessTokenResponse res=tokenManager.responseBuilder(realm,client,event).generateAccessToken(scope,client,user,userSession,clientSession).generateRefreshToken().generateIDToken().build();
+event.success();
+return Response.ok(res,MediaType.APPLICATION_JSON_TYPE).build();
+}

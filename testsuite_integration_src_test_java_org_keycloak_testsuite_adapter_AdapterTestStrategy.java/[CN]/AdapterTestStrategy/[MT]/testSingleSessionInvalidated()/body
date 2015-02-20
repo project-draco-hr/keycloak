@@ -5,7 +5,7 @@
   browser2.webRule.before();
   try {
     loginAndCheckSession(browser2.driver,browser2.loginPage);
-    String logoutUri=OpenIDConnectService.logoutUrl(UriBuilder.fromUri(AUTH_SERVER_URL)).queryParam(OAuth2Constants.REDIRECT_URI,APP_SERVER_BASE_URL + "/session-portal").build("demo").toString();
+    String logoutUri=OIDCLoginProtocolService.logoutUrl(UriBuilder.fromUri(AUTH_SERVER_URL)).queryParam(OAuth2Constants.REDIRECT_URI,APP_SERVER_BASE_URL + "/session-portal").build("demo").toString();
     browser1.driver.navigate().to(logoutUri);
     Assert.assertTrue(browser1.driver.getCurrentUrl().startsWith(LOGIN_URL));
     browser1.driver.navigate().to(APP_SERVER_BASE_URL + "/session-portal");

@@ -22,7 +22,7 @@
   }
   String redirect;
   if (redirectUri != null) {
-    redirect=OpenIDConnectService.verifyRedirectUri(uriInfo,redirectUri,realm,client);
+    redirect=OIDCLoginProtocolService.verifyRedirectUri(uriInfo,redirectUri,realm,client);
     if (redirect == null) {
       return Flows.errors().error("Invalid redirect uri.",Response.Status.BAD_REQUEST);
     }
@@ -32,7 +32,7 @@
   }
   UserSessionModel userSession=session.sessions().createUserSession(realm,user,username,clientConnection.getRemoteAddr(),"form",false);
   ClientSessionModel clientSession=session.sessions().createClientSession(realm,client);
-  clientSession.setAuthMethod(OpenIDConnect.LOGIN_PROTOCOL);
+  clientSession.setAuthMethod(OIDCLoginProtocol.LOGIN_PROTOCOL);
   clientSession.setRedirectUri(redirect);
   clientSession.setUserSession(userSession);
   ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);

@@ -20,10 +20,21 @@
   if (refreshToken.getIssuedAt() < client.getNotBefore()) {
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale refresh token");
   }
+  ClientSessionModel clientSession=null;
+  for (  ClientSessionModel clientSessionModel : userSession.getClientSessions()) {
+    if (clientSessionModel.getId().equals(refreshToken.getClientSession())) {
+      clientSession=clientSessionModel;
+      break;
+    }
+  }
+  if (clientSession == null) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Client session not active","Client session not active");
+  }
   verifyAccess(refreshToken,realm,client,user);
-  AccessToken accessToken=initToken(realm,client,user,userSession);
+  AccessToken accessToken=initToken(realm,client,user,userSession,clientSession);
   accessToken.setRealmAccess(refreshToken.getRealmAccess());
   accessToken.setResourceAccess(refreshToken.getResourceAccess());
+  accessToken=transformToken(accessToken,realm,client,user,userSession,clientSession);
   userSession.setLastSessionRefresh(currentTime);
   return accessToken;
 }

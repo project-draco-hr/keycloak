@@ -1,0 +1,13 @@
+{
+  String sourceAttribute=model.getSourceAttribute();
+  if (sourceAttribute == null)   return null;
+  String methodName="get" + Character.toUpperCase(sourceAttribute.charAt(0)) + sourceAttribute.substring(1);
+  try {
+    Method method=UserModel.class.getMethod(methodName);
+    Object val=method.invoke(user);
+    if (val != null)     return val.toString();
+  }
+ catch (  Exception ignore) {
+  }
+  return null;
+}

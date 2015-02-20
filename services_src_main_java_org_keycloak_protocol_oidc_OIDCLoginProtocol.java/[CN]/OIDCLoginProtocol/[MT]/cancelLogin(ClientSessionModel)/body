@@ -1,0 +1,9 @@
+{
+  String redirect=clientSession.getRedirectUri();
+  String state=clientSession.getNote(OIDCLoginProtocol.STATE_PARAM);
+  UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam(OAuth2Constants.ERROR,"access_denied");
+  if (state != null) {
+    redirectUri.queryParam(OAuth2Constants.STATE,state);
+  }
+  return Response.status(302).location(redirectUri.build()).build();
+}

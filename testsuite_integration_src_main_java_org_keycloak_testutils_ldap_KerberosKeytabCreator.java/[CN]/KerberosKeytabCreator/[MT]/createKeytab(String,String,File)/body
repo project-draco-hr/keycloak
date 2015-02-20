@@ -1,0 +1,14 @@
+{
+  final KerberosTime timeStamp=new KerberosTime();
+  final int principalType=1;
+  final Keytab keytab=Keytab.getInstance();
+  final List<KeytabEntry> entries=new ArrayList<KeytabEntry>();
+  for (  Map.Entry<EncryptionType,EncryptionKey> keyEntry : KerberosKeyFactory.getKerberosKeys(principalName,passPhrase).entrySet()) {
+    System.out.println("Adding keytab entry of type: " + keyEntry.getKey().getName());
+    final EncryptionKey key=keyEntry.getValue();
+    final byte keyVersion=(byte)key.getKeyVersion();
+    entries.add(new KeytabEntry(principalName,principalType,timeStamp,keyVersion,key));
+  }
+  keytab.setEntries(entries);
+  keytab.write(keytabFile);
+}

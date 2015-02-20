@@ -1,0 +1,15 @@
+{
+  KerberosConfig kdcConfig=new KerberosConfig();
+  kdcConfig.setServicePrincipal("krbtgt/" + this.kerberosRealm + "@"+ this.kerberosRealm);
+  kdcConfig.setPrimaryRealm(this.kerberosRealm);
+  kdcConfig.setMaximumTicketLifetime(60000 * 1440);
+  kdcConfig.setMaximumRenewableLifetime(60000 * 10080);
+  kdcConfig.setPaEncTimestampRequired(false);
+  kdcServer=new NoReplayKdcServer(kdcConfig);
+  kdcServer.setSearchBaseDn(this.baseDN);
+  UdpTransport udp=new UdpTransport(this.bindHost,this.kdcPort);
+  kdcServer.addTransports(udp);
+  kdcServer.setDirectoryService(directoryService);
+  kdcServer.start();
+  return kdcServer;
+}

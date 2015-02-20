@@ -1,7 +1,10 @@
 {
   try {
-    embeddedServer.tearDown();
-    embeddedServer=null;
+    if (ldapEmbeddedServer != null) {
+      ldapEmbeddedServer.stop();
+      ldapEmbeddedServer=null;
+      ldapConfiguration=null;
+    }
   }
  catch (  Exception e) {
     throw new RuntimeException("Error tearDown Embedded LDAP server.",e);

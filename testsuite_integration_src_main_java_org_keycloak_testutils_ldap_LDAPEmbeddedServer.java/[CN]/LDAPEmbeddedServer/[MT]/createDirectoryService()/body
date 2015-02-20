@@ -1,0 +1,19 @@
+{
+  String dcName=baseDN.split(",")[0].substring(3);
+  InMemoryDirectoryServiceFactory dsf=new InMemoryDirectoryServiceFactory();
+  DirectoryService service=dsf.getDirectoryService();
+  service.setAccessControlEnabled(false);
+  service.setAllowAnonymousAccess(false);
+  service.getChangeLog().setEnabled(false);
+  dsf.init(dcName + "DS");
+  SchemaManager schemaManager=service.getSchemaManager();
+  PartitionFactory partitionFactory=dsf.getPartitionFactory();
+  Partition partition=partitionFactory.createPartition(schemaManager,service.getDnFactory(),dcName,this.baseDN,1000,new File(service.getInstanceLayout().getPartitionsDirectory(),dcName));
+  partition.setCacheService(service.getCacheService());
+  partition.initialize();
+  partition.setSchemaManager(schemaManager);
+  service.addPartition(partition);
+  String entryLdif="dn: " + baseDN + "\n"+ "dc: "+ dcName+ "\n"+ "objectClass: top\n"+ "objectClass: domain\n\n";
+  DSAnnotationProcessor.injectEntries(service,entryLdif);
+  return service;
+}

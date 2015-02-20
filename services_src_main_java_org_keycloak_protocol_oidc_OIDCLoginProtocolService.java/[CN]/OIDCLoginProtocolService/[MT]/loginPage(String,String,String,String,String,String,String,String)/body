@@ -21,6 +21,9 @@
   }
   response=authManager.checkNonFormAuthentication(session,clientSession,realm,uriInfo,request,clientConnection,headers,event);
   if (response != null)   return response;
+  HttpAuthenticationManager httpAuthManager=new HttpAuthenticationManager(session,clientSession,realm,uriInfo,request,clientConnection,event);
+  HttpAuthenticationManager.HttpAuthOutput httpAuthOutput=httpAuthManager.spnegoAuthenticate();
+  if (httpAuthOutput.getResponse() != null)   return httpAuthOutput.getResponse();
   if (prompt != null && prompt.equals("none")) {
     OIDCLoginProtocol oauth=new OIDCLoginProtocol(session,realm,uriInfo);
     return oauth.cancelLogin(clientSession);
@@ -42,6 +45,9 @@
     return Flows.forms(session,realm,null,uriInfo).setError("Realm [" + this.realm.getName() + "] does not support any credential type.").createErrorPage();
   }
   LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(accessCode);
+  if (httpAuthOutput.getChallenge() != null) {
+    httpAuthOutput.getChallenge().sendChallenge(forms);
+  }
   String rememberMeUsername=AuthenticationManager.getRememberMeUsername(realm,headers);
   if (loginHint != null || rememberMeUsername != null) {
     MultivaluedMap<String,String> formData=new MultivaluedMapImpl<String,String>();

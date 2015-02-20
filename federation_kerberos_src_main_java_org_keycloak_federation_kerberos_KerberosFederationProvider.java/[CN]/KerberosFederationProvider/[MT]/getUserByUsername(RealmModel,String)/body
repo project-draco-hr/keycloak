@@ -1,0 +1,12 @@
+{
+  if (username.contains("@")) {
+    username=username.split("@")[0];
+  }
+  KerberosUsernamePasswordAuthenticator authenticator=factory.createKerberosUsernamePasswordAuthenticator(kerberosConfig);
+  if (authenticator.isUserAvailable(username)) {
+    return findOrCreateAuthenticatedUser(realm,username);
+  }
+ else {
+    return null;
+  }
+}

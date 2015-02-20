@@ -1,0 +1,19 @@
+{
+  Map<String,String> map=new HashMap<String,String>();
+  map.put("hostname",this.bindHost);
+  InputStream is=getClass().getClassLoader().getResourceAsStream(ldifFile);
+  if (is == null) {
+    throw new IllegalStateException("LDIF file not found on classpath. Location was: " + ldifFile);
+  }
+  final String ldifContent=StrSubstitutor.replace(StreamUtil.readString(is),map);
+  log.info("Importing LDIF: " + ldifContent);
+  final SchemaManager schemaManager=directoryService.getSchemaManager();
+  for (  LdifEntry ldifEntry : new LdifReader(IOUtils.toInputStream(ldifContent))) {
+    try {
+      directoryService.getAdminSession().add(new DefaultEntry(schemaManager,ldifEntry.getEntry()));
+    }
+ catch (    LdapEntryAlreadyExistsException ignore) {
+      log.debug("Entry " + ldifEntry.getNewRdn() + " already exists. Ignoring");
+    }
+  }
+}

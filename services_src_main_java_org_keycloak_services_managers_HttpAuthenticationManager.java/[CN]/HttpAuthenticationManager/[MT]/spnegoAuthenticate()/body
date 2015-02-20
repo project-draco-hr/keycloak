@@ -1,0 +1,37 @@
+{
+  boolean kerberosSupported=false;
+  for (  RequiredCredentialModel c : realm.getRequiredCredentials()) {
+    if (c.getType().equals(CredentialRepresentation.KERBEROS)) {
+      logger.debug("Kerberos authentication is supported");
+      kerberosSupported=true;
+    }
+  }
+  if (!kerberosSupported) {
+    return new HttpAuthOutput(null,null);
+  }
+  String authHeader=request.getHttpHeaders().getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+  if (authHeader == null) {
+    return challengeNegotiation(null);
+  }
+  String[] tokens=authHeader.split(" ");
+  if (tokens.length != 2) {
+    logger.warn("Invalid length of tokens: " + tokens.length);
+    return challengeNegotiation(null);
+  }
+ else   if (!KerberosConstants.NEGOTIATE.equalsIgnoreCase(tokens[0])) {
+    logger.warn("Unknown scheme " + tokens[0]);
+    return challengeNegotiation(null);
+  }
+ else {
+    String spnegoToken=tokens[1];
+    UserCredentialModel spnegoCredential=UserCredentialModel.kerberos(spnegoToken);
+    CredentialValidationOutput output=session.users().validCredentials(realm,spnegoCredential);
+    if (output.getAuthStatus() == CredentialValidationOutput.Status.AUTHENTICATED) {
+      return sendResponse(output.getAuthenticatedUser(),"spnego");
+    }
+ else {
+      String spnegoResponseToken=(String)output.getState().get(KerberosConstants.RESPONSE_TOKEN);
+      return challengeNegotiation(spnegoResponseToken);
+    }
+  }
+}

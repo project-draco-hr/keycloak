@@ -1,0 +1,18 @@
+{
+  this.factory=factory;
+  this.session=session;
+  this.model=model;
+  this.partitionManager=partitionManager;
+  this.kerberosConfig=new LDAPProviderKerberosConfig(model);
+  String editModeString=model.getConfig().get(EDIT_MODE);
+  if (editModeString == null) {
+    editMode=EditMode.READ_ONLY;
+  }
+ else {
+    editMode=EditMode.valueOf(editModeString);
+  }
+  supportedCredentialTypes.add(UserCredentialModel.PASSWORD);
+  if (kerberosConfig.isAllowKerberosAuthentication()) {
+    supportedCredentialTypes.add(UserCredentialModel.KERBEROS);
+  }
+}

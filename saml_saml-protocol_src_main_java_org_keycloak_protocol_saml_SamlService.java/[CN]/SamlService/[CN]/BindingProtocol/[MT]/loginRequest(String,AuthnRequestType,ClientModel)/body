@@ -2,7 +2,7 @@
   if (!uriInfo.getAbsolutePath().equals(requestAbstractType.getDestination())) {
     event.error(Errors.INVALID_SAML_AUTHN_REQUEST);
     event.detail(Details.REASON,"invalid_destination");
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid request.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUEST);
   }
   String bindingType=getBindingType(requestAbstractType);
   if ("true".equals(client.getAttribute(SamlProtocol.SAML_FORCE_POST_BINDING)))   bindingType=SamlProtocol.SAML_POST_BINDING;
@@ -24,7 +24,7 @@
   }
   if (redirect == null) {
     event.error(Errors.INVALID_REDIRECT_URI);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid redirect_uri.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REDIRECT_URI);
   }
   ClientSessionModel clientSession=session.sessions().createClientSession(realm,client);
   clientSession.setAuthMethod(SamlProtocol.LOGIN_PROTOCOL);
@@ -43,15 +43,15 @@
  else {
       event.error(Errors.INVALID_SAML_AUTHN_REQUEST);
       event.detail(Details.REASON,"unsupported_nameid_format");
-      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unsupported NameIDFormat.");
+      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.UNSUPPORTED_NAME_ID_FORMAT);
     }
   }
   Response response=authManager.checkNonFormAuthentication(session,clientSession,realm,uriInfo,request,clientConnection,headers,event);
   if (response != null)   return response;
   HttpAuthenticationManager httpAuthManager=new HttpAuthenticationManager(session,clientSession,realm,uriInfo,request,clientConnection,event);
-  HttpAuthenticationManager.HttpAuthOutput httpAuthOutput=httpAuthManager.spnegoAuthenticate();
+  HttpAuthenticationManager.HttpAuthOutput httpAuthOutput=httpAuthManager.spnegoAuthenticate(headers);
   if (httpAuthOutput.getResponse() != null)   return httpAuthOutput.getResponse();
-  LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(new ClientSessionCode(realm,clientSession).getCode());
+  LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo,headers).setClientSessionCode(new ClientSessionCode(realm,clientSession).getCode());
   if (httpAuthOutput.getChallenge() != null) {
     httpAuthOutput.getChallenge().sendChallenge(forms);
   }

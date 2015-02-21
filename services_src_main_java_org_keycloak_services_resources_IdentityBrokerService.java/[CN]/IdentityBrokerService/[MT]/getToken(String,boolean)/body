@@ -16,7 +16,7 @@
         return corsResponse(badRequest("Client [" + audience + "] not authorized to retrieve tokens from identity provider ["+ providerId+ "]."),clientModel);
       }
       if (OAuthClientModel.class.isInstance(clientModel) && !forceRetrieval) {
-        return corsResponse(Flows.forms(this.session,this.realmModel,clientModel,this.uriInfo).setClientSessionCode(authManager.extractAuthorizationHeaderToken(this.request.getHttpHeaders())).setAccessRequest("Your information from " + providerId + " identity provider.").setClient(clientModel).setUriInfo(this.uriInfo).setActionUri(this.uriInfo.getRequestUri()).createOAuthGrant(null),clientModel);
+        return corsResponse(Flows.forms(this.session,this.realmModel,clientModel,this.uriInfo,headers).setClientSessionCode(authManager.extractAuthorizationHeaderToken(this.request.getHttpHeaders())).setAccessRequest("Your information from " + providerId + " identity provider.").setClient(clientModel).setActionUri(this.uriInfo.getRequestUri()).createOAuthGrant(null),clientModel);
       }
       IdentityProvider identityProvider=getIdentityProvider(providerId);
       IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(providerId);
@@ -33,9 +33,9 @@
     return badRequest("Invalid token.");
   }
  catch (  IdentityBrokerException e) {
-    return redirectToErrorPage("Could not obtain token fron identity provider [" + providerId + "].",e);
+    return redirectToErrorPage(Messages.COULD_NOT_OBTAIN_TOKEN,e,providerId);
   }
 catch (  Exception e) {
-    return redirectToErrorPage("Unexpected error when retrieving token from identity provider [" + providerId + "].",e);
+    return redirectToErrorPage(Messages.UNEXPECTED_ERROR_RETRIEVING_TOKEN,e,providerId);
   }
 }

@@ -3,17 +3,17 @@
   if (idpHint != null && !"".equals(idpHint)) {
     IdentityProviderModel identityProviderModel=realm.getIdentityProviderById(idpHint);
     if (identityProviderModel == null) {
-      return Flows.forms(session,realm,null,uriInfo).setError("Could not find an identity provider with the identifier [" + idpHint + "].").createErrorPage();
+      return Flows.forms(session,realm,null,uriInfo,headers).setError(Messages.IDENTITY_PROVIDER_NOT_FOUND,idpHint).createErrorPage();
     }
     return buildRedirectToIdentityProvider(idpHint,accessCode);
   }
   Response response=authManager.checkNonFormAuthentication(session,clientSession,realm,uriInfo,request,clientConnection,headers,event);
   if (response != null)   return response;
   HttpAuthenticationManager httpAuthManager=new HttpAuthenticationManager(session,clientSession,realm,uriInfo,request,clientConnection,event);
-  HttpAuthenticationManager.HttpAuthOutput httpAuthOutput=httpAuthManager.spnegoAuthenticate();
+  HttpAuthenticationManager.HttpAuthOutput httpAuthOutput=httpAuthManager.spnegoAuthenticate(headers);
   if (httpAuthOutput.getResponse() != null)   return httpAuthOutput.getResponse();
   if (prompt != null && prompt.equals("none")) {
-    OIDCLoginProtocol oauth=new OIDCLoginProtocol(session,realm,uriInfo);
+    OIDCLoginProtocol oauth=new OIDCLoginProtocol(session,realm,uriInfo,headers);
     return oauth.cancelLogin(clientSession);
   }
   List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
@@ -28,11 +28,11 @@
       if (identityProviders.size() == 1) {
         return buildRedirectToIdentityProvider(identityProviders.get(0).getId(),accessCode);
       }
-      return Flows.forms(session,realm,null,uriInfo).setError("Realm [" + realm.getName() + "] supports multiple identity providers. Could not determine which identity provider should be used to authenticate with.").createErrorPage();
+      return Flows.forms(session,realm,null,uriInfo,headers).setError(Messages.IDENTITY_PROVIDER_NOT_UNIQUE,realm.getName()).createErrorPage();
     }
-    return Flows.forms(session,realm,null,uriInfo).setError("Realm [" + realm.getName() + "] does not support any credential type.").createErrorPage();
+    return Flows.forms(session,realm,null,uriInfo,headers).setError(Messages.REALM_SUPPORTS_NO_CREDENTIALS,realm.getName()).createErrorPage();
   }
-  LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(accessCode);
+  LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo,headers).setClientSessionCode(accessCode);
   if (httpAuthOutput.getChallenge() != null) {
     httpAuthOutput.getChallenge().sendChallenge(forms);
   }

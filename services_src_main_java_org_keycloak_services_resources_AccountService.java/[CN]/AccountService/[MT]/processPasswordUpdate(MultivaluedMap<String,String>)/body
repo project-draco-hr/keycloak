@@ -41,6 +41,11 @@
     setReferrerOnPage();
     return account.setError(Messages.READ_ONLY_PASSWORD).createResponse(AccountPages.PASSWORD);
   }
+catch (  ModelException me) {
+    logger.error("Failed to update password",me);
+    setReferrerOnPage();
+    return account.setError(me.getMessage(),me.getParameters()).createResponse(AccountPages.PASSWORD);
+  }
 catch (  Exception ape) {
     logger.error("Failed to update password",ape);
     setReferrerOnPage();
@@ -55,5 +60,5 @@ catch (  Exception ape) {
   }
   event.event(EventType.UPDATE_PASSWORD).client(auth.getClient()).user(auth.getUser()).success();
   setReferrerOnPage();
-  return account.setPasswordSet(true).setSuccess("accountPasswordUpdated").createResponse(AccountPages.PASSWORD);
+  return account.setPasswordSet(true).setSuccess(Messages.ACCOUNT_PASSWORD_UPDATED).createResponse(AccountPages.PASSWORD);
 }

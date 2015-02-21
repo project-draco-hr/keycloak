@@ -15,9 +15,14 @@
  catch (  IOException e) {
     logger.warn("Failed to load properties",e);
   }
+  Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,headers);
+  if (locale != null) {
+    attributes.put("locale",locale);
+    attributes.put("formatter",new TextFormatterBean(locale));
+  }
   Properties messages;
   try {
-    messages=theme.getMessages();
+    messages=theme.getMessages(locale);
     attributes.put("rb",messages);
   }
  catch (  IOException e) {
@@ -34,10 +39,20 @@
     attributes.put("stateChecker",stateChecker);
   }
   if (message != null) {
-    attributes.put("message",new MessageBean(messages.containsKey(message) ? messages.getProperty(message) : message,messageType));
+    String formattedMessage;
+    if (messages.containsKey(message)) {
+      formattedMessage=new MessageFormat(messages.getProperty(message).replace("'","''"),locale).format(parameters);
+    }
+ else {
+      formattedMessage=message;
+    }
+    attributes.put("message",new MessageBean(formattedMessage,messageType));
   }
   if (referrer != null) {
     attributes.put("referrer",new ReferrerBean(referrer));
+  }
+  if (realm != null) {
+    attributes.put("realm",new RealmBean(realm));
   }
   attributes.put("url",new UrlBean(realm,theme,baseUri,baseQueryUri,uriInfo.getRequestUri(),stateChecker));
   attributes.put("features",new FeaturesBean(identityProviderEnabled,eventsEnabled,passwordUpdateSupported));
@@ -64,6 +79,7 @@ try {
 String result=freeMarker.processTemplate(attributes,Templates.getTemplate(page),theme);
 Response.ResponseBuilder builder=Response.status(status).type(MediaType.TEXT_HTML).entity(result);
 BrowserSecurityHeaderSetup.headers(builder,realm);
+LocaleHelper.updateLocaleCookie(builder,locale,realm,uriInfo,Urls.localeCookiePath(baseUri,realm.getName()));
 return builder.build();
 }
  catch (FreeMarkerException e) {

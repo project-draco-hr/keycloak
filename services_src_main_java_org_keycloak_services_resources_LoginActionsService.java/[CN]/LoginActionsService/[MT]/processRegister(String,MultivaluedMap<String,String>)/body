@@ -2,24 +2,24 @@
   event.event(EventType.REGISTER);
   if (!checkSsl()) {
     event.error(Errors.SSL_REQUIRED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.HTTPS_REQUIRED);
   }
   if (!realm.isEnabled()) {
     event.error(Errors.REALM_DISABLED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.REALM_NOT_ENABLED);
   }
   if (!realm.isRegistrationAllowed()) {
     event.error(Errors.REGISTRATION_DISABLED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Registration not allowed");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.REGISTRATION_NOT_ALLOWED);
   }
   ClientSessionCode clientCode=ClientSessionCode.parse(code,session,realm);
   if (clientCode == null) {
     event.error(Errors.INVALID_CODE);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown code, please login again through your application.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.UNKNOWN_CODE);
   }
   if (!clientCode.isValid(ClientSessionModel.Action.AUTHENTICATE)) {
     event.error(Errors.INVALID_CODE);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid code, please login again through your application.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_CODE);
   }
   String username=formData.getFirst("username");
   String email=formData.getFirst("email");
@@ -31,36 +31,41 @@
   event.client(clientSession.getClient()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.RESPONSE_TYPE,"code").detail(Details.USERNAME,username).detail(Details.EMAIL,email).detail(Details.REGISTER_METHOD,"form");
   if (!realm.isEnabled()) {
     event.error(Errors.REALM_DISABLED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.REALM_NOT_ENABLED);
   }
   ClientModel client=clientSession.getClient();
   if (client == null) {
     event.error(Errors.CLIENT_NOT_FOUND);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown login requester.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.UNKNOWN_LOGIN_REQUESTER);
   }
   if (!client.isEnabled()) {
     event.error(Errors.CLIENT_DISABLED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Login requester not enabled.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.LOGIN_REQUESTER_NOT_ENABLED);
   }
   List<String> requiredCredentialTypes=new LinkedList<String>();
   for (  RequiredCredentialModel m : realm.getRequiredCredentials()) {
     requiredCredentialTypes.add(m.getType());
   }
-  String error=Validation.validateRegistrationForm(realm,formData,requiredCredentialTypes);
-  if (error == null) {
-    error=Validation.validatePassword(formData,realm.getPasswordPolicy());
+  String errorMessage=Validation.validateRegistrationForm(realm,formData,requiredCredentialTypes);
+  Object[] parameters=new Object[0];
+  if (errorMessage == null) {
+    PasswordPolicy.Error error=Validation.validatePassword(formData,realm.getPasswordPolicy());
+    if (error != null) {
+      errorMessage=error.getMessage();
+      parameters=error.getParameters();
+    }
   }
-  if (error != null) {
+  if (errorMessage != null) {
     event.error(Errors.INVALID_REGISTRATION);
-    return Flows.forms(session,realm,client,uriInfo).setError(error).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
+    return Flows.forms(session,realm,client,uriInfo,headers).setError(errorMessage,parameters).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
   }
   if (session.users().getUserByUsername(username,realm) != null) {
     event.error(Errors.USERNAME_IN_USE);
-    return Flows.forms(session,realm,client,uriInfo).setError(Messages.USERNAME_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
+    return Flows.forms(session,realm,client,uriInfo,headers).setError(Messages.USERNAME_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
   }
   if (session.users().getUserByEmail(email,realm) != null) {
     event.error(Errors.EMAIL_IN_USE);
-    return Flows.forms(session,realm,client,uriInfo).setError(Messages.EMAIL_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
+    return Flows.forms(session,realm,client,uriInfo,headers).setError(Messages.EMAIL_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
   }
   UserModel user=session.users().addUser(realm,username);
   user.setEnabled(true);
@@ -73,17 +78,23 @@
     credentials.setValue(formData.getFirst("password"));
     boolean passwordUpdateSuccessful;
     String passwordUpdateError=null;
+    Object[] passwordUpdateErrorParameters=null;
     try {
       session.users().updateCredential(realm,user,UserCredentialModel.password(formData.getFirst("password")));
       passwordUpdateSuccessful=true;
     }
- catch (    Exception ape) {
+ catch (    ModelException me) {
+      passwordUpdateSuccessful=false;
+      passwordUpdateError=me.getMessage();
+      passwordUpdateErrorParameters=me.getParameters();
+    }
+catch (    Exception ape) {
       passwordUpdateSuccessful=false;
       passwordUpdateError=ape.getMessage();
     }
     if (!passwordUpdateSuccessful) {
       user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
-      return Flows.forms(session,realm,client,uriInfo).setError(passwordUpdateError).setClientSessionCode(clientCode.getCode()).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
+      return Flows.forms(session,realm,client,uriInfo,headers).setError(passwordUpdateError,passwordUpdateErrorParameters).setClientSessionCode(clientCode.getCode()).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
     }
   }
   AttributeFormDataProcessor.process(formData,realm,user);

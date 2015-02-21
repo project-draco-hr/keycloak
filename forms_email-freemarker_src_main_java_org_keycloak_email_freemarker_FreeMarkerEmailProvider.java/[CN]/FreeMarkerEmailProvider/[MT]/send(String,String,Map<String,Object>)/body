@@ -2,7 +2,12 @@
   try {
     ThemeProvider themeProvider=session.getProvider(ThemeProvider.class,"extending");
     Theme theme=themeProvider.getTheme(realm.getEmailTheme(),Theme.Type.EMAIL);
-    String subject=theme.getMessages().getProperty(subjectKey);
+    Locale locale=LocaleHelper.getLocale(realm,user);
+    attributes.put("locale",locale);
+    Properties rb=theme.getMessages(locale);
+    attributes.put("rb",rb);
+    attributes.put("formatter",new TextFormatterBean(locale));
+    String subject=rb.getProperty(subjectKey);
     String body=freeMarker.processTemplate(attributes,template,theme);
     send(subject,body);
   }

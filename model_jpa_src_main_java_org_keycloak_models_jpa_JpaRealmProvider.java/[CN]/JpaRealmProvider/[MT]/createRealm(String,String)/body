@@ -4,5 +4,7 @@
   realm.setId(id);
   em.persist(realm);
   em.flush();
-  return new RealmAdapter(session,em,realm);
+  RealmModel model=new RealmAdapter(session,em,realm);
+  listeners.executeCreationListeners(model);
+  return model;
 }

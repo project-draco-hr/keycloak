@@ -1,7 +1,7 @@
 {
   UriBuilder builder=UriBuilder.fromUri(org.keycloak.testsuite.Constants.AUTH_SERVER_ROOT);
-  UriBuilder uriBuilder=OpenIDConnectService.tokenServiceBaseUrl(builder);
-  URI userInfoUri=uriBuilder.path(OpenIDConnectService.class,"issueUserInfo").build("test");
+  UriBuilder uriBuilder=OIDCLoginProtocolService.tokenServiceBaseUrl(builder);
+  URI userInfoUri=uriBuilder.path(OIDCLoginProtocolService.class,"issueUserInfo").build("test");
   Client client=ClientBuilder.newClient();
   WebTarget userInfoTarget=client.target(userInfoUri);
   return userInfoTarget.request().header(HttpHeaders.AUTHORIZATION,"bearer " + accessToken).get();

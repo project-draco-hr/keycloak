@@ -1,9 +1,15 @@
 {
-  ProtocolMapperEntity entity=getProtocolClaimMapping(mapping.getId());
-  entity.setProtocol(mapping.getProtocol());
-  entity.setProtocolClaim(mapping.getProtocolClaim());
+  ProtocolMapperEntity entity=getProtocolMapper(mapping.getId());
+  entity.setProtocolMapper(mapping.getProtocolMapper());
   entity.setAppliedByDefault(mapping.isAppliedByDefault());
-  entity.setSource(mapping.getSource().name());
-  entity.setSourceAttribute(mapping.getSourceAttribute());
+  entity.setConsentRequired(mapping.isConsentRequired());
+  entity.setConsentText(mapping.getConsentText());
+  if (entity.getConfig() == null) {
+    entity.setConfig(mapping.getConfig());
+  }
+ else {
+    entity.getConfig().clear();
+    entity.getConfig().putAll(mapping.getConfig());
+  }
   em.flush();
 }

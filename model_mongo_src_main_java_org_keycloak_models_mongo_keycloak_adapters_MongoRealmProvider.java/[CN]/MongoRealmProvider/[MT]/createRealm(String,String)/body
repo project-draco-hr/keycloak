@@ -3,5 +3,7 @@
   newRealm.setId(id);
   newRealm.setName(name);
   getMongoStore().insertEntity(newRealm,invocationContext);
-  return new RealmAdapter(session,newRealm,invocationContext);
+  RealmModel model=new RealmAdapter(session,newRealm,invocationContext);
+  listeners.executeCreationListeners(model);
+  return model;
 }

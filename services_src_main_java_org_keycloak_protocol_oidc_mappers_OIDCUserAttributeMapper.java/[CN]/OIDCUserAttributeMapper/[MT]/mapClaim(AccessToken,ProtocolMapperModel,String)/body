@@ -1,0 +1,19 @@
+{
+  if (attributeValue == null)   return;
+  String protocolClaim=mappingModel.getConfig().get(TOKEN_CLAIM_NAME);
+  String[] split=protocolClaim.split(".");
+  Map<String,Object> jsonObject=token.getOtherClaims();
+  for (int i=0; i < split.length; i++) {
+    if (i == split.length - 1) {
+      jsonObject.put(split[i],attributeValue);
+    }
+ else {
+      Map<String,Object> nested=(Map<String,Object>)jsonObject.get(split[i]);
+      if (nested == null) {
+        nested=new HashMap<String,Object>();
+        jsonObject.put(split[i],nested);
+        jsonObject=nested;
+      }
+    }
+  }
+}

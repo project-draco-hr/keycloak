@@ -4,7 +4,12 @@
   realm.setId(id);
   em.persist(realm);
   em.flush();
-  RealmModel model=new RealmAdapter(session,em,realm);
-  listeners.executeCreationListeners(model);
+  final RealmModel model=new RealmAdapter(session,em,realm);
+  session.getKeycloakSessionFactory().publish(new RealmCreationEvent(){
+    @Override public RealmModel getCreatedRealm(){
+      return model;
+    }
+  }
+);
   return model;
 }

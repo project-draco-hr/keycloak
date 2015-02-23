@@ -1,0 +1,29 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealm("test");
+    UserFederationProviderModel kerberosProviderModel=realm.getUserFederationProviders().get(0);
+    kerberosProviderModel.getConfig().put(KerberosConstants.UPDATE_PROFILE_FIRST_LOGIN,"true");
+    realm.updateUserFederationProvider(kerberosProviderModel);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  Response spnegoResponse=spnegoLogin("hnelson","secret");
+  Assert.assertEquals(200,spnegoResponse.getStatus());
+  String responseText=spnegoResponse.readEntity(String.class);
+  Assert.assertTrue(responseText.contains("You need to update your user profile to activate your account."));
+  Assert.assertTrue(responseText.contains("hnelson@keycloak.org"));
+  spnegoResponse.close();
+  assertUser("hnelson","hnelson@keycloak.org",null,null,true);
+  session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealm("test");
+    UserFederationProviderModel kerberosProviderModel=realm.getUserFederationProviders().get(0);
+    kerberosProviderModel.getConfig().put(KerberosConstants.UPDATE_PROFILE_FIRST_LOGIN,"false");
+    realm.updateUserFederationProvider(kerberosProviderModel);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

@@ -1,11 +1,7 @@
 {
-  String principal=getKerberosPrincipal(username);
-  logger.debug("Validating password of principal: " + principal);
   try {
-    LoginContext loginContext=new LoginContext("does-not-matter",null,createJaasCallbackHandler(principal,password),createJaasConfiguration());
-    loginContext.login();
-    logger.debug("Principal " + principal + " authenticated succesfully");
-    loginContext.logout();
+    authenticateSubject(username,password);
+    logoutSubject();
     return true;
   }
  catch (  LoginException le) {

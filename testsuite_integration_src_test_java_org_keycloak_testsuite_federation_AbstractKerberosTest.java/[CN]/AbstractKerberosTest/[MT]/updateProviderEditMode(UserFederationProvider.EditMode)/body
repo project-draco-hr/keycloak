@@ -1,0 +1,13 @@
+{
+  KeycloakRule keycloakRule=getKeycloakRule();
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealm("test");
+    UserFederationProviderModel kerberosProviderModel=realm.getUserFederationProviders().get(0);
+    kerberosProviderModel.getConfig().put(LDAPConstants.EDIT_MODE,editMode.toString());
+    realm.updateUserFederationProvider(kerberosProviderModel);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

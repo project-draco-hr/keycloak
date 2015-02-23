@@ -1,0 +1,22 @@
+{
+  KeycloakRule keycloakRule=getKeycloakRule();
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmManager manager=new RealmManager(session);
+    RealmModel appRealm=manager.getRealm("test");
+    UserModel user=session.users().getUserByUsername(expectedUsername,appRealm);
+    Assert.assertNotNull(user);
+    Assert.assertEquals(user.getEmail(),expectedEmail);
+    Assert.assertEquals(user.getFirstName(),expectedFirstname);
+    Assert.assertEquals(user.getLastName(),expectedLastname);
+    if (updateProfileActionExpected) {
+      Assert.assertEquals(UserModel.RequiredAction.UPDATE_PROFILE.toString(),user.getRequiredActions().iterator().next().name());
+    }
+ else {
+      Assert.assertTrue(user.getRequiredActions().isEmpty());
+    }
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

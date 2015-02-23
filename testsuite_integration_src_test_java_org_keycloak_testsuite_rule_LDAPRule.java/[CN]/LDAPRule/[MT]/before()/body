@@ -1,8 +1,9 @@
 {
-  ldapConfiguration=LDAPConfiguration.readConfiguration();
+  String connectionPropsLocation=getConnectionPropertiesLocation();
+  ldapConfiguration=LDAPConfiguration.readConfiguration(connectionPropsLocation);
   if (ldapConfiguration.isStartEmbeddedLdapLerver()) {
     EmbeddedServersFactory factory=EmbeddedServersFactory.readConfiguration();
-    ldapEmbeddedServer=factory.createLdapServer();
+    ldapEmbeddedServer=createServer(factory);
     ldapEmbeddedServer.init();
     ldapEmbeddedServer.start();
   }

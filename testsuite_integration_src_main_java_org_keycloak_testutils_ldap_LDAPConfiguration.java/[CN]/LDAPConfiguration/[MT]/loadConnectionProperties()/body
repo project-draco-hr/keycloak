@@ -1,26 +1,24 @@
 {
   Properties p=new Properties();
   try {
-    InputStream is=Thread.currentThread().getContextClassLoader().getResourceAsStream(CONNECTION_PROPERTIES);
+    log.info("Reading LDAP configuration from: " + connectionPropertiesLocation);
+    InputStream is=Thread.currentThread().getContextClassLoader().getResourceAsStream(connectionPropertiesLocation);
     p.load(is);
   }
  catch (  Exception e) {
     throw new RuntimeException(e);
   }
-  connectionUrl=p.getProperty(IDM_TEST_LDAP_CONNECTION_URL,connectionUrl);
-  baseDn=p.getProperty(IDM_TEST_LDAP_BASE_DN,baseDn);
-  userDnSuffix=p.getProperty(IDM_TEST_LDAP_USER_DN_SUFFIX,userDnSuffix);
-  rolesDnSuffix=p.getProperty(IDM_TEST_LDAP_ROLES_DN_SUFFIX,rolesDnSuffix);
-  groupDnSuffix=p.getProperty(IDM_TEST_LDAP_GROUP_DN_SUFFIX,groupDnSuffix);
-  agentDnSuffix=p.getProperty(IDM_TEST_LDAP_AGENT_DN_SUFFIX,agentDnSuffix);
-  startEmbeddedLdapLerver=Boolean.parseBoolean(p.getProperty(IDM_TEST_LDAP_START_EMBEDDED_LDAP_SERVER,"true"));
-  bindDn=p.getProperty(IDM_TEST_LDAP_BIND_DN,bindDn);
-  bindCredential=p.getProperty(IDM_TEST_LDAP_BIND_CREDENTIAL,bindCredential);
-  vendor=p.getProperty(IDM_TEST_LDAP_VENDOR);
-  connectionPooling=Boolean.parseBoolean(p.getProperty(IDM_TEST_LDAP_CONNECTION_POOLING,"true"));
-  pagination=Boolean.parseBoolean(p.getProperty(IDM_TEST_LDAP_PAGINATION,"true"));
-  batchSizeForSync=Integer.parseInt(p.getProperty(IDM_TEST_LDAP_BATCH_SIZE_FOR_SYNC,String.valueOf(batchSizeForSync)));
-  usernameLDAPAttribute=p.getProperty(IDM_TEST_LDAP_USERNAME_LDAP_ATTRIBUTE);
-  userObjectClasses=p.getProperty(IDM_TEST_LDAP_USER_OBJECT_CLASSES);
-  userAccountControlsAfterPasswordUpdate=Boolean.parseBoolean(p.getProperty(IDM_TEST_LDAP_USER_ACCOUNT_CONTROLS_AFTER_PASSWORD_UPDATE));
+  config=new HashMap<String,String>();
+  for (  Map.Entry<String,String> property : PROP_MAPPINGS.entrySet()) {
+    String propertyName=property.getKey();
+    String configName=property.getValue();
+    String value=(String)p.get(configName);
+    if (value == null) {
+      value=DEFAULT_VALUES.get(propertyName);
+    }
+    config.put(propertyName,value);
+  }
+  startEmbeddedLdapLerver=Boolean.parseBoolean(p.getProperty("idm.test.ldap.start.embedded.ldap.server","true"));
+  log.info("Start embedded server: " + startEmbeddedLdapLerver);
+  log.info("Read config: " + config);
 }

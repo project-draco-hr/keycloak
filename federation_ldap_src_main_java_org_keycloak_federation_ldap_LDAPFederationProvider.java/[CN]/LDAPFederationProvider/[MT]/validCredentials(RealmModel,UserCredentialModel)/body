@@ -9,6 +9,10 @@
         state.put(KerberosConstants.GSS_DELEGATION_CREDENTIAL,spnegoAuthenticator.getDelegationCredential());
         String username=spnegoAuthenticator.getAuthenticatedUsername();
         UserModel user=findOrCreateAuthenticatedUser(realm,username);
+        if (user == null) {
+          logger.warn("Kerberos/SPNEGO authentication succeeded with username [" + username + "], but couldn't find or create user with federation provider ["+ model.getDisplayName()+ "]");
+          return CredentialValidationOutput.failed();
+        }
         return new CredentialValidationOutput(user,CredentialValidationOutput.Status.AUTHENTICATED,state);
       }
  else {

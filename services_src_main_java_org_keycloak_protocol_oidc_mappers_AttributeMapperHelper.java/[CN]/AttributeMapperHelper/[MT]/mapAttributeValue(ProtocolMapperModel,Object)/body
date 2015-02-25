@@ -1,0 +1,25 @@
+{
+  if (attributeValue == null)   return null;
+  String type=mappingModel.getConfig().get(JSON_TYPE);
+  if (type == null)   return attributeValue;
+  if (type.equals("boolean")) {
+    if (attributeValue instanceof Boolean)     return attributeValue;
+    if (attributeValue instanceof String)     return Boolean.valueOf((String)attributeValue);
+    throw new RuntimeException("cannot map type for token claim");
+  }
+ else   if (type.equals("String")) {
+    if (attributeValue instanceof String)     return attributeValue;
+    return attributeValue.toString();
+  }
+ else   if (type.equals("long")) {
+    if (attributeValue instanceof Long)     return attributeValue;
+    if (attributeValue instanceof String)     return Long.valueOf((String)attributeValue);
+    throw new RuntimeException("cannot map type for token claim");
+  }
+ else   if (type.equals("int")) {
+    if (attributeValue instanceof Integer)     return attributeValue;
+    if (attributeValue instanceof String)     return Integer.valueOf((String)attributeValue);
+    throw new RuntimeException("cannot map type for token claim");
+  }
+  return attributeValue;
+}

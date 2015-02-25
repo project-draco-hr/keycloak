@@ -1,5 +1,8 @@
 {
-  String id=model.getId() == null ? KeycloakModelUtils.generateId() : model.getId();
+  if (getProtocolMapperByName(model.getName()) != null) {
+    throw new RuntimeException("Duplicate protocol mapper with name: " + model.getName());
+  }
+  String id=KeycloakModelUtils.generateId();
   ProtocolMapperEntity entity=new ProtocolMapperEntity();
   entity.setId(id);
   entity.setName(model.getName());
@@ -11,14 +14,6 @@
   entity.setConsentRequired(model.isConsentRequired());
   entity.setConsentText(model.getConsentText());
   em.persist(entity);
-  ProtocolMapperModel mapping=new ProtocolMapperModel();
-  mapping.setId(entity.getId());
-  mapping.setName(model.getName());
-  mapping.setProtocol(entity.getProtocol());
-  mapping.setProtocolMapper(entity.getProtocolMapper());
-  mapping.setAppliedByDefault(entity.isAppliedByDefault());
-  mapping.setConfig(model.getConfig());
-  mapping.setConsentRequired(entity.isConsentRequired());
-  mapping.setConsentText(entity.getConsentText());
-  return mapping;
+  realm.getProtocolMappers().add(entity);
+  return entityToModel(entity);
 }

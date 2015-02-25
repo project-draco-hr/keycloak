@@ -1,11 +1,15 @@
 {
-  if (rep.getProtocolClaimMappings() != null) {
-    for (    ProtocolMapperRepresentation representation : rep.getProtocolClaimMappings()) {
-      if (representation.getId() == null || newRealm.getProtocolMapperById(representation.getId()) == null) {
+  if (rep.getProtocolMappers() != null) {
+    Set<ProtocolMapperModel> mappers=newRealm.getProtocolMappers();
+    for (    ProtocolMapperRepresentation representation : rep.getProtocolMappers()) {
+      ProtocolMapperModel existing=newRealm.getProtocolMapperByName(representation.getName());
+      if (existing == null) {
         newRealm.addProtocolMapper(toModel(representation));
       }
  else {
-        newRealm.updateProtocolMapper(toModel(representation));
+        ProtocolMapperModel mapping=toModel(representation);
+        mapping.setId(existing.getId());
+        newRealm.updateProtocolMapper(mapping);
       }
     }
   }

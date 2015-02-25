@@ -1,2 +1,24 @@
 {
+  KeycloakSession session=factory.create();
+  session.getTransaction().begin();
+  try {
+    List<RealmModel> realms=session.realms().getRealms();
+    for (    RealmModel realm : realms)     addMappers(realm);
+    session.getTransaction().commit();
+  }
+ catch (  Exception e) {
+    session.getTransaction().rollback();
+  }
+ finally {
+    session.close();
+  }
+  factory.register(new ProviderEventListener(){
+    @Override public void onEvent(    ProviderEvent event){
+      if (event instanceof RealmModel.RealmCreationEvent) {
+        RealmModel realm=((RealmModel.RealmCreationEvent)event).getCreatedRealm();
+        addMappers(realm);
+      }
+    }
+  }
+);
 }

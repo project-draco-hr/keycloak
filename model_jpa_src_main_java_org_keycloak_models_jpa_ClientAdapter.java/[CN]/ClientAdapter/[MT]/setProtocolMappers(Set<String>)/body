@@ -1,0 +1,22 @@
+{
+  Collection<ProtocolMapperEntity> entities=entity.getProtocolMappers();
+  Iterator<ProtocolMapperEntity> it=entities.iterator();
+  Set<String> already=new HashSet<String>();
+  while (it.hasNext()) {
+    ProtocolMapperEntity mapper=it.next();
+    if (mappings.contains(mapper.getName())) {
+      already.add(mapper.getName());
+      continue;
+    }
+    it.remove();
+  }
+  for (  String name : mappings) {
+    if (!already.contains(name)) {
+      ProtocolMapperEntity mapping=findProtocolMapperByName(name);
+      if (mapping != null) {
+        entities.add(mapping);
+      }
+    }
+  }
+  em.flush();
+}

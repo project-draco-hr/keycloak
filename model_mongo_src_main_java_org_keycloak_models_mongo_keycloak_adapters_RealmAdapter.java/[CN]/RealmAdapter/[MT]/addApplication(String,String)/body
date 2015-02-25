@@ -5,5 +5,7 @@
   appData.setRealmId(getId());
   appData.setEnabled(true);
   getMongoStore().insertEntity(appData,invocationContext);
-  return new ApplicationAdapter(session,this,appData,invocationContext);
+  ApplicationModel model=new ApplicationAdapter(session,this,appData,invocationContext);
+  addDefaultClientProtocolMappers(model);
+  return model;
 }

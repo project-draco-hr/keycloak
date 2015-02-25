@@ -1,0 +1,28 @@
+{
+  int counter=0;
+  addClaimMapper(realm,"username",OIDCUserModelMapper.PROVIDER_ID,OIDCUserModelMapper.USER_MODEL_PROPERTY,"username","preferred_username","String",true,"username",true);
+  addClaimMapper(realm,"email",OIDCUserModelMapper.PROVIDER_ID,OIDCUserModelMapper.USER_MODEL_PROPERTY,"email","email","String",true,"email",true);
+  addClaimMapper(realm,"given name",OIDCUserModelMapper.PROVIDER_ID,OIDCUserModelMapper.USER_MODEL_PROPERTY,"firstName","given_name","String",true,"given name",true);
+  addClaimMapper(realm,"family name",OIDCUserModelMapper.PROVIDER_ID,OIDCUserModelMapper.USER_MODEL_PROPERTY,"lastName","family_name","String",true,"family name",true);
+  addClaimMapper(realm,"email verified",OIDCUserModelMapper.PROVIDER_ID,OIDCUserModelMapper.USER_MODEL_PROPERTY,"emailVerified","email_verified","boolean",false,null,false);
+  ProtocolMapperModel fullName=new ProtocolMapperModel();
+  if (realm.getProtocolMapperByName("full name") == null) {
+    fullName.setName("full name");
+    fullName.setProtocolMapper(OIDCFullNameMapper.PROVIDER_ID);
+    fullName.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);
+    fullName.setConsentRequired(true);
+    fullName.setConsentText("full name");
+    fullName.setAppliedByDefault(true);
+    realm.addProtocolMapper(fullName);
+  }
+  ProtocolMapperModel address=new ProtocolMapperModel();
+  if (realm.getProtocolMapperByName("address") == null) {
+    address.setName("address");
+    address.setProtocolMapper(OIDCAddressMapper.PROVIDER_ID);
+    address.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);
+    address.setConsentRequired(true);
+    address.setConsentText("address");
+    address.setAppliedByDefault(false);
+    realm.addProtocolMapper(address);
+  }
+}

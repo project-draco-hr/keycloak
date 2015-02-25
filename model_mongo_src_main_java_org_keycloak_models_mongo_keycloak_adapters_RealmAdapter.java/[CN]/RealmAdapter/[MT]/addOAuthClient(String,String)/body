@@ -4,5 +4,7 @@
   oauthClient.setRealmId(getId());
   oauthClient.setName(name);
   getMongoStore().insertEntity(oauthClient,invocationContext);
-  return new OAuthClientAdapter(session,this,oauthClient,invocationContext);
+  OAuthClientAdapter model=new OAuthClientAdapter(session,this,oauthClient,invocationContext);
+  addDefaultClientProtocolMappers(model);
+  return model;
 }

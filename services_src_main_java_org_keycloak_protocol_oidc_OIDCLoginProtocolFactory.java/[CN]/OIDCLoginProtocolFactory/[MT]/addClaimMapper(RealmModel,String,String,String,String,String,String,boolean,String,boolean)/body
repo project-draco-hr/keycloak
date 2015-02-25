@@ -1,0 +1,17 @@
+{
+  ProtocolMapperModel mapper=realm.getProtocolMapperByName(name);
+  if (mapper != null)   return;
+  mapper=new ProtocolMapperModel();
+  mapper.setName(name);
+  mapper.setProtocolMapper(mapperRef);
+  mapper.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);
+  mapper.setConsentRequired(consentRequired);
+  mapper.setConsentText(consentText);
+  mapper.setAppliedByDefault(appliedByDefault);
+  Map<String,String> config=new HashMap<String,String>();
+  config.put(propertyName,propertyNameValue);
+  config.put(AttributeMapperHelper.TOKEN_CLAIM_NAME,tokenClaimName);
+  config.put(AttributeMapperHelper.JSON_TYPE,claimType);
+  mapper.setConfig(config);
+  realm.addProtocolMapper(mapper);
+}

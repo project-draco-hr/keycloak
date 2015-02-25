@@ -6,5 +6,8 @@
   data.setRealm(realm);
   em.persist(data);
   em.flush();
-  return new OAuthClientAdapter(this,data,em);
+  OAuthClientModel model=new OAuthClientAdapter(this,data,em);
+  addDefaultClientProtocolMappers(model);
+  em.flush();
+  return model;
 }

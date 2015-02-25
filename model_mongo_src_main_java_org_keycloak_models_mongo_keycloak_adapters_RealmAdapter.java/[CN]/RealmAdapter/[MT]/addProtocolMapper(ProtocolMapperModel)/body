@@ -1,7 +1,6 @@
 {
   ProtocolMapperEntity entity=new ProtocolMapperEntity();
-  if (model.getId() != null)   entity.setId(model.getId());
- else   entity.setId(KeycloakModelUtils.generateId());
+  entity.setId(KeycloakModelUtils.generateId());
   entity.setProtocol(model.getProtocol());
   entity.setName(model.getName());
   entity.setAppliedByDefault(model.isAppliedByDefault());
@@ -11,13 +10,5 @@
   entity.setConsentText(model.getConsentText());
   realm.getProtocolMappers().add(entity);
   updateRealm();
-  ProtocolMapperModel mapping=new ProtocolMapperModel();
-  mapping.setId(entity.getId());
-  mapping.setProtocol(model.getProtocol());
-  mapping.setAppliedByDefault(model.isAppliedByDefault());
-  mapping.setProtocolMapper(model.getProtocolMapper());
-  mapping.setConfig(model.getConfig());
-  mapping.setConsentText(model.getConsentText());
-  mapping.setConsentRequired(model.isConsentRequired());
-  return mapping;
+  return entityToModel(entity);
 }

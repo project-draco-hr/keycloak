@@ -1,0 +1,20 @@
+{
+  IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+  RealmModel realm=getRealm();
+  ApplicationModel applicationModel=realm.getApplicationByName("test-app");
+  List<String> allowedIdentityProviders=applicationModel.getAllowedIdentityProviders();
+  assertTrue(allowedIdentityProviders.contains(identityProviderModel.getId()));
+  allowedIdentityProviders.remove(identityProviderModel.getId());
+  this.driver.navigate().to("http://localhost:8081/test-app/");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/login"));
+  try {
+    this.driver.findElement(By.className(getProviderId()));
+    fail("Provider [" + getProviderId() + "] not disabled.");
+  }
+ catch (  NoSuchElementException nsee) {
+  }
+  allowedIdentityProviders.add(identityProviderModel.getId());
+  applicationModel.updateAllowedIdentityProviders(allowedIdentityProviders);
+  this.driver.navigate().to("http://localhost:8081/test-app/");
+  this.driver.findElement(By.className(getProviderId()));
+}

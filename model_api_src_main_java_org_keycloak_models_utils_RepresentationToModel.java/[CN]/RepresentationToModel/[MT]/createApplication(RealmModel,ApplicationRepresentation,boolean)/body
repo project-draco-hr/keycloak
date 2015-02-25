@@ -89,5 +89,13 @@
     }
     applicationModel.setProtocolMappers(ids);
   }
+  List<String> allowedIdentityProviders=resourceRep.getAllowedIdentityProviders();
+  if (allowedIdentityProviders == null || allowedIdentityProviders.isEmpty()) {
+    allowedIdentityProviders=new ArrayList<String>();
+    for (    IdentityProviderModel identityProvider : realm.getIdentityProviders()) {
+      allowedIdentityProviders.add(identityProvider.getId());
+    }
+  }
+  applicationModel.updateAllowedIdentityProviders(allowedIdentityProviders);
   return applicationModel;
 }

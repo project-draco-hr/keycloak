@@ -35,7 +35,14 @@
   if (rep.getAllowedIdentityProviders() != null) {
     model.updateAllowedIdentityProviders(rep.getAllowedIdentityProviders());
   }
-  if (rep.getProtocolClaimMappings() != null) {
-    model.addProtocolMappers(rep.getProtocolClaimMappings());
+  if (rep.getProtocolMappers() != null) {
+    Set<String> ids=new HashSet<String>();
+    for (    ClientProtocolMappingRepresentation map : rep.getProtocolMappers()) {
+      ProtocolMapperModel mapperModel=model.getRealm().getProtocolMapperByName(map.getProtocol(),map.getName());
+      if (mapperModel != null) {
+        ids.add(mapperModel.getId());
+      }
+    }
+    model.setProtocolMappers(ids);
   }
 }

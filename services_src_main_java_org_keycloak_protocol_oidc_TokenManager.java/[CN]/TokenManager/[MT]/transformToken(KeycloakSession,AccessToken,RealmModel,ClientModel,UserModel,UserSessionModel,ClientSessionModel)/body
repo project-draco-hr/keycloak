@@ -1,0 +1,11 @@
+{
+  Set<ProtocolMapperModel> mappings=client.getProtocolMappers();
+  KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+  for (  ProtocolMapperModel mapping : mappings) {
+    if (!mapping.getProtocol().equals(OIDCLoginProtocol.LOGIN_PROTOCOL))     continue;
+    ProtocolMapper mapper=(ProtocolMapper)sessionFactory.getProviderFactory(ProtocolMapper.class,mapping.getProtocolMapper());
+    if (mapper == null || !(mapper instanceof OIDCAccessTokenMapper))     continue;
+    token=((OIDCAccessTokenMapper)mapper).transformToken(token,mapping,session,userSession,clientSession);
+  }
+  return token;
+}

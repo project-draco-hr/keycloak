@@ -8,7 +8,12 @@
       state.put(KerberosConstants.GSS_DELEGATION_CREDENTIAL,spnegoAuthenticator.getDelegationCredential());
       String username=spnegoAuthenticator.getAuthenticatedUsername();
       UserModel user=findOrCreateAuthenticatedUser(realm,username);
-      return new CredentialValidationOutput(user,CredentialValidationOutput.Status.AUTHENTICATED,state);
+      if (user == null) {
+        return CredentialValidationOutput.failed();
+      }
+ else {
+        return new CredentialValidationOutput(user,CredentialValidationOutput.Status.AUTHENTICATED,state);
+      }
     }
  else {
       Map<String,Object> state=new HashMap<String,Object>();

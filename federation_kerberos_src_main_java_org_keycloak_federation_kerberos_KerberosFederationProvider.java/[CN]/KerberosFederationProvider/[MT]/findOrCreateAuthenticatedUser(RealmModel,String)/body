@@ -2,11 +2,16 @@
   UserModel user=session.userStorage().getUserByUsername(username,realm);
   if (user != null) {
     logger.debug("Kerberos authenticated user " + username + " found in Keycloak storage");
-    if (isValid(user)) {
+    if (!model.getId().equals(user.getFederationLink())) {
+      logger.warn("User with username " + username + " already exists, but is not linked to provider ["+ model.getDisplayName()+ "]");
+      return null;
+    }
+ else     if (isValid(user)) {
       return proxy(user);
     }
  else {
-      logger.warn("User with username " + username + " already exists, but is not linked to provider ["+ model.getDisplayName()+ "] or kerberos principal is not correct. Kerberos principal on user is: "+ user.getAttribute(KERBEROS_PRINCIPAL));
+      logger.warn("User with username " + username + " already exists and is linked to provider ["+ model.getDisplayName()+ "] but kerberos principal is not correct. Kerberos principal on user is: "+ user.getAttribute(KERBEROS_PRINCIPAL));
+      logger.warn("Will re-create user");
       session.userStorage().removeUser(realm,user);
     }
   }

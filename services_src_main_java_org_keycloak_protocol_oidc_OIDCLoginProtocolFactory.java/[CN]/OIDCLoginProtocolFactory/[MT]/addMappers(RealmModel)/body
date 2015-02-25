@@ -6,7 +6,7 @@
   addClaimMapper(realm,"family name",OIDCUserModelMapper.PROVIDER_ID,OIDCUserModelMapper.USER_MODEL_PROPERTY,"lastName","family_name","String",true,"family name",true);
   addClaimMapper(realm,"email verified",OIDCUserModelMapper.PROVIDER_ID,OIDCUserModelMapper.USER_MODEL_PROPERTY,"emailVerified","email_verified","boolean",false,null,false);
   ProtocolMapperModel fullName=new ProtocolMapperModel();
-  if (realm.getProtocolMapperByName("full name") == null) {
+  if (realm.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,"full name") == null) {
     fullName.setName("full name");
     fullName.setProtocolMapper(OIDCFullNameMapper.PROVIDER_ID);
     fullName.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);
@@ -16,7 +16,7 @@
     realm.addProtocolMapper(fullName);
   }
   ProtocolMapperModel address=new ProtocolMapperModel();
-  if (realm.getProtocolMapperByName("address") == null) {
+  if (realm.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,"address") == null) {
     address.setName("address");
     address.setProtocolMapper(OIDCAddressMapper.PROVIDER_ID);
     address.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);

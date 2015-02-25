@@ -2,11 +2,11 @@
   Collection<ProtocolMapperEntity> entities=entity.getProtocolMappers();
   Set<String> already=new HashSet<String>();
   for (  ProtocolMapperEntity rel : entities) {
-    already.add(rel.getName());
+    already.add(rel.getId());
   }
-  for (  String name : mappings) {
-    if (!already.contains(name)) {
-      ProtocolMapperEntity mapping=findProtocolMapperByName(name);
+  for (  String id : mappings) {
+    if (!already.contains(id)) {
+      ProtocolMapperEntity mapping=em.find(ProtocolMapperEntity.class,id);
       if (mapping != null) {
         entities.add(mapping);
       }

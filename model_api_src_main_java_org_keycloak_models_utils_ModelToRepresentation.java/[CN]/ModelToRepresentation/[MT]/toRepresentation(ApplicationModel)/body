@@ -32,8 +32,12 @@
     rep.setAllowedIdentityProviders(applicationModel.getAllowedIdentityProviders());
   }
   if (!applicationModel.getProtocolMappers().isEmpty()) {
-    Set<String> mappings=new HashSet<String>();
-    for (    ProtocolMapperModel model : applicationModel.getProtocolMappers())     mappings.add(model.getName());
+    List<ClientProtocolMappingRepresentation> mappings=new LinkedList<ClientProtocolMappingRepresentation>();
+    for (    ProtocolMapperModel model : applicationModel.getProtocolMappers()) {
+      ClientProtocolMappingRepresentation map=new ClientProtocolMappingRepresentation();
+      map.setProtocol(model.getProtocol());
+      map.setName(model.getName());
+    }
     rep.setProtocolMappers(mappings);
   }
   return rep;

@@ -80,7 +80,14 @@
     applicationModel.setAllowedClaimsMask(ClaimMask.ALL);
   }
   if (resourceRep.getProtocolMappers() != null) {
-    applicationModel.setProtocolMappers(resourceRep.getProtocolMappers());
+    Set<String> ids=new HashSet<String>();
+    for (    ClientProtocolMappingRepresentation map : resourceRep.getProtocolMappers()) {
+      ProtocolMapperModel mapperModel=applicationModel.getRealm().getProtocolMapperByName(map.getProtocol(),map.getName());
+      if (mapperModel != null) {
+        ids.add(mapperModel.getId());
+      }
+    }
+    applicationModel.setProtocolMappers(ids);
   }
   return applicationModel;
 }

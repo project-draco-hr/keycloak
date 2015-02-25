@@ -3,6 +3,22 @@
     return Response.status(302).location(uriInfo.getRequestUriBuilder().path("/").build()).build();
   }
  else {
-    return getResource("index.html");
+    String adminTheme=realm.getAdminTheme();
+    if (adminTheme == null) {
+      adminTheme="keycloak";
+    }
+    Map<String,String> map=new HashMap<String,String>();
+    URI baseUri=uriInfo.getBaseUri();
+    String authUrl=baseUri.toString();
+    authUrl=authUrl.substring(0,authUrl.length() - 1);
+    map.put("authUrl",authUrl);
+    map.put("resourceUrl",Urls.themeRoot(baseUri) + "/admin/" + adminTheme);
+    ThemeProvider themeProvider=session.getProvider(ThemeProvider.class,"extending");
+    Theme theme=themeProvider.getTheme(realm.getAdminTheme(),Theme.Type.ADMIN);
+    FreeMarkerUtil freeMarkerUtil=new FreeMarkerUtil();
+    String result=freeMarkerUtil.processTemplate(map,"index.ftl",theme);
+    Response.ResponseBuilder builder=Response.status(Response.Status.OK).type(MediaType.TEXT_HTML).entity(result);
+    BrowserSecurityHeaderSetup.headers(builder,realm);
+    return builder.build();
   }
 }

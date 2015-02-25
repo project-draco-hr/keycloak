@@ -1,0 +1,13 @@
+{
+  createUser();
+  try {
+    UserRepresentation user=new UserRepresentation();
+    user.setUsername("user2");
+    user.setEmail("user1@localhost");
+    realm.users().create(user);
+    fail("Expected failure");
+  }
+ catch (  ClientErrorException e) {
+    assertEquals(409,e.getResponse().getStatus());
+  }
+}

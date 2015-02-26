@@ -9,11 +9,16 @@
         if (clientId != null) {
           ClientModel clientModel=realm.findClient(clientId);
           if (clientModel != null && !clientModel.hasIdentityProvider(identityProvider.getId())) {
+            if (ApplicationModel.class.isInstance(clientModel)) {
+              ApplicationModel applicationModel=(ApplicationModel)clientModel;
+              if (applicationModel.getName().equals(Constants.ACCOUNT_MANAGEMENT_APP)) {
+                addIdentityProvider(realm,baseURI,identityProvider);
+              }
+            }
             continue;
           }
         }
-        String loginUrl=Urls.identityProviderAuthnRequest(baseURI,identityProvider.getId(),realm.getName()).toString();
-        providers.add(new IdentityProvider(identityProvider.getId(),identityProvider.getName(),loginUrl));
+        addIdentityProvider(realm,baseURI,identityProvider);
       }
     }
     if (!providers.isEmpty()) {

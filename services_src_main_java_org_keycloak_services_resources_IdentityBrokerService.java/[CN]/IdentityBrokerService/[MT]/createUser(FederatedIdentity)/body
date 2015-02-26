@@ -1,6 +1,9 @@
 {
   FederatedIdentityModel federatedIdentityModel=new FederatedIdentityModel(updatedIdentity.getIdentityProviderId(),updatedIdentity.getId(),updatedIdentity.getUsername(),updatedIdentity.getToken());
-  UserModel existingUser=this.session.users().getUserByEmail(updatedIdentity.getEmail(),this.realmModel);
+  UserModel existingUser=null;
+  if (updatedIdentity.getEmail() != null) {
+    existingUser=this.session.users().getUserByEmail(updatedIdentity.getEmail(),this.realmModel);
+  }
   if (existingUser != null) {
     fireErrorEvent(Errors.FEDERATED_IDENTITY_EMAIL_EXISTS);
     throw new IdentityBrokerException("federatedIdentityEmailExists");

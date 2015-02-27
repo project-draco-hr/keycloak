@@ -1,8 +1,8 @@
 {
   auth.requireView();
-  Map<String,ProtocolMapperRepresentation> mappers=new HashMap<String,ProtocolMapperRepresentation>();
+  List<ProtocolMapperRepresentation> mappers=new LinkedList<ProtocolMapperRepresentation>();
   for (  ProtocolMapperModel mapper : realm.getProtocolMappers()) {
-    mappers.put(mapper.getName(),ModelToRepresentation.toRepresentation(mapper));
+    if (mapper.getProtocol().equals(protocol))     mappers.add(ModelToRepresentation.toRepresentation(mapper));
   }
   return mappers;
 }

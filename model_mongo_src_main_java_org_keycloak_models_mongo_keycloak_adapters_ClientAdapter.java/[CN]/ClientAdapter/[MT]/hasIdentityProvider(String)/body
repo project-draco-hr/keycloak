@@ -1,4 +1,9 @@
 {
-  List<String> allowedIdentityProviders=getMongoEntityAsClient().getAllowedIdentityProviders();
-  return allowedIdentityProviders.contains(providerId);
+  for (  ClientIdentityProviderMappingEntity identityProviderMappingModel : getMongoEntityAsClient().getIdentityProviders()) {
+    String identityProvider=identityProviderMappingModel.getId();
+    if (identityProvider.equals(providerId)) {
+      return true;
+    }
+  }
+  return false;
 }

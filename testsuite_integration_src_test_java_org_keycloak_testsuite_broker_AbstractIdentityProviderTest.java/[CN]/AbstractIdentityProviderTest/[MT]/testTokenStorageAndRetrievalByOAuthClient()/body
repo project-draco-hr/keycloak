@@ -18,6 +18,15 @@
   grantPage.assertCurrent();
   grantPage.accept();
   assertTrue(oauth.getCurrentQuery().containsKey(OAuth2Constants.CODE));
+  ClientModel clientModel=getRealm().findClient("third-party");
+  ClientIdentityProviderMappingModel providerMappingModel=null;
+  for (  ClientIdentityProviderMappingModel identityProviderMappingModel : clientModel.getIdentityProviders()) {
+    if (identityProviderMappingModel.getIdentityProvider().equals(getProviderId())) {
+      providerMappingModel=identityProviderMappingModel;
+      break;
+    }
+  }
+  providerMappingModel.setRetrieveToken(true);
   AccessTokenResponse accessToken=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get(OAuth2Constants.CODE),"password");
   URI tokenEndpointUrl=Urls.identityProviderRetrieveToken(BASE_URI,getProviderId(),getRealm().getName());
   String authHeader="Bearer " + accessToken.getAccessToken();

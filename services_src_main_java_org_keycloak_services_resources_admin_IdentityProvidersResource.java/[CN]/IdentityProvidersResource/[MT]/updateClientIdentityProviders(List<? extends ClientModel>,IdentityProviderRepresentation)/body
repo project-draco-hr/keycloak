@@ -1,7 +1,9 @@
 {
   for (  ClientModel clientModel : clients) {
-    List<String> allowedIdentityProviders=clientModel.getAllowedIdentityProviders();
-    allowedIdentityProviders.add(identityProvider.getId());
+    List<ClientIdentityProviderMappingModel> allowedIdentityProviders=clientModel.getIdentityProviders();
+    ClientIdentityProviderMappingModel providerMappingModel=new ClientIdentityProviderMappingModel();
+    providerMappingModel.setIdentityProvider(identityProvider.getId());
+    allowedIdentityProviders.add(providerMappingModel);
     clientModel.updateAllowedIdentityProviders(allowedIdentityProviders);
   }
 }

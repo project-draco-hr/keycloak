@@ -1,0 +1,14 @@
+{
+  Document samlResponseDocument=null;
+  try {
+    SAML2Response docGen=new SAML2Response();
+    samlResponseDocument=docGen.convert(responseType);
+    if (logger.isTraceEnabled()) {
+      logger.trace("SAML Response Document: " + DocumentUtil.asString(samlResponseDocument));
+    }
+  }
+ catch (  Exception e) {
+    throw logger.samlAssertionMarshallError(e);
+  }
+  return samlResponseDocument;
+}

@@ -1,0 +1,13 @@
+{
+  AttributeStatementType attributeStatement=new AttributeStatementType();
+  AssertionType assertion=response.getAssertions().get(0).getAssertion();
+  assertion.addStatement(attributeStatement);
+  Set<ProtocolMapperModel> mappings=client.getProtocolMappers();
+  KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+  for (  ProtocolMapperModel mapping : mappings) {
+    if (!mapping.getProtocol().equals(SamlProtocol.LOGIN_PROTOCOL))     continue;
+    ProtocolMapper mapper=(ProtocolMapper)sessionFactory.getProviderFactory(ProtocolMapper.class,mapping.getProtocolMapper());
+    if (mapper == null || !(mapper instanceof SAMLAttributeStatementMapper))     continue;
+    ((SAMLAttributeStatementMapper)mapper).transformAttributeStatement(attributeStatement,mapping,session,userSession,clientSession);
+  }
+}

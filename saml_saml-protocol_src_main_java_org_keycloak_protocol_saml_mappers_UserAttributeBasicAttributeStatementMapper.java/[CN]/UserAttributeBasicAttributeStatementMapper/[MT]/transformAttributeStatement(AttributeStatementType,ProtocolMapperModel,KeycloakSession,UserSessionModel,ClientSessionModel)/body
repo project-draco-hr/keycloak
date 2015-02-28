@@ -2,7 +2,5 @@
   UserModel user=userSession.getUser();
   String attributeName=mappingModel.getConfig().get(ProtocolMapperUtils.USER_MODEL_ATTRIBUTE_NAME);
   String attributeValue=user.getAttribute(attributeName);
-  if (attributeValue == null)   return token;
-  OIDCAttributeMapperHelper.mapClaim(token,mappingModel,attributeValue);
-  return token;
+  AttributeStatementHelper.addBasicAttribute(attributeStatement,mappingModel,attributeValue);
 }

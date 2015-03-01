@@ -3,7 +3,7 @@
   session.getTransaction().begin();
   try {
     List<RealmModel> realms=session.realms().getRealms();
-    for (    RealmModel realm : realms)     addMappers(realm);
+    for (    RealmModel realm : realms)     addDefaults(realm);
     session.getTransaction().commit();
   }
  catch (  Exception e) {
@@ -16,7 +16,7 @@
     @Override public void onEvent(    ProviderEvent event){
       if (event instanceof RealmModel.RealmCreationEvent) {
         RealmModel realm=((RealmModel.RealmCreationEvent)event).getCreatedRealm();
-        addMappers(realm);
+        addDefaults(realm);
       }
     }
   }

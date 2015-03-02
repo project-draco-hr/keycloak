@@ -1,0 +1,14 @@
+{
+  Set<EncryptionType> encryptionTypes=new HashSet<EncryptionType>();
+  String[] configEncTypes=kdcEncryptionTypes.split(",");
+  for (  String enc : configEncTypes) {
+    enc=enc.trim();
+    for (    EncryptionType type : EncryptionType.getEncryptionTypes()) {
+      if (type.getName().equalsIgnoreCase(enc)) {
+        encryptionTypes.add(type);
+      }
+    }
+  }
+  encryptionTypes=KerberosUtils.orderEtypesByStrength(encryptionTypes);
+  return encryptionTypes;
+}

@@ -42,7 +42,13 @@
   }
   Response response=authManager.checkNonFormAuthentication(session,clientSession,realm,uriInfo,request,clientConnection,headers,event);
   if (response != null)   return response;
+  HttpAuthenticationManager httpAuthManager=new HttpAuthenticationManager(session,clientSession,realm,uriInfo,request,clientConnection,event);
+  HttpAuthenticationManager.HttpAuthOutput httpAuthOutput=httpAuthManager.spnegoAuthenticate();
+  if (httpAuthOutput.getResponse() != null)   return httpAuthOutput.getResponse();
   LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo).setClientSessionCode(new ClientSessionCode(realm,clientSession).getCode());
+  if (httpAuthOutput.getChallenge() != null) {
+    httpAuthOutput.getChallenge().sendChallenge(forms);
+  }
   String rememberMeUsername=AuthenticationManager.getRememberMeUsername(realm,headers);
   if (rememberMeUsername != null) {
     MultivaluedMap<String,String> formData=new MultivaluedMapImpl<String,String>();

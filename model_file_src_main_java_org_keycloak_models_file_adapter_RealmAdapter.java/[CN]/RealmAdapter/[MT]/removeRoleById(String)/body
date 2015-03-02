@@ -1,0 +1,13 @@
+{
+  if (id == null)   throw new NullPointerException("id == null");
+  if (allRoles.remove(id) != null)   return true;
+  for (  ApplicationModel app : getApplications()) {
+    for (    RoleModel appRole : app.getRoles()) {
+      if (id.equals(appRole.getId())) {
+        app.removeRole(appRole);
+        return true;
+      }
+    }
+  }
+  return false;
+}

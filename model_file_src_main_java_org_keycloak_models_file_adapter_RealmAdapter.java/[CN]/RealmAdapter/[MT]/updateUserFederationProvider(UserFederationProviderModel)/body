@@ -1,0 +1,18 @@
+{
+  Iterator<UserFederationProviderEntity> it=realm.getUserFederationProviders().iterator();
+  while (it.hasNext()) {
+    UserFederationProviderEntity entity=it.next();
+    if (entity.getId().equals(model.getId())) {
+      entity.setProviderName(model.getProviderName());
+      entity.setConfig(model.getConfig());
+      entity.setPriority(model.getPriority());
+      String displayName=model.getDisplayName();
+      if (displayName != null) {
+        entity.setDisplayName(model.getDisplayName());
+      }
+      entity.setFullSyncPeriod(model.getFullSyncPeriod());
+      entity.setChangedSyncPeriod(model.getChangedSyncPeriod());
+      entity.setLastSync(model.getLastSync());
+    }
+  }
+}

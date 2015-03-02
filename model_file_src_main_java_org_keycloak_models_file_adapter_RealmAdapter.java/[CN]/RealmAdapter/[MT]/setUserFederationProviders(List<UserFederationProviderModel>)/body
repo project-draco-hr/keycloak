@@ -1,0 +1,21 @@
+{
+  List<UserFederationProviderEntity> entities=new LinkedList<UserFederationProviderEntity>();
+  for (  UserFederationProviderModel model : providers) {
+    UserFederationProviderEntity entity=new UserFederationProviderEntity();
+    if (model.getId() != null)     entity.setId(model.getId());
+ else     entity.setId(KeycloakModelUtils.generateId());
+    entity.setProviderName(model.getProviderName());
+    entity.setConfig(model.getConfig());
+    entity.setPriority(model.getPriority());
+    String displayName=model.getDisplayName();
+    if (displayName == null) {
+      entity.setDisplayName(entity.getId());
+    }
+    entity.setDisplayName(displayName);
+    entity.setFullSyncPeriod(model.getFullSyncPeriod());
+    entity.setChangedSyncPeriod(model.getChangedSyncPeriod());
+    entity.setLastSync(model.getLastSync());
+    entities.add(entity);
+  }
+  realm.setUserFederationProviders(entities);
+}

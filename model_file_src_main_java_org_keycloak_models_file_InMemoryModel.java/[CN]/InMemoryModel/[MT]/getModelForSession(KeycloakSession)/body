@@ -1,0 +1,12 @@
+{
+synchronized (allModels) {
+    InMemoryModel model=allModels.get(session);
+    if (model == null) {
+      model=new InMemoryModel(session);
+      allModels.put(session,model);
+      session.getTransaction().enlist(model);
+      model.readModelFile();
+    }
+    return model;
+  }
+}

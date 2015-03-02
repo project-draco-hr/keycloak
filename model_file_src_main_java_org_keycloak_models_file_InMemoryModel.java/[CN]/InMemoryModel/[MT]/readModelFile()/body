@@ -1,0 +1,20 @@
+{
+  File kcdata=new File(directory,fileName);
+  if (!kcdata.exists())   return;
+  FileInputStream fis=null;
+  try {
+    fis=new FileInputStream(kcdata);
+    ImportUtils.importFromStream(session,JsonSerialization.mapper,fis,Strategy.IGNORE_EXISTING);
+  }
+ catch (  IOException ioe) {
+    logger.error("Unable to read model file " + kcdata.getAbsolutePath(),ioe);
+  }
+ finally {
+    try {
+      if (fis != null)       fis.close();
+    }
+ catch (    IOException e) {
+      logger.error("Failed to close output stream.",e);
+    }
+  }
+}

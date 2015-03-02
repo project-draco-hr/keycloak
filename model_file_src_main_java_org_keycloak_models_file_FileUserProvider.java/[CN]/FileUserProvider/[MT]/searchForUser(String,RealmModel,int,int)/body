@@ -1,0 +1,29 @@
+{
+  search=search.trim();
+  Pattern caseInsensitivePattern=Pattern.compile("(?i:.*" + search + ".*)",Pattern.CASE_INSENSITIVE);
+  int spaceInd=search.lastIndexOf(" ");
+  boolean isFirstAndLastSearch=spaceInd != -1;
+  Pattern firstNamePattern=null;
+  Pattern lastNamePattern=null;
+  if (isFirstAndLastSearch) {
+    String firstNamePatternString=search.substring(0,spaceInd);
+    String lastNamePatternString=search.substring(spaceInd + 1);
+    firstNamePattern=Pattern.compile("(?i:.*" + firstNamePatternString + ".*$)",Pattern.CASE_INSENSITIVE);
+    lastNamePattern=Pattern.compile("(?i:^.*" + lastNamePatternString + ".*)",Pattern.CASE_INSENSITIVE);
+  }
+  List<UserModel> found=new ArrayList<UserModel>();
+  for (  UserModel user : inMemoryModel.getUsers(realm.getId())) {
+    String firstName=user.getFirstName();
+    String lastName=user.getLastName();
+    if (isFirstAndLastSearch) {
+      if (isAMatch(firstNamePattern,firstName) && isAMatch(lastNamePattern,lastName)) {
+        found.add(user);
+        continue;
+      }
+    }
+    if (isAMatch(caseInsensitivePattern,firstName) || isAMatch(caseInsensitivePattern,lastName) || isAMatch(caseInsensitivePattern,user.getUsername())|| isAMatch(caseInsensitivePattern,user.getEmail())) {
+      found.add(user);
+    }
+  }
+  return sortedSubList(found,firstResult,maxResults);
+}

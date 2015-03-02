@@ -1,0 +1,27 @@
+{
+  Pattern usernamePattern=null;
+  Pattern firstNamePattern=null;
+  Pattern lastNamePattern=null;
+  Pattern emailPattern=null;
+  for (  Map.Entry<String,String> entry : attributes.entrySet()) {
+    if (entry.getKey().equalsIgnoreCase(UserModel.USERNAME)) {
+      usernamePattern=Pattern.compile(".*" + entry.getValue() + ".*",Pattern.CASE_INSENSITIVE);
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.FIRST_NAME)) {
+      firstNamePattern=Pattern.compile(".*" + entry.getValue() + ".*",Pattern.CASE_INSENSITIVE);
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.LAST_NAME)) {
+      lastNamePattern=Pattern.compile(".*" + entry.getValue() + ".*",Pattern.CASE_INSENSITIVE);
+    }
+ else     if (entry.getKey().equalsIgnoreCase(UserModel.EMAIL)) {
+      emailPattern=Pattern.compile(".*" + entry.getValue() + ".*",Pattern.CASE_INSENSITIVE);
+    }
+  }
+  List<UserModel> found=new ArrayList<UserModel>();
+  for (  UserModel user : inMemoryModel.getUsers(realm.getId())) {
+    if (isAMatch(usernamePattern,user.getUsername()) || isAMatch(firstNamePattern,user.getFirstName()) || isAMatch(lastNamePattern,user.getLastName())|| isAMatch(emailPattern,user.getEmail())) {
+      found.add(user);
+    }
+  }
+  return sortedSubList(found,firstResult,maxResults);
+}

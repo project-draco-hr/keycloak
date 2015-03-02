@@ -1,0 +1,20 @@
+{
+  if (name == null)   throw new NullPointerException("name == null");
+  if (id == null)   throw new NullPointerException("id == null");
+  if (getApplicationNameMap().containsKey(name)) {
+    throw new ModelDuplicateException("Application named '" + name + "' already exists.");
+  }
+  ApplicationEntity appEntity=new ApplicationEntity();
+  appEntity.setId(id);
+  appEntity.setName(name);
+  appEntity.setRealmId(getId());
+  appEntity.setEnabled(true);
+  ClientEntity clientEntity=new ClientEntity();
+  clientEntity.setId(id);
+  clientEntity.setName(name);
+  clientEntity.setRealmId(getId());
+  clientEntity.setEnabled(true);
+  ApplicationModel app=new ApplicationAdapter(session,this,appEntity,clientEntity,inMemoryModel);
+  allApps.put(id,app);
+  return app;
+}

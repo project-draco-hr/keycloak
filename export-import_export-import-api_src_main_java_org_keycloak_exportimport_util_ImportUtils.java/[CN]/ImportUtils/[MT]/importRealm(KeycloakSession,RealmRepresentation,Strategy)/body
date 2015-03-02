@@ -20,6 +20,8 @@
   realm=rep.getId() != null ? model.createRealm(rep.getId(),realmName) : model.createRealm(realmName);
   RepresentationToModel.importRealm(session,rep,realm);
   refreshMasterAdminApps(model,realm);
-  logger.infof("Realm '%s' imported",realmName);
+  if (System.getProperty(ExportImportConfig.ACTION) != null) {
+    logger.infof("Realm '%s' imported",realmName);
+  }
   return realm;
 }

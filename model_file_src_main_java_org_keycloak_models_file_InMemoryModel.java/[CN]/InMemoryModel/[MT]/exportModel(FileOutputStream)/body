@@ -1,0 +1,8 @@
+{
+  List<RealmModel> realms=session.realms().getRealms();
+  List<RealmRepresentation> reps=new ArrayList<RealmRepresentation>();
+  for (  RealmModel realm : realms) {
+    reps.add(ExportUtils.exportRealm(session,realm,true));
+  }
+  JsonSerialization.prettyMapper.writeValue(outStream,reps);
+}

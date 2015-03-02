@@ -1,0 +1,10 @@
+{
+  UserModel user=getUserById(userModel.getId(),realm);
+  UserEntity userEntity=((UserAdapter)user).getUserEntity();
+  FederatedIdentityEntity federatedIdentityEntity=findSocialLink(userEntity,socialProvider);
+  if (federatedIdentityEntity == null) {
+    return false;
+  }
+  userEntity.getSocialLinks().remove(federatedIdentityEntity);
+  return true;
+}

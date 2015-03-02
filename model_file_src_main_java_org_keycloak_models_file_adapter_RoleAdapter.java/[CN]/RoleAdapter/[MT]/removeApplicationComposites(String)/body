@@ -1,0 +1,16 @@
+{
+  if (!isComposite())   return;
+  Set<RoleModel> toBeRemoved=new HashSet<RoleModel>();
+  for (  RoleModel compositeRole : getComposites()) {
+    RoleAdapter roleAdapter=(RoleAdapter)compositeRole;
+    if (appId.equals(roleAdapter.getRoleEntity().getApplicationId())) {
+      toBeRemoved.add(compositeRole);
+    }
+ else {
+      roleAdapter.removeApplicationComposites(appId);
+    }
+  }
+  for (  RoleModel compositeRole : toBeRemoved) {
+    removeCompositeRole(compositeRole);
+  }
+}

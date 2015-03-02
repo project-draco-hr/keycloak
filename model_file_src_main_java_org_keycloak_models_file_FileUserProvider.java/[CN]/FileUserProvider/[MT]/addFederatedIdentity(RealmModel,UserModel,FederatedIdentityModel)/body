@@ -1,0 +1,12 @@
+{
+  UserAdapter userAdapter=(UserAdapter)getUserById(user.getId(),realm);
+  UserEntity userEntity=userAdapter.getUserEntity();
+  FederatedIdentityEntity federatedIdentityEntity=new FederatedIdentityEntity();
+  federatedIdentityEntity.setIdentityProvider(socialLink.getIdentityProvider());
+  federatedIdentityEntity.setUserId(socialLink.getUserId());
+  federatedIdentityEntity.setUserName(socialLink.getUserName());
+  for (  FederatedIdentityEntity fedIdent : userEntity.getSocialLinks()) {
+    if (fedIdent.equals(federatedIdentityEntity))     return;
+  }
+  userEntity.getSocialLinks().add(federatedIdentityEntity);
+}

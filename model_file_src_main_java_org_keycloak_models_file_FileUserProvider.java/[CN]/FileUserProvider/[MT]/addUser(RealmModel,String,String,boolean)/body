@@ -1,0 +1,15 @@
+{
+  if (inMemoryModel.hasUserWithUsername(realm.getId(),username))   throw new ModelDuplicateException("User with username " + username + " already exists in realm.");
+  UserAdapter userModel=addUserEntity(realm,id,username);
+  if (addDefaultRoles) {
+    for (    String r : realm.getDefaultRoles()) {
+      userModel.grantRole(realm.getRole(r));
+    }
+    for (    ApplicationModel application : realm.getApplications()) {
+      for (      String r : application.getDefaultRoles()) {
+        userModel.grantRole(application.getRole(r));
+      }
+    }
+  }
+  return userModel;
+}

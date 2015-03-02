@@ -1,9 +1,10 @@
 {
-  List<ClientIdentityProviderMappingEntity> stored=getMongoEntityAsClient().getIdentityProviders();
+  List<ClientIdentityProviderMappingEntity> stored=new ArrayList<ClientIdentityProviderMappingEntity>();
   for (  ClientIdentityProviderMappingModel model : identityProviders) {
     ClientIdentityProviderMappingEntity entity=new ClientIdentityProviderMappingEntity();
     entity.setId(model.getIdentityProvider());
     entity.setRetrieveToken(model.isRetrieveToken());
+    stored.add(entity);
   }
   getMongoEntityAsClient().setIdentityProviders(stored);
   updateMongoEntity();

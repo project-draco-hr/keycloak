@@ -5,6 +5,8 @@
   kdcConfig.setMaximumTicketLifetime(60000 * 1440);
   kdcConfig.setMaximumRenewableLifetime(60000 * 10080);
   kdcConfig.setPaEncTimestampRequired(false);
+  Set<EncryptionType> encryptionTypes=convertEncryptionTypes();
+  kdcConfig.setEncryptionTypes(encryptionTypes);
   kdcServer=new NoReplayKdcServer(kdcConfig);
   kdcServer.setSearchBaseDn(this.baseDN);
   UdpTransport udp=new UdpTransport(this.bindHost,this.kdcPort);

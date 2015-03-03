@@ -1,0 +1,18 @@
+{
+  Set<ProtocolMapperModel> result=new HashSet<ProtocolMapperModel>();
+  for (  ProtocolMapperEntity entity : realm.getProtocolMappers()) {
+    ProtocolMapperModel mapping=new ProtocolMapperModel();
+    mapping.setId(entity.getId());
+    mapping.setName(entity.getName());
+    mapping.setProtocol(entity.getProtocol());
+    mapping.setAppliedByDefault(entity.isAppliedByDefault());
+    mapping.setConsentRequired(entity.isConsentRequired());
+    mapping.setConsentText(entity.getConsentText());
+    Map<String,String> config=new HashMap<String,String>();
+    if (entity.getConfig() != null) {
+      config.putAll(entity.getConfig());
+    }
+    mapping.setConfig(config);
+  }
+  return result;
+}

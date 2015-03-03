@@ -2,27 +2,15 @@
   try {
     loginPage.open();
     loginPage.login("test-user@localhost","password");
-    keycloakRule.configure(new KeycloakSetup(){
-      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
-        lifespan=appRealm.getAccessCodeLifespanUserAction();
-        appRealm.setAccessCodeLifespanUserAction(1);
-      }
-    }
-);
     loginTotpPage.assertCurrent();
-    Thread.sleep(2000);
+    Time.setOffset(350);
     loginTotpPage.login(totp.generate("totpSecret"));
     loginPage.assertCurrent();
-    Assert.assertEquals("Login timeout. Please login again",loginPage.getError());
-    AssertEvents.ExpectedEvent expectedEvent=events.expectLogin().error("expired_code").user((String)null).clearDetails().session((String)null);
+    Assert.assertEquals("Invalid username or password.",loginPage.getError());
+    AssertEvents.ExpectedEvent expectedEvent=events.expectLogin().error("invalid_user_credentials").session((String)null);
     expectedEvent.assertEvent();
   }
   finally {
-    keycloakRule.configure(new KeycloakSetup(){
-      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
-        appRealm.setAccessCodeLifespanUserAction(lifespan);
-      }
-    }
-);
+    Time.setOffset(0);
   }
 }

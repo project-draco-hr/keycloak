@@ -1,0 +1,38 @@
+{
+  try {
+    realm.setAccessCodeLifespan(10);
+    realm.setAccessCodeLifespanUserAction(10);
+    realm.setAccessCodeLifespanLogin(30);
+    String clientSessionId=session.sessions().createClientSession(realm,realm.findClient("test-app")).getId();
+    Time.setOffset(25);
+    session.sessions().removeExpiredUserSessions(realm);
+    assertNotNull(session.sessions().getClientSession(clientSessionId));
+    Time.setOffset(35);
+    session.sessions().removeExpiredUserSessions(realm);
+    assertNull(session.sessions().getClientSession(clientSessionId));
+    realm.setAccessCodeLifespanUserAction(40);
+    Time.setOffset(0);
+    clientSessionId=session.sessions().createClientSession(realm,realm.findClient("test-app")).getId();
+    Time.setOffset(35);
+    session.sessions().removeExpiredUserSessions(realm);
+    assertNotNull(session.sessions().getClientSession(clientSessionId));
+    Time.setOffset(45);
+    session.sessions().removeExpiredUserSessions(realm);
+    assertNull(session.sessions().getClientSession(clientSessionId));
+    realm.setAccessCodeLifespan(50);
+    Time.setOffset(0);
+    clientSessionId=session.sessions().createClientSession(realm,realm.findClient("test-app")).getId();
+    Time.setOffset(45);
+    session.sessions().removeExpiredUserSessions(realm);
+    assertNotNull(session.sessions().getClientSession(clientSessionId));
+    Time.setOffset(55);
+    session.sessions().removeExpiredUserSessions(realm);
+    assertNull(session.sessions().getClientSession(clientSessionId));
+  }
+  finally {
+    Time.setOffset(0);
+    realm.setAccessCodeLifespan(60);
+    realm.setAccessCodeLifespanUserAction(300);
+    realm.setAccessCodeLifespanLogin(1800);
+  }
+}

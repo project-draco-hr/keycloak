@@ -4,6 +4,6 @@
   mongoStore.removeEntities(MongoUserSessionEntity.class,query,invocationContext);
   query=new QueryBuilder().and("realmId").is(realm.getId()).and("lastSessionRefresh").lessThan(currentTime - realm.getSsoSessionIdleTimeout()).get();
   mongoStore.removeEntities(MongoUserSessionEntity.class,query,invocationContext);
-  query=new QueryBuilder().and("sessionId").is(null).and("realmId").is(realm.getId()).and("timestamp").lessThan(currentTime - realm.getSsoSessionIdleTimeout()).get();
+  query=new QueryBuilder().and("sessionId").is(null).and("realmId").is(realm.getId()).and("timestamp").lessThan(currentTime - RealmInfoUtil.getDettachedClientSessionLifespan(realm)).get();
   mongoStore.removeEntities(MongoClientSessionEntity.class,query,invocationContext);
 }

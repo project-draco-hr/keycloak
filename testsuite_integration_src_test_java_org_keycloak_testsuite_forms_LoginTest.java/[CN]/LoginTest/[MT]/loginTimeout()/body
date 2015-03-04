@@ -1,0 +1,11 @@
+{
+  try {
+    loginPage.open();
+    Time.setOffset(1850);
+    loginPage.login("login-test","password");
+    events.expectLogin().clearDetails().detail(Details.CODE_ID,AssertEvents.isCodeId()).user((String)null).session((String)null).error("expired_code").assertEvent().getSessionId();
+  }
+  finally {
+    Time.setOffset(0);
+  }
+}

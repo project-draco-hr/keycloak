@@ -1,7 +1,7 @@
 {
   event.event(EventType.UPDATE_PASSWORD);
   Checks checks=new Checks();
-  if (!checks.check(code,ClientSessionModel.Action.UPDATE_PASSWORD)) {
+  if (!checks.check(code,ClientSessionModel.Action.UPDATE_PASSWORD,ClientSessionModel.Action.RECOVER_PASSWORD)) {
     return checks.response;
   }
   ClientSessionCode accessCode=checks.clientCode;
@@ -25,6 +25,13 @@
     return loginForms.setError(ape.getMessage()).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
   user.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
-  event.clone().event(EventType.UPDATE_PASSWORD).success();
+  event.event(EventType.UPDATE_PASSWORD).success();
+  if (clientSession.getAction().equals(ClientSessionModel.Action.RECOVER_PASSWORD)) {
+    String actionCookieValue=getActionCookie();
+    if (actionCookieValue == null || !actionCookieValue.equals(userSession.getId())) {
+      return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setSuccess("passwordUpdated").createInfoPage();
+    }
+  }
+  event=event.clone().event(EventType.LOGIN);
   return redirectOauth(user,accessCode,clientSession,userSession);
 }

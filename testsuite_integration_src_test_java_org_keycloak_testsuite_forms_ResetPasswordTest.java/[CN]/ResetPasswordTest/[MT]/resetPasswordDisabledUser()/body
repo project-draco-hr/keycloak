@@ -11,9 +11,9 @@
     resetPasswordPage.assertCurrent();
     resetPasswordPage.changePassword("login-test");
     resetPasswordPage.assertCurrent();
-    Assert.assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
+    assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
     Thread.sleep(1000);
-    Assert.assertEquals(0,greenMail.getReceivedMessages().length);
+    assertEquals(0,greenMail.getReceivedMessages().length);
     events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).session((String)null).user(userId).detail(Details.USERNAME,"login-test").removeDetail(Details.CODE_ID).error("user_disabled").assertEvent();
   }
   finally {

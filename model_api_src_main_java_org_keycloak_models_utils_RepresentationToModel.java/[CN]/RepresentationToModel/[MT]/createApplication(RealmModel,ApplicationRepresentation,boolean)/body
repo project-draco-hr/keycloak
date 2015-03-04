@@ -74,14 +74,11 @@
     applicationModel.updateDefaultRoles(resourceRep.getDefaultRoles());
   }
   if (resourceRep.getProtocolMappers() != null) {
-    Set<String> ids=new HashSet<String>();
-    for (    ClientProtocolMappingRepresentation map : resourceRep.getProtocolMappers()) {
-      ProtocolMapperModel mapperModel=applicationModel.getRealm().getProtocolMapperByName(map.getProtocol(),map.getName());
-      if (mapperModel != null) {
-        ids.add(mapperModel.getId());
-      }
+    Set<ProtocolMapperModel> mappers=applicationModel.getProtocolMappers();
+    for (    ProtocolMapperModel mapper : mappers)     applicationModel.removeProtocolMapper(mapper);
+    for (    ProtocolMapperRepresentation mapper : resourceRep.getProtocolMappers()) {
+      applicationModel.addProtocolMapper(toModel(mapper));
     }
-    applicationModel.setProtocolMappers(ids);
   }
   applicationModel.updateAllowedIdentityProviders(toModel(resourceRep.getIdentityProviders(),realm));
   return applicationModel;

@@ -3,20 +3,22 @@
     String spnegoToken=credential.getValue();
     SPNEGOAuthenticator spnegoAuthenticator=factory.createSPNEGOAuthenticator(spnegoToken,kerberosConfig);
     spnegoAuthenticator.authenticate();
+    Map<String,String> state=new HashMap<String,String>();
     if (spnegoAuthenticator.isAuthenticated()) {
-      Map<String,Object> state=new HashMap<String,Object>();
-      state.put(KerberosConstants.GSS_DELEGATION_CREDENTIAL,spnegoAuthenticator.getDelegationCredential());
       String username=spnegoAuthenticator.getAuthenticatedUsername();
       UserModel user=findOrCreateAuthenticatedUser(realm,username);
       if (user == null) {
         return CredentialValidationOutput.failed();
       }
  else {
+        String delegationCredential=spnegoAuthenticator.getSerializedDelegationCredential();
+        if (delegationCredential != null) {
+          state.put(KerberosConstants.GSS_DELEGATION_CREDENTIAL,delegationCredential);
+        }
         return new CredentialValidationOutput(user,CredentialValidationOutput.Status.AUTHENTICATED,state);
       }
     }
  else {
-      Map<String,Object> state=new HashMap<String,Object>();
       state.put(KerberosConstants.RESPONSE_TOKEN,spnegoAuthenticator.getResponseToken());
       return new CredentialValidationOutput(null,CredentialValidationOutput.Status.CONTINUE,state);
     }

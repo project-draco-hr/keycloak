@@ -1,0 +1,23 @@
+{
+  if (serializedCred == null) {
+    throw new KerberosSerializationException("Null credential given as input. Did you enable kerberos credential delegation for your web browser and mapping of gss credential to access token?");
+  }
+  try {
+    Object deserializedCred=deserialize(serializedCred);
+    if (!(deserializedCred instanceof KerberosTicket)) {
+      throw new KerberosSerializationException("Deserialized object is not KerberosTicket! Type is: " + deserializedCred);
+    }
+    KerberosTicket ticket=(KerberosTicket)deserializedCred;
+    String fullName=ticket.getClient().getName();
+    Method getInstance=Reflections.findDeclaredMethod(Krb5NameElement.class,"getInstance",String.class,Oid.class);
+    Krb5NameElement krb5Name=Reflections.invokeMethod(true,getInstance,Krb5NameElement.class,null,fullName,KRB5_NAME_OID);
+    Credentials krb5CredsInternal=new Credentials(ticket.getEncoded(),ticket.getClient().getName(),ticket.getServer().getName(),ticket.getSessionKey().getEncoded(),ticket.getSessionKeyType(),ticket.getFlags(),ticket.getAuthTime(),ticket.getStartTime(),ticket.getEndTime(),ticket.getRenewTill(),ticket.getClientAddresses());
+    Method getInstance2=Reflections.findDeclaredMethod(Krb5InitCredential.class,"getInstance",Krb5NameElement.class,Credentials.class);
+    Krb5InitCredential initCredential=Reflections.invokeMethod(true,getInstance2,Krb5InitCredential.class,null,krb5Name,krb5CredsInternal);
+    GSSManagerImpl manager=(GSSManagerImpl)GSSManager.getInstance();
+    return new GSSCredentialImpl(manager,initCredential);
+  }
+ catch (  Exception ioe) {
+    throw new KerberosSerializationException("Exception occured",ioe);
+  }
+}

@@ -1,0 +1,28 @@
+{
+  getKeycloakRule().update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      ProtocolMapperModel protocolMapper=OIDCUserSessionNoteMapper.createClaimMapper(KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME,KerberosConstants.GSS_DELEGATION_CREDENTIAL,KerberosConstants.GSS_DELEGATION_CREDENTIAL,"String",true,KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME,true,false);
+      ApplicationModel kerberosApp=appRealm.getApplicationByName("kerberos-app");
+      kerberosApp.addProtocolMapper(protocolMapper);
+    }
+  }
+);
+  spnegoLoginTestImpl();
+  driver.navigate().to(KERBEROS_APP_URL + KerberosCredDelegServlet.CRED_DELEG_TEST_PATH);
+  String pageSource=driver.getPageSource();
+  Assert.assertTrue(pageSource.contains("LDAP Data: Horatio Nelson"));
+  getKeycloakRule().update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      ApplicationModel kerberosApp=appRealm.getApplicationByName("kerberos-app");
+      ProtocolMapperModel toRemove=kerberosApp.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME);
+      kerberosApp.removeProtocolMapper(toRemove);
+    }
+  }
+);
+  driver.manage().deleteAllCookies();
+  spnegoLoginTestImpl();
+  driver.navigate().to(KERBEROS_APP_URL + KerberosCredDelegServlet.CRED_DELEG_TEST_PATH);
+  pageSource=driver.getPageSource();
+  Assert.assertFalse(pageSource.contains("LDAP Data: Horatio Nelson"));
+  Assert.assertTrue(pageSource.contains("LDAP Data: ERROR"));
+}

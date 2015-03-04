@@ -54,6 +54,7 @@
       logger.error("Failed to send password reset email",e);
       return Flows.forms(this.session,realm,client,uriInfo).setError("emailSendError").setClientSessionCode(accessCode.getCode()).createErrorPage();
     }
+    createActionCookie(realm,uriInfo,clientConnection,userSession.getId());
   }
   return Flows.forms(session,realm,client,uriInfo).setSuccess("emailSent").setClientSessionCode(accessCode.getCode()).createPasswordReset();
 }

@@ -103,7 +103,7 @@
     event.error(Errors.INVALID_CODE);
     return Response.status(Response.Status.BAD_REQUEST).entity(error).type("application/json").build();
   }
-  AccessTokenResponse res=tokenManager.responseBuilder(realm,client,event).accessToken(token).generateIDToken().generateRefreshToken().build();
+  AccessTokenResponse res=tokenManager.responseBuilder(realm,client,event,session,userSession,clientSession).accessToken(token).generateIDToken().generateRefreshToken().build();
   event.success();
   return Cors.add(request,Response.ok(res)).auth().allowedOrigins(client).allowedMethods("POST").exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build();
 }

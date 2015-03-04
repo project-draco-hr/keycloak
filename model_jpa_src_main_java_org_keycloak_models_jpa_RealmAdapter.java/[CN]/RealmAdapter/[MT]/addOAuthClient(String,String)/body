@@ -6,8 +6,16 @@
   data.setRealm(realm);
   em.persist(data);
   em.flush();
-  OAuthClientModel model=new OAuthClientAdapter(this,data,em);
-  addDefaultClientProtocolMappers(model);
+  final OAuthClientModel model=new OAuthClientAdapter(this,data,em);
   em.flush();
+  session.getKeycloakSessionFactory().publish(new OAuthClientCreationEvent(){
+    @Override public OAuthClientModel getCreatedOAuthClient(){
+      return model;
+    }
+    @Override public ClientModel getCreatedClient(){
+      return model;
+    }
+  }
+);
   return model;
 }

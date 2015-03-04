@@ -1,0 +1,16 @@
+{
+  if (getProtocolMapperByName(model.getProtocol(),model.getName()) != null) {
+    throw new RuntimeException("protocol mapper name must be unique per protocol");
+  }
+  ProtocolMapperEntity entity=new ProtocolMapperEntity();
+  entity.setId(KeycloakModelUtils.generateId());
+  entity.setProtocol(model.getProtocol());
+  entity.setName(model.getName());
+  entity.setProtocolMapper(model.getProtocolMapper());
+  entity.setConfig(model.getConfig());
+  entity.setConsentRequired(model.isConsentRequired());
+  entity.setConsentText(model.getConsentText());
+  getMongoEntityAsClient().getProtocolMappers().add(entity);
+  updateMongoEntity();
+  return entityToModel(entity);
+}

@@ -1,8 +1,17 @@
 {
   Set<ProtocolMapperModel> result=new HashSet<ProtocolMapperModel>();
-  for (  String id : getMongoEntityAsClient().getProtocolMappers()) {
-    ProtocolMapperModel model=getRealm().getProtocolMapperById(id);
-    if (model != null)     result.add(model);
+  for (  ProtocolMapperEntity entity : getMongoEntityAsClient().getProtocolMappers()) {
+    ProtocolMapperModel mapping=new ProtocolMapperModel();
+    mapping.setId(entity.getId());
+    mapping.setName(entity.getName());
+    mapping.setProtocol(entity.getProtocol());
+    mapping.setConsentRequired(entity.isConsentRequired());
+    mapping.setConsentText(entity.getConsentText());
+    Map<String,String> config=new HashMap<String,String>();
+    if (entity.getConfig() != null) {
+      config.putAll(entity.getConfig());
+    }
+    mapping.setConfig(config);
   }
   return result;
 }

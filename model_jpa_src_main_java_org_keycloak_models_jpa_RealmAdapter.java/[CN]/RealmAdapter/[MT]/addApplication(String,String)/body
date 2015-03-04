@@ -7,8 +7,16 @@
   realm.getApplications().add(applicationData);
   em.persist(applicationData);
   em.flush();
-  ApplicationModel resource=new ApplicationAdapter(this,em,session,applicationData);
-  addDefaultClientProtocolMappers(resource);
+  final ApplicationModel resource=new ApplicationAdapter(this,em,session,applicationData);
   em.flush();
+  session.getKeycloakSessionFactory().publish(new ApplicationCreationEvent(){
+    @Override public ApplicationModel getCreatedApplication(){
+      return resource;
+    }
+    @Override public ClientModel getCreatedClient(){
+      return resource;
+    }
+  }
+);
   return resource;
 }

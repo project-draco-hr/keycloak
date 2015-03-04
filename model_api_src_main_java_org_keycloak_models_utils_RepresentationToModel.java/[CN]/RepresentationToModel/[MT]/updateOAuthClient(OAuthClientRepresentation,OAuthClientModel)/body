@@ -31,13 +31,10 @@
   }
   updateClientIdentityProvides(rep.getIdentityProviders(),model);
   if (rep.getProtocolMappers() != null) {
-    Set<String> ids=new HashSet<String>();
-    for (    ClientProtocolMappingRepresentation map : rep.getProtocolMappers()) {
-      ProtocolMapperModel mapperModel=model.getRealm().getProtocolMapperByName(map.getProtocol(),map.getName());
-      if (mapperModel != null) {
-        ids.add(mapperModel.getId());
-      }
+    Set<ProtocolMapperModel> mappers=model.getProtocolMappers();
+    for (    ProtocolMapperModel mapper : mappers)     model.removeProtocolMapper(mapper);
+    for (    ProtocolMapperRepresentation mapper : rep.getProtocolMappers()) {
+      model.addProtocolMapper(toModel(mapper));
     }
-    model.setProtocolMappers(ids);
   }
 }

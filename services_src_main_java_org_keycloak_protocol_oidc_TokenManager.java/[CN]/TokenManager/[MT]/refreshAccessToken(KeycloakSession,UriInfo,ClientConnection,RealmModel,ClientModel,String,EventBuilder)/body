@@ -34,7 +34,8 @@
   AccessToken accessToken=initToken(realm,client,user,userSession,clientSession);
   accessToken.setRealmAccess(refreshToken.getRealmAccess());
   accessToken.setResourceAccess(refreshToken.getResourceAccess());
-  accessToken=transformToken(session,accessToken,realm,client,user,userSession,clientSession);
+  accessToken=transformAccessToken(session,accessToken,realm,client,user,userSession,clientSession);
   userSession.setLastSessionRefresh(currentTime);
-  return accessToken;
+  AccessTokenResponse res=responseBuilder(realm,client,event,session,userSession,clientSession).accessToken(accessToken).generateIDToken().generateRefreshToken().build();
+  return res;
 }

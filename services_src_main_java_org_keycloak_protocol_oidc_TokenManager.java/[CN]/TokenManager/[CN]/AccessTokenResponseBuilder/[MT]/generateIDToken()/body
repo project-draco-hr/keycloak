@@ -12,24 +12,6 @@
   if (realm.getAccessTokenLifespan() > 0) {
     idToken.expiration(Time.currentTime() + realm.getAccessTokenLifespan());
   }
-  idToken.getUserClaimSet().setPreferredUsername(accessToken.getUserClaimSet().getPreferredUsername());
-  idToken.getUserClaimSet().setGivenName(accessToken.getUserClaimSet().getGivenName());
-  idToken.getUserClaimSet().setMiddleName(accessToken.getUserClaimSet().getMiddleName());
-  idToken.getUserClaimSet().setFamilyName(accessToken.getUserClaimSet().getFamilyName());
-  idToken.getUserClaimSet().setName(accessToken.getUserClaimSet().getName());
-  idToken.getUserClaimSet().setNickName(accessToken.getUserClaimSet().getNickName());
-  idToken.getUserClaimSet().setGender(accessToken.getUserClaimSet().getGender());
-  idToken.getUserClaimSet().setPicture(accessToken.getUserClaimSet().getPicture());
-  idToken.getUserClaimSet().setProfile(accessToken.getUserClaimSet().getProfile());
-  idToken.getUserClaimSet().setWebsite(accessToken.getUserClaimSet().getWebsite());
-  idToken.getUserClaimSet().setBirthdate(accessToken.getUserClaimSet().getBirthdate());
-  idToken.getUserClaimSet().setEmail(accessToken.getUserClaimSet().getEmail());
-  idToken.getUserClaimSet().setEmailVerified(accessToken.getUserClaimSet().getEmailVerified());
-  idToken.getUserClaimSet().setLocale(accessToken.getUserClaimSet().getLocale());
-  idToken.getUserClaimSet().setAddress(accessToken.getUserClaimSet().getAddress());
-  idToken.getUserClaimSet().setPhoneNumber(accessToken.getUserClaimSet().getPhoneNumber());
-  idToken.getUserClaimSet().setPhoneNumberVerified(accessToken.getUserClaimSet().getPhoneNumberVerified());
-  idToken.getUserClaimSet().setZoneinfo(accessToken.getUserClaimSet().getZoneinfo());
-  idToken.setOtherClaims(accessToken.getOtherClaims());
+  transformIDToken(session,idToken,realm,client,userSession.getUser(),userSession,clientSession);
   return this;
 }

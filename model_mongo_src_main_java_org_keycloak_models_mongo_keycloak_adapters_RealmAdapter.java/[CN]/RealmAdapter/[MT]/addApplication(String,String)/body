@@ -5,6 +5,15 @@
   appData.setRealmId(getId());
   appData.setEnabled(true);
   getMongoStore().insertEntity(appData,invocationContext);
-  ApplicationModel model=new ApplicationAdapter(session,this,appData,invocationContext);
+  final ApplicationModel model=new ApplicationAdapter(session,this,appData,invocationContext);
+  session.getKeycloakSessionFactory().publish(new ApplicationCreationEvent(){
+    @Override public ApplicationModel getCreatedApplication(){
+      return model;
+    }
+    @Override public ClientModel getCreatedClient(){
+      return model;
+    }
+  }
+);
   return model;
 }

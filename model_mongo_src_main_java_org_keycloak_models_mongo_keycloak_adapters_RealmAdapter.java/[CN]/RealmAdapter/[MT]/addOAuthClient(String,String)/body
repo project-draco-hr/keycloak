@@ -4,6 +4,15 @@
   oauthClient.setRealmId(getId());
   oauthClient.setName(name);
   getMongoStore().insertEntity(oauthClient,invocationContext);
-  OAuthClientAdapter model=new OAuthClientAdapter(session,this,oauthClient,invocationContext);
+  final OAuthClientAdapter model=new OAuthClientAdapter(session,this,oauthClient,invocationContext);
+  session.getKeycloakSessionFactory().publish(new OAuthClientCreationEvent(){
+    @Override public OAuthClientModel getCreatedOAuthClient(){
+      return model;
+    }
+    @Override public ClientModel getCreatedClient(){
+      return model;
+    }
+  }
+);
   return model;
 }

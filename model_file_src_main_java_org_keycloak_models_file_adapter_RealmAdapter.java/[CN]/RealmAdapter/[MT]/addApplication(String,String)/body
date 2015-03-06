@@ -14,7 +14,16 @@
   clientEntity.setName(name);
   clientEntity.setRealmId(getId());
   clientEntity.setEnabled(true);
-  ApplicationModel app=new ApplicationAdapter(session,this,appEntity,clientEntity,inMemoryModel);
+  final ApplicationModel app=new ApplicationAdapter(session,this,appEntity,clientEntity,inMemoryModel);
+  session.getKeycloakSessionFactory().publish(new ApplicationCreationEvent(){
+    @Override public ApplicationModel getCreatedApplication(){
+      return app;
+    }
+    @Override public ClientModel getCreatedClient(){
+      return app;
+    }
+  }
+);
   allApps.put(id,app);
   return app;
 }

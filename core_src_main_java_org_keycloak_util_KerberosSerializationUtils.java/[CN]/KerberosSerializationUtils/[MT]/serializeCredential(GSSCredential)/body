@@ -1,0 +1,34 @@
+{
+  try {
+    if (gssCredential == null) {
+      throw new KerberosSerializationException("Null credential given as input");
+    }
+    if (!(gssCredential instanceof GSSCredentialImpl)) {
+      throw new KerberosSerializationException("Unknown credential type: " + gssCredential.getClass());
+    }
+    GSSCredentialImpl gssCredImpl=(GSSCredentialImpl)gssCredential;
+    Oid[] mechs=gssCredImpl.getMechs();
+    for (    Oid oid : mechs) {
+      if (oid.equals(KRB5_OID)) {
+        int usage=gssCredImpl.getUsage(oid);
+        boolean initiate=(usage == GSSCredential.INITIATE_ONLY || usage == GSSCredential.INITIATE_AND_ACCEPT);
+        GSSCredentialSpi credentialSpi=gssCredImpl.getElement(oid,initiate);
+        if (credentialSpi instanceof Krb5InitCredential) {
+          Krb5InitCredential credential=(Krb5InitCredential)credentialSpi;
+          KerberosTicket kerberosTicket=new KerberosTicket(credential.getEncoded(),credential.getClient(),credential.getServer(),credential.getSessionKey().getEncoded(),credential.getSessionKeyType(),credential.getFlags(),credential.getAuthTime(),credential.getStartTime(),credential.getEndTime(),credential.getRenewTill(),credential.getClientAddresses());
+          return serialize(kerberosTicket);
+        }
+ else {
+          throw new KerberosSerializationException("Unsupported type of credentialSpi: " + credentialSpi.getClass());
+        }
+      }
+    }
+    throw new KerberosSerializationException("Kerberos credential not found. Available mechanisms: " + mechs);
+  }
+ catch (  IOException e) {
+    throw new KerberosSerializationException("Exception occured",e);
+  }
+catch (  GSSException e) {
+    throw new KerberosSerializationException("Exception occured",e);
+  }
+}

@@ -1,0 +1,18 @@
+{
+  if (delegationCredential == null) {
+    if (log.isTraceEnabled()) {
+      log.trace("No delegation credential available.");
+    }
+    return null;
+  }
+  try {
+    if (log.isTraceEnabled()) {
+      log.trace("Serializing credential " + delegationCredential);
+    }
+    return KerberosSerializationUtils.serializeCredential(delegationCredential);
+  }
+ catch (  KerberosSerializationUtils.KerberosSerializationException kse) {
+    log.warn("Couldn't serialize credential: " + delegationCredential,kse);
+    return null;
+  }
+}

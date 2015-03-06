@@ -30,7 +30,7 @@
     UserCredentialModel spnegoCredential=UserCredentialModel.kerberos(spnegoToken);
     CredentialValidationOutput output=session.users().validCredentials(realm,spnegoCredential);
     if (output.getAuthStatus() == CredentialValidationOutput.Status.AUTHENTICATED) {
-      return sendResponse(output.getAuthenticatedUser(),"spnego");
+      return sendResponse(output.getAuthenticatedUser(),output.getState(),"spnego");
     }
  else {
       String spnegoResponseToken=(String)output.getState().get(KerberosConstants.RESPONSE_TOKEN);

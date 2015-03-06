@@ -1,0 +1,15 @@
+{
+  KeycloakPrincipal keycloakPrincipal=(KeycloakPrincipal)req.getUserPrincipal();
+  AccessToken accessToken=keycloakPrincipal.getKeycloakSecurityContext().getToken();
+  String username=accessToken.getPreferredUsername();
+  String serializedGssCredential=(String)accessToken.getOtherClaims().get(KerberosConstants.GSS_DELEGATION_CREDENTIAL);
+  GSSCredential deserializedGssCredential=KerberosSerializationUtils.deserializeCredential(serializedGssCredential);
+  try {
+    invokeLdap(null,username);
+    throw new RuntimeException("Not expected to authenticate to LDAP without credential");
+  }
+ catch (  NamingException nse) {
+    System.out.println("GSSCredentialsClient: Expected exception: " + nse.getMessage());
+  }
+  return invokeLdap(deserializedGssCredential,username);
+}

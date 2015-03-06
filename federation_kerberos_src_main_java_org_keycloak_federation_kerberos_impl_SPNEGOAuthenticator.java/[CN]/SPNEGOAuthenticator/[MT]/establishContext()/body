@@ -1,5 +1,6 @@
 {
-  GSSContext gssContext=GSS_MANAGER.createContext((GSSCredential)null);
+  GSSManager manager=GSSManager.getInstance();
+  GSSContext gssContext=manager.createContext((GSSCredential)null);
   byte[] inputToken=Base64.decode(spnegoToken);
   byte[] respToken=gssContext.acceptSecContext(inputToken,0,inputToken.length);
   responseToken=Base64.encodeBytes(respToken);

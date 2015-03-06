@@ -1,6 +1,8 @@
 {
   initHttpClient(false);
-  Response response=client.target(oauth.getLoginFormUrl()).request().get();
+  driver.navigate().to(KERBEROS_APP_URL);
+  String kcLoginPageLocation=driver.getCurrentUrl();
+  Response response=client.target(kcLoginPageLocation).request().get();
   Assert.assertEquals(401,response.getStatus());
   Assert.assertEquals(KerberosConstants.NEGOTIATE,response.getHeaderString(HttpHeaders.WWW_AUTHENTICATE));
   String responseText=response.readEntity(String.class);

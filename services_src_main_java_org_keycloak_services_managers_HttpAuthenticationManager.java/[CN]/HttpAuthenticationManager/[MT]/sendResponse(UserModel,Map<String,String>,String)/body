@@ -1,0 +1,20 @@
+{
+  if (logger.isTraceEnabled()) {
+    logger.trace("User " + user.getUsername() + " authenticated with "+ authMethod);
+  }
+  Response response;
+  if (!user.isEnabled()) {
+    event.error(Errors.USER_DISABLED);
+    response=Flows.forwardToSecurityFailurePage(session,realm,uriInfo,Messages.ACCOUNT_DISABLED);
+  }
+ else {
+    UserSessionModel userSession=session.sessions().createUserSession(realm,user,user.getUsername(),clientConnection.getRemoteAddr(),authMethod,false);
+    for (    Map.Entry<String,String> entry : authState.entrySet()) {
+      userSession.setNote(entry.getKey(),entry.getValue());
+    }
+    TokenManager.attachClientSession(userSession,clientSession);
+    event.user(user).session(userSession).detail(Details.AUTH_METHOD,authMethod).detail(Details.USERNAME,user.getUsername());
+    response=AuthenticationManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
+  }
+  return new HttpAuthOutput(response,null);
+}

@@ -1,0 +1,27 @@
+{
+  String role=mappingModel.getConfig().get(ROLE_CONFIG);
+  String newName=mappingModel.getConfig().get(NEW_ROLE_NAME);
+  String appName=null;
+  int scopeIndex=role.indexOf('.');
+  if (scopeIndex > -1) {
+    appName=role.substring(0,scopeIndex);
+    AccessToken.Access access=token.getResourceAccess(appName);
+    if (access == null)     return token;
+    role=role.substring(scopeIndex + 1);
+    if (!access.getRoles().contains(role))     return token;
+    access.getRoles().remove(role);
+  }
+ else {
+    AccessToken.Access access=token.getRealmAccess();
+    if (access == null)     return token;
+    access.getRoles().remove(role);
+  }
+  String newAppName=null;
+  scopeIndex=newName.indexOf('.');
+  if (scopeIndex > -1) {
+    newAppName=role.substring(0,scopeIndex);
+    newName=role.substring(scopeIndex + 1);
+    token.addAccess(newAppName).addRole(newName);
+  }
+  return token;
+}

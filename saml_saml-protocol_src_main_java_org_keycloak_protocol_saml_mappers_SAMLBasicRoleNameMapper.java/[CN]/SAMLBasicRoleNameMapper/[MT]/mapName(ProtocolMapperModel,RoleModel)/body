@@ -1,0 +1,22 @@
+{
+  RoleContainerModel container=roleModel.getContainer();
+  ApplicationModel app=null;
+  if (container instanceof ApplicationModel) {
+    app=((ApplicationModel)container);
+  }
+  String role=model.getConfig().get(ROLE_CONFIG);
+  String newName=model.getConfig().get(NEW_ROLE_NAME);
+  String appName=null;
+  int scopeIndex=role.indexOf('.');
+  if (scopeIndex > -1) {
+    if (app == null)     return null;
+    appName=role.substring(0,scopeIndex);
+    if (!app.getName().equals(appName))     return null;
+    role=role.substring(scopeIndex + 1);
+  }
+ else {
+    if (app != null)     return null;
+  }
+  if (roleModel.getName().equals(role))   return newName;
+  return null;
+}

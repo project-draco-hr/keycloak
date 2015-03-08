@@ -11,24 +11,33 @@
   clientSession.setNote(SAML_NAME_ID_FORMAT,nameIdFormat);
   SALM2LoginResponseBuilder builder=new SALM2LoginResponseBuilder();
   builder.requestID(requestID).destination(redirectUri).issuer(responseIssuer).requestIssuer(clientSession.getClient().getClientId()).nameIdentifier(nameIdFormat,nameId).authMethod(JBossSAMLURIConstants.AC_UNSPECIFIED.get());
-  initClaims(builder,clientSession.getClient(),userSession.getUser());
-  if (clientSession.getRoles() != null) {
-    if (multivaluedRoles(client)) {
-      builder.multiValuedRoles(true);
-    }
-    for (    String roleId : clientSession.getRoles()) {
-      RoleModel roleModel=clientSession.getRealm().getRoleById(roleId);
-      builder.roles(roleModel.getName());
-    }
-  }
   if (!includeAuthnStatement(client)) {
     builder.disableAuthnStatement(true);
+  }
+  List<ProtocolMapperProcessor<SAMLAttributeStatementMapper>> attributeStatementMappers=new LinkedList<>();
+  List<ProtocolMapperProcessor<SAMLLoginResponseMapper>> loginResponseMappers=new LinkedList<>();
+  ProtocolMapperProcessor<SAMLRoleListMapper> roleListMapper=null;
+  Set<ProtocolMapperModel> mappings=client.getProtocolMappers();
+  for (  ProtocolMapperModel mapping : mappings) {
+    if (!mapping.getProtocol().equals(SamlProtocol.LOGIN_PROTOCOL))     continue;
+    ProtocolMapper mapper=(ProtocolMapper)session.getKeycloakSessionFactory().getProviderFactory(ProtocolMapper.class,mapping.getProtocolMapper());
+    if (mapper == null)     continue;
+    if (mapper instanceof SAMLAttributeStatementMapper) {
+      attributeStatementMappers.add(new ProtocolMapperProcessor<SAMLAttributeStatementMapper>((SAMLAttributeStatementMapper)mapper,mapping));
+    }
+    if (mapper instanceof SAMLLoginResponseMapper) {
+      loginResponseMappers.add(new ProtocolMapperProcessor<SAMLLoginResponseMapper>((SAMLLoginResponseMapper)mapper,mapping));
+    }
+    if (mapper instanceof SAMLRoleListMapper) {
+      roleListMapper=new ProtocolMapperProcessor<SAMLRoleListMapper>((SAMLRoleListMapper)mapper,mapping);
+    }
   }
   Document samlDocument=null;
   try {
     ResponseType samlModel=builder.buildModel();
-    transformAttributeStatement(session,samlModel,client,userSession,clientSession);
-    samlModel=transformLoginResponse(session,samlModel,client,userSession,clientSession);
+    transformAttributeStatement(attributeStatementMappers,samlModel,session,userSession,clientSession);
+    populateRoles(roleListMapper,samlModel,session,userSession,clientSession);
+    samlModel=transformLoginResponse(loginResponseMappers,samlModel,session,userSession,clientSession);
     samlDocument=builder.buildDocument(samlModel);
   }
  catch (  Exception e) {

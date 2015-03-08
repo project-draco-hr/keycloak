@@ -1,34 +1,90 @@
 {
-  SamlSPFacade.samlResponse=null;
-  driver.navigate().to("http://localhost:8081/employee/");
-  Assert.assertTrue(driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/demo/protocol/saml"));
-  System.out.println(driver.getCurrentUrl());
-  loginPage.login("bburke","password");
-  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/employee/");
-  Assert.assertNotNull(SamlSPFacade.samlResponse);
-  SAML2Response saml2Response=new SAML2Response();
-  byte[] samlResponse=PostBindingUtil.base64Decode(SamlSPFacade.samlResponse);
-  ResponseType rt=saml2Response.getResponseType(new ByteArrayInputStream(samlResponse));
-  Assert.assertTrue(rt.getAssertions().size() == 1);
-  AssertionType assertion=rt.getAssertions().get(0).getAssertion();
-  boolean email=false;
-  boolean phone=false;
-  for (  AttributeStatementType statement : assertion.getAttributeStatements()) {
-    for (    AttributeStatementType.ASTChoiceType choice : statement.getAttributes()) {
-      AttributeType attr=choice.getAttribute();
-      if (X500SAMLProfileConstants.EMAIL.getFriendlyName().equals(attr.getFriendlyName())) {
-        Assert.assertEquals(X500SAMLProfileConstants.EMAIL.get(),attr.getName());
-        Assert.assertEquals(JBossSAMLURIConstants.ATTRIBUTE_FORMAT_URI.get(),attr.getNameFormat());
-        Assert.assertEquals(attr.getAttributeValue().get(0),"bburke@redhat.com");
-        email=true;
+{
+    SamlSPFacade.samlResponse=null;
+    driver.navigate().to("http://localhost:8081/employee/");
+    Assert.assertTrue(driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/demo/protocol/saml"));
+    System.out.println(driver.getCurrentUrl());
+    loginPage.login("bburke","password");
+    Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/employee/");
+    Assert.assertNotNull(SamlSPFacade.samlResponse);
+    SAML2Response saml2Response=new SAML2Response();
+    byte[] samlResponse=PostBindingUtil.base64Decode(SamlSPFacade.samlResponse);
+    ResponseType rt=saml2Response.getResponseType(new ByteArrayInputStream(samlResponse));
+    Assert.assertTrue(rt.getAssertions().size() == 1);
+    AssertionType assertion=rt.getAssertions().get(0).getAssertion();
+    boolean email=false;
+    boolean phone=false;
+    boolean userRole=false;
+    boolean managerRole=false;
+    for (    AttributeStatementType statement : assertion.getAttributeStatements()) {
+      for (      AttributeStatementType.ASTChoiceType choice : statement.getAttributes()) {
+        AttributeType attr=choice.getAttribute();
+        if (X500SAMLProfileConstants.EMAIL.getFriendlyName().equals(attr.getFriendlyName())) {
+          Assert.assertEquals(X500SAMLProfileConstants.EMAIL.get(),attr.getName());
+          Assert.assertEquals(JBossSAMLURIConstants.ATTRIBUTE_FORMAT_URI.get(),attr.getNameFormat());
+          Assert.assertEquals(attr.getAttributeValue().get(0),"bburke@redhat.com");
+          email=true;
+        }
+ else         if (attr.getName().equals("phone")) {
+          Assert.assertEquals(JBossSAMLURIConstants.ATTRIBUTE_FORMAT_BASIC.get(),attr.getNameFormat());
+          Assert.assertEquals(attr.getAttributeValue().get(0),"617");
+          phone=true;
+        }
+ else         if (attr.getName().equals("Role")) {
+          if (attr.getAttributeValue().get(0).equals("manager"))           managerRole=true;
+          if (attr.getAttributeValue().get(0).equals("user"))           userRole=true;
+        }
       }
- else       if (attr.getName().equals("phone")) {
-        Assert.assertEquals(JBossSAMLURIConstants.ATTRIBUTE_FORMAT_BASIC.get(),attr.getNameFormat());
-        Assert.assertEquals(attr.getAttributeValue().get(0),"617");
-        phone=true;
+    }
+    Assert.assertTrue(email);
+    Assert.assertTrue(phone);
+    Assert.assertTrue(userRole);
+    Assert.assertTrue(managerRole);
+  }
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      ApplicationModel app=appRealm.getApplicationByName("http://localhost:8081/employee/");
+      for (      ProtocolMapperModel mapper : app.getProtocolMappers()) {
+        if (mapper.getName().equals("role-list")) {
+          app.removeProtocolMapper(mapper);
+          mapper.setId(null);
+          mapper.getConfig().put(SAMLBasicRoleListMapper.SINGLE_ROLE_ATTRIBUTE,"true");
+          mapper.getConfig().put(AttributeStatementHelper.SAML_ATTRIBUTE_NAME,"memberOf");
+          app.addProtocolMapper(mapper);
+        }
       }
     }
   }
-  Assert.assertTrue(email);
-  Assert.assertTrue(phone);
+,"demo");
+  System.out.println(">>>>>>>>>> single role attribute <<<<<<<<");
+{
+    SamlSPFacade.samlResponse=null;
+    driver.navigate().to("http://localhost:8081/employee/");
+    System.out.println(driver.getCurrentUrl());
+    Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/employee/");
+    Assert.assertNotNull(SamlSPFacade.samlResponse);
+    SAML2Response saml2Response=new SAML2Response();
+    byte[] samlResponse=PostBindingUtil.base64Decode(SamlSPFacade.samlResponse);
+    ResponseType rt=saml2Response.getResponseType(new ByteArrayInputStream(samlResponse));
+    Assert.assertTrue(rt.getAssertions().size() == 1);
+    AssertionType assertion=rt.getAssertions().get(0).getAssertion();
+    boolean userRole=false;
+    boolean managerRole=false;
+    boolean single=false;
+    for (    AttributeStatementType statement : assertion.getAttributeStatements()) {
+      for (      AttributeStatementType.ASTChoiceType choice : statement.getAttributes()) {
+        AttributeType attr=choice.getAttribute();
+        if (attr.getName().equals("memberOf")) {
+          if (single)           Assert.fail("too many role attributes");
+          single=true;
+          for (          Object value : attr.getAttributeValue()) {
+            if (value.equals("manager"))             managerRole=true;
+            if (value.equals("user"))             userRole=true;
+          }
+        }
+      }
+    }
+    Assert.assertTrue(userRole);
+    Assert.assertTrue(managerRole);
+  }
 }

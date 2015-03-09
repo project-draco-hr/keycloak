@@ -1,0 +1,11 @@
+{
+  RSAPublicKey rsaKey=(RSAPublicKey)key;
+  RSAPublicJWK k=new RSAPublicJWK();
+  k.setKeyId(createKeyId(key));
+  k.setKeyType(RSAPublicJWK.RSA);
+  k.setAlgorithm(RSAPublicJWK.RS256);
+  k.setPublicKeyUse(DEFAULT_PUBLIC_KEY_USE);
+  k.setModulus(Base64Url.encode(toIntegerBytes(rsaKey.getModulus())));
+  k.setPublicExponent(Base64Url.encode(toIntegerBytes(rsaKey.getPublicExponent())));
+  return k;
+}

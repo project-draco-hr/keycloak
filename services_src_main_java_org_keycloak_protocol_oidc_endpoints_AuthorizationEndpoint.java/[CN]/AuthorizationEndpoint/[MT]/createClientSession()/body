@@ -1,0 +1,14 @@
+{
+  clientSession=session.sessions().createClientSession(realm,client);
+  clientSession.setAuthMethod(OIDCLoginProtocol.LOGIN_PROTOCOL);
+  clientSession.setRedirectUri(redirectUri);
+  clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE);
+  clientSession.setNote(ClientSessionCode.ACTION_KEY,KeycloakModelUtils.generateCodeSecret());
+  clientSession.setNote(OIDCLoginProtocol.RESPONSE_TYPE_PARAM,responseType);
+  clientSession.setNote(OIDCLoginProtocol.REDIRECT_URI_PARAM,redirectUriParam);
+  if (state != null)   clientSession.setNote(OIDCLoginProtocol.STATE_PARAM,state);
+  if (scope != null)   clientSession.setNote(OIDCLoginProtocol.SCOPE_PARAM,scope);
+  if (loginHint != null)   clientSession.setNote(OIDCLoginProtocol.LOGIN_HINT_PARAM,loginHint);
+  if (prompt != null)   clientSession.setNote(OIDCLoginProtocol.PROMPT_PARAM,prompt);
+  if (idpHint != null)   clientSession.setNote(OIDCLoginProtocol.K_IDP_HINT,idpHint);
+}

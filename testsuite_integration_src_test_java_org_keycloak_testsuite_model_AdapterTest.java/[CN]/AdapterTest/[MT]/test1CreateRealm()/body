@@ -4,8 +4,13 @@
   realmModel.setAccessCodeLifespanUserAction(600);
   realmModel.setEnabled(true);
   realmModel.setName("JUGGLER");
+  KeyPair keyPair=generateKeypair();
+  realmModel.setPrivateKey(keyPair.getPrivate());
+  realmModel.setPublicKey(keyPair.getPublic());
   realmModel.setAccessTokenLifespan(1000);
   realmModel.addDefaultRole("foo");
+  session.getTransaction().commit();
+  resetSession();
   realmModel=realmManager.getRealm(realmModel.getId());
   assertNotNull(realmModel);
   Assert.assertEquals(realmModel.getAccessCodeLifespan(),100);
@@ -13,6 +18,8 @@
   Assert.assertEquals(realmModel.getAccessTokenLifespan(),1000);
   Assert.assertEquals(realmModel.isEnabled(),true);
   Assert.assertEquals(realmModel.getName(),"JUGGLER");
+  Assert.assertArrayEquals(realmModel.getPrivateKey().getEncoded(),keyPair.getPrivate().getEncoded());
+  Assert.assertArrayEquals(realmModel.getPublicKey().getEncoded(),keyPair.getPublic().getEncoded());
   Assert.assertEquals(1,realmModel.getDefaultRoles().size());
   Assert.assertEquals("foo",realmModel.getDefaultRoles().get(0));
 }

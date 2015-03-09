@@ -1,9 +1,14 @@
 {
-  if (app == null)   throw new NullPointerException("app == null");
-  String appId=app.getId();
-  if (appId == null) {
-    throw new IllegalStateException("Master Admin app not initialized.");
+  if (app == null) {
+    realm.setAdminAppId(null);
+    this.masterAdminApp=null;
   }
-  realm.setAdminAppId(appId);
-  this.masterAdminApp=app;
+ else {
+    String appId=app.getId();
+    if (appId == null) {
+      throw new IllegalStateException("Master Admin app not initialized.");
+    }
+    realm.setAdminAppId(appId);
+    this.masterAdminApp=app;
+  }
 }

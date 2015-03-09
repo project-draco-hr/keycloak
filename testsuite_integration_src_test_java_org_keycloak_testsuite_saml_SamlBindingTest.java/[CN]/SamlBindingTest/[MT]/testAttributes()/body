@@ -53,6 +53,9 @@
           app.addProtocolMapper(mapper);
         }
       }
+      app.addProtocolMapper(HardcodedAttributeMapper.create("hardcoded-attribute","hardcoded-attribute","Basic",null,"hard",false,null));
+      app.addProtocolMapper(HardcodedRole.create("hardcoded-role","hardcoded-role"));
+      app.addProtocolMapper(SAMLBasicRoleNameMapper.create("renamed-role","manager","el-jefe"));
     }
   }
 ,"demo");
@@ -71,6 +74,8 @@
     boolean userRole=false;
     boolean managerRole=false;
     boolean single=false;
+    boolean hardcodedRole=false;
+    boolean hardcodedAttribute=false;
     for (    AttributeStatementType statement : assertion.getAttributeStatements()) {
       for (      AttributeStatementType.ASTChoiceType choice : statement.getAttributes()) {
         AttributeType attr=choice.getAttribute();
@@ -78,12 +83,20 @@
           if (single)           Assert.fail("too many role attributes");
           single=true;
           for (          Object value : attr.getAttributeValue()) {
-            if (value.equals("manager"))             managerRole=true;
+            if (value.equals("el-jefe"))             managerRole=true;
             if (value.equals("user"))             userRole=true;
+            if (value.equals("hardcoded-role"))             hardcodedRole=true;
           }
+        }
+ else         if (attr.getName().equals("hardcoded-attribute")) {
+          hardcodedAttribute=true;
+          Assert.assertEquals(attr.getAttributeValue().get(0),"hard");
         }
       }
     }
+    Assert.assertTrue(single);
+    Assert.assertTrue(hardcodedAttribute);
+    Assert.assertTrue(hardcodedRole);
     Assert.assertTrue(userRole);
     Assert.assertTrue(managerRole);
   }

@@ -23,6 +23,10 @@
   }
   String username=formData.getFirst("username");
   String email=formData.getFirst("email");
+  if (realm.isRegistrationEmailAsUsername()) {
+    username=email;
+    formData.putSingle(AuthenticationManager.FORM_USERNAME,username);
+  }
   ClientSessionModel clientSession=clientCode.getClientSession();
   event.client(clientSession.getClient()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.RESPONSE_TYPE,"code").detail(Details.USERNAME,username).detail(Details.EMAIL,email).detail(Details.REGISTER_METHOD,"form");
   if (!realm.isEnabled()) {
@@ -42,7 +46,7 @@
   for (  RequiredCredentialModel m : realm.getRequiredCredentials()) {
     requiredCredentialTypes.add(m.getType());
   }
-  String error=Validation.validateRegistrationForm(formData,requiredCredentialTypes);
+  String error=Validation.validateRegistrationForm(realm,formData,requiredCredentialTypes);
   if (error == null) {
     error=Validation.validatePassword(formData,realm.getPasswordPolicy());
   }

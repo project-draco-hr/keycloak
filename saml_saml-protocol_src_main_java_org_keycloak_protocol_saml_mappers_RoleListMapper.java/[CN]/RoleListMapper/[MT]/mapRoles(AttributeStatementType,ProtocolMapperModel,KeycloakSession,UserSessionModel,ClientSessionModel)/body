@@ -1,0 +1,54 @@
+{
+  String single=mappingModel.getConfig().get(SINGLE_ROLE_ATTRIBUTE);
+  boolean singleAttribute=Boolean.parseBoolean(single);
+  List<SamlProtocol.ProtocolMapperProcessor<SAMLRoleNameMapper>> roleNameMappers=new LinkedList<>();
+  KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+  AttributeType singleAttributeType=null;
+  for (  ProtocolMapperModel mapping : clientSession.getClient().getProtocolMappers()) {
+    if (!mapping.getProtocol().equals(SamlProtocol.LOGIN_PROTOCOL))     continue;
+    ProtocolMapper mapper=(ProtocolMapper)sessionFactory.getProviderFactory(ProtocolMapper.class,mapping.getProtocolMapper());
+    if (mapper == null)     continue;
+    if (mapper instanceof SAMLRoleNameMapper) {
+      roleNameMappers.add(new SamlProtocol.ProtocolMapperProcessor<>((SAMLRoleNameMapper)mapper,mapping));
+    }
+    if (mapper instanceof HardcodedRole) {
+      AttributeType attributeType=null;
+      if (singleAttribute) {
+        if (singleAttributeType == null) {
+          singleAttributeType=AttributeStatementHelper.createAttributeType(mappingModel);
+          roleAttributeStatement.addAttribute(new AttributeStatementType.ASTChoiceType(singleAttributeType));
+        }
+        attributeType=singleAttributeType;
+      }
+ else {
+        attributeType=AttributeStatementHelper.createAttributeType(mappingModel);
+        roleAttributeStatement.addAttribute(new AttributeStatementType.ASTChoiceType(attributeType));
+      }
+      attributeType.addAttributeValue(mapping.getConfig().get("role"));
+    }
+  }
+  for (  String roleId : clientSession.getRoles()) {
+    RoleModel roleModel=clientSession.getRealm().getRoleById(roleId);
+    AttributeType attributeType=null;
+    if (singleAttribute) {
+      if (singleAttributeType == null) {
+        singleAttributeType=AttributeStatementHelper.createAttributeType(mappingModel);
+        roleAttributeStatement.addAttribute(new AttributeStatementType.ASTChoiceType(singleAttributeType));
+      }
+      attributeType=singleAttributeType;
+    }
+ else {
+      attributeType=AttributeStatementHelper.createAttributeType(mappingModel);
+      roleAttributeStatement.addAttribute(new AttributeStatementType.ASTChoiceType(attributeType));
+    }
+    String roleName=roleModel.getName();
+    for (    SamlProtocol.ProtocolMapperProcessor<SAMLRoleNameMapper> entry : roleNameMappers) {
+      String newName=entry.mapper.mapName(entry.model,roleModel);
+      if (newName != null) {
+        roleName=newName;
+        break;
+      }
+    }
+    attributeType.addAttributeValue(roleName);
+  }
+}

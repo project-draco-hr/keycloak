@@ -1,0 +1,38 @@
+{
+  UserModel user=session.users().getUserById(oldToken.getSubject(),realm);
+  if (user == null) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid refresh token","Unknown user");
+  }
+  if (!user.isEnabled()) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"User disabled","User disabled");
+  }
+  UserSessionModel userSession=session.sessions().getUserSession(realm,oldToken.getSessionState());
+  if (!AuthenticationManager.isSessionValid(realm,userSession)) {
+    AuthenticationManager.logout(session,realm,userSession,uriInfo,connection);
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Session not active","Session not active");
+  }
+  ClientSessionModel clientSession=null;
+  for (  ClientSessionModel clientSessionModel : userSession.getClientSessions()) {
+    if (clientSessionModel.getId().equals(oldToken.getClientSession())) {
+      clientSession=clientSessionModel;
+      break;
+    }
+  }
+  if (clientSession == null) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Client session not active","Client session not active");
+  }
+  ClientModel client=clientSession.getClient();
+  if (!client.getClientId().equals(oldToken.getIssuedFor())) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Unmatching clients","Unmatching clients");
+  }
+  if (oldToken.getIssuedAt() < client.getNotBefore()) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale token");
+  }
+  if (oldToken.getIssuedAt() < realm.getNotBefore()) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale token");
+  }
+  Set<RoleModel> requestedRoles=TokenManager.getAccess(null,clientSession.getClient(),user);
+  AccessToken newToken=createClientAccessToken(session,requestedRoles,realm,client,user,userSession,clientSession);
+  verifyAccess(oldToken,newToken);
+  return new TokenValidation(user,userSession,clientSession,newToken);
+}

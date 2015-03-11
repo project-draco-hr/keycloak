@@ -1,4 +1,9 @@
 {
+  if (!uriInfo.getAbsolutePath().equals(requestAbstractType.getDestination())) {
+    event.error(Errors.INVALID_SAML_AUTHN_REQUEST);
+    event.detail(Details.REASON,"invalid_destination");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid request.");
+  }
   String bindingType=getBindingType(requestAbstractType);
   if ("true".equals(client.getAttribute(SamlProtocol.SAML_FORCE_POST_BINDING)))   bindingType=SamlProtocol.SAML_POST_BINDING;
   String redirect=null;
@@ -36,7 +41,8 @@
       clientSession.setNote(GeneralConstants.NAMEID_FORMAT,nameIdFormat);
     }
  else {
-      event.error(Errors.INVALID_TOKEN);
+      event.error(Errors.INVALID_SAML_AUTHN_REQUEST);
+      event.detail(Details.REASON,"unsupported_nameid_format");
       return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unsupported NameIDFormat.");
     }
   }

@@ -1,11 +1,10 @@
 {
   String role=mappingModel.getConfig().get(ROLE_CONFIG);
-  String appName=null;
-  int scopeIndex=role.indexOf('.');
-  if (scopeIndex > -1) {
-    appName=role.substring(0,scopeIndex);
-    role=role.substring(scopeIndex + 1);
-    token.addAccess(appName).addRole(role);
+  String[] scopedRole=ProtocolMapperUtils.parseRole(role);
+  String appName=scopedRole[0];
+  String roleName=scopedRole[1];
+  if (appName != null) {
+    token.addAccess(appName).addRole(roleName);
   }
  else {
     AccessToken.Access access=token.getRealmAccess();

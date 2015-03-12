@@ -1,0 +1,14 @@
+{
+  PublicKey publicKey=KeyPairGenerator.getInstance("RSA").generateKeyPair().getPublic();
+  JWK jwk=JWKBuilder.create().rs256(publicKey);
+  assertNotNull(jwk.getKeyId());
+  assertEquals("RSA",jwk.getKeyType());
+  assertEquals("RS256",jwk.getAlgorithm());
+  assertEquals("sig",jwk.getPublicKeyUse());
+  assertTrue(jwk instanceof RSAPublicJWK);
+  assertNotNull(((RSAPublicJWK)jwk).getModulus());
+  assertNotNull(((RSAPublicJWK)jwk).getPublicExponent());
+  String jwkJson=JsonSerialization.writeValueAsString(jwk);
+  assertArrayEquals(publicKey.getEncoded(),JWKParser.create().parse(jwkJson).toPublicKey().getEncoded());
+  assertArrayEquals(publicKey.getEncoded(),RSAKey.parse(jwkJson).toRSAPublicKey().getEncoded());
+}

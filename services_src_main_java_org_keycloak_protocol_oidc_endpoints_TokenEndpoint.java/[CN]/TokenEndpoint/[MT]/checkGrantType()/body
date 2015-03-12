@@ -1,0 +1,25 @@
+{
+  if (grantType == null) {
+    if (legacyGrantType != null) {
+      grantType=legacyGrantType;
+    }
+ else {
+      throw new ErrorResponseException("invalid_request","Missing query parameter: " + OIDCLoginProtocol.GRANT_TYPE_PARAM,Response.Status.BAD_REQUEST);
+    }
+  }
+  if (grantType.equals(OAuth2Constants.AUTHORIZATION_CODE)) {
+    event.event(EventType.CODE_TO_TOKEN);
+    action=Action.AUTHORIZATION_CODE;
+  }
+ else   if (grantType.equals(OAuth2Constants.REFRESH_TOKEN)) {
+    event.event(EventType.REFRESH_TOKEN);
+    action=Action.REFRESH_TOKEN;
+  }
+ else   if (grantType.equals(OAuth2Constants.PASSWORD)) {
+    event.event(EventType.LOGIN);
+    action=Action.PASSWORD;
+  }
+ else {
+    throw new ErrorResponseException(Errors.INVALID_REQUEST,"Invalid " + OIDCLoginProtocol.GRANT_TYPE_PARAM,Response.Status.BAD_REQUEST);
+  }
+}

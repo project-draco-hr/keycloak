@@ -1,0 +1,19 @@
+{
+  if (responseType == null) {
+    if (legacyResponseType != null) {
+      responseType=legacyResponseType;
+    }
+ else {
+      event.error(Errors.INVALID_REQUEST);
+      throw new ErrorPageException(session,realm,uriInfo,"Missing query parameter: " + OIDCLoginProtocol.RESPONSE_TYPE_PARAM);
+    }
+  }
+  event.detail(Details.RESPONSE_TYPE,responseType);
+  if (responseType.equals(OAuth2Constants.CODE)) {
+    action=Action.CODE;
+  }
+ else {
+    event.error(Errors.INVALID_REQUEST);
+    throw new ErrorPageException(session,realm,uriInfo,"Invalid " + OIDCLoginProtocol.RESPONSE_TYPE_PARAM);
+  }
+}

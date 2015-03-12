@@ -1,0 +1,20 @@
+{
+  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.USER_INFO_REQUEST).detail(Details.AUTH_METHOD,Details.VALIDATE_ACCESS_TOKEN);
+  AccessToken token=null;
+  try {
+    token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),realm.getName());
+  }
+ catch (  Exception e) {
+    throw new ErrorResponseException(OAuthErrorException.INVALID_GRANT,"Token invalid",Status.FORBIDDEN);
+  }
+  UserSessionModel userSession=session.sessions().getUserSession(realm,token.getSessionState());
+  ClientModel clientModel=realm.findClient(token.getIssuedFor());
+  UserModel userModel=userSession.getUser();
+  AccessToken userInfo=new AccessToken();
+  tokenManager.transformAccessToken(session,userInfo,realm,clientModel,userModel,userSession,null);
+  event.detail(Details.USERNAME,userModel.getUsername()).client(clientModel).session(userSession).user(userModel).success();
+  Map<String,Object> claims=new HashMap<String,Object>();
+  claims.putAll(userInfo.getOtherClaims());
+  claims.put("sub",userModel.getId());
+  return Cors.add(request,Response.ok(claims)).auth().allowedOrigins(token).build();
+}

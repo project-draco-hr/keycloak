@@ -11,10 +11,14 @@
   String username=updatedIdentity.getUsername();
   if (this.realmModel.isRegistrationEmailAsUsername()) {
     username=updatedIdentity.getEmail();
-    if (username == null) {
+    if (username == null || username.trim().length() == 0) {
       fireErrorEvent(Errors.FEDERATED_IDENTITY_REGISTRATION_EMAIL_MISSING);
       throw new IdentityBrokerException("federatedIdentityRegistrationEmailMissing");
     }
+    username=username.trim();
+  }
+ else   if (username != null) {
+    username=username.trim();
   }
   existingUser=this.session.users().getUserByUsername(username,this.realmModel);
   if (existingUser != null) {

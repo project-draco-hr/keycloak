@@ -1,0 +1,13 @@
+{
+  InputStream is;
+  is=RedirectBindingUtil.base64DeflateDecode(samlMessage);
+  SAML2Response response=new SAML2Response();
+  try {
+    response.getSAML2ObjectFromStream(is);
+    return response.getSamlDocumentHolder();
+  }
+ catch (  Exception e) {
+    logger.samlBase64DecodingError(e);
+  }
+  return null;
+}

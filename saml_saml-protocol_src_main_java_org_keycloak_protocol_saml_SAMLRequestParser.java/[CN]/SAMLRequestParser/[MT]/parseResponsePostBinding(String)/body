@@ -1,0 +1,14 @@
+{
+  InputStream is;
+  byte[] samlBytes=PostBindingUtil.base64Decode(samlMessage);
+  is=new ByteArrayInputStream(samlBytes);
+  SAML2Response response=new SAML2Response();
+  try {
+    response.getSAML2ObjectFromStream(is);
+    return response.getSamlDocumentHolder();
+  }
+ catch (  Exception e) {
+    logger.samlBase64DecodingError(e);
+  }
+  return null;
+}

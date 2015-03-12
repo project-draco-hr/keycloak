@@ -1,8 +1,16 @@
 {
+  event.event(EventType.LOGOUT);
+  SAMLDocumentHolder holder=extractResponseDocument(samlResponse);
+  StatusResponseType statusResponse=(StatusResponseType)holder.getSamlObject();
+  if (!uriInfo.getAbsolutePath().toString().equals(statusResponse.getDestination())) {
+    event.error(Errors.INVALID_SAML_LOGOUT_RESPONSE);
+    event.detail(Details.REASON,"invalid_destination");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid request.");
+  }
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers,false);
   if (authResult == null) {
     logger.warn("Unknown saml response.");
-    event.event(EventType.LOGIN);
+    event.event(EventType.LOGOUT);
     event.error(Errors.INVALID_TOKEN);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
   }
@@ -10,10 +18,12 @@
   if (userSession.getState() != UserSessionModel.State.LOGGING_OUT) {
     logger.warn("Unknown saml response.");
     logger.warn("UserSession is not tagged as logging out.");
-    event.event(EventType.LOGIN);
-    event.error(Errors.INVALID_TOKEN);
+    event.event(EventType.LOGOUT);
+    event.error(Errors.INVALID_SAML_LOGOUT_RESPONSE);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid Request");
   }
   logger.debug("logout response");
-  return authManager.browserLogout(session,realm,userSession,uriInfo,clientConnection);
+  Response response=authManager.browserLogout(session,realm,userSession,uriInfo,clientConnection);
+  event.success();
+  return response;
 }

@@ -1,0 +1,17 @@
+{
+  getRealm().setRegistrationEmailAsUsername(true);
+  brokerServerRule.stopSession(this.session,true);
+  this.session=brokerServerRule.startSession();
+  try {
+    IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+    identityProviderModel.setUpdateProfileFirstLogin(false);
+    authenticateWithIdentityProvider(identityProviderModel,"test-user-noemail");
+    RealmModel realm=getRealm();
+    UserModel federatedUser=session.users().getUserByUsername("test-user-noemail",realm);
+    assertNull(federatedUser);
+    assertEquals("Email is not provided. Use another provider to create account please.",this.driver.findElement(By.className("kc-feedback-text")).getText());
+  }
+  finally {
+    getRealm().setRegistrationEmailAsUsername(false);
+  }
+}

@@ -1,0 +1,15 @@
+{
+  configureRelamRegistrationEmailAsUsername(true);
+  try {
+    loginPage.open();
+    loginPage.clickRegister();
+    registerPage.assertCurrent();
+    registerPage.registerWithEmailAsUsername("firstName","lastName","registerUserSuccessE@email","password","password");
+    Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+    String userId=events.expectRegister("registerUserSuccessE@email","registerUserSuccessE@email").assertEvent().getUserId();
+    events.expectLogin().detail("username","registerUserSuccessE@email").user(userId).assertEvent();
+  }
+  finally {
+    configureRelamRegistrationEmailAsUsername(false);
+  }
+}

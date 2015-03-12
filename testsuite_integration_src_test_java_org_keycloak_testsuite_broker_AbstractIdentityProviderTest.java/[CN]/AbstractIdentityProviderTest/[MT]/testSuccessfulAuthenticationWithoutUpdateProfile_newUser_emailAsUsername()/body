@@ -1,0 +1,26 @@
+{
+  getRealm().setRegistrationEmailAsUsername(true);
+  brokerServerRule.stopSession(this.session,true);
+  this.session=brokerServerRule.startSession();
+  try {
+    IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+    identityProviderModel.setUpdateProfileFirstLogin(false);
+    authenticateWithIdentityProvider(identityProviderModel,"test-user");
+    assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
+    RealmModel realm=getRealm();
+    UserModel federatedUser=session.users().getUserByUsername("test-user@localhost",realm);
+    assertNotNull(federatedUser);
+    assertEquals("test-user@localhost",federatedUser.getUsername());
+    doAssertFederatedUser(federatedUser,identityProviderModel);
+    Set<FederatedIdentityModel> federatedIdentities=this.session.users().getFederatedIdentities(federatedUser,realm);
+    assertEquals(1,federatedIdentities.size());
+    FederatedIdentityModel federatedIdentityModel=federatedIdentities.iterator().next();
+    assertEquals(getProviderId(),federatedIdentityModel.getIdentityProvider());
+    driver.navigate().to("http://localhost:8081/test-app/logout");
+    driver.navigate().to("http://localhost:8081/test-app");
+    assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/login"));
+  }
+  finally {
+    getRealm().setRegistrationEmailAsUsername(false);
+  }
+}

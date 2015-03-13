@@ -106,6 +106,15 @@
   Assert.assertEquals("auto@keycloak.org",smtpConfig.get("from"));
   Assert.assertEquals("localhost",smtpConfig.get("host"));
   Assert.assertEquals("3025",smtpConfig.get("port"));
+  List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
+  Assert.assertEquals(1,identityProviders.size());
+  IdentityProviderModel google=identityProviders.get(0);
+  Assert.assertEquals("google1",google.getId());
+  Assert.assertEquals("google",google.getProviderId());
+  Assert.assertEquals("Google",google.getName());
+  Assert.assertTrue(google.isEnabled());
+  Assert.assertEquals("googleId",google.getConfig().get("clientId"));
+  Assert.assertEquals("googleSecret",google.getConfig().get("clientSecret"));
   List<UserFederationProviderModel> fedProviders=realm.getUserFederationProviders();
   Assert.assertTrue(fedProviders.size() == 1);
   UserFederationProviderModel ldap=fedProviders.get(0);
@@ -115,4 +124,18 @@
   Assert.assertEquals("ldap://foo",ldap.getConfig().get("important.config"));
   UserFederationProviderFactory factory=(UserFederationProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(UserFederationProvider.class,"dummy");
   Assert.assertNull(factory.getInstance(session,null).getUserByUsername(realm,"wburke"));
+  Assert.assertNotNull(application.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,"username"));
+  Assert.assertNotNull(application.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,"email"));
+  Assert.assertNotNull(application.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,"given name"));
+  Assert.assertNull(application.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME));
+  Assert.assertEquals(1,otherApp.getProtocolMappers().size());
+  Assert.assertNull(otherApp.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,"username"));
+  ProtocolMapperModel gssCredentialMapper=otherApp.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME);
+  Assert.assertEquals(KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME,gssCredentialMapper.getName());
+  Assert.assertEquals(OIDCLoginProtocol.LOGIN_PROTOCOL,gssCredentialMapper.getProtocol());
+  Assert.assertEquals(UserSessionNoteMapper.PROVIDER_ID,gssCredentialMapper.getProtocolMapper());
+  String includeInAccessToken=gssCredentialMapper.getConfig().get(OIDCAttributeMapperHelper.INCLUDE_IN_ACCESS_TOKEN);
+  String includeInIdToken=gssCredentialMapper.getConfig().get(OIDCAttributeMapperHelper.INCLUDE_IN_ID_TOKEN);
+  Assert.assertTrue(includeInAccessToken.equalsIgnoreCase("true"));
+  Assert.assertTrue(includeInIdToken == null || Boolean.parseBoolean(includeInIdToken) == false);
 }

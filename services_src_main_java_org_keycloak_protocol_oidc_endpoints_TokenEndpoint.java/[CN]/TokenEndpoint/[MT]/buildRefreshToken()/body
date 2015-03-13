@@ -1,0 +1,16 @@
+{
+  String refreshToken=formParams.getFirst(OAuth2Constants.REFRESH_TOKEN);
+  if (refreshToken == null) {
+    throw new ErrorResponseException(OAuthErrorException.INVALID_REQUEST,"No refresh token",Response.Status.BAD_REQUEST);
+  }
+  AccessTokenResponse res;
+  try {
+    res=tokenManager.refreshAccessToken(session,uriInfo,clientConnection,realm,client,refreshToken,event,headers);
+  }
+ catch (  OAuthErrorException e) {
+    event.error(Errors.INVALID_TOKEN);
+    throw new ErrorResponseException(e.getError(),e.getDescription(),Response.Status.BAD_REQUEST);
+  }
+  event.success();
+  return Cors.add(request,Response.ok(res,MediaType.APPLICATION_JSON_TYPE)).auth().allowedOrigins(client).allowedMethods("POST").exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build();
+}

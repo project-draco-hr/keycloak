@@ -5,6 +5,6 @@
   String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
   AccessTokenResponse response=oauth.doAccessTokenRequest(code,"invalid");
   Assert.assertEquals(400,response.getStatusCode());
-  AssertEvents.ExpectedEvent expectedEvent=events.expectCodeToToken(codeId,loginEvent.getSessionId()).error("invalid_client_credentials").removeDetail(Details.TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_ID);
+  AssertEvents.ExpectedEvent expectedEvent=events.expectCodeToToken(codeId,loginEvent.getSessionId()).error("invalid_client_credentials").clearDetails().user((String)null).session((String)null);
   expectedEvent.assertEvent();
 }

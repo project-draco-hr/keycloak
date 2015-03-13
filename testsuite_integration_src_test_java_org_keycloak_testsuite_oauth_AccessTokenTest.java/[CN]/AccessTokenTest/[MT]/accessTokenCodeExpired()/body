@@ -18,7 +18,7 @@
   OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(400,response.getStatusCode());
   AssertEvents.ExpectedEvent expectedEvent=events.expectCodeToToken(codeId,null);
-  expectedEvent.error("invalid_code").removeDetail(Details.TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_ID).client((String)null).user((String)null);
+  expectedEvent.error("invalid_code").removeDetail(Details.TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_ID).user((String)null);
   expectedEvent.assertEvent();
   events.clear();
   keycloakRule.update(new KeycloakRule.KeycloakSetup(){

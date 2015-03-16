@@ -1,7 +1,8 @@
 {
   try {
     UriInfo uriInfo=request.getUriInfo();
-    String issuerURL=UriBuilder.fromUri(uriInfo.getBaseUri()).build().toString();
+    RealmModel realm=request.getRealm();
+    String issuerURL=getEntityId(uriInfo,realm);
     String destinationUrl=getConfig().getSingleSignOnServiceUrl();
     String nameIDPolicyFormat=getConfig().getNameIDPolicyFormat();
     if (nameIDPolicyFormat == null) {
@@ -13,13 +14,13 @@
     }
     SAML2AuthnRequestBuilder authnRequestBuilder=new SAML2AuthnRequestBuilder().assertionConsumerUrl(request.getRedirectUri()).destination(destinationUrl).issuer(issuerURL).forceAuthn(getConfig().isForceAuthn()).protocolBinding(protocolBinding).nameIdPolicy(SAML2NameIDPolicyBuilder.format(nameIDPolicyFormat)).relayState(request.getState());
     if (getConfig().isWantAuthnRequestsSigned()) {
-      PrivateKey privateKey=request.getRealm().getPrivateKey();
-      PublicKey publicKey=request.getRealm().getPublicKey();
+      PrivateKey privateKey=realm.getPrivateKey();
+      PublicKey publicKey=realm.getPublicKey();
       if (privateKey == null) {
-        throw new IdentityBrokerException("Identity Provider [" + getConfig().getName() + "] wants a signed authentication request. But the Realm ["+ request.getRealm().getName()+ "] does not have a private key.");
+        throw new IdentityBrokerException("Identity Provider [" + getConfig().getName() + "] wants a signed authentication request. But the Realm ["+ realm.getName()+ "] does not have a private key.");
       }
       if (publicKey == null) {
-        throw new IdentityBrokerException("Identity Provider [" + getConfig().getName() + "] wants a signed authentication request. But the Realm ["+ request.getRealm().getName()+ "] does not have a public key.");
+        throw new IdentityBrokerException("Identity Provider [" + getConfig().getName() + "] wants a signed authentication request. But the Realm ["+ realm.getName()+ "] does not have a public key.");
       }
       KeyPair keypair=new KeyPair(publicKey,privateKey);
       authnRequestBuilder.signWith(keypair);

@@ -16,14 +16,10 @@
     logger.warn("Failed to load properties",e);
   }
   Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,headers);
-  if (locale != null) {
-    attributes.put("locale",locale);
-    attributes.put("formatter",new TextFormatterBean(locale));
-  }
   Properties messages;
   try {
     messages=theme.getMessages(locale);
-    attributes.put("rb",messages);
+    attributes.put("msg",new MessageFormatterMethod(locale,messages));
   }
  catch (  IOException e) {
     logger.warn("Failed to load messages",e);
@@ -41,7 +37,7 @@
   if (message != null) {
     String formattedMessage;
     if (messages.containsKey(message)) {
-      formattedMessage=new MessageFormat(messages.getProperty(message).replace("'","''"),locale).format(parameters);
+      formattedMessage=new MessageFormat(messages.getProperty(message),locale).format(parameters);
     }
  else {
       formattedMessage=message;
@@ -55,11 +51,20 @@
     attributes.put("realm",new RealmBean(realm));
   }
   attributes.put("url",new UrlBean(realm,theme,baseUri,baseQueryUri,uriInfo.getRequestUri(),stateChecker));
-  attributes.put("features",new FeaturesBean(identityProviderEnabled,eventsEnabled,passwordUpdateSupported));
+  if (realm.isInternationalizationEnabled()) {
+    UriBuilder b;
+switch (page) {
+default :
+      b=UriBuilder.fromUri(baseQueryUri).path(uriInfo.getPath());
+    break;
+}
+attributes.put("locale",new LocaleBean(realm,locale,b,messages));
+}
+attributes.put("features",new FeaturesBean(identityProviderEnabled,eventsEnabled,passwordUpdateSupported));
 switch (page) {
 case ACCOUNT:
-    attributes.put("account",new AccountBean(user,profileFormData));
-  break;
+attributes.put("account",new AccountBean(user,profileFormData));
+break;
 case TOTP:
 attributes.put("totp",new TotpBean(realm,user,baseUri));
 break;

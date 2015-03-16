@@ -1,8 +1,0 @@
-{
-  String authorizationHeader=headers.getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-  ClientModel client=AuthorizeClientUtil.authorizeClient(authorizationHeader,formData,event,realm);
-  if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
-    throw new ErrorResponseException("invalid_client","Bearer-only not allowed",Response.Status.BAD_REQUEST);
-  }
-  return client;
-}

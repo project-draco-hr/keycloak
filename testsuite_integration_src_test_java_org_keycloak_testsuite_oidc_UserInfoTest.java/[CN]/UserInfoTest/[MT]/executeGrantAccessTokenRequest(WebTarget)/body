@@ -1,7 +1,7 @@
 {
   String header=BasicAuthHelper.createHeader("test-app","password");
   Form form=new Form();
-  form.param("username","test-user@localhost").param("password","password");
+  form.param(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD).param("username","test-user@localhost").param("password","password");
   Response response=grantTarget.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
   assertEquals(200,response.getStatus());
   AccessTokenResponse accessTokenResponse=response.readEntity(AccessTokenResponse.class);

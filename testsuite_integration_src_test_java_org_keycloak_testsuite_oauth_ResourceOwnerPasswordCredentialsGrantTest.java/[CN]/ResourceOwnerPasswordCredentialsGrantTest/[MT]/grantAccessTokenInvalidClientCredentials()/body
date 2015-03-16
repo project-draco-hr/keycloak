@@ -3,5 +3,5 @@
   OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("invalid","test-user@localhost","password");
   assertEquals(400,response.getStatusCode());
   assertEquals("unauthorized_client",response.getError());
-  events.expectLogin().client("resource-owner").session((String)null).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token").removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).error(Errors.INVALID_CLIENT_CREDENTIALS).assertEvent();
+  events.expectLogin().client("resource-owner").session((String)null).clearDetails().error(Errors.INVALID_CLIENT_CREDENTIALS).user((String)null).assertEvent();
 }

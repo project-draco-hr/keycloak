@@ -1,0 +1,65 @@
+{
+  String code=formParams.getFirst(OAuth2Constants.CODE);
+  if (code == null) {
+    event.error(Errors.INVALID_CODE);
+    throw new ErrorResponseException("invalid_request","Missing parameter: " + OAuth2Constants.CODE,Response.Status.BAD_REQUEST);
+  }
+  ClientSessionCode accessCode=ClientSessionCode.parse(code,session,realm);
+  if (accessCode == null) {
+    String[] parts=code.split("\\.");
+    if (parts.length == 2) {
+      try {
+        event.detail(Details.CODE_ID,new String(parts[1]));
+      }
+ catch (      Throwable t) {
+      }
+    }
+    event.error(Errors.INVALID_CODE);
+    throw new ErrorResponseException("invalid_grant","Code not found",Response.Status.BAD_REQUEST);
+  }
+  ClientSessionModel clientSession=accessCode.getClientSession();
+  event.detail(Details.CODE_ID,clientSession.getId());
+  if (!accessCode.isValid(ClientSessionModel.Action.CODE_TO_TOKEN)) {
+    event.error(Errors.INVALID_CODE);
+    throw new ErrorResponseException("invalid_grant","Code is expired",Response.Status.BAD_REQUEST);
+  }
+  accessCode.setAction(null);
+  UserSessionModel userSession=clientSession.getUserSession();
+  event.user(userSession.getUser());
+  event.session(userSession.getId());
+  String redirectUri=clientSession.getNote(OIDCLoginProtocol.REDIRECT_URI_PARAM);
+  if (redirectUri != null && !redirectUri.equals(formParams.getFirst(OAuth2Constants.REDIRECT_URI))) {
+    event.error(Errors.INVALID_CODE);
+    throw new ErrorResponseException("invalid_grant","Incorrect redirect_uri",Response.Status.BAD_REQUEST);
+  }
+  if (!client.getClientId().equals(clientSession.getClient().getClientId())) {
+    event.error(Errors.INVALID_CODE);
+    throw new ErrorResponseException("invalid_grant","Auth error",Response.Status.BAD_REQUEST);
+  }
+  UserModel user=session.users().getUserById(userSession.getUser().getId(),realm);
+  if (user == null) {
+    event.error(Errors.USER_NOT_FOUND);
+    throw new ErrorResponseException("invalid_grant","User not found",Response.Status.BAD_REQUEST);
+  }
+  if (!user.isEnabled()) {
+    event.error(Errors.USER_DISABLED);
+    throw new ErrorResponseException("invalid_grant","User disabled",Response.Status.BAD_REQUEST);
+  }
+  if (!AuthenticationManager.isSessionValid(realm,userSession)) {
+    event.error(Errors.USER_SESSION_NOT_FOUND);
+    throw new ErrorResponseException("invalid_grant","Session not active",Response.Status.BAD_REQUEST);
+  }
+  String adapterSessionId=formParams.getFirst(AdapterConstants.APPLICATION_SESSION_STATE);
+  if (adapterSessionId != null) {
+    String adapterSessionHost=formParams.getFirst(AdapterConstants.APPLICATION_SESSION_HOST);
+    logger.debugf("Adapter Session '%s' saved in ClientSession for client '%s'. Host is '%s'",adapterSessionId,client.getClientId(),adapterSessionHost);
+    event.detail(AdapterConstants.APPLICATION_SESSION_STATE,adapterSessionId);
+    clientSession.setNote(AdapterConstants.APPLICATION_SESSION_STATE,adapterSessionId);
+    event.detail(AdapterConstants.APPLICATION_SESSION_HOST,adapterSessionHost);
+    clientSession.setNote(AdapterConstants.APPLICATION_SESSION_HOST,adapterSessionHost);
+  }
+  AccessToken token=tokenManager.createClientAccessToken(session,accessCode.getRequestedRoles(),realm,client,user,userSession,clientSession);
+  AccessTokenResponse res=tokenManager.responseBuilder(realm,client,event,session,userSession,clientSession).accessToken(token).generateIDToken().generateRefreshToken().build();
+  event.success();
+  return Cors.add(request,Response.ok(res).type(MediaType.APPLICATION_JSON_TYPE)).auth().allowedOrigins(client).allowedMethods("POST").exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build();
+}

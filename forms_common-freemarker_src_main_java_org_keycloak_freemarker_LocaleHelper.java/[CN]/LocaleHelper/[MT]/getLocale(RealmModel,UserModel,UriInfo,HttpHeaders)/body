@@ -1,0 +1,54 @@
+{
+  if (!realm.isInternationalizationEnabled()) {
+    return Locale.ENGLISH;
+  }
+  if (httpHeaders != null && httpHeaders.getCookies().containsKey(LOCALE_COOKIE)) {
+    String localeString=httpHeaders.getCookies().get(LOCALE_COOKIE).getValue();
+    Locale locale=findLocale(localeString,realm.getSupportedLocales());
+    if (locale != null) {
+      if (user != null) {
+        user.setAttribute(UserModel.LOCALE,locale.toLanguageTag());
+      }
+      return locale;
+    }
+ else {
+      LOGGER.infof("Locale %s is not supported.",localeString);
+    }
+  }
+  if (user != null && user.getAttributes().containsKey(UserModel.LOCALE)) {
+    String localeString=user.getAttribute(UserModel.LOCALE);
+    Locale locale=findLocale(localeString,realm.getSupportedLocales());
+    if (locale != null) {
+      return locale;
+    }
+ else {
+      LOGGER.infof("Locale %s is not supported.",localeString);
+    }
+  }
+  if (uriInfo != null && uriInfo.getQueryParameters().containsKey(LOCALE_PARAM)) {
+    String localeString=uriInfo.getQueryParameters().getFirst(LOCALE_PARAM);
+    Locale locale=findLocale(localeString,realm.getSupportedLocales());
+    if (locale != null) {
+      return locale;
+    }
+ else {
+      LOGGER.infof("Locale %s is not supported.",localeString);
+    }
+  }
+  if (httpHeaders != null && httpHeaders.getAcceptableLanguages() != null && !httpHeaders.getAcceptableLanguages().isEmpty()) {
+    for (    Locale l : httpHeaders.getAcceptableLanguages()) {
+      String localeString=l.toLanguageTag();
+      Locale locale=findLocale(localeString,realm.getSupportedLocales());
+      if (locale != null) {
+        return locale;
+      }
+ else {
+        LOGGER.infof("Locale %s is not supported.",localeString);
+      }
+    }
+  }
+  if (realm.getDefaultLocale() != null) {
+    return Locale.forLanguageTag(realm.getDefaultLocale());
+  }
+  return Locale.ENGLISH;
+}

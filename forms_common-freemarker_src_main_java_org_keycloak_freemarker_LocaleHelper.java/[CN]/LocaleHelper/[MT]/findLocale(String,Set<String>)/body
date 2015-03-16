@@ -1,0 +1,16 @@
+{
+  Locale result=null;
+  Locale search=Locale.forLanguageTag(localeString);
+  for (  String languageTag : supportedLocales) {
+    Locale locale=Locale.forLanguageTag(languageTag);
+    if (locale.getLanguage().equals(search.getLanguage())) {
+      if (locale.getCountry().equals("") && result == null) {
+        result=locale;
+      }
+      if (locale.getCountry().equals(search.getCountry())) {
+        return locale;
+      }
+    }
+  }
+  return result;
+}

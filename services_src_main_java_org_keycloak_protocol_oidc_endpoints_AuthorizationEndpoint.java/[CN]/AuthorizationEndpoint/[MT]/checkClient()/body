@@ -1,20 +1,20 @@
 {
   if (clientId == null) {
     event.error(Errors.INVALID_REQUEST);
-    throw new ErrorPageException(session,realm,uriInfo,"Missing paramater: " + OIDCLoginProtocol.CLIENT_ID_PARAM);
+    throw new ErrorPageException(session,realm,uriInfo,headers,Messages.MISSING_PARAMETER,OIDCLoginProtocol.CLIENT_ID_PARAM);
   }
   event.client(clientId);
   client=realm.findClient(clientId);
   if (client == null) {
     event.error(Errors.CLIENT_NOT_FOUND);
-    throw new ErrorPageException(session,realm,uriInfo,"Client not found");
+    throw new ErrorPageException(session,realm,uriInfo,headers,Messages.CLIENT_NOT_FOUND);
   }
   if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
     event.error(Errors.NOT_ALLOWED);
-    throw new ErrorPageException(session,realm,uriInfo,"Bearer only clients are not allowed to initiate browser login");
+    throw new ErrorPageException(session,realm,uriInfo,headers,Messages.BEARER_ONLY);
   }
   if (client.isDirectGrantsOnly()) {
     event.error(Errors.NOT_ALLOWED);
-    throw new ErrorPageException(session,realm,uriInfo,"Direct grants only clients are not allowed to initiate browser login");
+    throw new ErrorPageException(session,realm,uriInfo,headers,Messages.DIRECT_GRANTS_ONLY);
   }
 }

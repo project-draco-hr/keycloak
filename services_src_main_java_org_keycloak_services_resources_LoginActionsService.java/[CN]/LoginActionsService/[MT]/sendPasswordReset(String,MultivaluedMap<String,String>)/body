@@ -1,25 +1,25 @@
 {
   event.event(EventType.SEND_RESET_PASSWORD);
   if (!checkSsl()) {
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.HTTPS_REQUIRED);
   }
   if (!realm.isEnabled()) {
     event.error(Errors.REALM_DISABLED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Realm not enabled.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.REALM_NOT_ENABLED);
   }
   ClientSessionCode accessCode=ClientSessionCode.parse(code,session,realm);
   if (accessCode == null) {
     event.error(Errors.INVALID_CODE);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown code, please login again through your application.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.UNKNOWN_CODE);
   }
   ClientSessionModel clientSession=accessCode.getClientSession();
   String username=formData.getFirst("username");
   ClientModel client=clientSession.getClient();
   if (client == null) {
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Unknown login requester.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.UNKNOWN_LOGIN_REQUESTER);
   }
   if (!client.isEnabled()) {
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Login requester not enabled.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.LOGIN_REQUESTER_NOT_ENABLED);
   }
   event.client(client.getClientId()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
   UserModel user=session.users().getUserByUsername(username,realm);
@@ -52,9 +52,9 @@
  catch (    EmailException e) {
       event.error(Errors.EMAIL_SEND_FAILED);
       logger.error("Failed to send password reset email",e);
-      return Flows.forms(this.session,realm,client,uriInfo).setError("emailSendError").setClientSessionCode(accessCode.getCode()).createErrorPage();
+      return Flows.forms(this.session,realm,client,uriInfo,headers).setError(Messages.EMAIL_SENT_ERROR).setClientSessionCode(accessCode.getCode()).createErrorPage();
     }
     createActionCookie(realm,uriInfo,clientConnection,userSession.getId());
   }
-  return Flows.forms(session,realm,client,uriInfo).setSuccess("emailSent").setClientSessionCode(accessCode.getCode()).createPasswordReset();
+  return Flows.forms(session,realm,client,uriInfo,headers).setSuccess(Messages.EMAIL_SENT).setClientSessionCode(accessCode.getCode()).createPasswordReset();
 }

@@ -1,8 +1,10 @@
 {
   PasswordPolicy policy=new PasswordPolicy("length");
-  Assert.assertEquals("Invalid password: minimum length 8",policy.validate("jdoe","1234567"));
+  Assert.assertEquals("invalidPasswordMinLengthMessage",policy.validate("jdoe","1234567").getMessage());
+  Assert.assertArrayEquals(new Object[]{8},policy.validate("jdoe","1234567").getParameters());
   Assert.assertNull(policy.validate("jdoe","12345678"));
   policy=new PasswordPolicy("length(4)");
-  Assert.assertEquals("Invalid password: minimum length 4",policy.validate("jdoe","123"));
+  Assert.assertEquals("invalidPasswordMinLengthMessage",policy.validate("jdoe","123").getMessage());
+  Assert.assertArrayEquals(new Object[]{4},policy.validate("jdoe","123").getParameters());
   Assert.assertNull(policy.validate("jdoe","1234"));
 }

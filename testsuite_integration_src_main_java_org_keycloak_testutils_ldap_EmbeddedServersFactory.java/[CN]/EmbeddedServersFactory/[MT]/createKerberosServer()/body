@@ -2,5 +2,16 @@
   if (ldifFile.equals(DEFAULT_LDIF_FILE)) {
     ldifFile=DEFAULT_KERBEROS_LDIF_FILE;
   }
+  if (ldapSaslPrincipal == null || ldapSaslPrincipal.isEmpty()) {
+    try {
+      GSSName gssName=GSSManager.getInstance().createName("ldap@" + bindHost,GSSName.NT_HOSTBASED_SERVICE);
+      GSSNameImpl gssName1=(GSSNameImpl)gssName;
+      Krb5NameElement krb5NameElement=(Krb5NameElement)gssName1.getElement(KerberosSerializationUtils.KRB5_OID);
+      this.ldapSaslPrincipal=krb5NameElement.getKrb5PrincipalName().toString();
+    }
+ catch (    GSSException uhe) {
+      throw new RuntimeException(uhe);
+    }
+  }
   return new KerberosEmbeddedServer(baseDN,bindHost,bindPort,ldifFile,ldapSaslPrincipal,kerberosRealm,kdcPort,kdcEncryptionTypes);
 }

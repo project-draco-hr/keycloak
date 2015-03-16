@@ -3,6 +3,7 @@
   SAML2LogoutResponseBuilder builder=new SAML2LogoutResponseBuilder();
   builder.logoutRequestID(userSession.getNote(SAML_LOGOUT_REQUEST_ID));
   builder.destination(userSession.getNote(SAML_LOGOUT_ISSUER));
+  builder.issuer(getResponseIssuer(realm));
   String signingAlgorithm=userSession.getNote(SAML_LOGOUT_SIGNATURE_ALGORITHM);
   if (signingAlgorithm != null) {
     SignatureAlgorithm algorithm=SignatureAlgorithm.valueOf(signingAlgorithm);

@@ -26,10 +26,12 @@
   }
   if (ldapSaslPrincipal == null || ldapSaslPrincipal.isEmpty()) {
     try {
-      String canonicalHost=(InetAddress.getByName(bindHost)).getCanonicalHostName();
-      this.ldapSaslPrincipal="ldap/" + canonicalHost + "@"+ kerberosRealm;
+      GSSName gssName=GSSManager.getInstance().createName("ldap@localhost",GSSName.NT_HOSTBASED_SERVICE);
+      GSSNameImpl gssName1=(GSSNameImpl)gssName;
+      Krb5NameElement krb5NameElement=(Krb5NameElement)gssName1.getElement(KerberosSerializationUtils.KRB5_OID);
+      this.ldapSaslPrincipal=krb5NameElement.getKrb5PrincipalName().toString();
     }
- catch (    UnknownHostException uhe) {
+ catch (    GSSException uhe) {
       throw new RuntimeException(uhe);
     }
   }

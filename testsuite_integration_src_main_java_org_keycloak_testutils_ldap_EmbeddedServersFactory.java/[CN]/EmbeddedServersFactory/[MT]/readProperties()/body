@@ -3,6 +3,7 @@
   this.bindHost=System.getProperty("ldap.host");
   String bindPort=System.getProperty("ldap.port");
   this.ldifFile=System.getProperty("ldap.ldif");
+  this.ldapSaslPrincipal=System.getProperty("ldap.saslPrincipal");
   this.kerberosRealm=System.getProperty("kerberos.realm");
   String kdcPort=System.getProperty("kerberos.port");
   this.kdcEncryptionTypes=System.getProperty("kerberos.encTypes");
@@ -22,5 +23,14 @@
   this.kdcPort=(kdcPort == null || kdcPort.isEmpty()) ? DEFAULT_KDC_PORT : Integer.parseInt(kdcPort);
   if (kdcEncryptionTypes == null || kdcEncryptionTypes.isEmpty()) {
     kdcEncryptionTypes=DEFAULT_KDC_ENCRYPTION_TYPES;
+  }
+  if (ldapSaslPrincipal == null || ldapSaslPrincipal.isEmpty()) {
+    try {
+      String canonicalHost=(InetAddress.getByName(bindHost)).getCanonicalHostName();
+      this.ldapSaslPrincipal="ldap/" + canonicalHost + "@"+ kerberosRealm;
+    }
+ catch (    UnknownHostException uhe) {
+      throw new RuntimeException(uhe);
+    }
   }
 }

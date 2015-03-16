@@ -1,8 +1,10 @@
 {
   PasswordPolicy policy=new PasswordPolicy("digits");
-  Assert.assertEquals("Invalid password: must contain at least 1 numerical digits",policy.validate("abcd"));
-  Assert.assertNull(policy.validate("abcd1"));
+  Assert.assertEquals("invalidPasswordMinDigitsMessage",policy.validate("jdoe","abcd").getMessage());
+  Assert.assertArrayEquals(new Object[]{1},policy.validate("jdoe","abcd").getParameters());
+  Assert.assertNull(policy.validate("jdoe","abcd1"));
   policy=new PasswordPolicy("digits(2)");
-  Assert.assertEquals("Invalid password: must contain at least 2 numerical digits",policy.validate("abcd1"));
-  Assert.assertNull(policy.validate("abcd12"));
+  Assert.assertEquals("invalidPasswordMinDigitsMessage",policy.validate("jdoe","abcd1").getMessage());
+  Assert.assertArrayEquals(new Object[]{2},policy.validate("jdoe","abcd1").getParameters());
+  Assert.assertNull(policy.validate("jdoe","abcd12"));
 }

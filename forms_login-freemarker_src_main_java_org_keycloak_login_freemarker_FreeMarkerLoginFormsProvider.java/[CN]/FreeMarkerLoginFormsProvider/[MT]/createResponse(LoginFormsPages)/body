@@ -27,8 +27,13 @@
     logger.warn("Failed to load properties",e);
   }
   Properties messages;
+  Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,httpHeaders);
+  if (locale != null) {
+    attributes.put("locale",locale);
+    attributes.put("formatter",new TextFormatterBean(locale));
+  }
   try {
-    messages=theme.getMessages();
+    messages=theme.getMessages(locale);
     attributes.put("rb",messages);
   }
  catch (  IOException e) {
@@ -36,7 +41,14 @@
     messages=new Properties();
   }
   if (message != null) {
-    attributes.put("message",new MessageBean(messages.containsKey(message) ? messages.getProperty(message) : message,messageType));
+    String formattedMessage;
+    if (messages.containsKey(message)) {
+      formattedMessage=new MessageFormat(messages.getProperty(message).replace("'","''"),locale).format(parameters);
+    }
+ else {
+      formattedMessage=message;
+    }
+    attributes.put("message",new MessageBean(formattedMessage,messageType));
   }
   if (page == LoginFormsPages.OAUTH_GRANT) {
     uriBuilder.replaceQuery(null);
@@ -78,6 +90,7 @@ BrowserSecurityHeaderSetup.headers(builder,realm);
 for (Map.Entry<String,String> entry : httpResponseHeaders.entrySet()) {
 builder.header(entry.getKey(),entry.getValue());
 }
+LocaleHelper.updateLocaleCookie(builder,locale,realm,uriInfo,Urls.localeCookiePath(baseUri,realm.getName()));
 return builder.build();
 }
  catch (FreeMarkerException e) {

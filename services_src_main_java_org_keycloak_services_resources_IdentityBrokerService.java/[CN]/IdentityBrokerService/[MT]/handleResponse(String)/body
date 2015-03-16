@@ -9,7 +9,7 @@
     IdentityProvider identityProvider=getIdentityProvider(providerId);
     String relayState=identityProvider.getRelayState(createAuthenticationRequest(providerId,null));
     if (relayState == null) {
-      return redirectToErrorPage("No relay state in response from identity identity [" + providerId + ".");
+      return redirectToErrorPage(Messages.NO_RELAY_STATE_IN_RESPONSE,providerId);
     }
     if (isDebugEnabled()) {
       LOGGER.debugf("Relay state is valid: [%s].",relayState);
@@ -38,11 +38,11 @@
   }
  catch (  IdentityBrokerException e) {
     rollback();
-    return redirectToErrorPage("Authentication failed. Could not authenticate with identity provider [" + providerId + "].",e);
+    return redirectToErrorPage(Messages.IDENTITY_PROVIDER_AUTHENTICATION_FAILED,e,providerId);
   }
 catch (  Exception e) {
     rollback();
-    return redirectToErrorPage("Unexpected error when handling response from identity provider [" + providerId + "].",e);
+    return redirectToErrorPage(Messages.UNEXPECTED_ERROR_HANDLING_RESPONSE,e,providerId);
   }
  finally {
     if (this.session.getTransaction().isActive()) {

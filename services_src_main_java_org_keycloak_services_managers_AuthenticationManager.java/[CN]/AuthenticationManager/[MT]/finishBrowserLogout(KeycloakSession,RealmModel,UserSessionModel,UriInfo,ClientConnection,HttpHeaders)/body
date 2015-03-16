@@ -1,0 +1,11 @@
+{
+  expireIdentityCookie(realm,uriInfo,connection);
+  expireRememberMeCookie(realm,uriInfo,connection);
+  userSession.setState(UserSessionModel.State.LOGGED_OUT);
+  String method=userSession.getNote(KEYCLOAK_LOGOUT_PROTOCOL);
+  LoginProtocol protocol=session.getProvider(LoginProtocol.class,method);
+  protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo);
+  Response response=protocol.finishLogout(userSession);
+  session.sessions().removeUserSession(realm,userSession);
+  return response;
+}

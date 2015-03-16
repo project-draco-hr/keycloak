@@ -1,7 +1,7 @@
 {
   Client client=ClientBuilder.newClient();
   UriBuilder builder=UriBuilder.fromUri(org.keycloak.testsuite.Constants.AUTH_SERVER_ROOT);
-  URI grantUri=OIDCLoginProtocolService.grantAccessTokenUrl(builder).build("test");
+  URI grantUri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
   WebTarget grantTarget=client.target(grantUri);
 {
 {
@@ -25,6 +25,7 @@
 {
     String header=BasicAuthHelper.createHeader("test-app","password");
     Form form=new Form();
+    form.param(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD);
     form.param("password","password");
     Response response=grantTarget.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
     Assert.assertEquals(401,response.getStatus());
@@ -33,6 +34,7 @@
 {
     String header=BasicAuthHelper.createHeader("test-app","password");
     Form form=new Form();
+    form.param(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD);
     form.param("username","test-user@localhost");
     Response response=grantTarget.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
     Assert.assertEquals(401,response.getStatus());
@@ -41,6 +43,7 @@
 {
     String header=BasicAuthHelper.createHeader("test-app","password");
     Form form=new Form();
+    form.param(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD);
     form.param("username","test-user@localhost");
     form.param("password","invalid");
     Response response=grantTarget.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));

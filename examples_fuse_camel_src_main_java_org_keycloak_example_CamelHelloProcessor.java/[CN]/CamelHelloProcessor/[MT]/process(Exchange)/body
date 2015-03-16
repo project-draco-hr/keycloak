@@ -1,0 +1,7 @@
+{
+  HttpServletRequest req=exchange.getIn().getBody(HttpServletRequest.class);
+  KeycloakPrincipal keycloakPrincipal=(KeycloakPrincipal)req.getUserPrincipal();
+  AccessToken accessToken=keycloakPrincipal.getKeycloakSecurityContext().getToken();
+  String username=accessToken.getPreferredUsername();
+  exchange.getOut().setBody("<html><body>Hello " + username + "! It's "+ sdf.format(new Date())+ "</body></html>");
+}

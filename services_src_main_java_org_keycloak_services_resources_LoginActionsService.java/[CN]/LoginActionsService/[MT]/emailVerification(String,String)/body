@@ -15,7 +15,7 @@
     event.event(EventType.VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
     String actionCookieValue=getActionCookie();
     if (actionCookieValue == null || !actionCookieValue.equals(userSession.getId())) {
-      return Flows.forms(session,realm,clientSession.getClient(),uriInfo).setSuccess("emailVerified").createInfoPage();
+      return Flows.forms(session,realm,clientSession.getClient(),uriInfo,headers).setSuccess(Messages.EMAIL_VERIFIED).createInfoPage();
     }
     event=event.clone().removeDetail(Details.EMAIL).event(EventType.LOGIN);
     return redirectOauth(user,accessCode,clientSession,userSession);
@@ -30,6 +30,6 @@
     UserSessionModel userSession=clientSession.getUserSession();
     initEvent(clientSession);
     createActionCookie(realm,uriInfo,clientConnection,userSession.getId());
-    return Flows.forms(session,realm,null,uriInfo).setClientSessionCode(accessCode.getCode()).setUser(userSession.getUser()).createResponse(RequiredAction.VERIFY_EMAIL);
+    return Flows.forms(session,realm,null,uriInfo,headers).setClientSessionCode(accessCode.getCode()).setUser(userSession.getUser()).createResponse(RequiredAction.VERIFY_EMAIL);
   }
 }

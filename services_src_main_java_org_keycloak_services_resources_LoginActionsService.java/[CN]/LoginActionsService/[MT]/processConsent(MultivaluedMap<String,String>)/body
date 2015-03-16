@@ -1,13 +1,13 @@
 {
   event.event(EventType.LOGIN).detail(Details.RESPONSE_TYPE,"code");
   if (!checkSsl()) {
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"HTTPS required");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.HTTPS_REQUIRED);
   }
   String code=formData.getFirst("code");
   ClientSessionCode accessCode=ClientSessionCode.parse(code,session,realm);
   if (accessCode == null || !accessCode.isValid(ClientSessionModel.Action.OAUTH_GRANT)) {
     event.error(Errors.INVALID_CODE);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Invalid access code.");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_ACCESS_CODE);
   }
   ClientSessionModel clientSession=accessCode.getClientSession();
   event.detail(Details.CODE_ID,clientSession.getId());
@@ -22,13 +22,13 @@
     }
   }
   if (!AuthenticationManager.isSessionValid(realm,userSession)) {
-    AuthenticationManager.logout(session,realm,userSession,uriInfo,clientConnection);
+    AuthenticationManager.logout(session,realm,userSession,uriInfo,clientConnection,headers);
     event.error(Errors.INVALID_CODE);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,"Session not active");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.SESSION_NOT_ACTIVE);
   }
   event.session(userSession);
   LoginProtocol protocol=session.getProvider(LoginProtocol.class,clientSession.getAuthMethod());
-  protocol.setRealm(realm).setUriInfo(uriInfo);
+  protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo);
   if (formData.containsKey("cancel")) {
     event.error(Errors.REJECTED_BY_USER);
     return protocol.consentDenied(clientSession);

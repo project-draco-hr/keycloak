@@ -1,0 +1,32 @@
+{
+  this.auth.requireManage();
+  String id=data.get("id").toString();
+  String name=data.get("name").toString();
+  String providerId=data.get("providerId").toString();
+  String enabled=data.get("enabled").toString();
+  String updateProfileFirstLogin=data.get("updateProfileFirstLogin").toString();
+  String storeToken="false";
+  if (data.containsKey("storeToken")) {
+    storeToken=data.get("storeToken").toString();
+  }
+  String from=data.get("fromUrl").toString();
+  ApacheHttpClient4Executor executor=ResourceAdminManager.createExecutor();
+  InputStream inputStream=null;
+  try {
+    inputStream=executor.createRequest(from).getTarget(InputStream.class);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  IdentityProviderFactory providerFactory=getProviderFactorytById(providerId);
+  Map config=providerFactory.parseConfig(inputStream);
+  IdentityProviderRepresentation representation=new IdentityProviderRepresentation();
+  representation.setId(id);
+  representation.setName(name);
+  representation.setProviderId(providerId);
+  representation.setEnabled(Boolean.valueOf(enabled));
+  representation.setUpdateProfileFirstLogin(Boolean.valueOf(updateProfileFirstLogin));
+  representation.setStoreToken(Boolean.valueOf(storeToken));
+  representation.setConfig(config);
+  return create(uriInfo,representation);
+}

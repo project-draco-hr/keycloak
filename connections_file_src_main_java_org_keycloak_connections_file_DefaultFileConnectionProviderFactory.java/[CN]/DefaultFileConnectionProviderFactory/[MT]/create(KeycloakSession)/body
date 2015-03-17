@@ -1,0 +1,13 @@
+{
+synchronized (allProviders) {
+    FileConnectionProvider fcProvider=allProviders.get(session);
+    if (fcProvider == null) {
+      InMemoryModel model=new InMemoryModel();
+      fcProvider=new DefaultFileConnectionProvider(this,session,model);
+      allProviders.put(session,fcProvider);
+      session.getTransaction().enlist(fcProvider);
+      readModelFile(session);
+    }
+    return fcProvider;
+  }
+}

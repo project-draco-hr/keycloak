@@ -1,4 +1,9 @@
 {
+  if (type == null)   throw new NullPointerException("Credential type can not be null");
   RequiredCredentialModel credentialModel=initRequiredCredentialModel(type);
-  addRequiredCredential(credentialModel,realm.getRequiredCredentials());
+  List<RequiredCredentialEntity> requiredCredList=realm.getRequiredCredentials();
+  for (  RequiredCredentialEntity cred : requiredCredList) {
+    if (type.equals(cred.getType()))     return;
+  }
+  addRequiredCredential(credentialModel,requiredCredList);
 }

@@ -1,6 +1,6 @@
 {
   ProviderManager pm=new ProviderManager(getClass().getClassLoader(),Config.scope().getArray("providers"));
-  for (  Spi spi : ServiceLoader.load(Spi.class)) {
+  for (  Spi spi : ServiceLoader.load(Spi.class,getClass().getClassLoader())) {
     Map<String,ProviderFactory> factories=new HashMap<String,ProviderFactory>();
     factoriesMap.put(spi.getProviderClass(),factories);
     String provider=Config.getProvider(spi.getName());

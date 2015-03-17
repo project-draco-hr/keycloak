@@ -1,0 +1,18 @@
+{
+  IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+  RealmModel realm=getRealm();
+  ApplicationModel applicationModel=realm.getApplicationByName("test-app");
+  ClientModel client2=realm.findClient("test-app");
+  assertEquals(0,client2.getIdentityProviders().size());
+  this.driver.navigate().to("http://localhost:8081/test-app/");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/auth"));
+  this.driver.findElement(By.className(getProviderId()));
+  List<ClientIdentityProviderMappingModel> appIdentityProviders=new ArrayList<ClientIdentityProviderMappingModel>();
+  ClientIdentityProviderMappingModel mapping=new ClientIdentityProviderMappingModel();
+  mapping.setIdentityProvider(getProviderId());
+  mapping.setRetrieveToken(true);
+  appIdentityProviders.add(mapping);
+  applicationModel.updateIdentityProviders(appIdentityProviders);
+  this.driver.navigate().to("http://localhost:8081/test-app/");
+  this.driver.findElement(By.className(getProviderId()));
+}

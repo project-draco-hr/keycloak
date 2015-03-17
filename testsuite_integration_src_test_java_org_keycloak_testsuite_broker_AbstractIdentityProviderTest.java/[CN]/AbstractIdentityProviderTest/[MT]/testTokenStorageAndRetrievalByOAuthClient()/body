@@ -20,14 +20,7 @@
   assertTrue(oauth.getCurrentQuery().containsKey(OAuth2Constants.CODE));
   ClientModel clientModel=getRealm().findClient("third-party");
   assertEquals(0,clientModel.getIdentityProviders().size());
-  ClientIdentityProviderMappingModel providerMappingModel=new ClientIdentityProviderMappingModel();
-  providerMappingModel.setIdentityProvider(getProviderId());
-  providerMappingModel.setRetrieveToken(true);
-  List<ClientIdentityProviderMappingModel> providerMappingModels=new ArrayList<ClientIdentityProviderMappingModel>();
-  providerMappingModels.add(providerMappingModel);
-  clientModel.updateIdentityProviders(providerMappingModels);
-  brokerServerRule.stopSession(session,true);
-  session=brokerServerRule.startSession();
+  configureRetrieveToken(clientModel,getProviderId(),true);
   AccessTokenResponse accessToken=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get(OAuth2Constants.CODE),"password");
   URI tokenEndpointUrl=Urls.identityProviderRetrieveToken(BASE_URI,getProviderId(),getRealm().getName());
   String authHeader="Bearer " + accessToken.getAccessToken();

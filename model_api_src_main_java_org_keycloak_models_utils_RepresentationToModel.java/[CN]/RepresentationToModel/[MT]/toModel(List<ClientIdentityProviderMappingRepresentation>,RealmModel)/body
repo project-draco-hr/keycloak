@@ -1,20 +1,12 @@
 {
-  List<ClientIdentityProviderMappingModel> allowedIdentityProviders=new ArrayList<ClientIdentityProviderMappingModel>();
-  if (repIdentityProviders == null || repIdentityProviders.isEmpty()) {
-    allowedIdentityProviders=new ArrayList<ClientIdentityProviderMappingModel>();
-    for (    IdentityProviderModel identityProvider : realm.getIdentityProviders()) {
-      ClientIdentityProviderMappingModel identityProviderMapping=new ClientIdentityProviderMappingModel();
-      identityProviderMapping.setIdentityProvider(identityProvider.getId());
-      allowedIdentityProviders.add(identityProviderMapping);
-    }
-  }
- else {
+  List<ClientIdentityProviderMappingModel> result=new ArrayList<ClientIdentityProviderMappingModel>();
+  if (repIdentityProviders != null) {
     for (    ClientIdentityProviderMappingRepresentation rep : repIdentityProviders) {
       ClientIdentityProviderMappingModel identityProviderMapping=new ClientIdentityProviderMappingModel();
       identityProviderMapping.setIdentityProvider(rep.getId());
       identityProviderMapping.setRetrieveToken(rep.isRetrieveToken());
-      allowedIdentityProviders.add(identityProviderMapping);
+      result.add(identityProviderMapping);
     }
   }
-  return allowedIdentityProviders;
+  return result;
 }

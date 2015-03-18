@@ -1,10 +1,19 @@
 {
   try {
     this.auth.requireManage();
-    this.realm.updateIdentityProvider(RepresentationToModel.toModel(model));
+    String internalId=providerRep.getInternalId();
+    String newProviderId=providerRep.getId();
+    String oldProviderId=getProviderIdByInternalId(this.realm,internalId);
+    this.realm.updateIdentityProvider(RepresentationToModel.toModel(providerRep));
+    if (oldProviderId != null && !oldProviderId.equals(newProviderId)) {
+      logger.debug("Changing providerId in all clients and linked users. oldProviderId=" + oldProviderId + ", newProviderId="+ newProviderId);
+      updateClientsAfterProviderAliasChange(this.realm.getApplications(),oldProviderId,newProviderId);
+      updateClientsAfterProviderAliasChange(this.realm.getOAuthClients(),oldProviderId,newProviderId);
+      updateUsersAfterProviderAliasChange(this.session.users().getUsers(this.realm),oldProviderId,newProviderId);
+    }
     return Response.noContent().build();
   }
  catch (  ModelDuplicateException e) {
-    return Flows.errors().exists("Identity Provider " + model.getId() + " already exists");
+    return Flows.errors().exists("Identity Provider " + providerRep.getId() + " already exists");
   }
 }

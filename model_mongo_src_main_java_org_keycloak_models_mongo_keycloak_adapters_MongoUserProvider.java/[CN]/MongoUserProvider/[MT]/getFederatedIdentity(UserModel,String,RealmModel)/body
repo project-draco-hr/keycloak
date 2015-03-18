@@ -1,4 +1,6 @@
 {
-  FederatedIdentityEntity federatedIdentityEntity=findSocialLink(user,socialProvider,realm);
+  user=getUserById(user.getId(),realm);
+  MongoUserEntity userEntity=((UserAdapter)user).getUser();
+  FederatedIdentityEntity federatedIdentityEntity=findFederatedIdentityLink(userEntity,socialProvider);
   return federatedIdentityEntity != null ? new FederatedIdentityModel(federatedIdentityEntity.getIdentityProvider(),federatedIdentityEntity.getUserId(),federatedIdentityEntity.getUserName(),federatedIdentityEntity.getToken()) : null;
 }

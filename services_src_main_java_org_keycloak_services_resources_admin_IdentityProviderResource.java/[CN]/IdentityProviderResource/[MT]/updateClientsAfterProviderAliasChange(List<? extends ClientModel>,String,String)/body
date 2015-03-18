@@ -1,0 +1,16 @@
+{
+  for (  ClientModel client : clients) {
+    List<ClientIdentityProviderMappingModel> clientIdentityProviders=client.getIdentityProviders();
+    boolean found=true;
+    for (    ClientIdentityProviderMappingModel mappingModel : clientIdentityProviders) {
+      if (mappingModel.getIdentityProvider().equals(oldProviderId)) {
+        mappingModel.setIdentityProvider(newProviderId);
+        found=true;
+        break;
+      }
+    }
+    if (found) {
+      client.updateIdentityProviders(clientIdentityProviders);
+    }
+  }
+}

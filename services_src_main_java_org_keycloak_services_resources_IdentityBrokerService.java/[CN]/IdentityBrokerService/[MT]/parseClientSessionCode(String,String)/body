@@ -4,16 +4,14 @@
     ClientSessionModel clientSession=clientCode.getClientSession();
     if (clientSession != null) {
       ClientModel client=clientSession.getClient();
-      if (client != null) {
-        LOGGER.debugf("Got authorization code from client [%s].",client.getClientId());
-        this.event.client(client);
+      if (client == null) {
+        throw new IdentityBrokerException("Invalid client");
       }
+      LOGGER.debugf("Got authorization code from client [%s].",client.getClientId());
+      this.event.client(client);
       if (clientSession.getUserSession() != null) {
         this.event.session(clientSession.getUserSession());
       }
-    }
- else {
-      validateClientPermissions(clientCode,providerId);
     }
     if (isDebugEnabled()) {
       LOGGER.debugf("Authorization code is valid.");

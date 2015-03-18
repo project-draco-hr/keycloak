@@ -1,0 +1,19 @@
+{
+  List<ClientIdentityProviderMappingModel> providerMappingModels=clientModel.getIdentityProviders();
+  ClientIdentityProviderMappingModel providerMappingModel=null;
+  for (  ClientIdentityProviderMappingModel current : providerMappingModels) {
+    if (current.getIdentityProvider().equals(providerId)) {
+      providerMappingModel=current;
+      break;
+    }
+  }
+  if (providerMappingModel == null) {
+    providerMappingModel=new ClientIdentityProviderMappingModel();
+    providerMappingModel.setIdentityProvider(providerId);
+    providerMappingModels.add(providerMappingModel);
+  }
+  providerMappingModel.setRetrieveToken(retrieveToken);
+  clientModel.updateIdentityProviders(providerMappingModels);
+  brokerServerRule.stopSession(session,true);
+  session=brokerServerRule.startSession();
+}

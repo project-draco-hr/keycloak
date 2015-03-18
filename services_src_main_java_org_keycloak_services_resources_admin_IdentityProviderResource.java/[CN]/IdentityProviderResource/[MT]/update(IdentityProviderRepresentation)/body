@@ -6,9 +6,10 @@
     String oldProviderId=getProviderIdByInternalId(this.realm,internalId);
     this.realm.updateIdentityProvider(RepresentationToModel.toModel(providerRep));
     if (oldProviderId != null && !oldProviderId.equals(newProviderId)) {
-      logger.info("Changing identityProviderMapping in all clients. oldProviderId=" + oldProviderId + ", newProviderId="+ newProviderId);
+      logger.debug("Changing providerId in all clients and linked users. oldProviderId=" + oldProviderId + ", newProviderId="+ newProviderId);
       updateClientsAfterProviderAliasChange(this.realm.getApplications(),oldProviderId,newProviderId);
       updateClientsAfterProviderAliasChange(this.realm.getOAuthClients(),oldProviderId,newProviderId);
+      updateUsersAfterProviderAliasChange(this.session.users().getUsers(this.realm),oldProviderId,newProviderId);
     }
     return Response.noContent().build();
   }

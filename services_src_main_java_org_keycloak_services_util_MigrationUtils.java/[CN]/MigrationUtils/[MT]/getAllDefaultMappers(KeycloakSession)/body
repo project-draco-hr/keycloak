@@ -1,0 +1,12 @@
+{
+  Map<String,ProtocolMapperModel> allMappers=new HashMap<String,ProtocolMapperModel>();
+  List<ProviderFactory> loginProtocolFactories=session.getKeycloakSessionFactory().getProviderFactories(LoginProtocol.class);
+  for (  ProviderFactory factory : loginProtocolFactories) {
+    LoginProtocolFactory loginProtocolFactory=(LoginProtocolFactory)factory;
+    List<ProtocolMapperModel> currentMappers=loginProtocolFactory.getDefaultBuiltinMappers();
+    for (    ProtocolMapperModel protocolMapper : currentMappers) {
+      allMappers.put(protocolMapper.getName(),protocolMapper);
+    }
+  }
+  return allMappers;
+}

@@ -1,14 +1,4 @@
 {
-  T objectToConvert=context.getObjectToConvert();
-  BasicDBObject dbObject=new BasicDBObject();
-  Set<Map.Entry> entries=objectToConvert.entrySet();
-  for (  Map.Entry entry : entries) {
-    String key=(String)entry.getKey();
-    Object value=entry.getValue();
-    if (key.contains(".")) {
-      key=key.replaceAll("\\.",DOT_PLACEHOLDER);
-    }
-    dbObject.put(key,value);
-  }
-  return dbObject;
+  T mapToConvert=context.getObjectToConvert();
+  return convertMap(mapToConvert);
 }

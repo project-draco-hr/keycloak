@@ -1,0 +1,19 @@
+{
+  DBCollection realms=db.getCollection("realms");
+  String adminRealmName=Config.getAdminRealm();
+  DBCursor realmsCursor=realms.find();
+  try {
+    while (realmsCursor.hasNext()) {
+      BasicDBObject realm=(BasicDBObject)realmsCursor.next();
+      if (adminRealmName.equals(realm.get("name"))) {
+        addNewAdminRolesToMasterRealm(realm);
+      }
+ else {
+        addNewAdminRolesToRealm(realm);
+      }
+    }
+  }
+  finally {
+    realmsCursor.close();
+  }
+}

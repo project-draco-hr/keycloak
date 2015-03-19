@@ -1,0 +1,24 @@
+{
+  DBCollection realms=db.getCollection("realms");
+  DBCollection applications=db.getCollection("applications");
+  DBCollection roles=db.getCollection("roles");
+  DBCursor realmsCursor=realms.find();
+  try {
+    while (realmsCursor.hasNext()) {
+      BasicDBObject currentRealm=(BasicDBObject)realmsCursor.next();
+      String masterAdminAppName=currentRealm.getString("name") + "-realm";
+      BasicDBObject masterAdminApp=(BasicDBObject)applications.findOne(new BasicDBObject().append("realmId",adminRealm.get("_id")).append("name",masterAdminAppName));
+      String viewIdProvidersRoleId=insertApplicationRole(roles,AdminRoles.VIEW_IDENTITY_PROVIDERS,masterAdminApp.getString("_id"));
+      String manageIdProvidersRoleId=insertApplicationRole(roles,AdminRoles.MANAGE_IDENTITY_PROVIDERS,masterAdminApp.getString("_id"));
+      BasicDBObject adminRole=(BasicDBObject)roles.findOne(new BasicDBObject().append("realmId",adminRealm.get("_id")).append("name",AdminRoles.ADMIN));
+      BasicDBList adminCompositeRoles=(BasicDBList)adminRole.get("compositeRoleIds");
+      adminCompositeRoles.add(viewIdProvidersRoleId);
+      adminCompositeRoles.add(manageIdProvidersRoleId);
+      roles.save(adminRole);
+      log.debugv("Added roles {0} and {1} to application {2}",AdminRoles.VIEW_IDENTITY_PROVIDERS,AdminRoles.MANAGE_IDENTITY_PROVIDERS,masterAdminAppName);
+    }
+  }
+  finally {
+    realmsCursor.close();
+  }
+}

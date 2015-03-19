@@ -1,0 +1,13 @@
+{
+  DBCollection applications=db.getCollection("applications");
+  DBCollection roles=db.getCollection("roles");
+  BasicDBObject adminApp=(BasicDBObject)applications.findOne(new BasicDBObject().append("realmId",currentRealm.get("_id")).append("name","realm-management"));
+  String viewIdProvidersRoleId=insertApplicationRole(roles,AdminRoles.VIEW_IDENTITY_PROVIDERS,adminApp.getString("_id"));
+  String manageIdProvidersRoleId=insertApplicationRole(roles,AdminRoles.MANAGE_IDENTITY_PROVIDERS,adminApp.getString("_id"));
+  BasicDBObject adminRole=(BasicDBObject)roles.findOne(new BasicDBObject().append("applicationId",adminApp.get("_id")).append("name",AdminRoles.REALM_ADMIN));
+  BasicDBList adminCompositeRoles=(BasicDBList)adminRole.get("compositeRoleIds");
+  adminCompositeRoles.add(viewIdProvidersRoleId);
+  adminCompositeRoles.add(manageIdProvidersRoleId);
+  roles.save(adminRole);
+  log.debugv("Added roles {0} and {1} to application realm-management of realm {2}",AdminRoles.VIEW_IDENTITY_PROVIDERS,AdminRoles.MANAGE_IDENTITY_PROVIDERS,currentRealm.get("name"));
+}

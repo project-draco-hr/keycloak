@@ -1,0 +1,14 @@
+{
+  DBCollection realms=db.getCollection("realms");
+  DBCursor realmsCursor=realms.find();
+  try {
+    while (realmsCursor.hasNext()) {
+      BasicDBObject realm=(BasicDBObject)realmsCursor.next();
+      realm.put("accessCodeLifespanLogin",1800);
+      realms.save(realm);
+    }
+  }
+  finally {
+    realmsCursor.close();
+  }
+}

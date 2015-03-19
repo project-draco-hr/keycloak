@@ -1,0 +1,31 @@
+{
+  DBCursor clientsCursor=clients.find();
+  try {
+    while (clientsCursor.hasNext()) {
+      BasicDBObject currentClient=(BasicDBObject)clientsCursor.next();
+      BasicDBList dbProtocolMappers=new BasicDBList();
+      currentClient.put("protocolMappers",dbProtocolMappers);
+      Object claimMask=currentClient.get("allowedClaimsMask");
+      Collection<ProtocolMapperModel> clientProtocolMappers=MigrationUtils.getMappersForClaimMask(session,(Long)claimMask);
+      for (      ProtocolMapperModel protocolMapper : clientProtocolMappers) {
+        BasicDBObject dbMapper=new BasicDBObject();
+        dbMapper.put("id",KeycloakModelUtils.generateId());
+        dbMapper.put("protocol",protocolMapper.getProtocol());
+        dbMapper.put("name",protocolMapper.getName());
+        dbMapper.put("consentRequired",protocolMapper.isConsentRequired());
+        dbMapper.put("consentText",protocolMapper.getConsentText());
+        dbMapper.put("protocolMapper",protocolMapper.getProtocolMapper());
+        Map<String,String> config=protocolMapper.getConfig();
+        BasicDBObject dbConfig=MapMapper.convertMap(config);
+        dbMapper.put("config",dbConfig);
+        dbProtocolMappers.add(dbMapper);
+      }
+      currentClient.remove("allowedClaimsMask");
+      log.debugv("Added default mappers to application {1}",currentClient.get("name"));
+      clients.save(currentClient);
+    }
+  }
+  finally {
+    clientsCursor.close();
+  }
+}

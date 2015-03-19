@@ -1,0 +1,14 @@
+{
+  getRealm().setVerifyEmail(true);
+  brokerServerRule.stopSession(this.session,true);
+  this.session=brokerServerRule.startSession();
+  try {
+    IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+    identityProviderModel.setUpdateProfileFirstLogin(false);
+    UserModel federatedUser=assertSuccessfulAuthentication(identityProviderModel,"test-user-noemail",null);
+    federatedUser.getRequiredActions().contains(RequiredAction.VERIFY_EMAIL);
+  }
+  finally {
+    getRealm().setVerifyEmail(false);
+  }
+}

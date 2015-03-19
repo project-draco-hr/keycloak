@@ -11,14 +11,21 @@
   event.detail(Details.CODE_ID,clientSession.getId());
   Set<UserModel.RequiredAction> requiredActions=user.getRequiredActions();
   if (!requiredActions.isEmpty()) {
-    UserModel.RequiredAction action=user.getRequiredActions().iterator().next();
-    accessCode.setRequiredAction(action);
-    LoginFormsProvider loginFormsProvider=Flows.forms(session,realm,client,uriInfo,request.getHttpHeaders()).setClientSessionCode(accessCode.getCode()).setUser(user);
-    if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL)) {
-      event.clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
-      LoginActionsService.createActionCookie(realm,uriInfo,clientConnection,userSession.getId());
+    Iterator<RequiredAction> i=user.getRequiredActions().iterator();
+    UserModel.RequiredAction action=i.next();
+    if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL) && Validation.isEmpty(user.getEmail())) {
+      if (i.hasNext())       action=i.next();
+ else       action=null;
     }
-    return loginFormsProvider.createResponse(action);
+    if (action != null) {
+      accessCode.setRequiredAction(action);
+      LoginFormsProvider loginFormsProvider=Flows.forms(session,realm,client,uriInfo,request.getHttpHeaders()).setClientSessionCode(accessCode.getCode()).setUser(user);
+      if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL)) {
+        event.clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
+        LoginActionsService.createActionCookie(realm,uriInfo,clientConnection,userSession.getId());
+      }
+      return loginFormsProvider.createResponse(action);
+    }
   }
   if (!isResource) {
     accessCode.setAction(ClientSessionModel.Action.OAUTH_GRANT);

@@ -1,0 +1,13 @@
+{
+  if (user.getSocialLinks() != null && !user.getSocialLinks().isEmpty() && user.getFederatedIdentities() == null) {
+    List<FederatedIdentityRepresentation> federatedIdentities=new LinkedList<>();
+    for (    SocialLinkRepresentation social : user.getSocialLinks()) {
+      FederatedIdentityRepresentation federatedIdentity=new FederatedIdentityRepresentation();
+      federatedIdentity.setIdentityProvider(social.getSocialProvider());
+      federatedIdentity.setUserId(social.getSocialUserId());
+      federatedIdentity.setUserName(social.getSocialUsername());
+    }
+    user.setFederatedIdentities(federatedIdentities);
+  }
+  user.setSocialLinks(null);
+}

@@ -1,0 +1,30 @@
+{
+  if (rep.isSocial() != null && rep.isSocial() && rep.getSocialProviders() != null && !rep.getSocialProviders().isEmpty() && rep.getIdentityProviders() == null) {
+    Boolean updateProfileFirstLogin=rep.isUpdateProfileOnInitialSocialLogin() != null && rep.isUpdateProfileOnInitialSocialLogin();
+    if (rep.getSocialProviders() != null) {
+      List<IdentityProviderRepresentation> identityProviders=new LinkedList<>();
+      for (      String k : rep.getSocialProviders().keySet()) {
+        if (k.endsWith(".key")) {
+          String providerId=k.split("\\.")[0];
+          String key=rep.getSocialProviders().get(k);
+          String secret=rep.getSocialProviders().get(k.replace(".key",".secret"));
+          IdentityProviderRepresentation identityProvider=new IdentityProviderRepresentation();
+          identityProvider.setId(providerId);
+          identityProvider.setProviderId(providerId);
+          identityProvider.setName(providerId);
+          identityProvider.setEnabled(true);
+          identityProvider.setUpdateProfileFirstLogin(updateProfileFirstLogin);
+          Map<String,String> config=new HashMap<>();
+          config.put("clientId",key);
+          config.put("clientSecret",secret);
+          identityProvider.setConfig(config);
+          identityProviders.add(identityProvider);
+        }
+      }
+      rep.setIdentityProviders(identityProviders);
+    }
+  }
+  rep.setSocial(null);
+  rep.setSocialProviders(null);
+  rep.setUpdateProfileOnInitialSocialLogin(false);
+}

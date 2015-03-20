@@ -5,7 +5,7 @@
   Assert.assertTrue(totpPage.isCurrent());
   Assert.assertFalse(driver.getPageSource().contains("Remove Google"));
   totpPage.configure(totp.generate(totpPage.getTotpSecret() + "123"));
-  Assert.assertEquals("Invalid authenticator code",profilePage.getError());
+  Assert.assertEquals("Invalid authenticator code.",profilePage.getError());
   totpPage.configure(totp.generate(totpPage.getTotpSecret()));
   Assert.assertEquals("Mobile authenticator configured.",profilePage.getSuccess());
   events.expectAccount(EventType.UPDATE_TOTP).assertEvent();

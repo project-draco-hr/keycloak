@@ -1,0 +1,12 @@
+{
+  try {
+    ClassLoader classLoader=getClass().getClassLoader();
+    Enumeration<URL> resources=classLoader.getResources(KEYCLOAK_THEMES_JSON);
+    while (resources.hasMoreElements()) {
+      loadThemes(classLoader,resources.nextElement().openStream());
+    }
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Failed to load themes",e);
+  }
+}

@@ -1,0 +1,17 @@
+{
+  try {
+    ThemesRepresentation themesRep=JsonSerialization.readValue(themesInputStream,ThemesRepresentation.class);
+    for (    ThemeRepresentation themeRep : themesRep.getThemes()) {
+      for (      String t : themeRep.getTypes()) {
+        Theme.Type type=Theme.Type.valueOf(t.toUpperCase());
+        if (!themes.containsKey(type)) {
+          themes.put(type,new HashMap<String,ClassLoaderTheme>());
+        }
+        themes.get(type).put(themeRep.getName(),new ClassLoaderTheme(themeRep.getName(),type,classLoader));
+      }
+    }
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Failed to load themes",e);
+  }
+}

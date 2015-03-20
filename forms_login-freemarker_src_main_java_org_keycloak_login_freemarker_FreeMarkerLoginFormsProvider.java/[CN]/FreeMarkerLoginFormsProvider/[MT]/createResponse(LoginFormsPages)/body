@@ -28,13 +28,9 @@
   }
   Properties messages;
   Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,httpHeaders);
-  if (locale != null) {
-    attributes.put("locale",locale);
-    attributes.put("formatter",new TextFormatterBean(locale));
-  }
   try {
     messages=theme.getMessages(locale);
-    attributes.put("rb",messages);
+    attributes.put("msg",new MessageFormatterMethod(locale,messages));
   }
  catch (  IOException e) {
     logger.warn("Failed to load messages",e);
@@ -43,7 +39,7 @@
   if (message != null) {
     String formattedMessage;
     if (messages.containsKey(message)) {
-      formattedMessage=new MessageFormat(messages.getProperty(message).replace("'","''"),locale).format(parameters);
+      formattedMessage=new MessageFormat(messages.getProperty(message),locale).format(parameters);
     }
  else {
       formattedMessage=message;
@@ -58,15 +54,30 @@
     attributes.put("realm",new RealmBean(realm));
     attributes.put("social",new IdentityProviderBean(realm,baseUri,this.uriInfo));
     attributes.put("url",new UrlBean(realm,theme,baseUri,this.actionUri));
-  }
-  if (client != null) {
-    attributes.put("client",new ClientBean(client));
-  }
-  attributes.put("login",new LoginBean(formData));
+    if (realm.isInternationalizationEnabled()) {
+      UriBuilder b;
+switch (page) {
+case LOGIN:
+        b=UriBuilder.fromUri(Urls.realmLoginPage(baseUri,realm.getName()));
+      break;
+case REGISTER:
+    b=UriBuilder.fromUri(Urls.realmRegisterPage(baseUri,realm.getName()));
+  break;
+default :
+b=UriBuilder.fromUri(baseUri).path(uriInfo.getPath());
+break;
+}
+attributes.put("locale",new LocaleBean(realm,locale,b,messages));
+}
+}
+if (client != null) {
+attributes.put("client",new ClientBean(client));
+}
+attributes.put("login",new LoginBean(formData));
 switch (page) {
 case LOGIN_CONFIG_TOTP:
-    attributes.put("totp",new TotpBean(realm,user,baseUri));
-  break;
+attributes.put("totp",new TotpBean(realm,user,baseUri));
+break;
 case LOGIN_UPDATE_PROFILE:
 attributes.put("user",new ProfileBean(user));
 break;

@@ -1,0 +1,14 @@
+{
+  log.debug("doGetFederatedIdentity()");
+  try {
+    JsonNode profile=SimpleHttp.doGet(PROFILE_URL).header("Authorization","Bearer " + accessToken).asJson();
+    FederatedIdentity user=new FederatedIdentity(getJsonProperty(profile,"id"));
+    user.setUsername(extractUsernameFromProfileURL(getJsonProperty(profile,"publicProfileUrl")));
+    user.setName(getJsonProperty(profile,"formattedName"));
+    user.setEmail(getJsonProperty(profile,"emailAddress"));
+    return user;
+  }
+ catch (  Exception e) {
+    throw new IdentityBrokerException("Could not obtain user profile from github.",e);
+  }
+}

@@ -1,0 +1,18 @@
+{
+  Map<String,ProtocolMapperModel> allMappers=getAllDefaultMappers(session);
+  if (claimMask == null) {
+    return allMappers.values();
+  }
+  if (!ClaimMask.hasUsername(claimMask)) {
+    allMappers.remove(OIDCLoginProtocolFactory.USERNAME);
+  }
+  if (!ClaimMask.hasEmail(claimMask)) {
+    allMappers.remove(OIDCLoginProtocolFactory.EMAIL);
+  }
+  if (!ClaimMask.hasName(claimMask)) {
+    allMappers.remove(OIDCLoginProtocolFactory.FAMILY_NAME);
+    allMappers.remove(OIDCLoginProtocolFactory.FULL_NAME);
+    allMappers.remove(OIDCLoginProtocolFactory.GIVEN_NAME);
+  }
+  return allMappers.values();
+}

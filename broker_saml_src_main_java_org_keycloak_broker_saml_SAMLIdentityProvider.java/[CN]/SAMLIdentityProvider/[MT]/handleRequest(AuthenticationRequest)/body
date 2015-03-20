@@ -9,7 +9,7 @@
       nameIDPolicyFormat=JBossSAMLURIConstants.NAMEID_FORMAT_PERSISTENT.get();
     }
     String protocolBinding=JBossSAMLURIConstants.SAML_HTTP_REDIRECT_BINDING.get();
-    String assertionConsumerServiceUrl=UriBuilder.fromUri(request.getRedirectUri()).path("endpoint").build().toString();
+    String assertionConsumerServiceUrl=request.getRedirectUri();
     if (getConfig().isPostBindingResponse()) {
       protocolBinding=JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get();
     }
@@ -28,10 +28,10 @@
       authnRequestBuilder.signDocument();
     }
     if (getConfig().isPostBindingAuthnRequest()) {
-      return AuthenticationResponse.fromResponse(authnRequestBuilder.postBinding().request());
+      return authnRequestBuilder.postBinding().request();
     }
  else {
-      return AuthenticationResponse.fromResponse(authnRequestBuilder.redirectBinding().request());
+      return authnRequestBuilder.redirectBinding().request();
     }
   }
  catch (  Exception e) {

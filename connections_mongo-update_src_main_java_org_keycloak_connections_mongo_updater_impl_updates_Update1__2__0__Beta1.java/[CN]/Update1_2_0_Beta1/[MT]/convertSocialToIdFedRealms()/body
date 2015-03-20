@@ -1,0 +1,37 @@
+{
+  DBCollection realms=db.getCollection("realms");
+  DBCursor realmsCursor=realms.find();
+  try {
+    while (realmsCursor.hasNext()) {
+      BasicDBObject realm=(BasicDBObject)realmsCursor.next();
+      boolean updateProfileOnInitialSocialLogin=realm.getBoolean("updateProfileOnInitialSocialLogin");
+      BasicDBObject socialConfig=(BasicDBObject)realm.get("socialConfig");
+      BasicDBList identityProviders=(BasicDBList)realm.get("identityProviders");
+      if (identityProviders == null) {
+        identityProviders=new BasicDBList();
+        realm.put("identityProviders",identityProviders);
+      }
+      if (socialConfig != null) {
+        for (        Map.Entry<String,Object> entry : socialConfig.entrySet()) {
+          if (entry.getKey().endsWith("###key")) {
+            String socialProviderId=entry.getKey().substring(0,entry.getKey().indexOf("###"));
+            String clientId=(String)entry.getValue();
+            String clientSecret=socialConfig.getString(socialProviderId + "###secret");
+            DBObject identityProviderConfig=new BasicDBObjectBuilder().add("clientId",clientId).add("clientSecret",clientSecret).get();
+            DBObject identityProvider=new BasicDBObjectBuilder().add("internalId",KeycloakModelUtils.generateId()).add("providerId",socialProviderId).add("name",socialProviderId).add("id",socialProviderId).add("updateProfileFirstLogin",updateProfileOnInitialSocialLogin).add("enabled",true).add("storeToken",false).add("authenticateByDefault",false).add("config",identityProviderConfig).get();
+            identityProviders.add(identityProvider);
+            log.debugv("Converted social provider {0} to identity provider",socialProviderId);
+          }
+        }
+      }
+      realm.remove("social");
+      realm.remove("updateProfileOnInitialSocialLogin");
+      realm.remove("socialConfig");
+      realms.save(realm);
+      log.debugv("Social providers of realm {0} converted to identity providers",realm.get("_id"));
+    }
+  }
+  finally {
+    realmsCursor.close();
+  }
+}

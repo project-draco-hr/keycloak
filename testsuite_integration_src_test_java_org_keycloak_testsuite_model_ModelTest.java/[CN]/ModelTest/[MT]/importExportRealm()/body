@@ -15,9 +15,14 @@
   smtp.put("from","auto@keycloak");
   smtp.put("hostname","localhost");
   realm.setSmtpConfig(smtp);
-  HashMap<String,String> social=new HashMap<String,String>();
-  social.put("google.key","1234");
-  social.put("google.secret","5678");
+  realm.setDefaultLocale("en");
+  realm.setAccessCodeLifespanLogin(100);
+  realm.setInternationalizationEnabled(true);
+  realm.setRegistrationEmailAsUsername(true);
+  realm.setSupportedLocales(new HashSet<String>(Arrays.asList("en","cz")));
+  realm.setEventsListeners(new HashSet<String>(Arrays.asList("jpa","mongo","foo")));
+  realm.setEventsExpiration(200);
+  realm.setEventsEnabled(true);
   RealmModel persisted=realmManager.getRealm(realm.getId());
   assertEquals(realm,persisted);
   RealmModel copy=importExport(realm,"copy");

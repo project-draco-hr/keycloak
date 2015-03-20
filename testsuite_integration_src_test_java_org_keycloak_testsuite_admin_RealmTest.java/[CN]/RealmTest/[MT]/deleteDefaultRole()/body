@@ -1,0 +1,16 @@
+{
+  RoleRepresentation role=new RoleRepresentation("test","test");
+  realm.roles().create(role);
+  assertNotNull(realm.roles().get("test").toRepresentation());
+  RealmRepresentation rep=realm.toRepresentation();
+  rep.setDefaultRoles(new LinkedList<String>());
+  rep.getDefaultRoles().add("test");
+  realm.update(rep);
+  realm.roles().deleteRole("test");
+  try {
+    realm.roles().get("testsadfsadf").toRepresentation();
+    fail("Expected NotFoundException");
+  }
+ catch (  NotFoundException e) {
+  }
+}

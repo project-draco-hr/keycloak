@@ -4,8 +4,8 @@
     LOGGER.debugf("Sending authentication request to identity provider [%s].",providerId);
   }
   try {
-    ClientSessionCode clientSessionCode=parseClientSessionCode(code,providerId);
-    IdentityProvider identityProvider=getIdentityProvider(providerId);
+    ClientSessionCode clientSessionCode=parseClientSessionCode(code);
+    IdentityProvider identityProvider=getIdentityProvider(session,realmModel,providerId);
     AuthenticationResponse authenticationResponse=identityProvider.handleRequest(createAuthenticationRequest(providerId,clientSessionCode));
     Response response=authenticationResponse.getResponse();
     if (response != null) {

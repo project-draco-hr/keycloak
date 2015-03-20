@@ -1,0 +1,10 @@
+{
+  Map<String,IdentityProviderFactory> availableProviders=new HashMap<String,IdentityProviderFactory>();
+  List<ProviderFactory> allProviders=new ArrayList<ProviderFactory>();
+  allProviders.addAll(session.getKeycloakSessionFactory().getProviderFactories(IdentityProvider.class));
+  allProviders.addAll(session.getKeycloakSessionFactory().getProviderFactories(SocialIdentityProvider.class));
+  for (  ProviderFactory providerFactory : allProviders) {
+    availableProviders.put(providerFactory.getId(),(IdentityProviderFactory)providerFactory);
+  }
+  return availableProviders.get(model.getProviderId());
+}

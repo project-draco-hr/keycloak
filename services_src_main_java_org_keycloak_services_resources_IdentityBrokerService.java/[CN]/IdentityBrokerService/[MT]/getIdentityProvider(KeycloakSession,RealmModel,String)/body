@@ -1,0 +1,11 @@
+{
+  IdentityProviderModel identityProviderModel=realm.getIdentityProviderByAlias(alias);
+  if (identityProviderModel != null) {
+    IdentityProviderFactory providerFactory=getIdentityProviderFactory(session,identityProviderModel);
+    if (providerFactory == null) {
+      throw new IdentityBrokerException("Could not find factory for identity provider [" + alias + "].");
+    }
+    return providerFactory.create(identityProviderModel);
+  }
+  throw new IdentityBrokerException("Identity Provider [" + alias + "] not found.");
+}

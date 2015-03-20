@@ -1,3 +1,14 @@
 {
-  throw new RuntimeException("NOT IMPLEMENTED");
+  String redirectUri=userSession.getNote(OIDCLoginProtocol.LOGOUT_REDIRECT_URI);
+  event.event(EventType.LOGOUT);
+  if (redirectUri != null) {
+    event.detail(Details.REDIRECT_URI,redirectUri);
+  }
+  event.user(userSession.getUser()).session(userSession).success();
+  if (redirectUri != null) {
+    return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
+  }
+ else {
+    return Response.ok().build();
+  }
 }

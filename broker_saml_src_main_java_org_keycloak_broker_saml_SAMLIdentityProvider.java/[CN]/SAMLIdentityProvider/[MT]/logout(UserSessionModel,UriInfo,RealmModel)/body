@@ -1,0 +1,13 @@
+{
+  if (getConfig().getSingleLogoutServiceUrl() == null)   return null;
+  SAML2LogoutRequestBuilder logoutBuilder=new SAML2LogoutRequestBuilder().issuer(getEntityId(uriInfo,realm)).sessionIndex(userSession.getNote("SAML_FEDERATED_SESSION_INDEX")).userPrincipal(userSession.getNote("SAML_FEDERATED_SUBJECT"),userSession.getNote("SAML_FEDERATED_SUBJECT_NAMEFORMAT")).destination(getConfig().getSingleLogoutServiceUrl());
+  if (getConfig().isWantAuthnRequestsSigned()) {
+    logoutBuilder.signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
+  }
+  try {
+    return logoutBuilder.relayState(userSession.getId()).postBinding().request();
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

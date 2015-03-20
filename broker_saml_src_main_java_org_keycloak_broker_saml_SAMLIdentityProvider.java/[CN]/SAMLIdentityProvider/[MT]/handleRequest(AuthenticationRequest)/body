@@ -9,10 +9,11 @@
       nameIDPolicyFormat=JBossSAMLURIConstants.NAMEID_FORMAT_PERSISTENT.get();
     }
     String protocolBinding=JBossSAMLURIConstants.SAML_HTTP_REDIRECT_BINDING.get();
+    String assertionConsumerServiceUrl=UriBuilder.fromUri(request.getRedirectUri()).path("endpoint").build().toString();
     if (getConfig().isPostBindingResponse()) {
       protocolBinding=JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get();
     }
-    SAML2AuthnRequestBuilder authnRequestBuilder=new SAML2AuthnRequestBuilder().assertionConsumerUrl(request.getRedirectUri()).destination(destinationUrl).issuer(issuerURL).forceAuthn(getConfig().isForceAuthn()).protocolBinding(protocolBinding).nameIdPolicy(SAML2NameIDPolicyBuilder.format(nameIDPolicyFormat)).relayState(request.getState());
+    SAML2AuthnRequestBuilder authnRequestBuilder=new SAML2AuthnRequestBuilder().assertionConsumerUrl(assertionConsumerServiceUrl).destination(destinationUrl).issuer(issuerURL).forceAuthn(getConfig().isForceAuthn()).protocolBinding(protocolBinding).nameIdPolicy(SAML2NameIDPolicyBuilder.format(nameIDPolicyFormat)).relayState(request.getState());
     if (getConfig().isWantAuthnRequestsSigned()) {
       PrivateKey privateKey=realm.getPrivateKey();
       PublicKey publicKey=realm.getPublicKey();

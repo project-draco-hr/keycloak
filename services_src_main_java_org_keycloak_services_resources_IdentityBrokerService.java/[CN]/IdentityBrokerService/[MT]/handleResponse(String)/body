@@ -6,7 +6,7 @@
   this.event.detail(Details.IDENTITY_PROVIDER,providerId);
   IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(providerId);
   try {
-    IdentityProvider identityProvider=getIdentityProvider(providerId);
+    IdentityProvider identityProvider=getIdentityProvider(session,realmModel,providerId);
     String relayState=identityProvider.getRelayState(createAuthenticationRequest(providerId,null));
     if (relayState == null) {
       return redirectToErrorPage(Messages.NO_RELAY_STATE_IN_RESPONSE,providerId);
@@ -14,7 +14,7 @@
     if (isDebugEnabled()) {
       LOGGER.debugf("Relay state is valid: [%s].",relayState);
     }
-    ClientSessionCode clientSessionCode=parseClientSessionCode(relayState,providerId);
+    ClientSessionCode clientSessionCode=parseClientSessionCode(relayState);
     AuthenticationResponse authenticationResponse=identityProvider.handleResponse(createAuthenticationRequest(providerId,clientSessionCode));
     Response response=authenticationResponse.getResponse();
     if (response != null) {

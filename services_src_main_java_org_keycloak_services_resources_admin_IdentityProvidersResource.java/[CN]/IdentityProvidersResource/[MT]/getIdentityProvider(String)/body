@@ -2,12 +2,12 @@
   this.auth.requireView();
   IdentityProviderModel identityProviderModel=null;
   for (  IdentityProviderModel storedIdentityProvider : this.realm.getIdentityProviders()) {
-    if (storedIdentityProvider.getId().equals(providerId) || storedIdentityProvider.getInternalId().equals(providerId)) {
+    if (storedIdentityProvider.getAlias().equals(alias) || storedIdentityProvider.getInternalId().equals(alias)) {
       identityProviderModel=storedIdentityProvider;
     }
   }
   if (identityProviderModel == null) {
-    throw new NotFoundException("Could not find identity provider: " + providerId);
+    throw new NotFoundException("Could not find identity provider: " + alias);
   }
   IdentityProviderResource identityProviderResource=new IdentityProviderResource(this.auth,realm,session,identityProviderModel);
   ResteasyProviderFactory.getInstance().injectProperties(identityProviderResource);

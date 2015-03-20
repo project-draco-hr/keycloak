@@ -6,7 +6,7 @@
     IdentityProviderEntity identityProvider=entity.getIdentityProvider();
     boolean toRemove=true;
     for (    ClientIdentityProviderMappingModel model : identityProviders) {
-      if (model.getIdentityProvider().equals(identityProvider.getId())) {
+      if (model.getIdentityProvider().equals(identityProvider.getAlias())) {
         toRemove=false;
         break;
       }
@@ -15,7 +15,7 @@
       remove.add(entity);
     }
  else {
-      already.add(entity.getIdentityProvider().getId());
+      already.add(entity.getIdentityProvider().getAlias());
     }
   }
   for (  ClientIdentityProviderMappingEntity entity : remove) {
@@ -31,13 +31,13 @@
     }
  else {
       for (      ClientIdentityProviderMappingEntity entity : entities) {
-        if (entity.getIdentityProvider().getId().equals(model.getIdentityProvider())) {
+        if (entity.getIdentityProvider().getAlias().equals(model.getIdentityProvider())) {
           mappingEntity=entity;
           break;
         }
       }
     }
-    TypedQuery<IdentityProviderEntity> query=em.createNamedQuery("findIdentityProviderById",IdentityProviderEntity.class).setParameter("id",model.getIdentityProvider());
+    TypedQuery<IdentityProviderEntity> query=em.createNamedQuery("findIdentityProviderByAlias",IdentityProviderEntity.class).setParameter("alias",model.getIdentityProvider());
     IdentityProviderEntity identityProviderEntity=query.getSingleResult();
     mappingEntity.setIdentityProvider(identityProviderEntity);
     mappingEntity.setClient(this.entity);

@@ -15,7 +15,7 @@
       if (OAuthClientModel.class.isInstance(clientModel) && !forceRetrieval) {
         return corsResponse(Flows.forms(this.session,this.realmModel,clientModel,this.uriInfo,headers).setClientSessionCode(authManager.extractAuthorizationHeaderToken(this.request.getHttpHeaders())).setAccessRequest("Your information from " + providerId + " identity provider.").setClient(clientModel).setActionUri(this.uriInfo.getRequestUri()).createOAuthGrant(null),clientModel);
       }
-      IdentityProvider identityProvider=getIdentityProvider(providerId);
+      IdentityProvider identityProvider=getIdentityProvider(session,realmModel,providerId);
       IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(providerId);
       if (identityProviderConfig.isStoreToken()) {
         FederatedIdentityModel identity=this.session.users().getFederatedIdentity(authResult.getUser(),providerId,this.realmModel);

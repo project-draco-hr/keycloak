@@ -1,0 +1,16 @@
+{
+  SAMLDocumentHolder holder=extractResponseDocument(samlResponse);
+  StatusResponseType statusResponse=(StatusResponseType)holder.getSamlObject();
+  if (!uriInfo.getAbsolutePath().toString().equals(statusResponse.getDestination())) {
+    event.event(EventType.IDENTITY_PROVIDER_RESPONSE);
+    event.error(Errors.INVALID_SAML_RESPONSE);
+    event.detail(Details.REASON,"invalid_destination");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUEST);
+  }
+  if (statusResponse instanceof ResponseType) {
+    return handleLoginResponse(samlResponse,holder,(ResponseType)statusResponse,relayState);
+  }
+ else {
+    return handleLogoutResponse(holder,statusResponse,relayState);
+  }
+}

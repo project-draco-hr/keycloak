@@ -3,8 +3,9 @@
   expireRememberMeCookie(realm,uriInfo,connection);
   userSession.setState(UserSessionModel.State.LOGGED_OUT);
   String method=userSession.getNote(KEYCLOAK_LOGOUT_PROTOCOL);
+  EventBuilder event=new EventsManager(realm,session,connection).createEventBuilder();
   LoginProtocol protocol=session.getProvider(LoginProtocol.class,method);
-  protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo);
+  protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo).setEventBuilder(event);
   Response response=protocol.finishLogout(userSession);
   session.sessions().removeUserSession(realm,userSession);
   return response;

@@ -1,0 +1,31 @@
+{
+  try {
+    Twitter twitter=new TwitterFactory().getInstance();
+    twitter.setOAuthConsumer(getConfig().getClientId(),getConfig().getClientSecret());
+    ClientSessionModel clientSession=parseClientSessionCode(state).getClientSession();
+    String twitterToken=clientSession.getNote("twitter_token");
+    String twitterSecret=clientSession.getNote("twitter_tokenSecret");
+    RequestToken requestToken=new RequestToken(twitterToken,twitterSecret);
+    AccessToken oAuthAccessToken=twitter.getOAuthAccessToken(requestToken,verifier);
+    twitter4j.User twitterUser=twitter.verifyCredentials();
+    FederatedIdentity identity=new FederatedIdentity(Long.toString(twitterUser.getId()));
+    identity.setUsername(twitterUser.getScreenName());
+    identity.setName(twitterUser.getName());
+    StringBuilder tokenBuilder=new StringBuilder();
+    tokenBuilder.append("{");
+    tokenBuilder.append("\"oauth_token\":").append("\"").append(oAuthAccessToken.getToken()).append("\"").append(",");
+    tokenBuilder.append("\"oauth_token_secret\":").append("\"").append(oAuthAccessToken.getTokenSecret()).append("\"").append(",");
+    tokenBuilder.append("\"screen_name\":").append("\"").append(oAuthAccessToken.getScreenName()).append("\"").append(",");
+    tokenBuilder.append("\"user_id\":").append("\"").append(oAuthAccessToken.getUserId()).append("\"");
+    tokenBuilder.append("}");
+    identity.setToken(tokenBuilder.toString());
+    return callback.authenticated(new HashMap<String,String>(),getConfig(),identity,state);
+  }
+ catch (  Exception e) {
+    logger.error("Could get user profile from twitter.",e);
+  }
+  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder();
+  event.event(EventType.LOGIN);
+  event.error("twitter_login_failed");
+  return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.UNEXPECTED_ERROR_HANDLING_RESPONSE);
+}

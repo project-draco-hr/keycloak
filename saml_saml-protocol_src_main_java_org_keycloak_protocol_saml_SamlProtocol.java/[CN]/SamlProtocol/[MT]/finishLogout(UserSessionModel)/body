@@ -1,9 +1,12 @@
 {
   logger.debug("finishLogout");
+  String logoutBindingUri=userSession.getNote(SAML_LOGOUT_BINDING_URI);
+  String logoutRelayState=userSession.getNote(SAML_LOGOUT_RELAY_STATE);
   SAML2LogoutResponseBuilder builder=new SAML2LogoutResponseBuilder();
   builder.logoutRequestID(userSession.getNote(SAML_LOGOUT_REQUEST_ID));
-  builder.destination(userSession.getNote(SAML_LOGOUT_ISSUER));
+  builder.destination(logoutBindingUri);
   builder.issuer(getResponseIssuer(realm));
+  builder.relayState(logoutRelayState);
   String signingAlgorithm=userSession.getNote(SAML_LOGOUT_SIGNATURE_ALGORITHM);
   if (signingAlgorithm != null) {
     SignatureAlgorithm algorithm=SignatureAlgorithm.valueOf(signingAlgorithm);
@@ -11,10 +14,10 @@
   }
   try {
     if (isLogoutPostBindingForInitiator(userSession)) {
-      return builder.postBinding().response(userSession.getNote(SAML_LOGOUT_BINDING_URI));
+      return builder.postBinding().response(logoutBindingUri);
     }
  else {
-      return builder.redirectBinding().response(userSession.getNote(SAML_LOGOUT_BINDING_URI));
+      return builder.redirectBinding().response(logoutBindingUri);
     }
   }
  catch (  ConfigurationException e) {

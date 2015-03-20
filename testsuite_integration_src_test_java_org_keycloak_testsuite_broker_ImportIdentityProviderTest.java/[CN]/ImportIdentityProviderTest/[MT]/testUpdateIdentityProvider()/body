@@ -3,8 +3,7 @@
   List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
   assertFalse(identityProviders.isEmpty());
   IdentityProviderModel identityProviderModel=identityProviders.get(0);
-  String identityProviderId=identityProviderModel.getId();
-  identityProviderModel.setName("Changed Name");
+  String identityProviderId=identityProviderModel.getAlias();
   identityProviderModel.getConfig().put("config-added","value-added");
   identityProviderModel.setEnabled(false);
   identityProviderModel.setUpdateProfileFirstLogin(false);
@@ -13,14 +12,12 @@
   realm.updateIdentityProvider(identityProviderModel);
   commit();
   realm=this.realmManager.getRealm(realm.getId());
-  identityProviderModel=realm.getIdentityProviderById(identityProviderId);
-  assertEquals("Changed Name",identityProviderModel.getName());
+  identityProviderModel=realm.getIdentityProviderByAlias(identityProviderId);
   assertEquals("value-added",identityProviderModel.getConfig().get("config-added"));
   assertFalse(identityProviderModel.isEnabled());
   assertFalse(identityProviderModel.isUpdateProfileFirstLogin());
   assertTrue(identityProviderModel.isStoreToken());
   assertTrue(identityProviderModel.isAuthenticateByDefault());
-  identityProviderModel.setName("Changed Name Again");
   identityProviderModel.getConfig().remove("config-added");
   identityProviderModel.setEnabled(true);
   identityProviderModel.setUpdateProfileFirstLogin(true);
@@ -28,8 +25,7 @@
   realm.updateIdentityProvider(identityProviderModel);
   commit();
   realm=this.realmManager.getRealm(realm.getId());
-  identityProviderModel=realm.getIdentityProviderById(identityProviderId);
-  assertEquals("Changed Name Again",identityProviderModel.getName());
+  identityProviderModel=realm.getIdentityProviderByAlias(identityProviderId);
   assertFalse(identityProviderModel.getConfig().containsKey("config-added"));
   assertTrue(identityProviderModel.isEnabled());
   assertTrue(identityProviderModel.isUpdateProfileFirstLogin());

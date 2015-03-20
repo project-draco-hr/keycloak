@@ -2,7 +2,7 @@
   try {
     this.auth.requireManage();
     String internalId=providerRep.getInternalId();
-    String newProviderId=providerRep.getId();
+    String newProviderId=providerRep.getAlias();
     String oldProviderId=getProviderIdByInternalId(this.realm,internalId);
     this.realm.updateIdentityProvider(RepresentationToModel.toModel(providerRep));
     if (oldProviderId != null && !oldProviderId.equals(newProviderId)) {
@@ -14,6 +14,6 @@
     return Response.noContent().build();
   }
  catch (  ModelDuplicateException e) {
-    return Flows.errors().exists("Identity Provider " + providerRep.getId() + " already exists");
+    return Flows.errors().exists("Identity Provider " + providerRep.getAlias() + " already exists");
   }
 }

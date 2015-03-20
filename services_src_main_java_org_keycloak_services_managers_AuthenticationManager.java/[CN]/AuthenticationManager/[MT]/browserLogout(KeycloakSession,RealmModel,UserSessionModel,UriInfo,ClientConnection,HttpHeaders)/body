@@ -30,9 +30,6 @@
       }
     }
   }
-  if (redirectClients.size() == 0) {
-    return finishBrowserLogout(session,realm,userSession,uriInfo,connection,headers);
-  }
   for (  ClientSessionModel nextRedirectClient : redirectClients) {
     String authMethod=nextRedirectClient.getAuthMethod();
     LoginProtocol protocol=session.getProvider(LoginProtocol.class,authMethod);
@@ -49,6 +46,12 @@
  catch (    Exception e) {
       logger.warn("Failed to logout client, continuing",e);
     }
+  }
+  String brokerId=userSession.getNote(IdentityBrokerService.BROKER_PROVIDER_ID);
+  if (brokerId != null) {
+    IdentityProvider identityProvider=IdentityBrokerService.getIdentityProvider(session,realm,brokerId);
+    Response response=identityProvider.keycloakInitiatedBrowserLogout(userSession,uriInfo,realm);
+    if (response != null)     return response;
   }
   return finishBrowserLogout(session,realm,userSession,uriInfo,connection,headers);
 }

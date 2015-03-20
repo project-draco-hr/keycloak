@@ -17,7 +17,8 @@
     String authContextRef=JBossSAMLURIConstants.AC_UNSPECIFIED.get();
     if (isNotNull(authMethod))     authContextRef=authMethod;
     AuthnStatementType authnStatement=StatementUtil.createAuthnStatement(XMLTimeUtil.getIssueInstant(),authContextRef);
-    authnStatement.setSessionIndex(assertion.getID());
+    if (sessionIndex != null)     authnStatement.setSessionIndex(sessionIndex);
+ else     authnStatement.setSessionIndex(assertion.getID());
     assertion.addStatement(authnStatement);
   }
   return responseType;

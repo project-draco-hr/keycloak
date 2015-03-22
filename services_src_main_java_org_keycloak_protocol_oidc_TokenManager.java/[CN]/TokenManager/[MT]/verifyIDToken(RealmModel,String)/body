@@ -1,0 +1,20 @@
+{
+  JWSInput jws=new JWSInput(encodedIDToken);
+  IDToken idToken=null;
+  try {
+    if (!RSAProvider.verify(jws,realm.getPublicKey())) {
+      throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid refresh token");
+    }
+    idToken=jws.readJsonContent(IDToken.class);
+  }
+ catch (  IOException e) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid refresh token",e);
+  }
+  if (idToken.isExpired()) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Refresh token expired");
+  }
+  if (idToken.getIssuedAt() < realm.getNotBefore()) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale refresh token");
+  }
+  return idToken;
+}

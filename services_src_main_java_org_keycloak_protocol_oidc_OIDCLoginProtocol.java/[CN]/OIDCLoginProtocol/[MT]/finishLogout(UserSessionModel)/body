@@ -1,12 +1,15 @@
 {
   String redirectUri=userSession.getNote(OIDCLoginProtocol.LOGOUT_REDIRECT_URI);
+  String state=userSession.getNote(OIDCLoginProtocol.LOGOUT_STATE_PARAM);
   event.event(EventType.LOGOUT);
   if (redirectUri != null) {
     event.detail(Details.REDIRECT_URI,redirectUri);
   }
   event.user(userSession.getUser()).session(userSession).success();
   if (redirectUri != null) {
-    return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
+    UriBuilder uriBuilder=UriBuilder.fromUri(redirectUri);
+    if (state != null)     uriBuilder.queryParam(STATE_PARAM,state);
+    return Response.status(302).location(uriBuilder.build()).build();
   }
  else {
     return Response.ok().build();

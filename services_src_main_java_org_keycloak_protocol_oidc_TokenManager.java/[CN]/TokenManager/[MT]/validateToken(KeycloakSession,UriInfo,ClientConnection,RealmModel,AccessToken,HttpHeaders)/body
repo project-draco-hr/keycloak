@@ -8,7 +8,7 @@
   }
   UserSessionModel userSession=session.sessions().getUserSession(realm,oldToken.getSessionState());
   if (!AuthenticationManager.isSessionValid(realm,userSession)) {
-    AuthenticationManager.logout(session,realm,userSession,uriInfo,connection,headers);
+    AuthenticationManager.backchannelLogout(session,realm,userSession,uriInfo,connection,headers);
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Session not active","Session not active");
   }
   ClientSessionModel clientSession=null;

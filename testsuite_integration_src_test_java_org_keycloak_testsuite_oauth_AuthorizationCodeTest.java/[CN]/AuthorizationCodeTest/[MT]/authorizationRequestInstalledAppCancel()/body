@@ -9,7 +9,7 @@
   oauth.openLoginForm();
   driver.findElement(By.name("cancel")).click();
   String title=driver.getTitle();
-  Assert.assertTrue(title.equals("Error error=access_denied"));
+  Assert.assertEquals("Error code: access_denied",title);
   String error=driver.findElement(By.id(OAuth2Constants.ERROR)).getText();
   assertEquals("access_denied",error);
   events.expectLogin().error("rejected_by_user").user((String)null).session((String)null).removeDetail(Details.USERNAME).detail(Details.REDIRECT_URI,"http://localhost:8081/auth/realms/test/protocol/openid-connect/oauth/oob").assertEvent().getDetails().get(Details.CODE_ID);

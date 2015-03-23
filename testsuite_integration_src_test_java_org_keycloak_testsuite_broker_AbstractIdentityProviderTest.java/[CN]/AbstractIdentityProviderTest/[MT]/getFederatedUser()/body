@@ -2,6 +2,11 @@
   UserSessionStatus userSessionStatus=retrieveSessionStatus();
   IDToken idToken=userSessionStatus.getIdToken();
   KeycloakSession samlServerSession=brokerServerRule.startSession();
-  RealmModel brokerRealm=samlServerSession.realms().getRealm("realm-with-broker");
-  return samlServerSession.users().getUserById(idToken.getSubject(),brokerRealm);
+  try {
+    RealmModel brokerRealm=samlServerSession.realms().getRealm("realm-with-broker");
+    return samlServerSession.users().getUserById(idToken.getSubject(),brokerRealm);
+  }
+  finally {
+    brokerServerRule.stopSession(samlServerSession,false);
+  }
 }

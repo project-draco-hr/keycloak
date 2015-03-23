@@ -2,8 +2,9 @@
   if (updateUserAccountAfterPasswordUpdate && event instanceof CredentialUpdatedEvent) {
     CredentialUpdatedEvent credEvent=((CredentialUpdatedEvent)event);
     PartitionManager partitionManager=credEvent.getPartitionMananger();
-    IdentityContext identityCtx=(IdentityContext)partitionManager.createIdentityManager();
-    CredentialStore store=((StoreSelector)partitionManager).getStoreForCredentialOperation(identityCtx,credEvent.getCredential().getClass());
+    ContextualIdentityManager identityManager=(ContextualIdentityManager)partitionManager.createIdentityManager();
+    IdentityContext identityCtx=identityManager.getIdentityContext();
+    CredentialStore store=identityManager.getStoreSelector().getStoreForCredentialOperation(identityCtx,credEvent.getCredential().getClass());
     if (store instanceof LDAPIdentityStore) {
       LDAPIdentityStore ldapStore=(LDAPIdentityStore)store;
       LDAPOperationManager operationManager=ldapStore.getOperationManager();

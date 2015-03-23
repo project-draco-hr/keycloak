@@ -19,7 +19,7 @@
   driver.navigate().to(changePasswordUrl.trim());
   updatePasswordPage.assertCurrent();
   updatePasswordPage.changePassword("invalid","invalid");
-  assertEquals("Invalid password: minimum length 8",resetPasswordPage.getErrorMessage());
+  assertEquals("Invalid password: minimum length 8.",resetPasswordPage.getErrorMessage());
   updatePasswordPage.changePassword("resetPasswordWithPasswordPolicy","resetPasswordWithPasswordPolicy");
   events.expectRequiredAction(EventType.UPDATE_PASSWORD).user(userId).session(sessionId).detail(Details.USERNAME,"login-test").assertEvent();
   assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());

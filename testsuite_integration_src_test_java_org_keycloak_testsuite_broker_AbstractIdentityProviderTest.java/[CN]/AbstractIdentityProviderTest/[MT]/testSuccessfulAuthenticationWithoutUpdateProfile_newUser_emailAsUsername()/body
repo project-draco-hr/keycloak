@@ -7,6 +7,8 @@
     identityProviderModel.setUpdateProfileFirstLogin(false);
     authenticateWithIdentityProvider(identityProviderModel,"test-user");
     assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
+    brokerServerRule.stopSession(session,true);
+    session=brokerServerRule.startSession();
     RealmModel realm=getRealm();
     UserModel federatedUser=session.users().getUserByUsername("test-user@localhost",realm);
     assertNotNull(federatedUser);

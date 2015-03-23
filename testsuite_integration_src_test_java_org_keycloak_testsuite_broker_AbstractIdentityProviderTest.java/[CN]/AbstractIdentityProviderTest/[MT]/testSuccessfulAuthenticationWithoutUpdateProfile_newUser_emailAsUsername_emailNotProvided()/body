@@ -6,6 +6,8 @@
     IdentityProviderModel identityProviderModel=getIdentityProviderModel();
     identityProviderModel.setUpdateProfileFirstLogin(false);
     authenticateWithIdentityProvider(identityProviderModel,"test-user-noemail");
+    brokerServerRule.stopSession(session,true);
+    session=brokerServerRule.startSession();
     RealmModel realm=getRealm();
     UserModel federatedUser=getFederatedUser();
     assertNotNull(federatedUser);

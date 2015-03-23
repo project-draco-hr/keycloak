@@ -4,6 +4,8 @@
   UserModel federatedUser=getFederatedUser();
   assertNotNull(federatedUser);
   doAssertFederatedUser(federatedUser,identityProviderModel,expectedEmail);
+  brokerServerRule.stopSession(session,true);
+  session=brokerServerRule.startSession();
   RealmModel realm=getRealm();
   Set<FederatedIdentityModel> federatedIdentities=this.session.users().getFederatedIdentities(federatedUser,realm);
   assertEquals(1,federatedIdentities.size());

@@ -1,0 +1,18 @@
+{
+  loginPage.open();
+  loginPage.resetPassword();
+  resetPasswordPage.changePassword("login-test");
+  assertEquals(1,greenMail.getReceivedMessages().length);
+  MimeMessage message=greenMail.getReceivedMessages()[0];
+  Assert.assertEquals("Passwort zur??ckzusetzen",message.getSubject());
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      manager.getSession().users().getUserByUsername("login-test",appRealm).setAttribute(UserModel.LOCALE,"en");
+    }
+  }
+);
+  resetPasswordPage.changePassword("login-test");
+  assertEquals(2,greenMail.getReceivedMessages().length);
+  message=greenMail.getReceivedMessages()[1];
+  Assert.assertEquals("Reset password",message.getSubject());
+}

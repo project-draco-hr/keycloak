@@ -1,11 +1,11 @@
 {
-  if (idToken == null) {
+  if (encodedToken == null) {
     throw new IdentityBrokerException("No id_token from server.");
   }
   try {
-    JsonNode idTokenInfo=asJsonNode(decodeJWS(idToken));
-    String aud=getJsonProperty(idTokenInfo,"aud");
-    String iss=getJsonProperty(idTokenInfo,"iss");
+    IDToken idToken=new JWSInput(encodedToken).readJsonContent(IDToken.class);
+    String aud=idToken.getAudience();
+    String iss=idToken.getIssuer();
     if (aud != null && !aud.equals(getConfig().getClientId())) {
       throw new RuntimeException("Wrong audience from id_token..");
     }
@@ -14,11 +14,12 @@
       String[] issuers=trustedIssuers.split(",");
       for (      String trustedIssuer : issuers) {
         if (iss != null && iss.equals(trustedIssuer.trim())) {
-          return;
+          return idToken;
         }
       }
       throw new IdentityBrokerException("Wrong issuer from id_token..");
     }
+    return idToken;
   }
  catch (  IOException e) {
     throw new IdentityBrokerException("Could not decode id token.",e);

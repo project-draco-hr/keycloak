@@ -1,0 +1,50 @@
+{
+  AccessTokenResponse tokenResponse=null;
+  try {
+    tokenResponse=JsonSerialization.readValue(response,AccessTokenResponse.class);
+  }
+ catch (  IOException e) {
+    throw new IdentityBrokerException("Could not decode access token response.",e);
+  }
+  String accessToken=tokenResponse.getToken();
+  if (accessToken == null) {
+    throw new IdentityBrokerException("No access_token from server.");
+  }
+  String encodedIdToken=tokenResponse.getIdToken();
+  notes.put(FEDERATED_ACCESS_TOKEN,accessToken);
+  notes.put(FEDERATED_ID_TOKEN,encodedIdToken);
+  notes.put(FEDERATED_REFRESH_TOKEN,tokenResponse.getRefreshToken());
+  notes.put(FEDERATED_TOKEN_EXPIRATION,Long.toString(tokenResponse.getExpiresIn()));
+  IDToken idToken=validateIdToken(encodedIdToken);
+  try {
+    String id=idToken.getSubject();
+    String name=idToken.getName();
+    String preferredUsername=idToken.getPreferredUsername();
+    String email=idToken.getEmail();
+    if (id == null || name == null || preferredUsername == null || email == null && getConfig().getUserInfoUrl() != null) {
+      JsonNode userInfo=SimpleHttp.doGet(getConfig().getUserInfoUrl()).header("Authorization","Bearer " + accessToken).asJson();
+      id=getJsonProperty(userInfo,"sub");
+      name=getJsonProperty(userInfo,"name");
+      preferredUsername=getJsonProperty(userInfo,"preferred_username");
+      email=getJsonProperty(userInfo,"email");
+    }
+    FederatedIdentity identity=new FederatedIdentity(id);
+    identity.setId(id);
+    identity.setName(name);
+    identity.setEmail(email);
+    if (preferredUsername == null) {
+      preferredUsername=email;
+    }
+    if (preferredUsername == null) {
+      preferredUsername=id;
+    }
+    identity.setUsername(preferredUsername);
+    if (getConfig().isStoreToken()) {
+      identity.setToken(response);
+    }
+    return identity;
+  }
+ catch (  Exception e) {
+    throw new IdentityBrokerException("Could not fetch attributes from userinfo endpoint.",e);
+  }
+}

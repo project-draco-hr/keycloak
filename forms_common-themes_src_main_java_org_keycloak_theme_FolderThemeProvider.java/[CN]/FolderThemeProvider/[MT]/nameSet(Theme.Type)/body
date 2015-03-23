@@ -1,17 +1,19 @@
 {
-  File typeDir=getTypeDir(type);
-  if (typeDir != null) {
-    File[] themes=typeDir.listFiles(new FileFilter(){
-      @Override public boolean accept(      File pathname){
-        return pathname.isDirectory();
-      }
+  final String typeName=type.name().toLowerCase();
+  File[] themeDirs=themesDir.listFiles(new FileFilter(){
+    @Override public boolean accept(    File pathname){
+      return pathname.isDirectory() && new File(pathname,typeName).isDirectory();
     }
+  }
 );
+  if (themeDirs != null) {
     Set<String> names=new HashSet<String>();
-    for (    File t : themes) {
-      names.add(t.getName());
+    for (    File themeDir : themeDirs) {
+      names.add(themeDir.getName());
     }
     return names;
   }
-  return Collections.emptySet();
+ else {
+    return Collections.emptySet();
+  }
 }

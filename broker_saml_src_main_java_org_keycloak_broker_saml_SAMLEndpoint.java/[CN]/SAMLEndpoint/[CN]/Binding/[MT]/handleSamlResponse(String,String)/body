@@ -5,7 +5,18 @@
     event.event(EventType.IDENTITY_PROVIDER_RESPONSE);
     event.error(Errors.INVALID_SAML_RESPONSE);
     event.detail(Details.REASON,"invalid_destination");
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUEST);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_FEDERATED_IDENTITY_ACTION);
+  }
+  if (config.isValidateSignature()) {
+    try {
+      verifySignature(holder);
+    }
+ catch (    VerificationException e) {
+      logger.error("validation failed",e);
+      event.event(EventType.IDENTITY_PROVIDER_RESPONSE);
+      event.error(Errors.INVALID_SIGNATURE);
+      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_FEDERATED_IDENTITY_ACTION);
+    }
   }
   if (statusResponse instanceof ResponseType) {
     return handleLoginResponse(samlResponse,holder,(ResponseType)statusResponse,relayState);

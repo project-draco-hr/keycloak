@@ -1,5 +1,5 @@
 {
-  if (getConfig().getLogoutUrl() == null)   return null;
+  if (getConfig().getLogoutUrl() == null || getConfig().getLogoutUrl().trim().equals(""))   return null;
   UriBuilder logoutUri=UriBuilder.fromUri(getConfig().getLogoutUrl()).queryParam("state",userSession.getId());
   String idToken=userSession.getNote(FEDERATED_ID_TOKEN);
   if (idToken != null)   logoutUri.queryParam("id_token_hint",idToken);

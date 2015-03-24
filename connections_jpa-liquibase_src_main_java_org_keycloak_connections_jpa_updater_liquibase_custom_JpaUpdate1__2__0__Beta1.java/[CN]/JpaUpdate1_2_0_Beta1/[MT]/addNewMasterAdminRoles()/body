@@ -1,0 +1,42 @@
+{
+  String adminRoleId=getAdminRoleId();
+  String masterRealmId=Config.getAdminRealm();
+  PreparedStatement statement=jdbcConnection.prepareStatement("select NAME from REALM");
+  try {
+    ResultSet resultSet=statement.executeQuery();
+    try {
+      while (resultSet.next()) {
+        String realmName=resultSet.getString("NAME");
+        String masterAdminAppName=realmName + "-realm";
+        PreparedStatement statement2=jdbcConnection.prepareStatement("select ID from CLIENT where REALM_ID = ? AND NAME = ?");
+        statement2.setString(1,masterRealmId);
+        statement2.setString(2,masterAdminAppName);
+        try {
+          ResultSet resultSet2=statement2.executeQuery();
+          try {
+            if (resultSet2.next()) {
+              String masterAdminAppId=resultSet2.getString("ID");
+              addAdminRole(AdminRoles.VIEW_IDENTITY_PROVIDERS,masterRealmId,masterAdminAppId,adminRoleId);
+              addAdminRole(AdminRoles.MANAGE_IDENTITY_PROVIDERS,masterRealmId,masterAdminAppId,adminRoleId);
+            }
+ else {
+              throw new IllegalStateException("Couldn't find ID of '" + masterAdminAppName + "' application in 'master' realm. ");
+            }
+          }
+  finally {
+            resultSet2.close();
+          }
+        }
+  finally {
+          statement2.close();
+        }
+      }
+    }
+  finally {
+      resultSet.close();
+    }
+  }
+  finally {
+    statement.close();
+  }
+}

@@ -1,0 +1,22 @@
+{
+  String federatedIdentityTableName=database.correctObjectName("FEDERATED_IDENTITY",Table.class);
+  PreparedStatement statement=jdbcConnection.prepareStatement("select REALM_ID, USER_ID, SOCIAL_PROVIDER, SOCIAL_USER_ID, SOCIAL_USERNAME from USER_SOCIAL_LINK");
+  try {
+    ResultSet resultSet=statement.executeQuery();
+    try {
+      int count=0;
+      while (resultSet.next()) {
+        InsertStatement insert=new InsertStatement(null,null,federatedIdentityTableName).addColumnValue("REALM_ID",resultSet.getString("REALM_ID")).addColumnValue("USER_ID",resultSet.getString("USER_ID")).addColumnValue("IDENTITY_PROVIDER",resultSet.getString("SOCIAL_PROVIDER")).addColumnValue("FEDERATED_USER_ID",resultSet.getString("SOCIAL_USER_ID")).addColumnValue("FEDERATED_USERNAME",resultSet.getString("SOCIAL_USERNAME"));
+        count++;
+        statements.add(insert);
+      }
+      confirmationMessage.append("Updating " + count + " social links to federated identities. ");
+    }
+  finally {
+      resultSet.close();
+    }
+  }
+  finally {
+    statement.close();
+  }
+}

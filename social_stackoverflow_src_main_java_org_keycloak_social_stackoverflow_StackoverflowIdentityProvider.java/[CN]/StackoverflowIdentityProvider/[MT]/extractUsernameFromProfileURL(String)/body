@@ -1,0 +1,31 @@
+{
+  if (isNotBlank(profileURL)) {
+    try {
+      log.debug("go to extract username from profile URL " + profileURL);
+      URL u=new URL(profileURL);
+      String path=u.getPath();
+      if (isNotBlank(path) && path.length() > 1) {
+        if (path.startsWith("/")) {
+          path=path.substring(1);
+        }
+        String[] pe=path.split("/");
+        if (pe.length >= 3) {
+          return URLDecoder.decode(pe[2],"UTF-8");
+        }
+ else {
+          log.warn("Stackoverflow profile URL path is without third part: " + profileURL);
+        }
+      }
+ else {
+        log.warn("Stackoverflow profile URL is without path part: " + profileURL);
+      }
+    }
+ catch (    MalformedURLException e) {
+      log.warn("Stackoverflow profile URL is malformed: " + profileURL);
+    }
+catch (    Exception e) {
+      log.warn("Stackoverflow profile URL " + profileURL + " username extraction failed due: "+ e.getMessage());
+    }
+  }
+  return null;
+}

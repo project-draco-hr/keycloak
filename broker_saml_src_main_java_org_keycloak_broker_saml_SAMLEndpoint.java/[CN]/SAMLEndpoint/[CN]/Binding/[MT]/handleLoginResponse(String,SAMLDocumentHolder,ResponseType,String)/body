@@ -1,15 +1,4 @@
 {
-  if (config.isValidateSignature()) {
-    try {
-      verifySignature(holder);
-    }
- catch (    VerificationException e) {
-      logger.error("validation failed",e);
-      event.event(EventType.LOGIN);
-      event.error(Errors.INVALID_SIGNATURE);
-      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUESTER);
-    }
-  }
   try {
     AssertionType assertion=getAssertion(responseType);
     SubjectType subject=assertion.getSubject();
@@ -34,7 +23,7 @@
       }
     }
     if (authn != null && authn.getSessionIndex() != null) {
-      notes.put("SAML_FEDERATED_SESSION_INDEX",authn.getSessionIndex());
+      notes.put(SAML_FEDERATED_SESSION_INDEX,authn.getSessionIndex());
     }
     return callback.authenticated(notes,config,identity,relayState);
   }

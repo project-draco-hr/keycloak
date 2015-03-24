@@ -1,0 +1,22 @@
+{
+  if (!(e instanceof UserSessionEntity)) {
+    return;
+  }
+  UserSessionEntity entity=(UserSessionEntity)e;
+  if (!realm.equals(entity.getRealm())) {
+    return;
+  }
+  for (  Map.Entry<String,String> entry : notes.entrySet()) {
+    String note=entity.getNotes().get(entry.getKey());
+    if (note == null)     return;
+    if (!note.equals(entry.getValue()))     return;
+  }
+switch (emit) {
+case KEY:
+    collector.emit(key,key);
+  break;
+case ENTITY:
+collector.emit(key,entity);
+break;
+}
+}

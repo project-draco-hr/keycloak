@@ -1,0 +1,32 @@
+{
+  SAMLDocumentHolder holder=extractRequestDocument(samlRequest);
+  RequestAbstractType requestAbstractType=(RequestAbstractType)holder.getSamlObject();
+  if (!uriInfo.getAbsolutePath().toString().equals(requestAbstractType.getDestination())) {
+    event.event(EventType.IDENTITY_PROVIDER_RESPONSE);
+    event.error(Errors.INVALID_SAML_RESPONSE);
+    event.detail(Details.REASON,"invalid_destination");
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUEST);
+  }
+  if (config.isValidateSignature()) {
+    try {
+      verifySignature(holder);
+    }
+ catch (    VerificationException e) {
+      logger.error("validation failed",e);
+      event.event(EventType.IDENTITY_PROVIDER_RESPONSE);
+      event.error(Errors.INVALID_SIGNATURE);
+      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUESTER);
+    }
+  }
+  if (requestAbstractType instanceof LogoutRequestType) {
+    logger.debug("** logout request");
+    event.event(EventType.LOGOUT);
+    LogoutRequestType logout=(LogoutRequestType)requestAbstractType;
+    return logoutRequest(logout,relayState);
+  }
+ else {
+    event.event(EventType.LOGIN);
+    event.error(Errors.INVALID_TOKEN);
+    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUEST);
+  }
+}

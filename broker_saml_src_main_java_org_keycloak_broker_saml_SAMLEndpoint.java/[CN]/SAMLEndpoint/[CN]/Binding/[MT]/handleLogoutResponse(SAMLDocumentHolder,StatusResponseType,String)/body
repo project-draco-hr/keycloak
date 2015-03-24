@@ -1,15 +1,4 @@
 {
-  if (config.isValidateSignature()) {
-    try {
-      verifySignature(holder);
-    }
- catch (    VerificationException e) {
-      logger.error("logout response validation failed",e);
-      event.event(EventType.LOGOUT);
-      event.error(Errors.INVALID_SIGNATURE);
-      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
-    }
-  }
   if (relayState == null) {
     logger.error("no valid user session");
     event.event(EventType.LOGOUT);

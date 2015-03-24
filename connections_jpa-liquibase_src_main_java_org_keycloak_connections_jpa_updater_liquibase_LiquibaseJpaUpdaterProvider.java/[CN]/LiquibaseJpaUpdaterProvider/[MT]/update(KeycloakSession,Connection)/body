@@ -1,5 +1,6 @@
 {
   logger.debug("Starting database update");
+  ThreadLocalSessionContext.setCurrentSession(session);
   try {
     Liquibase liquibase=getLiquibase(connection);
     List<ChangeSet> changeSets=liquibase.listUnrunChangeSets((Contexts)null);
@@ -29,6 +30,9 @@
   }
  catch (  Exception e) {
     throw new RuntimeException("Failed to update database",e);
+  }
+ finally {
+    ThreadLocalSessionContext.removeCurrentSession();
   }
   logger.debug("Completed database update");
 }

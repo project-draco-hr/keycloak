@@ -5,8 +5,8 @@
     SubjectType.STSubType subType=subject.getSubType();
     NameIDType subjectNameID=(NameIDType)subType.getBaseID();
     Map<String,String> notes=new HashMap<>();
-    notes.put("SAML_FEDERATED_SUBJECT",subjectNameID.getValue());
-    if (subjectNameID.getFormat() != null)     notes.put("SAML_FEDERATED_SUBJECT_NAMEFORMAT",subjectNameID.getFormat().toString());
+    notes.put(SAML_FEDERATED_SUBJECT,subjectNameID.getValue());
+    if (subjectNameID.getFormat() != null)     notes.put(SAML_FEDERATED_SUBJECT_NAMEFORMAT,subjectNameID.getFormat().toString());
     FederatedIdentity identity=new FederatedIdentity(subjectNameID.getValue());
     identity.setUsername(subjectNameID.getValue());
     if (subjectNameID.getFormat().toString().equals(JBossSAMLURIConstants.NAMEID_FORMAT_EMAIL.get())) {
@@ -22,7 +22,10 @@
         break;
       }
     }
+    String brokerUserId=config.getAlias() + "." + subjectNameID.getValue();
+    identity.setBrokerUserId(brokerUserId);
     if (authn != null && authn.getSessionIndex() != null) {
+      identity.setBrokerSessionId(identity.getBrokerUserId() + "." + authn.getSessionIndex());
       notes.put(SAML_FEDERATED_SESSION_INDEX,authn.getSessionIndex());
     }
     return callback.authenticated(notes,config,identity,relayState);

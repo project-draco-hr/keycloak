@@ -1,0 +1,9 @@
+{
+  DBObject query=new BasicDBObject("brokerSessionId",brokerSessionId);
+  List<UserSessionModel> sessions=new LinkedList<UserSessionModel>();
+  for (  MongoUserSessionEntity e : mongoStore.loadEntities(MongoUserSessionEntity.class,query,invocationContext)) {
+    sessions.add(new UserSessionAdapter(session,this,e,realm,invocationContext));
+  }
+  if (sessions.isEmpty())   return null;
+  return sessions.get(0);
+}

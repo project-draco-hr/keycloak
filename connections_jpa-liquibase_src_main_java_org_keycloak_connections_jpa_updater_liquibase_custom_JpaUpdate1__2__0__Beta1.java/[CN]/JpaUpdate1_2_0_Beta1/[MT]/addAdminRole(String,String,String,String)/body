@@ -1,0 +1,9 @@
+{
+  String roleTableName=database.correctObjectName("KEYCLOAK_ROLE",Table.class);
+  String compositeRoleTableName=database.correctObjectName("COMPOSITE_ROLE",Table.class);
+  String newRoleId=KeycloakModelUtils.generateId();
+  InsertStatement insertRole=new InsertStatement(null,null,roleTableName).addColumnValue("ID",newRoleId).addColumnValue("APP_REALM_CONSTRAINT",applicationId).addColumnValue("APPLICATION_ROLE",true).addColumnValue("NAME",roleName).addColumnValue("REALM_ID",realmId).addColumnValue("APPLICATION",applicationId);
+  InsertStatement insertCompRole=new InsertStatement(null,null,compositeRoleTableName).addColumnValue("COMPOSITE",realmAdminAppRoleId).addColumnValue("CHILD_ROLE",newRoleId);
+  statements.add(insertRole);
+  statements.add(insertCompRole);
+}

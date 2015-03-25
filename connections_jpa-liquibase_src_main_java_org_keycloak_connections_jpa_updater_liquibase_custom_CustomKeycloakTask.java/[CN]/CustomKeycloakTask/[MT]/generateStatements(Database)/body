@@ -1,0 +1,13 @@
+{
+  this.database=database;
+  jdbcConnection=(JdbcConnection)database.getConnection();
+  connection=jdbcConnection.getWrappedConnection();
+  if (isApplicable()) {
+    confirmationMessage.append(getTaskId() + ": ");
+    generateStatementsImpl();
+  }
+ else {
+    confirmationMessage.append(getTaskId() + ": no update applicable for this task");
+  }
+  return statements.toArray(new SqlStatement[statements.size()]);
+}

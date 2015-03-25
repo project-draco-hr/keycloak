@@ -1,0 +1,22 @@
+{
+  PreparedStatement statement=jdbcConnection.prepareStatement("select CLIENT.ID REALM_ADMIN_APP_ID, CLIENT.REALM_ID REALM_ID, KEYCLOAK_ROLE.ID ADMIN_ROLE_ID from CLIENT,KEYCLOAK_ROLE where KEYCLOAK_ROLE.APPLICATION = CLIENT.ID AND CLIENT.NAME = 'realm-management' AND KEYCLOAK_ROLE.NAME = ?");
+  statement.setString(1,AdminRoles.REALM_ADMIN);
+  try {
+    ResultSet resultSet=statement.executeQuery();
+    try {
+      while (resultSet.next()) {
+        String realmAdminAppId=resultSet.getString("REALM_ADMIN_APP_ID");
+        String realmId=resultSet.getString("REALM_ID");
+        String adminRoleId=resultSet.getString("ADMIN_ROLE_ID");
+        addAdminRole(AdminRoles.VIEW_IDENTITY_PROVIDERS,realmId,realmAdminAppId,adminRoleId);
+        addAdminRole(AdminRoles.MANAGE_IDENTITY_PROVIDERS,realmId,realmAdminAppId,adminRoleId);
+      }
+    }
+  finally {
+      resultSet.close();
+    }
+  }
+  finally {
+    statement.close();
+  }
+}

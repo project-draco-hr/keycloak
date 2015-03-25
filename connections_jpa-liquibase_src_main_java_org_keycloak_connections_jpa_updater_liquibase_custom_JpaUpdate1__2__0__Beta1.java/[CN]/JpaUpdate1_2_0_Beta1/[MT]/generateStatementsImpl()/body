@@ -1,0 +1,13 @@
+{
+  realmTableName=database.correctObjectName("REALM",Table.class);
+  try {
+    convertSocialToIdFedRealms();
+    convertSocialToIdFedUsers();
+    addAccessCodeLoginTimeout();
+    addNewAdminRoles();
+    addDefaultProtocolMappers();
+  }
+ catch (  Exception e) {
+    throw new CustomChangeException(getTaskId() + ": Exception when updating data from previous version",e);
+  }
+}

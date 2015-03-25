@@ -1,0 +1,56 @@
+{
+  String identityProviderTableName=database.correctObjectName("IDENTITY_PROVIDER",Table.class);
+  String idpConfigTableName=database.correctObjectName("IDENTITY_PROVIDER_CONFIG",Table.class);
+  PreparedStatement statement=jdbcConnection.prepareStatement("select RSC.NAME, VALUE, REALM_ID, UPDATE_PROFILE_ON_SOC_LOGIN from REALM_SOCIAL_CONFIG RSC,REALM where RSC.REALM_ID = REALM.ID ORDER BY RSC.REALM_ID, RSC.NAME");
+  try {
+    ResultSet resultSet=statement.executeQuery();
+    try {
+      boolean providerInProgress=false;
+      String socialProviderId=null;
+      String clientId=null;
+      String clientSecret;
+      String realmId=null;
+      boolean updateProfileOnSocialLogin=false;
+      boolean first=true;
+      while (resultSet.next()) {
+        if (first) {
+          confirmationMessage.append("Migrating social to identity providers: ");
+          first=false;
+        }
+        if (!providerInProgress) {
+          String key=resultSet.getString("NAME");
+          int keyIndex=key.indexOf(".key");
+          if (keyIndex == -1) {
+            throw new IllegalStateException("Can't parse the provider from column: " + key);
+          }
+          socialProviderId=key.substring(0,keyIndex);
+          clientId=resultSet.getString("VALUE");
+          realmId=resultSet.getString("REALM_ID");
+          updateProfileOnSocialLogin=resultSet.getBoolean("UPDATE_PROFILE_ON_SOC_LOGIN");
+          providerInProgress=true;
+        }
+ else {
+          clientSecret=resultSet.getString("VALUE");
+          String internalId=KeycloakModelUtils.generateId();
+          InsertStatement idpInsert=new InsertStatement(null,null,identityProviderTableName).addColumnValue("INTERNAL_ID",internalId).addColumnValue("ENABLED",true).addColumnValue("PROVIDER_ALIAS",socialProviderId).addColumnValue("PROVIDER_ID",socialProviderId).addColumnValue("UPDATE_PROFILE_FIRST_LOGIN",updateProfileOnSocialLogin).addColumnValue("STORE_TOKEN",false).addColumnValue("AUTHENTICATE_BY_DEFAULT",false).addColumnValue("REALM_ID",realmId);
+          InsertStatement clientIdInsert=new InsertStatement(null,null,idpConfigTableName).addColumnValue("IDENTITY_PROVIDER_ID",internalId).addColumnValue("NAME","clientId").addColumnValue("VALUE",clientId);
+          InsertStatement clientSecretInsert=new InsertStatement(null,null,idpConfigTableName).addColumnValue("IDENTITY_PROVIDER_ID",internalId).addColumnValue("NAME","clientSecret").addColumnValue("VALUE",clientSecret);
+          statements.add(idpInsert);
+          statements.add(clientIdInsert);
+          statements.add(clientSecretInsert);
+          confirmationMessage.append(socialProviderId + " in realm " + realmId+ ", ");
+          providerInProgress=false;
+        }
+      }
+      if (!first) {
+        confirmationMessage.append(". ");
+      }
+    }
+  finally {
+      resultSet.close();
+    }
+  }
+  finally {
+    statement.close();
+  }
+}

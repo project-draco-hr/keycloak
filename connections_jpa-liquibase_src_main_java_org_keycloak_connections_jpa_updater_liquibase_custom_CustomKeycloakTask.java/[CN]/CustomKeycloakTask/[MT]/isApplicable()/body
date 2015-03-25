@@ -1,0 +1,20 @@
+{
+  try {
+    String correctedTableName=database.correctObjectName("REALM",Table.class);
+    if (SnapshotGeneratorFactory.getInstance().has(new Table().setName(correctedTableName),database)) {
+      ResultSet resultSet=connection.createStatement().executeQuery("SELECT ID FROM REALM");
+      try {
+        return (resultSet.next());
+      }
+  finally {
+        resultSet.close();
+      }
+    }
+ else {
+      return false;
+    }
+  }
+ catch (  Exception e) {
+    throw new CustomChangeException("Failed to check database availability",e);
+  }
+}

@@ -13,6 +13,14 @@
   sp.setIssuer(requestIssuer);
   responseType=saml2Response.createResponseType(id,sp,idp,issuerHolder);
   AssertionType assertion=responseType.getAssertions().get(0).getAssertion();
+  if (assertionExpiration > 0) {
+    ConditionsType conditions=assertion.getConditions();
+    conditions.setNotOnOrAfter(XMLTimeUtil.add(conditions.getNotBefore(),assertionExpiration * 1000));
+  }
+  if (subjectExpiration > 0) {
+    SubjectConfirmationDataType subjectConfirmationData=assertion.getSubject().getConfirmation().get(0).getSubjectConfirmationData();
+    subjectConfirmationData.setNotOnOrAfter(XMLTimeUtil.add(assertion.getConditions().getNotBefore(),subjectExpiration * 1000));
+  }
   if (!disableAuthnStatement) {
     String authContextRef=JBossSAMLURIConstants.AC_UNSPECIFIED.get();
     if (isNotNull(authMethod))     authContextRef=authMethod;

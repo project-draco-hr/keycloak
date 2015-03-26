@@ -2,7 +2,7 @@
   EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder().event(EventType.USER_INFO_REQUEST).detail(Details.AUTH_METHOD,Details.VALIDATE_ACCESS_TOKEN);
   AccessToken token=null;
   try {
-    token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),realm.getName());
+    token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName()));
   }
  catch (  Exception e) {
     throw new ErrorResponseException(OAuthErrorException.INVALID_GRANT,"Token invalid",Status.FORBIDDEN);

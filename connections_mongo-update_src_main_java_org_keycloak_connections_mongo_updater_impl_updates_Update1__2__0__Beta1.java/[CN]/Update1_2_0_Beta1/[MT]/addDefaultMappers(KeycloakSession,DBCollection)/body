@@ -6,8 +6,9 @@
       BasicDBList dbProtocolMappers=new BasicDBList();
       currentClient.put("protocolMappers",dbProtocolMappers);
       Object claimMask=currentClient.get("allowedClaimsMask");
-      Collection<ProtocolMapperModel> clientProtocolMappers=MigrationUtils.getMappersForClaimMask(session,(Long)claimMask);
-      for (      ProtocolMapperModel protocolMapper : clientProtocolMappers) {
+      MigrationProvider migrationProvider=session.getProvider(MigrationProvider.class);
+      List<ProtocolMapperRepresentation> protocolMappers=migrationProvider.getMappersForClaimMask((Long)claimMask);
+      for (      ProtocolMapperRepresentation protocolMapper : protocolMappers) {
         BasicDBObject dbMapper=new BasicDBObject();
         dbMapper.put("id",KeycloakModelUtils.generateId());
         dbMapper.put("protocol",protocolMapper.getProtocol());

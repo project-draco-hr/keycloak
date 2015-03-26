@@ -1,4 +1,10 @@
 {
+  File f=new File(System.getProperty("user.home"),".keycloak-server.properties");
+  if (f.isFile()) {
+    Properties p=new Properties();
+    p.load(new FileInputStream(f));
+    System.getProperties().putAll(p);
+  }
   KeycloakServerConfig config=new KeycloakServerConfig();
   for (int i=0; i < args.length; i++) {
     if (args[i].equals("-b")) {

@@ -1,0 +1,14 @@
+{
+  AccessToken token=new AccessToken();
+  token.id(KeycloakModelUtils.generateId());
+  token.issuedNow();
+  token.subject(user.getId());
+  token.issuer(issuer);
+  if (session != null) {
+    token.setSessionState(session.getId());
+  }
+  if (realm.getSsoSessionMaxLifespan() > 0) {
+    token.expiration(Time.currentTime() + realm.getSsoSessionMaxLifespan());
+  }
+  return token;
+}

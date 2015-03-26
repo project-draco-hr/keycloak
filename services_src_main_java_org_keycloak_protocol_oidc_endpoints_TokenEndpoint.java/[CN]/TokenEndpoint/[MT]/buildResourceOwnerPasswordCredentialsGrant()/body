@@ -33,6 +33,7 @@ UserSessionModel userSession=sessions.createUserSession(realm,user,username,clie
 event.session(userSession);
 ClientSessionModel clientSession=sessions.createClientSession(realm,client);
 clientSession.setAuthMethod(OIDCLoginProtocol.LOGIN_PROTOCOL);
+clientSession.setNote(OIDCLoginProtocol.ISSUER,Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName()));
 TokenManager.attachClientSession(userSession,clientSession);
 AccessTokenResponse res=tokenManager.responseBuilder(realm,client,event,session,userSession,clientSession).generateAccessToken(session,scope,client,user,userSession,clientSession).generateRefreshToken().generateIDToken().build();
 event.success();

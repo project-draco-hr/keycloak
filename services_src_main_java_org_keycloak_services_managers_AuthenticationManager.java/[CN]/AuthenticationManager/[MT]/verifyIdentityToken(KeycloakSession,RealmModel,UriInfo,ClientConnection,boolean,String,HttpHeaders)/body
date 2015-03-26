@@ -1,6 +1,6 @@
 {
   try {
-    AccessToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),realm.getName(),checkActive);
+    AccessToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName()),checkActive);
     if (checkActive) {
       if (!token.isActive() || token.getIssuedAt() < realm.getNotBefore()) {
         logger.debug("identity cookie expired");

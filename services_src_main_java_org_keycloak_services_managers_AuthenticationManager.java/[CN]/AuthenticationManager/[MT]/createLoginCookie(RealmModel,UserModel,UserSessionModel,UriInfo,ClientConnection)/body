@@ -1,6 +1,7 @@
 {
   String cookiePath=getIdentityCookiePath(realm,uriInfo);
-  AccessToken identityToken=createIdentityToken(realm,user,session);
+  String issuer=Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName());
+  AccessToken identityToken=createIdentityToken(realm,user,session,issuer);
   String encoded=encodeToken(realm,identityToken);
   boolean secureOnly=realm.getSslRequired().isRequired(connection);
   int maxAge=NewCookie.DEFAULT_MAX_AGE;

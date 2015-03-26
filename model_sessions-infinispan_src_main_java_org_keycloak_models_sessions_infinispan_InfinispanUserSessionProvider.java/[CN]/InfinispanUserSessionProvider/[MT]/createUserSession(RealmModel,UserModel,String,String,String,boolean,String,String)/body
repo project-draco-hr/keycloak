@@ -1,0 +1,18 @@
+{
+  String id=KeycloakModelUtils.generateId();
+  UserSessionEntity entity=new UserSessionEntity();
+  entity.setId(id);
+  entity.setRealm(realm.getId());
+  entity.setUser(user.getId());
+  entity.setLoginUsername(loginUsername);
+  entity.setIpAddress(ipAddress);
+  entity.setAuthMethod(authMethod);
+  entity.setRememberMe(rememberMe);
+  entity.setBrokerSessionId(brokerSessionId);
+  entity.setBrokerUserId(brokerUserId);
+  int currentTime=Time.currentTime();
+  entity.setStarted(currentTime);
+  entity.setLastSessionRefresh(currentTime);
+  tx.put(sessionCache,id,entity);
+  return wrap(realm,entity);
+}

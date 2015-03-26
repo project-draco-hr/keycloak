@@ -1,0 +1,15 @@
+{
+  if (!action.validate()) {
+    logger.warn("admin request failed, not validated" + action.getAction());
+    return false;
+  }
+  if (action.isExpired()) {
+    logger.warn("admin request failed, expired token");
+    return false;
+  }
+  if (!getConfig().getClientId().equals(action.getResource())) {
+    logger.warn("Resource name does not match");
+    return false;
+  }
+  return true;
+}

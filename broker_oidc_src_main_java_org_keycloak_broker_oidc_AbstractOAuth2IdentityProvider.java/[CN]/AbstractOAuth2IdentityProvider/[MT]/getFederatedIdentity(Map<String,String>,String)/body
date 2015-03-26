@@ -1,15 +1,5 @@
 {
-  AccessTokenResponse tokenResponse=null;
-  try {
-    tokenResponse=JsonSerialization.readValue(response,AccessTokenResponse.class);
-  }
- catch (  IOException e) {
-    throw new IdentityBrokerException("Could not decode access token response.",e);
-  }
-  String accessToken=tokenResponse.getToken();
-  notes.put(FEDERATED_ACCESS_TOKEN,accessToken);
-  notes.put(FEDERATED_REFRESH_TOKEN,tokenResponse.getRefreshToken());
-  notes.put(FEDERATED_TOKEN_EXPIRATION,Long.toString(tokenResponse.getExpiresIn()));
+  String accessToken=extractTokenFromResponse(response,OAUTH2_PARAMETER_ACCESS_TOKEN);
   if (accessToken == null) {
     throw new IdentityBrokerException("No access token from server.");
   }

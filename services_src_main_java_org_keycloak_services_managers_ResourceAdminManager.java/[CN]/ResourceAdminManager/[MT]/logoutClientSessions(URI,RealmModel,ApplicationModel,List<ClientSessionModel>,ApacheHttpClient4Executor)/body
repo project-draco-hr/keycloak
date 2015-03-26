@@ -2,6 +2,7 @@
   String managementUrl=getManagementUrl(requestUri,resource);
   if (managementUrl != null) {
     MultivaluedHashMap<String,String> adapterSessionIds=null;
+    List<String> userSessions=new LinkedList<>();
     if (clientSessions != null && clientSessions.size() > 0) {
       adapterSessionIds=new MultivaluedHashMap<String,String>();
       for (      ClientSessionModel clientSession : clientSessions) {
@@ -10,6 +11,7 @@
           String host=clientSession.getNote(AdapterConstants.APPLICATION_SESSION_HOST);
           adapterSessionIds.add(host,adapterSessionId);
         }
+        if (clientSession.getUserSession() != null)         userSessions.add(clientSession.getUserSession().getId());
       }
     }
     if (adapterSessionIds == null || adapterSessionIds.isEmpty()) {
@@ -22,7 +24,7 @@
         String host=entry.getKey();
         List<String> sessionIds=entry.getValue();
         String currentHostMgmtUrl=managementUrl.replace(APPLICATION_SESSION_HOST_PROPERTY,host);
-        allPassed=sendLogoutRequest(realm,resource,sessionIds,client,0,currentHostMgmtUrl) && allPassed;
+        allPassed=sendLogoutRequest(realm,resource,sessionIds,userSessions,client,0,currentHostMgmtUrl) && allPassed;
       }
       return allPassed;
     }
@@ -31,7 +33,7 @@
       for (      List<String> currentIds : adapterSessionIds.values()) {
         allSessionIds.addAll(currentIds);
       }
-      return sendLogoutRequest(realm,resource,allSessionIds,client,0,managementUrl);
+      return sendLogoutRequest(realm,resource,allSessionIds,userSessions,client,0,managementUrl);
     }
   }
  else {

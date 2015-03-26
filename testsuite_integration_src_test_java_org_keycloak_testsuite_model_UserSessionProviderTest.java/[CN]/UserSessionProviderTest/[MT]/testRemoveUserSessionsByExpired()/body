@@ -5,10 +5,10 @@
     Set<String> expired=new HashSet<String>();
     Set<String> expiredClientSessions=new HashSet<String>();
     Time.setOffset(-(realm.getSsoSessionMaxLifespan() + 1));
-    expired.add(session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0.1","form",true).getId());
+    expired.add(session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0.1","form",true,null,null).getId());
     expiredClientSessions.add(session.sessions().createClientSession(realm,client).getId());
     Time.setOffset(0);
-    UserSessionModel s=session.sessions().createUserSession(realm,session.users().getUserByUsername("user2",realm),"user2","127.0.0.1","form",true);
+    UserSessionModel s=session.sessions().createUserSession(realm,session.users().getUserByUsername("user2",realm),"user2","127.0.0.1","form",true,null,null);
     s.setLastSessionRefresh(0);
     expired.add(s.getId());
     ClientSessionModel clSession=session.sessions().createClientSession(realm,client);
@@ -16,7 +16,7 @@
     expiredClientSessions.add(clSession.getId());
     Set<String> valid=new HashSet<String>();
     Set<String> validClientSessions=new HashSet<String>();
-    valid.add(session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0.1","form",true).getId());
+    valid.add(session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0.1","form",true,null,null).getId());
     validClientSessions.add(session.sessions().createClientSession(realm,client).getId());
     resetSession();
     session.sessions().removeExpiredUserSessions(realm);

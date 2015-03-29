@@ -7,6 +7,7 @@
     throw new NotFoundException("account management not enabled");
   }
   EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder();
+  event.eventGroup(EventGroup.USER);
   AccountService accountService=new AccountService(realm,application,event);
   ResteasyProviderFactory.getInstance().injectProperties(accountService);
   accountService.init();

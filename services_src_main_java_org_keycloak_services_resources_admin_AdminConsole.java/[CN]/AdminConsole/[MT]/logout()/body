@@ -1,4 +1,5 @@
 {
   URI redirect=AdminRoot.adminConsoleUrl(uriInfo).build(realm.getName());
+  event.event(EventType.LOGOUT).detail(Details.REDIRECT_URI,redirect.toString()).success();
   return Response.status(302).location(OIDCLoginProtocolService.logoutUrl(uriInfo).queryParam("redirect_uri",redirect.toString()).build(realm.getName())).build();
 }

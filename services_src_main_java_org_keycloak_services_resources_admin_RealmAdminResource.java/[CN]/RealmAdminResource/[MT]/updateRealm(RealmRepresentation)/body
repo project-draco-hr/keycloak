@@ -16,6 +16,7 @@
     for (    final UserFederationProviderModel fedProvider : federationProviders) {
       usersSyncManager.refreshPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),fedProvider,realm.getId());
     }
+    event.event(EventType.UPDATE_REALM).success();
     return Response.noContent().build();
   }
  catch (  ModelDuplicateException e) {

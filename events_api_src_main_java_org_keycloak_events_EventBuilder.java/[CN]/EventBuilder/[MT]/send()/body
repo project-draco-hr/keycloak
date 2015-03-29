@@ -3,7 +3,14 @@
   if (listeners != null) {
     for (    EventListenerProvider l : listeners) {
       try {
-        l.onEvent(event);
+        if (enabledEventTypes != null && enabledEventTypes.size() > 0) {
+          if (enabledEventTypes.contains(event.getType())) {
+            l.onEvent(event);
+          }
+        }
+ else         if (!excludedEvents.contains(event.getType())) {
+          l.onEvent(event);
+        }
       }
  catch (      Throwable t) {
         log.error("Failed to send type to " + l,t);

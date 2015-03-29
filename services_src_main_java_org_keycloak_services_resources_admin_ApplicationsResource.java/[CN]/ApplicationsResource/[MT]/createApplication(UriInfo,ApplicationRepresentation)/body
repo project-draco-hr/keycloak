@@ -2,6 +2,7 @@
   auth.requireManage();
   try {
     ApplicationModel applicationModel=RepresentationToModel.createApplication(session,realm,rep,true);
+    event.event(EventType.CREATE_APPLICATION).client(applicationModel).success();
     return Response.created(uriInfo.getAbsolutePathBuilder().path(getApplicationPath(applicationModel)).build()).build();
   }
  catch (  ModelDuplicateException e) {

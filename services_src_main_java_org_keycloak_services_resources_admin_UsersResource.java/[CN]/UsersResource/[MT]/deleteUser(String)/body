@@ -6,6 +6,7 @@
   }
   boolean removed=new UserManager(session).removeUser(realm,user);
   if (removed) {
+    event.event(EventType.DELETE_USER).user(user).detail(Details.USERNAME,user.getUsername()).success();
     return Response.noContent().build();
   }
  else {

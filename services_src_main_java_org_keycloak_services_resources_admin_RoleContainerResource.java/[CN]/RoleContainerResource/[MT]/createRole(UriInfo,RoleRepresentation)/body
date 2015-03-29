@@ -3,6 +3,7 @@
   try {
     RoleModel role=roleContainer.addRole(rep.getName());
     role.setDescription(rep.getDescription());
+    event.event(EventType.CREATE_ROLE).detail(Details.ROLE_ID,role.getId()).detail(Details.ROLE_NAME,role.getName()).success();
     return Response.created(uriInfo.getAbsolutePathBuilder().path(role.getName()).build()).build();
   }
  catch (  ModelDuplicateException e) {

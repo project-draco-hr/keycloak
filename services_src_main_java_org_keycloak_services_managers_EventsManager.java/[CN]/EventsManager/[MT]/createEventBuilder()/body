@@ -20,5 +20,9 @@
       }
     }
   }
-  return new EventBuilder(listeners,realm,clientConnection.getRemoteAddr());
+  Set<EventType> enabledEventTypes=new HashSet<EventType>();
+  for (  String type : realm.getEnabledEventTypes()) {
+    enabledEventTypes.add(EventType.valueOf(type));
+  }
+  return new EventBuilder(listeners,enabledEventTypes,realm,clientConnection.getRemoteAddr());
 }

@@ -1,0 +1,12 @@
+{
+  DefaultHttpClient httpClient=(DefaultHttpClient)new HttpClientBuilder().build();
+  ApacheHttpClient4Engine engine=new ApacheHttpClient4Engine(httpClient);
+  ResteasyClient client=new ResteasyClientBuilder().httpEngine(engine).build();
+  loginPage.open();
+  Response response=client.target(driver.getCurrentUrl()).request().acceptLanguage("de").get();
+  Assert.assertTrue(response.readEntity(String.class).contains("Anmeldung bei test"));
+  Assert.assertEquals("de",response.getCookies().get(LocaleHelper.LOCALE_COOKIE).getValue());
+  response=client.target(driver.getCurrentUrl()).request().acceptLanguage("en").get();
+  Assert.assertTrue(response.readEntity(String.class).contains("Log in to test"));
+  Assert.assertEquals("en",response.getCookies().get(LocaleHelper.LOCALE_COOKIE).getValue());
+}

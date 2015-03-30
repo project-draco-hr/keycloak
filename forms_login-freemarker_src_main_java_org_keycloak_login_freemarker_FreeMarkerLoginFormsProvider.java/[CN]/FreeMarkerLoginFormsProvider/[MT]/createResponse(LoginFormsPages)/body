@@ -36,25 +36,19 @@
     logger.warn("Failed to load messages",e);
     messagesBundle=new Properties();
   }
+  MessagesPerFieldBean messagesPerField=new MessagesPerFieldBean();
   if (messages != null) {
-    Map<String,MessageBean> messagesPerField=new HashMap<String,MessageBean>();
     MessageBean wholeMessage=new MessageBean(null,messageType);
     for (    FormMessage message : this.messages) {
       String formattedMessageText=formatMessageMessage(message,messagesBundle,locale);
       if (formattedMessageText != null) {
         wholeMessage.appendSummaryLine(formattedMessageText);
-        MessageBean fm=messagesPerField.get(message.getField());
-        if (fm == null) {
-          messagesPerField.put(message.getField(),new MessageBean(formattedMessageText,messageType));
-        }
- else {
-          fm.appendSummaryLine(formattedMessageText);
-        }
+        messagesPerField.addMessage(message.getField(),formattedMessageText,messageType);
       }
     }
     attributes.put("message",wholeMessage);
-    attributes.put("messagePerField",messagesPerField);
   }
+  attributes.put("messagesPerField",messagesPerField);
   if (page == LoginFormsPages.OAUTH_GRANT) {
     uriBuilder.replaceQuery(null);
   }

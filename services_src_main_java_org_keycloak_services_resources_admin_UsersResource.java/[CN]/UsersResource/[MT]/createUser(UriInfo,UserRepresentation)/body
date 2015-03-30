@@ -9,7 +9,7 @@
   try {
     UserModel user=session.users().addUser(realm,rep.getUsername());
     updateUserFromRep(user,rep);
-    event.event(EventType.CREATE_USER).user(user).detail(Details.USERNAME,user.getUsername()).success();
+    event.event(EventType.CREATE_USER).representation(rep).success();
     if (session.getTransaction().isActive()) {
       session.getTransaction().commit();
     }

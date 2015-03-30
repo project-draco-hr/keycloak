@@ -1,7 +1,7 @@
 {
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=locateRealm(name,realmManager);
-  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder();
+  EventBuilder event=new EventBuilder(EventGroup.USER,realm,session,clientConnection);
   AuthenticationManager authManager=new AuthenticationManager(protector);
   LoginProtocolFactory factory=(LoginProtocolFactory)session.getKeycloakSessionFactory().getProviderFactory(LoginProtocol.class,OIDCLoginProtocol.LOGIN_PROTOCOL);
   OIDCLoginProtocolService endpoint=(OIDCLoginProtocolService)factory.createProtocolEndpoint(realm,event,authManager);

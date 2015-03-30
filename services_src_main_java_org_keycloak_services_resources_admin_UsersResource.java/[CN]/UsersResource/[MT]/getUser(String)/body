@@ -4,6 +4,7 @@
   if (user == null) {
     throw new NotFoundException("User not found");
   }
-  event.event(EventType.VIEW_USER).user(user).detail(Details.USERNAME,user.getUsername()).success();
-  return ModelToRepresentation.toRepresentation(user);
+  UserRepresentation rep=ModelToRepresentation.toRepresentation(user);
+  event.event(EventType.VIEW_USER).representation(rep).success();
+  return rep;
 }

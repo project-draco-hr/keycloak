@@ -1,9 +1,7 @@
 {
   RealmManager realmManager=new RealmManager(session);
   RealmModel realm=locateRealm(name,realmManager);
-  EventBuilder event=new EventsManager(realm,session,clientConnection).createEventBuilder();
-  event.eventGroup(EventGroup.ADMIN).detail(Details.REALM_NAME,realm.getName());
-  AdminConsole service=new AdminConsole(realm,event);
+  AdminConsole service=new AdminConsole(realm);
   ResteasyProviderFactory.getInstance().injectProperties(service);
   return service;
 }

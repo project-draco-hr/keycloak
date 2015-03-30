@@ -1,12 +1,13 @@
 {
   auth.requireManage();
+  UserRepresentation rep=getUser(username);
   UserModel user=session.users().getUserByUsername(username,realm);
   if (user == null) {
     throw new NotFoundException("User not found");
   }
   boolean removed=new UserManager(session).removeUser(realm,user);
   if (removed) {
-    event.event(EventType.DELETE_USER).user(user).detail(Details.USERNAME,user.getUsername()).success();
+    event.event(EventType.DELETE_USER).representation(rep).success();
     return Response.noContent().build();
   }
  else {

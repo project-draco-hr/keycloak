@@ -1,9 +1,10 @@
 {
   auth.requireManage();
+  RoleRepresentation rep=getRole(roleName);
   RoleModel role=roleContainer.getRole(roleName);
   if (role == null) {
     throw new NotFoundException("Could not find role: " + roleName);
   }
   deleteRole(role);
-  event.event(EventType.DELETE_ROLE).detail(Details.ROLE_ID,role.getId()).detail(Details.ROLE_NAME,role.getName()).success();
+  event.event(EventType.DELETE_ROLE).representation(rep).success();
 }

@@ -16,7 +16,7 @@
   federatedIdentity.setIdentityProviderId(providerId);
   ClientSessionModel clientSession=clientCode.getClientSession();
   FederatedIdentityModel federatedIdentityModel=new FederatedIdentityModel(providerId,federatedIdentity.getId(),federatedIdentity.getUsername(),federatedIdentity.getToken());
-  this.event.event(EventType.IDENTITY_PROVIDER_LOGIN).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.IDENTITY_PROVIDER_IDENTITY,federatedIdentity.getUsername());
+  this.event.event(EventType.IDENTITY_PROVIDER_LOGIN).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.IDENTITY_PROVIDER_USERNAME,federatedIdentity.getUsername());
   UserModel federatedUser=this.session.users().getUserByFederatedIdentity(federatedIdentityModel,this.realmModel);
   if (clientSession.getUserSession() != null) {
     UserSessionModel userSession=clientSession.getUserSession();

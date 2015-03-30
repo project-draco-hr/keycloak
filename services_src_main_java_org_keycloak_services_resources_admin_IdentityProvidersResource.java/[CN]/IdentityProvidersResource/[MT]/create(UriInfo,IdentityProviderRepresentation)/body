@@ -2,6 +2,7 @@
   this.auth.requireManage();
   try {
     this.realm.addIdentityProvider(RepresentationToModel.toModel(representation));
+    event.event(EventType.CREATE_IDENTITY_PROVIDER).representation(representation).success();
     return Response.created(uriInfo.getAbsolutePathBuilder().path(representation.getProviderId()).build()).build();
   }
  catch (  ModelDuplicateException e) {

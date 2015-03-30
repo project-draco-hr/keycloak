@@ -13,6 +13,7 @@
     grantPermissionsToRealmCreator(realm);
     URI location=AdminRoot.realmsUrl(uriInfo).path(realm.getName()).build();
     logger.debugv("imported realm success, sending back: {0}",location.toString());
+    event.event(EventType.CREATE_REALM).representation(rep).success();
     return Response.created(location).build();
   }
  catch (  ModelDuplicateException e) {

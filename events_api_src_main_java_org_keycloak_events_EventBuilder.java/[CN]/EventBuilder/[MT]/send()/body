@@ -1,5 +1,15 @@
 {
   event.setTime(System.currentTimeMillis());
+  if (store != null) {
+    if (realm.getEnabledEventTypes() != null && !realm.getEnabledEventTypes().isEmpty() ? realm.getEnabledEventTypes().contains(event.getType().name()) : event.getType().isSaveByDefault()) {
+      try {
+        store.onEvent(event);
+      }
+ catch (      Throwable t) {
+        log.error("Failed to save event",t);
+      }
+    }
+  }
   if (listeners != null) {
     for (    EventListenerProvider l : listeners) {
       try {

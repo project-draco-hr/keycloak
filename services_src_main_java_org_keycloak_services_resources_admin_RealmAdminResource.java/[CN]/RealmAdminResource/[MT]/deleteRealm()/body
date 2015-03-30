@@ -1,6 +1,8 @@
 {
   auth.requireManage();
+  RealmRepresentation rep=getRealm();
   if (!new RealmManager(session).removeRealm(realm)) {
     throw new NotFoundException("Realm doesn't exist");
   }
+  event.event(EventType.DELETE_REALM).representation(rep).success();
 }

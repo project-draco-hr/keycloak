@@ -2,7 +2,9 @@
   auth.requireView();
   for (  UserFederationProviderModel model : realm.getUserFederationProviders()) {
     if (model.getId().equals(id)) {
-      return ModelToRepresentation.toRepresentation(model);
+      UserFederationProviderRepresentation rep=ModelToRepresentation.toRepresentation(model);
+      event.event(EventType.VIEW_FEDERATION_PROVIDER).representation(rep).success();
+      return rep;
     }
   }
   throw new NotFoundException("could not find provider");

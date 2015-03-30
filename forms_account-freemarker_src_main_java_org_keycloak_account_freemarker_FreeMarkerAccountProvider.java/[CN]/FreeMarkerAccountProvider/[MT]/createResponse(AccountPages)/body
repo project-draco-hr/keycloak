@@ -16,14 +16,14 @@
     logger.warn("Failed to load properties",e);
   }
   Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,headers);
-  Properties messages;
+  Properties messagesBundle;
   try {
-    messages=theme.getMessages(locale);
-    attributes.put("msg",new MessageFormatterMethod(locale,messages));
+    messagesBundle=theme.getMessages(locale);
+    attributes.put("msg",new MessageFormatterMethod(locale,messagesBundle));
   }
  catch (  IOException e) {
     logger.warn("Failed to load messages",e);
-    messages=new Properties();
+    messagesBundle=new Properties();
   }
   URI baseUri=uriInfo.getBaseUri();
   UriBuilder baseUriBuilder=uriInfo.getBaseUriBuilder();
@@ -34,16 +34,19 @@
   if (stateChecker != null) {
     attributes.put("stateChecker",stateChecker);
   }
-  if (message != null) {
-    String formattedMessage;
-    if (messages.containsKey(message)) {
-      formattedMessage=new MessageFormat(messages.getProperty(message),locale).format(parameters);
+  MessagesPerFieldBean messagesPerField=new MessagesPerFieldBean();
+  if (messages != null) {
+    MessageBean wholeMessage=new MessageBean(null,messageType);
+    for (    FormMessage message : this.messages) {
+      String formattedMessageText=formatMessage(message,messagesBundle,locale);
+      if (formattedMessageText != null) {
+        wholeMessage.appendSummaryLine(formattedMessageText);
+        messagesPerField.addMessage(message.getField(),formattedMessageText,messageType);
+      }
     }
- else {
-      formattedMessage=message;
-    }
-    attributes.put("message",new MessageBean(formattedMessage,messageType));
+    attributes.put("message",wholeMessage);
   }
+  attributes.put("messagesPerField",messagesPerField);
   if (referrer != null) {
     attributes.put("referrer",new ReferrerBean(referrer));
   }
@@ -58,7 +61,7 @@ default :
       b=UriBuilder.fromUri(baseQueryUri).path(uriInfo.getPath());
     break;
 }
-attributes.put("locale",new LocaleBean(realm,locale,b,messages));
+attributes.put("locale",new LocaleBean(realm,locale,b,messagesBundle));
 }
 attributes.put("features",new FeaturesBean(identityProviderEnabled,eventsEnabled,passwordUpdateSupported));
 attributes.put("account",new AccountBean(user,profileFormData));

@@ -1,0 +1,15 @@
+{
+  String signingCert=getConfig().getCertificateSignatureVerifier();
+  try {
+    if (signingCert != null && !signingCert.trim().equals("")) {
+      return PemUtils.decodeCertificate(signingCert).getPublicKey();
+    }
+ else     if (getConfig().getPublicKeySignatureVerifier() != null && !getConfig().getPublicKeySignatureVerifier().trim().equals("")) {
+      return PemUtils.decodePublicKey(getConfig().getPublicKeySignatureVerifier());
+    }
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  return null;
+}

@@ -1,0 +1,36 @@
+{
+  OIDCConfigurationRepresentation rep=null;
+  try {
+    rep=JsonSerialization.readValue(inputStream,OIDCConfigurationRepresentation.class);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("failed to load openid connect metadata",e);
+  }
+  OIDCIdentityProviderConfig config=new OIDCIdentityProviderConfig(new IdentityProviderModel());
+  config.setIssuer(rep.getIssuer());
+  config.setLogoutUrl(rep.getLogoutEndpoint());
+  config.setAuthorizationUrl(rep.getAuthorizationEndpoint());
+  config.setTokenUrl(rep.getTokenEndpoint());
+  config.setUserInfoUrl(rep.getUserinfoEndpoint());
+  if (rep.getJwksUri() != null) {
+    String uri=rep.getJwksUri();
+    String keySetString=null;
+    try {
+      keySetString=SimpleHttp.doGet(uri).asString();
+      JSONWebKeySet keySet=JsonSerialization.readValue(keySetString,JSONWebKeySet.class);
+      for (      JWK jwk : keySet.getKeys()) {
+        JWKParser parse=JWKParser.create(jwk);
+        if (parse.getJwk().getPublicKeyUse().equals(JWK.SIG_USE)) {
+          PublicKey key=parse.toPublicKey();
+          config.setPublicKeySignatureVerifier(KeycloakModelUtils.getPemFromKey(key));
+          config.setValidateSignature(true);
+          break;
+        }
+      }
+    }
+ catch (    IOException e) {
+      throw new RuntimeException("F   ailed to query JWKSet from: " + uri,e);
+    }
+  }
+  return config.getConfig();
+}

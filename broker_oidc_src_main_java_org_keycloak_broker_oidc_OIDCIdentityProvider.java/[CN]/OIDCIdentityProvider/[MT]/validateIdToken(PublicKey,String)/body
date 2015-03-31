@@ -3,11 +3,15 @@
     throw new IdentityBrokerException("No id_token from server.");
   }
   try {
-    IDToken idToken=new JWSInput(encodedToken).readJsonContent(IDToken.class);
+    JWSInput jws=new JWSInput(encodedToken);
+    if (!verify(jws,key)) {
+      throw new IdentityBrokerException("IDToken signature validation failed");
+    }
+    IDToken idToken=jws.readJsonContent(IDToken.class);
     String aud=idToken.getAudience();
     String iss=idToken.getIssuer();
     if (aud != null && !aud.equals(getConfig().getClientId())) {
-      throw new RuntimeException("Wrong audience from id_token..");
+      throw new IdentityBrokerException("Wrong audience from id_token..");
     }
     String trustedIssuers=getConfig().getIssuer();
     if (trustedIssuers != null) {

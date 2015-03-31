@@ -1,8 +1,9 @@
 {
   JWSInput token=new JWSInput(input);
-  String signingCert=getConfig().getSigningCertificate();
-  if (signingCert != null && !signingCert.trim().equals("")) {
-    if (!token.verify(getConfig().getSigningCertificate())) {
+  PublicKey key=getExternalIdpKey();
+  if (key != null) {
+    if (!verify(token,key)) {
+      logger.warn("Failed to verify logout request");
       return Response.status(400).build();
     }
   }

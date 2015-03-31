@@ -9,8 +9,7 @@
   if (identityProviderModel == null) {
     throw new NotFoundException("Could not find identity provider: " + alias);
   }
-  IdentityProviderResource identityProviderResource=new IdentityProviderResource(this.auth,realm,session,identityProviderModel,event);
+  IdentityProviderResource identityProviderResource=new IdentityProviderResource(this.auth,realm,session,identityProviderModel);
   ResteasyProviderFactory.getInstance().injectProperties(identityProviderResource);
-  event.event(EventType.VIEW_IDENTITY_PROVIDER).representation(identityProviderResource).success();
   return identityProviderResource;
 }

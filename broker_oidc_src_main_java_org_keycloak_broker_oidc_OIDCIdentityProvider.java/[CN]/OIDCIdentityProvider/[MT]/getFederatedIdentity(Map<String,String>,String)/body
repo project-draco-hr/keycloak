@@ -6,16 +6,14 @@
  catch (  IOException e) {
     throw new IdentityBrokerException("Could not decode access token response.",e);
   }
-  String accessToken=tokenResponse.getToken();
-  if (accessToken == null) {
-    throw new IdentityBrokerException("No access_token from server.");
-  }
+  PublicKey key=getExternalIdpKey();
+  String accessToken=verifyAccessToken(key,tokenResponse);
   String encodedIdToken=tokenResponse.getIdToken();
   notes.put(FEDERATED_ACCESS_TOKEN,accessToken);
   notes.put(FEDERATED_ID_TOKEN,encodedIdToken);
   notes.put(FEDERATED_REFRESH_TOKEN,tokenResponse.getRefreshToken());
   notes.put(FEDERATED_TOKEN_EXPIRATION,Long.toString(tokenResponse.getExpiresIn()));
-  IDToken idToken=validateIdToken(encodedIdToken);
+  IDToken idToken=validateIdToken(key,encodedIdToken);
   try {
     String id=idToken.getSubject();
     String name=idToken.getName();

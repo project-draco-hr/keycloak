@@ -1,8 +1,10 @@
 {
   FederatedIdentityModel federatedIdentityModel=this.session.users().getFederatedIdentity(federatedUser,updatedIdentity.getIdentityProviderId(),this.realmModel);
-  federatedIdentityModel.setToken(updatedIdentity.getToken());
-  this.session.users().updateFederatedIdentity(this.realmModel,federatedUser,federatedIdentityModel);
-  if (isDebugEnabled()) {
-    LOGGER.debugf("Identity [%s] update with response from identity provider [%s].",federatedUser,updatedIdentity.getIdentityProviderId());
+  if (!ObjectUtil.isEqualOrNull(updatedIdentity.getToken(),federatedIdentityModel.getToken())) {
+    federatedIdentityModel.setToken(updatedIdentity.getToken());
+    this.session.users().updateFederatedIdentity(this.realmModel,federatedUser,federatedIdentityModel);
+    if (isDebugEnabled()) {
+      LOGGER.debugf("Identity [%s] update with response from identity provider [%s].",federatedUser,updatedIdentity.getIdentityProviderId());
+    }
   }
 }

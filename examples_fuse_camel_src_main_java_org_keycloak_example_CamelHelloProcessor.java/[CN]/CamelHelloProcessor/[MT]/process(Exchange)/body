@@ -3,5 +3,6 @@
   KeycloakPrincipal keycloakPrincipal=(KeycloakPrincipal)req.getUserPrincipal();
   AccessToken accessToken=keycloakPrincipal.getKeycloakSecurityContext().getToken();
   String username=accessToken.getPreferredUsername();
-  exchange.getOut().setBody("<html><body>Hello " + username + "! It's "+ sdf.format(new Date())+ "</body></html>");
+  String fullName=accessToken.getName();
+  exchange.getOut().setBody("Hello " + username + "! Your full name is "+ fullName+ ".");
 }

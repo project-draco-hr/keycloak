@@ -18,7 +18,13 @@
     }
     return Response.noContent().build();
   }
- catch (  ModelDuplicateException e) {
-    return Flows.errors().exists("Realm " + rep.getRealm() + " already exists");
+ catch (  PatternSyntaxException e) {
+    return Flows.errors().exists("Specified regex pattern(s) is invalid.");
+  }
+catch (  ModelDuplicateException e) {
+    return Flows.errors().exists("Realm " + rep.getRealm() + " already exists.");
+  }
+catch (  Exception e) {
+    return Flows.errors().exists("Failed to update " + rep.getRealm() + " Realm.");
   }
 }

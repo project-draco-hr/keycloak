@@ -21,8 +21,8 @@
     event.error(Errors.INVALID_CODE);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_CODE);
   }
-  String username=formData.getFirst("username");
-  String email=formData.getFirst("email");
+  String username=formData.getFirst(Validation.FIELD_USERNAME);
+  String email=formData.getFirst(Validation.FIELD_EMAIL);
   if (realm.isRegistrationEmailAsUsername()) {
     username=email;
     formData.putSingle(AuthenticationManager.FORM_USERNAME,username);
@@ -46,24 +46,16 @@
   for (  RequiredCredentialModel m : realm.getRequiredCredentials()) {
     requiredCredentialTypes.add(m.getType());
   }
-  String errorMessage=Validation.validateRegistrationForm(realm,formData,requiredCredentialTypes);
-  Object[] parameters=new Object[0];
-  if (errorMessage == null) {
-    PasswordPolicy.Error error=Validation.validatePassword(formData,realm.getPasswordPolicy());
-    if (error != null) {
-      errorMessage=error.getMessage();
-      parameters=error.getParameters();
-    }
-  }
-  if (errorMessage != null) {
+  List<FormMessage> errors=Validation.validateRegistrationForm(realm,formData,requiredCredentialTypes,realm.getPasswordPolicy());
+  if (errors != null && !errors.isEmpty()) {
     event.error(Errors.INVALID_REGISTRATION);
-    return Flows.forms(session,realm,client,uriInfo,headers).setError(errorMessage,parameters).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
+    return Flows.forms(session,realm,client,uriInfo,headers).setErrors(errors).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
   }
   if (session.users().getUserByUsername(username,realm) != null) {
     event.error(Errors.USERNAME_IN_USE);
     return Flows.forms(session,realm,client,uriInfo,headers).setError(Messages.USERNAME_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
   }
-  if (session.users().getUserByEmail(email,realm) != null) {
+  if (email != null && session.users().getUserByEmail(email,realm) != null) {
     event.error(Errors.EMAIL_IN_USE);
     return Flows.forms(session,realm,client,uriInfo,headers).setError(Messages.EMAIL_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
   }

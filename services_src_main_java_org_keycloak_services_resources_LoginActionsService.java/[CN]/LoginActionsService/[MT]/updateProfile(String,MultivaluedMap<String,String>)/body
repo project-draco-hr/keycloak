@@ -9,9 +9,9 @@
   UserSessionModel userSession=clientSession.getUserSession();
   UserModel user=userSession.getUser();
   initEvent(clientSession);
-  String error=Validation.validateUpdateProfileForm(formData);
-  if (error != null) {
-    return Flows.forms(session,realm,null,uriInfo,headers).setUser(user).setError(error).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PROFILE);
+  List<FormMessage> errors=Validation.validateUpdateProfileForm(formData);
+  if (errors != null && !errors.isEmpty()) {
+    return Flows.forms(session,realm,null,uriInfo,headers).setUser(user).setErrors(errors).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PROFILE);
   }
   user.setFirstName(formData.getFirst("firstName"));
   user.setLastName(formData.getFirst("lastName"));

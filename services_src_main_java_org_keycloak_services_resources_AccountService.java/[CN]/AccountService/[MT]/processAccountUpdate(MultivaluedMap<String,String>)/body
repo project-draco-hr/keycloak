@@ -10,10 +10,10 @@
   }
   csrfCheck(formData);
   UserModel user=auth.getUser();
-  String error=Validation.validateUpdateProfileForm(formData);
-  if (error != null) {
+  List<FormMessage> errors=Validation.validateUpdateProfileForm(formData);
+  if (errors != null && !errors.isEmpty()) {
     setReferrerOnPage();
-    return account.setError(error).setProfileFormData(formData).createResponse(AccountPages.ACCOUNT);
+    return account.setErrors(errors).setProfileFormData(formData).createResponse(AccountPages.ACCOUNT);
   }
   try {
     user.setFirstName(formData.getFirst("firstName"));

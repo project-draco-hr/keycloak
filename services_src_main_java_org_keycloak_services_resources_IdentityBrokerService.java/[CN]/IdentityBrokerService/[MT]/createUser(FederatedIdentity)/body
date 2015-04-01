@@ -12,6 +12,12 @@
   if (this.realmModel.isRegistrationEmailAsUsername() && !Validation.isEmpty(updatedIdentity.getEmail())) {
     username=updatedIdentity.getEmail();
   }
+ else   if (username == null) {
+    username=updatedIdentity.getIdentityProviderId() + "." + updatedIdentity.getId();
+  }
+ else {
+    username=updatedIdentity.getIdentityProviderId() + "." + updatedIdentity.getUsername();
+  }
   if (username != null) {
     username=username.trim();
   }

@@ -11,7 +11,7 @@
   assertEquals(1,federatedIdentities.size());
   FederatedIdentityModel federatedIdentityModel=federatedIdentities.iterator().next();
   assertEquals(getProviderId(),federatedIdentityModel.getIdentityProvider());
-  assertEquals(federatedUser.getUsername(),federatedIdentityModel.getUserName());
+  assertEquals(federatedUser.getUsername(),federatedIdentityModel.getIdentityProvider() + "." + federatedIdentityModel.getUserName());
   driver.navigate().to("http://localhost:8081/test-app/logout");
   driver.navigate().to("http://localhost:8081/test-app");
   assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/auth"));

@@ -1,12 +1,12 @@
 {
   this.authServerBaseUrl=config.getAuthServerUrl();
-  if (authServerBaseUrl == null && config.getAuthServerUrlForBackendRequests() == null)   return;
+  String authServerURLForBackendReqs=config.getAuthServerUrlForBackendRequests();
+  if (authServerBaseUrl == null && authServerURLForBackendReqs == null)   return;
   URI authServerUri=null;
   if (authServerBaseUrl != null) {
     authServerUri=URI.create(authServerBaseUrl);
   }
   if (authServerUri == null || authServerUri.getHost() == null) {
-    String authServerURLForBackendReqs=config.getAuthServerUrlForBackendRequests();
     if (authServerURLForBackendReqs != null) {
       relativeUrls=RelativeUrlsUsed.BROWSER_ONLY;
       KeycloakUriBuilder serverBuilder=KeycloakUriBuilder.fromUri(authServerURLForBackendReqs);
@@ -23,6 +23,12 @@
     relativeUrls=RelativeUrlsUsed.NEVER;
     KeycloakUriBuilder serverBuilder=KeycloakUriBuilder.fromUri(authServerBaseUrl);
     resolveBrowserUrls(serverBuilder);
-    resolveNonBrowserUrls(serverBuilder);
+    if (authServerURLForBackendReqs == null) {
+      resolveNonBrowserUrls(serverBuilder);
+    }
+ else {
+      serverBuilder=KeycloakUriBuilder.fromUri(authServerURLForBackendReqs);
+      resolveNonBrowserUrls(serverBuilder);
+    }
   }
 }

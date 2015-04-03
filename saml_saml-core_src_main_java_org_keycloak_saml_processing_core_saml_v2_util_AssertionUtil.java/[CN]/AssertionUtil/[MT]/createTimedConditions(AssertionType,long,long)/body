@@ -1,0 +1,10 @@
+{
+  XMLGregorianCalendar issueInstant=assertion.getIssueInstant();
+  if (issueInstant == null)   throw logger.samlIssueInstantMissingError();
+  XMLGregorianCalendar assertionValidityLength=XMLTimeUtil.add(issueInstant,durationInMilis + clockSkew);
+  ConditionsType conditionsType=new ConditionsType();
+  XMLGregorianCalendar beforeInstant=XMLTimeUtil.subtract(issueInstant,clockSkew);
+  conditionsType.setNotBefore(beforeInstant);
+  conditionsType.setNotOnOrAfter(assertionValidityLength);
+  assertion.setConditions(conditionsType);
+}

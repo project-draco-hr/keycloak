@@ -1,0 +1,19 @@
+{
+  Attribute idAttr=startElement.getAttributeByName(new QName(JBossSAMLConstants.ID.get()));
+  if (idAttr == null)   throw logger.parserRequiredAttribute("ID");
+  String id=StaxParserUtil.getAttributeValue(idAttr);
+  Attribute version=startElement.getAttributeByName(new QName(JBossSAMLConstants.VERSION.get()));
+  if (version == null)   throw logger.parserRequiredAttribute("Version");
+  StringUtil.match(JBossSAMLConstants.VERSION_2_0.get(),StaxParserUtil.getAttributeValue(version));
+  Attribute issueInstant=startElement.getAttributeByName(new QName(JBossSAMLConstants.ISSUE_INSTANT.get()));
+  if (issueInstant == null)   throw logger.parserRequiredAttribute("IssueInstant");
+  XMLGregorianCalendar issueInstantVal=XMLTimeUtil.parse(StaxParserUtil.getAttributeValue(issueInstant));
+  StatusResponseType response=new StatusResponseType(id,issueInstantVal);
+  Attribute destination=startElement.getAttributeByName(new QName(JBossSAMLConstants.DESTINATION.get()));
+  if (destination != null)   response.setDestination(StaxParserUtil.getAttributeValue(destination));
+  Attribute consent=startElement.getAttributeByName(new QName(JBossSAMLConstants.CONSENT.get()));
+  if (consent != null)   response.setConsent(StaxParserUtil.getAttributeValue(consent));
+  Attribute inResponseTo=startElement.getAttributeByName(new QName(JBossSAMLConstants.IN_RESPONSE_TO.get()));
+  if (inResponseTo != null)   response.setInResponseTo(StaxParserUtil.getAttributeValue(inResponseTo));
+  return response;
+}

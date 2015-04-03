@@ -1,0 +1,29 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,RESPONSE);
+  Attribute idAttr=startElement.getAttributeByName(new QName(SAML11Constants.RESPONSE_ID));
+  if (idAttr == null)   throw logger.parserRequiredAttribute(SAML11Constants.RESPONSE_ID);
+  String id=StaxParserUtil.getAttributeValue(idAttr);
+  Attribute issueInstant=startElement.getAttributeByName(new QName(SAML11Constants.ISSUE_INSTANT));
+  if (issueInstant == null)   throw logger.parserRequiredAttribute(SAML11Constants.ISSUE_INSTANT);
+  XMLGregorianCalendar issueInstantVal=XMLTimeUtil.parse(StaxParserUtil.getAttributeValue(issueInstant));
+  SAML11ResponseType response=new SAML11ResponseType(id,issueInstantVal);
+  while (xmlEventReader.hasNext()) {
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    String elementName=StaxParserUtil.getStartElementName(startElement);
+    if (JBossSAMLConstants.SIGNATURE.get().equals(elementName)) {
+      Element sig=StaxParserUtil.getDOMElement(xmlEventReader);
+      response.setSignature(sig);
+    }
+ else     if (JBossSAMLConstants.ASSERTION.get().equals(elementName)) {
+      SAML11AssertionParser assertionParser=new SAML11AssertionParser();
+      response.add((SAML11AssertionType)assertionParser.parse(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.STATUS.get().equals(elementName)) {
+      response.setStatus(parseStatus(xmlEventReader));
+    }
+ else     throw logger.parserUnknownStartElement(elementName,startElement.getLocation());
+  }
+  return response;
+}

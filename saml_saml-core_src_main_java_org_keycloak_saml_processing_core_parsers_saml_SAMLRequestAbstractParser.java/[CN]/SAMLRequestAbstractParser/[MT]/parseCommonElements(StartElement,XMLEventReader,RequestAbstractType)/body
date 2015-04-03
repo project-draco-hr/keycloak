@@ -1,0 +1,13 @@
+{
+  if (startElement == null)   throw logger.parserNullStartElement();
+  String elementName=StaxParserUtil.getStartElementName(startElement);
+  if (JBossSAMLConstants.ISSUER.get().equals(elementName)) {
+    startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+    NameIDType issuer=new NameIDType();
+    issuer.setValue(StaxParserUtil.getElementText(xmlEventReader));
+    request.setIssuer(issuer);
+  }
+ else   if (JBossSAMLConstants.SIGNATURE.get().equals(elementName)) {
+    request.setSignature(StaxParserUtil.getDOMElement(xmlEventReader));
+  }
+}

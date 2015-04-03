@@ -1,0 +1,51 @@
+{
+  if (elementQName == null)   throw logger.nullArgumentError("elementQName");
+  if (document == null)   throw logger.nullArgumentError("document");
+  String wrappingElementPrefix=wrappingElementQName.getPrefix();
+  if (wrappingElementPrefix == null || wrappingElementPrefix == "")   throw logger.wrongTypeError("Wrapping element prefix invalid");
+  Element documentElement=DocumentUtil.getElement(document,elementQName);
+  if (documentElement == null)   throw logger.domMissingDocElementError(elementQName.toString());
+  XMLCipher cipher=null;
+  EncryptedKey encryptedKey=encryptKey(document,secretKey,publicKey,keySize);
+  String encryptionAlgorithm=getXMLEncryptionURL(secretKey.getAlgorithm(),keySize);
+  try {
+    cipher=XMLCipher.getInstance(encryptionAlgorithm);
+    cipher.init(XMLCipher.ENCRYPT_MODE,secretKey);
+  }
+ catch (  XMLEncryptionException e1) {
+    throw logger.processingError(e1);
+  }
+  Document encryptedDoc;
+  try {
+    encryptedDoc=cipher.doFinal(document,documentElement);
+  }
+ catch (  Exception e) {
+    throw logger.processingError(e);
+  }
+  Element encryptedKeyElement=cipher.martial(document,encryptedKey);
+  String wrappingElementName=wrappingElementPrefix + ":" + wrappingElementQName.getLocalPart();
+  Element wrappingElement=encryptedDoc.createElementNS(wrappingElementQName.getNamespaceURI(),wrappingElementName);
+  if (StringUtil.isNullOrEmpty(wrappingElementPrefix)) {
+    wrappingElementName=wrappingElementQName.getLocalPart();
+  }
+  wrappingElement.setAttributeNS(XMLNS,"xmlns:" + wrappingElementPrefix,wrappingElementQName.getNamespaceURI());
+  NodeList cipherElements=encryptedDoc.getElementsByTagNameNS(XMLENC_NS,"EncryptedData");
+  if (cipherElements == null || cipherElements.getLength() == 0)   throw logger.domMissingElementError("xenc:EncryptedData");
+  Element encryptedDataElement=(Element)cipherElements.item(0);
+  Node parentOfEncNode=encryptedDataElement.getParentNode();
+  parentOfEncNode.replaceChild(wrappingElement,encryptedDataElement);
+  wrappingElement.appendChild(encryptedDataElement);
+  if (addEncryptedKeyInKeyInfo) {
+    Element sigElement=encryptedDoc.createElementNS(XMLSIG_NS,DS_KEY_INFO);
+    sigElement.setAttributeNS(XMLNS,"xmlns:ds",XMLSIG_NS);
+    sigElement.appendChild(encryptedKeyElement);
+    NodeList nodeList=encryptedDoc.getElementsByTagNameNS(XMLENC_NS,CIPHER_DATA_LOCALNAME);
+    if (nodeList == null || nodeList.getLength() == 0)     throw logger.domMissingElementError("xenc:CipherData");
+    Element cipherDataElement=(Element)nodeList.item(0);
+    Node cipherParent=cipherDataElement.getParentNode();
+    cipherParent.insertBefore(sigElement,cipherDataElement);
+  }
+ else {
+    wrappingElement.appendChild(encryptedKeyElement);
+  }
+}

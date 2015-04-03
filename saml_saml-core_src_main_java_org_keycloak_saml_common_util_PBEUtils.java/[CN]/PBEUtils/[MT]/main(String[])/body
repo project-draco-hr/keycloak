@@ -1,0 +1,16 @@
+{
+  if (args.length != 3) {
+    System.err.println("Encrypt a password" + "Usage: PBEUtils salt count domain-password password" + " salt : the Salt "+ " count : the IterationCount "+ " password : the plaintext password that should be encrypted");
+    throw new RuntimeException(" ERROR: please see format above");
+  }
+  byte[] salt=args[0].substring(0,8).getBytes();
+  int count=Integer.parseInt(args[1]);
+  char[] password="somearbitrarycrazystringthatdoesnotmatter".toCharArray();
+  byte[] passwordToEncode=args[2].getBytes("UTF-8");
+  PBEParameterSpec cipherSpec=new PBEParameterSpec(salt,count);
+  PBEKeySpec keySpec=new PBEKeySpec(password);
+  SecretKeyFactory factory=SecretKeyFactory.getInstance("PBEwithMD5andDES");
+  SecretKey cipherKey=factory.generateSecret(keySpec);
+  String encodedPassword=encode64(passwordToEncode,"PBEwithMD5andDES",cipherKey,cipherSpec);
+  System.err.println("Encoded password: MASK-" + encodedPassword);
+}

@@ -1,0 +1,10 @@
+{
+  SAMLRequestWriter samlRequestWriter=new SAMLRequestWriter(StaxUtil.getXMLStreamWriter(writer));
+  if (requestType instanceof AuthnRequestType) {
+    samlRequestWriter.write((AuthnRequestType)requestType);
+  }
+ else   if (requestType instanceof LogoutRequestType) {
+    samlRequestWriter.write((LogoutRequestType)requestType);
+  }
+ else   throw logger.unsupportedType(requestType.getClass().getName());
+}

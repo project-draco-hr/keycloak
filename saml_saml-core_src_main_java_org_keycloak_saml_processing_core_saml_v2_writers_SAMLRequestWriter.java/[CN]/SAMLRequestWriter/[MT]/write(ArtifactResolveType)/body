@@ -1,0 +1,29 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,JBossSAMLConstants.ARTIFACT_RESOLVE.get(),PROTOCOL_NSURI.get());
+  StaxUtil.writeNameSpace(writer,PROTOCOL_PREFIX,PROTOCOL_NSURI.get());
+  StaxUtil.writeNameSpace(writer,ASSERTION_PREFIX,ASSERTION_NSURI.get());
+  StaxUtil.writeDefaultNameSpace(writer,ASSERTION_NSURI.get());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.ID.get(),request.getID());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.VERSION.get(),request.getVersion());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.ISSUE_INSTANT.get(),request.getIssueInstant().toString());
+  URI destination=request.getDestination();
+  if (destination != null)   StaxUtil.writeAttribute(writer,JBossSAMLConstants.DESTINATION.get(),destination.toASCIIString());
+  String consent=request.getConsent();
+  if (StringUtil.isNotNull(consent))   StaxUtil.writeAttribute(writer,JBossSAMLConstants.CONSENT.get(),consent);
+  NameIDType issuer=request.getIssuer();
+  if (issuer != null) {
+    write(issuer,new QName(ASSERTION_NSURI.get(),JBossSAMLConstants.ISSUER.get(),ASSERTION_PREFIX));
+  }
+  Element sig=request.getSignature();
+  if (sig != null) {
+    StaxUtil.writeDOMElement(writer,sig);
+  }
+  String artifact=request.getArtifact();
+  if (StringUtil.isNotNull(artifact)) {
+    StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,JBossSAMLConstants.ARTIFACT.get(),PROTOCOL_NSURI.get());
+    StaxUtil.writeCharacters(writer,artifact);
+    StaxUtil.writeEndElement(writer);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

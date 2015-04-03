@@ -1,0 +1,47 @@
+{
+  AttributeStatementType attrStatement=null;
+  int i=0;
+  Set<String> keys=attributes.keySet();
+  for (  String key : keys) {
+    if (i == 0) {
+      attrStatement=new AttributeStatementType();
+      i++;
+    }
+    if (AttributeConstants.ROLES.equalsIgnoreCase(key)) {
+      Object value=attributes.get(key);
+      if (value instanceof Collection<?>) {
+        Collection<?> roles=(Collection<?>)value;
+        attrStatement=createAttributeStatement(new ArrayList(roles));
+      }
+    }
+ else {
+      AttributeType att;
+      Object value=attributes.get(key);
+      String uri=X500SAMLProfileConstants.getOID(key);
+      if (StringUtil.isNotNull(uri)) {
+        att=getX500Attribute(uri);
+        att.setFriendlyName(key);
+      }
+ else {
+        att=new AttributeType(key);
+        att.setFriendlyName(key);
+        att.setNameFormat(JBossSAMLURIConstants.ATTRIBUTE_FORMAT_URI.get());
+      }
+      if (Collection.class.isInstance(value)) {
+        Collection collection=(Collection)value;
+        Iterator iterator=collection.iterator();
+        while (iterator.hasNext()) {
+          att.addAttributeValue(iterator.next());
+        }
+      }
+ else       if (String.class.isInstance(value)) {
+        att.addAttributeValue(value);
+      }
+ else {
+        throw new RuntimeException("Unsupported attribute value [" + value + "]. Values must be a string, even if using a Collection.");
+      }
+      attrStatement.addAttribute(new ASTChoiceType(att));
+    }
+  }
+  return attrStatement;
+}

@@ -1,0 +1,17 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,JBossSAMLConstants.NAMEID_POLICY.get(),PROTOCOL_NSURI.get());
+  URI format=nameIDPolicy.getFormat();
+  if (format != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.FORMAT.get(),format.toASCIIString());
+  }
+  String spNameQualifier=nameIDPolicy.getSPNameQualifier();
+  if (StringUtil.isNotNull(spNameQualifier)) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.SP_NAME_QUALIFIER.get(),spNameQualifier);
+  }
+  Boolean allowCreate=nameIDPolicy.isAllowCreate();
+  if (allowCreate != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.ALLOW_CREATE.get(),allowCreate.toString());
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

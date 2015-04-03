@@ -1,0 +1,28 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.KEY_DESCRIPTOR.get());
+  KeyDescriptorType keyDescriptor=new KeyDescriptorType();
+  String use=StaxParserUtil.getAttributeValue(startElement,"use");
+  if (use != null && !use.isEmpty()) {
+    keyDescriptor.setUse(KeyTypes.fromValue(use));
+  }
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement end=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(end,JBossSAMLConstants.KEY_DESCRIPTOR.get());
+      break;
+    }
+    startElement=(StartElement)xmlEvent;
+    String localPart=startElement.getName().getLocalPart();
+    if (JBossSAMLConstants.KEY_INFO.get().equals(localPart)) {
+      Element key=StaxParserUtil.getDOMElement(xmlEventReader);
+      keyDescriptor.setKeyInfo(key);
+    }
+ else     if (JBossSAMLConstants.ENCRYPTION_METHOD.get().equals(localPart)) {
+      keyDescriptor.addEncryptionMethod(parseEncryptionMethod(xmlEventReader));
+    }
+ else     throw logger.parserUnknownTag(localPart,startElement.getLocation());
+  }
+  return keyDescriptor;
+}

@@ -1,0 +1,13 @@
+{
+  PublicKey publicKey=null;
+  Key key=ks.getKey(alias,password);
+  if (key instanceof PrivateKey) {
+    Certificate cert=ks.getCertificate(alias);
+    publicKey=cert.getPublicKey();
+  }
+  if (publicKey == null) {
+    Certificate cert=ks.getCertificate(alias);
+    if (cert != null)     publicKey=cert.getPublicKey();
+  }
+  return publicKey;
+}

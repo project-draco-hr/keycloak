@@ -1,0 +1,7 @@
+{
+  if (is == null)   throw logger.nullArgumentError("InputStream");
+  Document samlDocument=DocumentUtil.getDocument(is);
+  SAMLParser samlParser=new SAMLParser();
+  JAXPValidationUtil.checkSchemaValidation(samlDocument);
+  return (EncryptedAssertionType)samlParser.parse(DocumentUtil.getNodeAsStream(samlDocument));
+}

@@ -1,0 +1,18 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,JBossSAMLConstants.REQUESTED_AUTHN_CONTEXT.get(),PROTOCOL_NSURI.get());
+  AuthnContextComparisonType comparison=requestedAuthnContextType.getComparison();
+  if (comparison != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.COMPARISON.get(),comparison.value());
+  }
+  List<String> authnContextClassRef=requestedAuthnContextType.getAuthnContextClassRef();
+  if (authnContextClassRef != null && !authnContextClassRef.isEmpty()) {
+    for (    String classRef : authnContextClassRef) {
+      StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.AUTHN_CONTEXT_CLASS_REF.get(),ASSERTION_NSURI.get());
+      StaxUtil.writeNameSpace(writer,ASSERTION_PREFIX,ASSERTION_NSURI.get());
+      StaxUtil.writeCharacters(writer,classRef);
+      StaxUtil.writeEndElement(writer);
+    }
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

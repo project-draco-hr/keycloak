@@ -1,0 +1,15 @@
+{
+  StringBuilder sb=new StringBuilder();
+  if (isRequestQueryString(queryString)) {
+    addParameter(sb,GeneralConstants.SAML_REQUEST_KEY,RedirectBindingSignatureUtil.getTokenValue(queryString,GeneralConstants.SAML_REQUEST_KEY));
+  }
+ else {
+    addParameter(sb,GeneralConstants.SAML_RESPONSE_KEY,RedirectBindingSignatureUtil.getTokenValue(queryString,GeneralConstants.SAML_RESPONSE_KEY));
+  }
+  String relayStateFromURL=RedirectBindingSignatureUtil.getTokenValue(queryString,GeneralConstants.RELAY_STATE);
+  if (isNotNull(relayStateFromURL)) {
+    addParameter(sb,GeneralConstants.RELAY_STATE,relayStateFromURL);
+  }
+  addParameter(sb,GeneralConstants.SAML_SIG_ALG_REQUEST_KEY,RedirectBindingSignatureUtil.getTokenValue(queryString,GeneralConstants.SAML_SIG_ALG_REQUEST_KEY));
+  return SignatureUtil.validate(sb.toString().getBytes("UTF-8"),sigValue,validatingKey);
+}

@@ -1,0 +1,13 @@
+{
+  if (is == null)   throw logger.nullArgumentError("InputStream");
+  Document samlResponseDocument=DocumentUtil.getDocument(is);
+  if (logger.isTraceEnabled()) {
+    logger.trace("SAML Response Document: " + DocumentUtil.asString(samlResponseDocument));
+  }
+  SAMLParser samlParser=new SAMLParser();
+  JAXPValidationUtil.checkSchemaValidation(samlResponseDocument);
+  InputStream responseStream=DocumentUtil.getNodeAsStream(samlResponseDocument);
+  SAML2Object responseType=(SAML2Object)samlParser.parse(responseStream);
+  samlDocumentHolder=new SAMLDocumentHolder(responseType,samlResponseDocument);
+  return responseType;
+}

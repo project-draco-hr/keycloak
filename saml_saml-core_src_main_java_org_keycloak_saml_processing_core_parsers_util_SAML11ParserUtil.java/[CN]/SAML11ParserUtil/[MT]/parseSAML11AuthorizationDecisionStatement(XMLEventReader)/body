@@ -1,0 +1,38 @@
+{
+  SAML11AuthorizationDecisionStatementType authzDecision=null;
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,SAML11Constants.AUTHORIZATION_DECISION_STATEMENT);
+  Attribute decision=startElement.getAttributeByName(new QName(SAML11Constants.DECISION));
+  if (decision == null)   throw logger.parserRequiredAttribute("Decision");
+  String decisionValue=StaxParserUtil.getAttributeValue(decision);
+  Attribute resource=startElement.getAttributeByName(new QName(SAML11Constants.RESOURCE));
+  if (resource == null)   throw logger.parserRequiredAttribute("Namespace");
+  String resValue=StaxParserUtil.getAttributeValue(resource);
+  authzDecision=new SAML11AuthorizationDecisionStatementType(URI.create(resValue),SAML11DecisionType.valueOf(decisionValue));
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement end=StaxParserUtil.getNextEndElement(xmlEventReader);
+      if (StaxParserUtil.matches(end,SAML11Constants.AUTHORIZATION_DECISION_STATEMENT))       break;
+    }
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    String tag=StaxParserUtil.getStartElementName(startElement);
+    if (SAML11Constants.ACTION.equals(tag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      SAML11ActionType samlAction=new SAML11ActionType();
+      Attribute namespaceAttr=startElement.getAttributeByName(new QName(SAML11Constants.NAMESPACE));
+      if (namespaceAttr != null) {
+        samlAction.setNamespace(StaxParserUtil.getAttributeValue(namespaceAttr));
+      }
+      samlAction.setValue(StaxParserUtil.getElementText(xmlEventReader));
+      authzDecision.addAction(samlAction);
+    }
+ else     if (JBossSAMLConstants.SUBJECT.get().equals(tag)) {
+      SAML11SubjectParser parser=new SAML11SubjectParser();
+      authzDecision.setSubject((SAML11SubjectType)parser.parse(xmlEventReader));
+    }
+ else     throw logger.parserUnknownTag(tag,startElement.getLocation());
+  }
+  return authzDecision;
+}

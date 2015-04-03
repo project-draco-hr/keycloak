@@ -1,0 +1,9 @@
+{
+  if (is == null)   throw logger.nullArgumentError("InputStream");
+  Document samlResponseDocument=DocumentUtil.getDocument(is);
+  SAMLParser samlParser=new SAMLParser();
+  JAXPValidationUtil.checkSchemaValidation(samlResponseDocument);
+  ResponseType responseType=(ResponseType)samlParser.parse(DocumentUtil.getNodeAsStream(samlResponseDocument));
+  samlDocumentHolder=new SAMLDocumentHolder(responseType,samlResponseDocument);
+  return responseType;
+}

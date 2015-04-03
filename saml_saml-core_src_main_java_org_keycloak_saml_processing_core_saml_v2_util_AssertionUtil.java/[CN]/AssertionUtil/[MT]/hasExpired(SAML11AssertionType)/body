@@ -1,0 +1,15 @@
+{
+  boolean expiry=false;
+  SAML11ConditionsType conditionsType=assertion.getConditions();
+  if (conditionsType != null) {
+    XMLGregorianCalendar now=XMLTimeUtil.getIssueInstant();
+    XMLGregorianCalendar notBefore=conditionsType.getNotBefore();
+    XMLGregorianCalendar notOnOrAfter=conditionsType.getNotOnOrAfter();
+    logger.trace("Now=" + now.toXMLFormat() + " ::notBefore="+ notBefore.toXMLFormat()+ " ::notOnOrAfter="+ notOnOrAfter);
+    expiry=!XMLTimeUtil.isValid(now,notBefore,notOnOrAfter);
+    if (expiry) {
+      logger.samlAssertionExpired(assertion.getID());
+    }
+  }
+  return expiry;
+}

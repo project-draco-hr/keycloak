@@ -1,0 +1,27 @@
+{
+  super.parseRequiredAttributes(startElement);
+  AuthnRequestType authnRequest=new AuthnRequestType(id,issueInstant);
+  super.parseBaseAttributes(startElement,authnRequest);
+  Attribute assertionConsumerServiceURL=startElement.getAttributeByName(new QName(JBossSAMLConstants.ASSERTION_CONSUMER_SERVICE_URL.get()));
+  if (assertionConsumerServiceURL != null) {
+    String uri=StaxParserUtil.getAttributeValue(assertionConsumerServiceURL);
+    authnRequest.setAssertionConsumerServiceURL(URI.create(uri));
+  }
+  Attribute assertionConsumerServiceIndex=startElement.getAttributeByName(new QName(JBossSAMLConstants.ASSERTION_CONSUMER_SERVICE_INDEX.get()));
+  if (assertionConsumerServiceIndex != null)   authnRequest.setAssertionConsumerServiceIndex(Integer.parseInt(StaxParserUtil.getAttributeValue(assertionConsumerServiceIndex)));
+  Attribute protocolBinding=startElement.getAttributeByName(new QName(JBossSAMLConstants.PROTOCOL_BINDING.get()));
+  if (protocolBinding != null)   authnRequest.setProtocolBinding(URI.create(StaxParserUtil.getAttributeValue(protocolBinding)));
+  Attribute providerName=startElement.getAttributeByName(new QName(JBossSAMLConstants.PROVIDER_NAME.get()));
+  if (providerName != null)   authnRequest.setProviderName(StaxParserUtil.getAttributeValue(providerName));
+  Attribute forceAuthn=startElement.getAttributeByName(new QName(JBossSAMLConstants.FORCE_AUTHN.get()));
+  if (forceAuthn != null) {
+    authnRequest.setForceAuthn(Boolean.parseBoolean(StaxParserUtil.getAttributeValue(forceAuthn)));
+  }
+  Attribute isPassive=startElement.getAttributeByName(new QName(JBossSAMLConstants.IS_PASSIVE.get()));
+  if (isPassive != null) {
+    authnRequest.setIsPassive(Boolean.parseBoolean(StaxParserUtil.getAttributeValue(isPassive)));
+  }
+  Attribute attributeConsumingServiceIndex=startElement.getAttributeByName(new QName(JBossSAMLConstants.ATTRIBUTE_CONSUMING_SERVICE_INDEX.get()));
+  if (attributeConsumingServiceIndex != null)   authnRequest.setAttributeConsumingServiceIndex(Integer.parseInt(StaxParserUtil.getAttributeValue(attributeConsumingServiceIndex)));
+  return authnRequest;
+}

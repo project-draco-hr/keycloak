@@ -1,0 +1,24 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,LOGOUT_RESPONSE.get());
+  StatusResponseType response=parseBaseAttributes(startElement);
+  while (xmlEventReader.hasNext()) {
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    String elementName=StaxParserUtil.getStartElementName(startElement);
+    if (JBossSAMLConstants.ISSUER.get().equals(elementName)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      NameIDType issuer=new NameIDType();
+      issuer.setValue(StaxParserUtil.getElementText(xmlEventReader));
+      response.setIssuer(issuer);
+    }
+ else     if (JBossSAMLConstants.SIGNATURE.get().equals(elementName)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      StaxParserUtil.bypassElementBlock(xmlEventReader,JBossSAMLConstants.SIGNATURE.get());
+    }
+ else     if (JBossSAMLConstants.STATUS.get().equals(elementName)) {
+      response.setStatus(parseStatus(xmlEventReader));
+    }
+  }
+  return response;
+}

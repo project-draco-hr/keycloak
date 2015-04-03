@@ -1,0 +1,10 @@
+{
+  Attribute idAttribute=nextElement.getAttributeByName(new QName(JBossSAMLConstants.ID.get()));
+  String id=StaxParserUtil.getAttributeValue(idAttribute);
+  Attribute versionAttribute=nextElement.getAttributeByName(new QName(JBossSAMLConstants.VERSION.get()));
+  String version=StaxParserUtil.getAttributeValue(versionAttribute);
+  StringUtil.match(JBossSAMLConstants.VERSION_2_0.get(),version);
+  Attribute issueInstantAttribute=nextElement.getAttributeByName(new QName(JBossSAMLConstants.ISSUE_INSTANT.get()));
+  XMLGregorianCalendar issueInstant=XMLTimeUtil.parse(StaxParserUtil.getAttributeValue(issueInstantAttribute));
+  return new AssertionType(id,issueInstant);
+}

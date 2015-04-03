@@ -1,0 +1,41 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,SAML11Constants.REQUEST,namespace);
+  StaxUtil.writeNameSpace(writer,PROTOCOL_PREFIX,namespace);
+  StaxUtil.writeNameSpace(writer,ASSERTION_PREFIX,SAML11Constants.ASSERTION_11_NSURI);
+  StaxUtil.writeDefaultNameSpace(writer,namespace);
+  StaxUtil.writeAttribute(writer,SAML11Constants.REQUEST_ID,request.getID());
+  StaxUtil.writeAttribute(writer,SAML11Constants.MAJOR_VERSION,request.getMajorVersion() + "");
+  StaxUtil.writeAttribute(writer,SAML11Constants.MINOR_VERSION,request.getMinorVersion() + "");
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.ISSUE_INSTANT.get(),request.getIssueInstant().toString());
+  List<String> assertionIDRefs=request.getAssertionIDRef();
+  for (  String assertionIDRef : assertionIDRefs) {
+    StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,SAML11Constants.ASSERTION_ID_REF,SAML11Constants.ASSERTION_11_NSURI);
+    StaxUtil.writeCharacters(writer,assertionIDRef);
+    StaxUtil.writeEndElement(writer);
+  }
+  List<String> assertionArtifacts=request.getAssertionArtifact();
+  for (  String assertionArtifact : assertionArtifacts) {
+    StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,SAML11Constants.ASSERTION_ARTIFACT,namespace);
+    StaxUtil.writeCharacters(writer,assertionArtifact);
+    StaxUtil.writeEndElement(writer);
+  }
+  SAML11QueryAbstractType query=request.getQuery();
+  if (query instanceof SAML11AuthenticationQueryType) {
+    SAML11AuthenticationQueryType authQuery=(SAML11AuthenticationQueryType)query;
+    write(authQuery);
+  }
+ else   if (query instanceof SAML11AttributeQueryType) {
+    SAML11AttributeQueryType attQuery=(SAML11AttributeQueryType)query;
+    write(attQuery);
+  }
+ else   if (query instanceof SAML11AuthenticationQueryType) {
+    SAML11AuthenticationQueryType attQuery=(SAML11AuthenticationQueryType)query;
+    write(attQuery);
+  }
+ else   if (query instanceof SAML11AuthorizationDecisionQueryType) {
+    SAML11AuthorizationDecisionQueryType attQuery=(SAML11AuthorizationDecisionQueryType)query;
+    write(attQuery);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

@@ -1,0 +1,65 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,SAML11Constants.AUTHENTICATION_STATEMENT);
+  Attribute authMethod=startElement.getAttributeByName(new QName(SAML11Constants.AUTHENTICATION_METHOD));
+  if (authMethod == null)   throw logger.parserRequiredAttribute(SAML11Constants.AUTHENTICATION_METHOD);
+  Attribute authInstant=startElement.getAttributeByName(new QName(SAML11Constants.AUTHENTICATION_INSTANT));
+  if (authInstant == null)   throw logger.parserRequiredAttribute(SAML11Constants.AUTHENTICATION_INSTANT);
+  SAML11AuthenticationStatementType authStat=new SAML11AuthenticationStatementType(URI.create(StaxParserUtil.getAttributeValue(authMethod)),XMLTimeUtil.parse(StaxParserUtil.getAttributeValue(authInstant)));
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent == null)     break;
+    if (xmlEvent instanceof EndElement) {
+      xmlEvent=StaxParserUtil.getNextEvent(xmlEventReader);
+      EndElement endElement=(EndElement)xmlEvent;
+      String endElementTag=StaxParserUtil.getEndElementName(endElement);
+      if (endElementTag.equals(SAML11Constants.AUTHENTICATION_STATEMENT))       break;
+ else       throw logger.parserUnknownEndElement(endElementTag);
+    }
+    startElement=null;
+    if (xmlEvent instanceof StartElement) {
+      startElement=(StartElement)xmlEvent;
+    }
+ else {
+      startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    }
+    if (startElement == null)     break;
+    String tag=StaxParserUtil.getStartElementName(startElement);
+    if (JBossSAMLConstants.SUBJECT.get().equalsIgnoreCase(tag)) {
+      SAML11SubjectParser subjectParser=new SAML11SubjectParser();
+      SAML11SubjectType subject=(SAML11SubjectType)subjectParser.parse(xmlEventReader);
+      SAML11SubjectStatementType subStat=new SAML11SubjectStatementType();
+      subStat.setSubject(subject);
+      authStat.setSubject(subject);
+    }
+ else     if (JBossSAMLConstants.SUBJECT_LOCALITY.get().equals(tag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      SAML11SubjectLocalityType subjectLocalityType=new SAML11SubjectLocalityType();
+      Attribute address=startElement.getAttributeByName(new QName(SAML11Constants.IP_ADDRESS));
+      if (address != null) {
+        subjectLocalityType.setIpAddress(StaxParserUtil.getAttributeValue(address));
+      }
+      Attribute dns=startElement.getAttributeByName(new QName(SAML11Constants.DNS_ADDRESS));
+      if (dns != null) {
+        subjectLocalityType.setDnsAddress(StaxParserUtil.getAttributeValue(dns));
+      }
+      authStat.setSubjectLocality(subjectLocalityType);
+      StaxParserUtil.validate(StaxParserUtil.getNextEndElement(xmlEventReader),JBossSAMLConstants.SUBJECT_LOCALITY.get());
+    }
+ else     if (SAML11Constants.AUTHORITY_BINDING.equals(tag)) {
+      Attribute authorityKindAttr=startElement.getAttributeByName(new QName(SAML11Constants.AUTHORITY_KIND));
+      if (authorityKindAttr == null)       throw logger.parserRequiredAttribute("AuthorityKind");
+      Attribute locationAttr=startElement.getAttributeByName(new QName(SAML11Constants.LOCATION));
+      if (locationAttr == null)       throw logger.parserRequiredAttribute("Location");
+      URI location=URI.create(StaxParserUtil.getAttributeValue(locationAttr));
+      Attribute bindingAttr=startElement.getAttributeByName(new QName(SAML11Constants.BINDING));
+      if (bindingAttr == null)       throw logger.parserRequiredAttribute("Binding");
+      URI binding=URI.create(StaxParserUtil.getAttributeValue(bindingAttr));
+      QName authorityKind=QName.valueOf(StaxParserUtil.getAttributeValue(authorityKindAttr));
+      SAML11AuthorityBindingType authorityBinding=new SAML11AuthorityBindingType(authorityKind,location,binding);
+      authStat.add(authorityBinding);
+    }
+ else     throw logger.parserUnknownTag("",startElement.getLocation());
+  }
+  return authStat;
+}

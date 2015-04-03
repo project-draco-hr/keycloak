@@ -1,0 +1,28 @@
+{
+  if (configStream == null)   throw logger.nullArgumentError("InputStream");
+  XMLInputFactory xmlInputFactory=getXMLInputFactory();
+  XMLEventReader xmlEventReader=StaxParserUtil.getXMLEventReader(configStream);
+  try {
+    xmlEventReader=xmlInputFactory.createFilteredReader(xmlEventReader,new EventFilter(){
+      public boolean accept(      XMLEvent xmlEvent){
+        if (xmlEvent.isCharacters()) {
+          Characters chars=xmlEvent.asCharacters();
+          String data=chars.getData();
+          data=valid(data) ? data.trim() : null;
+          return valid(data);
+        }
+ else {
+          return xmlEvent.isStartElement() || xmlEvent.isEndElement();
+        }
+      }
+      private boolean valid(      String str){
+        return str != null && str.length() > 0;
+      }
+    }
+);
+  }
+ catch (  XMLStreamException e) {
+    throw logger.parserException(e);
+  }
+  return parse(xmlEventReader);
+}

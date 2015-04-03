@@ -1,0 +1,11 @@
+{
+  ByteArrayOutputStream baos=new ByteArrayOutputStream();
+  SAMLAssertionWriter writer=new SAMLAssertionWriter(StaxUtil.getXMLStreamWriter(baos));
+  writer.write(assertion);
+  try {
+    return DocumentUtil.getDocument(new ByteArrayInputStream(baos.toByteArray()));
+  }
+ catch (  Exception e) {
+    throw logger.processingError(e);
+  }
+}

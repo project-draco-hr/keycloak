@@ -1,0 +1,9 @@
+{
+  Attribute idAttr=startElement.getAttributeByName(new QName(SAML11Constants.REQUEST_ID));
+  if (idAttr == null)   throw logger.parserRequiredAttribute(SAML11Constants.REQUEST_ID);
+  String id=StaxParserUtil.getAttributeValue(idAttr);
+  Attribute issueInstantAttr=startElement.getAttributeByName(new QName(SAML11Constants.ISSUE_INSTANT));
+  if (issueInstantAttr == null)   throw logger.parserRequiredAttribute(SAML11Constants.ISSUE_INSTANT);
+  XMLGregorianCalendar issueInstant=XMLTimeUtil.parse(StaxParserUtil.getAttributeValue(issueInstantAttr));
+  return new SAML11RequestType(id,issueInstant);
+}

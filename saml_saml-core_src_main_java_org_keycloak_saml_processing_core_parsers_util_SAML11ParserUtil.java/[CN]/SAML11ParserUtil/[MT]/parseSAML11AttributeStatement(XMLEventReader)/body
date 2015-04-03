@@ -1,0 +1,27 @@
+{
+  SAML11AttributeStatementType attributeStatementType=new SAML11AttributeStatementType();
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  String ATTRIBSTATEMT=JBossSAMLConstants.ATTRIBUTE_STATEMENT.get();
+  StaxParserUtil.validate(startElement,ATTRIBSTATEMT);
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(endElement,JBossSAMLConstants.ATTRIBUTE_STATEMENT.get());
+      break;
+    }
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    String tag=startElement.getName().getLocalPart();
+    if (JBossSAMLConstants.ATTRIBUTE.get().equals(tag)) {
+      SAML11AttributeType attribute=parseSAML11Attribute(xmlEventReader);
+      attributeStatementType.add(attribute);
+    }
+ else     if (JBossSAMLConstants.SUBJECT.get().equals(tag)) {
+      SAML11SubjectParser parser=new SAML11SubjectParser();
+      SAML11SubjectType subject=(SAML11SubjectType)parser.parse(xmlEventReader);
+      attributeStatementType.setSubject(subject);
+    }
+ else     throw logger.parserUnknownTag(tag,startElement.getLocation());
+  }
+  return attributeStatementType;
+}

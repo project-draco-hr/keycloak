@@ -1,0 +1,32 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.ENCRYPTION_METHOD.get());
+  Attribute algorithm=startElement.getAttributeByName(new QName("Algorithm"));
+  EncryptionMethodType encryptionMethodType=new EncryptionMethodType(algorithm.getValue());
+  BigInteger keySize=null;
+  byte[] OAEPparams=null;
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement end=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(end,JBossSAMLConstants.ENCRYPTION_METHOD.get());
+      break;
+    }
+    startElement=(StartElement)xmlEvent;
+    String localPart=startElement.getName().getLocalPart();
+    if ("KeySize".equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      keySize=BigInteger.valueOf(Long.valueOf(StaxParserUtil.getElementText(xmlEventReader)));
+    }
+ else     if ("OAEPparams".equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      OAEPparams=StaxParserUtil.getElementText(xmlEventReader).getBytes();
+    }
+ else {
+      throw logger.parserUnknownTag(localPart,startElement.getLocation());
+    }
+  }
+  EncryptionMethodType.EncryptionMethod encryptionMethod=new EncryptionMethodType.EncryptionMethod(keySize,OAEPparams);
+  encryptionMethodType.setEncryptionMethod(encryptionMethod);
+  return encryptionMethodType;
+}

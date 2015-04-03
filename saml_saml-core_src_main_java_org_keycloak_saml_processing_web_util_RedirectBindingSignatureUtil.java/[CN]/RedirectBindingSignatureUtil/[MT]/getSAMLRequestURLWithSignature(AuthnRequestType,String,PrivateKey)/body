@@ -1,0 +1,10 @@
+{
+  SAML2Request saml2Request=new SAML2Request();
+  StringWriter sw=new StringWriter();
+  saml2Request.marshall(authRequest,sw);
+  String urlEncodedRequest=RedirectBindingUtil.deflateBase64URLEncode(sw.toString());
+  String urlEncodedRelayState=null;
+  if (isNotNull(relayState))   urlEncodedRelayState=URLEncoder.encode(relayState,"UTF-8");
+  byte[] sigValue=computeSignature(GeneralConstants.SAML_REQUEST_KEY,urlEncodedRequest,urlEncodedRelayState,signingKey);
+  return getRequestRedirectURLWithSignature(urlEncodedRequest,urlEncodedRelayState,sigValue,signingKey.getAlgorithm());
+}

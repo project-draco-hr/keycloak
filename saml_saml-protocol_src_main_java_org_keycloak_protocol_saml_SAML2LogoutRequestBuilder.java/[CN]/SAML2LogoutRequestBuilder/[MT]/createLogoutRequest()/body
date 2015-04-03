@@ -11,8 +11,7 @@
     lort.setIssuer(issuerID);
   }
   if (sessionIndex != null)   lort.addSessionIndex(sessionIndex);
-  long assertionValidity=PicketLinkCoreSTS.instance().getConfiguration().getIssuedTokenTimeout();
-  lort.setNotOnOrAfter(XMLTimeUtil.add(lort.getIssueInstant(),assertionValidity));
+  if (assertionExpiration > 0)   lort.setNotOnOrAfter(XMLTimeUtil.add(lort.getIssueInstant(),assertionExpiration * 1000));
   lort.setDestination(URI.create(destination));
   return lort;
 }

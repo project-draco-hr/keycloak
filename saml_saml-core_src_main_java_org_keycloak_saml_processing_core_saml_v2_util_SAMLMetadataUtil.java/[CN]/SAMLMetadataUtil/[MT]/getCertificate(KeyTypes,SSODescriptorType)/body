@@ -1,0 +1,16 @@
+{
+  if (ssoDescriptorType != null) {
+    for (    KeyDescriptorType keyDescriptorType : ssoDescriptorType.getKeyDescriptor()) {
+      KeyTypes keyUse=keyDescriptorType.getUse();
+      if (keyUse == null || (use != null && keyUse.value().equals(use.value()))) {
+        try {
+          return getCertificate(keyDescriptorType);
+        }
+ catch (        Exception e) {
+          throw new RuntimeException("Could not parse KeyDescriptor X509 certificate from metadata [" + ssoDescriptorType.getID() + "].");
+        }
+      }
+    }
+  }
+  return null;
+}

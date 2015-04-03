@@ -1,0 +1,28 @@
+{
+  X509Certificate cert=null;
+  Element keyInfo=keyDescriptor.getKeyInfo();
+  if (keyInfo != null) {
+    NodeList x509DataNodes=keyInfo.getElementsByTagName("X509Data");
+    if (x509DataNodes == null || x509DataNodes.getLength() == 0) {
+      x509DataNodes=keyInfo.getElementsByTagNameNS(JBossSAMLURIConstants.XMLDSIG_NSURI.get(),"X509Data");
+    }
+    if (x509DataNodes == null || x509DataNodes.getLength() == 0) {
+      x509DataNodes=keyInfo.getElementsByTagName("ds:X509Data");
+    }
+    if (x509DataNodes != null && x509DataNodes.getLength() > 0) {
+      Node x509DataNode=x509DataNodes.item(0);
+      NodeList children=x509DataNode.getChildNodes();
+      int len=children != null ? children.getLength() : 0;
+      for (int i=0; i < len; i++) {
+        Node nl=children.item(i);
+        if (nl.getNodeName().contains("X509Certificate")) {
+          Node certNode=nl.getFirstChild();
+          String certNodeValue=certNode.getNodeValue();
+          cert=XMLSignatureUtil.getX509CertificateFromKeyInfoString(certNodeValue.replaceAll("\\s",""));
+          break;
+        }
+      }
+    }
+  }
+  return cert;
+}

@@ -1,0 +1,11 @@
+{
+  ByteArrayOutputStream bos=new ByteArrayOutputStream();
+  SAMLRequestWriter writer=new SAMLRequestWriter(StaxUtil.getXMLStreamWriter(bos));
+  if (rat instanceof AuthnRequestType) {
+    writer.write((AuthnRequestType)rat);
+  }
+ else   if (rat instanceof LogoutRequestType) {
+    writer.write((LogoutRequestType)rat);
+  }
+  return DocumentUtil.getDocument(new String(bos.toByteArray()));
+}

@@ -1,0 +1,15 @@
+{
+  BigInteger BigY, BigP, BigQ, BigG;
+  BigY=new BigInteger(1,massage(Base64.decode(new String(y))));
+  BigP=new BigInteger(1,massage(Base64.decode(new String(p))));
+  BigQ=new BigInteger(1,massage(Base64.decode(new String(q))));
+  BigG=new BigInteger(1,massage(Base64.decode(new String(g))));
+  try {
+    KeyFactory dsaKeyFactory=KeyFactory.getInstance("dsa");
+    DSAPrivateKeySpec kspec=new DSAPrivateKeySpec(BigY,BigP,BigQ,BigG);
+    return (DSAPrivateKey)dsaKeyFactory.generatePrivate(kspec);
+  }
+ catch (  Exception e) {
+    throw new ProcessingException(e);
+  }
+}

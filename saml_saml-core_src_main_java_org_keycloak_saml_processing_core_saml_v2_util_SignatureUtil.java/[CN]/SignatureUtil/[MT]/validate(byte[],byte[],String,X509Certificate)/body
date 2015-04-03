@@ -1,0 +1,10 @@
+{
+  if (signedContent == null)   throw logger.nullArgumentError("signedContent");
+  if (signatureValue == null)   throw logger.nullArgumentError("signatureValue");
+  if (signatureAlgorithm == null)   throw logger.nullArgumentError("signatureAlgorithm");
+  if (validatingCert == null)   throw logger.nullArgumentError("validatingCert");
+  Signature sig=getSignature(signatureAlgorithm);
+  sig.initVerify(validatingCert);
+  sig.update(signedContent);
+  return sig.verify(signatureValue);
+}

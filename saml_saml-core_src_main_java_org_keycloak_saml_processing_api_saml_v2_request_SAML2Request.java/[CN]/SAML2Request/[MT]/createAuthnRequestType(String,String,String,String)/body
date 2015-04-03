@@ -1,0 +1,17 @@
+{
+  XMLGregorianCalendar issueInstant=XMLTimeUtil.getIssueInstant();
+  AuthnRequestType authnRequest=new AuthnRequestType(id,issueInstant);
+  authnRequest.setAssertionConsumerServiceURL(URI.create(assertionConsumerURL));
+  authnRequest.setProtocolBinding(URI.create(JBossSAMLConstants.HTTP_POST_BINDING.get()));
+  if (destination != null) {
+    authnRequest.setDestination(URI.create(destination));
+  }
+  NameIDType issuer=new NameIDType();
+  issuer.setValue(issuerValue);
+  authnRequest.setIssuer(issuer);
+  NameIDPolicyType nameIDPolicy=new NameIDPolicyType();
+  nameIDPolicy.setAllowCreate(Boolean.TRUE);
+  nameIDPolicy.setFormat(URI.create(this.nameIDFormat));
+  authnRequest.setNameIDPolicy(nameIDPolicy);
+  return authnRequest;
+}

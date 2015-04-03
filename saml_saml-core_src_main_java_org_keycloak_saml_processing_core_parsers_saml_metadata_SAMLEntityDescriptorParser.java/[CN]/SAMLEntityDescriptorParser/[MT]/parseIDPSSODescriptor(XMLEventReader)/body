@@ -1,0 +1,75 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.IDP_SSO_DESCRIPTOR.get());
+  List<String> protocolEnum=SAMLParserUtil.parseProtocolEnumeration(startElement);
+  IDPSSODescriptorType idpSSODescriptor=new IDPSSODescriptorType(protocolEnum);
+  Attribute wantAuthnSigned=startElement.getAttributeByName(new QName(JBossSAMLConstants.WANT_AUTHN_REQUESTS_SIGNED.get()));
+  if (wantAuthnSigned != null) {
+    idpSSODescriptor.setWantAuthnRequestsSigned(Boolean.parseBoolean(StaxParserUtil.getAttributeValue(wantAuthnSigned)));
+  }
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement end=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(end,JBossSAMLConstants.IDP_SSO_DESCRIPTOR.get());
+      break;
+    }
+    startElement=(StartElement)xmlEvent;
+    String localPart=startElement.getName().getLocalPart();
+    if (JBossSAMLConstants.ARTIFACT_RESOLUTION_SERVICE.get().equals(localPart)) {
+      IndexedEndpointType endpoint=parseArtifactResolutionService(xmlEventReader,startElement);
+      idpSSODescriptor.addArtifactResolutionService(endpoint);
+    }
+ else     if (JBossSAMLConstants.ASSERTION_ID_REQUEST_SERVICE.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      EndpointType endpoint=getEndpointType(startElement);
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(endElement,JBossSAMLConstants.ASSERTION_ID_REQUEST_SERVICE.get());
+      idpSSODescriptor.addAssertionIDRequestService(endpoint);
+    }
+ else     if (JBossSAMLConstants.SINGLE_LOGOUT_SERVICE.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      EndpointType endpoint=getEndpointType(startElement);
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(endElement,JBossSAMLConstants.SINGLE_LOGOUT_SERVICE.get());
+      idpSSODescriptor.addSingleLogoutService(endpoint);
+    }
+ else     if (JBossSAMLConstants.SINGLE_SIGNON_SERVICE.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      EndpointType endpoint=getEndpointType(startElement);
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(endElement,JBossSAMLConstants.SINGLE_SIGNON_SERVICE.get());
+      idpSSODescriptor.addSingleSignOnService(endpoint);
+    }
+ else     if (JBossSAMLConstants.MANAGE_NAMEID_SERVICE.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      EndpointType endpoint=getEndpointType(startElement);
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(endElement,JBossSAMLConstants.MANAGE_NAMEID_SERVICE.get());
+      idpSSODescriptor.addManageNameIDService(endpoint);
+    }
+ else     if (JBossSAMLConstants.NAMEID_MAPPING_SERVICE.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      EndpointType endpoint=getEndpointType(startElement);
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(endElement,JBossSAMLConstants.NAMEID_MAPPING_SERVICE.get());
+      idpSSODescriptor.addNameIDMappingService(endpoint);
+    }
+ else     if (JBossSAMLConstants.NAMEID_FORMAT.get().equalsIgnoreCase(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      idpSSODescriptor.addNameIDFormat(StaxParserUtil.getElementText(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.ATTRIBUTE.get().equalsIgnoreCase(localPart)) {
+      AttributeType attribute=SAMLParserUtil.parseAttribute(xmlEventReader);
+      idpSSODescriptor.addAttribute(attribute);
+    }
+ else     if (JBossSAMLConstants.KEY_DESCRIPTOR.get().equalsIgnoreCase(localPart)) {
+      idpSSODescriptor.addKeyDescriptor(parseKeyDescriptor(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.EXTENSIONS.get().equalsIgnoreCase(localPart)) {
+      idpSSODescriptor.setExtensions(parseExtensions(xmlEventReader));
+    }
+ else     throw logger.parserUnknownTag(localPart,startElement.getLocation());
+  }
+  return idpSSODescriptor;
+}

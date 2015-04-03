@@ -1,0 +1,25 @@
+{
+  Transformer transformer=null;
+  final String JDK_TRANSFORMER_PROPERTY="picketlink.jdk.transformer";
+  boolean useJDKTransformer=Boolean.parseBoolean(SecurityActions.getSystemProperty(JDK_TRANSFORMER_PROPERTY,"false"));
+  try {
+    if (useJDKTransformer) {
+      transformer=TransformerUtil.getTransformer();
+    }
+ else {
+      transformer=TransformerUtil.getStaxSourceToDomResultTransformer();
+    }
+    Document resultDocument=DocumentUtil.createDocument();
+    DOMResult domResult=new DOMResult(resultDocument);
+    Source source=new StAXSource(xmlEventReader);
+    TransformerUtil.transform(transformer,source,domResult);
+    Document doc=(Document)domResult.getNode();
+    return doc.getDocumentElement();
+  }
+ catch (  ConfigurationException e) {
+    throw logger.parserException(e);
+  }
+catch (  XMLStreamException e) {
+    throw logger.parserException(e);
+  }
+}

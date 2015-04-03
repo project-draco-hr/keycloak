@@ -1,0 +1,12 @@
+{
+  try {
+    Document doc=DocumentUtil.createDocument();
+    Node n=doc.importNode(assertionElement,true);
+    doc.appendChild(n);
+    return new SAML2Signature().validate(doc,publicKey);
+  }
+ catch (  Exception e) {
+    logger.signatureAssertionValidationError(e);
+  }
+  return false;
+}

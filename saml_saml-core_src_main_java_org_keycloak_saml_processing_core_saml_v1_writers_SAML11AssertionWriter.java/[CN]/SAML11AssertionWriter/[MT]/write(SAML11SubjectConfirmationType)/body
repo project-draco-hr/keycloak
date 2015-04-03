@@ -1,0 +1,21 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.SUBJECT_CONFIRMATION.get(),SAML11Constants.ASSERTION_11_NSURI);
+  List<URI> confirmationMethods=confirmation.getConfirmationMethod();
+  if (confirmationMethods != null) {
+    for (    URI confirmationMethod : confirmationMethods) {
+      StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,SAML11Constants.CONFIRMATION_METHOD,SAML11Constants.ASSERTION_11_NSURI);
+      StaxUtil.writeCharacters(writer,confirmationMethod.toString());
+      StaxUtil.writeEndElement(writer);
+    }
+  }
+  Element keyInfo=confirmation.getKeyInfo();
+  if (keyInfo != null) {
+    StaxUtil.writeDOMElement(writer,keyInfo);
+  }
+  Object subjectConfirmationData=confirmation.getSubjectConfirmationData();
+  if (subjectConfirmationData != null) {
+    writeSubjectConfirmationData(subjectConfirmationData);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

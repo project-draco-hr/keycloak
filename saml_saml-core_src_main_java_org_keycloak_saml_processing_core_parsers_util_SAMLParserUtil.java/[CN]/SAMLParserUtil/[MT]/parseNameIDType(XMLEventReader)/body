@@ -1,0 +1,23 @@
+{
+  StartElement nameIDElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  NameIDType nameID=new NameIDType();
+  Attribute nameQualifier=nameIDElement.getAttributeByName(new QName(JBossSAMLConstants.NAME_QUALIFIER.get()));
+  if (nameQualifier != null) {
+    nameID.setNameQualifier(StaxParserUtil.getAttributeValue(nameQualifier));
+  }
+  Attribute format=nameIDElement.getAttributeByName(new QName(JBossSAMLConstants.FORMAT.get()));
+  if (format != null) {
+    nameID.setFormat(URI.create(StaxParserUtil.getAttributeValue(format)));
+  }
+  Attribute spProvidedID=nameIDElement.getAttributeByName(new QName(JBossSAMLConstants.SP_PROVIDED_ID.get()));
+  if (spProvidedID != null) {
+    nameID.setSPProvidedID(StaxParserUtil.getAttributeValue(spProvidedID));
+  }
+  Attribute spNameQualifier=nameIDElement.getAttributeByName(new QName(JBossSAMLConstants.SP_NAME_QUALIFIER.get()));
+  if (spNameQualifier != null) {
+    nameID.setSPNameQualifier(StaxParserUtil.getAttributeValue(spNameQualifier));
+  }
+  String nameIDValue=StaxParserUtil.getElementText(xmlEventReader);
+  nameID.setValue(nameIDValue);
+  return nameID;
+}

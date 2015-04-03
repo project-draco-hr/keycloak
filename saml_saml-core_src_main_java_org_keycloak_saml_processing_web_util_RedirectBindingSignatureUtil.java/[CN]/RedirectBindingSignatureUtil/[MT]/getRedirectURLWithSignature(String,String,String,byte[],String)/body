@@ -1,0 +1,13 @@
+{
+  StringBuilder sb=new StringBuilder();
+  addParameter(sb,samlParameter,urlEncoded);
+  if (isNotNull(urlEncodedRelayState)) {
+    addParameter(sb,GeneralConstants.RELAY_STATE,urlEncodedRelayState);
+  }
+  String sigAlg=SignatureUtil.getXMLSignatureAlgorithmURI(sigAlgo);
+  sigAlg=URLEncoder.encode(sigAlg,"UTF-8");
+  addParameter(sb,GeneralConstants.SAML_SIG_ALG_REQUEST_KEY,sigAlg);
+  String encodedSig=RedirectBindingUtil.base64URLEncode(signature);
+  addParameter(sb,GeneralConstants.SAML_SIGNATURE_REQUEST_KEY,encodedSig);
+  return sb.toString();
+}

@@ -1,0 +1,14 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,JBossSAMLConstants.STATUS.get(),JBossSAMLURIConstants.PROTOCOL_NSURI.get());
+  StatusCodeType statusCodeType=status.getStatusCode();
+  write(statusCodeType);
+  String statusMessage=status.getStatusMessage();
+  if (StringUtil.isNotNull(statusMessage)) {
+    StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,JBossSAMLConstants.STATUS_MESSAGE.get(),JBossSAMLURIConstants.PROTOCOL_NSURI.get());
+    StaxUtil.writeEndElement(writer);
+  }
+  StatusDetailType statusDetail=status.getStatusDetail();
+  if (statusDetail != null)   write(statusDetail);
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

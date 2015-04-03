@@ -1,0 +1,51 @@
+{
+  StartElement conditionsElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(conditionsElement,JBossSAMLConstants.CONDITIONS.get());
+  ConditionsType conditions=new ConditionsType();
+  String assertionNS=JBossSAMLURIConstants.ASSERTION_NSURI.get();
+  QName notBeforeQName=new QName("",JBossSAMLConstants.NOT_BEFORE.get());
+  QName notBeforeQNameWithNS=new QName(assertionNS,JBossSAMLConstants.NOT_BEFORE.get());
+  QName notAfterQName=new QName("",JBossSAMLConstants.NOT_ON_OR_AFTER.get());
+  QName notAfterQNameWithNS=new QName(assertionNS,JBossSAMLConstants.NOT_ON_OR_AFTER.get());
+  Attribute notBeforeAttribute=conditionsElement.getAttributeByName(notBeforeQName);
+  if (notBeforeAttribute == null)   notBeforeAttribute=conditionsElement.getAttributeByName(notBeforeQNameWithNS);
+  Attribute notAfterAttribute=conditionsElement.getAttributeByName(notAfterQName);
+  if (notAfterAttribute == null)   notAfterAttribute=conditionsElement.getAttributeByName(notAfterQNameWithNS);
+  if (notBeforeAttribute != null) {
+    String notBeforeValue=StaxParserUtil.getAttributeValue(notBeforeAttribute);
+    conditions.setNotBefore(XMLTimeUtil.parse(notBeforeValue));
+  }
+  if (notAfterAttribute != null) {
+    String notAfterValue=StaxParserUtil.getAttributeValue(notAfterAttribute);
+    conditions.setNotOnOrAfter(XMLTimeUtil.parse(notAfterValue));
+  }
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement nextEndElement=(EndElement)xmlEvent;
+      if (StaxParserUtil.matches(nextEndElement,JBossSAMLConstants.CONDITIONS.get())) {
+        nextEndElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+        break;
+      }
+ else       throw new RuntimeException(ErrorCodes.UNKNOWN_END_ELEMENT + StaxParserUtil.getEndElementName(nextEndElement));
+    }
+    String tag=null;
+    if (xmlEvent instanceof StartElement) {
+      StartElement peekedElement=(StartElement)xmlEvent;
+      tag=StaxParserUtil.getStartElementName(peekedElement);
+    }
+    if (JBossSAMLConstants.AUDIENCE_RESTRICTION.get().equals(tag)) {
+      AudienceRestrictionType audienceRestriction=getAudienceRestriction(xmlEventReader);
+      conditions.addCondition(audienceRestriction);
+    }
+ else     if (JBossSAMLConstants.ONE_TIME_USE.get().equals(tag)) {
+      StaxParserUtil.getNextStartElement(xmlEventReader);
+      OneTimeUseType oneTimeUseCondition=new OneTimeUseType();
+      conditions.addCondition(oneTimeUseCondition);
+      EndElement endElement=(EndElement)StaxParserUtil.getNextEvent(xmlEventReader);
+      StaxParserUtil.matches(endElement,JBossSAMLConstants.ONE_TIME_USE.get());
+    }
+ else     throw new RuntimeException(ErrorCodes.UNKNOWN_TAG + tag + "::location="+ xmlEvent.getLocation());
+  }
+  return conditions;
+}

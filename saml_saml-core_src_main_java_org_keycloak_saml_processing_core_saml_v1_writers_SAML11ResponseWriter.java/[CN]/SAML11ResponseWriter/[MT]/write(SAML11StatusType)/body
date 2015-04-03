@@ -1,0 +1,24 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,SAML11Constants.STATUS,namespace);
+  SAML11StatusCodeType statusCode=status.getStatusCode();
+  if (statusCode != null) {
+    write(statusCode);
+  }
+  String statusMsg=status.getStatusMessage();
+  if (StringUtil.isNotNull(statusMsg)) {
+    StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,SAML11Constants.STATUS_MSG,namespace);
+    StaxUtil.writeCharacters(writer,statusMsg);
+    StaxUtil.writeEndElement(writer);
+  }
+  CommonStatusDetailType details=status.getStatusDetail();
+  if (details != null) {
+    StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,SAML11Constants.STATUS_DETAIL,namespace);
+    List<Object> objs=details.getAny();
+    for (    Object theObj : objs) {
+      StaxUtil.writeCharacters(writer,theObj.toString());
+    }
+    StaxUtil.writeEndElement(writer);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

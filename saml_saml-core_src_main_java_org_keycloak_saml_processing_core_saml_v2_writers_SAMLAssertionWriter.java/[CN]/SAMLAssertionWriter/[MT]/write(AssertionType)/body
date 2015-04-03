@@ -1,0 +1,61 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.ASSERTION.get(),ASSERTION_NSURI.get());
+  StaxUtil.writeNameSpace(writer,ASSERTION_PREFIX,ASSERTION_NSURI.get());
+  StaxUtil.writeDefaultNameSpace(writer,ASSERTION_NSURI.get());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.ID.get(),assertion.getID());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.VERSION.get(),assertion.getVersion());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.ISSUE_INSTANT.get(),assertion.getIssueInstant().toString());
+  NameIDType issuer=assertion.getIssuer();
+  if (issuer != null)   write(issuer,new QName(ASSERTION_NSURI.get(),JBossSAMLConstants.ISSUER.get(),ASSERTION_PREFIX));
+  Element sig=assertion.getSignature();
+  if (sig != null)   StaxUtil.writeDOMElement(writer,sig);
+  SubjectType subject=assertion.getSubject();
+  if (subject != null) {
+    write(subject);
+  }
+  ConditionsType conditions=assertion.getConditions();
+  if (conditions != null) {
+    StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.CONDITIONS.get(),ASSERTION_NSURI.get());
+    if (conditions.getNotBefore() != null) {
+      StaxUtil.writeAttribute(writer,JBossSAMLConstants.NOT_BEFORE.get(),conditions.getNotBefore().toString());
+    }
+    if (conditions.getNotOnOrAfter() != null) {
+      StaxUtil.writeAttribute(writer,JBossSAMLConstants.NOT_ON_OR_AFTER.get(),conditions.getNotOnOrAfter().toString());
+    }
+    List<ConditionAbstractType> typeOfConditions=conditions.getConditions();
+    if (typeOfConditions != null) {
+      for (      ConditionAbstractType typeCondition : typeOfConditions) {
+        if (typeCondition instanceof AudienceRestrictionType) {
+          AudienceRestrictionType art=(AudienceRestrictionType)typeCondition;
+          StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.AUDIENCE_RESTRICTION.get(),ASSERTION_NSURI.get());
+          List<URI> audiences=art.getAudience();
+          if (audiences != null) {
+            for (            URI audience : audiences) {
+              StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.AUDIENCE.get(),ASSERTION_NSURI.get());
+              StaxUtil.writeCharacters(writer,audience.toString());
+              StaxUtil.writeEndElement(writer);
+            }
+          }
+          StaxUtil.writeEndElement(writer);
+        }
+      }
+    }
+    StaxUtil.writeEndElement(writer);
+  }
+  AdviceType advice=assertion.getAdvice();
+  if (advice != null)   throw logger.notImplementedYet("Advice");
+  Set<StatementAbstractType> statements=assertion.getStatements();
+  if (statements != null) {
+    for (    StatementAbstractType statement : statements) {
+      if (statement instanceof AuthnStatementType) {
+        write((AuthnStatementType)statement);
+      }
+ else       if (statement instanceof AttributeStatementType) {
+        write((AttributeStatementType)statement);
+      }
+ else       throw logger.writerUnknownTypeError(statement.getClass().getName());
+    }
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

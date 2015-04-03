@@ -1,0 +1,33 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.ATTRIBUTE_VALUE.get());
+  Attribute type=startElement.getAttributeByName(new QName(JBossSAMLURIConstants.XSI_NSURI.get(),"type","xsi"));
+  if (type == null) {
+    if (StaxParserUtil.hasTextAhead(xmlEventReader)) {
+      return StaxParserUtil.getElementText(xmlEventReader);
+    }
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof StartElement) {
+      startElement=(StartElement)xmlEvent;
+      String tag=StaxParserUtil.getStartElementName(startElement);
+      if (tag.equals(JBossSAMLConstants.NAMEID.get())) {
+        return parseNameIDType(xmlEventReader);
+      }
+    }
+ else     if (xmlEvent instanceof EndElement) {
+      return "";
+    }
+    throw logger.unsupportedType(StaxParserUtil.getStartElementName(startElement));
+  }
+  String typeValue=StaxParserUtil.getAttributeValue(type);
+  if (typeValue.contains(":string")) {
+    return StaxParserUtil.getElementText(xmlEventReader);
+  }
+ else   if (typeValue.contains(":anyType")) {
+    return StaxParserUtil.getElementText(xmlEventReader);
+  }
+ else   if (typeValue.contains(":base64Binary")) {
+    return StaxParserUtil.getElementText(xmlEventReader);
+  }
+  throw logger.parserUnknownXSI(typeValue);
+}

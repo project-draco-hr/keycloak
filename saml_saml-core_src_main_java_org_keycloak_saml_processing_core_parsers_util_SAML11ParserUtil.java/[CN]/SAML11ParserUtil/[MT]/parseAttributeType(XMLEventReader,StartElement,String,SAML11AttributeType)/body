@@ -1,0 +1,18 @@
+{
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement end=StaxParserUtil.getNextEndElement(xmlEventReader);
+      if (StaxParserUtil.matches(end,rootTag))       break;
+    }
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    String tag=StaxParserUtil.getStartElementName(startElement);
+    if (JBossSAMLConstants.ATTRIBUTE.get().equals(tag))     break;
+    if (JBossSAMLConstants.ATTRIBUTE_VALUE.get().equals(tag)) {
+      Object attributeValue=parseAttributeValue(xmlEventReader);
+      attributeType.add(attributeValue);
+    }
+ else     throw logger.parserUnknownTag(tag,startElement.getLocation());
+  }
+}

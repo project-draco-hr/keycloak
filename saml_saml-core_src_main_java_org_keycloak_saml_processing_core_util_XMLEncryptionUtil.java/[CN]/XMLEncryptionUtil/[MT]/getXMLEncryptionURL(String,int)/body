@@ -1,0 +1,15 @@
+{
+  if ("AES".equals(algo)) {
+switch (keySize) {
+case 192:
+      return XMLCipher.AES_192;
+case 256:
+    return XMLCipher.AES_256;
+default :
+  return XMLCipher.AES_128;
+}
+}
+if (algo.contains("RSA")) return XMLCipher.RSA_v1dot5;
+if (algo.contains("DES")) return XMLCipher.TRIPLEDES_KeyWrap;
+throw logger.unsupportedType("Secret Key with unsupported algo:" + algo);
+}

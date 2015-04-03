@@ -1,0 +1,14 @@
+{
+  startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.REQUESTED_ATTRIBUTE.get());
+  RequestedAttributeType attributeType=null;
+  Attribute name=startElement.getAttributeByName(new QName(JBossSAMLConstants.NAME.get()));
+  if (name == null)   throw logger.parserRequiredAttribute("Name");
+  attributeType=new RequestedAttributeType(StaxParserUtil.getAttributeValue(name));
+  Attribute isRequired=startElement.getAttributeByName(new QName(JBossSAMLConstants.IS_REQUIRED.get()));
+  if (isRequired != null) {
+    attributeType.setIsRequired(Boolean.parseBoolean(StaxParserUtil.getAttributeValue(isRequired)));
+  }
+  SAMLParserUtil.parseAttributeType(xmlEventReader,startElement,JBossSAMLConstants.REQUESTED_ATTRIBUTE.get(),attributeType);
+  return attributeType;
+}

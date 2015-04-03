@@ -1,0 +1,11 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,JBossSAMLConstants.STATUS_CODE.get(),JBossSAMLURIConstants.PROTOCOL_NSURI.get());
+  URI value=statusCodeType.getValue();
+  if (value != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.VALUE.get(),value.toASCIIString());
+  }
+  StatusCodeType subStatusCode=statusCodeType.getStatusCode();
+  if (subStatusCode != null)   write(subStatusCode);
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

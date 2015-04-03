@@ -1,0 +1,13 @@
+{
+  Source source=new DOMSource(signedDoc);
+  StringWriter sw=new StringWriter();
+  Result streamResult=new StreamResult(sw);
+  Transformer xformer=TransformerUtil.getTransformer();
+  try {
+    xformer.transform(source,streamResult);
+  }
+ catch (  TransformerException e) {
+    throw logger.processingError(e);
+  }
+  return sw.toString();
+}

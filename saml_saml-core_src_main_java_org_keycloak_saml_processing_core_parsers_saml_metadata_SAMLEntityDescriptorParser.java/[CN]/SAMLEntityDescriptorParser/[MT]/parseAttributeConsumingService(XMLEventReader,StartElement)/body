@@ -1,0 +1,32 @@
+{
+  startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  Attribute indexAttr=startElement.getAttributeByName(new QName(JBossSAMLConstants.INDEX.get()));
+  if (indexAttr == null)   throw logger.parserRequiredAttribute("index");
+  AttributeConsumingServiceType attributeConsumer=new AttributeConsumingServiceType(Integer.parseInt(StaxParserUtil.getAttributeValue(indexAttr)));
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement end=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(end,JBossSAMLConstants.ATTRIBUTE_CONSUMING_SERVICE.get());
+      break;
+    }
+    startElement=(StartElement)xmlEvent;
+    String localPart=startElement.getName().getLocalPart();
+    if (JBossSAMLConstants.SERVICE_NAME.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      LocalizedNameType localName=getLocalizedName(xmlEventReader,startElement);
+      attributeConsumer.addServiceName(localName);
+    }
+ else     if (JBossSAMLConstants.SERVICE_DESCRIPTION.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      LocalizedNameType localName=getLocalizedName(xmlEventReader,startElement);
+      attributeConsumer.addServiceDescription(localName);
+    }
+ else     if (JBossSAMLConstants.REQUESTED_ATTRIBUTE.get().equals(localPart)) {
+      RequestedAttributeType attType=parseRequestedAttributeType(xmlEventReader,startElement);
+      attributeConsumer.addRequestedAttribute(attType);
+    }
+ else     throw logger.parserUnknownTag(localPart,startElement.getLocation());
+  }
+  return attributeConsumer;
+}

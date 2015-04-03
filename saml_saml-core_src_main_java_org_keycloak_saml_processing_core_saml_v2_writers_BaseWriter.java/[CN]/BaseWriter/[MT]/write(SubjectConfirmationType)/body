@@ -1,0 +1,17 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.SUBJECT_CONFIRMATION.get(),ASSERTION_NSURI.get());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.METHOD.get(),subjectConfirmationType.getMethod());
+  BaseIDAbstractType baseID=subjectConfirmationType.getBaseID();
+  if (baseID != null) {
+    write(baseID);
+  }
+  NameIDType nameIDType=subjectConfirmationType.getNameID();
+  if (nameIDType != null) {
+    write(nameIDType,new QName(ASSERTION_NSURI.get(),JBossSAMLConstants.NAMEID.get(),ASSERTION_PREFIX));
+  }
+  SubjectConfirmationDataType subjectConfirmationData=subjectConfirmationType.getSubjectConfirmationData();
+  if (subjectConfirmationData != null) {
+    write(subjectConfirmationData);
+  }
+  StaxUtil.writeEndElement(writer);
+}

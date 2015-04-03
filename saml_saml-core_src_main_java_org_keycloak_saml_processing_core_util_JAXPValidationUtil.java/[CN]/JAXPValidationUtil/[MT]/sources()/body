@@ -1,0 +1,11 @@
+{
+  List<String> schemas=SchemaManagerUtil.getSchemas();
+  Source[] sourceArr=new Source[schemas.size()];
+  int i=0;
+  for (  String schema : schemas) {
+    URL url=SecurityActions.loadResource(JAXPValidationUtil.class,schema);
+    if (url == null)     throw logger.nullValueError("schema url:" + schema);
+    sourceArr[i++]=new StreamSource(url.openStream());
+  }
+  return sourceArr;
+}

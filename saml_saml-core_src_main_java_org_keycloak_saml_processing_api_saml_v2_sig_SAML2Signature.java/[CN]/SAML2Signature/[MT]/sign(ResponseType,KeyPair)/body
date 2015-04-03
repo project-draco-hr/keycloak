@@ -1,0 +1,10 @@
+{
+  SAML2Response saml2Request=new SAML2Response();
+  Document doc=saml2Request.convert(response);
+  doc.normalize();
+  Node theSibling=getNextSiblingOfIssuer(doc);
+  if (theSibling != null) {
+    this.sibling=theSibling;
+  }
+  return sign(doc,response.getID(),keypair);
+}

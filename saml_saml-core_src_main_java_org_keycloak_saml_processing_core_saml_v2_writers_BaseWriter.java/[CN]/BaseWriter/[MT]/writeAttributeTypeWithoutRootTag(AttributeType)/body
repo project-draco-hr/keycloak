@@ -1,0 +1,40 @@
+{
+  String attributeName=attributeType.getName();
+  if (attributeName != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.NAME.get(),attributeName);
+  }
+  String friendlyName=attributeType.getFriendlyName();
+  if (StringUtil.isNotNull(friendlyName)) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.FRIENDLY_NAME.get(),friendlyName);
+  }
+  String nameFormat=attributeType.getNameFormat();
+  if (StringUtil.isNotNull(nameFormat)) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.NAME_FORMAT.get(),nameFormat);
+  }
+  Map<QName,String> otherAttribs=attributeType.getOtherAttributes();
+  if (otherAttribs != null) {
+    List<String> nameSpacesDealt=new ArrayList<String>();
+    Iterator<QName> keySet=otherAttribs.keySet().iterator();
+    while (keySet != null && keySet.hasNext()) {
+      QName qname=keySet.next();
+      String ns=qname.getNamespaceURI();
+      if (!nameSpacesDealt.contains(ns)) {
+        StaxUtil.writeNameSpace(writer,qname.getPrefix(),ns);
+        nameSpacesDealt.add(ns);
+      }
+      String attribValue=otherAttribs.get(qname);
+      StaxUtil.writeAttribute(writer,qname,attribValue);
+    }
+  }
+  List<Object> attributeValues=attributeType.getAttributeValue();
+  if (attributeValues != null) {
+    for (    Object attributeValue : attributeValues) {
+      if (attributeValue != null) {
+        if (attributeValue instanceof String) {
+          writeStringAttributeValue((String)attributeValue);
+        }
+ else         throw logger.writerUnsupportedAttributeValueError(attributeValue.getClass().getName());
+      }
+    }
+  }
+}

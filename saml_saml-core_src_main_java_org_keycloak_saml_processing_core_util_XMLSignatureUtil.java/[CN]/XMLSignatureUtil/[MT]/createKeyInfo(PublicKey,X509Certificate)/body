@@ -1,0 +1,21 @@
+{
+  KeyInfoFactory keyInfoFactory=fac.getKeyInfoFactory();
+  KeyInfo keyInfo=null;
+  KeyValue keyValue=null;
+  if (publicKey != null) {
+    keyValue=keyInfoFactory.newKeyValue(publicKey);
+    keyInfo=keyInfoFactory.newKeyInfo(Collections.singletonList(keyValue));
+  }
+  if (x509Certificate != null) {
+    List x509list=new ArrayList();
+    x509list.add(x509Certificate);
+    X509Data x509Data=keyInfoFactory.newX509Data(x509list);
+    List items=new ArrayList();
+    items.add(x509Data);
+    if (keyValue != null) {
+      items.add(keyValue);
+    }
+    keyInfo=keyInfoFactory.newKeyInfo(items);
+  }
+  return keyInfo;
+}

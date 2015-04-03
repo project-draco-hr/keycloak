@@ -1,0 +1,9 @@
+{
+  if (stringToBeSigned == null)   throw logger.nullArgumentError("stringToBeSigned");
+  if (signingKey == null)   throw logger.nullArgumentError("signingKey");
+  String algo=signingKey.getAlgorithm();
+  Signature sig=getSignature(algo);
+  sig.initSign(signingKey);
+  sig.update(stringToBeSigned.getBytes());
+  return sig.sign();
+}

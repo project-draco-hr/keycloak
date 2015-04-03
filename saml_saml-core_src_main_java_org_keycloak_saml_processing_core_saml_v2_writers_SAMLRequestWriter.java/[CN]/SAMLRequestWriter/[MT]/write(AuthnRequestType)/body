@@ -1,0 +1,56 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,JBossSAMLConstants.AUTHN_REQUEST.get(),PROTOCOL_NSURI.get());
+  StaxUtil.writeNameSpace(writer,PROTOCOL_PREFIX,PROTOCOL_NSURI.get());
+  StaxUtil.writeDefaultNameSpace(writer,ASSERTION_NSURI.get());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.ID.get(),request.getID());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.VERSION.get(),request.getVersion());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.ISSUE_INSTANT.get(),request.getIssueInstant().toString());
+  URI destination=request.getDestination();
+  if (destination != null)   StaxUtil.writeAttribute(writer,JBossSAMLConstants.DESTINATION.get(),destination.toASCIIString());
+  String consent=request.getConsent();
+  if (StringUtil.isNotNull(consent))   StaxUtil.writeAttribute(writer,JBossSAMLConstants.CONSENT.get(),consent);
+  URI assertionURL=request.getAssertionConsumerServiceURL();
+  if (assertionURL != null)   StaxUtil.writeAttribute(writer,JBossSAMLConstants.ASSERTION_CONSUMER_SERVICE_URL.get(),assertionURL.toASCIIString());
+  Boolean forceAuthn=request.isForceAuthn();
+  if (forceAuthn != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.FORCE_AUTHN.get(),forceAuthn.toString());
+  }
+  Boolean isPassive=request.isIsPassive();
+  if (isPassive != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.IS_PASSIVE.get(),isPassive.toString());
+  }
+  URI protocolBinding=request.getProtocolBinding();
+  if (protocolBinding != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.PROTOCOL_BINDING.get(),protocolBinding.toString());
+  }
+  Integer assertionIndex=request.getAssertionConsumerServiceIndex();
+  if (assertionIndex != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.ASSERTION_CONSUMER_SERVICE_INDEX.get(),assertionIndex.toString());
+  }
+  Integer attrIndex=request.getAttributeConsumingServiceIndex();
+  if (attrIndex != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.ATTRIBUTE_CONSUMING_SERVICE_INDEX.get(),attrIndex.toString());
+  }
+  String providerName=request.getProviderName();
+  if (StringUtil.isNotNull(providerName)) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.PROVIDER_NAME.get(),providerName);
+  }
+  NameIDType issuer=request.getIssuer();
+  if (issuer != null) {
+    write(issuer,new QName(ASSERTION_NSURI.get(),JBossSAMLConstants.ISSUER.get(),ASSERTION_PREFIX));
+  }
+  Element sig=request.getSignature();
+  if (sig != null) {
+    StaxUtil.writeDOMElement(writer,sig);
+  }
+  NameIDPolicyType nameIDPolicy=request.getNameIDPolicy();
+  if (nameIDPolicy != null) {
+    write(nameIDPolicy);
+  }
+  RequestedAuthnContextType requestedAuthnContext=request.getRequestedAuthnContext();
+  if (requestedAuthnContext != null) {
+    write(requestedAuthnContext);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

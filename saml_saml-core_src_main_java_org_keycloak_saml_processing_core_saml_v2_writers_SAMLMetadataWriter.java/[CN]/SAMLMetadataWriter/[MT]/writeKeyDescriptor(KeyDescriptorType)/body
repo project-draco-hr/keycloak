@@ -1,0 +1,9 @@
+{
+  StaxUtil.writeStartElement(writer,METADATA_PREFIX,JBossSAMLConstants.KEY_DESCRIPTOR.get(),JBossSAMLURIConstants.METADATA_NSURI.get());
+  KeyTypes keyTypes=keyDescriptor.getUse();
+  if (keyTypes != null)   StaxUtil.writeAttribute(writer,new QName(JBossSAMLConstants.USE.get()),keyTypes.value());
+  Element keyInfo=keyDescriptor.getKeyInfo();
+  StaxUtil.writeDOMElement(writer,keyInfo);
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

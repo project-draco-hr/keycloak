@@ -1,0 +1,54 @@
+{
+  StaxUtil.writeStartElement(writer,METADATA_PREFIX,JBossSAMLConstants.ENTITY_DESCRIPTOR.get(),JBossSAMLURIConstants.METADATA_NSURI.get());
+  StaxUtil.writeDefaultNameSpace(writer,JBossSAMLURIConstants.METADATA_NSURI.get());
+  StaxUtil.writeNameSpace(writer,"md",JBossSAMLURIConstants.METADATA_NSURI.get());
+  StaxUtil.writeNameSpace(writer,"saml",JBossSAMLURIConstants.ASSERTION_NSURI.get());
+  StaxUtil.writeNameSpace(writer,"ds",JBossSAMLURIConstants.XMLDSIG_NSURI.get());
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.ENTITY_ID.get(),entityDescriptor.getEntityID());
+  if (entityDescriptor.getValidUntil() != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.VALID_UNTIL.get(),entityDescriptor.getValidUntil().toString());
+  }
+  if (entityDescriptor.getID() != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.ID.get(),entityDescriptor.getID());
+  }
+  Element signature=entityDescriptor.getSignature();
+  if (signature != null) {
+    StaxUtil.writeDOMElement(writer,signature);
+  }
+  ExtensionsType extensions=entityDescriptor.getExtensions();
+  if (extensions != null) {
+    StaxUtil.writeDOMElement(writer,extensions.getElement());
+  }
+  List<EntityDescriptorType.EDTChoiceType> choiceTypes=entityDescriptor.getChoiceType();
+  for (  EntityDescriptorType.EDTChoiceType edtChoice : choiceTypes) {
+    AffiliationDescriptorType affliationDesc=edtChoice.getAffiliationDescriptor();
+    if (affliationDesc != null)     throw logger.notImplementedYet("affliation");
+    List<EntityDescriptorType.EDTDescriptorChoiceType> edtDescChoices=edtChoice.getDescriptors();
+    for (    EntityDescriptorType.EDTDescriptorChoiceType edtDescChoice : edtDescChoices) {
+      RoleDescriptorType roleDesc=edtDescChoice.getRoleDescriptor();
+      if (roleDesc != null)       throw logger.notImplementedYet("Role Descriptor type");
+      IDPSSODescriptorType idpSSO=edtDescChoice.getIdpDescriptor();
+      if (idpSSO != null)       write(idpSSO);
+      SPSSODescriptorType spSSO=edtDescChoice.getSpDescriptor();
+      if (spSSO != null)       write(spSSO);
+      AttributeAuthorityDescriptorType attribAuth=edtDescChoice.getAttribDescriptor();
+      if (attribAuth != null)       writeAttributeAuthorityDescriptor(attribAuth);
+      AuthnAuthorityDescriptorType authNDesc=edtDescChoice.getAuthnDescriptor();
+      if (authNDesc != null)       throw logger.notImplementedYet("AuthnAuthorityDescriptorType");
+      PDPDescriptorType pdpDesc=edtDescChoice.getPdpDescriptor();
+      if (pdpDesc != null)       throw logger.notImplementedYet("PDPDescriptorType");
+    }
+  }
+  OrganizationType organization=entityDescriptor.getOrganization();
+  if (organization != null) {
+    writeOrganization(organization);
+  }
+  List<ContactType> contactPersons=entityDescriptor.getContactPerson();
+  for (  ContactType contact : contactPersons) {
+    write(contact);
+  }
+  List<AdditionalMetadataLocationType> addl=entityDescriptor.getAdditionalMetadataLocation();
+  if (addl.size() > 0)   throw logger.notImplementedYet("AdditionalMetadataLocationType");
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

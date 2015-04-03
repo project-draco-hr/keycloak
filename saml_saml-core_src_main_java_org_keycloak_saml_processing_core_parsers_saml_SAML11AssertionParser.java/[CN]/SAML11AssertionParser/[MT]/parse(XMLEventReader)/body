@@ -1,0 +1,63 @@
+{
+  StartElement startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+  startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,ASSERTION);
+  SAML11AssertionType assertion=parseBaseAttributes(startElement);
+  Attribute issuerAttribute=startElement.getAttributeByName(new QName(SAML11Constants.ISSUER));
+  String issuer=StaxParserUtil.getAttributeValue(issuerAttribute);
+  assertion.setIssuer(issuer);
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent == null)     break;
+    if (xmlEvent instanceof EndElement) {
+      xmlEvent=StaxParserUtil.getNextEvent(xmlEventReader);
+      EndElement endElement=(EndElement)xmlEvent;
+      String endElementTag=StaxParserUtil.getEndElementName(endElement);
+      if (endElementTag.equals(JBossSAMLConstants.ASSERTION.get()))       break;
+ else       throw logger.parserUnknownEndElement(endElementTag);
+    }
+    StartElement peekedElement=null;
+    if (xmlEvent instanceof StartElement) {
+      peekedElement=(StartElement)xmlEvent;
+    }
+ else {
+      peekedElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    }
+    if (peekedElement == null)     break;
+    String tag=StaxParserUtil.getStartElementName(peekedElement);
+    if (tag.equals(JBossSAMLConstants.SIGNATURE.get())) {
+      assertion.setSignature(StaxParserUtil.getDOMElement(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.ISSUER.get().equalsIgnoreCase(tag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      issuer=StaxParserUtil.getElementText(xmlEventReader);
+      assertion.setIssuer(issuer);
+    }
+ else     if (JBossSAMLConstants.SUBJECT.get().equalsIgnoreCase(tag)) {
+      SAML11SubjectParser subjectParser=new SAML11SubjectParser();
+      SAML11SubjectType subject=(SAML11SubjectType)subjectParser.parse(xmlEventReader);
+      SAML11SubjectStatementType subStat=new SAML11SubjectStatementType();
+      subStat.setSubject(subject);
+    }
+ else     if (JBossSAMLConstants.CONDITIONS.get().equalsIgnoreCase(tag)) {
+      startElement=(StartElement)xmlEvent;
+      SAML11ConditionsType conditions=SAML11ParserUtil.parseSAML11Conditions(xmlEventReader);
+      assertion.setConditions(conditions);
+    }
+ else     if (SAML11Constants.AUTHENTICATION_STATEMENT.equals(tag)) {
+      startElement=(StartElement)xmlEvent;
+      SAML11AuthenticationStatementType authStat=SAML11ParserUtil.parseAuthenticationStatement(xmlEventReader);
+      assertion.add(authStat);
+    }
+ else     if (SAML11Constants.ATTRIBUTE_STATEMENT.equalsIgnoreCase(tag)) {
+      SAML11AttributeStatementType attributeStatementType=SAML11ParserUtil.parseSAML11AttributeStatement(xmlEventReader);
+      assertion.add(attributeStatementType);
+    }
+ else     if (SAML11Constants.AUTHORIZATION_DECISION_STATEMENT.equalsIgnoreCase(tag)) {
+      SAML11AuthorizationDecisionStatementType authzStat=SAML11ParserUtil.parseSAML11AuthorizationDecisionStatement(xmlEventReader);
+      assertion.add(authzStat);
+    }
+ else     throw logger.parserUnknownTag(tag,peekedElement.getLocation());
+  }
+  return assertion;
+}

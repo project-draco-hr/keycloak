@@ -1,0 +1,30 @@
+{
+  List<String> roles=new ArrayList<String>();
+  Set<StatementAbstractType> statements=assertion.getStatements();
+  for (  StatementAbstractType statement : statements) {
+    if (statement instanceof AttributeStatementType) {
+      AttributeStatementType attributeStatement=(AttributeStatementType)statement;
+      List<ASTChoiceType> attList=attributeStatement.getAttributes();
+      for (      ASTChoiceType obj : attList) {
+        AttributeType attr=obj.getAttribute();
+        if (roleKeys != null && roleKeys.size() > 0) {
+          if (!roleKeys.contains(attr.getName()))           continue;
+        }
+        List<Object> attributeValues=attr.getAttributeValue();
+        if (attributeValues != null) {
+          for (          Object attrValue : attributeValues) {
+            if (attrValue instanceof String) {
+              roles.add((String)attrValue);
+            }
+ else             if (attrValue instanceof Node) {
+              Node roleNode=(Node)attrValue;
+              roles.add(roleNode.getFirstChild().getNodeValue());
+            }
+ else             throw logger.unknownObjectType(attrValue);
+          }
+        }
+      }
+    }
+  }
+  return roles;
+}

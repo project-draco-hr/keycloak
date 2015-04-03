@@ -1,0 +1,29 @@
+{
+  Provider currentProvider=Security.getProvider(name);
+  if (currentProvider == null) {
+    try {
+      int ret=0;
+      Provider[] provs=Security.getProviders();
+      for (int i=0; i < provs.length; i++) {
+        if ("SUN".equals(provs[i].getName()) || "IBMJCE".equals(provs[i].getName())) {
+          ret=Security.insertProviderAt(provider,i + 2);
+          break;
+        }
+      }
+      if (ret == 0) {
+        ret=Security.insertProviderAt(provider,2);
+      }
+      if (logger.isDebugEnabled()) {
+        logger.debug("The provider " + provider.getName() + " - "+ provider.getVersion()+ " was added at position: "+ ret);
+      }
+      return provider.getName();
+    }
+ catch (    Throwable t) {
+      if (logger.isDebugEnabled()) {
+        logger.jceProviderCouldNotBeLoaded(name,t);
+      }
+      return null;
+    }
+  }
+  return currentProvider.getName();
+}

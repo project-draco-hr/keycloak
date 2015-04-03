@@ -1,0 +1,12 @@
+{
+  BigInteger bigModulus=new BigInteger(1,massage(Base64.decode(new String(modulus))));
+  BigInteger bigEx=new BigInteger(1,massage(Base64.decode(new String(exponent))));
+  try {
+    KeyFactory rsaKeyFactory=KeyFactory.getInstance("rsa");
+    RSAPrivateKeySpec kspec=new RSAPrivateKeySpec(bigModulus,bigEx);
+    return (RSAPrivateKey)rsaKeyFactory.generatePrivate(kspec);
+  }
+ catch (  Exception e) {
+    throw new ProcessingException(e);
+  }
+}

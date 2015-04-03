@@ -1,0 +1,22 @@
+{
+  StartElement audienceRestElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.matches(audienceRestElement,JBossSAMLConstants.AUDIENCE_RESTRICTION.get());
+  AudienceRestrictionType audience=new AudienceRestrictionType();
+  while (xmlEventReader.hasNext()) {
+    StartElement audienceElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+    if (!StaxParserUtil.matches(audienceElement,JBossSAMLConstants.AUDIENCE.get()))     break;
+    if (!StaxParserUtil.hasTextAhead(xmlEventReader))     throw new ParsingException(ErrorCodes.EXPECTED_TAG + "audienceValue");
+    String audienceValue=StaxParserUtil.getElementText(xmlEventReader);
+    audience.addAudience(URI.create(audienceValue));
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement endElement=(EndElement)xmlEvent;
+      if (StaxParserUtil.matches(endElement,JBossSAMLConstants.AUDIENCE_RESTRICTION.get())) {
+        StaxParserUtil.getNextEvent(xmlEventReader);
+        break;
+      }
+ else       throw new RuntimeException(ErrorCodes.UNKNOWN_END_ELEMENT + StaxParserUtil.getEndElementName(endElement));
+    }
+  }
+  return audience;
+}

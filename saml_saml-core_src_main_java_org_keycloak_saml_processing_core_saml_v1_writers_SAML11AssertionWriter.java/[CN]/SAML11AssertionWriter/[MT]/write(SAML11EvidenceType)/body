@@ -1,0 +1,14 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,SAML11Constants.EVIDENCE,ns);
+  List<String> assertionIDRefs=evidence.getAssertionIDReference();
+  for (  String assertionIDRef : assertionIDRefs) {
+    StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,SAML11Constants.ASSERTION_ID_REF,ns);
+    StaxUtil.writeCharacters(writer,assertionIDRef);
+    StaxUtil.writeEndElement(writer);
+  }
+  List<SAML11AssertionType> assertions=evidence.getAssertions();
+  for (  SAML11AssertionType assertion : assertions) {
+    write(assertion);
+  }
+  StaxUtil.writeEndElement(writer);
+}

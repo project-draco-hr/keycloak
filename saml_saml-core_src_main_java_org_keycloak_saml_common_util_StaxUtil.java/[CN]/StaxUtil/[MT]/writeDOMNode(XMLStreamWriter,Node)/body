@@ -1,0 +1,26 @@
+{
+  try {
+    short nodeType=node.getNodeType();
+switch (nodeType) {
+case Node.ELEMENT_NODE:
+      writeDOMElement(writer,(Element)node);
+    break;
+case Node.TEXT_NODE:
+  writer.writeCharacters(node.getNodeValue());
+break;
+case Node.COMMENT_NODE:
+writer.writeComment(node.getNodeValue());
+break;
+case Node.CDATA_SECTION_NODE:
+writer.writeCData(node.getNodeValue());
+break;
+default :
+}
+}
+ catch (DOMException e) {
+throw logger.processingError(e);
+}
+catch (XMLStreamException e) {
+throw logger.processingError(e);
+}
+}

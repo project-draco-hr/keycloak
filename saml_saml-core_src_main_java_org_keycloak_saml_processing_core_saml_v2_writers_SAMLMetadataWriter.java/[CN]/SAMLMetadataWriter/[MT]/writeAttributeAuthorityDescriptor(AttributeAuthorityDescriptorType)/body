@@ -1,0 +1,30 @@
+{
+  StaxUtil.writeStartElement(writer,METADATA_PREFIX,JBossSAMLConstants.ATTRIBUTE_AUTHORITY_DESCRIPTOR.get(),JBossSAMLURIConstants.METADATA_NSURI.get());
+  writeProtocolSupportEnumeration(attributeAuthority.getProtocolSupportEnumeration());
+  Element signature=attributeAuthority.getSignature();
+  if (signature != null) {
+    StaxUtil.writeDOMElement(writer,signature);
+  }
+  ExtensionsType extensions=attributeAuthority.getExtensions();
+  if (extensions != null) {
+    StaxUtil.writeDOMElement(writer,extensions.getElement());
+  }
+  List<KeyDescriptorType> keyDescriptorList=attributeAuthority.getKeyDescriptor();
+  for (  KeyDescriptorType keyDescriptor : keyDescriptorList) {
+    writeKeyDescriptor(keyDescriptor);
+  }
+  List<EndpointType> attributeServices=attributeAuthority.getAttributeService();
+  for (  EndpointType endpoint : attributeServices) {
+    writeAttributeService(endpoint);
+  }
+  List<String> nameIDFormats=attributeAuthority.getNameIDFormat();
+  for (  String nameIDFormat : nameIDFormats) {
+    writeNameIDFormat(nameIDFormat);
+  }
+  List<AttributeType> attributes=attributeAuthority.getAttribute();
+  for (  AttributeType attributeType : attributes) {
+    write(attributeType);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

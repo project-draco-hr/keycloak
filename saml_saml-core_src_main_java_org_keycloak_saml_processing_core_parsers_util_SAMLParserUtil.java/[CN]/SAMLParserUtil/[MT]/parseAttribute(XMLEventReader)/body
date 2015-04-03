@@ -1,0 +1,10 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.ATTRIBUTE.get());
+  AttributeType attributeType=null;
+  Attribute name=startElement.getAttributeByName(new QName(JBossSAMLConstants.NAME.get()));
+  if (name == null)   throw logger.parserRequiredAttribute("Name");
+  attributeType=new AttributeType(StaxParserUtil.getAttributeValue(name));
+  parseAttributeType(xmlEventReader,startElement,JBossSAMLConstants.ATTRIBUTE.get(),attributeType);
+  return attributeType;
+}

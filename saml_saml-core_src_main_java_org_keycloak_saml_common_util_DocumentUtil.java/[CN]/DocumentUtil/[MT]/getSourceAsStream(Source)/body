@@ -1,0 +1,12 @@
+{
+  ByteArrayOutputStream baos=new ByteArrayOutputStream();
+  Result streamResult=new StreamResult(baos);
+  Transformer transformer=TransformerUtil.getTransformer();
+  try {
+    transformer.transform(source,streamResult);
+  }
+ catch (  TransformerException e) {
+    throw logger.processingError(e);
+  }
+  return new ByteArrayInputStream(baos.toByteArray());
+}

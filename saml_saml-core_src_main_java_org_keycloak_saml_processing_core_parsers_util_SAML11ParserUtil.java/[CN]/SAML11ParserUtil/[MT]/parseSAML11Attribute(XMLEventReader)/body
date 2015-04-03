@@ -1,0 +1,15 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.ATTRIBUTE.get());
+  SAML11AttributeType attributeType=null;
+  Attribute name=startElement.getAttributeByName(new QName(SAML11Constants.ATTRIBUTE_NAME));
+  if (name == null)   throw logger.parserRequiredAttribute("Name");
+  String attribName=StaxParserUtil.getAttributeValue(name);
+  Attribute namesp=startElement.getAttributeByName(new QName(SAML11Constants.ATTRIBUTE_NAMESPACE));
+  if (namesp == null)   throw logger.parserRequiredAttribute("Namespace");
+  String attribNamespace=StaxParserUtil.getAttributeValue(namesp);
+  attributeType=new SAML11AttributeType(attribName,URI.create(attribNamespace));
+  attributeType.add(parseAttributeValue(xmlEventReader));
+  parseAttributeType(xmlEventReader,startElement,JBossSAMLConstants.ATTRIBUTE.get(),attributeType);
+  return attributeType;
+}

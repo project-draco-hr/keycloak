@@ -1,0 +1,44 @@
+{
+  String responseDestinationURI=sp.getResponseDestinationURI();
+  XMLGregorianCalendar issueInstant=XMLTimeUtil.getIssueInstant();
+  SubjectType subjectType=new SubjectType();
+  NameIDType nameIDType=new NameIDType();
+  nameIDType.setFormat(URI.create(idp.getNameIDFormat()));
+  nameIDType.setValue(idp.getNameIDFormatValue());
+  SubjectType.STSubType subType=new SubjectType.STSubType();
+  subType.addBaseID(nameIDType);
+  subjectType.setSubType(subType);
+  SubjectConfirmationType subjectConfirmation=new SubjectConfirmationType();
+  subjectConfirmation.setMethod(idp.getSubjectConfirmationMethod());
+  SubjectConfirmationDataType subjectConfirmationData=new SubjectConfirmationDataType();
+  subjectConfirmationData.setInResponseTo(sp.getRequestID());
+  subjectConfirmationData.setRecipient(responseDestinationURI);
+  subjectConfirmationData.setNotOnOrAfter(issueInstant);
+  subjectConfirmation.setSubjectConfirmationData(subjectConfirmationData);
+  subjectType.addConfirmation(subjectConfirmation);
+  AssertionType assertionType=null;
+  NameIDType issuerID=issuerInfo.getIssuer();
+  try {
+    issueInstant=XMLTimeUtil.getIssueInstant();
+  }
+ catch (  ConfigurationException e) {
+    throw logger.processingError(e);
+  }
+  ConditionsType conditions=null;
+  List<StatementAbstractType> statements=new LinkedList<>();
+  String assertionID=IDGenerator.create("ID_");
+  assertionType=SAMLAssertionFactory.createAssertion(assertionID,issuerID,issueInstant,conditions,subjectType,statements);
+  try {
+    AssertionUtil.createTimedConditions(assertionType,ASSERTION_VALIDITY,CLOCK_SKEW);
+  }
+ catch (  ConfigurationException e) {
+    throw logger.processingError(e);
+  }
+catch (  IssueInstantMissingException e) {
+    throw logger.processingError(e);
+  }
+  ResponseType responseType=createResponseType(ID,issuerInfo,assertionType);
+  responseType.setInResponseTo(sp.getRequestID());
+  responseType.setDestination(responseDestinationURI);
+  return responseType;
+}

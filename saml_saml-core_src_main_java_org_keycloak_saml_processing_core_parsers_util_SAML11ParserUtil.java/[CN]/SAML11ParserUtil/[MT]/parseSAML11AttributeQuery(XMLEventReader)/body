@@ -1,0 +1,22 @@
+{
+  SAML11AttributeQueryType query=new SAML11AttributeQueryType();
+  StartElement startElement;
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      if (StaxParserUtil.matches(endElement,SAML11Constants.ATTRIBUTE_QUERY))       break;
+ else       throw logger.parserUnknownEndElement(StaxParserUtil.getEndElementName(endElement));
+    }
+    if (xmlEvent instanceof StartElement) {
+      startElement=(StartElement)xmlEvent;
+      String startTag=StaxParserUtil.getStartElementName(startElement);
+      if (startTag.equals(JBossSAMLConstants.SUBJECT.get())) {
+        SAML11SubjectParser parser=new SAML11SubjectParser();
+        query.setSubject((SAML11SubjectType)parser.parse(xmlEventReader));
+      }
+ else       throw logger.parserUnknownTag(startTag,startElement.getLocation());
+    }
+  }
+  return query;
+}

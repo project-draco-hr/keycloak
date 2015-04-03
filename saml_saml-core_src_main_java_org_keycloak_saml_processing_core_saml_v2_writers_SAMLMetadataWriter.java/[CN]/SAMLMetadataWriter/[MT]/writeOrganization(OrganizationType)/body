@@ -1,0 +1,29 @@
+{
+  if (org == null)   throw new ProcessingException(logger.nullArgumentError("Organization"));
+  StaxUtil.writeStartElement(writer,METADATA_PREFIX,JBossSAMLConstants.ORGANIZATION.get(),JBossSAMLURIConstants.METADATA_NSURI.get());
+  ExtensionsType extensions=org.getExtensions();
+  if (extensions != null) {
+    StaxUtil.writeDOMElement(writer,extensions.getElement());
+  }
+  List<LocalizedNameType> nameList=org.getOrganizationName();
+  for (  LocalizedNameType localName : nameList) {
+    StaxUtil.writeStartElement(writer,METADATA_PREFIX,JBossSAMLConstants.ORGANIZATION_NAME.get(),JBossSAMLURIConstants.METADATA_NSURI.get());
+    writeLocalizedType(localName);
+  }
+  List<LocalizedNameType> displayNameList=org.getOrganizationDisplayName();
+  for (  LocalizedNameType localName : displayNameList) {
+    StaxUtil.writeStartElement(writer,METADATA_PREFIX,JBossSAMLConstants.ORGANIZATION_DISPLAY_NAME.get(),JBossSAMLURIConstants.METADATA_NSURI.get());
+    writeLocalizedType(localName);
+  }
+  List<LocalizedURIType> uriList=org.getOrganizationURL();
+  for (  LocalizedURIType uri : uriList) {
+    StaxUtil.writeStartElement(writer,METADATA_PREFIX,JBossSAMLConstants.ORGANIZATION_URL.get(),JBossSAMLURIConstants.METADATA_NSURI.get());
+    String lang=uri.getLang();
+    String val=uri.getValue().toString();
+    StaxUtil.writeAttribute(writer,new QName(JBossSAMLURIConstants.XML.get(),JBossSAMLConstants.LANG.get(),"xml"),lang);
+    StaxUtil.writeCharacters(writer,val);
+    StaxUtil.writeEndElement(writer);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

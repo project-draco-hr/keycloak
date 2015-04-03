@@ -1,0 +1,53 @@
+{
+  if (!(xmlSource instanceof StAXSource))   throw logger.wrongTypeError("xmlSource should be a stax source");
+  if (outputTarget instanceof DOMResult == false)   throw logger.wrongTypeError("outputTarget should be a dom result");
+  String rootTag=null;
+  StAXSource staxSource=(StAXSource)xmlSource;
+  XMLEventReader xmlEventReader=staxSource.getXMLEventReader();
+  if (xmlEventReader == null)   throw new TransformerException(logger.nullValueError("XMLEventReader"));
+  DOMResult domResult=(DOMResult)outputTarget;
+  Document doc=(Document)domResult.getNode();
+  Stack<Node> stack=new Stack<Node>();
+  try {
+    XMLEvent xmlEvent=StaxParserUtil.getNextEvent(xmlEventReader);
+    if (xmlEvent instanceof StartElement == false)     throw new TransformerException(ErrorCodes.WRITER_SHOULD_START_ELEMENT);
+    StartElement rootElement=(StartElement)xmlEvent;
+    rootTag=StaxParserUtil.getStartElementName(rootElement);
+    Element docRoot=handleStartElement(xmlEventReader,rootElement,new CustomHolder(doc,false));
+    Node parent=doc.importNode(docRoot,true);
+    doc.appendChild(parent);
+    stack.push(parent);
+    while (xmlEventReader.hasNext()) {
+      xmlEvent=StaxParserUtil.getNextEvent(xmlEventReader);
+      int type=xmlEvent.getEventType();
+switch (type) {
+case XMLEvent.START_ELEMENT:
+        StartElement startElement=(StartElement)xmlEvent;
+      CustomHolder holder=new CustomHolder(doc,false);
+    Element docStartElement=handleStartElement(xmlEventReader,startElement,holder);
+  Node el=doc.importNode(docStartElement,true);
+Node top=null;
+if (!stack.isEmpty()) {
+top=stack.peek();
+}
+if (!holder.encounteredTextNode) {
+stack.push(el);
+}
+if (top == null) doc.appendChild(el);
+ else top.appendChild(el);
+break;
+case XMLEvent.END_ELEMENT:
+EndElement endElement=(EndElement)xmlEvent;
+String endTag=StaxParserUtil.getEndElementName(endElement);
+if (rootTag.equals(endTag)) return;
+ else {
+if (!stack.isEmpty()) stack.pop();
+}
+break;
+}
+}
+}
+ catch (Exception e) {
+throw new TransformerException(e);
+}
+}

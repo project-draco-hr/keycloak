@@ -1,0 +1,29 @@
+{
+  Map<String,Object> attrMap=new HashMap<String,Object>();
+  if (attributeStatementTypes != null && !attributeStatementTypes.isEmpty()) {
+    attrMap=new HashMap<String,Object>();
+    for (    StatementAbstractType statement : attributeStatementTypes) {
+      if (statement instanceof AttributeStatementType) {
+        AttributeStatementType attrStat=(AttributeStatementType)statement;
+        List<ASTChoiceType> attrs=attrStat.getAttributes();
+        for (        ASTChoiceType attrChoice : attrs) {
+          AttributeType attr=attrChoice.getAttribute();
+          String attributeName=attr.getFriendlyName();
+          if (attributeName == null) {
+            attributeName=attr.getName();
+          }
+          List<Object> values=attr.getAttributeValue();
+          if (values != null) {
+            if (values.size() == 1) {
+              attrMap.put(attributeName,values.get(0));
+            }
+ else {
+              attrMap.put(attributeName,values);
+            }
+          }
+        }
+      }
+    }
+  }
+  return attrMap;
+}

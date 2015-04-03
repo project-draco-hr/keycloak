@@ -1,0 +1,21 @@
+{
+  StringBuilder builder=new StringBuilder();
+  int len=pkgNames.length;
+  if (len == 0)   throw logger.nullValueError("Packages are empty");
+  for (  String pkg : pkgNames) {
+    builder.append(pkg);
+    builder.append(":");
+  }
+  Unmarshaller unmarshaller=getUnmarshaller(builder.toString());
+  SchemaFactory schemaFactory=getSchemaFactory();
+  Source[] schemaSources=new Source[schemaLocations.length];
+  int i=0;
+  for (  String schemaLocation : schemaLocations) {
+    URL schemaURL=SecurityActions.loadResource(JAXBUtil.class,schemaLocation);
+    if (schemaURL == null)     throw logger.nullValueError("Schema URL :" + schemaLocation);
+    schemaSources[i++]=new StreamSource(schemaURL.openStream());
+  }
+  Schema schema=schemaFactory.newSchema(schemaSources);
+  unmarshaller.setSchema(schema);
+  return unmarshaller;
+}

@@ -1,0 +1,42 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.CONTACT_PERSON.get());
+  Attribute attr=startElement.getAttributeByName(new QName(JBossSAMLConstants.CONTACT_TYPE.get()));
+  if (attr == null)   throw logger.parserRequiredAttribute("contactType");
+  ContactType contactType=new ContactType(ContactTypeType.fromValue(StaxParserUtil.getAttributeValue(attr)));
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement end=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(end,JBossSAMLConstants.CONTACT_PERSON.get());
+      break;
+    }
+    startElement=(StartElement)xmlEvent;
+    String localPart=startElement.getName().getLocalPart();
+    if (JBossSAMLConstants.COMPANY.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      contactType.setCompany(StaxParserUtil.getElementText(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.GIVEN_NAME.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      contactType.setGivenName(StaxParserUtil.getElementText(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.SURNAME.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      contactType.setSurName(StaxParserUtil.getElementText(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.EMAIL_ADDRESS.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      contactType.addEmailAddress(StaxParserUtil.getElementText(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.TELEPHONE_NUMBER.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      contactType.addTelephone(StaxParserUtil.getElementText(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.EXTENSIONS.get().equalsIgnoreCase(localPart)) {
+      contactType.setExtensions(parseExtensions(xmlEventReader));
+    }
+ else     throw logger.parserUnknownTag(localPart,startElement.getLocation());
+  }
+  return contactType;
+}

@@ -1,0 +1,38 @@
+{
+  StaxUtil.writeStartElement(writer,METADATA_PREFIX,JBossSAMLConstants.SP_SSO_DESCRIPTOR.get(),JBossSAMLURIConstants.METADATA_NSURI.get());
+  StaxUtil.writeAttribute(writer,new QName(JBossSAMLConstants.PROTOCOL_SUPPORT_ENUMERATION.get()),spSSODescriptor.getProtocolSupportEnumeration().get(0));
+  Boolean authnSigned=spSSODescriptor.isAuthnRequestsSigned();
+  if (authnSigned != null) {
+    StaxUtil.writeAttribute(writer,new QName(JBossSAMLConstants.AUTHN_REQUESTS_SIGNED.get()),authnSigned.toString());
+  }
+  Boolean wantAssertionsSigned=spSSODescriptor.isWantAssertionsSigned();
+  if (wantAssertionsSigned != null) {
+    StaxUtil.writeAttribute(writer,new QName(JBossSAMLConstants.WANT_ASSERTIONS_SIGNED.get()),wantAssertionsSigned.toString());
+  }
+  List<KeyDescriptorType> keyDescriptors=spSSODescriptor.getKeyDescriptor();
+  for (  KeyDescriptorType keyDescriptor : keyDescriptors) {
+    writeKeyDescriptor(keyDescriptor);
+  }
+  List<EndpointType> sloServices=spSSODescriptor.getSingleLogoutService();
+  for (  EndpointType endpoint : sloServices) {
+    writeSingleLogoutService(endpoint);
+  }
+  List<IndexedEndpointType> artifactResolutions=spSSODescriptor.getArtifactResolutionService();
+  for (  IndexedEndpointType artifactResolution : artifactResolutions) {
+    writeArtifactResolutionService(artifactResolution);
+  }
+  List<String> nameIDFormats=spSSODescriptor.getNameIDFormat();
+  for (  String nameIDFormat : nameIDFormats) {
+    writeNameIDFormat(nameIDFormat);
+  }
+  List<IndexedEndpointType> assertionConsumers=spSSODescriptor.getAssertionConsumerService();
+  for (  IndexedEndpointType assertionConsumer : assertionConsumers) {
+    writeAssertionConsumerService(assertionConsumer);
+  }
+  List<AttributeConsumingServiceType> attributeConsumers=spSSODescriptor.getAttributeConsumingService();
+  for (  AttributeConsumingServiceType attributeConsumer : attributeConsumers) {
+    writeAttributeConsumingService(attributeConsumer);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

@@ -1,0 +1,10 @@
+{
+  ResponseType responseType=new ResponseType(ID,XMLTimeUtil.getIssueInstant());
+  NameIDType issuer=issuerInfo.getIssuer();
+  responseType.setIssuer(issuer);
+  String statusCode=issuerInfo.getStatusCode();
+  if (statusCode == null)   throw logger.issuerInfoMissingStatusCodeError();
+  responseType.setStatus(createStatusType(statusCode));
+  responseType.addAssertion(new RTChoiceType(new EncryptedAssertionType(encryptedAssertion)));
+  return responseType;
+}

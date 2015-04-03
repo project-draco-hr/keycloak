@@ -1,0 +1,30 @@
+{
+  if (element == null)   throw logger.nullArgumentError("element");
+  if (document == null)   throw logger.nullArgumentError("document");
+  XMLCipher cipher=null;
+  EncryptedKey encryptedKey=encryptKey(document,secretKey,publicKey,keySize);
+  String encryptionAlgorithm=getXMLEncryptionURL(secretKey.getAlgorithm(),keySize);
+  try {
+    cipher=XMLCipher.getInstance(encryptionAlgorithm);
+    cipher.init(XMLCipher.ENCRYPT_MODE,secretKey);
+  }
+ catch (  XMLEncryptionException e1) {
+    throw logger.processingError(e1);
+  }
+  Document encryptedDoc;
+  try {
+    encryptedDoc=cipher.doFinal(document,element);
+  }
+ catch (  Exception e) {
+    throw logger.processingError(e);
+  }
+  Element encryptedKeyElement=cipher.martial(document,encryptedKey);
+  Element sigElement=encryptedDoc.createElementNS(XMLSIG_NS,DS_KEY_INFO);
+  sigElement.setAttributeNS(XMLNS,"xmlns:ds",XMLSIG_NS);
+  sigElement.appendChild(encryptedKeyElement);
+  NodeList nodeList=encryptedDoc.getElementsByTagNameNS(XMLENC_NS,CIPHER_DATA_LOCALNAME);
+  if (nodeList == null || nodeList.getLength() == 0)   throw logger.domMissingElementError("xenc:CipherData");
+  Element cipherDataElement=(Element)nodeList.item(0);
+  Node cipherParent=cipherDataElement.getParentNode();
+  cipherParent.insertBefore(sigElement,cipherDataElement);
+}

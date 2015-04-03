@@ -1,0 +1,38 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.ORGANIZATION.get());
+  OrganizationType org=new OrganizationType();
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement end=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(end,JBossSAMLConstants.ORGANIZATION.get());
+      break;
+    }
+    startElement=(StartElement)xmlEvent;
+    String localPart=startElement.getName().getLocalPart();
+    if (JBossSAMLConstants.ORGANIZATION_NAME.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      LocalizedNameType localName=getLocalizedName(xmlEventReader,startElement);
+      org.addOrganizationName(localName);
+    }
+ else     if (JBossSAMLConstants.ORGANIZATION_DISPLAY_NAME.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      LocalizedNameType localName=getLocalizedName(xmlEventReader,startElement);
+      org.addOrganizationDisplayName(localName);
+    }
+ else     if (JBossSAMLConstants.ORGANIZATION_URL.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      Attribute lang=startElement.getAttributeByName(new QName(JBossSAMLURIConstants.XML.get(),"lang"));
+      String langVal=StaxParserUtil.getAttributeValue(lang);
+      LocalizedURIType localName=new LocalizedURIType(langVal);
+      localName.setValue(URI.create(StaxParserUtil.getElementText(xmlEventReader)));
+      org.addOrganizationURL(localName);
+    }
+ else     if (JBossSAMLConstants.EXTENSIONS.get().equalsIgnoreCase(localPart)) {
+      org.setExtensions(parseExtensions(xmlEventReader));
+    }
+ else     throw logger.parserUnknownTag(localPart,startElement.getLocation());
+  }
+  return org;
+}

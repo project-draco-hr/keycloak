@@ -1,0 +1,16 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.ATTRIBUTE_STATEMENT.get(),ASSERTION_NSURI.get());
+  List<ASTChoiceType> attributes=statement.getAttributes();
+  if (attributes != null) {
+    for (    ASTChoiceType attr : attributes) {
+      AttributeType attributeType=attr.getAttribute();
+      if (attributeType != null) {
+        write(attributeType);
+      }
+      EncryptedElementType encType=attr.getEncryptedAssertion();
+      if (encType != null)       throw logger.notImplementedYet("EncryptedElementType");
+    }
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

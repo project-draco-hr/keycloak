@@ -1,0 +1,14 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,SAML11Constants.AUTHORIZATION_DECISION_STATEMENT,ns);
+  String resource=xacmlStat.getResource().toString();
+  StaxUtil.writeAttribute(writer,SAML11Constants.RESOURCE,resource);
+  StaxUtil.writeAttribute(writer,SAML11Constants.DECISION,xacmlStat.getDecision().name());
+  SAML11SubjectType subject=xacmlStat.getSubject();
+  if (subject != null)   write(subject);
+  List<SAML11ActionType> actions=xacmlStat.getActions();
+  for (  SAML11ActionType action : actions) {
+    write(action);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

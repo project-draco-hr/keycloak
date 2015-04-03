@@ -1,0 +1,30 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.LOGOUT_REQUEST.get());
+  LogoutRequestType logoutRequest=parseBaseAttributes(startElement);
+  while (xmlEventReader.hasNext()) {
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    String elementName=StaxParserUtil.getStartElementName(startElement);
+    parseCommonElements(startElement,xmlEventReader,logoutRequest);
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    elementName=StaxParserUtil.getStartElementName(startElement);
+    if (JBossSAMLConstants.SESSION_INDEX.get().equals(elementName)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      logoutRequest.addSessionIndex(StaxParserUtil.getElementText(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.NAMEID.get().equals(elementName)) {
+      NameIDType nameID=SAMLParserUtil.parseNameIDType(xmlEventReader);
+      logoutRequest.setNameID(nameID);
+    }
+ else     if (JBossSAMLConstants.ISSUER.get().equals(elementName)) {
+      continue;
+    }
+ else     if (JBossSAMLConstants.SIGNATURE.get().equals(elementName)) {
+      continue;
+    }
+ else     throw logger.parserUnknownTag(elementName,startElement.getLocation());
+  }
+  return logoutRequest;
+}

@@ -1,0 +1,17 @@
+{
+  String attributeName=attributeType.getAttributeName();
+  if (StringUtil.isNullOrEmpty(attributeName))   throw logger.writerNullValueError("attribute name");
+  StaxUtil.writeAttribute(writer,SAML11Constants.ATTRIBUTE_NAME,attributeName);
+  String attributeNamespace=attributeType.getAttributeNamespace().toString();
+  if (StringUtil.isNullOrEmpty(attributeNamespace))   throw logger.writerNullValueError("attribute namespace");
+  StaxUtil.writeAttribute(writer,SAML11Constants.ATTRIBUTE_NAMESPACE,attributeNamespace);
+  List<Object> attributeValues=attributeType.get();
+  if (attributeValues != null) {
+    for (    Object attributeValue : attributeValues) {
+      if (attributeValue instanceof String) {
+        writeStringAttributeValue((String)attributeValue);
+      }
+ else       throw logger.writerUnsupportedAttributeValueError(attributeValue.getClass().getName());
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,SAML11Constants.NAME_IDENTIFIER,SAML11Constants.ASSERTION_11_NSURI);
+  URI format=nameid.getFormat();
+  if (format != null) {
+    StaxUtil.writeAttribute(writer,SAML11Constants.FORMAT,format.toString());
+  }
+  String nameQualifier=nameid.getNameQualifier();
+  if (StringUtil.isNotNull(nameQualifier)) {
+    StaxUtil.writeAttribute(writer,SAML11Constants.NAME_QUALIFIER,nameQualifier);
+  }
+  StaxUtil.writeCharacters(writer,nameid.getValue());
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

@@ -1,0 +1,39 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.ATTRIBUTE_AUTHORITY_DESCRIPTOR.get());
+  List<String> protocolEnum=SAMLParserUtil.parseProtocolEnumeration(startElement);
+  AttributeAuthorityDescriptorType attributeAuthority=new AttributeAuthorityDescriptorType(protocolEnum);
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement end=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(end,JBossSAMLConstants.ATTRIBUTE_AUTHORITY_DESCRIPTOR.get());
+      break;
+    }
+    startElement=(StartElement)xmlEvent;
+    String localPart=startElement.getName().getLocalPart();
+    if (JBossSAMLConstants.ATTRIBUTE_SERVICE.get().equals(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      Attribute bindingAttr=startElement.getAttributeByName(new QName(JBossSAMLConstants.BINDING.get()));
+      String binding=StaxParserUtil.getAttributeValue(bindingAttr);
+      Attribute locationAttr=startElement.getAttributeByName(new QName(JBossSAMLConstants.LOCATION.get()));
+      String location=StaxParserUtil.getAttributeValue(locationAttr);
+      IndexedEndpointType endpoint=new IndexedEndpointType(URI.create(binding),URI.create(location));
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(endElement,JBossSAMLConstants.ATTRIBUTE_SERVICE.get());
+      attributeAuthority.addAttributeService(endpoint);
+    }
+ else     if (JBossSAMLConstants.KEY_DESCRIPTOR.get().equalsIgnoreCase(localPart)) {
+      attributeAuthority.addKeyDescriptor(parseKeyDescriptor(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.NAMEID_FORMAT.get().equalsIgnoreCase(localPart)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      attributeAuthority.addNameIDFormat(StaxParserUtil.getElementText(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.EXTENSIONS.get().equalsIgnoreCase(localPart)) {
+      attributeAuthority.setExtensions(parseExtensions(xmlEventReader));
+    }
+ else     throw logger.parserUnknownTag(localPart,startElement.getLocation());
+  }
+  return attributeAuthority;
+}

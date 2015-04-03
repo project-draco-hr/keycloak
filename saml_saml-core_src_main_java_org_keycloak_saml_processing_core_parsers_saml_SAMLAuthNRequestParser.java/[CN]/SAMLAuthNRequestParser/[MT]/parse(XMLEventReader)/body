@@ -1,0 +1,32 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.AUTHN_REQUEST.get());
+  AuthnRequestType authnRequest=parseBaseAttributes(startElement);
+  while (xmlEventReader.hasNext()) {
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    super.parseCommonElements(startElement,xmlEventReader,authnRequest);
+    String elementName=StaxParserUtil.getStartElementName(startElement);
+    if (JBossSAMLConstants.NAMEID_POLICY.get().equals(elementName)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      authnRequest.setNameIDPolicy(getNameIDPolicy(startElement));
+    }
+ else     if (JBossSAMLConstants.SUBJECT.get().equals(elementName)) {
+      authnRequest.setSubject(getSubject(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.CONDITIONS.get().equals(elementName)) {
+      authnRequest.setConditions((ConditionsType)(new SAMLConditionsParser()).parse(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.REQUESTED_AUTHN_CONTEXT.get().equals(elementName)) {
+      authnRequest.setRequestedAuthnContext(getRequestedAuthnContextType(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.ISSUER.get().equals(elementName)) {
+      continue;
+    }
+ else     if (JBossSAMLConstants.SIGNATURE.get().equals(elementName)) {
+      continue;
+    }
+ else     throw new RuntimeException(ErrorCodes.UNKNOWN_START_ELEMENT + elementName + "::location="+ startElement.getLocation());
+  }
+  return authnRequest;
+}

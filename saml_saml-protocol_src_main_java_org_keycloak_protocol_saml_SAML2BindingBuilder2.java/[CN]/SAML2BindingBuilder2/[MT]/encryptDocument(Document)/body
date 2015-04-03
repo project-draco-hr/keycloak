@@ -2,7 +2,7 @@
   String samlNSPrefix=getSAMLNSPrefix(samlDocument);
   try {
     QName encryptedAssertionElementQName=new QName(JBossSAMLURIConstants.ASSERTION_NSURI.get(),JBossSAMLConstants.ENCRYPTED_ASSERTION.get(),samlNSPrefix);
-    byte[] secret=WSTrustUtil.createRandomSecret(encryptionKeySize / 8);
+    byte[] secret=SamlProtocolUtils.createRandomSecret(encryptionKeySize / 8);
     SecretKey secretKey=new SecretKeySpec(secret,encryptionAlgorithm);
     XMLEncryptionUtil.encryptElement(new QName(JBossSAMLURIConstants.ASSERTION_NSURI.get(),JBossSAMLConstants.ASSERTION.get(),samlNSPrefix),samlDocument,encryptionPublicKey,secretKey,encryptionKeySize,encryptedAssertionElementQName,true);
   }

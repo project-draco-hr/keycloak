@@ -1,0 +1,13 @@
+{
+  XMLCipher keyCipher=null;
+  String pubKeyAlg=keyUsedToEncryptSecretKey.getAlgorithm();
+  try {
+    String keyWrapAlgo=getXMLEncryptionURLForKeyUnwrap(pubKeyAlg,keySize);
+    keyCipher=XMLCipher.getInstance(keyWrapAlgo);
+    keyCipher.init(XMLCipher.WRAP_MODE,keyUsedToEncryptSecretKey);
+    return keyCipher.encryptKey(document,keyToBeEncrypted);
+  }
+ catch (  XMLEncryptionException e) {
+    throw logger.processingError(e);
+  }
+}

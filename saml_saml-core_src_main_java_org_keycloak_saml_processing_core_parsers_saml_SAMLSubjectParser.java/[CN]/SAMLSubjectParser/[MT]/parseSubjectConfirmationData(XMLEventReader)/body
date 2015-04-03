@@ -1,0 +1,41 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.SUBJECT_CONFIRMATION_DATA.get());
+  SubjectConfirmationDataType subjectConfirmationData=new SubjectConfirmationDataType();
+  Attribute inResponseTo=startElement.getAttributeByName(new QName(JBossSAMLConstants.IN_RESPONSE_TO.get()));
+  if (inResponseTo != null) {
+    subjectConfirmationData.setInResponseTo(StaxParserUtil.getAttributeValue(inResponseTo));
+  }
+  Attribute notBefore=startElement.getAttributeByName(new QName(JBossSAMLConstants.NOT_BEFORE.get()));
+  if (notBefore != null) {
+    subjectConfirmationData.setNotBefore(XMLTimeUtil.parse(StaxParserUtil.getAttributeValue(notBefore)));
+  }
+  Attribute notOnOrAfter=startElement.getAttributeByName(new QName(JBossSAMLConstants.NOT_ON_OR_AFTER.get()));
+  if (notOnOrAfter != null) {
+    subjectConfirmationData.setNotOnOrAfter(XMLTimeUtil.parse(StaxParserUtil.getAttributeValue(notOnOrAfter)));
+  }
+  Attribute recipient=startElement.getAttributeByName(new QName(JBossSAMLConstants.RECIPIENT.get()));
+  if (recipient != null) {
+    subjectConfirmationData.setRecipient(StaxParserUtil.getAttributeValue(recipient));
+  }
+  Attribute address=startElement.getAttributeByName(new QName(JBossSAMLConstants.ADDRESS.get()));
+  if (address != null) {
+    subjectConfirmationData.setAddress(StaxParserUtil.getAttributeValue(address));
+  }
+  XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+  if (!(xmlEvent instanceof EndElement)) {
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    String tag=StaxParserUtil.getStartElementName(startElement);
+    if (tag.equals(WSTrustConstants.XMLDSig.KEYINFO)) {
+      KeyInfoType keyInfo=SAMLParserUtil.parseKeyInfo(xmlEventReader);
+      subjectConfirmationData.setAnyType(keyInfo);
+    }
+ else     if (tag.equals(WSTrustConstants.XMLEnc.ENCRYPTED_KEY)) {
+      subjectConfirmationData.setAnyType(StaxParserUtil.getDOMElement(xmlEventReader));
+    }
+ else     throw logger.parserUnknownTag(tag,startElement.getLocation());
+  }
+  EndElement endElement=(EndElement)StaxParserUtil.getNextEvent(xmlEventReader);
+  StaxParserUtil.matches(endElement,JBossSAMLConstants.SUBJECT_CONFIRMATION_DATA.get());
+  return subjectConfirmationData;
+}

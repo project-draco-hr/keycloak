@@ -1,0 +1,30 @@
+{
+  String responseDestinationURI=sp.getResponseDestinationURI();
+  XMLGregorianCalendar issueInstant=XMLTimeUtil.getIssueInstant();
+  SubjectType subjectType=new SubjectType();
+  NameIDType nameIDType=new NameIDType();
+  nameIDType.setFormat(URI.create(idp.getNameIDFormat()));
+  nameIDType.setValue(idp.getNameIDFormatValue());
+  SubjectType.STSubType subType=new SubjectType.STSubType();
+  subType.addBaseID(nameIDType);
+  subjectType.setSubType(subType);
+  SubjectConfirmationType subjectConfirmation=new SubjectConfirmationType();
+  subjectConfirmation.setMethod(idp.getSubjectConfirmationMethod());
+  SubjectConfirmationDataType subjectConfirmationData=new SubjectConfirmationDataType();
+  subjectConfirmationData.setInResponseTo(sp.getRequestID());
+  subjectConfirmationData.setRecipient(responseDestinationURI);
+  subjectConfirmationData.setNotOnOrAfter(issueInstant);
+  subjectConfirmation.setSubjectConfirmationData(subjectConfirmationData);
+  subjectType.addConfirmation(subjectConfirmation);
+  ConditionsType conditions=assertion.getConditions();
+  if (conditions != null) {
+    subjectConfirmationData.setNotOnOrAfter(conditions.getNotOnOrAfter());
+    AudienceRestrictionType audience=new AudienceRestrictionType();
+    audience.addAudience(URI.create(sp.getResponseDestinationURI()));
+    conditions.addCondition(audience);
+  }
+  ResponseType responseType=createResponseType(ID,issuerInfo,assertion);
+  responseType.setInResponseTo(sp.getRequestID());
+  responseType.setDestination(responseDestinationURI);
+  return responseType;
+}

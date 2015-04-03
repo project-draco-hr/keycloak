@@ -1,0 +1,70 @@
+{
+  Document doc=holder.doc;
+  QName elementName=startElement.getName();
+  String ns=elementName.getNamespaceURI();
+  String prefix=elementName.getPrefix();
+  String localPart=elementName.getLocalPart();
+  String qual=prefix != null && prefix != "" ? prefix + ":" + localPart : localPart;
+  Element el=doc.createElementNS(ns,qual);
+  String containsBaseNamespace=containsBaseNamespace(startElement);
+  if (StringUtil.isNotNull(containsBaseNamespace)) {
+    el=DocumentUtil.createDocumentWithBaseNamespace(containsBaseNamespace,localPart).getDocumentElement();
+    el=(Element)doc.importNode(el,true);
+  }
+  if (StringUtil.isNotNull(prefix)) {
+    el.setPrefix(prefix);
+  }
+  @SuppressWarnings("unchecked") Iterator<Attribute> attrs=startElement.getAttributes();
+  while (attrs != null && attrs.hasNext()) {
+    Attribute attr=attrs.next();
+    QName attrName=attr.getName();
+    ns=attrName.getNamespaceURI();
+    prefix=attrName.getPrefix();
+    localPart=attrName.getLocalPart();
+    qual=prefix != null && prefix != "" ? prefix + ":" + localPart : localPart;
+    if (logger.isTraceEnabled()) {
+      logger.trace("Creating an Attribute Namespace=" + ns + ":"+ qual);
+    }
+    doc.createAttributeNS(ns,qual);
+    el.setAttributeNS(ns,qual,attr.getValue());
+  }
+  @SuppressWarnings("unchecked") Iterator<Namespace> namespaces=startElement.getNamespaces();
+  while (namespaces != null && namespaces.hasNext()) {
+    Namespace namespace=namespaces.next();
+    QName name=namespace.getName();
+    localPart=name.getLocalPart();
+    prefix=name.getPrefix();
+    if (prefix != null && prefix != "")     qual=(localPart != null && localPart != "") ? prefix + ":" + localPart : prefix;
+    if (qual.equals("xmlns"))     continue;
+    if (logger.isTraceEnabled()) {
+      logger.trace("Set Attribute Namespace=" + name.getNamespaceURI() + "::Qual=:"+ qual+ "::Value="+ namespace.getNamespaceURI());
+    }
+    if (qual != null && qual.startsWith("xmlns")) {
+      el.setAttributeNS(name.getNamespaceURI(),qual,namespace.getNamespaceURI());
+    }
+  }
+  XMLEvent nextEvent=StaxParserUtil.peek(xmlEventReader);
+  if (nextEvent instanceof Comment) {
+    Comment commentEvent=(Comment)nextEvent;
+    Node commentNode=doc.createComment(commentEvent.getText());
+    commentNode=doc.importNode(commentNode,true);
+    el.appendChild(commentNode);
+  }
+ else   if (nextEvent.getEventType() == XMLEvent.CHARACTERS) {
+    Characters characterEvent=(Characters)nextEvent;
+    String trimmedData=characterEvent.getData().trim();
+    if (trimmedData != null && trimmedData.length() > 0) {
+      holder.encounteredTextNode=true;
+      try {
+        String text=StaxParserUtil.getElementText(xmlEventReader);
+        Node textNode=doc.createTextNode(text);
+        textNode=doc.importNode(textNode,true);
+        el.appendChild(textNode);
+      }
+ catch (      Exception e) {
+        throw logger.parserException(e);
+      }
+    }
+  }
+  return el;
+}

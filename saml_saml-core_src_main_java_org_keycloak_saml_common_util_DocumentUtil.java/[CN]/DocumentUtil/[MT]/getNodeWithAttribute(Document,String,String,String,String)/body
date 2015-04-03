@@ -1,0 +1,14 @@
+{
+  NodeList nl=document.getElementsByTagNameNS(nsURI,nodeName);
+  int len=nl != null ? nl.getLength() : 0;
+  for (int i=0; i < len; i++) {
+    Node n=nl.item(i);
+    if (n.getNodeType() != Node.ELEMENT_NODE)     continue;
+    Element el=(Element)n;
+    String attrValue=el.getAttributeNS(nsURI,attributeName);
+    if (attributeValue.equals(attrValue))     return el;
+    attrValue=el.getAttribute(attributeName);
+    if (attributeValue.equals(attrValue))     return el;
+  }
+  return null;
+}

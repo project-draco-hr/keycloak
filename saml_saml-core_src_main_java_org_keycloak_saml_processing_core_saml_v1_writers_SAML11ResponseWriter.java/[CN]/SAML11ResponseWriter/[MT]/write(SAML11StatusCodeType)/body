@@ -1,0 +1,12 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,SAML11Constants.STATUS_CODE,namespace);
+  QName value=statusCode.getValue();
+  if (value == null)   throw logger.writerNullValueError("Attribute Value");
+  StaxUtil.writeAttribute(writer,SAML11Constants.VALUE,value);
+  SAML11StatusCodeType secondCode=statusCode.getStatusCode();
+  if (secondCode != null) {
+    write(secondCode);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

@@ -1,0 +1,23 @@
+{
+  if (timeValue == null) {
+    PicketLinkLoggerFactory.getLogger().nullArgumentError("duration time");
+  }
+  DatatypeFactory factory=null;
+  try {
+    factory=newDatatypeFactory();
+  }
+ catch (  DatatypeConfigurationException e) {
+    throw logger.parserError(e);
+  }
+  try {
+    if (timeValue.startsWith("P")) {
+      return factory.newDuration(timeValue);
+    }
+ else {
+      return factory.newDuration(Long.valueOf(timeValue));
+    }
+  }
+ catch (  Exception e) {
+    throw logger.samlMetaDataFailedToCreateCacheDuration(timeValue);
+  }
+}

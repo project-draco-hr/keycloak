@@ -20,7 +20,7 @@
   try {
     ClientRequest request=executor.createRequest(logoutUrl);
     request.formParameter(GeneralConstants.SAML_REQUEST_KEY,logoutRequestString);
-    request.formParameter(SAML2LogOutHandler.BACK_CHANNEL_LOGOUT,SAML2LogOutHandler.BACK_CHANNEL_LOGOUT);
+    request.formParameter("BACK_CHANNEL_LOGOUT","BACK_CHANNEL_LOGOUT");
     ClientResponse response=null;
     try {
       response=request.post();
@@ -31,7 +31,7 @@
         if (withSlash.equals(redirect)) {
           request=executor.createRequest(withSlash);
           request.formParameter(GeneralConstants.SAML_REQUEST_KEY,logoutRequestString);
-          request.formParameter(SAML2LogOutHandler.BACK_CHANNEL_LOGOUT,SAML2LogOutHandler.BACK_CHANNEL_LOGOUT);
+          request.formParameter("BACK_CHANNEL_LOGOUT","BACK_CHANNEL_LOGOUT");
           response=request.post();
           response.releaseConnection();
         }

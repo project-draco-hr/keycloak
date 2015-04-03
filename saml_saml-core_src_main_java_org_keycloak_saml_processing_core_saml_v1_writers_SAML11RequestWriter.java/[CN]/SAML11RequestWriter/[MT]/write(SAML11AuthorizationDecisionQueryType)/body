@@ -1,0 +1,21 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,SAML11Constants.AUTHORIZATION_DECISION_QUERY,namespace);
+  URI resource=attr.getResource();
+  if (resource != null) {
+    StaxUtil.writeAttribute(writer,SAML11Constants.RESOURCE,resource.toString());
+  }
+  SAML11SubjectType subject=attr.getSubject();
+  if (subject != null) {
+    assertionWriter.write(subject);
+  }
+  List<SAML11ActionType> actions=attr.get();
+  for (  SAML11ActionType action : actions) {
+    assertionWriter.write(action);
+  }
+  SAML11EvidenceType evidence=attr.getEvidence();
+  if (evidence != null) {
+    assertionWriter.write(evidence);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

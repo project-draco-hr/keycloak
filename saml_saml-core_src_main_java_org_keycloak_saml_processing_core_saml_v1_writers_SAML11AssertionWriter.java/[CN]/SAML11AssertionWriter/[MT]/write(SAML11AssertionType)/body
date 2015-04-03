@@ -1,0 +1,62 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.ASSERTION.get(),ns);
+  StaxUtil.writeNameSpace(writer,ASSERTION_PREFIX,ns);
+  StaxUtil.writeDefaultNameSpace(writer,ns);
+  StaxUtil.writeAttribute(writer,SAML11Constants.ASSERTIONID,assertion.getID());
+  StaxUtil.writeAttribute(writer,SAML11Constants.MAJOR_VERSION,assertion.getMajorVersion() + "");
+  StaxUtil.writeAttribute(writer,SAML11Constants.MINOR_VERSION,assertion.getMinorVersion() + "");
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.ISSUE_INSTANT.get(),assertion.getIssueInstant().toString());
+  String issuer=assertion.getIssuer();
+  if (issuer != null) {
+    StaxUtil.writeAttribute(writer,SAML11Constants.ISSUER,issuer);
+  }
+  SAML11ConditionsType conditions=assertion.getConditions();
+  if (conditions != null) {
+    StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.CONDITIONS.get(),ns);
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.NOT_BEFORE.get(),conditions.getNotBefore().toString());
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.NOT_ON_OR_AFTER.get(),conditions.getNotOnOrAfter().toString());
+    List<SAML11ConditionAbstractType> typeOfConditions=conditions.get();
+    if (typeOfConditions != null) {
+      for (      SAML11ConditionAbstractType typeCondition : typeOfConditions) {
+        if (typeCondition instanceof SAML11AudienceRestrictionCondition) {
+          SAML11AudienceRestrictionCondition art=(SAML11AudienceRestrictionCondition)typeCondition;
+          StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,SAML11Constants.AUDIENCE_RESTRICTION_CONDITION,ns);
+          List<URI> audiences=art.get();
+          if (audiences != null) {
+            for (            URI audience : audiences) {
+              StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.AUDIENCE.get(),ns);
+              StaxUtil.writeCharacters(writer,audience.toString());
+              StaxUtil.writeEndElement(writer);
+            }
+          }
+          StaxUtil.writeEndElement(writer);
+        }
+      }
+    }
+    StaxUtil.writeEndElement(writer);
+  }
+  SAML11AdviceType advice=assertion.getAdvice();
+  if (advice != null)   throw logger.notImplementedYet("Advice");
+  List<SAML11StatementAbstractType> statements=assertion.getStatements();
+  if (statements != null) {
+    for (    SAML11StatementAbstractType statement : statements) {
+      if (statement instanceof SAML11AuthenticationStatementType) {
+        write((SAML11AuthenticationStatementType)statement);
+      }
+ else       if (statement instanceof SAML11AttributeStatementType) {
+        write((SAML11AttributeStatementType)statement);
+      }
+ else       if (statement instanceof SAML11AuthorizationDecisionStatementType) {
+        write((SAML11AuthorizationDecisionStatementType)statement);
+      }
+ else       if (statement instanceof SAML11SubjectStatementType) {
+        write((SAML11SubjectStatementType)statement);
+      }
+ else       throw logger.writerUnknownTypeError(statement.getClass().getName());
+    }
+  }
+  Element sig=assertion.getSignature();
+  if (sig != null)   StaxUtil.writeDOMElement(writer,sig);
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

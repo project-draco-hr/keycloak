@@ -1,0 +1,29 @@
+{
+  List<String> roles=new ArrayList<String>();
+  List<SAML11StatementAbstractType> statements=assertion.getStatements();
+  for (  SAML11StatementAbstractType statement : statements) {
+    if (statement instanceof SAML11AttributeStatementType) {
+      SAML11AttributeStatementType attributeStatement=(SAML11AttributeStatementType)statement;
+      List<SAML11AttributeType> attributes=attributeStatement.get();
+      for (      SAML11AttributeType attr : attributes) {
+        if (roleKeys != null && roleKeys.size() > 0) {
+          if (!roleKeys.contains(attr.getAttributeName()))           continue;
+        }
+        List<Object> attributeValues=attr.get();
+        if (attributeValues != null) {
+          for (          Object attrValue : attributeValues) {
+            if (attrValue instanceof String) {
+              roles.add((String)attrValue);
+            }
+ else             if (attrValue instanceof Node) {
+              Node roleNode=(Node)attrValue;
+              roles.add(roleNode.getFirstChild().getNodeValue());
+            }
+ else             throw logger.unknownObjectType(attrValue);
+          }
+        }
+      }
+    }
+  }
+  return roles;
+}

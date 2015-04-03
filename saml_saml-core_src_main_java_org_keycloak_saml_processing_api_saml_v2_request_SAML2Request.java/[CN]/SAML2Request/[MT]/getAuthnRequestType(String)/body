@@ -1,0 +1,13 @@
+{
+  if (fileName == null)   throw logger.nullArgumentError("fileName");
+  URL resourceURL=SecurityActions.loadResource(getClass(),fileName);
+  if (resourceURL == null)   throw logger.resourceNotFound(fileName);
+  InputStream is=null;
+  try {
+    is=resourceURL.openStream();
+  }
+ catch (  IOException e) {
+    throw logger.processingError(e);
+  }
+  return getAuthnRequestType(is);
+}

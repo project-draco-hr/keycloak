@@ -1,0 +1,13 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.ATTRIBUTE_VALUE.get());
+  Attribute type=startElement.getAttributeByName(new QName(JBossSAMLURIConstants.XSI_NSURI.get(),"type","xsi"));
+  if (type == null) {
+    return StaxParserUtil.getElementText(xmlEventReader);
+  }
+  String typeValue=StaxParserUtil.getAttributeValue(type);
+  if (typeValue.contains(":string")) {
+    return StaxParserUtil.getElementText(xmlEventReader);
+  }
+  throw logger.parserUnknownXSI(typeValue);
+}

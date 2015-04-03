@@ -1,0 +1,13 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.ATTRIBUTE_STATEMENT.get(),SAML11Constants.ASSERTION_11_NSURI);
+  SAML11SubjectType subject=statement.getSubject();
+  if (subject != null)   write(subject);
+  List<SAML11AttributeType> attributes=statement.get();
+  if (attributes != null) {
+    for (    SAML11AttributeType attr : attributes) {
+      write(attr);
+    }
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

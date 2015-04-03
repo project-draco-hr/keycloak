@@ -1,0 +1,44 @@
+{
+  if (registeredNSStack.get() == null) {
+    registeredNSStack.set(new Stack<String>());
+  }
+  String domElementPrefix=domElement.getPrefix();
+  if (domElementPrefix == null) {
+    domElementPrefix="";
+  }
+  String domElementNS=domElement.getNamespaceURI();
+  if (domElementNS == null) {
+    domElementNS="";
+  }
+  writeStartElement(writer,domElementPrefix,domElement.getLocalName(),domElementNS);
+  if (domElementPrefix != "" && !registeredNSStack.get().contains(domElementNS)) {
+    registeredNSStack.get().push(domElementNS);
+  }
+ else   if (domElementPrefix == "" && domElementNS != null) {
+    writeNameSpace(writer,"xmlns",domElementNS);
+  }
+  NamedNodeMap attrs=domElement.getAttributes();
+  for (int i=0, len=attrs.getLength(); i < len; ++i) {
+    Attr attr=(Attr)attrs.item(i);
+    String attributePrefix=attr.getPrefix();
+    String attribLocalName=attr.getLocalName();
+    String attribValue=attr.getValue();
+    if (attributePrefix == null || attributePrefix.length() == 0) {
+      if (!("xmlns".equals(attribLocalName))) {
+        writeAttribute(writer,attribLocalName,attribValue);
+      }
+    }
+ else {
+      if ("xmlns".equals(attributePrefix)) {
+        writeNameSpace(writer,attribLocalName,attribValue);
+      }
+ else {
+        writeAttribute(writer,new QName(attr.getNamespaceURI(),attribLocalName,attributePrefix),attribValue);
+      }
+    }
+  }
+  for (Node child=domElement.getFirstChild(); child != null; child=child.getNextSibling()) {
+    writeDOMNode(writer,child);
+  }
+  writeEndElement(writer);
+}

@@ -1,0 +1,13 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,SAML11Constants.AUTHENTICATION_QUERY,namespace);
+  URI authMethod=auth.getAuthenticationMethod();
+  if (authMethod != null) {
+    StaxUtil.writeAttribute(writer,SAML11Constants.AUTHENTICATION_METHOD,authMethod.toString());
+  }
+  SAML11SubjectType subject=auth.getSubject();
+  if (subject != null) {
+    assertionWriter.write(subject);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

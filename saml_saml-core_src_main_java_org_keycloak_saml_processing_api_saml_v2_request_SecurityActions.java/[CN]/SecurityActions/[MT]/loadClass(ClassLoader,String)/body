@@ -1,0 +1,24 @@
+{
+  SecurityManager sm=System.getSecurityManager();
+  if (sm != null) {
+    return AccessController.doPrivileged(new PrivilegedAction<Class<?>>(){
+      public Class<?> run(){
+        try {
+          return classLoader.loadClass(fullQualifiedName);
+        }
+ catch (        ClassNotFoundException e) {
+        }
+        return null;
+      }
+    }
+);
+  }
+ else {
+    try {
+      return classLoader.loadClass(fullQualifiedName);
+    }
+ catch (    ClassNotFoundException e) {
+    }
+    return null;
+  }
+}

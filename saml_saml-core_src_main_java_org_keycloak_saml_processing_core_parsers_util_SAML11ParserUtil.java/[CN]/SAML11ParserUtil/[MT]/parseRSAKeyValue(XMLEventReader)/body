@@ -1,0 +1,32 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,WSTrustConstants.XMLDSig.RSA_KEYVALUE);
+  XMLEvent xmlEvent=null;
+  String tag=null;
+  RSAKeyValueType rsaKeyValue=new RSAKeyValueType();
+  while (xmlEventReader.hasNext()) {
+    xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      tag=StaxParserUtil.getEndElementName((EndElement)xmlEvent);
+      if (tag.equals(WSTrustConstants.XMLDSig.RSA_KEYVALUE)) {
+        xmlEvent=StaxParserUtil.getNextEndElement(xmlEventReader);
+        break;
+      }
+ else       throw logger.parserUnknownEndElement(tag);
+    }
+    startElement=(StartElement)xmlEvent;
+    tag=StaxParserUtil.getStartElementName(startElement);
+    if (tag.equals(WSTrustConstants.XMLDSig.MODULUS)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      String text=StaxParserUtil.getElementText(xmlEventReader);
+      rsaKeyValue.setModulus(text.getBytes());
+    }
+ else     if (tag.equals(WSTrustConstants.XMLDSig.EXPONENT)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      String text=StaxParserUtil.getElementText(xmlEventReader);
+      rsaKeyValue.setExponent(text.getBytes());
+    }
+ else     throw logger.parserUnknownTag(tag,startElement.getLocation());
+  }
+  return rsaKeyValue;
+}

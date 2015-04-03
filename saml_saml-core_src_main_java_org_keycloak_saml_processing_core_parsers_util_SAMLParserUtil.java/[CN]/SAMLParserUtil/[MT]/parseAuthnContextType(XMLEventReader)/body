@@ -1,0 +1,56 @@
+{
+  AuthnContextType authnContextType=new AuthnContextType();
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,JBossSAMLConstants.AUTHN_CONTEXT.get());
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent == null)     break;
+    if (xmlEvent instanceof EndElement) {
+      xmlEvent=StaxParserUtil.getNextEvent(xmlEventReader);
+      EndElement endElement=(EndElement)xmlEvent;
+      String endElementTag=StaxParserUtil.getEndElementName(endElement);
+      if (endElementTag.equals(JBossSAMLConstants.AUTHN_CONTEXT.get()))       break;
+ else       throw logger.parserUnknownEndElement(endElementTag);
+    }
+    startElement=null;
+    if (xmlEvent instanceof StartElement) {
+      startElement=(StartElement)xmlEvent;
+    }
+ else {
+      startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    }
+    if (startElement == null)     break;
+    String tag=StaxParserUtil.getStartElementName(startElement);
+    if (JBossSAMLConstants.AUTHN_CONTEXT_DECLARATION.get().equals(tag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      Element dom=StaxParserUtil.getDOMElement(xmlEventReader);
+      AuthnContextDeclType authnContextDecl=new AuthnContextDeclType(dom);
+      AuthnContextType.AuthnContextTypeSequence authnContextSequence=authnContextType.new AuthnContextTypeSequence();
+      authnContextSequence.setAuthnContextDecl(authnContextDecl);
+      authnContextType.setSequence(authnContextSequence);
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(endElement,JBossSAMLConstants.AUTHN_CONTEXT_DECLARATION.get());
+    }
+ else     if (JBossSAMLConstants.AUTHN_CONTEXT_DECLARATION_REF.get().equals(tag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      String text=StaxParserUtil.getElementText(xmlEventReader);
+      AuthnContextDeclRefType aAuthnContextDeclType=new AuthnContextDeclRefType(URI.create(text));
+      authnContextType.addURIType(aAuthnContextDeclType);
+    }
+ else     if (JBossSAMLConstants.AUTHN_CONTEXT_CLASS_REF.get().equals(tag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      String text=StaxParserUtil.getElementText(xmlEventReader);
+      AuthnContextClassRefType aAuthnContextClassRefType=new AuthnContextClassRefType(URI.create(text));
+      AuthnContextType.AuthnContextTypeSequence authnContextSequence=authnContextType.new AuthnContextTypeSequence();
+      authnContextSequence.setClassRef(aAuthnContextClassRefType);
+      authnContextType.setSequence(authnContextSequence);
+    }
+ else     if (JBossSAMLConstants.AUTHENTICATING_AUTHORITY.get().equals(tag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      String text=StaxParserUtil.getElementText(xmlEventReader);
+      authnContextType.addAuthenticatingAuthority(URI.create(text));
+    }
+ else     throw logger.parserUnknownTag(tag,startElement.getLocation());
+  }
+  return authnContextType;
+}

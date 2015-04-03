@@ -1,0 +1,21 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,SAML11Constants.AUTHENTICATION_STATEMENT,SAML11Constants.ASSERTION_11_NSURI);
+  XMLGregorianCalendar authnInstant=authnStatement.getAuthenticationInstant();
+  if (authnInstant != null) {
+    StaxUtil.writeAttribute(writer,SAML11Constants.AUTHENTICATION_INSTANT,authnInstant.toString());
+  }
+  URI authMethod=authnStatement.getAuthenticationMethod();
+  if (authMethod != null) {
+    StaxUtil.writeAttribute(writer,SAML11Constants.AUTHENTICATION_METHOD,authMethod.toString());
+  }
+  SAML11SubjectType subject=authnStatement.getSubject();
+  if (subject != null)   write(subject);
+  SAML11SubjectLocalityType locality=authnStatement.getSubjectLocality();
+  if (locality != null)   write(locality);
+  List<SAML11AuthorityBindingType> authorities=authnStatement.getAuthorityBindingType();
+  for (  SAML11AuthorityBindingType authority : authorities) {
+    write(authority);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

@@ -1,0 +1,15 @@
+{
+  int len=paths.length;
+  if (len == 0)   return getJAXBContext(paths[0]);
+  StringBuilder builder=new StringBuilder();
+  for (  String path : paths) {
+    builder.append(path).append(":");
+  }
+  String finalPath=builder.toString();
+  JAXBContext jx=jaxbContextHash.get(finalPath);
+  if (jx == null) {
+    jx=JAXBContext.newInstance(finalPath);
+    jaxbContextHash.put(finalPath,jx);
+  }
+  return jx;
+}

@@ -1,0 +1,39 @@
+{
+  StaxParserUtil.getNextEvent(xmlEventReader);
+  SAML11SubjectType subject=new SAML11SubjectType();
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement endElement=(EndElement)xmlEvent;
+      if (StaxParserUtil.matches(endElement,JBossSAMLConstants.SUBJECT.get())) {
+        endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+        break;
+      }
+ else       throw logger.parserUnknownEndElement(StaxParserUtil.getEndElementName(endElement));
+    }
+    StartElement peekedElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (peekedElement == null)     break;
+    String tag=StaxParserUtil.getStartElementName(peekedElement);
+    if (SAML11Constants.NAME_IDENTIFIER.equalsIgnoreCase(tag)) {
+      peekedElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      String val=StaxParserUtil.getElementText(xmlEventReader);
+      SAML11NameIdentifierType nameID=new SAML11NameIdentifierType(val);
+      Attribute formatAtt=peekedElement.getAttributeByName(new QName(SAML11Constants.FORMAT));
+      if (formatAtt != null) {
+        nameID.setFormat(URI.create(StaxParserUtil.getAttributeValue(formatAtt)));
+      }
+      Attribute nameQAtt=peekedElement.getAttributeByName(new QName(SAML11Constants.NAME_QUALIFIER));
+      if (nameQAtt != null) {
+        nameID.setNameQualifier(StaxParserUtil.getAttributeValue(nameQAtt));
+      }
+      SAML11SubjectTypeChoice subChoice=new SAML11SubjectTypeChoice(nameID);
+      subject.setChoice(subChoice);
+    }
+ else     if (JBossSAMLConstants.SUBJECT_CONFIRMATION.get().equalsIgnoreCase(tag)) {
+      SAML11SubjectConfirmationType subjectConfirmationType=SAML11ParserUtil.parseSAML11SubjectConfirmation(xmlEventReader);
+      subject.setSubjectConfirmation(subjectConfirmationType);
+    }
+ else     throw logger.parserUnknownTag(tag,peekedElement.getLocation());
+  }
+  return subject;
+}

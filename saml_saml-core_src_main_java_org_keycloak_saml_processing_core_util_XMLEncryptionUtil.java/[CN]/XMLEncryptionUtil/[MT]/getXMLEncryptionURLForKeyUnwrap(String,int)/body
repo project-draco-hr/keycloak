@@ -1,0 +1,15 @@
+{
+  if ("AES".equals(publicKeyAlgo)) {
+switch (keySize) {
+case 192:
+      return XMLCipher.AES_192_KeyWrap;
+case 256:
+    return XMLCipher.AES_256_KeyWrap;
+default :
+  return XMLCipher.AES_128_KeyWrap;
+}
+}
+if (publicKeyAlgo.contains("RSA")) return XMLCipher.RSA_v1dot5;
+if (publicKeyAlgo.contains("DES")) return XMLCipher.TRIPLEDES_KeyWrap;
+throw logger.unsupportedType("unsupported publicKey Algo:" + publicKeyAlgo);
+}

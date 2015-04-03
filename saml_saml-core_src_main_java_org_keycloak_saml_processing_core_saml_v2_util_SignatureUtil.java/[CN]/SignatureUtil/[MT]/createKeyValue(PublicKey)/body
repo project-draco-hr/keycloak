@@ -1,0 +1,25 @@
+{
+  if (key instanceof RSAPublicKey) {
+    RSAPublicKey pubKey=(RSAPublicKey)key;
+    byte[] modulus=pubKey.getModulus().toByteArray();
+    byte[] exponent=pubKey.getPublicExponent().toByteArray();
+    RSAKeyValueType rsaKeyValue=new RSAKeyValueType();
+    rsaKeyValue.setModulus(Base64.encodeBytes(modulus).getBytes());
+    rsaKeyValue.setExponent(Base64.encodeBytes(exponent).getBytes());
+    return rsaKeyValue;
+  }
+ else   if (key instanceof DSAPublicKey) {
+    DSAPublicKey pubKey=(DSAPublicKey)key;
+    byte[] P=pubKey.getParams().getP().toByteArray();
+    byte[] Q=pubKey.getParams().getQ().toByteArray();
+    byte[] G=pubKey.getParams().getG().toByteArray();
+    byte[] Y=pubKey.getY().toByteArray();
+    DSAKeyValueType dsaKeyValue=new DSAKeyValueType();
+    dsaKeyValue.setP(Base64.encodeBytes(P).getBytes());
+    dsaKeyValue.setQ(Base64.encodeBytes(Q).getBytes());
+    dsaKeyValue.setG(Base64.encodeBytes(G).getBytes());
+    dsaKeyValue.setY(Base64.encodeBytes(Y).getBytes());
+    return dsaKeyValue;
+  }
+  throw logger.unsupportedType(key.toString());
+}

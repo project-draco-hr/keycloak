@@ -1,0 +1,20 @@
+{
+  RSAKeyValueType rsa=new RSAKeyValueType();
+  NodeList nl=element.getChildNodes();
+  int length=nl.getLength();
+  for (int i=0; i < length; i++) {
+    Node node=nl.item(i);
+    if (node instanceof Element) {
+      Element childElement=(Element)node;
+      String tag=childElement.getLocalName();
+      byte[] text=childElement.getTextContent().getBytes();
+      if (WSTrustConstants.XMLDSig.MODULUS.equals(tag)) {
+        rsa.setModulus(text);
+      }
+ else       if (WSTrustConstants.XMLDSig.EXPONENT.equals(tag)) {
+        rsa.setExponent(text);
+      }
+    }
+  }
+  return rsa;
+}

@@ -1,0 +1,16 @@
+{
+  Attribute bindingAttr=startElement.getAttributeByName(new QName(JBossSAMLConstants.BINDING.get()));
+  String binding=StaxParserUtil.getAttributeValue(bindingAttr);
+  Attribute locationAttr=startElement.getAttributeByName(new QName(JBossSAMLConstants.LOCATION.get()));
+  String location=StaxParserUtil.getAttributeValue(locationAttr);
+  IndexedEndpointType endpoint=new IndexedEndpointType(URI.create(binding),URI.create(location));
+  Attribute isDefault=startElement.getAttributeByName(new QName(JBossSAMLConstants.ISDEFAULT.get()));
+  if (isDefault != null) {
+    endpoint.setIsDefault(Boolean.parseBoolean(StaxParserUtil.getAttributeValue(isDefault)));
+  }
+  Attribute index=startElement.getAttributeByName(new QName(JBossSAMLConstants.INDEX.get()));
+  if (index != null) {
+    endpoint.setIndex(Integer.parseInt(StaxParserUtil.getAttributeValue(index)));
+  }
+  return endpoint;
+}

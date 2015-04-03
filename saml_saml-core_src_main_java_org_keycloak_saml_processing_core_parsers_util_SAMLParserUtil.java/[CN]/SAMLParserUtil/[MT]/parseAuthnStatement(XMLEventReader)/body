@@ -1,0 +1,50 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  String AUTHNSTATEMENT=JBossSAMLConstants.AUTHN_STATEMENT.get();
+  StaxParserUtil.validate(startElement,AUTHNSTATEMENT);
+  Attribute authnInstant=startElement.getAttributeByName(new QName("AuthnInstant"));
+  if (authnInstant == null)   throw logger.parserRequiredAttribute("AuthnInstant");
+  XMLGregorianCalendar issueInstant=XMLTimeUtil.parse(StaxParserUtil.getAttributeValue(authnInstant));
+  AuthnStatementType authnStatementType=new AuthnStatementType(issueInstant);
+  Attribute sessionIndex=startElement.getAttributeByName(new QName("SessionIndex"));
+  if (sessionIndex != null)   authnStatementType.setSessionIndex(StaxParserUtil.getAttributeValue(sessionIndex));
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent == null)     break;
+    if (xmlEvent instanceof EndElement) {
+      xmlEvent=StaxParserUtil.getNextEvent(xmlEventReader);
+      EndElement endElement=(EndElement)xmlEvent;
+      String endElementTag=StaxParserUtil.getEndElementName(endElement);
+      if (endElementTag.equals(AUTHNSTATEMENT))       break;
+ else       throw logger.parserUnknownEndElement(endElementTag);
+    }
+    startElement=null;
+    if (xmlEvent instanceof StartElement) {
+      startElement=(StartElement)xmlEvent;
+    }
+ else {
+      startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    }
+    if (startElement == null)     break;
+    String tag=StaxParserUtil.getStartElementName(startElement);
+    if (JBossSAMLConstants.SUBJECT_LOCALITY.get().equals(tag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      SubjectLocalityType subjectLocalityType=new SubjectLocalityType();
+      Attribute address=startElement.getAttributeByName(new QName(JBossSAMLConstants.ADDRESS.get()));
+      if (address != null) {
+        subjectLocalityType.setAddress(StaxParserUtil.getAttributeValue(address));
+      }
+      Attribute dns=startElement.getAttributeByName(new QName(JBossSAMLConstants.DNS_NAME.get()));
+      if (dns != null) {
+        subjectLocalityType.setDNSName(StaxParserUtil.getAttributeValue(dns));
+      }
+      authnStatementType.setSubjectLocality(subjectLocalityType);
+      StaxParserUtil.validate(StaxParserUtil.getNextEndElement(xmlEventReader),JBossSAMLConstants.SUBJECT_LOCALITY.get());
+    }
+ else     if (JBossSAMLConstants.AUTHN_CONTEXT.get().equals(tag)) {
+      authnStatementType.setAuthnContext(parseAuthnContextType(xmlEventReader));
+    }
+ else     throw logger.parserUnknownTag(tag,startElement.getLocation());
+  }
+  return authnStatementType;
+}

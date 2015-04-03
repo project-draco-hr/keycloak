@@ -1,0 +1,16 @@
+{
+  LSInput lsi=null;
+  if (systemId == null)   throw logger.nullValueError("systemid");
+  if (StringUtil.isNotNull(systemId) && systemId.endsWith("dtd") && StringUtil.isNotNull(baseURI)) {
+    lsi=lsmap.get(baseURI);
+  }
+  if (lsi == null)   lsi=lsmap.get(systemId);
+  if (lsi == null) {
+    final String loc=schemaLocationMap.get(systemId);
+    if (loc == null)     return null;
+    lsi=new PicketLinkLSInput(baseURI,loc,publicId,systemId);
+    logger.trace("Loaded:" + lsi);
+    lsmap.put(systemId,lsi);
+  }
+  return lsi;
+}

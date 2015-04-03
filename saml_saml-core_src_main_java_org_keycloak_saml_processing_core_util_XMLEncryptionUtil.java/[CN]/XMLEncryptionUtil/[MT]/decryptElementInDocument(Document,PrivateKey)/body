@@ -1,0 +1,48 @@
+{
+  if (documentWithEncryptedElement == null)   throw logger.nullArgumentError("Input document is null");
+  Element documentRoot=documentWithEncryptedElement.getDocumentElement();
+  Element encDataElement=getNextElementNode(documentRoot.getFirstChild());
+  if (encDataElement == null)   throw logger.domMissingElementError("No element representing the encrypted data found");
+  Element encKeyElement=getNextElementNode(encDataElement.getNextSibling());
+  if (encKeyElement == null) {
+    NodeList nodeList=encDataElement.getElementsByTagNameNS(XMLENC_NS,ENCRYPTED_KEY_LOCALNAME);
+    if (nodeList == null || nodeList.getLength() == 0)     throw logger.nullValueError("Encrypted Key not found in the enc data");
+    encKeyElement=(Element)nodeList.item(0);
+  }
+  XMLCipher cipher;
+  EncryptedData encryptedData;
+  EncryptedKey encryptedKey;
+  try {
+    cipher=XMLCipher.getInstance();
+    cipher.init(XMLCipher.DECRYPT_MODE,null);
+    encryptedData=cipher.loadEncryptedData(documentWithEncryptedElement,encDataElement);
+    encryptedKey=cipher.loadEncryptedKey(documentWithEncryptedElement,encKeyElement);
+  }
+ catch (  XMLEncryptionException e1) {
+    throw logger.processingError(e1);
+  }
+  Document decryptedDoc=null;
+  if (encryptedData != null && encryptedKey != null) {
+    try {
+      String encAlgoURL=encryptedData.getEncryptionMethod().getAlgorithm();
+      XMLCipher keyCipher=XMLCipher.getInstance();
+      keyCipher.init(XMLCipher.UNWRAP_MODE,privateKey);
+      Key encryptionKey=keyCipher.decryptKey(encryptedKey,encAlgoURL);
+      cipher=XMLCipher.getInstance();
+      cipher.init(XMLCipher.DECRYPT_MODE,encryptionKey);
+      decryptedDoc=cipher.doFinal(documentWithEncryptedElement,encDataElement);
+    }
+ catch (    Exception e) {
+      throw logger.processingError(e);
+    }
+  }
+  if (decryptedDoc == null) {
+    throw logger.nullValueError("decryptedDoc");
+  }
+  Element decryptedRoot=decryptedDoc.getDocumentElement();
+  Element dataElement=getNextElementNode(decryptedRoot.getFirstChild());
+  if (dataElement == null)   throw logger.nullValueError("Data Element after encryption is null");
+  decryptedRoot.removeChild(dataElement);
+  decryptedDoc.replaceChild(dataElement,decryptedRoot);
+  return decryptedDoc.getDocumentElement();
+}

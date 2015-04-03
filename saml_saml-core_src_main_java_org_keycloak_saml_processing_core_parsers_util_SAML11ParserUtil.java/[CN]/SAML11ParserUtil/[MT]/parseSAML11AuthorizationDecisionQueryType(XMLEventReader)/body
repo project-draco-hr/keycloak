@@ -1,0 +1,36 @@
+{
+  SAML11AuthorizationDecisionQueryType query=new SAML11AuthorizationDecisionQueryType();
+  StartElement startElement;
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      if (StaxParserUtil.matches(endElement,SAML11Constants.AUTHORIZATION_DECISION_QUERY))       break;
+ else       throw logger.parserUnknownEndElement(StaxParserUtil.getEndElementName(endElement));
+    }
+    if (xmlEvent instanceof StartElement) {
+      startElement=(StartElement)xmlEvent;
+      String startTag=StaxParserUtil.getStartElementName(startElement);
+      if (startTag.equals(JBossSAMLConstants.SUBJECT.get())) {
+        SAML11SubjectParser parser=new SAML11SubjectParser();
+        query.setSubject((SAML11SubjectType)parser.parse(xmlEventReader));
+      }
+ else       if (startTag.equals(SAML11Constants.RESOURCE)) {
+        startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+        query.setResource(URI.create(StaxParserUtil.getElementText(xmlEventReader)));
+      }
+ else       if (startTag.equals(SAML11Constants.ACTION)) {
+        startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+        SAML11ActionType action=new SAML11ActionType();
+        Attribute nsAttr=startElement.getAttributeByName(new QName(SAML11Constants.NAMESPACE));
+        if (nsAttr != null) {
+          action.setNamespace(StaxParserUtil.getAttributeValue(nsAttr));
+        }
+        action.setValue(StaxParserUtil.getElementText(xmlEventReader));
+        query.add(action);
+      }
+ else       throw logger.parserUnknownTag(startTag,startElement.getLocation());
+    }
+  }
+  return query;
+}

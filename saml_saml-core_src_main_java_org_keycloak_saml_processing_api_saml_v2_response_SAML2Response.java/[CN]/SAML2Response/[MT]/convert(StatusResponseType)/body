@@ -1,0 +1,12 @@
+{
+  ByteArrayOutputStream bos=new ByteArrayOutputStream();
+  SAMLResponseWriter writer=new SAMLResponseWriter(StaxUtil.getXMLStreamWriter(bos));
+  if (responseType instanceof ResponseType) {
+    ResponseType response=(ResponseType)responseType;
+    writer.write(response);
+  }
+ else {
+    writer.write(responseType,new QName(PROTOCOL_NSURI.get(),JBossSAMLConstants.LOGOUT_RESPONSE.get(),"samlp"));
+  }
+  return DocumentUtil.getDocument(new ByteArrayInputStream(bos.toByteArray()));
+}

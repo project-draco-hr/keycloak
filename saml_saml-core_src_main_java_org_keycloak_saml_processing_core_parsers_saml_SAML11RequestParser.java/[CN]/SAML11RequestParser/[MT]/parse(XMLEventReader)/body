@@ -1,0 +1,38 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,SAML11Constants.REQUEST);
+  SAML11RequestType request=parseRequiredAttributes(startElement);
+  while (xmlEventReader.hasNext()) {
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    String elementName=StaxParserUtil.getStartElementName(startElement);
+    if (SAML11Constants.ATTRIBUTE_QUERY.equals(elementName)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      SAML11AttributeQueryType query=SAML11ParserUtil.parseSAML11AttributeQuery(xmlEventReader);
+      request.setQuery(query);
+    }
+ else     if (SAML11Constants.AUTHENTICATION_QUERY.equals(elementName)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      SAML11AuthenticationQueryType query=SAML11ParserUtil.parseSAML11AuthenticationQuery(xmlEventReader);
+      request.setQuery(query);
+    }
+ else     if (SAML11Constants.ASSERTION_ARTIFACT.equals(elementName)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      request.addAssertionArtifact(StaxParserUtil.getElementText(xmlEventReader));
+    }
+ else     if (SAML11Constants.AUTHORIZATION_DECISION_QUERY.equals(elementName)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      SAML11AuthorizationDecisionQueryType query=SAML11ParserUtil.parseSAML11AuthorizationDecisionQueryType(xmlEventReader);
+      request.setQuery(query);
+    }
+ else     if (elementName.equals(JBossSAMLConstants.SIGNATURE.get())) {
+      request.setSignature(StaxParserUtil.getDOMElement(xmlEventReader));
+    }
+ else     if (SAML11Constants.ASSERTION_ID_REF.equals(elementName)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      request.addAssertionIDRef(StaxParserUtil.getElementText(xmlEventReader));
+    }
+ else     throw logger.parserUnknownStartElement(elementName,startElement.getLocation());
+  }
+  return request;
+}

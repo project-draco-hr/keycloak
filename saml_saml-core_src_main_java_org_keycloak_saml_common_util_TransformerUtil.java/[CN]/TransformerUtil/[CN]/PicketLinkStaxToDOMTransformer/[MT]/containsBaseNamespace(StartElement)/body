@@ -1,0 +1,13 @@
+{
+  String localPart, prefix, qual=null;
+  Iterator<Namespace> namespaces=startElement.getNamespaces();
+  while (namespaces != null && namespaces.hasNext()) {
+    Namespace namespace=namespaces.next();
+    QName name=namespace.getName();
+    localPart=name.getLocalPart();
+    prefix=name.getPrefix();
+    if (prefix != null && prefix != "")     qual=(localPart != null && localPart != "") ? prefix + ":" + localPart : prefix;
+    if (qual != null && qual.equals("xmlns"))     return namespace.getNamespaceURI();
+  }
+  return null;
+}

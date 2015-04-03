@@ -1,0 +1,12 @@
+{
+  Attribute bindingAttr=startElement.getAttributeByName(new QName(JBossSAMLConstants.BINDING.get()));
+  String binding=StaxParserUtil.getAttributeValue(bindingAttr);
+  Attribute locationAttr=startElement.getAttributeByName(new QName(JBossSAMLConstants.LOCATION.get()));
+  String location=StaxParserUtil.getAttributeValue(locationAttr);
+  EndpointType endpoint=new IndexedEndpointType(URI.create(binding),URI.create(location));
+  Attribute responseLocation=startElement.getAttributeByName(new QName(JBossSAMLConstants.RESPONSE_LOCATION.get()));
+  if (responseLocation != null) {
+    endpoint.setResponseLocation(URI.create(StaxParserUtil.getAttributeValue(responseLocation)));
+  }
+  return endpoint;
+}

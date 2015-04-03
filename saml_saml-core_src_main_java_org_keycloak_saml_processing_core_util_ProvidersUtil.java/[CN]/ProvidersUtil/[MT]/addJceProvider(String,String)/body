@@ -1,0 +1,17 @@
+{
+  Provider currentProvider=Security.getProvider(name);
+  if (currentProvider == null) {
+    try {
+      Class<? extends Provider> clazz=Class.forName(className).asSubclass(Provider.class);
+      Provider provider=clazz.newInstance();
+      return addJceProvider(name,provider);
+    }
+ catch (    Throwable t) {
+      if (logger.isDebugEnabled()) {
+        logger.jceProviderCouldNotBeLoaded(name,t);
+      }
+      return null;
+    }
+  }
+  return currentProvider.getName();
+}

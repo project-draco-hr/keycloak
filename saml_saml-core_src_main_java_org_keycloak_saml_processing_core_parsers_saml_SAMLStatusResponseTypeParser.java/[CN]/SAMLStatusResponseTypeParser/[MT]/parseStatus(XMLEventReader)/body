@@ -1,0 +1,64 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  String STATUS=JBossSAMLConstants.STATUS.get();
+  StaxParserUtil.validate(startElement,STATUS);
+  StatusType status=new StatusType();
+  while (xmlEventReader.hasNext()) {
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    QName startElementName=startElement.getName();
+    String elementTag=startElementName.getLocalPart();
+    StatusCodeType statusCode=new StatusCodeType();
+    if (JBossSAMLConstants.STATUS_CODE.get().equals(elementTag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      if (startElement == null)       break;
+      Attribute valueAttr=startElement.getAttributeByName(new QName("Value"));
+      if (valueAttr != null) {
+        statusCode.setValue(URI.create(StaxParserUtil.getAttributeValue(valueAttr)));
+      }
+      status.setStatusCode(statusCode);
+      startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+      if (startElement == null) {
+        EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+        if (endElement != null) {
+          StaxParserUtil.validate(endElement,JBossSAMLConstants.STATUS_CODE.get());
+        }
+        continue;
+      }
+      elementTag=startElement.getName().getLocalPart();
+      if (JBossSAMLConstants.STATUS_CODE.get().equals(elementTag)) {
+        StatusCodeType subStatusCodeType=new StatusCodeType();
+        startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+        Attribute subValueAttr=startElement.getAttributeByName(new QName("Value"));
+        if (subValueAttr != null) {
+          subStatusCodeType.setValue(URI.create(StaxParserUtil.getAttributeValue(subValueAttr)));
+        }
+        statusCode.setStatusCode(subStatusCodeType);
+        EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+        StaxParserUtil.validate(endElement,JBossSAMLConstants.STATUS_CODE.get());
+        continue;
+      }
+    }
+    if (JBossSAMLConstants.STATUS_MESSAGE.get().equals(elementTag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      if (startElement == null)       break;
+      status.setStatusMessage(StaxParserUtil.getElementText(xmlEventReader));
+    }
+    if (JBossSAMLConstants.STATUS_DETAIL.get().equals(elementTag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      if (startElement == null)       break;
+      Element domElement=StaxParserUtil.getDOMElement(xmlEventReader);
+      StatusDetailType statusDetailType=new StatusDetailType();
+      statusDetailType.addStatusDetail(domElement);
+      status.setStatusDetail(statusDetailType);
+    }
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      if (StaxParserUtil.matches(endElement,STATUS))       break;
+ else       throw logger.parserUnknownEndElement(StaxParserUtil.getEndElementName(endElement));
+    }
+ else     break;
+  }
+  return status;
+}

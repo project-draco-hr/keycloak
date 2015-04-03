@@ -1,0 +1,14 @@
+{
+  Attribute idAttribute=nextElement.getAttributeByName(new QName(SAML11Constants.ASSERTIONID));
+  if (idAttribute == null)   throw logger.parserRequiredAttribute("AssertionID");
+  String id=StaxParserUtil.getAttributeValue(idAttribute);
+  Attribute majVersionAttribute=nextElement.getAttributeByName(new QName(SAML11Constants.MAJOR_VERSION));
+  String majVersion=StaxParserUtil.getAttributeValue(majVersionAttribute);
+  StringUtil.match("1",majVersion);
+  Attribute minVersionAttribute=nextElement.getAttributeByName(new QName(SAML11Constants.MINOR_VERSION));
+  String minVersion=StaxParserUtil.getAttributeValue(minVersionAttribute);
+  StringUtil.match("1",minVersion);
+  Attribute issueInstantAttribute=nextElement.getAttributeByName(new QName(JBossSAMLConstants.ISSUE_INSTANT.get()));
+  XMLGregorianCalendar issueInstant=XMLTimeUtil.parse(StaxParserUtil.getAttributeValue(issueInstantAttribute));
+  return new SAML11AssertionType(id,issueInstant);
+}

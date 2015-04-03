@@ -1,0 +1,17 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.SUBJECT.get(),SAML11Constants.ASSERTION_11_NSURI);
+  StaxUtil.writeNameSpace(writer,ASSERTION_PREFIX,ns);
+  SAML11SubjectTypeChoice choice=subject.getChoice();
+  if (choice != null) {
+    SAML11NameIdentifierType nameid=choice.getNameID();
+    if (nameid != null) {
+      write(nameid);
+    }
+    SAML11SubjectConfirmationType confirmation=choice.getSubjectConfirmation();
+    if (confirmation != null)     write(confirmation);
+  }
+  SAML11SubjectConfirmationType confirmation=subject.getSubjectConfirmation();
+  if (confirmation != null)   write(confirmation);
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

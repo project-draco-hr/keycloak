@@ -1,0 +1,68 @@
+{
+  StartElement startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+  String startElementName=StaxParserUtil.getStartElementName(startElement);
+  if (startElementName.equals(JBossSAMLConstants.ENCRYPTED_ASSERTION.get())) {
+    Element domElement=StaxParserUtil.getDOMElement(xmlEventReader);
+    EncryptedAssertionType encryptedAssertion=new EncryptedAssertionType();
+    encryptedAssertion.setEncryptedElement(domElement);
+    return encryptedAssertion;
+  }
+  startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,ASSERTION);
+  AssertionType assertion=parseBaseAttributes(startElement);
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent == null)     break;
+    if (xmlEvent instanceof EndElement) {
+      xmlEvent=StaxParserUtil.getNextEvent(xmlEventReader);
+      EndElement endElement=(EndElement)xmlEvent;
+      String endElementTag=StaxParserUtil.getEndElementName(endElement);
+      if (endElementTag.equals(JBossSAMLConstants.ASSERTION.get()))       break;
+ else       throw new RuntimeException(ErrorCodes.UNKNOWN_END_ELEMENT + endElementTag);
+    }
+    StartElement peekedElement=null;
+    if (xmlEvent instanceof StartElement) {
+      peekedElement=(StartElement)xmlEvent;
+    }
+ else {
+      peekedElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    }
+    if (peekedElement == null)     break;
+    String tag=StaxParserUtil.getStartElementName(peekedElement);
+    if (tag.equals(JBossSAMLConstants.SIGNATURE.get())) {
+      assertion.setSignature(StaxParserUtil.getDOMElement(xmlEventReader));
+      continue;
+    }
+    if (JBossSAMLConstants.ISSUER.get().equalsIgnoreCase(tag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      String issuerValue=StaxParserUtil.getElementText(xmlEventReader);
+      NameIDType issuer=new NameIDType();
+      issuer.setValue(issuerValue);
+      assertion.setIssuer(issuer);
+    }
+ else     if (JBossSAMLConstants.SUBJECT.get().equalsIgnoreCase(tag)) {
+      SAMLSubjectParser subjectParser=new SAMLSubjectParser();
+      assertion.setSubject((SubjectType)subjectParser.parse(xmlEventReader));
+    }
+ else     if (JBossSAMLConstants.CONDITIONS.get().equalsIgnoreCase(tag)) {
+      SAMLConditionsParser conditionsParser=new SAMLConditionsParser();
+      ConditionsType conditions=(ConditionsType)conditionsParser.parse(xmlEventReader);
+      assertion.setConditions(conditions);
+    }
+ else     if (JBossSAMLConstants.AUTHN_STATEMENT.get().equalsIgnoreCase(tag)) {
+      AuthnStatementType authnStatementType=SAMLParserUtil.parseAuthnStatement(xmlEventReader);
+      assertion.addStatement(authnStatementType);
+    }
+ else     if (JBossSAMLConstants.ATTRIBUTE_STATEMENT.get().equalsIgnoreCase(tag)) {
+      AttributeStatementType attributeStatementType=SAMLParserUtil.parseAttributeStatement(xmlEventReader);
+      assertion.addStatement(attributeStatementType);
+    }
+ else     if (JBossSAMLConstants.STATEMENT.get().equalsIgnoreCase(tag)) {
+      startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+      String xsiTypeValue=StaxParserUtil.getXSITypeValue(startElement);
+      throw new RuntimeException(ErrorCodes.UNKNOWN_XSI + xsiTypeValue);
+    }
+ else     throw new RuntimeException(ErrorCodes.UNKNOWN_TAG + tag + "::location="+ peekedElement.getLocation());
+  }
+  return assertion;
+}

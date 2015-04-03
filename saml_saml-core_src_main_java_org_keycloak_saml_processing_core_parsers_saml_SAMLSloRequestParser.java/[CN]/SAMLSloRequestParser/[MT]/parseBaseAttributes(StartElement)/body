@@ -1,0 +1,10 @@
+{
+  super.parseRequiredAttributes(startElement);
+  LogoutRequestType logoutRequest=new LogoutRequestType(id,issueInstant);
+  super.parseBaseAttributes(startElement,logoutRequest);
+  Attribute reason=startElement.getAttributeByName(new QName(JBossSAMLConstants.REASON.get()));
+  if (reason != null)   logoutRequest.setReason(StaxParserUtil.getAttributeValue(reason));
+  Attribute notOnOrAfter=startElement.getAttributeByName(new QName(JBossSAMLConstants.NOT_ON_OR_AFTER.get()));
+  if (notOnOrAfter != null)   logoutRequest.setNotOnOrAfter(XMLTimeUtil.parse(StaxParserUtil.getAttributeValue(notOnOrAfter)));
+  return logoutRequest;
+}

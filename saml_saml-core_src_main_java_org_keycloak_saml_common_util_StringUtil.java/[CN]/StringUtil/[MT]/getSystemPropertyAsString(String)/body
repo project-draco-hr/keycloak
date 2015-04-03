@@ -1,0 +1,29 @@
+{
+  if (str == null)   throw logger.nullArgumentError("str");
+  if (str.contains("${")) {
+    Pattern pattern=Pattern.compile("\\$\\{([^}]+)}");
+    Matcher matcher=pattern.matcher(str);
+    StringBuffer buffer=new StringBuffer();
+    String sysPropertyValue=null;
+    while (matcher.find()) {
+      String subString=matcher.group(1);
+      String defaultValue="";
+      if (subString.contains("::")) {
+        int index=subString.indexOf("::");
+        defaultValue=subString.substring(index + 2);
+        subString=subString.substring(0,index);
+      }
+      sysPropertyValue=SecurityActions.getSystemProperty(subString,defaultValue);
+      if (sysPropertyValue.isEmpty()) {
+        throw logger.systemPropertyMissingError(matcher.group(1));
+      }
+ else {
+        sysPropertyValue=Matcher.quoteReplacement(sysPropertyValue);
+      }
+      matcher.appendReplacement(buffer,sysPropertyValue);
+    }
+    matcher.appendTail(buffer);
+    str=buffer.toString();
+  }
+  return str;
+}

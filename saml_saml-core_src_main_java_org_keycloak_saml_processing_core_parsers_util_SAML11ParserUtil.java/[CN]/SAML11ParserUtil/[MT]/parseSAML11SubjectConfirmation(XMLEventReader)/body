@@ -1,0 +1,32 @@
+{
+  SAML11SubjectConfirmationType subjectConfirmationType=new SAML11SubjectConfirmationType();
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent instanceof EndElement) {
+      EndElement endElement=StaxParserUtil.getNextEndElement(xmlEventReader);
+      StaxParserUtil.validate(endElement,JBossSAMLConstants.SUBJECT_CONFIRMATION.get());
+      break;
+    }
+    if (xmlEvent instanceof StartElement) {
+      startElement=(StartElement)xmlEvent;
+      String startTag=StaxParserUtil.getStartElementName(startElement);
+      if (startTag.equals(SAML11Constants.CONFIRMATION_METHOD)) {
+        startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+        String method=StaxParserUtil.getElementText(xmlEventReader);
+        subjectConfirmationType.addConfirmationMethod(URI.create(method));
+      }
+ else       if (startTag.equals(JBossSAMLConstants.SUBJECT_CONFIRMATION_DATA.get())) {
+        startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+        SubjectConfirmationDataType subjectConfirmationData=parseSubjectConfirmationData(xmlEventReader);
+        subjectConfirmationType.setSubjectConfirmationData(subjectConfirmationData);
+      }
+ else       if (startTag.equals(JBossSAMLConstants.KEY_INFO.get())) {
+        Element keyInfo=StaxParserUtil.getDOMElement(xmlEventReader);
+        subjectConfirmationType.setKeyInfo(keyInfo);
+      }
+ else       throw logger.parserUnknownTag(startTag,startElement.getLocation());
+    }
+  }
+  return subjectConfirmationType;
+}

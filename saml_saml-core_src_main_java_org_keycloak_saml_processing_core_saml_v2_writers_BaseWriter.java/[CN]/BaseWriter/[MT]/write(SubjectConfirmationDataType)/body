@@ -1,0 +1,30 @@
+{
+  StaxUtil.writeStartElement(writer,ASSERTION_PREFIX,JBossSAMLConstants.SUBJECT_CONFIRMATION_DATA.get(),ASSERTION_NSURI.get());
+  String inResponseTo=subjectConfirmationData.getInResponseTo();
+  if (StringUtil.isNotNull(inResponseTo)) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.IN_RESPONSE_TO.get(),inResponseTo);
+  }
+  XMLGregorianCalendar notBefore=subjectConfirmationData.getNotBefore();
+  if (notBefore != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.NOT_BEFORE.get(),notBefore.toString());
+  }
+  XMLGregorianCalendar notOnOrAfter=subjectConfirmationData.getNotOnOrAfter();
+  if (notOnOrAfter != null) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.NOT_ON_OR_AFTER.get(),notOnOrAfter.toString());
+  }
+  String recipient=subjectConfirmationData.getRecipient();
+  if (StringUtil.isNotNull(recipient)) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.RECIPIENT.get(),recipient);
+  }
+  String address=subjectConfirmationData.getAddress();
+  if (StringUtil.isNotNull(address)) {
+    StaxUtil.writeAttribute(writer,JBossSAMLConstants.ADDRESS.get(),address);
+  }
+  if (subjectConfirmationData instanceof KeyInfoConfirmationDataType) {
+    KeyInfoConfirmationDataType kicd=(KeyInfoConfirmationDataType)subjectConfirmationData;
+    KeyInfoType keyInfo=(KeyInfoType)kicd.getAnyType();
+    StaxWriterUtil.writeKeyInfo(writer,keyInfo);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

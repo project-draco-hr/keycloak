@@ -1,0 +1,10 @@
+{
+  SAML2Response saml2Response=new SAML2Response();
+  Document doc=saml2Response.convert(response);
+  doc.normalize();
+  Node theSibling=getNextSiblingOfIssuer(doc);
+  if (theSibling != null) {
+    this.sibling=theSibling;
+  }
+  return sign(doc,idValueOfAssertion,keypair,referenceURI);
+}

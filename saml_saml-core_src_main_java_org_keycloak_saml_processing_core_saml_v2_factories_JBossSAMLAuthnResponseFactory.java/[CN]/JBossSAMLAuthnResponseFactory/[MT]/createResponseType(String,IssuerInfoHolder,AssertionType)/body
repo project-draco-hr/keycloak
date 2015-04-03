@@ -1,0 +1,11 @@
+{
+  XMLGregorianCalendar issueInstant=XMLTimeUtil.getIssueInstant();
+  ResponseType responseType=new ResponseType(ID,issueInstant);
+  NameIDType issuer=issuerInfo.getIssuer();
+  responseType.setIssuer(issuer);
+  String statusCode=issuerInfo.getStatusCode();
+  if (statusCode == null)   throw logger.issuerInfoMissingStatusCodeError();
+  responseType.setStatus(createStatusType(statusCode));
+  responseType.addAssertion(new RTChoiceType(assertionType));
+  return responseType;
+}

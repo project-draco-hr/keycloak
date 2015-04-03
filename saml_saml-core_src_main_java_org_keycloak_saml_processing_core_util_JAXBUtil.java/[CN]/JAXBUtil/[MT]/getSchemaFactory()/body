@@ -1,0 +1,35 @@
+{
+  SchemaFactory scFact=SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
+  if (SecurityActions.getSystemProperty("org.picketlink.identity.federation.jaxb.ls",null) == null)   scFact.setResourceResolver(new IDFedLSInputResolver());
+  scFact.setErrorHandler(new ErrorHandler(){
+    public void error(    SAXParseException exception) throws SAXException {
+      StringBuilder builder=new StringBuilder();
+      builder.append("Line Number=").append(exception.getLineNumber());
+      builder.append(" Col Number=").append(exception.getColumnNumber());
+      builder.append(" Public ID=").append(exception.getPublicId());
+      builder.append(" System ID=").append(exception.getSystemId());
+      builder.append(" exc=").append(exception.getLocalizedMessage());
+      logger.trace("SAX Error:" + builder.toString());
+    }
+    public void fatalError(    SAXParseException exception) throws SAXException {
+      StringBuilder builder=new StringBuilder();
+      builder.append("Line Number=").append(exception.getLineNumber());
+      builder.append(" Col Number=").append(exception.getColumnNumber());
+      builder.append(" Public ID=").append(exception.getPublicId());
+      builder.append(" System ID=").append(exception.getSystemId());
+      builder.append(" exc=").append(exception.getLocalizedMessage());
+      logger.error("SAX Fatal Error:" + builder.toString());
+    }
+    public void warning(    SAXParseException exception) throws SAXException {
+      StringBuilder builder=new StringBuilder();
+      builder.append("Line Number=").append(exception.getLineNumber());
+      builder.append(" Col Number=").append(exception.getColumnNumber());
+      builder.append(" Public ID=").append(exception.getPublicId());
+      builder.append(" System ID=").append(exception.getSystemId());
+      builder.append(" exc=").append(exception.getLocalizedMessage());
+      logger.trace("SAX Warn:" + builder.toString());
+    }
+  }
+);
+  return scFact;
+}

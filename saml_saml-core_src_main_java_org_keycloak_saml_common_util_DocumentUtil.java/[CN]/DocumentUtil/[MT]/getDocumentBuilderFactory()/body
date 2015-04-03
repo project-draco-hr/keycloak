@@ -1,0 +1,32 @@
+{
+  boolean tccl_jaxp=SystemPropertiesUtil.getSystemProperty(GeneralConstants.TCCL_JAXP,"false").equalsIgnoreCase("true");
+  ClassLoader prevTCCL=SecurityActions.getTCCL();
+  if (documentBuilderFactory == null) {
+    try {
+      if (tccl_jaxp) {
+        SecurityActions.setTCCL(DocumentUtil.class.getClassLoader());
+      }
+      documentBuilderFactory=DocumentBuilderFactory.newInstance();
+      documentBuilderFactory.setNamespaceAware(true);
+      documentBuilderFactory.setXIncludeAware(true);
+      String feature="";
+      try {
+        feature=feature_disallow_doctype_decl;
+        documentBuilderFactory.setFeature(feature,true);
+        feature=feature_external_general_entities;
+        documentBuilderFactory.setFeature(feature,false);
+        feature=feature_external_parameter_entities;
+        documentBuilderFactory.setFeature(feature,false);
+      }
+ catch (      ParserConfigurationException e) {
+        throw logger.parserFeatureNotSupported(feature);
+      }
+    }
+  finally {
+      if (tccl_jaxp) {
+        SecurityActions.setTCCL(prevTCCL);
+      }
+    }
+  }
+  return documentBuilderFactory;
+}

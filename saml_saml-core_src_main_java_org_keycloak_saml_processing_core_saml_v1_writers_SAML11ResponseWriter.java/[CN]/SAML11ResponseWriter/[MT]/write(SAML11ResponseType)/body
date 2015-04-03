@@ -1,0 +1,31 @@
+{
+  StaxUtil.writeStartElement(writer,PROTOCOL_PREFIX,SAML11Constants.RESPONSE,namespace);
+  StaxUtil.writeNameSpace(writer,PROTOCOL_PREFIX,namespace);
+  StaxUtil.writeNameSpace(writer,ASSERTION_PREFIX,SAML11Constants.ASSERTION_11_NSURI);
+  StaxUtil.writeAttribute(writer,SAML11Constants.RESPONSE_ID,response.getID());
+  StaxUtil.writeAttribute(writer,SAML11Constants.MAJOR_VERSION,response.getMajorVersion() + "");
+  StaxUtil.writeAttribute(writer,SAML11Constants.MINOR_VERSION,response.getMinorVersion() + "");
+  StaxUtil.writeAttribute(writer,JBossSAMLConstants.ISSUE_INSTANT.get(),response.getIssueInstant().toString());
+  String inResp=response.getInResponseTo();
+  if (StringUtil.isNotNull(inResp)) {
+    StaxUtil.writeAttribute(writer,SAML11Constants.IN_RESPONSE_TO,inResp);
+  }
+  URI recipient=response.getRecipient();
+  if (recipient != null) {
+    StaxUtil.writeAttribute(writer,SAML11Constants.RECIPIENT,recipient.toString());
+  }
+  Element sig=response.getSignature();
+  if (sig != null) {
+    StaxUtil.writeDOMElement(writer,sig);
+  }
+  SAML11StatusType status=response.getStatus();
+  if (status != null) {
+    write(status);
+  }
+  List<SAML11AssertionType> assertions=response.get();
+  for (  SAML11AssertionType assertion : assertions) {
+    assertionWriter.write(assertion);
+  }
+  StaxUtil.writeEndElement(writer);
+  StaxUtil.flush(writer);
+}

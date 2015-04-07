@@ -1,10 +1,19 @@
 {
+  if (response == null)   return null;
   if (response.startsWith("{")) {
     try {
-      return mapper.readTree(response).get(tokenName).getTextValue();
+      JsonNode node=mapper.readTree(response);
+      if (node.has(tokenName)) {
+        String s=node.get(tokenName).getTextValue();
+        if (s == null || s.trim().isEmpty())         return null;
+        return s;
+      }
+ else {
+        return null;
+      }
     }
  catch (    IOException e) {
-      throw new IdentityBrokerException("Could not extract token [" + tokenName + "] from response ["+ response+ "].",e);
+      throw new IdentityBrokerException("Could not extract token [" + tokenName + "] from response ["+ response+ "] due: "+ e.getMessage(),e);
     }
   }
  else {

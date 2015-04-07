@@ -1,6 +1,14 @@
 {
   this.kcSession=ThreadLocalSessionContext.getCurrentSession();
   if (this.kcSession == null) {
-    throw new SetupException("No KeycloakSession provided in ThreadLocal");
+    logger.info("No KeycloakSession provided in ThreadLocal. Initializing KeycloakSessionFactory");
+    try {
+      DefaultKeycloakSessionFactory factory=new DefaultKeycloakSessionFactory();
+      factory.init();
+      this.kcSession=factory.create();
+    }
+ catch (    Exception e) {
+      throw new SetupException("Exception when initializing factory",e);
+    }
   }
 }

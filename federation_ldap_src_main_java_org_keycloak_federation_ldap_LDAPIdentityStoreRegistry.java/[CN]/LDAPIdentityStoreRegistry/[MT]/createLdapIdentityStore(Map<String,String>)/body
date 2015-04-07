@@ -1,0 +1,46 @@
+{
+  Properties connectionProps=new Properties();
+  if (ldapConfig.containsKey(LDAPConstants.CONNECTION_POOLING)) {
+    connectionProps.put("com.sun.jndi.ldap.connect.pool",ldapConfig.get(LDAPConstants.CONNECTION_POOLING));
+  }
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.authentication","none simple");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.initsize","1");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.maxsize","1000");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.prefsize","5");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.timeout","300000");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.protocol","plain");
+  checkSystemProperty("com.sun.jndi.ldap.connect.pool.debug","off");
+  String vendor=ldapConfig.get(LDAPConstants.VENDOR);
+  boolean activeDirectory=vendor != null && vendor.equals(LDAPConstants.VENDOR_ACTIVE_DIRECTORY);
+  String ldapLoginNameMapping=ldapConfig.get(LDAPConstants.USERNAME_LDAP_ATTRIBUTE);
+  if (ldapLoginNameMapping == null) {
+    ldapLoginNameMapping=activeDirectory ? LDAPConstants.CN : LDAPConstants.UID;
+  }
+  String ldapFirstNameMapping=activeDirectory ? "givenName" : LDAPConstants.CN;
+  String createTimestampMapping=activeDirectory ? "whenCreated" : LDAPConstants.CREATE_TIMESTAMP;
+  String modifyTimestampMapping=activeDirectory ? "whenChanged" : LDAPConstants.MODIFY_TIMESTAMP;
+  String[] userObjectClasses=getUserObjectClasses(ldapConfig);
+  boolean pagination=ldapConfig.containsKey(LDAPConstants.PAGINATION) ? Boolean.parseBoolean(ldapConfig.get(LDAPConstants.PAGINATION)) : false;
+  boolean userAccountControlsAfterPasswordUpdate=ldapConfig.containsKey(LDAPConstants.USER_ACCOUNT_CONTROLS_AFTER_PASSWORD_UPDATE) ? Boolean.parseBoolean(ldapConfig.get(LDAPConstants.USER_ACCOUNT_CONTROLS_AFTER_PASSWORD_UPDATE)) : false;
+  String uniqueIdentifierAttributeName=LDAPConstants.ENTRY_UUID;
+  if (vendor != null) {
+switch (vendor) {
+case LDAPConstants.VENDOR_RHDS:
+      uniqueIdentifierAttributeName="nsuniqueid";
+    break;
+case LDAPConstants.VENDOR_TIVOLI:
+  uniqueIdentifierAttributeName="uniqueidentifier";
+break;
+case LDAPConstants.VENDOR_ACTIVE_DIRECTORY:
+uniqueIdentifierAttributeName=LDAPConstants.OBJECT_GUID;
+}
+}
+LDAPIdentityStoreConfiguration ldapStoreConfig=new LDAPIdentityStoreConfiguration().setConnectionProperties(connectionProps).setBaseDN(ldapConfig.get(LDAPConstants.BASE_DN)).setBindDN(ldapConfig.get(LDAPConstants.BIND_DN)).setBindCredential(ldapConfig.get(LDAPConstants.BIND_CREDENTIAL)).setLdapURL(ldapConfig.get(LDAPConstants.CONNECTION_URL)).setActiveDirectory(activeDirectory).setPagination(pagination).setUniqueIdentifierAttributeName(uniqueIdentifierAttributeName).setFactoryName("com.sun.jndi.ldap.LdapCtxFactory").setAuthType("simple").setUserAccountControlsAfterPasswordUpdate(userAccountControlsAfterPasswordUpdate);
+LDAPMappingConfiguration ldapUserMappingConfig=ldapStoreConfig.mappingConfig(LDAPUser.class).setBaseDN(ldapConfig.get(LDAPConstants.USER_DN_SUFFIX)).setObjectClasses(new HashSet<String>(Arrays.asList(userObjectClasses))).setIdPropertyName("loginName").addAttributeMapping("loginName",ldapLoginNameMapping).addAttributeMapping("firstName",ldapFirstNameMapping).addAttributeMapping("lastName",LDAPConstants.SN).addAttributeMapping("email",LDAPConstants.EMAIL).addReadOnlyAttributeMapping("createdDate",createTimestampMapping).addReadOnlyAttributeMapping("modifyDate",modifyTimestampMapping);
+if (activeDirectory && ldapLoginNameMapping.equals("sAMAccountName")) {
+ldapUserMappingConfig.setBindingPropertyName("fullName");
+ldapUserMappingConfig.addAttributeMapping("fullName",LDAPConstants.CN);
+logger.infof("Using 'cn' attribute for DN of user and 'sAMAccountName' for username");
+}
+return new LDAPIdentityStore(ldapStoreConfig);
+}

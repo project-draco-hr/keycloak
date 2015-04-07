@@ -1,0 +1,11 @@
+{
+  attributedType.setId(null);
+  String entryDN=getBindingDN(attributedType,true);
+  this.operationManager.createSubContext(entryDN,extractAttributes(attributedType,true));
+  addToParentAsMember(attributedType);
+  attributedType.setId(getEntryIdentifier(attributedType));
+  attributedType.setEntryDN(entryDN);
+  if (logger.isTraceEnabled()) {
+    logger.tracef("Type with identifier [%s] successfully added to identity store [%s].",attributedType.getId(),this);
+  }
+}

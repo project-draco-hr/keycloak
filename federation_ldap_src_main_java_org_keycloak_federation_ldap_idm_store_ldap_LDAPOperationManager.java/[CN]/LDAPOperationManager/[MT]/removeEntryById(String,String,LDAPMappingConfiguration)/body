@@ -1,0 +1,30 @@
+{
+  final String filter=getFilterById(baseDN,id);
+  try {
+    final SearchControls cons=getSearchControls(mappingConfiguration);
+    execute(new LdapOperation<SearchResult>(){
+      @Override public SearchResult execute(      LdapContext context) throws NamingException {
+        NamingEnumeration<SearchResult> result=context.search(baseDN,filter,cons);
+        if (result.hasMore()) {
+          SearchResult sr=result.next();
+          if (logger.isDebugEnabled()) {
+            logger.debugf("Removing entry [%s] with attributes: [",sr.getNameInNamespace());
+            NamingEnumeration<? extends Attribute> all=sr.getAttributes().getAll();
+            while (all.hasMore()) {
+              Attribute attribute=all.next();
+              logger.debugf("  %s = %s",attribute.getID(),attribute.get());
+            }
+            logger.debugf("]");
+          }
+          destroySubcontext(context,sr.getNameInNamespace());
+        }
+        result.close();
+        return null;
+      }
+    }
+);
+  }
+ catch (  NamingException e) {
+    throw new ModelException("Could not remove entry from DN [" + baseDN + "] and id ["+ id+ "]",e);
+  }
+}

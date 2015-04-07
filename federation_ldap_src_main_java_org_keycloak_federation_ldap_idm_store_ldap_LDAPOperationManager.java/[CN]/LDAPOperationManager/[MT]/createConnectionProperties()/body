@@ -1,0 +1,36 @@
+{
+  HashMap<String,Object> env=new HashMap<String,Object>();
+  env.put(Context.INITIAL_CONTEXT_FACTORY,this.config.getFactoryName());
+  env.put(Context.SECURITY_AUTHENTICATION,this.config.getAuthType());
+  String protocol=this.config.getProtocol();
+  if (protocol != null) {
+    env.put(Context.SECURITY_PROTOCOL,protocol);
+  }
+  String bindDN=this.config.getBindDN();
+  char[] bindCredential=null;
+  if (this.config.getBindCredential() != null) {
+    bindCredential=this.config.getBindCredential().toCharArray();
+  }
+  if (bindDN != null) {
+    env.put(Context.SECURITY_PRINCIPAL,bindDN);
+    env.put(Context.SECURITY_CREDENTIALS,bindCredential);
+  }
+  String url=this.config.getLdapURL();
+  if (url == null) {
+    throw new RuntimeException("url");
+  }
+  env.put(Context.PROVIDER_URL,url);
+  Properties additionalProperties=this.config.getConnectionProperties();
+  if (additionalProperties != null) {
+    for (    Object key : additionalProperties.keySet()) {
+      env.put(key.toString(),additionalProperties.getProperty(key.toString()));
+    }
+  }
+  if (config.isActiveDirectory()) {
+    env.put("java.naming.ldap.attributes.binary",LDAPConstants.OBJECT_GUID);
+  }
+  if (logger.isDebugEnabled()) {
+    logger.debugf("Creating LdapContext using properties: [%s]",env);
+  }
+  return env;
+}

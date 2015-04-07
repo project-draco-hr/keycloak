@@ -1,12 +1,12 @@
 {
   KeycloakSession session=keycloakRule.startSession();
-  PartitionManager partitionManager=getPartitionManager(session,ldapModel);
+  LDAPIdentityStore ldapStore=getLdapIdentityStore(session,ldapModel);
   try {
     RealmModel appRealm=session.realms().getRealmByName("test");
-    LDAPUtils.addUser(partitionManager,"username1","John1","Doel1","user1@email.org");
-    LDAPUtils.addUser(partitionManager,"username2","John2","Doel2","user2@email.org");
-    LDAPUtils.addUser(partitionManager,"username3","John3","Doel3","user3@email.org");
-    LDAPUtils.addUser(partitionManager,"username4","John4","Doel4","user4@email.org");
+    LDAPUtils.addUser(ldapStore,"username1","John1","Doel1","user1@email.org");
+    LDAPUtils.addUser(ldapStore,"username2","John2","Doel2","user2@email.org");
+    LDAPUtils.addUser(ldapStore,"username3","John3","Doel3","user3@email.org");
+    LDAPUtils.addUser(ldapStore,"username4","John4","Doel4","user4@email.org");
     Assert.assertNull(session.userStorage().getUserByUsername("username1",appRealm));
     Assert.assertNull(session.userStorage().getUserByUsername("username2",appRealm));
     Assert.assertNull(session.userStorage().getUserByUsername("username3",appRealm));

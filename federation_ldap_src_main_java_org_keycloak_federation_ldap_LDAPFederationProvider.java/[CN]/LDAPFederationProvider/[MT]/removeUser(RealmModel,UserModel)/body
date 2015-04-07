@@ -3,10 +3,5 @@
     logger.warnf("User '%s' can't be deleted in LDAP as editMode is '%s'",user.getUsername(),editMode.toString());
     return false;
   }
-  try {
-    return LDAPUtils.removeUser(partitionManager,user.getUsername());
-  }
- catch (  IdentityManagementException ie) {
-    throw convertIDMException(ie);
-  }
+  return LDAPUtils.removeUser(this.ldapIdentityStore,user.getUsername());
 }

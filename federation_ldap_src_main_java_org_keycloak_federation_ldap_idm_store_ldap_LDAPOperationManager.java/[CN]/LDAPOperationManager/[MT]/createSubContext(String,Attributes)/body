@@ -1,0 +1,24 @@
+{
+  try {
+    if (logger.isDebugEnabled()) {
+      logger.debugf("Creating entry [%s] with attributes: [",name);
+      NamingEnumeration<? extends Attribute> all=attributes.getAll();
+      while (all.hasMore()) {
+        Attribute attribute=all.next();
+        logger.debugf("  %s = %s",attribute.getID(),attribute.get());
+      }
+      logger.debugf("]");
+    }
+    execute(new LdapOperation<Void>(){
+      @Override public Void execute(      LdapContext context) throws NamingException {
+        DirContext subcontext=context.createSubcontext(name,attributes);
+        subcontext.close();
+        return null;
+      }
+    }
+);
+  }
+ catch (  NamingException e) {
+    throw new ModelException("Error creating subcontext [" + name + "]",e);
+  }
+}

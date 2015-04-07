@@ -1,13 +1,8 @@
 {
   if (editMode == EditMode.READ_ONLY || editMode == EditMode.UNSYNCED)   throw new IllegalStateException("Registration is not supported by this ldap server");
-  ;
   if (!synchronizeRegistrations())   throw new IllegalStateException("Registration is not supported by this ldap server");
-  try {
-    User picketlinkUser=LDAPUtils.addUser(this.partitionManager,user.getUsername(),user.getFirstName(),user.getLastName(),user.getEmail());
-    user.setAttribute(LDAP_ID,picketlinkUser.getId());
-    return proxy(user);
-  }
- catch (  IdentityManagementException ie) {
-    throw convertIDMException(ie);
-  }
+  LDAPUser ldapUser=LDAPUtils.addUser(this.ldapIdentityStore,user.getUsername(),user.getFirstName(),user.getLastName(),user.getEmail());
+  user.setAttribute(LDAPConstants.LDAP_ID,ldapUser.getId());
+  user.setAttribute(LDAPConstants.LDAP_ENTRY_DN,ldapUser.getEntryDN());
+  return proxy(user);
 }

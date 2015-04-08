@@ -1,0 +1,18 @@
+{
+  try {
+    String newQuotedPassword="\"" + password + "\"";
+    byte[] newUnicodePassword=newQuotedPassword.getBytes("UTF-16LE");
+    BasicAttribute unicodePwd=new BasicAttribute("unicodePwd",newUnicodePassword);
+    List<ModificationItem> modItems=new ArrayList<ModificationItem>();
+    modItems.add(new ModificationItem(DirContext.REPLACE_ATTRIBUTE,unicodePwd));
+    if (getConfig().isUserAccountControlsAfterPasswordUpdate()) {
+      BasicAttribute userAccountControl=new BasicAttribute("userAccountControl","512");
+      modItems.add(new ModificationItem(DirContext.REPLACE_ATTRIBUTE,userAccountControl));
+      logger.debugf("Attribute userAccountControls will be switched to 512 after password update of user [%s]",userDN);
+    }
+    operationManager.modifyAttributes(userDN,modItems.toArray(new ModificationItem[]{}));
+  }
+ catch (  Exception e) {
+    throw new ModelException(e);
+  }
+}

@@ -1,0 +1,20 @@
+{
+  String userDN=getEntryDNOfUser(user);
+  if (logger.isDebugEnabled()) {
+    logger.debugf("Using DN [%s] for updating LDAP password of user [%s]",userDN,user.getLoginName());
+  }
+  if (getConfig().isActiveDirectory()) {
+    updateADPassword(userDN,password);
+  }
+ else {
+    ModificationItem[] mods=new ModificationItem[1];
+    try {
+      BasicAttribute mod0=new BasicAttribute(LDAPConstants.USER_PASSWORD_ATTRIBUTE,password);
+      mods[0]=new ModificationItem(DirContext.REPLACE_ATTRIBUTE,mod0);
+      operationManager.modifyAttribute(userDN,mod0);
+    }
+ catch (    Exception e) {
+      throw new ModelException("Error updating password.",e);
+    }
+  }
+}

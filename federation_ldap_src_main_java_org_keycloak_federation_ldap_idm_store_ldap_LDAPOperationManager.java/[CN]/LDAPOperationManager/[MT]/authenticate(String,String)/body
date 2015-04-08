@@ -1,0 +1,26 @@
+{
+  InitialContext authCtx=null;
+  try {
+    Hashtable<String,Object> env=new Hashtable<String,Object>(this.connectionProperties);
+    env.put(Context.SECURITY_PRINCIPAL,dn);
+    env.put(Context.SECURITY_CREDENTIALS,password);
+    env.put("com.sun.jndi.ldap.connect.pool","false");
+    authCtx=new InitialLdapContext(env,null);
+    return true;
+  }
+ catch (  Exception e) {
+    if (logger.isDebugEnabled()) {
+      logger.debugf(e,"Authentication failed for DN [%s]",dn);
+    }
+    return false;
+  }
+ finally {
+    if (authCtx != null) {
+      try {
+        authCtx.close();
+      }
+ catch (      NamingException e) {
+      }
+    }
+  }
+}

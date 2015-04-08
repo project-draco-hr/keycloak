@@ -1,0 +1,21 @@
+{
+  final List<SearchResult> result=new ArrayList<SearchResult>();
+  final SearchControls cons=getSearchControls(mappingConfiguration);
+  try {
+    return execute(new LdapOperation<List<SearchResult>>(){
+      @Override public List<SearchResult> execute(      LdapContext context) throws NamingException {
+        NamingEnumeration<SearchResult> search=context.search(baseDN,filter,cons);
+        while (search.hasMoreElements()) {
+          result.add(search.nextElement());
+        }
+        search.close();
+        return result;
+      }
+    }
+);
+  }
+ catch (  NamingException e) {
+    logger.errorf(e,"Could not query server using DN [%s] and filter [%s]",baseDN,filter);
+    throw e;
+  }
+}

@@ -1,0 +1,16 @@
+{
+  String email=(ldapUser.getEmail() != null && ldapUser.getEmail().trim().length() > 0) ? ldapUser.getEmail() : null;
+  if (ldapUser.getLoginName() == null) {
+    throw new ModelException("User returned from LDAP has null username! Check configuration of your LDAP mappings. ID of user from LDAP: " + ldapUser.getId());
+  }
+  UserModel imported=session.userStorage().addUser(realm,ldapUser.getLoginName());
+  imported.setEnabled(true);
+  imported.setEmail(email);
+  imported.setFirstName(ldapUser.getFirstName());
+  imported.setLastName(ldapUser.getLastName());
+  imported.setFederationLink(model.getId());
+  imported.setAttribute(LDAPConstants.LDAP_ID,ldapUser.getId());
+  imported.setAttribute(LDAPConstants.LDAP_ENTRY_DN,ldapUser.getEntryDN());
+  logger.debugf("Imported new user from LDAP to Keycloak DB. Username: [%s], Email: [%s], LDAP_ID: [%s], LDAP Entry DN: [%s]",imported.getUsername(),imported.getEmail(),ldapUser.getId(),ldapUser.getEntryDN());
+  return proxy(imported);
+}

@@ -1,0 +1,19 @@
+{
+  if (propertyClass.equals(type)) {
+    return true;
+  }
+ else {
+    boolean matchSubType=propertyClass.isAssignableFrom(type);
+    if (MatchOption.SUB_TYPE == this.matchOption) {
+      return matchSubType;
+    }
+    boolean matchSuperType=type.isAssignableFrom(propertyClass);
+    if (MatchOption.SUPER_TYPE == this.matchOption) {
+      return matchSuperType;
+    }
+    if (MatchOption.ALL == this.matchOption) {
+      return matchSubType || matchSuperType;
+    }
+  }
+  return false;
+}

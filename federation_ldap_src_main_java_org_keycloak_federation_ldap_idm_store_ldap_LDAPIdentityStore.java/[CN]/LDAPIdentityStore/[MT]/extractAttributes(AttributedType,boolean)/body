@@ -1,0 +1,42 @@
+{
+  BasicAttributes entryAttributes=new BasicAttributes();
+  LDAPMappingConfiguration mappingConfig=getMappingConfig(attributedType.getClass());
+  Map<String,String> mappedProperties=mappingConfig.getMappedProperties();
+  for (  String propertyName : mappedProperties.keySet()) {
+    if (!mappingConfig.getReadOnlyAttributes().contains(propertyName) && (isCreate || !mappingConfig.getBindingProperty().getName().equals(propertyName))) {
+      Property<Object> property=PropertyQueries.<Object>createQuery(attributedType.getClass()).addCriteria(new NamedPropertyCriteria(propertyName)).getFirstResult();
+      Object propertyValue=null;
+      if (property != null) {
+        propertyValue=property.getValue(attributedType);
+      }
+ else {
+        org.keycloak.federation.ldap.idm.model.Attribute<?> attribute=attributedType.getAttribute(propertyName);
+        if (attribute != null) {
+          propertyValue=attribute.getValue();
+        }
+      }
+      if (AttributedType.class.isInstance(propertyValue)) {
+        AttributedType referencedType=(AttributedType)propertyValue;
+        propertyValue=getBindingDN(referencedType,true);
+      }
+ else {
+        if (propertyValue == null || isNullOrEmpty(propertyValue.toString())) {
+          propertyValue=EMPTY_ATTRIBUTE_VALUE;
+        }
+      }
+      entryAttributes.put(mappedProperties.get(propertyName),propertyValue);
+    }
+  }
+  if (isCreate) {
+    LDAPMappingConfiguration ldapEntryConfig=getMappingConfig(attributedType.getClass());
+    BasicAttribute objectClassAttribute=new BasicAttribute(LDAPConstants.OBJECT_CLASS);
+    for (    String objectClassValue : ldapEntryConfig.getObjectClasses()) {
+      objectClassAttribute.add(objectClassValue);
+      if (objectClassValue.equals(LDAPConstants.GROUP_OF_NAMES) || objectClassValue.equals(LDAPConstants.GROUP_OF_ENTRIES) || objectClassValue.equals(LDAPConstants.GROUP_OF_UNIQUE_NAMES)) {
+        entryAttributes.put(LDAPConstants.MEMBER,EMPTY_ATTRIBUTE_VALUE);
+      }
+    }
+    entryAttributes.put(objectClassAttribute);
+  }
+  return entryAttributes;
+}

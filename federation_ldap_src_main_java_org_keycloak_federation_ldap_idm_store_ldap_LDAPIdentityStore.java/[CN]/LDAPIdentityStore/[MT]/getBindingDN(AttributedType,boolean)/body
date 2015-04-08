@@ -1,0 +1,23 @@
+{
+  LDAPMappingConfiguration mappingConfig=getMappingConfig(attributedType.getClass());
+  Property<String> idProperty=mappingConfig.getIdProperty();
+  String baseDN;
+  if (mappingConfig.getBaseDN() == null || !appendBaseDN) {
+    baseDN="";
+  }
+ else {
+    baseDN=LDAPConstants.COMMA + getBaseDN(attributedType);
+  }
+  Property<String> bindingProperty=mappingConfig.getBindingProperty();
+  String bindingAttribute;
+  String dn;
+  if (bindingProperty == null) {
+    bindingAttribute=mappingConfig.getMappedProperties().get(idProperty.getName());
+    dn=idProperty.getValue(attributedType);
+  }
+ else {
+    bindingAttribute=mappingConfig.getMappedProperties().get(bindingProperty.getName());
+    dn=mappingConfig.getBindingProperty().getValue(attributedType);
+  }
+  return bindingAttribute + LDAPConstants.EQUAL + dn+ baseDN;
+}

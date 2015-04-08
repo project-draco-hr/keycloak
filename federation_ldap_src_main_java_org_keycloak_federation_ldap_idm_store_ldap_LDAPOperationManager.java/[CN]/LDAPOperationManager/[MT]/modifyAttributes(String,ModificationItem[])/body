@@ -1,0 +1,28 @@
+{
+  try {
+    if (logger.isDebugEnabled()) {
+      logger.debugf("Modifying attributes for entry [%s]: [",dn);
+      for (      ModificationItem item : mods) {
+        Object values;
+        if (item.getAttribute().size() > 0) {
+          values=item.getAttribute().get();
+        }
+ else {
+          values="No values";
+        }
+        logger.debugf("  Op [%s]: %s = %s",item.getModificationOp(),item.getAttribute().getID(),values);
+      }
+      logger.debugf("]");
+    }
+    execute(new LdapOperation<Void>(){
+      @Override public Void execute(      LdapContext context) throws NamingException {
+        context.modifyAttributes(dn,mods);
+        return null;
+      }
+    }
+);
+  }
+ catch (  NamingException e) {
+    throw new ModelException("Could not modify attribute for DN [" + dn + "]",e);
+  }
+}

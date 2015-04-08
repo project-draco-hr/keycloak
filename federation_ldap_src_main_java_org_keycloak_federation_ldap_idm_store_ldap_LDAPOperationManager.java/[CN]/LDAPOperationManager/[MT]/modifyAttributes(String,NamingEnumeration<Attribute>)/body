@@ -1,0 +1,13 @@
+{
+  try {
+    List<ModificationItem> modItems=new ArrayList<ModificationItem>();
+    while (attributes.hasMore()) {
+      ModificationItem modItem=new ModificationItem(DirContext.REPLACE_ATTRIBUTE,attributes.next());
+      modItems.add(modItem);
+    }
+    modifyAttributes(dn,modItems.toArray(new ModificationItem[]{}));
+  }
+ catch (  NamingException ne) {
+    throw new ModelException("Could not modify attributes on entry from DN [" + dn + "]",ne);
+  }
+}

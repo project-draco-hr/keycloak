@@ -1,0 +1,15 @@
+{
+  LDAPMappingConfiguration entryConfig=getMappingConfig(attributedType.getClass());
+  if (entryConfig.getParentMembershipAttributeName() != null) {
+    Property<AttributedType> parentProperty=PropertyQueries.<AttributedType>createQuery(attributedType.getClass()).addCriteria(new TypedPropertyCriteria(attributedType.getClass())).getFirstResult();
+    if (parentProperty != null) {
+      AttributedType parentType=parentProperty.getValue(attributedType);
+      if (parentType != null) {
+        Attributes attributes=this.operationManager.getAttributes(parentType.getId(),getBaseDN(parentType),entryConfig);
+        Attribute attribute=attributes.get(entryConfig.getParentMembershipAttributeName());
+        attribute.add(getBindingDN(attributedType,true));
+        this.operationManager.modifyAttribute(getBindingDN(parentType,true),attribute);
+      }
+    }
+  }
+}

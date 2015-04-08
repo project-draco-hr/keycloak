@@ -2,13 +2,14 @@
   this.realm=realm;
   List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
   if (!identityProviders.isEmpty()) {
-    providers=new LinkedList<IdentityProvider>();
+    Set<IdentityProvider> orderedSet=new TreeSet<>(IdentityProviderComparator.INSTANCE);
     for (    IdentityProviderModel identityProvider : identityProviders) {
       if (identityProvider.isEnabled()) {
-        addIdentityProvider(realm,baseURI,identityProvider);
+        addIdentityProvider(orderedSet,realm,baseURI,identityProvider);
       }
     }
-    if (!providers.isEmpty()) {
+    if (!orderedSet.isEmpty()) {
+      providers=new LinkedList<IdentityProvider>(orderedSet);
       displaySocial=true;
     }
   }

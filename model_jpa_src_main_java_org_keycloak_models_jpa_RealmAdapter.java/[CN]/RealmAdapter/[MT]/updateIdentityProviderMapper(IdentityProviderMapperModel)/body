@@ -1,0 +1,13 @@
+{
+  IdentityProviderMapperEntity entity=getIdentityProviderMapperEntity(mapping.getId());
+  entity.setIdentityProviderAlias(mapping.getIdentityProviderAlias());
+  entity.setIdentityProviderMapper(mapping.getIdentityProviderMapper());
+  if (entity.getConfig() == null) {
+    entity.setConfig(mapping.getConfig());
+  }
+ else {
+    entity.getConfig().clear();
+    entity.getConfig().putAll(mapping.getConfig());
+  }
+  em.flush();
+}

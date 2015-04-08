@@ -1,0 +1,20 @@
+{
+  Set<IdentityProviderMapperModel> mappings=new HashSet<IdentityProviderMapperModel>();
+  for (  IdentityProviderMapperEntity entity : this.realm.getIdentityProviderMappers()) {
+    if (!entity.getIdentityProviderAlias().equals(brokerAlias)) {
+      continue;
+    }
+    IdentityProviderMapperModel mapping=new IdentityProviderMapperModel();
+    mapping.setId(entity.getId());
+    mapping.setName(entity.getName());
+    mapping.setIdentityProviderAlias(entity.getIdentityProviderAlias());
+    mapping.setIdentityProviderMapper(entity.getIdentityProviderMapper());
+    Map<String,String> config=new HashMap<String,String>();
+    if (entity.getConfig() != null) {
+      config.putAll(entity.getConfig());
+    }
+    mapping.setConfig(config);
+    mappings.add(mapping);
+  }
+  return mappings;
+}

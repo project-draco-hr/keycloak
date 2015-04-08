@@ -1,0 +1,15 @@
+{
+  if (getIdentityProviderMapperByName(model.getIdentityProviderAlias(),model.getIdentityProviderMapper()) != null) {
+    throw new RuntimeException("protocol mapper name must be unique per protocol");
+  }
+  String id=KeycloakModelUtils.generateId();
+  IdentityProviderMapperEntity entity=new IdentityProviderMapperEntity();
+  entity.setId(id);
+  entity.setName(model.getName());
+  entity.setIdentityProviderAlias(model.getIdentityProviderAlias());
+  entity.setIdentityProviderMapper(model.getIdentityProviderMapper());
+  entity.setConfig(model.getConfig());
+  getMongoEntity().getIdentityProviderMappers().add(entity);
+  updateMongoEntity();
+  return entityToModel(entity);
+}

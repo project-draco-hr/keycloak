@@ -1,15 +1,15 @@
 {
   auth.requireAny();
   List<ApplicationRepresentation> rep=new ArrayList<ApplicationRepresentation>();
-  List<ApplicationModel> applicationModels=realm.getApplications();
+  List<ClientModel> clientModels=realm.getClients();
   boolean view=auth.hasView();
-  for (  ApplicationModel applicationModel : applicationModels) {
+  for (  ClientModel clientModel : clientModels) {
     if (view) {
-      rep.add(ModelToRepresentation.toRepresentation(applicationModel));
+      rep.add(ModelToRepresentation.toRepresentation(clientModel));
     }
  else {
       ApplicationRepresentation app=new ApplicationRepresentation();
-      app.setName(applicationModel.getName());
+      app.setName(clientModel.getClientId());
       rep.add(app);
     }
   }

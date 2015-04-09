@@ -1,0 +1,10 @@
+{
+  if (client instanceof ClientModel) {
+    RoleModel roleModel=app.getRole(role);
+    return user.hasRole(roleModel) && client.hasScope(roleModel);
+  }
+ else {
+    AccessToken.Access access=token.getResourceAccess(app.getClientId());
+    return access != null && access.isUserInRole(role);
+  }
+}

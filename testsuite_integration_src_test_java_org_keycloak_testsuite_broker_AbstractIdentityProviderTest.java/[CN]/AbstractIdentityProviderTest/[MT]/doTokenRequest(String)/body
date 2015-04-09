@@ -1,0 +1,13 @@
+{
+  try {
+    HttpClient client=new DefaultHttpClient();
+    HttpGet get=new HttpGet(Urls.identityProviderRetrieveToken(BASE_URI,getProviderId(),getRealm().getName()));
+    get.setHeader("Authorization","Bearer " + token);
+    HttpResponse response=client.execute(get);
+    assertEquals(200,response.getStatusLine().getStatusCode());
+    assertNotNull(IOUtils.toString(response.getEntity().getContent()));
+  }
+ catch (  Exception e) {
+    fail(e.getMessage());
+  }
+}

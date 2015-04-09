@@ -1,8 +1,8 @@
 {
   IdentityProviderModel identityProviderModel=getIdentityProviderModel();
   RealmModel realm=getRealm();
-  ApplicationModel applicationModel=realm.getApplicationByName("test-app");
-  ClientModel client2=realm.findClient("test-app");
+  ClientModel clientModel=realm.getClientByClientId("test-app");
+  ClientModel client2=realm.getClientByClientId("test-app");
   assertEquals(0,client2.getIdentityProviders().size());
   this.driver.navigate().to("http://localhost:8081/test-app/");
   assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/auth"));
@@ -12,7 +12,7 @@
   mapping.setIdentityProvider(getProviderId());
   mapping.setRetrieveToken(true);
   appIdentityProviders.add(mapping);
-  applicationModel.updateIdentityProviders(appIdentityProviders);
+  clientModel.updateIdentityProviders(appIdentityProviders);
   this.driver.navigate().to("http://localhost:8081/test-app/");
   loginPage.findSocialButton(getProviderId());
 }

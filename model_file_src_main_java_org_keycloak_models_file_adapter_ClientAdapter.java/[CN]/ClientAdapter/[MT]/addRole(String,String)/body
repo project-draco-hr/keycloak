@@ -1,0 +1,10 @@
+{
+  if (roleNameExists(name))   throw new ModelDuplicateException("Role named " + name + " already exists.");
+  RoleEntity roleEntity=new RoleEntity();
+  roleEntity.setId(id);
+  roleEntity.setName(name);
+  roleEntity.setClientId(getId());
+  RoleAdapter role=new RoleAdapter(getRealm(),roleEntity,this);
+  allRoles.put(id,role);
+  return role;
+}

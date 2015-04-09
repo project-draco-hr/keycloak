@@ -66,7 +66,7 @@
   if (rep.getPasswordPolicy() != null)   newRealm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
   importIdentityProviders(rep,newRealm);
   if (rep.getApplications() != null) {
-    Map<String,ApplicationModel> appMap=createApplications(session,rep,newRealm);
+    Map<String,ClientModel> appMap=createApplications(session,rep,newRealm);
   }
   if (rep.getRoles() != null) {
     if (rep.getRoles().getRealm() != null) {
@@ -76,7 +76,7 @@
     }
     if (rep.getRoles().getApplication() != null) {
       for (      Map.Entry<String,List<RoleRepresentation>> entry : rep.getRoles().getApplication().entrySet()) {
-        ApplicationModel app=newRealm.getApplicationByName(entry.getKey());
+        ClientModel app=newRealm.getClientByClientId(entry.getKey());
         if (app == null) {
           throw new RuntimeException("App doesn't exist in role definitions: " + entry.getKey());
         }
@@ -94,7 +94,7 @@
     }
     if (rep.getRoles().getApplication() != null) {
       for (      Map.Entry<String,List<RoleRepresentation>> entry : rep.getRoles().getApplication().entrySet()) {
-        ApplicationModel app=newRealm.getApplicationByName(entry.getKey());
+        ClientModel app=newRealm.getClientByClientId(entry.getKey());
         if (app == null) {
           throw new RuntimeException("App doesn't exist in role definitions: " + entry.getKey());
         }
@@ -113,7 +113,7 @@
   if (rep.getApplications() != null) {
     for (    ApplicationRepresentation resourceRep : rep.getApplications()) {
       if (resourceRep.getDefaultRoles() != null) {
-        ApplicationModel appModel=newRealm.getApplicationByName(resourceRep.getName());
+        ClientModel appModel=newRealm.getClientByClientId(resourceRep.getName());
         appModel.updateDefaultRoles(resourceRep.getDefaultRoles());
       }
     }
@@ -121,10 +121,10 @@
   if (rep.getOauthClients() != null) {
     createOAuthClients(session,rep,newRealm);
   }
-  Map<String,ApplicationModel> appMap=newRealm.getApplicationNameMap();
+  Map<String,ClientModel> appMap=newRealm.getClientNameMap();
   if (rep.getApplicationScopeMappings() != null) {
     for (    Map.Entry<String,List<ScopeMappingRepresentation>> entry : rep.getApplicationScopeMappings().entrySet()) {
-      ApplicationModel app=appMap.get(entry.getKey());
+      ClientModel app=appMap.get(entry.getKey());
       if (app == null) {
         throw new RuntimeException("Unable to find application role mappings for app: " + entry.getKey());
       }
@@ -133,7 +133,7 @@
   }
   if (rep.getScopeMappings() != null) {
     for (    ScopeMappingRepresentation scope : rep.getScopeMappings()) {
-      ClientModel client=newRealm.findClient(scope.getClient());
+      ClientModel client=newRealm.getClientByClientId(scope.getClient());
       if (client == null) {
         throw new RuntimeException("Unknown client specification in realm scope mappings");
       }

@@ -3,7 +3,7 @@
   if (adminRealmId.equals(realm.getId())) {
     RealmModel adminRealm=realm;
     for (    RealmModel currentRealm : model.getRealms()) {
-      ApplicationModel masterApp=adminRealm.getApplicationByName(KeycloakModelUtils.getMasterRealmAdminApplicationName(currentRealm));
+      ClientModel masterApp=adminRealm.getClientByClientId(KeycloakModelUtils.getMasterRealmAdminApplicationName(currentRealm));
       if (masterApp != null) {
         currentRealm.setMasterAdminApp(masterApp);
       }
@@ -14,7 +14,7 @@
   }
  else {
     RealmModel adminRealm=model.getRealm(adminRealmId);
-    ApplicationModel masterApp=adminRealm.getApplicationByName(KeycloakModelUtils.getMasterRealmAdminApplicationName(realm));
+    ClientModel masterApp=adminRealm.getClientByClientId(KeycloakModelUtils.getMasterRealmAdminApplicationName(realm));
     if (masterApp != null) {
       realm.setMasterAdminApp(masterApp);
     }

@@ -2,7 +2,7 @@
   UserSessionModel[] sessions=createSessions();
   List<ClientSessionModel> clientSessions=session.sessions().getUserSession(realm,sessions[0].getId()).getClientSessions();
   assertEquals(2,clientSessions.size());
-  String client1=realm.findClient("test-app").getId();
+  String client1=realm.getClientByClientId("test-app").getId();
   ClientSessionModel session1;
   if (clientSessions.get(0).getClient().getId().equals(client1)) {
     session1=clientSessions.get(0);
@@ -11,7 +11,7 @@
     session1=clientSessions.get(1);
   }
   assertEquals(null,session1.getAction());
-  assertEquals(realm.findClient("test-app").getClientId(),session1.getClient().getClientId());
+  assertEquals(realm.getClientByClientId("test-app").getClientId(),session1.getClient().getClientId());
   assertEquals(sessions[0].getId(),session1.getUserSession().getId());
   assertEquals("http://redirect",session1.getRedirectUri());
   assertEquals("state",session1.getNote(OIDCLoginProtocol.STATE_PARAM));

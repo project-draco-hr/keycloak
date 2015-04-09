@@ -13,7 +13,7 @@
       }
     }
   }
-  session.sessions().onClientRemoved(realm,realm.findClient("third-party"));
+  session.sessions().onClientRemoved(realm,realm.getClientByClientId("third-party"));
   resetSession();
   for (  String c : clientSessionsRemoved) {
     assertNull(session.sessions().getClientSession(realm,c));
@@ -21,7 +21,7 @@
   for (  String c : clientSessionsKept) {
     assertNotNull(session.sessions().getClientSession(realm,c));
   }
-  session.sessions().onClientRemoved(realm,realm.findClient("test-app"));
+  session.sessions().onClientRemoved(realm,realm.getClientByClientId("test-app"));
   resetSession();
   for (  String c : clientSessionsRemoved) {
     assertNull(session.sessions().getClientSession(realm,c));

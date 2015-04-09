@@ -1,7 +1,12 @@
 {
-  if (updatedClient != null)   return updatedClient.hasScope(role);
-  if (cachedClient.isFullScopeAllowed() || cachedClient.getScope().contains(role.getId()))   return true;
+  if (updated != null)   return updated.hasScope(role);
+  if (cached.isFullScopeAllowed() || cached.getScope().contains(role.getId()))   return true;
   Set<RoleModel> roles=getScopeMappings();
+  for (  RoleModel mapping : roles) {
+    if (mapping.hasRole(role))     return true;
+  }
+  roles=getRoles();
+  if (roles.contains(role))   return true;
   for (  RoleModel mapping : roles) {
     if (mapping.hasRole(role))     return true;
   }

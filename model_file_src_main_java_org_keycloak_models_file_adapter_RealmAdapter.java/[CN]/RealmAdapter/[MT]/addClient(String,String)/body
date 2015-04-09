@@ -1,0 +1,21 @@
+{
+  if (clientId == null)   throw new NullPointerException("name == null");
+  if (id == null)   throw new NullPointerException("id == null");
+  if (getClientNameMap().containsKey(clientId)) {
+    throw new ModelDuplicateException("Application named '" + clientId + "' already exists.");
+  }
+  ApplicationEntity appEntity=new ApplicationEntity();
+  appEntity.setId(id);
+  appEntity.setName(clientId);
+  appEntity.setRealmId(getId());
+  appEntity.setEnabled(true);
+  final ClientModel app=new ClientAdapter(session,this,appEntity,inMemoryModel);
+  session.getKeycloakSessionFactory().publish(new ClientCreationEvent(){
+    @Override public ClientModel getCreatedClient(){
+      return app;
+    }
+  }
+);
+  allApps.put(id,app);
+  return app;
+}

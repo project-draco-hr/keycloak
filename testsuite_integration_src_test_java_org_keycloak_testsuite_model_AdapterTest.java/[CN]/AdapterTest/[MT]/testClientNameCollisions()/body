@@ -1,19 +1,19 @@
 {
-  realmManager.createRealm("JUGGLER1").addOAuthClient("client1");
-  realmManager.createRealm("JUGGLER2").addOAuthClient("client1");
+  realmManager.createRealm("JUGGLER1").addClient("client1");
+  realmManager.createRealm("JUGGLER2").addClient("client1");
   commit();
   try {
-    realmManager.getRealmByName("JUGGLER1").addOAuthClient("client1");
+    realmManager.getRealmByName("JUGGLER1").addClient("client1");
     commit();
     Assert.fail("Expected exception");
   }
  catch (  ModelDuplicateException e) {
   }
   commit(true);
-  realmManager.getRealmByName("JUGGLER1").addOAuthClient("client2");
+  realmManager.getRealmByName("JUGGLER1").addClient("client2");
   commit();
   try {
-    realmManager.getRealmByName("JUGGLER1").getOAuthClient("client2").setClientId("client1");
+    realmManager.getRealmByName("JUGGLER1").addClient("client2").setClientId("client1");
     commit();
     Assert.fail("Expected exception");
   }

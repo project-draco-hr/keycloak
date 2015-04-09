@@ -7,31 +7,23 @@
   if (realm.getEventsListeners() != null) {
     rep.setEventsListeners(new LinkedList<String>(realm.getEventsListeners()));
   }
-  List<ApplicationModel> applications=realm.getApplications();
+  List<ClientModel> applications=realm.getClients();
   List<ApplicationRepresentation> appReps=new ArrayList<ApplicationRepresentation>();
-  for (  ApplicationModel app : applications) {
+  for (  ClientModel app : applications) {
     ApplicationRepresentation appRep=exportApplication(app);
     appReps.add(appRep);
   }
   rep.setApplications(appReps);
-  List<OAuthClientModel> oauthClients=realm.getOAuthClients();
-  List<OAuthClientRepresentation> oauthClientReps=new ArrayList<OAuthClientRepresentation>();
-  for (  OAuthClientModel oauthClient : oauthClients) {
-    OAuthClientRepresentation clientRep=ModelToRepresentation.toRepresentation(oauthClient);
-    clientRep.setSecret(oauthClient.getSecret());
-    oauthClientReps.add(clientRep);
-  }
-  rep.setOauthClients(oauthClientReps);
   List<RoleRepresentation> realmRoleReps=null;
   Map<String,List<RoleRepresentation>> appRolesReps=new HashMap<String,List<RoleRepresentation>>();
   Set<RoleModel> realmRoles=realm.getRoles();
   if (realmRoles != null && realmRoles.size() > 0) {
     realmRoleReps=exportRoles(realmRoles);
   }
-  for (  ApplicationModel app : applications) {
+  for (  ClientModel app : applications) {
     Set<RoleModel> currentAppRoles=app.getRoles();
     List<RoleRepresentation> currentAppRoleReps=exportRoles(currentAppRoles);
-    appRolesReps.put(app.getName(),currentAppRoleReps);
+    appRolesReps.put(app.getClientId(),currentAppRoleReps);
   }
   RolesRepresentation rolesRep=new RolesRepresentation();
   if (realmRoleReps != null) {
@@ -41,9 +33,8 @@
     rolesRep.setApplication(appRolesReps);
   }
   rep.setRoles(rolesRep);
-  List<ClientModel> allClients=new ArrayList<ClientModel>(applications);
-  allClients.addAll(realm.getOAuthClients());
-  Map<String,List<ScopeMappingRepresentation>> appScopeReps=new HashMap<String,List<ScopeMappingRepresentation>>();
+  List<ClientModel> allClients=new ArrayList<>(applications);
+  Map<String,List<ScopeMappingRepresentation>> appScopeReps=new HashMap<>();
   for (  ClientModel client : allClients) {
     Set<RoleModel> clientScopes=client.getScopeMappings();
     ScopeMappingRepresentation scopeMappingRep=null;
@@ -55,11 +46,11 @@
         scopeMappingRep.role(scope.getName());
       }
  else {
-        ApplicationModel app=(ApplicationModel)scope.getContainer();
-        String appName=app.getName();
+        ClientModel app=(ClientModel)scope.getContainer();
+        String appName=app.getClientId();
         List<ScopeMappingRepresentation> currentAppScopes=appScopeReps.get(appName);
         if (currentAppScopes == null) {
-          currentAppScopes=new ArrayList<ScopeMappingRepresentation>();
+          currentAppScopes=new ArrayList<>();
           appScopeReps.put(appName,currentAppScopes);
         }
         ScopeMappingRepresentation currentClientScope=null;

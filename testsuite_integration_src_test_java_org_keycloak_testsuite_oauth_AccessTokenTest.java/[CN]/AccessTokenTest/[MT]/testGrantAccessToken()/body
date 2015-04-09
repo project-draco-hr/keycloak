@@ -63,7 +63,7 @@
 {
       KeycloakSession session=keycloakRule.startSession();
       RealmModel realm=session.realms().getRealmByName("test");
-      ApplicationModel clientModel=realm.getApplicationByName("test-app");
+      ClientModel clientModel=realm.getClientByClientId("test-app");
       clientModel.setBearerOnly(true);
       session.getTransaction().commit();
       session.close();
@@ -74,7 +74,7 @@
 {
       KeycloakSession session=keycloakRule.startSession();
       RealmModel realm=session.realms().getRealmByName("test");
-      ApplicationModel clientModel=realm.getApplicationByName("test-app");
+      ClientModel clientModel=realm.getClientByClientId("test-app");
       clientModel.setBearerOnly(false);
       session.getTransaction().commit();
       session.close();
@@ -103,7 +103,7 @@
 {
       KeycloakSession session=keycloakRule.startSession();
       RealmModel realm=session.realms().getRealmByName("test");
-      ClientModel clientModel=realm.findClient("test-app");
+      ClientModel clientModel=realm.getClientByClientId("test-app");
       clientModel.setEnabled(false);
       session.getTransaction().commit();
       session.close();
@@ -114,7 +114,7 @@
 {
       KeycloakSession session=keycloakRule.startSession();
       RealmModel realm=session.realms().getRealmByName("test");
-      ClientModel clientModel=realm.findClient("test-app");
+      ClientModel clientModel=realm.getClientByClientId("test-app");
       clientModel.setEnabled(true);
       session.getTransaction().commit();
       session.close();

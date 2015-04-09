@@ -1,0 +1,43 @@
+{
+  ApplicationRepresentation rep=new ApplicationRepresentation();
+  rep.setId(clientModel.getId());
+  rep.setName(clientModel.getClientId());
+  rep.setEnabled(clientModel.isEnabled());
+  rep.setAdminUrl(clientModel.getManagementUrl());
+  rep.setPublicClient(clientModel.isPublicClient());
+  rep.setFrontchannelLogout(clientModel.isFrontchannelLogout());
+  rep.setProtocol(clientModel.getProtocol());
+  rep.setAttributes(clientModel.getAttributes());
+  rep.setFullScopeAllowed(clientModel.isFullScopeAllowed());
+  rep.setBearerOnly(clientModel.isBearerOnly());
+  rep.setConsentRequired(clientModel.isConsentRequired());
+  rep.setSurrogateAuthRequired(clientModel.isSurrogateAuthRequired());
+  rep.setBaseUrl(clientModel.getBaseUrl());
+  rep.setNotBefore(clientModel.getNotBefore());
+  rep.setNodeReRegistrationTimeout(clientModel.getNodeReRegistrationTimeout());
+  Set<String> redirectUris=clientModel.getRedirectUris();
+  if (redirectUris != null) {
+    rep.setRedirectUris(new LinkedList<String>(redirectUris));
+  }
+  Set<String> webOrigins=clientModel.getWebOrigins();
+  if (webOrigins != null) {
+    rep.setWebOrigins(new LinkedList<String>(webOrigins));
+  }
+  if (!clientModel.getDefaultRoles().isEmpty()) {
+    rep.setDefaultRoles(clientModel.getDefaultRoles().toArray(new String[0]));
+  }
+  if (!clientModel.getRegisteredNodes().isEmpty()) {
+    rep.setRegisteredNodes(new HashMap<String,Integer>(clientModel.getRegisteredNodes()));
+  }
+  if (!clientModel.getIdentityProviders().isEmpty()) {
+    rep.setIdentityProviders(toRepresentation(clientModel.getIdentityProviders()));
+  }
+  if (!clientModel.getProtocolMappers().isEmpty()) {
+    List<ProtocolMapperRepresentation> mappings=new LinkedList<ProtocolMapperRepresentation>();
+    for (    ProtocolMapperModel model : clientModel.getProtocolMappers()) {
+      mappings.add(toRepresentation(model));
+    }
+    rep.setProtocolMappers(mappings);
+  }
+  return rep;
+}

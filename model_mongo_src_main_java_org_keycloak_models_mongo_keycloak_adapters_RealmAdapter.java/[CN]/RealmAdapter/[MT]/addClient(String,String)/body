@@ -1,0 +1,16 @@
+{
+  MongoApplicationEntity appData=new MongoApplicationEntity();
+  appData.setId(id);
+  appData.setName(clientId);
+  appData.setRealmId(getId());
+  appData.setEnabled(true);
+  getMongoStore().insertEntity(appData,invocationContext);
+  final ClientModel model=new ClientAdapter(session,this,appData,invocationContext);
+  session.getKeycloakSessionFactory().publish(new ClientCreationEvent(){
+    @Override public ClientModel getCreatedClient(){
+      return model;
+    }
+  }
+);
+  return model;
+}

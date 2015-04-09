@@ -1,0 +1,20 @@
+{
+  IdentityProvider o1=new IdentityProvider("alias1","id1","ur1",null);
+  IdentityProvider o2=new IdentityProvider("alias2","id2","ur2",null);
+  Assert.assertEquals(1,IdentityProviderComparator.INSTANCE.compare(o1,o2));
+  Assert.assertEquals(1,IdentityProviderComparator.INSTANCE.compare(o2,o1));
+  o1=new IdentityProvider("alias1","id1","ur1","not a number");
+  Assert.assertEquals(1,IdentityProviderComparator.INSTANCE.compare(o1,o2));
+  Assert.assertEquals(1,IdentityProviderComparator.INSTANCE.compare(o2,o1));
+  o1=new IdentityProvider("alias1","id1","ur1","0");
+  Assert.assertEquals(-1,IdentityProviderComparator.INSTANCE.compare(o1,o2));
+  Assert.assertEquals(1,IdentityProviderComparator.INSTANCE.compare(o2,o1));
+  o1=new IdentityProvider("alias1","id1","ur1","0");
+  o2=new IdentityProvider("alias2","id2","ur2","0");
+  Assert.assertEquals(1,IdentityProviderComparator.INSTANCE.compare(o1,o2));
+  Assert.assertEquals(1,IdentityProviderComparator.INSTANCE.compare(o2,o1));
+  o1=new IdentityProvider("alias1","id1","ur1","0");
+  o2=new IdentityProvider("alias2","id2","ur2","1");
+  Assert.assertEquals(-1,IdentityProviderComparator.INSTANCE.compare(o1,o2));
+  Assert.assertEquals(1,IdentityProviderComparator.INSTANCE.compare(o2,o1));
+}

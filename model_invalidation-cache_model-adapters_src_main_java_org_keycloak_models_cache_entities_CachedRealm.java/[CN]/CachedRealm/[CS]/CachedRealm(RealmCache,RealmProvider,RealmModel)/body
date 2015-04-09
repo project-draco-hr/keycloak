@@ -55,15 +55,10 @@
     CachedRole cachedRole=new CachedRealmRole(role,model);
     cache.addCachedRole(cachedRole);
   }
-  for (  ApplicationModel app : model.getApplications()) {
-    applications.put(app.getName(),app.getId());
+  for (  ClientModel app : model.getClients()) {
+    applications.put(app.getClientId(),app.getId());
     CachedApplication cachedApp=new CachedApplication(cache,delegate,model,app);
     cache.addCachedApplication(cachedApp);
-  }
-  for (  OAuthClientModel client : model.getOAuthClients()) {
-    clients.put(client.getClientId(),client.getId());
-    CachedOAuthClient cachedApp=new CachedOAuthClient(cache,delegate,model,client);
-    cache.addCachedOAuthClient(cachedApp);
   }
   internationalizationEnabled=model.isInternationalizationEnabled();
   supportedLocales.addAll(model.getSupportedLocales());

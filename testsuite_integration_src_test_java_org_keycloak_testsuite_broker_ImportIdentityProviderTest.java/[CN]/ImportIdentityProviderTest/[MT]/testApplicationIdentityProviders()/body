@@ -1,6 +1,6 @@
 {
   RealmModel realm=installTestRealm();
-  ClientModel client=realm.findClient("test-app-with-allowed-providers");
+  ClientModel client=realm.getClientByClientId("test-app-with-allowed-providers");
   List<ClientIdentityProviderMappingModel> identityProviders=client.getIdentityProviders();
   assertEquals(1,identityProviders.size());
   ClientIdentityProviderMappingModel identityProviderMappingModel=identityProviders.get(0);
@@ -8,7 +8,7 @@
   assertEquals(false,identityProviderMappingModel.isRetrieveToken());
   identityProviders.remove(identityProviderMappingModel);
   client.updateIdentityProviders(identityProviders);
-  client=realm.findClientById(client.getId());
+  client=realm.getClientById(client.getId());
   identityProviders=client.getIdentityProviders();
   assertEquals(0,identityProviders.size());
   this.realmManager.removeRealm(realm);

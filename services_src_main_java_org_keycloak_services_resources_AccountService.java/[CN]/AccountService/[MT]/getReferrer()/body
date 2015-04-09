@@ -4,7 +4,7 @@
     return null;
   }
   String referrerUri=uriInfo.getQueryParameters().getFirst("referrer_uri");
-  ApplicationModel application=realm.getApplicationByName(referrer);
+  ClientModel application=realm.getClientByClientId(referrer);
   if (application != null) {
     if (referrerUri != null) {
       referrerUri=RedirectUtils.verifyRedirectUri(uriInfo,referrerUri,realm,application);
@@ -17,7 +17,7 @@
     }
   }
  else   if (referrerUri != null) {
-    ClientModel client=realm.getOAuthClient(referrer);
+    ClientModel client=realm.getClientByClientId(referrer);
     if (client != null) {
       referrerUri=RedirectUtils.verifyRedirectUri(uriInfo,referrerUri,realm,application);
       if (referrerUri != null) {

@@ -9,21 +9,21 @@
     }
     all.setRealmMappings(realmRep);
   }
-  List<ApplicationModel> applications=realm.getApplications();
+  List<ClientModel> applications=realm.getClients();
   if (applications.size() > 0) {
     Map<String,ApplicationMappingsRepresentation> appMappings=new HashMap<String,ApplicationMappingsRepresentation>();
-    for (    ApplicationModel app : applications) {
+    for (    ClientModel app : applications) {
       Set<RoleModel> roleMappings=app.getApplicationScopeMappings(client);
       if (roleMappings.size() > 0) {
         ApplicationMappingsRepresentation mappings=new ApplicationMappingsRepresentation();
         mappings.setApplicationId(app.getId());
-        mappings.setApplication(app.getName());
+        mappings.setApplication(app.getClientId());
         List<RoleRepresentation> roles=new ArrayList<RoleRepresentation>();
         mappings.setMappings(roles);
         for (        RoleModel role : roleMappings) {
           roles.add(ModelToRepresentation.toRepresentation(role));
         }
-        appMappings.put(app.getName(),mappings);
+        appMappings.put(app.getClientId(),mappings);
         all.setApplicationMappings(appMappings);
       }
     }

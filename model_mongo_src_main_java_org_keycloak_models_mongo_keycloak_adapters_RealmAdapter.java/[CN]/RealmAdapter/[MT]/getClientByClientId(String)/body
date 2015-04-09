@@ -1,0 +1,5 @@
+{
+  DBObject query=new QueryBuilder().and("realmId").is(getId()).and("name").is(clientId).get();
+  MongoApplicationEntity appEntity=getMongoStore().loadSingleEntity(MongoApplicationEntity.class,query,invocationContext);
+  return appEntity == null ? null : new ClientAdapter(session,this,appEntity,invocationContext);
+}

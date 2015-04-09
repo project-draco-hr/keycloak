@@ -18,17 +18,9 @@
   grantPage.assertCurrent();
   grantPage.accept();
   assertTrue(oauth.getCurrentQuery().containsKey(OAuth2Constants.CODE));
-  ClientModel clientModel=getRealm().findClient("third-party");
+  ClientModel clientModel=getRealm().getClientByClientId("third-party");
   assertEquals(0,clientModel.getIdentityProviders().size());
   configureRetrieveToken(clientModel,getProviderId(),true);
   AccessTokenResponse accessToken=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get(OAuth2Constants.CODE),"password");
-  URI tokenEndpointUrl=Urls.identityProviderRetrieveToken(BASE_URI,getProviderId(),getRealm().getName());
-  String authHeader="Bearer " + accessToken.getAccessToken();
-  HtmlUnitDriver htmlUnitDriver=(WebRule.HtmlUnitDriver)this.driver;
-  htmlUnitDriver.getWebClient().addRequestHeader(HttpHeaders.AUTHORIZATION,authHeader);
-  htmlUnitDriver.navigate().to(tokenEndpointUrl.toString());
-  grantPage.assertCurrent();
-  grantPage.accept();
-  assertNotNull(driver.getPageSource());
-  doAssertTokenRetrieval(driver.getPageSource());
+  doTokenRequest(accessToken.getAccessToken());
 }

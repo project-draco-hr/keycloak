@@ -3,7 +3,7 @@
     for (int i=0; i < 25; i++) {
       Time.setOffset(i);
       UserSessionModel userSession=session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0." + i,"form",false,null,null);
-      ClientSessionModel clientSession=session.sessions().createClientSession(realm,realm.findClient("test-app"));
+      ClientSessionModel clientSession=session.sessions().createClientSession(realm,realm.getClientByClientId("test-app"));
       clientSession.setUserSession(userSession);
       clientSession.setRedirectUri("http://redirect");
       clientSession.setRoles(new HashSet<String>());
@@ -15,9 +15,9 @@
     Time.setOffset(0);
   }
   resetSession();
-  assertPaginatedSession(realm,realm.findClient("test-app"),0,1,1);
-  assertPaginatedSession(realm,realm.findClient("test-app"),0,10,10);
-  assertPaginatedSession(realm,realm.findClient("test-app"),10,10,10);
-  assertPaginatedSession(realm,realm.findClient("test-app"),20,10,5);
-  assertPaginatedSession(realm,realm.findClient("test-app"),30,10,0);
+  assertPaginatedSession(realm,realm.getClientByClientId("test-app"),0,1,1);
+  assertPaginatedSession(realm,realm.getClientByClientId("test-app"),0,10,10);
+  assertPaginatedSession(realm,realm.getClientByClientId("test-app"),10,10,10);
+  assertPaginatedSession(realm,realm.getClientByClientId("test-app"),20,10,5);
+  assertPaginatedSession(realm,realm.getClientByClientId("test-app"),30,10,0);
 }

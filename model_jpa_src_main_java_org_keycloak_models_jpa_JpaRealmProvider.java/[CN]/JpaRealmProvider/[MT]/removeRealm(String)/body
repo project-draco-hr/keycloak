@@ -5,11 +5,8 @@
   }
   RealmAdapter adapter=new RealmAdapter(session,em,realm);
   session.users().preRemove(adapter);
-  for (  ApplicationEntity a : new LinkedList<ApplicationEntity>(realm.getApplications())) {
-    adapter.removeApplication(a.getId());
-  }
-  for (  OAuthClientModel oauth : adapter.getOAuthClients()) {
-    adapter.removeOAuthClient(oauth.getId());
+  for (  ClientEntity a : new LinkedList<>(realm.getApplications())) {
+    adapter.removeClient(a.getId());
   }
   em.remove(realm);
   return true;

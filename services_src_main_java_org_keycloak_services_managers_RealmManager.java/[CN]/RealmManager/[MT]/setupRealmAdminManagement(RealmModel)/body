@@ -2,11 +2,11 @@
   if (realm.getName().equals(Config.getAdminRealm())) {
     return;
   }
-  ApplicationManager applicationManager=new ApplicationManager(new RealmManager(session));
+  ClientManager clientManager=new ClientManager(new RealmManager(session));
   String realmAdminApplicationName=getRealmAdminApplicationName(realm);
   ClientModel realmAdminApp=realm.getClientByClientId(realmAdminApplicationName);
   if (realmAdminApp == null) {
-    realmAdminApp=applicationManager.createApplication(realm,realmAdminApplicationName);
+    realmAdminApp=clientManager.createClient(realm,realmAdminApplicationName);
   }
   RoleModel adminRole=realmAdminApp.addRole(AdminRoles.REALM_ADMIN);
   adminRole.setDescription("${role_" + AdminRoles.REALM_ADMIN + "}");

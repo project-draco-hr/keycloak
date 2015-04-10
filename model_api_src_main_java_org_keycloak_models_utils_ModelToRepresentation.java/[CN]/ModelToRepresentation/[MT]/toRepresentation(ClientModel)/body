@@ -1,7 +1,7 @@
 {
-  ApplicationRepresentation rep=new ApplicationRepresentation();
+  ClientRepresentation rep=new ClientRepresentation();
   rep.setId(clientModel.getId());
-  rep.setName(clientModel.getClientId());
+  rep.setClientId(clientModel.getClientId());
   rep.setEnabled(clientModel.isEnabled());
   rep.setAdminUrl(clientModel.getManagementUrl());
   rep.setPublicClient(clientModel.isPublicClient());
@@ -17,23 +17,23 @@
   rep.setNodeReRegistrationTimeout(clientModel.getNodeReRegistrationTimeout());
   Set<String> redirectUris=clientModel.getRedirectUris();
   if (redirectUris != null) {
-    rep.setRedirectUris(new LinkedList<String>(redirectUris));
+    rep.setRedirectUris(new LinkedList<>(redirectUris));
   }
   Set<String> webOrigins=clientModel.getWebOrigins();
   if (webOrigins != null) {
-    rep.setWebOrigins(new LinkedList<String>(webOrigins));
+    rep.setWebOrigins(new LinkedList<>(webOrigins));
   }
   if (!clientModel.getDefaultRoles().isEmpty()) {
     rep.setDefaultRoles(clientModel.getDefaultRoles().toArray(new String[0]));
   }
   if (!clientModel.getRegisteredNodes().isEmpty()) {
-    rep.setRegisteredNodes(new HashMap<String,Integer>(clientModel.getRegisteredNodes()));
+    rep.setRegisteredNodes(new HashMap<>(clientModel.getRegisteredNodes()));
   }
   if (!clientModel.getIdentityProviders().isEmpty()) {
     rep.setIdentityProviders(toRepresentation(clientModel.getIdentityProviders()));
   }
   if (!clientModel.getProtocolMappers().isEmpty()) {
-    List<ProtocolMapperRepresentation> mappings=new LinkedList<ProtocolMapperRepresentation>();
+    List<ProtocolMapperRepresentation> mappings=new LinkedList<>();
     for (    ProtocolMapperModel model : clientModel.getProtocolMappers()) {
       mappings.add(toRepresentation(model));
     }

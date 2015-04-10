@@ -27,19 +27,19 @@
   updateResponse.close();
   storedRealm=realmTarget.request().get(RealmRepresentation.class);
   checkRealmRep(rep,storedRealm);
-  if (rep.getApplications() != null) {
+  if (rep.getClients() != null) {
     WebTarget applicationsTarget=realmTarget.path("applications");
-    for (    ApplicationRepresentation appRep : rep.getApplications()) {
-      ApplicationRepresentation newApp=new ApplicationRepresentation();
+    for (    ClientRepresentation appRep : rep.getClients()) {
+      ClientRepresentation newApp=new ClientRepresentation();
       if (appRep.getId() != null)       newApp.setId(appRep.getId());
-      newApp.setName(appRep.getName());
+      newApp.setClientId(appRep.getClientId());
       if (appRep.getSecret() != null) {
         newApp.setSecret(appRep.getSecret());
       }
       Response appCreateResponse=applicationsTarget.request().post(Entity.json(newApp));
       Assert.assertEquals(201,appCreateResponse.getStatus());
       appCreateResponse.close();
-      WebTarget appTarget=applicationsTarget.path(appRep.getName());
+      WebTarget appTarget=applicationsTarget.path(appRep.getClientId());
       CredentialRepresentation cred=appTarget.path("client-secret").request().get(CredentialRepresentation.class);
       if (appRep.getSecret() != null)       Assert.assertEquals(appRep.getSecret(),cred.getValue());
       CredentialRepresentation newCred=appTarget.path("client-secret").request().post(null,CredentialRepresentation.class);
@@ -47,7 +47,7 @@
       Response appUpdateResponse=appTarget.request().put(Entity.json(appRep));
       Assert.assertEquals(204,appUpdateResponse.getStatus());
       appUpdateResponse.close();
-      ApplicationRepresentation storedApp=appTarget.request().get(ApplicationRepresentation.class);
+      ClientRepresentation storedApp=appTarget.request().get(ClientRepresentation.class);
       checkAppUpdate(appRep,storedApp);
     }
   }

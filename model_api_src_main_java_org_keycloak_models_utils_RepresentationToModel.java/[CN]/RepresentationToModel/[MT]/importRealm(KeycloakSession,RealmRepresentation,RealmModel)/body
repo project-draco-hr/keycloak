@@ -1,5 +1,6 @@
 {
   convertDeprecatedSocialProviders(rep);
+  convertDeprecatedApplications(session,rep);
   newRealm.setName(rep.getRealm());
   if (rep.isEnabled() != null)   newRealm.setEnabled(rep.isEnabled());
   if (rep.isBruteForceProtected() != null)   newRealm.setBruteForceProtected(rep.isBruteForceProtected());
@@ -65,8 +66,8 @@
   }
   if (rep.getPasswordPolicy() != null)   newRealm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
   importIdentityProviders(rep,newRealm);
-  if (rep.getApplications() != null) {
-    Map<String,ClientModel> appMap=createApplications(session,rep,newRealm);
+  if (rep.getClients() != null) {
+    createClients(session,rep,newRealm);
   }
   if (rep.getRoles() != null) {
     if (rep.getRoles().getRealm() != null) {
@@ -110,25 +111,22 @@
       newRealm.addDefaultRole(roleString.trim());
     }
   }
-  if (rep.getApplications() != null) {
-    for (    ApplicationRepresentation resourceRep : rep.getApplications()) {
+  if (rep.getClients() != null) {
+    for (    ClientRepresentation resourceRep : rep.getClients()) {
       if (resourceRep.getDefaultRoles() != null) {
-        ClientModel appModel=newRealm.getClientByClientId(resourceRep.getName());
-        appModel.updateDefaultRoles(resourceRep.getDefaultRoles());
+        ClientModel clientModel=newRealm.getClientByClientId(resourceRep.getClientId());
+        clientModel.updateDefaultRoles(resourceRep.getDefaultRoles());
       }
     }
-  }
-  if (rep.getOauthClients() != null) {
-    createOAuthClients(session,rep,newRealm);
   }
   Map<String,ClientModel> appMap=newRealm.getClientNameMap();
   if (rep.getApplicationScopeMappings() != null) {
     for (    Map.Entry<String,List<ScopeMappingRepresentation>> entry : rep.getApplicationScopeMappings().entrySet()) {
       ClientModel app=appMap.get(entry.getKey());
       if (app == null) {
-        throw new RuntimeException("Unable to find application role mappings for app: " + entry.getKey());
+        throw new RuntimeException("Unable to find client role mappings for client: " + entry.getKey());
       }
-      createApplicationScopeMappings(newRealm,app,entry.getValue());
+      createClientScopeMappings(newRealm,app,entry.getValue());
     }
   }
   if (rep.getScopeMappings() != null) {

@@ -1,0 +1,15 @@
+{
+  for (  ScopeMappingRepresentation mapping : mappings) {
+    ClientModel client=realm.getClientByClientId(mapping.getClient());
+    if (client == null) {
+      throw new RuntimeException("Unknown client specified in application scope mappings");
+    }
+    for (    String roleString : mapping.getRoles()) {
+      RoleModel role=clientModel.getRole(roleString.trim());
+      if (role == null) {
+        role=clientModel.addRole(roleString.trim());
+      }
+      client.addScopeMapping(role);
+    }
+  }
+}

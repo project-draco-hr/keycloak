@@ -1,0 +1,9 @@
+{
+  ClientModel clientModel=getClientByPathParam(name);
+  if (clientModel == null) {
+    throw new NotFoundException("Could not find client: " + name);
+  }
+  ClientResource clientResource=new ClientResource(realm,auth,clientModel,session);
+  ResteasyProviderFactory.getInstance().injectProperties(clientResource);
+  return clientResource;
+}

@@ -1,0 +1,30 @@
+{
+  if (realm.getApplications() != null || realm.getOauthClients() != null) {
+    if (realm.getClients() == null) {
+      realm.setClients(new LinkedList<ClientRepresentation>());
+    }
+    List<ApplicationRepresentation> clients=new LinkedList<>();
+    if (realm.getApplications() != null) {
+      clients.addAll(realm.getApplications());
+    }
+    if (realm.getOauthClients() != null) {
+      clients.addAll(realm.getOauthClients());
+    }
+    for (    ApplicationRepresentation app : clients) {
+      app.setClientId(app.getName());
+      app.setName(null);
+      if (app instanceof OAuthClientRepresentation) {
+        app.setConsentRequired(true);
+        app.setFullScopeAllowed(false);
+      }
+      if (app.getProtocolMappers() == null && app.getClaims() != null) {
+        long mask=getClaimsMask(app.getClaims());
+        List<ProtocolMapperRepresentation> convertedProtocolMappers=session.getProvider(MigrationProvider.class).getMappersForClaimMask(mask);
+        app.setProtocolMappers(convertedProtocolMappers);
+        app.setClaims(null);
+      }
+      realm.getClients().add(app);
+    }
+    realm.setApplications(null);
+  }
+}

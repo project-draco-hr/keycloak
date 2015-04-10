@@ -1,0 +1,10 @@
+{
+  auth.requireManage();
+  try {
+    RepresentationToModel.updateClient(rep,client);
+    return Response.noContent().build();
+  }
+ catch (  ModelDuplicateException e) {
+    return Flows.errors().exists("Client " + rep.getClientId() + " already exists");
+  }
+}

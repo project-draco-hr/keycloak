@@ -7,20 +7,20 @@
   if (realm.getEventsListeners() != null) {
     rep.setEventsListeners(new LinkedList<String>(realm.getEventsListeners()));
   }
-  List<ClientModel> applications=realm.getClients();
-  List<ApplicationRepresentation> appReps=new ArrayList<ApplicationRepresentation>();
-  for (  ClientModel app : applications) {
-    ApplicationRepresentation appRep=exportApplication(app);
-    appReps.add(appRep);
+  List<ClientModel> clients=realm.getClients();
+  List<ClientRepresentation> clientReps=new ArrayList<>();
+  for (  ClientModel app : clients) {
+    ClientRepresentation clientRep=exportClient(app);
+    clientReps.add(clientRep);
   }
-  rep.setApplications(appReps);
+  rep.setClients(clientReps);
   List<RoleRepresentation> realmRoleReps=null;
   Map<String,List<RoleRepresentation>> appRolesReps=new HashMap<String,List<RoleRepresentation>>();
   Set<RoleModel> realmRoles=realm.getRoles();
   if (realmRoles != null && realmRoles.size() > 0) {
     realmRoleReps=exportRoles(realmRoles);
   }
-  for (  ClientModel app : applications) {
+  for (  ClientModel app : clients) {
     Set<RoleModel> currentAppRoles=app.getRoles();
     List<RoleRepresentation> currentAppRoleReps=exportRoles(currentAppRoles);
     appRolesReps.put(app.getClientId(),currentAppRoleReps);
@@ -33,7 +33,7 @@
     rolesRep.setApplication(appRolesReps);
   }
   rep.setRoles(rolesRep);
-  List<ClientModel> allClients=new ArrayList<>(applications);
+  List<ClientModel> allClients=new ArrayList<>(clients);
   Map<String,List<ScopeMappingRepresentation>> appScopeReps=new HashMap<>();
   for (  ClientModel client : allClients) {
     Set<RoleModel> clientScopes=client.getScopeMappings();

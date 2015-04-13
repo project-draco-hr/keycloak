@@ -1,7 +1,7 @@
 {
-  List<String> mgmtUrls=getAllManagementUrls(requestUri,application);
+  List<String> mgmtUrls=getAllManagementUrls(requestUri,client);
   if (mgmtUrls.isEmpty()) {
-    logger.debug("No management URL or no registered cluster nodes for the application " + application.getClientId());
+    logger.debug("No management URL or no registered cluster nodes for the application " + client.getClientId());
     return new GlobalRequestResult();
   }
   ApacheHttpClient4Executor executor=createExecutor();
@@ -9,7 +9,7 @@
     if (logger.isDebugEnabled())     logger.debug("Sending test nodes availability: " + mgmtUrls);
     GlobalRequestResult result=new GlobalRequestResult();
     for (    String mgmtUrl : mgmtUrls) {
-      if (sendTestNodeAvailabilityRequest(realm,application,executor,mgmtUrl)) {
+      if (sendTestNodeAvailabilityRequest(realm,client,executor,mgmtUrl)) {
         result.addSuccessRequest(mgmtUrl);
       }
  else {

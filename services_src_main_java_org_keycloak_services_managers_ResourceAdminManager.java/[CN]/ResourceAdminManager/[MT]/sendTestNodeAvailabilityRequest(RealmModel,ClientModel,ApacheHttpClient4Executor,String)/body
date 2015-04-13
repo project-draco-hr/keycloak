@@ -1,8 +1,8 @@
 {
-  TestAvailabilityAction adminAction=new TestAvailabilityAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,application.getClientId());
+  TestAvailabilityAction adminAction=new TestAvailabilityAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,client.getClientId());
   String token=new TokenManager().encodeToken(realm,adminAction);
-  logger.debugv("testNodes availability resource: {0} url: {1}",application.getClientId(),managementUrl);
-  ClientRequest request=client.createRequest(UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_TEST_AVAILABLE).build().toString());
+  logger.debugv("testNodes availability resource: {0} url: {1}",client.getClientId(),managementUrl);
+  ClientRequest request=httpClient.createRequest(UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_TEST_AVAILABLE).build().toString());
   ClientResponse response;
   try {
     response=request.body(MediaType.TEXT_PLAIN_TYPE,token).post();

@@ -1,16 +1,16 @@
 {
-  ClientModel application=realm.getClientNameMap().get(Constants.ACCOUNT_MANAGEMENT_APP);
-  if (application == null) {
-    application=new ClientManager(this).createClient(realm,Constants.ACCOUNT_MANAGEMENT_APP);
-    application.setEnabled(true);
-    application.setFullScopeAllowed(false);
+  ClientModel client=realm.getClientNameMap().get(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID);
+  if (client == null) {
+    client=new ClientManager(this).createClient(realm,Constants.ACCOUNT_MANAGEMENT_CLIENT_ID);
+    client.setEnabled(true);
+    client.setFullScopeAllowed(false);
     String base=contextPath + "/realms/" + realm.getName()+ "/account";
     String redirectUri=base + "/*";
-    application.addRedirectUri(redirectUri);
-    application.setBaseUrl(base);
+    client.addRedirectUri(redirectUri);
+    client.setBaseUrl(base);
     for (    String role : AccountRoles.ALL) {
-      application.addDefaultRole(role);
-      application.getRole(role).setDescription("${role_" + role + "}");
+      client.addDefaultRole(role);
+      client.getRole(role).setDescription("${role_" + role + "}");
     }
   }
 }

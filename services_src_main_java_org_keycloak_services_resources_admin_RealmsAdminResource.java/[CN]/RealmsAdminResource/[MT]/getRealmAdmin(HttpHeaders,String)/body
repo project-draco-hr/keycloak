@@ -7,10 +7,10 @@
   }
   RealmAuth realmAuth;
   if (auth.getRealm().equals(realmManager.getKeycloakAdminstrationRealm())) {
-    realmAuth=new RealmAuth(auth,realm.getMasterAdminApp());
+    realmAuth=new RealmAuth(auth,realm.getMasterAdminClient());
   }
  else {
-    realmAuth=new RealmAuth(auth,realm.getClientByClientId(realmManager.getRealmAdminApplicationName(auth.getRealm())));
+    realmAuth=new RealmAuth(auth,realm.getClientByClientId(realmManager.getRealmAdminClientId(auth.getRealm())));
   }
   RealmAdminResource adminResource=new RealmAdminResource(realmAuth,realm,tokenManager);
   ResteasyProviderFactory.getInstance().injectProperties(adminResource);

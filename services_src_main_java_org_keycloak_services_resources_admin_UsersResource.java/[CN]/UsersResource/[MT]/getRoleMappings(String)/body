@@ -14,21 +14,21 @@
     }
     all.setRealmMappings(realmRep);
   }
-  List<ClientModel> applications=realm.getClients();
-  if (applications.size() > 0) {
+  List<ClientModel> clients=realm.getClients();
+  if (clients.size() > 0) {
     Map<String,ClientMappingsRepresentation> appMappings=new HashMap<String,ClientMappingsRepresentation>();
-    for (    ClientModel application : applications) {
-      Set<RoleModel> roleMappings=user.getApplicationRoleMappings(application);
+    for (    ClientModel client : clients) {
+      Set<RoleModel> roleMappings=user.getClientRoleMappings(client);
       if (roleMappings.size() > 0) {
         ClientMappingsRepresentation mappings=new ClientMappingsRepresentation();
-        mappings.setId(application.getId());
-        mappings.setClient(application.getClientId());
+        mappings.setId(client.getId());
+        mappings.setClient(client.getClientId());
         List<RoleRepresentation> roles=new ArrayList<RoleRepresentation>();
         mappings.setMappings(roles);
         for (        RoleModel role : roleMappings) {
           roles.add(ModelToRepresentation.toRepresentation(role));
         }
-        appMappings.put(application.getClientId(),mappings);
+        appMappings.put(client.getClientId(),mappings);
         all.setClientMappings(appMappings);
       }
     }

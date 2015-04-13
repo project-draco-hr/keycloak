@@ -1,0 +1,18 @@
+{
+  List<String> mgmtUrls=getAllManagementUrls(requestUri,resource);
+  if (mgmtUrls.isEmpty()) {
+    logger.debug("No management URL or no registered cluster nodes for the client " + resource.getClientId());
+    return new GlobalRequestResult();
+  }
+  if (logger.isDebugEnabled())   logger.debug("Send logoutClient for URLs: " + mgmtUrls);
+  GlobalRequestResult result=new GlobalRequestResult();
+  for (  String mgmtUrl : mgmtUrls) {
+    if (sendLogoutRequest(realm,resource,null,null,executor,notBefore,mgmtUrl)) {
+      result.addSuccessRequest(mgmtUrl);
+    }
+ else {
+      result.addFailedRequest(mgmtUrl);
+    }
+  }
+  return result;
+}

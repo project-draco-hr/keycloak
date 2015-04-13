@@ -6,9 +6,9 @@
     if (clientSessions != null && clientSessions.size() > 0) {
       adapterSessionIds=new MultivaluedHashMap<String,String>();
       for (      ClientSessionModel clientSession : clientSessions) {
-        String adapterSessionId=clientSession.getNote(AdapterConstants.APPLICATION_SESSION_STATE);
+        String adapterSessionId=clientSession.getNote(AdapterConstants.CLIENT_SESSION_STATE);
         if (adapterSessionId != null) {
-          String host=clientSession.getNote(AdapterConstants.APPLICATION_SESSION_HOST);
+          String host=clientSession.getNote(AdapterConstants.CLIENT_SESSION_HOST);
           adapterSessionIds.add(host,adapterSessionId);
         }
         if (clientSession.getUserSession() != null)         userSessions.add(clientSession.getUserSession().getId());
@@ -18,12 +18,12 @@
       logger.debugv("Can't logout {0}: no logged adapter sessions",resource.getClientId());
       return false;
     }
-    if (managementUrl.contains(APPLICATION_SESSION_HOST_PROPERTY)) {
+    if (managementUrl.contains(CLIENT_SESSION_HOST_PROPERTY)) {
       boolean allPassed=true;
       for (      Map.Entry<String,List<String>> entry : adapterSessionIds.entrySet()) {
         String host=entry.getKey();
         List<String> sessionIds=entry.getValue();
-        String currentHostMgmtUrl=managementUrl.replace(APPLICATION_SESSION_HOST_PROPERTY,host);
+        String currentHostMgmtUrl=managementUrl.replace(CLIENT_SESSION_HOST_PROPERTY,host);
         allPassed=sendLogoutRequest(realm,resource,sessionIds,userSessions,client,0,currentHostMgmtUrl) && allPassed;
       }
       return allPassed;

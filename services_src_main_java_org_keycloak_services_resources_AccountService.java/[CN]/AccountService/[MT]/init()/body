@@ -3,12 +3,12 @@
   account=session.getProvider(AccountProvider.class).setRealm(realm).setUriInfo(uriInfo).setHttpHeaders(headers);
   AuthenticationManager.AuthResult authResult=authManager.authenticateBearerToken(session,realm,uriInfo,clientConnection,headers);
   if (authResult != null) {
-    auth=new Auth(realm,authResult.getToken(),authResult.getUser(),application,authResult.getSession(),false);
+    auth=new Auth(realm,authResult.getToken(),authResult.getUser(),client,authResult.getSession(),false);
   }
  else {
     authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers);
     if (authResult != null) {
-      auth=new Auth(realm,authResult.getToken(),authResult.getUser(),application,authResult.getSession(),true);
+      auth=new Auth(realm,authResult.getToken(),authResult.getUser(),client,authResult.getSession(),true);
       Cookie cookie=headers.getCookies().get(KEYCLOAK_STATE_CHECKER);
       if (cookie != null) {
         stateChecker=cookie.getValue();
@@ -40,14 +40,14 @@
     if (userSession != null) {
       boolean associated=false;
       for (      ClientSessionModel c : userSession.getClientSessions()) {
-        if (c.getClient().equals(application)) {
+        if (c.getClient().equals(client)) {
           auth.setClientSession(c);
           associated=true;
           break;
         }
       }
       if (!associated) {
-        ClientSessionModel clientSession=session.sessions().createClientSession(realm,application);
+        ClientSessionModel clientSession=session.sessions().createClientSession(realm,client);
         clientSession.setUserSession(userSession);
         auth.setClientSession(clientSession);
       }

@@ -3,25 +3,25 @@
   Set<RoleModel> composites=role.getComposites();
   if (composites != null && composites.size() > 0) {
     Set<String> compositeRealmRoles=null;
-    Map<String,List<String>> compositeAppRoles=null;
+    Map<String,List<String>> compositeClientRoles=null;
     for (    RoleModel composite : composites) {
       RoleContainerModel crContainer=composite.getContainer();
       if (crContainer instanceof RealmModel) {
         if (compositeRealmRoles == null) {
-          compositeRealmRoles=new HashSet<String>();
+          compositeRealmRoles=new HashSet<>();
         }
         compositeRealmRoles.add(composite.getName());
       }
  else {
-        if (compositeAppRoles == null) {
-          compositeAppRoles=new HashMap<String,List<String>>();
+        if (compositeClientRoles == null) {
+          compositeClientRoles=new HashMap<>();
         }
         ClientModel app=(ClientModel)crContainer;
         String appName=app.getClientId();
-        List<String> currentAppComposites=compositeAppRoles.get(appName);
+        List<String> currentAppComposites=compositeClientRoles.get(appName);
         if (currentAppComposites == null) {
-          currentAppComposites=new ArrayList<String>();
-          compositeAppRoles.put(appName,currentAppComposites);
+          currentAppComposites=new ArrayList<>();
+          compositeClientRoles.put(appName,currentAppComposites);
         }
         currentAppComposites.add(composite.getName());
       }
@@ -30,8 +30,8 @@
     if (compositeRealmRoles != null) {
       compRep.setRealm(compositeRealmRoles);
     }
-    if (compositeAppRoles != null) {
-      compRep.setApplication(compositeAppRoles);
+    if (compositeClientRoles != null) {
+      compRep.setClient(compositeClientRoles);
     }
     roleRep.setComposites(compRep);
   }

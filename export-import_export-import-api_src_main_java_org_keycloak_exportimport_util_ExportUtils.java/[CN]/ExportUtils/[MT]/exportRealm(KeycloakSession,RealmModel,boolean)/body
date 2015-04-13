@@ -15,26 +15,26 @@
   }
   rep.setClients(clientReps);
   List<RoleRepresentation> realmRoleReps=null;
-  Map<String,List<RoleRepresentation>> appRolesReps=new HashMap<String,List<RoleRepresentation>>();
+  Map<String,List<RoleRepresentation>> clientRolesReps=new HashMap<>();
   Set<RoleModel> realmRoles=realm.getRoles();
   if (realmRoles != null && realmRoles.size() > 0) {
     realmRoleReps=exportRoles(realmRoles);
   }
-  for (  ClientModel app : clients) {
-    Set<RoleModel> currentAppRoles=app.getRoles();
+  for (  ClientModel client : clients) {
+    Set<RoleModel> currentAppRoles=client.getRoles();
     List<RoleRepresentation> currentAppRoleReps=exportRoles(currentAppRoles);
-    appRolesReps.put(app.getClientId(),currentAppRoleReps);
+    clientRolesReps.put(client.getClientId(),currentAppRoleReps);
   }
   RolesRepresentation rolesRep=new RolesRepresentation();
   if (realmRoleReps != null) {
     rolesRep.setRealm(realmRoleReps);
   }
-  if (appRolesReps.size() > 0) {
-    rolesRep.setApplication(appRolesReps);
+  if (clientRolesReps.size() > 0) {
+    rolesRep.setClient(clientRolesReps);
   }
   rep.setRoles(rolesRep);
   List<ClientModel> allClients=new ArrayList<>(clients);
-  Map<String,List<ScopeMappingRepresentation>> appScopeReps=new HashMap<>();
+  Map<String,List<ScopeMappingRepresentation>> clientScopeReps=new HashMap<>();
   for (  ClientModel client : allClients) {
     Set<RoleModel> clientScopes=client.getScopeMappings();
     ScopeMappingRepresentation scopeMappingRep=null;
@@ -48,10 +48,10 @@
  else {
         ClientModel app=(ClientModel)scope.getContainer();
         String appName=app.getClientId();
-        List<ScopeMappingRepresentation> currentAppScopes=appScopeReps.get(appName);
+        List<ScopeMappingRepresentation> currentAppScopes=clientScopeReps.get(appName);
         if (currentAppScopes == null) {
           currentAppScopes=new ArrayList<>();
-          appScopeReps.put(appName,currentAppScopes);
+          clientScopeReps.put(appName,currentAppScopes);
         }
         ScopeMappingRepresentation currentClientScope=null;
         for (        ScopeMappingRepresentation scopeMapping : currentAppScopes) {
@@ -69,8 +69,8 @@
       }
     }
   }
-  if (appScopeReps.size() > 0) {
-    rep.setApplicationScopeMappings(appScopeReps);
+  if (clientScopeReps.size() > 0) {
+    rep.setClientScopeMappings(clientScopeReps);
   }
   if (includeUsers) {
     List<UserModel> allUsers=session.users().getUsers(realm);

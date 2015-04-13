@@ -1,0 +1,22 @@
+{
+  if (this.sortParameters != null) {
+    for (    QueryParameter parameter : this.sortParameters) {
+      if (isSortAscending()) {
+        sortBy(this.queryBuilder.asc(parameter));
+      }
+ else {
+        sortBy(this.queryBuilder.desc(parameter));
+      }
+    }
+  }
+  List<T> result=new ArrayList<T>();
+  try {
+    for (    T identityType : identityStore.fetchQueryResults(this)) {
+      result.add(identityType);
+    }
+  }
+ catch (  Exception e) {
+    throw new ModelException("LDAP Query failed",e);
+  }
+  return result;
+}

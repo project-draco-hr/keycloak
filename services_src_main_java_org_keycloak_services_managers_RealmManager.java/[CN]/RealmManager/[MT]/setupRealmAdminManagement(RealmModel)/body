@@ -2,18 +2,18 @@
   if (realm.getName().equals(Config.getAdminRealm())) {
     return;
   }
-  ApplicationManager applicationManager=new ApplicationManager(new RealmManager(session));
-  String realmAdminApplicationName=getRealmAdminApplicationName(realm);
-  ApplicationModel realmAdminApp=realm.getApplicationByName(realmAdminApplicationName);
-  if (realmAdminApp == null) {
-    realmAdminApp=applicationManager.createApplication(realm,realmAdminApplicationName);
+  ClientManager clientManager=new ClientManager(new RealmManager(session));
+  String realmAdminClientId=getRealmAdminClientId(realm);
+  ClientModel realmAdminClient=realm.getClientByClientId(realmAdminClientId);
+  if (realmAdminClient == null) {
+    realmAdminClient=clientManager.createClient(realm,realmAdminClientId);
   }
-  RoleModel adminRole=realmAdminApp.addRole(AdminRoles.REALM_ADMIN);
+  RoleModel adminRole=realmAdminClient.addRole(AdminRoles.REALM_ADMIN);
   adminRole.setDescription("${role_" + AdminRoles.REALM_ADMIN + "}");
-  realmAdminApp.setBearerOnly(true);
-  realmAdminApp.setFullScopeAllowed(false);
+  realmAdminClient.setBearerOnly(true);
+  realmAdminClient.setFullScopeAllowed(false);
   for (  String r : AdminRoles.ALL_REALM_ROLES) {
-    RoleModel role=realmAdminApp.addRole(r);
+    RoleModel role=realmAdminClient.addRole(r);
     role.setDescription("${role_" + r + "}");
     adminRole.addCompositeRole(role);
   }

@@ -1,0 +1,27 @@
+{
+  Map<String,Integer> registeredNodes=client.getRegisteredNodes();
+  if (registeredNodes == null || registeredNodes.isEmpty()) {
+    return Collections.emptySet();
+  }
+  int currentTime=Time.currentTime();
+  Set<String> validatedNodes=new TreeSet<String>();
+  if (client.getNodeReRegistrationTimeout() > 0) {
+    List<String> toRemove=new LinkedList<String>();
+    for (    Map.Entry<String,Integer> entry : registeredNodes.entrySet()) {
+      Integer lastReRegistration=entry.getValue();
+      if (lastReRegistration + client.getNodeReRegistrationTimeout() < currentTime) {
+        toRemove.add(entry.getKey());
+      }
+ else {
+        validatedNodes.add(entry.getKey());
+      }
+    }
+    for (    String node : toRemove) {
+      client.unregisterNode(node);
+    }
+  }
+ else {
+    validatedNodes.addAll(registeredNodes.keySet());
+  }
+  return validatedNodes;
+}

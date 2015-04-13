@@ -1,0 +1,10 @@
+{
+  if (auth.hasAppRole(realmManagementClient,AdminRoles.MANAGE_REALM)) {
+    reps.add(ModelToRepresentation.toRepresentation(realm,false));
+  }
+ else   if (auth.hasOneOfAppRole(realmManagementClient,AdminRoles.ALL_REALM_ROLES)) {
+    RealmRepresentation rep=new RealmRepresentation();
+    rep.setRealm(realm.getName());
+    reps.add(rep);
+  }
+}

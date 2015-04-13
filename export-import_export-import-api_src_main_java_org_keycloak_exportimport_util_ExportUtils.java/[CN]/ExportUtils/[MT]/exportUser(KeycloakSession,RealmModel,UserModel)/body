@@ -10,28 +10,28 @@
     userRep.setFederatedIdentities(socialLinkReps);
   }
   Set<RoleModel> roles=user.getRoleMappings();
-  List<String> realmRoleNames=new ArrayList<String>();
-  Map<String,List<String>> appRoleNames=new HashMap<String,List<String>>();
+  List<String> realmRoleNames=new ArrayList<>();
+  Map<String,List<String>> clientRoleNames=new HashMap<>();
   for (  RoleModel role : roles) {
     if (role.getContainer() instanceof RealmModel) {
       realmRoleNames.add(role.getName());
     }
  else {
-      ApplicationModel app=(ApplicationModel)role.getContainer();
-      String appName=app.getName();
-      List<String> currentAppRoles=appRoleNames.get(appName);
-      if (currentAppRoles == null) {
-        currentAppRoles=new ArrayList<String>();
-        appRoleNames.put(appName,currentAppRoles);
+      ClientModel client=(ClientModel)role.getContainer();
+      String clientId=client.getClientId();
+      List<String> currentClientRoles=clientRoleNames.get(clientId);
+      if (currentClientRoles == null) {
+        currentClientRoles=new ArrayList<>();
+        clientRoleNames.put(clientId,currentClientRoles);
       }
-      currentAppRoles.add(role.getName());
+      currentClientRoles.add(role.getName());
     }
   }
   if (realmRoleNames.size() > 0) {
     userRep.setRealmRoles(realmRoleNames);
   }
-  if (appRoleNames.size() > 0) {
-    userRep.setApplicationRoles(appRoleNames);
+  if (clientRoleNames.size() > 0) {
+    userRep.setClientRoles(clientRoleNames);
   }
   List<UserCredentialValueModel> creds=user.getCredentialsDirectly();
   List<CredentialRepresentation> credReps=new ArrayList<CredentialRepresentation>();

@@ -11,7 +11,7 @@
   RoleModel found=realmModel.getRoleById(realmUserRole.getId());
   assertNotNull(found);
   assertRolesEquals(found,realmUserRole);
-  ApplicationModel application=realmModel.addApplication("app1");
+  ClientModel application=realmModel.addClient("app1");
   application.addRole("user");
   application.addRole("bar");
   Set<RoleModel> appRoles=application.getRoles();
@@ -28,7 +28,7 @@
   assertRolesContains(realmUserRole,roles);
   Assert.assertTrue(user.hasRole(realmUserRole));
   Assert.assertTrue(user.hasRole(realmModel.getRole("foo")));
-  roles=user.getApplicationRoleMappings(application);
+  roles=user.getClientRoleMappings(application);
   Assert.assertEquals(roles.size(),2);
   assertRolesContains(application.getRole("user"),roles);
   assertRolesContains(appBarRole,roles);

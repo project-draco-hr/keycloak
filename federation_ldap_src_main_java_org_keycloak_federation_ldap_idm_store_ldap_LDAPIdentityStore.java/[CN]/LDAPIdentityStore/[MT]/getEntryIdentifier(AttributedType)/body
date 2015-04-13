@@ -1,0 +1,13 @@
+{
+  try {
+    List<SearchResult> search=this.operationManager.search(getBaseDN(attributedType),"(" + getBindingDN(attributedType,false) + ")",getMappingConfig(attributedType.getClass()));
+    Attribute id=search.get(0).getAttributes().get(getConfig().getUniqueIdentifierAttributeName());
+    if (id == null) {
+      throw new ModelException("Could not retrieve identifier for entry [" + getBindingDN(attributedType,true) + "].");
+    }
+    return this.operationManager.decodeEntryUUID(id.get());
+  }
+ catch (  NamingException ne) {
+    throw new ModelException("Could not add type [" + attributedType + "].",ne);
+  }
+}

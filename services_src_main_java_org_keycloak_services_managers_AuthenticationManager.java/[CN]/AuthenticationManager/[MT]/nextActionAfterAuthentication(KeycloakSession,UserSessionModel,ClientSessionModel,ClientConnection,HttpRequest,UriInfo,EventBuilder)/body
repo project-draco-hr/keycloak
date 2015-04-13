@@ -4,10 +4,8 @@
   isTotpConfigurationRequired(realm,user);
   isEmailVerificationRequired(realm,user);
   ClientModel client=clientSession.getClient();
-  boolean isResource=client instanceof ApplicationModel;
   ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
-  logger.debugv("processAccessCode: isResource: {0}",isResource);
-  logger.debugv("processAccessCode: go to oauth page?: {0}",!isResource);
+  logger.debugv("processAccessCode: go to oauth page?: {0}",client.isConsentRequired());
   event.detail(Details.CODE_ID,clientSession.getId());
   Set<UserModel.RequiredAction> requiredActions=user.getRequiredActions();
   if (!requiredActions.isEmpty()) {
@@ -27,7 +25,7 @@
       return loginFormsProvider.createResponse(action);
     }
   }
-  if (!isResource) {
+  if (client.isConsentRequired()) {
     accessCode.setAction(ClientSessionModel.Action.OAUTH_GRANT);
     List<RoleModel> realmRoles=new LinkedList<RoleModel>();
     MultivaluedMap<String,RoleModel> resourceRoles=new MultivaluedMapImpl<String,RoleModel>();
@@ -36,7 +34,7 @@
         realmRoles.add(r);
       }
  else {
-        resourceRoles.add(((ApplicationModel)r.getContainer()).getName(),r);
+        resourceRoles.add(((ClientModel)r.getContainer()).getClientId(),r);
       }
     }
     return Flows.forms(session,realm,client,uriInfo,request.getHttpHeaders()).setClientSessionCode(accessCode.getCode()).setAccessRequest(realmRoles,resourceRoles).setClient(client).createOAuthGrant(clientSession);

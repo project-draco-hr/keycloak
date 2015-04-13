@@ -1,0 +1,58 @@
+{
+  if (realm.getApplications() != null || realm.getOauthClients() != null) {
+    if (realm.getClients() == null) {
+      realm.setClients(new LinkedList<ClientRepresentation>());
+    }
+    List<ApplicationRepresentation> clients=new LinkedList<>();
+    if (realm.getApplications() != null) {
+      clients.addAll(realm.getApplications());
+    }
+    if (realm.getOauthClients() != null) {
+      clients.addAll(realm.getOauthClients());
+    }
+    for (    ApplicationRepresentation app : clients) {
+      app.setClientId(app.getName());
+      app.setName(null);
+      if (app instanceof OAuthClientRepresentation) {
+        app.setConsentRequired(true);
+        app.setFullScopeAllowed(false);
+      }
+      if (app.getProtocolMappers() == null && app.getClaims() != null) {
+        long mask=getClaimsMask(app.getClaims());
+        List<ProtocolMapperRepresentation> convertedProtocolMappers=session.getProvider(MigrationProvider.class).getMappersForClaimMask(mask);
+        app.setProtocolMappers(convertedProtocolMappers);
+        app.setClaims(null);
+      }
+      realm.getClients().add(app);
+    }
+  }
+  if (realm.getApplicationScopeMappings() != null && realm.getClientScopeMappings() == null) {
+    realm.setClientScopeMappings(realm.getApplicationScopeMappings());
+  }
+  if (realm.getRoles() != null && realm.getRoles().getApplication() != null && realm.getRoles().getClient() == null) {
+    realm.getRoles().setClient(realm.getRoles().getApplication());
+  }
+  if (realm.getUsers() != null) {
+    for (    UserRepresentation user : realm.getUsers()) {
+      if (user.getApplicationRoles() != null && user.getClientRoles() == null) {
+        user.setClientRoles(user.getApplicationRoles());
+      }
+    }
+  }
+  if (realm.getRoles() != null && realm.getRoles().getRealm() != null) {
+    for (    RoleRepresentation role : realm.getRoles().getRealm()) {
+      if (role.getComposites() != null && role.getComposites().getApplication() != null && role.getComposites().getClient() == null) {
+        role.getComposites().setClient(role.getComposites().getApplication());
+      }
+    }
+  }
+  if (realm.getRoles() != null && realm.getRoles().getClient() != null) {
+    for (    Map.Entry<String,List<RoleRepresentation>> clientRoles : realm.getRoles().getClient().entrySet()) {
+      for (      RoleRepresentation role : clientRoles.getValue()) {
+        if (role.getComposites() != null && role.getComposites().getApplication() != null && role.getComposites().getClient() == null) {
+          role.getComposites().setClient(role.getComposites().getApplication());
+        }
+      }
+    }
+  }
+}

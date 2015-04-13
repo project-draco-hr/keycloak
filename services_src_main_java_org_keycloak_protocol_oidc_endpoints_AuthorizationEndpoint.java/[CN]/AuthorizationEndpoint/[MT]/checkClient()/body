@@ -4,12 +4,12 @@
     throw new ErrorPageException(session,realm,uriInfo,headers,Messages.MISSING_PARAMETER,OIDCLoginProtocol.CLIENT_ID_PARAM);
   }
   event.client(clientId);
-  client=realm.findClient(clientId);
+  client=realm.getClientByClientId(clientId);
   if (client == null) {
     event.error(Errors.CLIENT_NOT_FOUND);
     throw new ErrorPageException(session,realm,uriInfo,headers,Messages.CLIENT_NOT_FOUND);
   }
-  if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
+  if ((client instanceof ClientModel) && ((ClientModel)client).isBearerOnly()) {
     event.error(Errors.NOT_ALLOWED);
     throw new ErrorPageException(session,realm,uriInfo,headers,Messages.BEARER_ONLY);
   }

@@ -3,7 +3,7 @@
 {
     KeycloakSession session=kc.startSession();
     RealmModel realm=session.realms().getRealmByName("test");
-    ApplicationModel testApp=realm.getApplicationByName("test-app");
+    ClientModel testApp=realm.getClientByClientId("test-app");
     Assert.assertNotNull(testApp);
     appId=testApp.getId();
     Assert.assertTrue(testApp.isEnabled());
@@ -14,7 +14,7 @@
     RealmModel realm=session.realms().getRealmByName("test");
     Assert.assertTrue(realm instanceof org.keycloak.models.cache.RealmAdapter);
     realm.setAccessCodeLifespanLogin(200);
-    ApplicationModel testApp=realm.getApplicationByName("test-app");
+    ClientModel testApp=realm.getClientByClientId("test-app");
     Assert.assertNotNull(testApp);
     testApp.setEnabled(false);
     kc.stopSession(session,true);
@@ -22,7 +22,7 @@
 {
     KeycloakSession session=kc.startSession();
     RealmModel realm=session.realms().getRealmByName("test");
-    ApplicationModel testApp=session.realms().getApplicationById(appId,realm);
+    ClientModel testApp=session.realms().getClientById(appId,realm);
     Assert.assertFalse(testApp.isEnabled());
     kc.stopSession(session,true);
   }

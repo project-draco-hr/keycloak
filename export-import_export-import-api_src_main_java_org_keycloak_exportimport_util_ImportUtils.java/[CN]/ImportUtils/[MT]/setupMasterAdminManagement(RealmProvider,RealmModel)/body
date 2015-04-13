@@ -13,9 +13,9 @@
     adminRole=adminRealm.getRole(AdminRoles.ADMIN);
   }
   adminRole.setDescription("${role_" + AdminRoles.ADMIN + "}");
-  ApplicationModel realmAdminApp=KeycloakModelUtils.createApplication(adminRealm,KeycloakModelUtils.getMasterRealmAdminApplicationName(realm));
+  ClientModel realmAdminApp=KeycloakModelUtils.createClient(adminRealm,KeycloakModelUtils.getMasterRealmAdminApplicationClientId(realm));
   realmAdminApp.setBearerOnly(true);
-  realm.setMasterAdminApp(realmAdminApp);
+  realm.setMasterAdminClient(realmAdminApp);
   for (  String r : AdminRoles.ALL_REALM_ROLES) {
     RoleModel role=realmAdminApp.addRole(r);
     role.setDescription("${role_" + r + "}");

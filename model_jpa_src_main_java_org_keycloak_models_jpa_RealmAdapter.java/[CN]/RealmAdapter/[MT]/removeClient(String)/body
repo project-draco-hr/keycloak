@@ -1,0 +1,30 @@
+{
+  if (id == null)   return false;
+  ClientModel application=getClientById(id);
+  if (application == null)   return false;
+  for (  RoleModel role : application.getRoles()) {
+    application.removeRole(role);
+  }
+  ClientEntity clientEntity=null;
+  Iterator<ClientEntity> it=realm.getApplications().iterator();
+  while (it.hasNext()) {
+    ClientEntity ae=it.next();
+    if (ae.getId().equals(id)) {
+      clientEntity=ae;
+      it.remove();
+      break;
+    }
+  }
+  for (  ClientEntity a : realm.getApplications()) {
+    if (a.getId().equals(id)) {
+      clientEntity=a;
+    }
+  }
+  if (application == null) {
+    return false;
+  }
+  em.remove(clientEntity);
+  em.createNamedQuery("deleteScopeMappingByClient").setParameter("client",clientEntity).executeUpdate();
+  em.flush();
+  return true;
+}

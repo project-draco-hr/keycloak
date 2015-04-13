@@ -7,43 +7,34 @@
   if (realm.getEventsListeners() != null) {
     rep.setEventsListeners(new LinkedList<String>(realm.getEventsListeners()));
   }
-  List<ApplicationModel> applications=realm.getApplications();
-  List<ApplicationRepresentation> appReps=new ArrayList<ApplicationRepresentation>();
-  for (  ApplicationModel app : applications) {
-    ApplicationRepresentation appRep=exportApplication(app);
-    appReps.add(appRep);
+  List<ClientModel> clients=realm.getClients();
+  List<ClientRepresentation> clientReps=new ArrayList<>();
+  for (  ClientModel app : clients) {
+    ClientRepresentation clientRep=exportClient(app);
+    clientReps.add(clientRep);
   }
-  rep.setApplications(appReps);
-  List<OAuthClientModel> oauthClients=realm.getOAuthClients();
-  List<OAuthClientRepresentation> oauthClientReps=new ArrayList<OAuthClientRepresentation>();
-  for (  OAuthClientModel oauthClient : oauthClients) {
-    OAuthClientRepresentation clientRep=ModelToRepresentation.toRepresentation(oauthClient);
-    clientRep.setSecret(oauthClient.getSecret());
-    oauthClientReps.add(clientRep);
-  }
-  rep.setOauthClients(oauthClientReps);
+  rep.setClients(clientReps);
   List<RoleRepresentation> realmRoleReps=null;
-  Map<String,List<RoleRepresentation>> appRolesReps=new HashMap<String,List<RoleRepresentation>>();
+  Map<String,List<RoleRepresentation>> clientRolesReps=new HashMap<>();
   Set<RoleModel> realmRoles=realm.getRoles();
   if (realmRoles != null && realmRoles.size() > 0) {
     realmRoleReps=exportRoles(realmRoles);
   }
-  for (  ApplicationModel app : applications) {
-    Set<RoleModel> currentAppRoles=app.getRoles();
+  for (  ClientModel client : clients) {
+    Set<RoleModel> currentAppRoles=client.getRoles();
     List<RoleRepresentation> currentAppRoleReps=exportRoles(currentAppRoles);
-    appRolesReps.put(app.getName(),currentAppRoleReps);
+    clientRolesReps.put(client.getClientId(),currentAppRoleReps);
   }
   RolesRepresentation rolesRep=new RolesRepresentation();
   if (realmRoleReps != null) {
     rolesRep.setRealm(realmRoleReps);
   }
-  if (appRolesReps.size() > 0) {
-    rolesRep.setApplication(appRolesReps);
+  if (clientRolesReps.size() > 0) {
+    rolesRep.setClient(clientRolesReps);
   }
   rep.setRoles(rolesRep);
-  List<ClientModel> allClients=new ArrayList<ClientModel>(applications);
-  allClients.addAll(realm.getOAuthClients());
-  Map<String,List<ScopeMappingRepresentation>> appScopeReps=new HashMap<String,List<ScopeMappingRepresentation>>();
+  List<ClientModel> allClients=new ArrayList<>(clients);
+  Map<String,List<ScopeMappingRepresentation>> clientScopeReps=new HashMap<>();
   for (  ClientModel client : allClients) {
     Set<RoleModel> clientScopes=client.getScopeMappings();
     ScopeMappingRepresentation scopeMappingRep=null;
@@ -55,12 +46,12 @@
         scopeMappingRep.role(scope.getName());
       }
  else {
-        ApplicationModel app=(ApplicationModel)scope.getContainer();
-        String appName=app.getName();
-        List<ScopeMappingRepresentation> currentAppScopes=appScopeReps.get(appName);
+        ClientModel app=(ClientModel)scope.getContainer();
+        String appName=app.getClientId();
+        List<ScopeMappingRepresentation> currentAppScopes=clientScopeReps.get(appName);
         if (currentAppScopes == null) {
-          currentAppScopes=new ArrayList<ScopeMappingRepresentation>();
-          appScopeReps.put(appName,currentAppScopes);
+          currentAppScopes=new ArrayList<>();
+          clientScopeReps.put(appName,currentAppScopes);
         }
         ScopeMappingRepresentation currentClientScope=null;
         for (        ScopeMappingRepresentation scopeMapping : currentAppScopes) {
@@ -78,8 +69,8 @@
       }
     }
   }
-  if (appScopeReps.size() > 0) {
-    rep.setApplicationScopeMappings(appScopeReps);
+  if (clientScopeReps.size() > 0) {
+    rep.setClientScopeMappings(clientScopeReps);
   }
   if (includeUsers) {
     List<UserModel> allUsers=session.users().getUsers(realm);

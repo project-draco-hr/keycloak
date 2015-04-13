@@ -1,0 +1,24 @@
+{
+  try {
+    NamingEnumeration<Binding> enumeration=null;
+    try {
+      enumeration=context.listBindings(dn);
+      while (enumeration.hasMore()) {
+        Binding binding=enumeration.next();
+        String name=binding.getNameInNamespace();
+        destroySubcontext(context,name);
+      }
+      context.unbind(dn);
+    }
+  finally {
+      try {
+        enumeration.close();
+      }
+ catch (      Exception e) {
+      }
+    }
+  }
+ catch (  Exception e) {
+    throw new ModelException("Could not unbind DN [" + dn + "]",e);
+  }
+}

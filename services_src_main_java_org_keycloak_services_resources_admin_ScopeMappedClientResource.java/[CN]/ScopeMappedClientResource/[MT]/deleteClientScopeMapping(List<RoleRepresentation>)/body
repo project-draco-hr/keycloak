@@ -1,0 +1,18 @@
+{
+  auth.requireManage();
+  if (roles == null) {
+    Set<RoleModel> roleModels=scopedClient.getClientScopeMappings(client);
+    for (    RoleModel roleModel : roleModels) {
+      client.deleteScopeMapping(roleModel);
+    }
+  }
+ else {
+    for (    RoleRepresentation role : roles) {
+      RoleModel roleModel=scopedClient.getRole(role.getName());
+      if (roleModel == null) {
+        throw new NotFoundException("Role not found");
+      }
+      client.deleteScopeMapping(roleModel);
+    }
+  }
+}

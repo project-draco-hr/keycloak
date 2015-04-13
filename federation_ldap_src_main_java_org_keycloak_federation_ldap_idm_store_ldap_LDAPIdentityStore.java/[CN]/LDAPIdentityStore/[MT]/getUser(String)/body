@@ -1,0 +1,16 @@
+{
+  if (isNullOrEmpty(username)) {
+    return null;
+  }
+  IdentityQueryBuilder queryBuilder=createQueryBuilder();
+  List<LDAPUser> agents=queryBuilder.createIdentityQuery(LDAPUser.class).where(queryBuilder.equal(LDAPUser.LOGIN_NAME,username)).getResultList();
+  if (agents.isEmpty()) {
+    return null;
+  }
+ else   if (agents.size() == 1) {
+    return agents.get(0);
+  }
+ else {
+    throw new ModelDuplicateException("Error - multiple Agent objects found with same login name");
+  }
+}

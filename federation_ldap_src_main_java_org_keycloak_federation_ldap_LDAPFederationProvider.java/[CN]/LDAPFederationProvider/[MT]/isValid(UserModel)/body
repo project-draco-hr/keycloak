@@ -1,12 +1,7 @@
 {
-  try {
-    User picketlinkUser=LDAPUtils.getUser(partitionManager,local.getUsername());
-    if (picketlinkUser == null) {
-      return false;
-    }
-    return picketlinkUser.getId().equals(local.getAttribute(LDAP_ID));
+  LDAPUser ldapUser=LDAPUtils.getUser(this.ldapIdentityStore,local.getUsername());
+  if (ldapUser == null) {
+    return false;
   }
- catch (  IdentityManagementException ie) {
-    throw convertIDMException(ie);
-  }
+  return ldapUser.getId().equals(local.getAttribute(LDAPConstants.LDAP_ID));
 }

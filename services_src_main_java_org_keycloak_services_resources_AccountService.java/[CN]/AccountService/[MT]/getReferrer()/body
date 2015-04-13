@@ -4,22 +4,22 @@
     return null;
   }
   String referrerUri=uriInfo.getQueryParameters().getFirst("referrer_uri");
-  ApplicationModel application=realm.getApplicationByName(referrer);
-  if (application != null) {
+  ClientModel referrerClient=realm.getClientByClientId(referrer);
+  if (referrerClient != null) {
     if (referrerUri != null) {
-      referrerUri=RedirectUtils.verifyRedirectUri(uriInfo,referrerUri,realm,application);
+      referrerUri=RedirectUtils.verifyRedirectUri(uriInfo,referrerUri,realm,referrerClient);
     }
  else {
-      referrerUri=ResolveRelative.resolveRelativeUri(uriInfo.getRequestUri(),application.getBaseUrl());
+      referrerUri=ResolveRelative.resolveRelativeUri(uriInfo.getRequestUri(),referrerClient.getBaseUrl());
     }
     if (referrerUri != null) {
       return new String[]{referrer,referrerUri};
     }
   }
  else   if (referrerUri != null) {
-    ClientModel client=realm.getOAuthClient(referrer);
+    referrerClient=realm.getClientByClientId(referrer);
     if (client != null) {
-      referrerUri=RedirectUtils.verifyRedirectUri(uriInfo,referrerUri,realm,application);
+      referrerUri=RedirectUtils.verifyRedirectUri(uriInfo,referrerUri,realm,referrerClient);
       if (referrerUri != null) {
         return new String[]{referrer,referrerUri};
       }

@@ -7,16 +7,16 @@
       role.addCompositeRole(realmRole);
     }
   }
-  if (roleRep.getComposites().getApplication() != null) {
-    for (    Map.Entry<String,List<String>> entry : roleRep.getComposites().getApplication().entrySet()) {
-      ApplicationModel app=realm.getApplicationByName(entry.getKey());
-      if (app == null) {
+  if (roleRep.getComposites().getClient() != null) {
+    for (    Map.Entry<String,List<String>> entry : roleRep.getComposites().getClient().entrySet()) {
+      ClientModel client=realm.getClientByClientId(entry.getKey());
+      if (client == null) {
         throw new RuntimeException("App doesn't exist in role definitions: " + roleRep.getName());
       }
       for (      String roleStr : entry.getValue()) {
-        RoleModel appRole=app.getRole(roleStr);
-        if (appRole == null)         throw new RuntimeException("Unable to find composite app role: " + roleStr);
-        role.addCompositeRole(appRole);
+        RoleModel clientRole=client.getRole(roleStr);
+        if (clientRole == null)         throw new RuntimeException("Unable to find composite client role: " + roleStr);
+        role.addCompositeRole(clientRole);
       }
     }
   }

@@ -1,0 +1,10 @@
+{
+  ApacheHttpClient4Executor executor=createExecutor();
+  try {
+    resource.setNotBefore(Time.currentTime());
+    return logoutClient(requestUri,realm,resource,executor,resource.getNotBefore());
+  }
+  finally {
+    executor.getHttpClient().getConnectionManager().shutdown();
+  }
+}

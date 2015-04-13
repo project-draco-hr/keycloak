@@ -9,10 +9,10 @@
  else     if (token.getRealmAccess().getRoles() != null && token.getRealmAccess().isUserInRole(role.getName()))     return;
   }
  else {
-    ApplicationModel app=(ApplicationModel)role.getContainer();
-    access=token.getResourceAccess(app.getName());
+    ClientModel app=(ClientModel)role.getContainer();
+    access=token.getResourceAccess(app.getClientId());
     if (access == null) {
-      access=token.addAccess(app.getName());
+      access=token.addAccess(app.getClientId());
       if (app.isSurrogateAuthRequired())       access.verifyCaller(true);
     }
  else     if (access.isUserInRole(role.getName()))     return;

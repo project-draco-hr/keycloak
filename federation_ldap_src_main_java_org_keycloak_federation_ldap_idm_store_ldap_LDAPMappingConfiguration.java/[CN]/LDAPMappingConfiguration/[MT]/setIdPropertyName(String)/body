@@ -1,0 +1,15 @@
+{
+  if (idPropertyName != null) {
+    this.idProperty=PropertyQueries.<String>createQuery(getMappedClass()).addCriteria(new NamedPropertyCriteria(idPropertyName)).getFirstResult();
+  }
+ else {
+    this.idProperty=null;
+  }
+  if (IdentityType.class.isAssignableFrom(mappedClass) && idProperty == null) {
+    throw new ModelException("Id attribute not mapped to any property of [" + mappedClass + "].");
+  }
+  if (this.bindingProperty == null) {
+    this.bindingProperty=this.idProperty;
+  }
+  return this;
+}

@@ -1,0 +1,18 @@
+{
+  InstallationAdapterConfig rep=new InstallationAdapterConfig();
+  rep.setRealm(realmModel.getName());
+  rep.setRealmKey(realmModel.getPublicKeyPem());
+  rep.setSslRequired(realmModel.getSslRequired().name().toLowerCase());
+  if (clientModel.isPublicClient() && !clientModel.isBearerOnly())   rep.setPublicClient(true);
+  if (clientModel.isBearerOnly())   rep.setBearerOnly(true);
+  if (!clientModel.isBearerOnly())   rep.setAuthServerUrl(baseUri.toString());
+  if (clientModel.getRoles().size() > 0)   rep.setUseResourceRoleMappings(true);
+  rep.setResource(clientModel.getClientId());
+  if (!clientModel.isBearerOnly() && !clientModel.isPublicClient()) {
+    Map<String,String> creds=new HashMap<String,String>();
+    String cred=clientModel.getSecret();
+    creds.put(CredentialRepresentation.SECRET,cred);
+    rep.setCredentials(creds);
+  }
+  return rep;
+}

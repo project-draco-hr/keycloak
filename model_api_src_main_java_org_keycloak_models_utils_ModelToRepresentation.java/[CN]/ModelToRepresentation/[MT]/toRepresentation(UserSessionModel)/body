@@ -1,18 +1,13 @@
 {
   UserSessionRepresentation rep=new UserSessionRepresentation();
   rep.setId(session.getId());
-  rep.setStart(((long)session.getStarted()) * 1000L);
-  rep.setLastAccess(((long)session.getLastSessionRefresh()) * 1000L);
+  rep.setStart(Time.toMillis(session.getStarted()));
+  rep.setLastAccess(Time.toMillis(session.getLastSessionRefresh()));
   rep.setUser(session.getUser().getUsername());
   rep.setIpAddress(session.getIpAddress());
   for (  ClientSessionModel clientSession : session.getClientSessions()) {
     ClientModel client=clientSession.getClient();
-    if (client instanceof ApplicationModel) {
-      rep.getApplications().put(client.getId(),client.getClientId());
-    }
- else     if (client instanceof OAuthClientModel) {
-      rep.getClients().put(client.getId(),client.getClientId());
-    }
+    rep.getClients().put(client.getId(),client.getClientId());
   }
   return rep;
 }

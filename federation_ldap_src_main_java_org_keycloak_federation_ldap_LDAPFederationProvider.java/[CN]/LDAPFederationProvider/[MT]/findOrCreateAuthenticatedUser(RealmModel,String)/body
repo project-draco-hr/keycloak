@@ -1,20 +1,20 @@
 {
   UserModel user=session.userStorage().getUserByUsername(username,realm);
   if (user != null) {
-    logger.debug("Kerberos authenticated user " + username + " found in Keycloak storage");
+    logger.debugf("Kerberos authenticated user [%s] found in Keycloak storage",username);
     if (!model.getId().equals(user.getFederationLink())) {
-      logger.warn("User with username " + username + " already exists, but is not linked to provider ["+ model.getDisplayName()+ "]");
+      logger.warnf("User with username [%s] already exists, but is not linked to provider [%s]",username,model.getDisplayName());
       return null;
     }
  else     if (isValid(user)) {
       return proxy(user);
     }
  else {
-      logger.warn("User with username " + username + " already exists and is linked to provider ["+ model.getDisplayName()+ "] but is not valid. Stale LDAP_ID on local user is: "+ user.getAttribute(LDAP_ID));
+      logger.warnf("User with username [%s] aready exists and is linked to provider [%s] but is not valid. Stale LDAP_ID on local user is: %s",username,model.getDisplayName(),user.getAttribute(LDAPConstants.LDAP_ID));
       logger.warn("Will re-create user");
       session.userStorage().removeUser(realm,user);
     }
   }
-  logger.debug("Kerberos authenticated user " + username + " not in Keycloak storage. Creating him");
+  logger.debugf("Kerberos authenticated user [%s] not in Keycloak storage. Creating him",username);
   return getUserByUsername(realm,username);
 }

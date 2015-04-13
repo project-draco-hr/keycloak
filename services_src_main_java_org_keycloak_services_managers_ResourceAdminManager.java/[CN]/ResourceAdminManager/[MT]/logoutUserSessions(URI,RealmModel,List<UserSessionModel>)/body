@@ -1,12 +1,12 @@
 {
   ApacheHttpClient4Executor executor=createExecutor();
   try {
-    MultivaluedHashMap<ApplicationModel,ClientSessionModel> clientSessions=new MultivaluedHashMap<ApplicationModel,ClientSessionModel>();
+    MultivaluedHashMap<ClientModel,ClientSessionModel> clientSessions=new MultivaluedHashMap<ClientModel,ClientSessionModel>();
     for (    UserSessionModel userSession : userSessions) {
       putClientSessions(clientSessions,userSession);
     }
     logger.debugv("logging out {0} resources ",clientSessions.size());
-    for (    Map.Entry<ApplicationModel,List<ClientSessionModel>> entry : clientSessions.entrySet()) {
+    for (    Map.Entry<ClientModel,List<ClientSessionModel>> entry : clientSessions.entrySet()) {
       logoutClientSessions(requestUri,realm,entry.getKey(),entry.getValue(),executor);
     }
   }

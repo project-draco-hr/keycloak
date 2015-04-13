@@ -14,9 +14,9 @@
     return Flows.errors().error("Client id missing",Response.Status.BAD_REQUEST);
   }
   if (clientId == null) {
-    clientId=Constants.ACCOUNT_MANAGEMENT_APP;
+    clientId=Constants.ACCOUNT_MANAGEMENT_CLIENT_ID;
   }
-  ClientModel client=realm.findClient(clientId);
+  ClientModel client=realm.getClientByClientId(clientId);
   if (client == null || !client.isEnabled()) {
     return Flows.errors().error(clientId + " not enabled",Response.Status.INTERNAL_SERVER_ERROR);
   }

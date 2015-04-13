@@ -1,0 +1,19 @@
+{
+  ClientEntity applicationData=new ClientEntity();
+  applicationData.setId(id);
+  applicationData.setClientId(clientId);
+  applicationData.setEnabled(true);
+  applicationData.setRealm(realm);
+  realm.getApplications().add(applicationData);
+  em.persist(applicationData);
+  em.flush();
+  final ClientModel resource=new ClientAdapter(this,em,session,applicationData);
+  em.flush();
+  session.getKeycloakSessionFactory().publish(new ClientCreationEvent(){
+    @Override public ClientModel getCreatedClient(){
+      return resource;
+    }
+  }
+);
+  return resource;
+}

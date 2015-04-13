@@ -1,16 +1,11 @@
 {
   List<UserModel> searchResults=new LinkedList<UserModel>();
-  try {
-    Map<String,User> plUsers=searchPicketlink(attributes,maxResults);
-    for (    User user : plUsers.values()) {
-      if (session.userStorage().getUserByUsername(user.getLoginName(),realm) == null) {
-        UserModel imported=importUserFromPicketlink(realm,user);
-        searchResults.add(imported);
-      }
+  Map<String,LDAPUser> ldapUsers=searchLDAP(attributes,maxResults);
+  for (  LDAPUser ldapUser : ldapUsers.values()) {
+    if (session.userStorage().getUserByUsername(ldapUser.getLoginName(),realm) == null) {
+      UserModel imported=importUserFromLDAP(realm,ldapUser);
+      searchResults.add(imported);
     }
-  }
- catch (  IdentityManagementException ie) {
-    throw convertIDMException(ie);
   }
   return searchResults;
 }

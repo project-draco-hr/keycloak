@@ -8,7 +8,7 @@
   SAML2Object samlObject=documentHolder.getSamlObject();
   RequestAbstractType requestAbstractType=(RequestAbstractType)samlObject;
   String issuer=requestAbstractType.getIssuer().getValue();
-  ClientModel client=realm.findClient(issuer);
+  ClientModel client=realm.getClientByClientId(issuer);
   if (client == null) {
     event.event(EventType.LOGIN);
     event.error(Errors.CLIENT_NOT_FOUND);
@@ -19,7 +19,7 @@
     event.error(Errors.CLIENT_DISABLED);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.LOGIN_REQUESTER_NOT_ENABLED);
   }
-  if ((client instanceof ApplicationModel) && ((ApplicationModel)client).isBearerOnly()) {
+  if ((client instanceof ClientModel) && ((ClientModel)client).isBearerOnly()) {
     event.event(EventType.LOGIN);
     event.error(Errors.NOT_ALLOWED);
     return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.BEARER_ONLY);

@@ -1,0 +1,50 @@
+{
+  convertDeprecatedSocialProviders(userRep);
+  UserModel user=session.userStorage().addUser(newRealm,userRep.getId(),userRep.getUsername(),false);
+  user.setEnabled(userRep.isEnabled());
+  user.setEmail(userRep.getEmail());
+  user.setFirstName(userRep.getFirstName());
+  user.setLastName(userRep.getLastName());
+  user.setFederationLink(userRep.getFederationLink());
+  user.setTotp(userRep.isTotp());
+  if (userRep.getAttributes() != null) {
+    for (    Map.Entry<String,String> entry : userRep.getAttributes().entrySet()) {
+      user.setAttribute(entry.getKey(),entry.getValue());
+    }
+  }
+  if (userRep.getRequiredActions() != null) {
+    for (    String requiredAction : userRep.getRequiredActions()) {
+      user.addRequiredAction(UserModel.RequiredAction.valueOf(requiredAction));
+    }
+  }
+  if (userRep.getCredentials() != null) {
+    for (    CredentialRepresentation cred : userRep.getCredentials()) {
+      updateCredential(user,cred);
+    }
+  }
+  if (userRep.getFederatedIdentities() != null) {
+    for (    FederatedIdentityRepresentation identity : userRep.getFederatedIdentities()) {
+      FederatedIdentityModel mappingModel=new FederatedIdentityModel(identity.getIdentityProvider(),identity.getUserId(),identity.getUserName());
+      session.users().addFederatedIdentity(newRealm,user,mappingModel);
+    }
+  }
+  if (userRep.getRealmRoles() != null) {
+    for (    String roleString : userRep.getRealmRoles()) {
+      RoleModel role=newRealm.getRole(roleString.trim());
+      if (role == null) {
+        role=newRealm.addRole(roleString.trim());
+      }
+      user.grantRole(role);
+    }
+  }
+  if (userRep.getClientRoles() != null) {
+    for (    Map.Entry<String,List<String>> entry : userRep.getClientRoles().entrySet()) {
+      ClientModel client=clientMap.get(entry.getKey());
+      if (client == null) {
+        throw new RuntimeException("Unable to find client role mappings for client: " + entry.getKey());
+      }
+      createClientRoleMappings(client,user,entry.getValue());
+    }
+  }
+  return user;
+}

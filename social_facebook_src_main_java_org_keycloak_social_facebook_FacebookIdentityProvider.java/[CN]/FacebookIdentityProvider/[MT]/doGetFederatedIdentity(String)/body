@@ -2,7 +2,7 @@
   try {
     JsonNode profile=SimpleHttp.doGet(PROFILE_URL).header("Authorization","Bearer " + accessToken).asJson();
     String id=getJsonProperty(profile,"id");
-    FederatedIdentity user=new FederatedIdentity(id);
+    BrokeredIdentityContext user=new BrokeredIdentityContext(id);
     String email=getJsonProperty(profile,"email");
     user.setEmail(email);
     String username=getJsonProperty(profile,"username");
@@ -24,6 +24,8 @@
       lastName=" " + lastName;
     }
     user.setName(firstName + lastName);
+    user.setIdpConfig(getConfig());
+    user.setIdp(this);
     return user;
   }
  catch (  Exception e) {

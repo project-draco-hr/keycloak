@@ -2,10 +2,12 @@
   log.debug("doGetFederatedIdentity()");
   try {
     JsonNode profile=SimpleHttp.doGet(PROFILE_URL).header("Authorization","Bearer " + accessToken).asJson();
-    FederatedIdentity user=new FederatedIdentity(getJsonProperty(profile,"id"));
+    BrokeredIdentityContext user=new BrokeredIdentityContext(getJsonProperty(profile,"id"));
     user.setUsername(extractUsernameFromProfileURL(getJsonProperty(profile,"publicProfileUrl")));
     user.setName(getJsonProperty(profile,"formattedName"));
     user.setEmail(getJsonProperty(profile,"emailAddress"));
+    user.setIdpConfig(getConfig());
+    user.setIdp(this);
     return user;
   }
  catch (  Exception e) {

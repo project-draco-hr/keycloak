@@ -6,9 +6,11 @@
       log.debug("StackOverflow profile request to: " + URL);
     }
     JsonNode profile=SimpleHttp.doGet(URL).asJson().get("items").get(0);
-    FederatedIdentity user=new FederatedIdentity(getJsonProperty(profile,"user_id"));
+    BrokeredIdentityContext user=new BrokeredIdentityContext(getJsonProperty(profile,"user_id"));
     user.setUsername(extractUsernameFromProfileURL(getJsonProperty(profile,"link")));
     user.setName(unescapeHtml3(getJsonProperty(profile,"display_name")));
+    user.setIdpConfig(getConfig());
+    user.setIdp(this);
     return user;
   }
  catch (  Exception e) {

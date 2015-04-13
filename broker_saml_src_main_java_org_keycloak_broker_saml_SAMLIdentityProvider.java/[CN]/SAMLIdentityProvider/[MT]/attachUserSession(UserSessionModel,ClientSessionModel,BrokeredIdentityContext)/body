@@ -1,0 +1,13 @@
+{
+  ResponseType responseType=(ResponseType)context.getContextData().get(SAMLEndpoint.SAML_LOGIN_RESPONSE);
+  AssertionType assertion=(AssertionType)context.getContextData().get(SAMLEndpoint.SAML_ASSERTION);
+  SubjectType subject=assertion.getSubject();
+  SubjectType.STSubType subType=subject.getSubType();
+  NameIDType subjectNameID=(NameIDType)subType.getBaseID();
+  userSession.setNote(SAMLEndpoint.SAML_FEDERATED_SUBJECT,subjectNameID.getValue());
+  if (subjectNameID.getFormat() != null)   userSession.setNote(SAMLEndpoint.SAML_FEDERATED_SUBJECT_NAMEFORMAT,subjectNameID.getFormat().toString());
+  AuthnStatementType authn=(AuthnStatementType)context.getContextData().get(SAMLEndpoint.SAML_AUTHN_STATEMENT);
+  if (authn != null && authn.getSessionIndex() != null) {
+    userSession.setNote(SAMLEndpoint.SAML_FEDERATED_SESSION_INDEX,authn.getSessionIndex());
+  }
+}

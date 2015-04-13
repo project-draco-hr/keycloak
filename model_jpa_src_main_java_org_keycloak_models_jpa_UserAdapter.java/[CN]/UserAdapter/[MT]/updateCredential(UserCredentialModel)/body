@@ -1,29 +1,18 @@
 {
-  CredentialEntity credentialEntity=getCredentialEntity(user,cred.getType());
-  if (credentialEntity == null) {
-    credentialEntity=new CredentialEntity();
-    credentialEntity.setId(KeycloakModelUtils.generateId());
-    credentialEntity.setType(cred.getType());
-    credentialEntity.setDevice(cred.getDevice());
-    credentialEntity.setUser(user);
-    em.persist(credentialEntity);
-    user.getCredentials().add(credentialEntity);
-  }
   if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
-    byte[] salt=getSalt();
-    int hashIterations=1;
-    PasswordPolicy policy=realm.getPasswordPolicy();
-    if (policy != null) {
-      hashIterations=policy.getHashIterations();
-      if (hashIterations == -1)       hashIterations=1;
-    }
-    credentialEntity.setValue(new Pbkdf2PasswordEncoder(salt).encode(cred.getValue(),hashIterations));
-    credentialEntity.setSalt(salt);
-    credentialEntity.setHashIterations(hashIterations);
+    updatePasswordCredential(cred);
   }
  else {
-    credentialEntity.setValue(cred.getValue());
+    CredentialEntity credentialEntity=getCredentialEntity(user,cred.getType());
+    if (credentialEntity == null) {
+      credentialEntity=setCredentials(user,cred);
+      credentialEntity.setValue(cred.getValue());
+      em.persist(credentialEntity);
+      user.getCredentials().add(credentialEntity);
+    }
+ else {
+      credentialEntity.setValue(cred.getValue());
+    }
   }
-  credentialEntity.setDevice(cred.getDevice());
   em.flush();
 }

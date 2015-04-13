@@ -1,0 +1,23 @@
+{
+  List<CredentialEntity> credentialEntities=new ArrayList<CredentialEntity>();
+  for (  CredentialEntity entity : userEntity.getCredentials()) {
+    if (entity.getType().equals(credType)) {
+      credentialEntities.add(entity);
+    }
+  }
+  Collections.sort(credentialEntities,new Comparator<CredentialEntity>(){
+    public int compare(    CredentialEntity credFirst,    CredentialEntity credSecond){
+      if (credFirst.getCreatedDate() > credSecond.getCreatedDate()) {
+        return -1;
+      }
+ else       if (credFirst.getCreatedDate() < credSecond.getCreatedDate()) {
+        return 1;
+      }
+ else {
+        return 0;
+      }
+    }
+  }
+);
+  return credentialEntities;
+}

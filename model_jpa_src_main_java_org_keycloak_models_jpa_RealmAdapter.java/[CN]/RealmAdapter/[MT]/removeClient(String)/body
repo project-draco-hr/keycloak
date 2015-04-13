@@ -1,12 +1,12 @@
 {
   if (id == null)   return false;
-  ClientModel application=getClientById(id);
-  if (application == null)   return false;
-  for (  RoleModel role : application.getRoles()) {
-    application.removeRole(role);
+  ClientModel client=getClientById(id);
+  if (client == null)   return false;
+  for (  RoleModel role : client.getRoles()) {
+    client.removeRole(role);
   }
   ClientEntity clientEntity=null;
-  Iterator<ClientEntity> it=realm.getApplications().iterator();
+  Iterator<ClientEntity> it=realm.getClients().iterator();
   while (it.hasNext()) {
     ClientEntity ae=it.next();
     if (ae.getId().equals(id)) {
@@ -15,12 +15,12 @@
       break;
     }
   }
-  for (  ClientEntity a : realm.getApplications()) {
+  for (  ClientEntity a : realm.getClients()) {
     if (a.getId().equals(id)) {
       clientEntity=a;
     }
   }
-  if (application == null) {
+  if (client == null) {
     return false;
   }
   em.remove(clientEntity);

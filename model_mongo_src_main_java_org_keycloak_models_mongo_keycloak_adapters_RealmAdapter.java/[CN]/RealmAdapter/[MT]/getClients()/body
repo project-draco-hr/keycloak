@@ -1,9 +1,9 @@
 {
   DBObject query=new QueryBuilder().and("realmId").is(getId()).get();
-  List<MongoClientEntity> appDatas=getMongoStore().loadEntities(MongoClientEntity.class,query,invocationContext);
+  List<MongoClientEntity> clientEntities=getMongoStore().loadEntities(MongoClientEntity.class,query,invocationContext);
   List<ClientModel> result=new ArrayList<ClientModel>();
-  for (  MongoClientEntity appData : appDatas) {
-    result.add(new ClientAdapter(session,this,appData,invocationContext));
+  for (  MongoClientEntity clientEntity : clientEntities) {
+    result.add(new ClientAdapter(session,this,clientEntity,invocationContext));
   }
   return result;
 }

@@ -12,7 +12,7 @@
   realm.setSsoSessionMaxLifespan(1);
   session.getTransaction().commit();
   session.close();
-  Thread.sleep(1000);
+  Time.setOffset(1);
   tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
   assertEquals(400,tokenResponse.getStatusCode());
   assertNull(tokenResponse.getAccessToken());
@@ -24,4 +24,5 @@
   session.close();
   events.expectRefresh(refreshId,sessionId).error(Errors.INVALID_TOKEN);
   events.clear();
+  Time.setOffset(0);
 }

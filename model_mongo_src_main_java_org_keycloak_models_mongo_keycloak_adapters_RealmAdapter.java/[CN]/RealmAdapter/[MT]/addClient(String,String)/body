@@ -1,11 +1,11 @@
 {
-  MongoClientEntity appData=new MongoClientEntity();
-  appData.setId(id);
-  appData.setClientId(clientId);
-  appData.setRealmId(getId());
-  appData.setEnabled(true);
-  getMongoStore().insertEntity(appData,invocationContext);
-  final ClientModel model=new ClientAdapter(session,this,appData,invocationContext);
+  MongoClientEntity clientEntity=new MongoClientEntity();
+  clientEntity.setId(id);
+  clientEntity.setClientId(clientId);
+  clientEntity.setRealmId(getId());
+  clientEntity.setEnabled(true);
+  getMongoStore().insertEntity(clientEntity,invocationContext);
+  final ClientModel model=new ClientAdapter(session,this,clientEntity,invocationContext);
   session.getKeycloakSessionFactory().publish(new ClientCreationEvent(){
     @Override public ClientModel getCreatedClient(){
       return model;

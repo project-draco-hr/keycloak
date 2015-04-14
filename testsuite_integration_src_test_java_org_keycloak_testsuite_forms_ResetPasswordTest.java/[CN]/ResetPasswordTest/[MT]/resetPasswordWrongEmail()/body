@@ -5,7 +5,6 @@
   resetPasswordPage.changePassword("invalid");
   resetPasswordPage.assertCurrent();
   assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
-  Thread.sleep(1000);
   assertEquals(0,greenMail.getReceivedMessages().length);
   events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).user((String)null).session((String)null).detail(Details.USERNAME,"invalid").removeDetail(Details.EMAIL).removeDetail(Details.CODE_ID).error("user_not_found").assertEvent();
 }

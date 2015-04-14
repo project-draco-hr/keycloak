@@ -10,11 +10,7 @@
   String codeId=loginEvent.getDetails().get(Details.CODE_ID);
   loginEvent.getSessionId();
   String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
-  try {
-    Thread.sleep(2000);
-  }
- catch (  InterruptedException e) {
-  }
+  Time.setOffset(2);
   OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(400,response.getStatusCode());
   AssertEvents.ExpectedEvent expectedEvent=events.expectCodeToToken(codeId,null);
@@ -27,4 +23,5 @@
     }
   }
 );
+  Time.setOffset(0);
 }

@@ -49,16 +49,16 @@
   eventsListeners.addAll(model.getEventsListeners());
   enabledEventTypes.addAll(model.getEnabledEventTypes());
   defaultRoles.addAll(model.getDefaultRoles());
-  masterAdminApp=model.getMasterAdminClient().getId();
+  masterAdminClient=model.getMasterAdminClient().getId();
   for (  RoleModel role : model.getRoles()) {
     realmRoles.put(role.getName(),role.getId());
     CachedRole cachedRole=new CachedRealmRole(role,model);
     cache.addCachedRole(cachedRole);
   }
-  for (  ClientModel app : model.getClients()) {
-    applications.put(app.getClientId(),app.getId());
-    CachedApplication cachedApp=new CachedApplication(cache,delegate,model,app);
-    cache.addCachedApplication(cachedApp);
+  for (  ClientModel client : model.getClients()) {
+    clients.put(client.getClientId(),client.getId());
+    CachedClient cachedClient=new CachedClient(cache,delegate,model,client);
+    cache.addCachedClient(cachedClient);
   }
   internationalizationEnabled=model.isInternationalizationEnabled();
   supportedLocales.addAll(model.getSupportedLocales());

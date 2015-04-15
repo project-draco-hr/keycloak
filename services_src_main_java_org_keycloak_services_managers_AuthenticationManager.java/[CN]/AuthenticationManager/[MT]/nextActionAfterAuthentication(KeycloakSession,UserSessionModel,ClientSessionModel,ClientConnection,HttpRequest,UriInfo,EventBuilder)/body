@@ -17,7 +17,7 @@
     }
     if (action != null) {
       accessCode.setRequiredAction(action);
-      LoginFormsProvider loginFormsProvider=Flows.forms(session,realm,client,uriInfo,request.getHttpHeaders()).setClientSessionCode(accessCode.getCode()).setUser(user);
+      LoginFormsProvider loginFormsProvider=session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setUser(user);
       if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL)) {
         event.clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
         LoginActionsService.createActionCookie(realm,uriInfo,clientConnection,userSession.getId());
@@ -37,7 +37,7 @@
         resourceRoles.add(((ClientModel)r.getContainer()).getClientId(),r);
       }
     }
-    return Flows.forms(session,realm,client,uriInfo,request.getHttpHeaders()).setClientSessionCode(accessCode.getCode()).setAccessRequest(realmRoles,resourceRoles).setClient(client).createOAuthGrant(clientSession);
+    return session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setAccessRequest(realmRoles,resourceRoles).createOAuthGrant(clientSession);
   }
   event.success();
   return redirectAfterSuccessfulFlow(session,realm,userSession,clientSession,request,uriInfo,clientConnection);

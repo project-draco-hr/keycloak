@@ -4,5 +4,5 @@
     message=Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR;
   }
   fireErrorEvent(message);
-  return Flows.forms(this.session,this.realmModel,clientCode.getClientSession().getClient(),this.uriInfo,headers).setClientSessionCode(clientCode.getCode()).setError(message).createLogin();
+  return session.getProvider(LoginFormsProvider.class).setClientSessionCode(clientCode.getCode()).setError(message).createLogin();
 }

@@ -2,17 +2,17 @@
   if (!checkSsl()) {
     event.event(EventType.LOGIN);
     event.error(Errors.SSL_REQUIRED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.HTTPS_REQUIRED);
+    return ErrorPage.error(session,Messages.HTTPS_REQUIRED);
   }
   if (!realm.isEnabled()) {
     event.event(EventType.LOGIN_ERROR);
     event.error(Errors.REALM_DISABLED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.REALM_NOT_ENABLED);
+    return ErrorPage.error(session,Messages.REALM_NOT_ENABLED);
   }
   if (samlRequest == null && samlResponse == null) {
     event.event(EventType.LOGIN);
     event.error(Errors.INVALID_TOKEN);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUEST);
+    return ErrorPage.error(session,Messages.INVALID_REQUEST);
   }
   return null;
 }

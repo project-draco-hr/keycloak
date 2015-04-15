@@ -3,7 +3,7 @@
   if (idpHint != null && !"".equals(idpHint)) {
     IdentityProviderModel identityProviderModel=realm.getIdentityProviderByAlias(idpHint);
     if (identityProviderModel == null) {
-      return Flows.forms(session,realm,null,uriInfo,headers).setError(Messages.IDENTITY_PROVIDER_NOT_FOUND,idpHint).createErrorPage();
+      return session.getProvider(LoginFormsProvider.class).setError(Messages.IDENTITY_PROVIDER_NOT_FOUND,idpHint).createErrorPage();
     }
     return buildRedirectToIdentityProvider(idpHint,accessCode);
   }
@@ -28,11 +28,11 @@
       if (identityProviders.size() == 1) {
         return buildRedirectToIdentityProvider(identityProviders.get(0).getAlias(),accessCode);
       }
-      return Flows.forms(session,realm,null,uriInfo,headers).setError(Messages.IDENTITY_PROVIDER_NOT_UNIQUE,realm.getName()).createErrorPage();
+      return session.getProvider(LoginFormsProvider.class).setError(Messages.IDENTITY_PROVIDER_NOT_UNIQUE,realm.getName()).createErrorPage();
     }
-    return Flows.forms(session,realm,null,uriInfo,headers).setError(Messages.REALM_SUPPORTS_NO_CREDENTIALS,realm.getName()).createErrorPage();
+    return session.getProvider(LoginFormsProvider.class).setError(Messages.REALM_SUPPORTS_NO_CREDENTIALS,realm.getName()).createErrorPage();
   }
-  LoginFormsProvider forms=Flows.forms(session,realm,clientSession.getClient(),uriInfo,headers).setClientSessionCode(accessCode);
+  LoginFormsProvider forms=session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode);
   if (httpAuthOutput.getChallenge() != null) {
     httpAuthOutput.getChallenge().sendChallenge(forms);
   }

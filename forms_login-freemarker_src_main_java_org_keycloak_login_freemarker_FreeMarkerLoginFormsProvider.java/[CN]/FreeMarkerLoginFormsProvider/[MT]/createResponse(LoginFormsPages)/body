@@ -1,4 +1,7 @@
 {
+  RealmModel realm=session.getContext().getRealm();
+  ClientModel client=session.getContext().getClient();
+  UriInfo uriInfo=session.getContext().getUri();
   MultivaluedMap<String,String> queryParameterMap=queryParams != null ? queryParams : new MultivaluedMapImpl<String,String>();
   String requestURI=uriInfo.getBaseUri().getPath();
   UriBuilder uriBuilder=UriBuilder.fromUri(requestURI);
@@ -27,7 +30,7 @@
     logger.warn("Failed to load properties",e);
   }
   Properties messagesBundle;
-  Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,httpHeaders);
+  Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,session.getContext().getRequestHeaders());
   try {
     messagesBundle=theme.getMessages(locale);
     attributes.put("msg",new MessageFormatterMethod(locale,messagesBundle));
@@ -55,7 +58,7 @@
   URI baseUri=uriBuilder.build();
   if (realm != null) {
     attributes.put("realm",new RealmBean(realm));
-    attributes.put("social",new IdentityProviderBean(realm,baseUri,this.uriInfo));
+    attributes.put("social",new IdentityProviderBean(realm,baseUri,uriInfo));
     attributes.put("url",new UrlBean(realm,theme,baseUri,this.actionUri));
     if (realm.isInternationalizationEnabled()) {
       UriBuilder b;

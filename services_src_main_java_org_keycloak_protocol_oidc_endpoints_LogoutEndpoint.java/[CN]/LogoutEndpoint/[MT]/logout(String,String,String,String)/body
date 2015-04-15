@@ -6,7 +6,7 @@
       event.event(EventType.LOGOUT);
       event.detail(Details.REDIRECT_URI,redirect);
       event.error(Errors.INVALID_REDIRECT_URI);
-      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REDIRECT_URI);
+      return ErrorPage.error(session,Messages.INVALID_REDIRECT_URI);
     }
     redirect=validatedUri;
   }
@@ -26,7 +26,7 @@
     if (error) {
       event.event(EventType.LOGOUT);
       event.error(Errors.INVALID_TOKEN);
-      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.SESSION_NOT_ACTIVE);
+      return ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE);
     }
   }
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers,false);

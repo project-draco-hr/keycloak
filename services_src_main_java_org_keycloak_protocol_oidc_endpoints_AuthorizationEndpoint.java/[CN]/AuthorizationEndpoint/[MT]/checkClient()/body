@@ -1,20 +1,21 @@
 {
   if (clientId == null) {
     event.error(Errors.INVALID_REQUEST);
-    throw new ErrorPageException(session,realm,uriInfo,headers,Messages.MISSING_PARAMETER,OIDCLoginProtocol.CLIENT_ID_PARAM);
+    throw new ErrorPageException(session,Messages.MISSING_PARAMETER,OIDCLoginProtocol.CLIENT_ID_PARAM);
   }
   event.client(clientId);
   client=realm.getClientByClientId(clientId);
   if (client == null) {
     event.error(Errors.CLIENT_NOT_FOUND);
-    throw new ErrorPageException(session,realm,uriInfo,headers,Messages.CLIENT_NOT_FOUND);
+    throw new ErrorPageException(session,Messages.CLIENT_NOT_FOUND);
   }
   if ((client instanceof ClientModel) && ((ClientModel)client).isBearerOnly()) {
     event.error(Errors.NOT_ALLOWED);
-    throw new ErrorPageException(session,realm,uriInfo,headers,Messages.BEARER_ONLY);
+    throw new ErrorPageException(session,Messages.BEARER_ONLY);
   }
   if (client.isDirectGrantsOnly()) {
     event.error(Errors.NOT_ALLOWED);
-    throw new ErrorPageException(session,realm,uriInfo,headers,Messages.DIRECT_GRANTS_ONLY);
+    throw new ErrorPageException(session,Messages.DIRECT_GRANTS_ONLY);
   }
+  session.getContext().setClient(client);
 }

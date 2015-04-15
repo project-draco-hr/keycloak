@@ -3,7 +3,7 @@
   if (documentHolder == null) {
     event.event(EventType.LOGIN);
     event.error(Errors.INVALID_TOKEN);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUEST);
+    return ErrorPage.error(session,Messages.INVALID_REQUEST);
   }
   SAML2Object samlObject=documentHolder.getSamlObject();
   RequestAbstractType requestAbstractType=(RequestAbstractType)samlObject;
@@ -12,23 +12,24 @@
   if (client == null) {
     event.event(EventType.LOGIN);
     event.error(Errors.CLIENT_NOT_FOUND);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.UNKNOWN_LOGIN_REQUESTER);
+    return ErrorPage.error(session,Messages.UNKNOWN_LOGIN_REQUESTER);
   }
   if (!client.isEnabled()) {
     event.event(EventType.LOGIN);
     event.error(Errors.CLIENT_DISABLED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.LOGIN_REQUESTER_NOT_ENABLED);
+    return ErrorPage.error(session,Messages.LOGIN_REQUESTER_NOT_ENABLED);
   }
   if ((client instanceof ClientModel) && ((ClientModel)client).isBearerOnly()) {
     event.event(EventType.LOGIN);
     event.error(Errors.NOT_ALLOWED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.BEARER_ONLY);
+    return ErrorPage.error(session,Messages.BEARER_ONLY);
   }
   if (client.isDirectGrantsOnly()) {
     event.event(EventType.LOGIN);
     event.error(Errors.NOT_ALLOWED);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.DIRECT_GRANTS_ONLY);
+    return ErrorPage.error(session,Messages.DIRECT_GRANTS_ONLY);
   }
+  session.getContext().setClient(client);
   try {
     verifySignature(documentHolder,client);
   }
@@ -36,7 +37,7 @@
     SamlService.logger.error("request validation failed",e);
     event.event(EventType.LOGIN);
     event.error(Errors.INVALID_SIGNATURE);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUESTER);
+    return ErrorPage.error(session,Messages.INVALID_REQUESTER);
   }
   logger.debug("verified request");
   if (samlObject instanceof AuthnRequestType) {
@@ -54,6 +55,6 @@
  else {
     event.event(EventType.LOGIN);
     event.error(Errors.INVALID_TOKEN);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUEST);
+    return ErrorPage.error(session,Messages.INVALID_REQUEST);
   }
 }

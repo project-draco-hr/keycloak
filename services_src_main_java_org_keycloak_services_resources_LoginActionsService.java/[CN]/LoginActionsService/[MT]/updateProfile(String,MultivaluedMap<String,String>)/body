@@ -11,7 +11,7 @@
   initEvent(clientSession);
   List<FormMessage> errors=Validation.validateUpdateProfileForm(formData);
   if (errors != null && !errors.isEmpty()) {
-    return Flows.forms(session,realm,null,uriInfo,headers).setUser(user).setErrors(errors).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PROFILE);
+    return session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setUser(user).setErrors(errors).createResponse(RequiredAction.UPDATE_PROFILE);
   }
   user.setFirstName(formData.getFirst("firstName"));
   user.setLastName(formData.getFirst("lastName"));
@@ -21,7 +21,7 @@
   if (emailChanged) {
     UserModel userByEmail=session.users().getUserByEmail(email,realm);
     if (userByEmail != null && !userByEmail.getId().equals(user.getId())) {
-      return Flows.forms(session,realm,null,uriInfo,headers).setUser(user).setError(Messages.EMAIL_EXISTS).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PROFILE);
+      return session.getProvider(LoginFormsProvider.class).setUser(user).setError(Messages.EMAIL_EXISTS).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PROFILE);
     }
     user.setEmail(email);
     user.setEmailVerified(false);

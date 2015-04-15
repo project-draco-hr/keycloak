@@ -3,20 +3,20 @@
     logger.error("no valid user session");
     event.event(EventType.LOGOUT);
     event.error(Errors.USER_SESSION_NOT_FOUND);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
+    return ErrorPage.error(session,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
   }
   UserSessionModel userSession=session.sessions().getUserSession(realm,relayState);
   if (userSession == null) {
     logger.error("no valid user session");
     event.event(EventType.LOGOUT);
     event.error(Errors.USER_SESSION_NOT_FOUND);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
+    return ErrorPage.error(session,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
   }
   if (userSession.getState() != UserSessionModel.State.LOGGING_OUT) {
     logger.error("usersession in different state");
     event.event(EventType.LOGOUT);
     event.error(Errors.USER_SESSION_NOT_FOUND);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.SESSION_NOT_ACTIVE);
+    return ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE);
   }
   return AuthenticationManager.finishBrowserLogout(session,realm,userSession,uriInfo,clientConnection,headers);
 }

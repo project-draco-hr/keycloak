@@ -2,7 +2,7 @@
   if (error != null) {
     event.event(EventType.LOGIN);
     event.error(error);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
+    return ErrorPage.error(session,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
   }
   try {
     if (authorizationCode != null) {
@@ -20,5 +20,5 @@
   }
   event.event(EventType.LOGIN);
   event.error(Errors.IDENTITY_PROVIDER_LOGIN_FAILURE);
-  return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
+  return ErrorPage.error(session,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
 }

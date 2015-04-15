@@ -1,6 +1,6 @@
 {
   if (!cache.isEnabled())   return getDelegate().getClientById(id,realm);
-  CachedApplication cached=cache.getApplication(id);
+  CachedClient cached=cache.getApplication(id);
   if (cached != null && !cached.getRealm().equals(realm.getId())) {
     cached=null;
   }
@@ -8,8 +8,8 @@
     ClientModel model=getDelegate().getClientById(id,realm);
     if (model == null)     return null;
     if (appInvalidations.contains(id))     return model;
-    cached=new CachedApplication(cache,getDelegate(),realm,model);
-    cache.addCachedApplication(cached);
+    cached=new CachedClient(cache,getDelegate(),realm,model);
+    cache.addCachedClient(cached);
   }
  else   if (appInvalidations.contains(id)) {
     return getDelegate().getClientById(id,realm);

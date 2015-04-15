@@ -11,7 +11,7 @@
   initEvent(clientSession);
   String totp=formData.getFirst("totp");
   String totpSecret=formData.getFirst("totpSecret");
-  LoginFormsProvider loginForms=Flows.forms(session,realm,null,uriInfo,headers).setUser(user);
+  LoginFormsProvider loginForms=session.getProvider(LoginFormsProvider.class).setUser(user);
   if (Validation.isEmpty(totp)) {
     return loginForms.setError(Messages.MISSING_TOTP).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.CONFIGURE_TOTP);
   }

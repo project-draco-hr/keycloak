@@ -6,9 +6,9 @@
       return checks.response;
     }
     ClientSessionCode accessCode=checks.clientCode;
-    return Flows.forms(session,realm,null,uriInfo,headers).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
+    return session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
   }
  else {
-    return Flows.forms(session,realm,null,uriInfo,headers).setClientSessionCode(code).createPasswordReset();
+    return session.getProvider(LoginFormsProvider.class).setClientSessionCode(code).createPasswordReset();
   }
 }

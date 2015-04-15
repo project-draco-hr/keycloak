@@ -12,7 +12,7 @@
   loginAndCheckSession(driver,loginPage);
   String logoutUri=OIDCLoginProtocolService.logoutUrl(UriBuilder.fromUri(AUTH_SERVER_URL)).queryParam(OAuth2Constants.REDIRECT_URI,APP_SERVER_BASE_URL + "/session-portal").build("demo").toString();
   driver.navigate().to(logoutUri);
-  Thread.sleep(2000);
+  Time.setOffset(2);
   driver.navigate().to(APP_SERVER_BASE_URL + "/session-portal");
   String currentUrl=driver.getCurrentUrl();
   Assert.assertTrue(currentUrl.startsWith(LOGIN_URL));
@@ -28,4 +28,5 @@
     }
   }
 ,"demo");
+  Time.setOffset(0);
 }

@@ -12,7 +12,7 @@
   int last=userSession.getLastSessionRefresh();
   session.getTransaction().commit();
   session.close();
-  Thread.sleep(2000);
+  Time.setOffset(2);
   tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
   AccessToken refreshedToken=oauth.verifyToken(tokenResponse.getAccessToken());
   RefreshToken refreshedRefreshToken=oauth.verifyRefreshToken(tokenResponse.getRefreshToken());
@@ -30,7 +30,7 @@
   realm.setAccessTokenLifespan(100000);
   session.getTransaction().commit();
   session.close();
-  Thread.sleep(2000);
+  Time.setOffset(4);
   tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
   session=keycloakRule.startSession();
   realm=session.realms().getRealmByName("test");
@@ -46,7 +46,7 @@
   session.getTransaction().commit();
   session.close();
   events.clear();
-  Thread.sleep(2000);
+  Time.setOffset(6);
   tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
   assertEquals(400,tokenResponse.getStatusCode());
   assertNull(tokenResponse.getAccessToken());
@@ -59,4 +59,5 @@
   session.getTransaction().commit();
   session.close();
   events.clear();
+  Time.setOffset(0);
 }

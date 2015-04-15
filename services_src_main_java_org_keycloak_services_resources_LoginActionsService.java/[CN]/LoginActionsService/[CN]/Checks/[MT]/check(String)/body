@@ -1,19 +1,20 @@
 {
   if (!checkSsl()) {
     event.error(Errors.SSL_REQUIRED);
-    response=Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.HTTPS_REQUIRED);
+    response=ErrorPage.error(session,Messages.HTTPS_REQUIRED);
     return false;
   }
   if (!realm.isEnabled()) {
     event.error(Errors.REALM_DISABLED);
-    response=Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.REALM_NOT_ENABLED);
+    response=ErrorPage.error(session,Messages.REALM_NOT_ENABLED);
     return false;
   }
   clientCode=ClientSessionCode.parse(code,session,realm);
   if (clientCode == null) {
     event.error(Errors.INVALID_CODE);
-    response=Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.UNKNOWN_CODE);
+    response=ErrorPage.error(session,Messages.UNKNOWN_CODE);
     return false;
   }
+  session.getContext().setClient(clientCode.getClientSession().getClient());
   return true;
 }

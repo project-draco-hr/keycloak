@@ -42,7 +42,7 @@
   }
  catch (  Exception e) {
     logger.error("failed",e);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.FAILED_TO_PROCESS_RESPONSE);
+    return ErrorPage.error(session,Messages.FAILED_TO_PROCESS_RESPONSE);
   }
   SAML2BindingBuilder2 bindingBuilder=new SAML2BindingBuilder2();
   bindingBuilder.relayState(relayState);
@@ -59,7 +59,7 @@
     }
  catch (    Exception e) {
       logger.error("failed",e);
-      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.FAILED_TO_PROCESS_RESPONSE);
+      return ErrorPage.error(session,Messages.FAILED_TO_PROCESS_RESPONSE);
     }
     bindingBuilder.encrypt(publicKey);
   }
@@ -73,6 +73,6 @@
   }
  catch (  Exception e) {
     logger.error("failed",e);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.FAILED_TO_PROCESS_RESPONSE);
+    return ErrorPage.error(session,Messages.FAILED_TO_PROCESS_RESPONSE);
   }
 }

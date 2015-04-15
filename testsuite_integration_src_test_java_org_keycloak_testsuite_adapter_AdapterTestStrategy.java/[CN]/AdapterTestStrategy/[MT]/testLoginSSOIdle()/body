@@ -14,7 +14,7 @@
   realm.setSsoSessionIdleTimeout(1);
   session.getTransaction().commit();
   session.close();
-  Thread.sleep(2000);
+  Time.setOffset(2);
   driver.navigate().to(APP_SERVER_BASE_URL + "/product-portal");
   Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
   session=keycloakRule.startSession();
@@ -22,4 +22,5 @@
   realm.setSsoSessionIdleTimeout(originalIdle);
   session.getTransaction().commit();
   session.close();
+  Time.setOffset(0);
 }

@@ -15,7 +15,7 @@
   int actual=refreshToken.getExpiration() - Time.currentTime();
   Assert.assertThat(actual,allOf(greaterThanOrEqualTo(1799),lessThanOrEqualTo(1800)));
   Assert.assertEquals(sessionId,refreshToken.getSessionState());
-  Thread.sleep(2000);
+  Time.setOffset(2);
   AccessTokenResponse response=oauth.doRefreshTokenRequest(refreshTokenString,"password");
   AccessToken refreshedToken=oauth.verifyToken(response.getAccessToken());
   RefreshToken refreshedRefreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
@@ -24,8 +24,8 @@
   Assert.assertEquals(sessionId,refreshedRefreshToken.getSessionState());
   Assert.assertThat(response.getExpiresIn(),allOf(greaterThanOrEqualTo(250),lessThanOrEqualTo(300)));
   Assert.assertThat(refreshedToken.getExpiration() - Time.currentTime(),allOf(greaterThanOrEqualTo(250),lessThanOrEqualTo(300)));
-  Assert.assertThat(refreshedToken.getExpiration() - token.getExpiration(),allOf(greaterThanOrEqualTo(1),lessThanOrEqualTo(5)));
-  Assert.assertThat(refreshedRefreshToken.getExpiration() - refreshToken.getExpiration(),allOf(greaterThanOrEqualTo(1),lessThanOrEqualTo(5)));
+  Assert.assertThat(refreshedToken.getExpiration() - token.getExpiration(),allOf(greaterThanOrEqualTo(1),lessThanOrEqualTo(10)));
+  Assert.assertThat(refreshedRefreshToken.getExpiration() - refreshToken.getExpiration(),allOf(greaterThanOrEqualTo(1),lessThanOrEqualTo(10)));
   Assert.assertNotEquals(token.getId(),refreshedToken.getId());
   Assert.assertNotEquals(refreshToken.getId(),refreshedRefreshToken.getId());
   Assert.assertEquals("bearer",response.getTokenType());
@@ -38,4 +38,5 @@
   Event refreshEvent=events.expectRefresh(tokenEvent.getDetails().get(Details.REFRESH_TOKEN_ID),sessionId).assertEvent();
   Assert.assertNotEquals(tokenEvent.getDetails().get(Details.TOKEN_ID),refreshEvent.getDetails().get(Details.TOKEN_ID));
   Assert.assertNotEquals(tokenEvent.getDetails().get(Details.REFRESH_TOKEN_ID),refreshEvent.getDetails().get(Details.UPDATED_REFRESH_TOKEN_ID));
+  Time.setOffset(0);
 }

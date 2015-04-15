@@ -14,7 +14,7 @@
   realm.setSsoSessionIdleTimeout(1);
   session.getTransaction().commit();
   session.close();
-  Thread.sleep(2000);
+  Time.setOffset(2);
   session=keycloakRule.startSession();
   realm=session.realms().getRealmByName("demo");
   session.sessions().removeExpiredUserSessions(realm);
@@ -29,4 +29,5 @@
   realm.setSsoSessionIdleTimeout(originalIdle);
   session.getTransaction().commit();
   session.close();
+  Time.setOffset(0);
 }

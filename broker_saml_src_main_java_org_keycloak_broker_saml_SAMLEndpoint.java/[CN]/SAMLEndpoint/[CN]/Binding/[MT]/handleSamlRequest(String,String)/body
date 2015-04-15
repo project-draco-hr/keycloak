@@ -5,7 +5,7 @@
     event.event(EventType.IDENTITY_PROVIDER_RESPONSE);
     event.error(Errors.INVALID_SAML_RESPONSE);
     event.detail(Details.REASON,"invalid_destination");
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUEST);
+    return ErrorPage.error(session,Messages.INVALID_REQUEST);
   }
   if (config.isValidateSignature()) {
     try {
@@ -15,7 +15,7 @@
       logger.error("validation failed",e);
       event.event(EventType.IDENTITY_PROVIDER_RESPONSE);
       event.error(Errors.INVALID_SIGNATURE);
-      return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUESTER);
+      return ErrorPage.error(session,Messages.INVALID_REQUESTER);
     }
   }
   if (requestAbstractType instanceof LogoutRequestType) {
@@ -27,6 +27,6 @@
  else {
     event.event(EventType.LOGIN);
     event.error(Errors.INVALID_TOKEN);
-    return Flows.forwardToSecurityFailurePage(session,realm,uriInfo,headers,Messages.INVALID_REQUEST);
+    return ErrorPage.error(session,Messages.INVALID_REQUEST);
   }
 }

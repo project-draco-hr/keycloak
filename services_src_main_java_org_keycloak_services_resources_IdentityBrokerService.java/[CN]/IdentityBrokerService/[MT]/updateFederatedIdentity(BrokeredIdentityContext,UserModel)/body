@@ -1,0 +1,19 @@
+{
+  FederatedIdentityModel federatedIdentityModel=this.session.users().getFederatedIdentity(federatedUser,updatedIdentity.getIdpConfig().getAlias(),this.realmModel);
+  if (!ObjectUtil.isEqualOrNull(updatedIdentity.getToken(),federatedIdentityModel.getToken())) {
+    federatedIdentityModel.setToken(updatedIdentity.getToken());
+    this.session.users().updateFederatedIdentity(this.realmModel,federatedUser,federatedIdentityModel);
+    if (isDebugEnabled()) {
+      LOGGER.debugf("Identity [%s] update with response from identity provider [%s].",federatedUser,updatedIdentity.getIdpConfig().getAlias());
+    }
+  }
+  updatedIdentity.getIdp().updateBrokeredUser(session,realmModel,federatedUser,updatedIdentity);
+  Set<IdentityProviderMapperModel> mappers=realmModel.getIdentityProviderMappersByAlias(updatedIdentity.getIdpConfig().getAlias());
+  if (mappers != null) {
+    KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+    for (    IdentityProviderMapperModel mapper : mappers) {
+      IdentityProviderMapper target=(IdentityProviderMapper)sessionFactory.getProviderFactory(IdentityProviderMapper.class,mapper.getIdentityProviderMapper());
+      target.updateBrokeredUser(session,realmModel,federatedUser,mapper,updatedIdentity);
+    }
+  }
+}

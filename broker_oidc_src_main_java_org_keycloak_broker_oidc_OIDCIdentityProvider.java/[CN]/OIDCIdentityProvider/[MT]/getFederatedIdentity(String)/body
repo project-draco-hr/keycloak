@@ -1,0 +1,51 @@
+{
+  AccessTokenResponse tokenResponse=null;
+  try {
+    tokenResponse=JsonSerialization.readValue(response,AccessTokenResponse.class);
+  }
+ catch (  IOException e) {
+    throw new IdentityBrokerException("Could not decode access token response.",e);
+  }
+  PublicKey key=getExternalIdpKey();
+  String accessToken=verifyAccessToken(key,tokenResponse);
+  String encodedIdToken=tokenResponse.getIdToken();
+  JsonWebToken idToken=validateIdToken(key,encodedIdToken);
+  try {
+    String id=idToken.getSubject();
+    BrokeredIdentityContext identity=new BrokeredIdentityContext(id);
+    String name=(String)idToken.getOtherClaims().get(IDToken.NAME);
+    String preferredUsername=(String)idToken.getOtherClaims().get(IDToken.PREFERRED_USERNAME);
+    String email=(String)idToken.getOtherClaims().get(IDToken.EMAIL);
+    if (getConfig().getUserInfoUrl() != null && (id == null || name == null || preferredUsername == null || email == null)) {
+      JsonNode userInfo=SimpleHttp.doGet(getConfig().getUserInfoUrl()).header("Authorization","Bearer " + accessToken).asJson();
+      id=getJsonProperty(userInfo,"sub");
+      name=getJsonProperty(userInfo,"name");
+      preferredUsername=getJsonProperty(userInfo,"preferred_username");
+      email=getJsonProperty(userInfo,"email");
+      identity.getContextData().put(USER_INFO,userInfo);
+    }
+    identity.getContextData().put(FEDERATED_ACCESS_TOKEN_RESPONSE,tokenResponse);
+    identity.getContextData().put(VALIDATED_ID_TOKEN,idToken);
+    identity.setId(id);
+    identity.setName(name);
+    identity.setEmail(email);
+    identity.setBrokerUserId(getConfig().getAlias() + "." + id);
+    if (tokenResponse.getSessionState() != null) {
+      identity.setBrokerSessionId(getConfig().getAlias() + "." + tokenResponse.getSessionState());
+    }
+    if (preferredUsername == null) {
+      preferredUsername=email;
+    }
+    if (preferredUsername == null) {
+      preferredUsername=id;
+    }
+    identity.setUsername(preferredUsername);
+    if (getConfig().isStoreToken()) {
+      identity.setToken(response);
+    }
+    return identity;
+  }
+ catch (  Exception e) {
+    throw new IdentityBrokerException("Could not fetch attributes from userinfo endpoint.",e);
+  }
+}

@@ -1,0 +1,30 @@
+{
+  this.auth.requireView();
+  KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+  List<IdentityProviderMapperTypeRepresentation> types=new LinkedList<>();
+  List<ProviderFactory> factories=sessionFactory.getProviderFactories(IdentityProviderMapper.class);
+  for (  ProviderFactory factory : factories) {
+    IdentityProviderMapper mapper=(IdentityProviderMapper)factory;
+    for (    String type : mapper.getCompatibleProviders()) {
+      if (type.equals(identityProviderModel.getProviderId())) {
+        IdentityProviderMapperTypeRepresentation rep=new IdentityProviderMapperTypeRepresentation();
+        rep.setId(mapper.getId());
+        rep.setCategory(mapper.getDisplayCategory());
+        rep.setName(mapper.getDisplayType());
+        rep.setHelpText(mapper.getHelpText());
+        List<ProviderConfigProperty> configProperties=mapper.getConfigProperties();
+        for (        ProviderConfigProperty prop : configProperties) {
+          ConfigPropertyRepresentation propRep=new ConfigPropertyRepresentation();
+          propRep.setName(prop.getName());
+          propRep.setLabel(prop.getLabel());
+          propRep.setType(prop.getType());
+          propRep.setDefaultValue(prop.getDefaultValue());
+          propRep.setHelpText(prop.getHelpText());
+          rep.getProperties().add(propRep);
+        }
+        types.add(rep);
+      }
+    }
+  }
+  return types;
+}

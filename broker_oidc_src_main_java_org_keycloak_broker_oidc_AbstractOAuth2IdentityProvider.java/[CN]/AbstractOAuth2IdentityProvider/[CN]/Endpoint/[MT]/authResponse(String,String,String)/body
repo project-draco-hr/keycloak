@@ -7,12 +7,14 @@
   try {
     if (authorizationCode != null) {
       String response=generateTokenRequest(authorizationCode).asString();
-      HashMap<String,String> userNotes=new HashMap<String,String>();
-      FederatedIdentity federatedIdentity=getFederatedIdentity(userNotes,response);
+      BrokeredIdentityContext federatedIdentity=getFederatedIdentity(response);
       if (getConfig().isStoreToken()) {
         federatedIdentity.setToken(response);
       }
-      return callback.authenticated(userNotes,getConfig(),federatedIdentity,state);
+      federatedIdentity.setCode(state);
+      federatedIdentity.setIdpConfig(getConfig());
+      federatedIdentity.setIdp(AbstractOAuth2IdentityProvider.this);
+      return callback.authenticated(federatedIdentity);
     }
   }
  catch (  Exception e) {

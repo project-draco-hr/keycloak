@@ -11,7 +11,10 @@
   try {
     session.users().updateCredential(realm,user,cred);
   }
- catch (  ModelReadOnlyException mre) {
+ catch (  IllegalStateException ise) {
+    throw new BadRequestException("Resetting to N old passwords is not allowed.");
+  }
+catch (  ModelReadOnlyException mre) {
     throw new BadRequestException("Can't reset password as account is read only");
   }
   if (pass.isTemporary())   user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);

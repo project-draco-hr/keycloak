@@ -1,0 +1,34 @@
+{
+  CredentialEntity credentialEntity=getCredentialEntity(user,cred.getType());
+  if (credentialEntity == null) {
+    credentialEntity=setCredentials(user,cred);
+    setValue(credentialEntity,cred);
+    user.getCredentials().add(credentialEntity);
+  }
+ else {
+    int expiredPasswordsPolicyValue=-1;
+    PasswordPolicy policy=realm.getPasswordPolicy();
+    if (policy != null) {
+      expiredPasswordsPolicyValue=policy.getExpiredPasswords();
+    }
+    if (expiredPasswordsPolicyValue != -1) {
+      user.getCredentials().remove(credentialEntity);
+      credentialEntity.setType(UserCredentialModel.PASSWORD_HISTORY);
+      user.getCredentials().add(credentialEntity);
+      List<CredentialEntity> credentialEntities=getCredentialEntities(user,UserCredentialModel.PASSWORD_HISTORY);
+      if (credentialEntities.size() > expiredPasswordsPolicyValue - 1) {
+        user.getCredentials().removeAll(credentialEntities.subList(expiredPasswordsPolicyValue - 1,credentialEntities.size()));
+      }
+      credentialEntity=setCredentials(user,cred);
+      setValue(credentialEntity,cred);
+      user.getCredentials().add(credentialEntity);
+    }
+ else {
+      List<CredentialEntity> credentialEntities=getCredentialEntities(user,UserCredentialModel.PASSWORD_HISTORY);
+      if (credentialEntities != null && credentialEntities.size() > 0) {
+        user.getCredentials().removeAll(credentialEntities);
+      }
+      setValue(credentialEntity,cred);
+    }
+  }
+}

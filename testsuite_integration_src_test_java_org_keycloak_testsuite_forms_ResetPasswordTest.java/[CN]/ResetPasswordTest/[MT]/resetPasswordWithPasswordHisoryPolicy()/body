@@ -1,0 +1,30 @@
+{
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.setPasswordPolicy(new PasswordPolicy("passwordHistory"));
+    }
+  }
+);
+  resetPassword("login-test","password1");
+  resetPassword("login-test","password2");
+  resetPassword("login-test","password3");
+  try {
+    resetPassword("login-test","password1");
+    fail("Expected NullPointerException: Block passwords that are equal to previous passwords.");
+  }
+ catch (  Exception e) {
+  }
+  try {
+    resetPassword("login-test","password2");
+    fail("Expected NullPointerException: Block passwords that are equal to previous passwords.");
+  }
+ catch (  Exception e) {
+  }
+  try {
+    resetPassword("login-test","password3");
+    fail("Expected NullPointerException: Block passwords that are equal to previous passwords.");
+  }
+ catch (  Exception e) {
+  }
+  resetPassword("login-test","password");
+}

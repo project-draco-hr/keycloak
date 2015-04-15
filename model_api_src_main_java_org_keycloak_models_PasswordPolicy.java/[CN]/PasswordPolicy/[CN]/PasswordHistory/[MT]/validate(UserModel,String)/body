@@ -1,0 +1,17 @@
+{
+  if (passwordHistoryPolicyValue != -1) {
+    UserCredentialValueModel cred=getCredentialValueModel(user,UserCredentialModel.PASSWORD);
+    if (cred != null) {
+      if (new Pbkdf2PasswordEncoder(cred.getSalt()).verify(password,cred.getValue(),cred.getHashIterations())) {
+        return new Error(INVALID_PASSWORD_HISTORY,password);
+      }
+    }
+    List<UserCredentialValueModel> passwordExpiredCredentials=getCredentialValueModels(user,passwordHistoryPolicyValue - 1,UserCredentialModel.PASSWORD_HISTORY);
+    for (    UserCredentialValueModel credential : passwordExpiredCredentials) {
+      if (new Pbkdf2PasswordEncoder(credential.getSalt()).verify(password,credential.getValue(),credential.getHashIterations())) {
+        return new Error(INVALID_PASSWORD_HISTORY,password);
+      }
+    }
+  }
+  return null;
+}

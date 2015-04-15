@@ -38,7 +38,15 @@
   federatedUser.setFirstName(updatedIdentity.getFirstName());
   federatedUser.setLastName(updatedIdentity.getLastName());
   this.session.users().addFederatedIdentity(this.realmModel,federatedUser,federatedIdentityModel);
-  updatedIdentity.getIdp().importNewUser(federatedUser,updatedIdentity);
+  updatedIdentity.getIdp().importNewUser(session,realmModel,federatedUser,updatedIdentity);
+  Set<IdentityProviderMapperModel> mappers=realmModel.getIdentityProviderMappersByAlias(updatedIdentity.getIdpConfig().getAlias());
+  if (mappers != null) {
+    KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+    for (    IdentityProviderMapperModel mapper : mappers) {
+      IdentityProviderMapper target=(IdentityProviderMapper)sessionFactory.getProviderFactory(IdentityProviderMapper.class,mapper.getIdentityProviderMapper());
+      target.importNewUser(session,realmModel,federatedUser,mapper,updatedIdentity);
+    }
+  }
   this.event.clone().user(federatedUser).event(EventType.REGISTER).detail(Details.IDENTITY_PROVIDER,federatedIdentityModel.getIdentityProvider()).detail(Details.IDENTITY_PROVIDER_USERNAME,updatedIdentity.getUsername()).removeDetail("auth_method").success();
   return federatedUser;
 }

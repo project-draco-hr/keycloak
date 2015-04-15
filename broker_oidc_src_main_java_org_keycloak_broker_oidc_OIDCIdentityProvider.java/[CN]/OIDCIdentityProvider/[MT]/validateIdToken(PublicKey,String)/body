@@ -7,7 +7,7 @@
     if (!verify(jws,key)) {
       throw new IdentityBrokerException("IDToken signature validation failed");
     }
-    IDToken idToken=jws.readJsonContent(IDToken.class);
+    JsonWebToken idToken=jws.readJsonContent(JsonWebToken.class);
     String aud=idToken.getAudience();
     String iss=idToken.getIssuer();
     if (aud != null && !aud.equals(getConfig().getClientId())) {

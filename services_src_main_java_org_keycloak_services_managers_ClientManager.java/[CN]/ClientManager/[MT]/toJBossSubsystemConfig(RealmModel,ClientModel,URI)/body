@@ -3,14 +3,12 @@
   buffer.append("<secure-deployment name=\"WAR MODULE NAME.war\">\n");
   buffer.append("    <realm>").append(realmModel.getName()).append("</realm>\n");
   buffer.append("    <realm-public-key>").append(realmModel.getPublicKeyPem()).append("</realm-public-key>\n");
+  buffer.append("    <auth-server-url>").append(baseUri.toString()).append("</auth-server-url>\n");
   if (clientModel.isBearerOnly()) {
     buffer.append("    <bearer-only>true</bearer-only>\n");
   }
- else {
-    buffer.append("    <auth-server-url>").append(baseUri.toString()).append("</auth-server-url>\n");
-    if (clientModel.isPublicClient() && !clientModel.isBearerOnly()) {
-      buffer.append("    <public-client>true</public-client>\n");
-    }
+ else   if (clientModel.isPublicClient()) {
+    buffer.append("    <public-client>true</public-client>\n");
   }
   buffer.append("    <ssl-required>").append(realmModel.getSslRequired().name()).append("</ssl-required>\n");
   buffer.append("    <resource>").append(clientModel.getClientId()).append("</resource>\n");

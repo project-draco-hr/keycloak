@@ -9,7 +9,7 @@
   PublicKey key=getExternalIdpKey();
   String accessToken=verifyAccessToken(key,tokenResponse);
   String encodedIdToken=tokenResponse.getIdToken();
-  JsonWebToken idToken=validateIdToken(key,encodedIdToken);
+  JsonWebToken idToken=validateToken(key,encodedIdToken);
   try {
     String id=idToken.getSubject();
     BrokeredIdentityContext identity=new BrokeredIdentityContext(id);
@@ -26,6 +26,7 @@
     }
     identity.getContextData().put(FEDERATED_ACCESS_TOKEN_RESPONSE,tokenResponse);
     identity.getContextData().put(VALIDATED_ID_TOKEN,idToken);
+    processAccessTokenResponse(identity,key,tokenResponse);
     identity.setId(id);
     identity.setName(name);
     identity.setEmail(email);

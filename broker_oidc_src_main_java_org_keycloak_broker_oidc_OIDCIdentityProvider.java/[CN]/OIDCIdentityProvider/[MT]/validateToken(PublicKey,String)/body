@@ -1,0 +1,34 @@
+{
+  if (encodedToken == null) {
+    throw new IdentityBrokerException("No token from server.");
+  }
+  try {
+    JWSInput jws=new JWSInput(encodedToken);
+    if (!verify(jws,key)) {
+      throw new IdentityBrokerException("token signature validation failed");
+    }
+    JsonWebToken token=jws.readJsonContent(JsonWebToken.class);
+    String aud=token.getAudience();
+    String iss=token.getIssuer();
+    if (aud != null && !aud.equals(getConfig().getClientId())) {
+      throw new IdentityBrokerException("Wrong audience from token.");
+    }
+    if (!token.isActive()) {
+      throw new IdentityBrokerException("Token is no longer valid");
+    }
+    String trustedIssuers=getConfig().getIssuer();
+    if (trustedIssuers != null) {
+      String[] issuers=trustedIssuers.split(",");
+      for (      String trustedIssuer : issuers) {
+        if (iss != null && iss.equals(trustedIssuer.trim())) {
+          return token;
+        }
+      }
+      throw new IdentityBrokerException("Wrong issuer from token. Got: " + iss + " expected: "+ getConfig().getIssuer());
+    }
+    return token;
+  }
+ catch (  IOException e) {
+    throw new IdentityBrokerException("Could not decode token.",e);
+  }
+}

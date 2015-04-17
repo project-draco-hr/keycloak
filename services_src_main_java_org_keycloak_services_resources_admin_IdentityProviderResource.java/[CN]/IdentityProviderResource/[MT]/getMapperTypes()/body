@@ -1,7 +1,7 @@
 {
   this.auth.requireView();
   KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
-  List<IdentityProviderMapperTypeRepresentation> types=new LinkedList<>();
+  Map<String,IdentityProviderMapperTypeRepresentation> types=new HashMap<>();
   List<ProviderFactory> factories=sessionFactory.getProviderFactories(IdentityProviderMapper.class);
   for (  ProviderFactory factory : factories) {
     IdentityProviderMapper mapper=(IdentityProviderMapper)factory;
@@ -22,7 +22,7 @@
           propRep.setHelpText(prop.getHelpText());
           rep.getProperties().add(propRep);
         }
-        types.add(rep);
+        types.put(rep.getId(),rep);
       }
     }
   }

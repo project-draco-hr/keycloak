@@ -1,0 +1,21 @@
+{
+  boolean searchAccess=Boolean.valueOf(mapperModel.getConfig().get(ACCESS_TOKEN_CLAIM));
+  boolean searchId=Boolean.valueOf(mapperModel.getConfig().get(ID_TOKEN_CLAIM));
+  String claim=mapperModel.getConfig().get(CLAIM);
+  String desiredValue=mapperModel.getConfig().get(CLAIM_VALUE);
+  if (searchAccess) {
+    JsonWebToken token=(JsonWebToken)context.getContextData().get(KeycloakOIDCIdentityProvider.VALIDATED_ACCESS_TOKEN);
+    if (token != null) {
+      Object value=getClaimValue(token,claim);
+      if (valueEquals(desiredValue,value))       return true;
+    }
+  }
+  if (searchId) {
+    JsonWebToken token=(JsonWebToken)context.getContextData().get(KeycloakOIDCIdentityProvider.VALIDATED_ID_TOKEN);
+    if (token != null) {
+      Object value=getClaimValue(token,claim);
+      if (valueEquals(desiredValue,value))       return true;
+    }
+  }
+  return false;
+}

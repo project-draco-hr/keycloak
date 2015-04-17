@@ -1,0 +1,15 @@
+{
+  String[] split=claim.split("\\.");
+  Map<String,Object> jsonObject=token.getOtherClaims();
+  for (int i=0; i < split.length; i++) {
+    if (i == split.length - 1) {
+      return jsonObject.get(split[i]);
+    }
+ else {
+      Object val=jsonObject.get(split[i]);
+      if (!(val instanceof Map))       return null;
+      jsonObject=(Map<String,Object>)val;
+    }
+  }
+  return null;
+}

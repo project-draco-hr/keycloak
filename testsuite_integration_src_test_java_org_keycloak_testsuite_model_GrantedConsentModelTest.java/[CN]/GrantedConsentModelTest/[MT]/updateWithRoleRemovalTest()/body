@@ -1,0 +1,23 @@
+{
+  RealmModel realm=realmManager.getRealm("original");
+  ClientModel fooClient=realm.getClientNameMap().get("foo-client");
+  UserModel john=session.users().getUserByUsername("john",realm);
+  GrantedConsentModel johnConsent=john.getGrantedConsentByClient(fooClient.getId());
+  ProtocolMapperModel protMapperModel=fooClient.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,"foo");
+  johnConsent.getGrantedProtocolMappers().remove(protMapperModel.getId());
+  RoleModel realmRole=realm.getRole("realm-role");
+  johnConsent.getGrantedRoles().remove(realmRole.getId());
+  RoleModel newRealmRole=realm.addRole("new-realm-role");
+  johnConsent.addGrantedRole(newRealmRole.getId());
+  john.updateGrantedConsent(johnConsent);
+  commit();
+  realm=realmManager.getRealm("original");
+  fooClient=realm.getClientNameMap().get("foo-client");
+  john=session.users().getUserByUsername("john",realm);
+  johnConsent=john.getGrantedConsentByClient(fooClient.getId());
+  Assert.assertEquals(johnConsent.getGrantedRoles().size(),2);
+  Assert.assertEquals(johnConsent.getGrantedProtocolMappers().size(),0);
+  Assert.assertFalse(isRoleGranted(realm,"realm-role",johnConsent));
+  Assert.assertTrue(isRoleGranted(realm,"new-realm-role",johnConsent));
+  Assert.assertFalse(isMapperGranted(fooClient,"foo",johnConsent));
+}

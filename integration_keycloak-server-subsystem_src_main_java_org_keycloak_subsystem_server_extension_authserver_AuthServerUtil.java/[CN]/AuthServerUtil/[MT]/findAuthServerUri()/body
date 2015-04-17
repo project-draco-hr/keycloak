@@ -1,0 +1,19 @@
+{
+  try {
+    URL subsysJar=this.subsysModule.getExportedResource("keycloak-server-subsystem-" + this.keycloakVersion + ".jar");
+    File subsysDir=new File(subsysJar.toURI()).getParentFile();
+    File authServerDir=new File(subsysDir,"auth-server");
+    if (this.isAuthServerExploded) {
+      return authServerDir.toURI();
+    }
+ else {
+      return new File(authServerDir,"keycloak-server-" + keycloakVersion + ".war").toURI();
+    }
+  }
+ catch (  URISyntaxException e) {
+    throw new IllegalStateException(e);
+  }
+catch (  IllegalArgumentException e) {
+    throw new IllegalStateException(e);
+  }
+}

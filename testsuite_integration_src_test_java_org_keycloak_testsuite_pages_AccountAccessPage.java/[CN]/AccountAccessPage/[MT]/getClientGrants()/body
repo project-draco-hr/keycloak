@@ -1,0 +1,35 @@
+{
+  Map<String,ClientGrant> table=new HashMap<String,ClientGrant>();
+  for (  WebElement r : driver.findElements(By.tagName("tr"))) {
+    int count=0;
+    ClientGrant currentGrant=null;
+    for (    WebElement col : r.findElements(By.tagName("td"))) {
+      count++;
+switch (count) {
+case 1:
+        currentGrant=new ClientGrant();
+      String clientId=col.getText();
+    table.put(clientId,currentGrant);
+  break;
+case 2:
+String protMappersStr=col.getText();
+String[] protMappers=protMappersStr.split(",");
+for (String protMapper : protMappers) {
+protMapper=protMapper.trim();
+currentGrant.addMapper(protMapper);
+}
+break;
+case 3:
+String rolesStr=col.getText();
+String[] roles=rolesStr.split(",");
+for (String role : roles) {
+role=role.trim();
+currentGrant.addRole(role);
+}
+break;
+}
+}
+}
+table.remove("Client");
+return table;
+}

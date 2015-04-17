@@ -1,6 +1,7 @@
 {
   RealmModel realm=clientSession.getRealm();
   UserModel user=userSession.getUser();
+  isForcePasswordUpdateRequired(realm,user);
   isTotpConfigurationRequired(realm,user);
   isEmailVerificationRequired(realm,user);
   ClientModel client=clientSession.getClient();
@@ -27,9 +28,13 @@
   }
   if (client.isConsentRequired()) {
     accessCode.setAction(ClientSessionModel.Action.OAUTH_GRANT);
+    GrantedConsentModel grantedConsent=user.getGrantedConsentByClient(client.getId());
     List<RoleModel> realmRoles=new LinkedList<RoleModel>();
     MultivaluedMap<String,RoleModel> resourceRoles=new MultivaluedMapImpl<String,RoleModel>();
     for (    RoleModel r : accessCode.getRequestedRoles()) {
+      if (grantedConsent != null && grantedConsent.getGrantedRoles().contains(r.getId())) {
+        continue;
+      }
       if (r.getContainer() instanceof RealmModel) {
         realmRoles.add(r);
       }
@@ -37,7 +42,17 @@
         resourceRoles.add(((ClientModel)r.getContainer()).getClientId(),r);
       }
     }
-    return session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setAccessRequest(realmRoles,resourceRoles).createOAuthGrant(clientSession);
+    List<ProtocolMapperModel> protocolMappers=new LinkedList<ProtocolMapperModel>();
+    for (    ProtocolMapperModel model : client.getProtocolMappers()) {
+      if (model.isConsentRequired() && model.getProtocol().equals(clientSession.getAuthMethod()) && model.getConsentText() != null) {
+        if (grantedConsent == null || !grantedConsent.getGrantedProtocolMappers().contains(model.getId())) {
+          protocolMappers.add(model);
+        }
+      }
+    }
+    if (realmRoles.size() > 0 || resourceRoles.size() > 0 || protocolMappers.size() > 0) {
+      return session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setAccessRequest(realmRoles,resourceRoles,protocolMappers).createOAuthGrant(clientSession);
+    }
   }
   event.success();
   return redirectAfterSuccessfulFlow(session,realm,userSession,clientSession,request,uriInfo,clientConnection);

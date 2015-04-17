@@ -1,0 +1,22 @@
+{
+  int daysToExpirePassword=realm.getPasswordPolicy().getDaysToExpirePassword();
+  if (daysToExpirePassword != -1) {
+    for (    UserCredentialValueModel entity : user.getCredentialsDirectly()) {
+      if (entity.getType().equals(UserCredentialModel.PASSWORD)) {
+        if (entity.getCreatedDate() == null) {
+          user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+          logger.debug("User is required to update password");
+        }
+ else {
+          long timeElapsed=Time.toMillis(Time.currentTime()) - entity.getCreatedDate();
+          long timeToExpire=TimeUnit.DAYS.toMillis(daysToExpirePassword);
+          if (timeElapsed > timeToExpire) {
+            user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+            logger.debug("User is required to update password");
+          }
+        }
+        break;
+      }
+    }
+  }
+}

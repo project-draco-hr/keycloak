@@ -1,0 +1,15 @@
+{
+  RealmModel realm=realmManager.getRealm("original");
+  ClientModel fooClient=realm.getClientNameMap().get("foo-client");
+  ProtocolMapperModel fooMapper=fooClient.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,"foo");
+  String fooMapperId=fooMapper.getId();
+  fooClient.removeProtocolMapper(fooMapper);
+  commit();
+  realm=realmManager.getRealm("original");
+  fooClient=realm.getClientNameMap().get("foo-client");
+  UserModel john=session.users().getUserByUsername("john",realm);
+  GrantedConsentModel johnConsent=john.getGrantedConsentByClient(fooClient.getId());
+  Assert.assertEquals(johnConsent.getGrantedRoles().size(),2);
+  Assert.assertEquals(johnConsent.getGrantedProtocolMappers().size(),0);
+  Assert.assertFalse(johnConsent.isProtocolMapperGranted(fooMapperId));
+}

@@ -11,6 +11,7 @@
   doAfterProviderAuthentication();
   assertTrue(accountFederatedIdentityPage.isCurrent());
   assertTrue(driver.getPageSource().contains("id=\"remove-" + identityProviderModel.getAlias() + "\""));
+  revokeGrant();
   accountFederatedIdentityPage.logout();
   assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
   loginPage.clickSocial(identityProviderModel.getAlias());
@@ -19,6 +20,7 @@
   assertTrue(driver.getPageSource().contains("id=\"remove-" + identityProviderModel.getAlias() + "\""));
   accountFederatedIdentityPage.clickRemoveProvider(identityProviderModel.getAlias());
   assertTrue(driver.getPageSource().contains("id=\"add-" + identityProviderModel.getAlias() + "\""));
+  revokeGrant();
   accountFederatedIdentityPage.logout();
   assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
   this.loginPage.clickSocial(identityProviderModel.getAlias());

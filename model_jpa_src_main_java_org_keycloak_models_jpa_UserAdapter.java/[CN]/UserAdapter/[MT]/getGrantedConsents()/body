@@ -1,0 +1,11 @@
+{
+  TypedQuery<GrantedConsentEntity> query=em.createNamedQuery("grantedConsentsByUser",GrantedConsentEntity.class);
+  query.setParameter("userId",getId());
+  List<GrantedConsentEntity> results=query.getResultList();
+  List<GrantedConsentModel> consents=new ArrayList<GrantedConsentModel>();
+  for (  GrantedConsentEntity entity : results) {
+    GrantedConsentModel model=toConsentModel(entity);
+    consents.add(model);
+  }
+  return consents;
+}

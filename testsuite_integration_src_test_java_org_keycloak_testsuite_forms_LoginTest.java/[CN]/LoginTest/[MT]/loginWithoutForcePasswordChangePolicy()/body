@@ -1,0 +1,25 @@
+{
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.setPasswordPolicy(new PasswordPolicy("forceExpiredPasswordChange(1)"));
+    }
+  }
+);
+  try {
+    Time.setOffset(86205);
+    loginPage.open();
+    loginPage.login("login-test","password");
+    Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+    Assert.assertNotNull(oauth.getCurrentQuery().get(OAuth2Constants.CODE));
+    events.expectLogin().user(userId).detail(Details.USERNAME,"login-test").assertEvent();
+  }
+  finally {
+    keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        appRealm.setPasswordPolicy(new PasswordPolicy(null));
+      }
+    }
+);
+    Time.setOffset(0);
+  }
+}

@@ -1,0 +1,16 @@
+{
+  String name=mapperModel.getConfig().get(ATTRIBUTE_NAME);
+  if (name != null && name.trim().equals(""))   name=null;
+  String friendly=mapperModel.getConfig().get(ATTRIBUTE_FRIENDLY_NAME);
+  if (friendly != null && friendly.trim().equals(""))   friendly=null;
+  AssertionType assertion=(AssertionType)context.getContextData().get(SAMLEndpoint.SAML_ASSERTION);
+  for (  AttributeStatementType statement : assertion.getAttributeStatements()) {
+    for (    AttributeStatementType.ASTChoiceType choice : statement.getAttributes()) {
+      AttributeType attr=choice.getAttribute();
+      if (name != null && !name.equals(attr.getName()))       continue;
+      if (friendly != null && !name.equals(attr.getFriendlyName()))       continue;
+      return attr.getAttributeValue().get(0).toString();
+    }
+  }
+  return null;
+}

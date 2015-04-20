@@ -9,7 +9,9 @@
       AttributeType attr=choice.getAttribute();
       if (name != null && !name.equals(attr.getName()))       continue;
       if (friendly != null && !name.equals(attr.getFriendlyName()))       continue;
-      return attr.getAttributeValue().get(0).toString();
+      List<Object> attributeValue=attr.getAttributeValue();
+      if (attributeValue == null || attributeValue.isEmpty())       return null;
+      return attributeValue.get(0).toString();
     }
   }
   return null;

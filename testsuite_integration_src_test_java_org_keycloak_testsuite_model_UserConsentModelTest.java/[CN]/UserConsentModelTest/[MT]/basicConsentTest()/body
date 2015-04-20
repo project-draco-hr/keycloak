@@ -1,0 +1,25 @@
+{
+  RealmModel realm=realmManager.getRealm("original");
+  ClientModel fooClient=realm.getClientByClientId("foo-client");
+  ClientModel barClient=realm.getClientByClientId("bar-client");
+  UserModel john=session.users().getUserByUsername("john",realm);
+  UserModel mary=session.users().getUserByUsername("mary",realm);
+  UserConsentModel johnFooConsent=john.getGrantedConsentByClient(fooClient.getId());
+  Assert.assertEquals(johnFooConsent.getGrantedRoles().size(),2);
+  Assert.assertEquals(johnFooConsent.getGrantedProtocolMappers().size(),1);
+  Assert.assertTrue(isRoleGranted(realm,"realm-role",johnFooConsent));
+  Assert.assertTrue(isRoleGranted(barClient,"bar-client-role",johnFooConsent));
+  Assert.assertTrue(isMapperGranted(fooClient,"foo",johnFooConsent));
+  UserConsentModel johnBarConsent=john.getGrantedConsentByClient(barClient.getId());
+  Assert.assertEquals(johnBarConsent.getGrantedRoles().size(),1);
+  Assert.assertEquals(johnBarConsent.getGrantedProtocolMappers().size(),1);
+  Assert.assertTrue(isRoleGranted(realm,"realm-role",johnBarConsent));
+  Assert.assertTrue(isMapperGranted(barClient,"bar",johnBarConsent));
+  UserConsentModel maryConsent=mary.getGrantedConsentByClient(fooClient.getId());
+  Assert.assertEquals(maryConsent.getGrantedRoles().size(),1);
+  Assert.assertEquals(maryConsent.getGrantedProtocolMappers().size(),1);
+  Assert.assertTrue(isRoleGranted(realm,"realm-role",maryConsent));
+  Assert.assertFalse(isRoleGranted(barClient,"bar-client-role",maryConsent));
+  Assert.assertTrue(isMapperGranted(fooClient,"foo",maryConsent));
+  Assert.assertNull(mary.getGrantedConsentByClient(barClient.getId()));
+}

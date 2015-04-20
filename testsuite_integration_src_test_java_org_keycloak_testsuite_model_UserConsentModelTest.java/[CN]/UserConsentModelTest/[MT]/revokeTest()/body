@@ -1,0 +1,10 @@
+{
+  RealmModel realm=realmManager.getRealm("original");
+  ClientModel fooClient=realm.getClientByClientId("foo-client");
+  UserModel john=session.users().getUserByUsername("john",realm);
+  john.revokeGrantedConsentForClient(fooClient.getId());
+  commit();
+  realm=realmManager.getRealm("original");
+  john=session.users().getUserByUsername("john",realm);
+  Assert.assertNull(john.getGrantedConsentByClient(fooClient.getId()));
+}

@@ -28,11 +28,11 @@
   }
   if (client.isConsentRequired()) {
     accessCode.setAction(ClientSessionModel.Action.OAUTH_GRANT);
-    GrantedConsentModel grantedConsent=user.getGrantedConsentByClient(client.getId());
+    UserConsentModel grantedConsent=user.getGrantedConsentByClient(client.getId());
     List<RoleModel> realmRoles=new LinkedList<RoleModel>();
     MultivaluedMap<String,RoleModel> resourceRoles=new MultivaluedMapImpl<String,RoleModel>();
     for (    RoleModel r : accessCode.getRequestedRoles()) {
-      if (grantedConsent != null && grantedConsent.getGrantedRoles().contains(r.getId())) {
+      if (grantedConsent != null && grantedConsent.isRoleGranted(r)) {
         continue;
       }
       if (r.getContainer() instanceof RealmModel) {
@@ -43,10 +43,10 @@
       }
     }
     List<ProtocolMapperModel> protocolMappers=new LinkedList<ProtocolMapperModel>();
-    for (    ProtocolMapperModel model : client.getProtocolMappers()) {
-      if (model.isConsentRequired() && model.getProtocol().equals(clientSession.getAuthMethod()) && model.getConsentText() != null) {
-        if (grantedConsent == null || !grantedConsent.getGrantedProtocolMappers().contains(model.getId())) {
-          protocolMappers.add(model);
+    for (    ProtocolMapperModel protocolMapper : client.getProtocolMappers()) {
+      if (protocolMapper.isConsentRequired() && protocolMapper.getProtocol().equals(clientSession.getAuthMethod()) && protocolMapper.getConsentText() != null) {
+        if (grantedConsent == null || !grantedConsent.isProtocolMapperGranted(protocolMapper)) {
+          protocolMappers.add(protocolMapper);
         }
       }
     }

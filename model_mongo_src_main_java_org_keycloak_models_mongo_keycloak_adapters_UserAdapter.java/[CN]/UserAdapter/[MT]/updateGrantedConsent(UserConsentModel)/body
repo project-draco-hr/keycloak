@@ -1,0 +1,11 @@
+{
+  String clientId=consent.getClient().getId();
+  MongoUserConsentEntity consentEntity=getConsentEntityByClientId(clientId);
+  if (consentEntity == null) {
+    throw new ModelException("Consent not found for client [" + clientId + "] and user ["+ user.getId()+ "]");
+  }
+ else {
+    fillEntityFromModel(consent,consentEntity);
+    getMongoStore().updateEntity(consentEntity,invocationContext);
+  }
+}

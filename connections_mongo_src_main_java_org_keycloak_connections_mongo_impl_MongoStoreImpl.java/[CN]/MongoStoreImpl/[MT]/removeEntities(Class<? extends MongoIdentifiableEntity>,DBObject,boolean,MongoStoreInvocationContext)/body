@@ -1,0 +1,26 @@
+{
+  if (callback) {
+    List<? extends MongoIdentifiableEntity> foundObjects=loadEntities(type,query,context);
+    if (foundObjects.size() == 0) {
+      return 0;
+    }
+ else {
+      DBCollection dbCollection=getDBCollectionForType(type);
+      dbCollection.remove(query);
+      logger.debugf("Removed %d entities of type: %s, query: %s",foundObjects.size(),type,query);
+      for (      MongoIdentifiableEntity found : foundObjects) {
+        context.addRemovedEntity(found);
+        ;
+      }
+      return foundObjects.size();
+    }
+  }
+ else {
+    context.beforeDBBulkUpdateOrRemove(type);
+    DBCollection dbCollection=getDBCollectionForType(type);
+    WriteResult writeResult=dbCollection.remove(query);
+    int removedCount=writeResult.getN();
+    logger.debugf("Removed directly %d entities of type: %s, query: %s",removedCount,type,query);
+    return removedCount;
+  }
+}

@@ -1,0 +1,11 @@
+{
+  String clientId=consent.getClient().getId();
+  if (getConsentEntityByClientId(clientId) != null) {
+    throw new ModelDuplicateException("Consent already exists for client [" + clientId + "] and user ["+ user.getId()+ "]");
+  }
+  MongoUserConsentEntity consentEntity=new MongoUserConsentEntity();
+  consentEntity.setUserId(getId());
+  consentEntity.setClientId(clientId);
+  fillEntityFromModel(consent,consentEntity);
+  getMongoStore().insertEntity(consentEntity,invocationContext);
+}

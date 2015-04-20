@@ -33,9 +33,10 @@
     event.error(Errors.REJECTED_BY_USER);
     return protocol.consentDenied(clientSession);
   }
-  GrantedConsentModel grantedConsent=user.getGrantedConsentByClient(client.getId());
+  UserConsentModel grantedConsent=user.getGrantedConsentByClient(client.getId());
   if (grantedConsent == null) {
-    grantedConsent=user.addGrantedConsent(new GrantedConsentModel(client.getId()));
+    grantedConsent=new UserConsentModel(realm,client.getId());
+    user.addGrantedConsent(grantedConsent);
   }
   for (  String roleId : clientSession.getRoles()) {
     grantedConsent.addGrantedRole(roleId);

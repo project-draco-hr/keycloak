@@ -1,7 +1,4 @@
 {
-  boolean defaultValue=AuthServerDefinition.ENABLED.getDefaultValue().asBoolean();
   ModelNode authServerModel=context.readResource(PathAddress.EMPTY_ADDRESS).getModel().clone();
-  String attrName=AuthServerDefinition.ENABLED.getName();
-  if (!authServerModel.get(attrName).isDefined())   return defaultValue;
-  return authServerModel.get(attrName).asBoolean();
+  return AuthServerDefinition.ENABLED.resolveModelAttribute(context,authServerModel).asBoolean();
 }

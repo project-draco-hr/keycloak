@@ -1,7 +1,7 @@
 {
-  String uploadFileName=operation.get(UPLOADED_FILE_OP_NAME).asString();
-  boolean isRedeploy=isRedeploy(context,operation);
-  boolean isOverwrite=getBooleanFromOperation(operation,OVERWRITE);
+  final String uploadFileName=UPLOADED_FILE_NAME.resolveModelAttribute(context,model).asString();
+  final boolean isRedeploy=isRedeploy(context,operation);
+  final boolean isOverwrite=OVERWRITE.resolveModelAttribute(context,model).asBoolean();
   String overlayPath=getOverlayPath(uploadFileName);
   String overlayName=AuthServerUtil.getOverlayName(operation);
   PathAddress overlayAddress=AuthServerUtil.getOverlayAddress(overlayName);
@@ -24,8 +24,12 @@
       throw new OperationFailedException(pathExistsMessage(overlayAddress,overlayPath));
     }
   }
-  addContent(context,overlayAddress,operation.get(BYTES_TO_UPLOAD.getName()).asBytes(),overlayPath);
-  if (isRedeploy)   AuthServerUtil.addStepToRedeployAuthServer(context,deploymentName);
-  if (!isRedeploy)   context.restartRequired();
+  addContent(context,overlayAddress,BYTES_TO_UPLOAD.resolveModelAttribute(context,model).asBytes(),overlayPath);
+  if (isRedeploy) {
+    AuthServerUtil.addStepToRedeployAuthServer(context,deploymentName);
+  }
+  if (!isRedeploy) {
+    context.restartRequired();
+  }
   context.completeStep(OperationContext.ResultHandler.NOOP_RESULT_HANDLER);
 }

@@ -1,7 +1,10 @@
 {
+  final ModelNode model=new ModelNode();
+  OVERLAY_FILE_PATH.validateAndSet(operation,model);
+  REDEPLOY_SERVER.validateAndSet(operation,model);
   String overlayName=AuthServerUtil.getOverlayName(operation);
   boolean isOverlayExists=AuthServerUtil.isOverlayExists(context,overlayName,PathAddress.EMPTY_ADDRESS);
-  String overlayPath=operation.get(OVERLAY_FILE_PATH.getName()).asString();
+  String overlayPath=OVERLAY_FILE_PATH.resolveModelAttribute(context,model).asString();
   if (isOverlayExists) {
     PathAddress overlayAddress=AuthServerUtil.getOverlayAddress(overlayName);
     AbstractAddOverlayHandler.removeContent(context,overlayAddress,overlayPath);
@@ -14,5 +17,4 @@
   String deploymentName=AuthServerUtil.getDeploymentName(operation);
   if (isRedeploy)   AuthServerUtil.addStepToRedeployAuthServer(context,deploymentName);
   if (!isRedeploy)   context.restartRequired();
-  context.stepCompleted();
 }

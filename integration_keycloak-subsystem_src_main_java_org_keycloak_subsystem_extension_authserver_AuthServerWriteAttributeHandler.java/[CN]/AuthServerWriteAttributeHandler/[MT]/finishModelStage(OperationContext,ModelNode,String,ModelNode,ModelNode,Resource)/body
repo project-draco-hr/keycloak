@@ -3,7 +3,7 @@
     super.finishModelStage(context,operation,attributeName,newValue,oldValue,model);
     return;
   }
-  boolean isEnabled=isEnabled(model);
+  boolean isEnabled=AuthServerDefinition.ENABLED.resolveModelAttribute(context,model.getModel()).asBoolean();
   String deploymentName=AuthServerUtil.getDeploymentName(operation);
   if (attributeName.equals(AuthServerDefinition.WEB_CONTEXT.getName())) {
     KeycloakAdapterConfigService.getInstance().removeServerDeployment(deploymentName);

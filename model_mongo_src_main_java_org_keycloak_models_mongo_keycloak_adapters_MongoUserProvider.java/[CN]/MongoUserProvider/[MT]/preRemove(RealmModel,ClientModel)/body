@@ -1,2 +1,7 @@
 {
+  for (  RoleModel role : client.getRoles()) {
+    preRemove(realm,role);
+  }
+  DBObject query=new QueryBuilder().and("clientId").is(client.getId()).get();
+  getMongoStore().removeEntities(MongoUserConsentEntity.class,query,false,invocationContext);
 }

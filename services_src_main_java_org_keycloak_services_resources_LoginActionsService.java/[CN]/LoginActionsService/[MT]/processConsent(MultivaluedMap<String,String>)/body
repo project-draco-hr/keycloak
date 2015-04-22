@@ -35,15 +35,15 @@
   }
   UserConsentModel grantedConsent=user.getConsentByClient(client.getId());
   if (grantedConsent == null) {
-    grantedConsent=new UserConsentModel(realm,client.getId());
+    grantedConsent=new UserConsentModel(client);
     user.addConsent(grantedConsent);
   }
-  for (  String roleId : clientSession.getRoles()) {
-    grantedConsent.addGrantedRole(roleId);
+  for (  RoleModel role : accessCode.getRequestedRoles()) {
+    grantedConsent.addGrantedRole(role);
   }
-  for (  ProtocolMapperModel protocolMapper : client.getProtocolMappers()) {
-    if (protocolMapper.isConsentRequired() && protocolMapper.getProtocol().equals(clientSession.getAuthMethod()) && protocolMapper.getConsentText() != null) {
-      grantedConsent.addGrantedProtocolMapper(protocolMapper.getId());
+  for (  ProtocolMapperModel protocolMapper : accessCode.getRequestedProtocolMappers()) {
+    if (protocolMapper.isConsentRequired() && protocolMapper.getConsentText() != null) {
+      grantedConsent.addGrantedProtocolMapper(protocolMapper);
     }
   }
   user.updateConsent(grantedConsent);

@@ -1,6 +1,9 @@
 {
   handlePreflightRequest();
   AdminAuth auth=authenticateRealmAdminRequest(headers);
+  if (!isAdmin(auth)) {
+    throw new ForbiddenException();
+  }
   if (auth != null) {
     logger.debug("authenticated admin access for: " + auth.getUser().getUsername());
   }

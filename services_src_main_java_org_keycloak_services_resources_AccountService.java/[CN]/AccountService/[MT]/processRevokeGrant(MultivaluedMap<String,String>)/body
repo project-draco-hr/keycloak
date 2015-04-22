@@ -13,7 +13,7 @@
     return account.setError(Messages.CLIENT_NOT_FOUND).createResponse(AccountPages.ACCESS);
   }
   UserModel user=auth.getUser();
-  user.revokeGrantedConsentForClient(client.getId());
+  user.revokeConsentForClient(client.getId());
   List<UserSessionModel> userSessions=session.sessions().getUserSessions(realm,user);
   for (  UserSessionModel userSession : userSessions) {
     List<ClientSessionModel> clientSessions=userSession.getClientSessions();

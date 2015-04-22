@@ -20,20 +20,20 @@
   johnFooGrant.addGrantedRole(realmRole.getId());
   johnFooGrant.addGrantedRole(barClientRole.getId());
   johnFooGrant.addGrantedProtocolMapper(fooMapper.getId());
-  john.addGrantedConsent(johnFooGrant);
+  john.addConsent(johnFooGrant);
   UserConsentModel johnBarGrant=new UserConsentModel(realm,barClient.getId());
   johnBarGrant.addGrantedProtocolMapper(barMapper.getId());
   johnBarGrant.addGrantedRole(realmRole.getId());
   try {
-    john.updateGrantedConsent(johnBarGrant);
+    john.updateConsent(johnBarGrant);
     Assert.fail("Not expected to end here");
   }
  catch (  ModelException expected) {
   }
-  john.addGrantedConsent(johnBarGrant);
+  john.addConsent(johnBarGrant);
   UserConsentModel maryFooGrant=new UserConsentModel(realm,fooClient.getId());
   maryFooGrant.addGrantedRole(realmRole.getId());
   maryFooGrant.addGrantedProtocolMapper(fooMapper.getId());
-  mary.addGrantedConsent(maryFooGrant);
+  mary.addConsent(maryFooGrant);
   commit();
 }

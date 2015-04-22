@@ -1,6 +1,9 @@
 {
   ClientRepresentation representation=ModelToRepresentation.toRepresentation(client);
   representation.setId(null);
+  for (  ProtocolMapperRepresentation protocolMapper : representation.getProtocolMappers()) {
+    protocolMapper.setId(null);
+  }
   RealmModel realm=realmManager.createRealm("copy");
   ClientModel copy=RepresentationToModel.createClient(session,realm,representation,true);
   assertEquals(client,copy);

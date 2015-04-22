@@ -33,10 +33,10 @@
     event.error(Errors.REJECTED_BY_USER);
     return protocol.consentDenied(clientSession);
   }
-  UserConsentModel grantedConsent=user.getGrantedConsentByClient(client.getId());
+  UserConsentModel grantedConsent=user.getConsentByClient(client.getId());
   if (grantedConsent == null) {
     grantedConsent=new UserConsentModel(realm,client.getId());
-    user.addGrantedConsent(grantedConsent);
+    user.addConsent(grantedConsent);
   }
   for (  String roleId : clientSession.getRoles()) {
     grantedConsent.addGrantedRole(roleId);
@@ -46,7 +46,7 @@
       grantedConsent.addGrantedProtocolMapper(protocolMapper.getId());
     }
   }
-  user.updateGrantedConsent(grantedConsent);
+  user.updateConsent(grantedConsent);
   event.success();
   return authManager.redirectAfterSuccessfulFlow(session,realm,userSession,clientSession,request,uriInfo,clientConnection);
 }

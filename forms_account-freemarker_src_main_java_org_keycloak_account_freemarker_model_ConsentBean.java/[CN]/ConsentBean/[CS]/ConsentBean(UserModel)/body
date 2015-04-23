@@ -1,0 +1,24 @@
+{
+  List<UserConsentModel> grantedConsents=user.getConsents();
+  for (  UserConsentModel consent : grantedConsents) {
+    ClientModel client=consent.getClient();
+    List<RoleModel> realmRolesGranted=new LinkedList<RoleModel>();
+    MultivaluedHashMap<String,ClientRoleEntry> resourceRolesGranted=new MultivaluedHashMap<String,ClientRoleEntry>();
+    for (    RoleModel role : consent.getGrantedRoles()) {
+      if (role.getContainer() instanceof RealmModel) {
+        realmRolesGranted.add(role);
+      }
+ else {
+        ClientModel currentClient=(ClientModel)role.getContainer();
+        ClientRoleEntry clientRole=new ClientRoleEntry(currentClient.getClientId(),currentClient.getName(),role.getName(),role.getDescription());
+        resourceRolesGranted.add(currentClient.getClientId(),clientRole);
+      }
+    }
+    List<String> claimsGranted=new LinkedList<String>();
+    for (    ProtocolMapperModel protocolMapper : consent.getGrantedProtocolMappers()) {
+      claimsGranted.add(protocolMapper.getConsentText());
+    }
+    ClientGrantBean clientGrant=new ClientGrantBean(realmRolesGranted,resourceRolesGranted,client,claimsGranted);
+    clientGrants.add(clientGrant);
+  }
+}

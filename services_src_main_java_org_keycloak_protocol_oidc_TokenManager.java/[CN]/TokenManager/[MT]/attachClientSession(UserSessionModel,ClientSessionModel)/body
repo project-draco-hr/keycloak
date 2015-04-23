@@ -9,4 +9,11 @@
     requestedRoles.add(r.getId());
   }
   clientSession.setRoles(requestedRoles);
+  Set<String> requestedProtocolMappers=new HashSet<String>();
+  for (  ProtocolMapperModel protocolMapper : clientSession.getClient().getProtocolMappers()) {
+    if (protocolMapper.getProtocol().equals(clientSession.getAuthMethod())) {
+      requestedProtocolMappers.add(protocolMapper.getId());
+    }
+  }
+  clientSession.setProtocolMappers(requestedProtocolMappers);
 }

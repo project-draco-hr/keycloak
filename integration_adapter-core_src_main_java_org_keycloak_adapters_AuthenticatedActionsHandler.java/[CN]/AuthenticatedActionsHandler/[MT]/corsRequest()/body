@@ -2,8 +2,9 @@
   if (!deployment.isCors())   return false;
   KeycloakSecurityContext securityContext=facade.getSecurityContext();
   String origin=facade.getRequest().getHeader(CorsHeaders.ORIGIN);
+  String requestOrigin=UriUtils.getOrigin(facade.getRequest().getURI());
   log.debugv("Origin: {0} uri: {1}",origin,facade.getRequest().getURI());
-  if (securityContext != null && origin != null) {
+  if (securityContext != null && origin != null && !origin.equals(requestOrigin)) {
     AccessToken token=securityContext.getToken();
     Set<String> allowedOrigins=token.getAllowedOrigins();
     if (log.isDebugEnabled()) {

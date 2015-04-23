@@ -1,0 +1,15 @@
+{
+  RealmModel realm=realmManager.getRealm("original");
+  RoleModel realmRole=realm.getRole("realm-role");
+  realm.removeRole(realmRole);
+  commit();
+  realm=realmManager.getRealm("original");
+  ClientModel fooClient=realm.getClientByClientId("foo-client");
+  ClientModel barClient=realm.getClientByClientId("bar-client");
+  UserModel john=session.users().getUserByUsername("john",realm);
+  UserConsentModel johnConsent=john.getConsentByClient(fooClient.getId());
+  Assert.assertEquals(johnConsent.getGrantedRoles().size(),1);
+  Assert.assertEquals(johnConsent.getGrantedProtocolMappers().size(),1);
+  Assert.assertFalse(johnConsent.isRoleGranted(realmRole));
+  Assert.assertTrue(isRoleGranted(barClient,"bar-client-role",johnConsent));
+}

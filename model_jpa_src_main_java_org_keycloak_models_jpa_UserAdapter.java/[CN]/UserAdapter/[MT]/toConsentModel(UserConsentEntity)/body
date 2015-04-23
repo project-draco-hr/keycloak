@@ -1,0 +1,19 @@
+{
+  if (entity == null) {
+    return null;
+  }
+  UserConsentModel model=new UserConsentModel(realm,entity.getClientId());
+  Collection<UserConsentRoleEntity> grantedRoleEntities=entity.getGrantedRoles();
+  if (grantedRoleEntities != null) {
+    for (    UserConsentRoleEntity grantedRole : grantedRoleEntities) {
+      model.addGrantedRole(grantedRole.getRoleId());
+    }
+  }
+  Collection<UserConsentProtocolMapperEntity> grantedProtocolMapperEntities=entity.getGrantedProtocolMappers();
+  if (grantedProtocolMapperEntities != null) {
+    for (    UserConsentProtocolMapperEntity grantedProtMapper : grantedProtocolMapperEntities) {
+      model.addGrantedProtocolMapper(grantedProtMapper.getProtocolMapperId());
+    }
+  }
+  return model;
+}

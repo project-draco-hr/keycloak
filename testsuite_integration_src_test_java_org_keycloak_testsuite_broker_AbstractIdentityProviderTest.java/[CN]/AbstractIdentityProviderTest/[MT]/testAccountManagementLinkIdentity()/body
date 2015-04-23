@@ -21,9 +21,13 @@
   accountFederatedIdentityPage.clickRemoveProvider(identityProviderModel.getAlias());
   assertTrue(driver.getPageSource().contains("id=\"add-" + identityProviderModel.getAlias() + "\""));
   revokeGrant();
+  String pageSource=driver.getPageSource();
   accountFederatedIdentityPage.logout();
   assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/auth"));
   this.loginPage.clickSocial(identityProviderModel.getAlias());
+  this.loginPage.login("test-user","password");
   doAfterProviderAuthentication();
+  String current=driver.getCurrentUrl();
   this.updateProfilePage.assertCurrent();
 }

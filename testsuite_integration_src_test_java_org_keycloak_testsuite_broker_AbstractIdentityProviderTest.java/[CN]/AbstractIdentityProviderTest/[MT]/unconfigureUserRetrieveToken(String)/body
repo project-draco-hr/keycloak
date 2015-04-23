@@ -1,0 +1,10 @@
+{
+  RealmModel realm=getRealm();
+  UserModel user=session.users().getUserByUsername(username,realm);
+  RoleModel readTokenRole=realm.getClientByClientId(Constants.BROKER_SERVICE_CLIENT_ID).getRole(IdentityBrokerService.READ_TOKEN_ROLE);
+  if (user != null && user.hasRole(readTokenRole)) {
+    user.deleteRoleMapping(readTokenRole);
+  }
+  brokerServerRule.stopSession(session,true);
+  session=brokerServerRule.startSession();
+}

@@ -9,7 +9,6 @@
   assertEquals(1,federatedIdentities.size());
   FederatedIdentityModel identityModel=federatedIdentities.iterator().next();
   assertNotNull(identityModel.getToken());
-  configureRetrieveToken(realm.getClientByClientId("test-app"),getProviderId(),false);
   UserSessionStatus userSessionStatus=retrieveSessionStatus();
   String accessToken=userSessionStatus.getAccessTokenString();
   URI tokenEndpointUrl=Urls.identityProviderRetrieveToken(BASE_URI,getProviderId(),realm.getName());
@@ -23,13 +22,30 @@
   Client client=ClientBuilder.newBuilder().register(authFilter).build();
   WebTarget tokenEndpoint=client.target(tokenEndpointUrl);
   Response response=tokenEndpoint.request().get();
-  assertEquals(Status.BAD_REQUEST.getStatusCode(),response.getStatus());
-  configureRetrieveToken(getRealm().getClientByClientId("test-app"),getProviderId(),true);
-  client=ClientBuilder.newBuilder().register(authFilter).build();
-  tokenEndpoint=client.target(tokenEndpointUrl);
-  response=tokenEndpoint.request().get();
   assertEquals(Status.OK.getStatusCode(),response.getStatus());
   assertNotNull(response.readEntity(String.class));
+  revokeGrant();
+  driver.navigate().to("http://localhost:8081/test-app/logout");
+  String currentUrl=this.driver.getCurrentUrl();
+  System.out.println("after logout currentUrl: " + currentUrl);
+  assertTrue(currentUrl.startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/auth"));
+  unconfigureUserRetrieveToken(getProviderId() + ".test-user");
+  loginIDP("test-user");
+  assertEquals("http://localhost:8081/test-app",driver.getCurrentUrl());
+  userSessionStatus=retrieveSessionStatus();
+  accessToken=userSessionStatus.getAccessTokenString();
+  final String authHeader2="Bearer " + accessToken;
+  ClientRequestFilter authFilter2=new ClientRequestFilter(){
+    @Override public void filter(    ClientRequestContext requestContext) throws IOException {
+      requestContext.getHeaders().add(HttpHeaders.AUTHORIZATION,authHeader2);
+    }
+  }
+;
+  client=ClientBuilder.newBuilder().register(authFilter2).build();
+  tokenEndpoint=client.target(tokenEndpointUrl);
+  response=tokenEndpoint.request().get();
+  assertEquals(Status.FORBIDDEN.getStatusCode(),response.getStatus());
+  revokeGrant();
   driver.navigate().to("http://localhost:8081/test-app/logout");
   driver.navigate().to("http://localhost:8081/test-app");
   assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/auth"));

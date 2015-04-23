@@ -1,0 +1,22 @@
+{
+  DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
+  WarMetaData warMetaData=deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
+  if (warMetaData == null) {
+    throw new DeploymentUnitProcessingException("WarMetaData not found for " + deploymentName + ".  Make sure you have specified a WAR as your secure-deployment in the Keycloak subsystem.");
+  }
+  addJSONData(service.getJSON(deploymentName),warMetaData);
+  JBossWebMetaData webMetaData=warMetaData.getMergedJBossWebMetaData();
+  if (webMetaData == null) {
+    webMetaData=new JBossWebMetaData();
+    warMetaData.setMergedJBossWebMetaData(webMetaData);
+  }
+  addValve(webMetaData);
+  LoginConfigMetaData loginConfig=webMetaData.getLoginConfig();
+  if (loginConfig == null) {
+    loginConfig=new LoginConfigMetaData();
+    webMetaData.setLoginConfig(loginConfig);
+  }
+  loginConfig.setAuthMethod("KEYCLOAK");
+  loginConfig.setRealmName(service.getRealmName(deploymentName));
+  KeycloakLogger.ROOT_LOGGER.deploymentSecured(deploymentName);
+}

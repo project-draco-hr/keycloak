@@ -4,8 +4,8 @@
   List<SamlProtocol.ProtocolMapperProcessor<SAMLRoleNameMapper>> roleNameMappers=new LinkedList<>();
   KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
   AttributeType singleAttributeType=null;
-  for (  ProtocolMapperModel mapping : clientSession.getClient().getProtocolMappers()) {
-    if (!mapping.getProtocol().equals(SamlProtocol.LOGIN_PROTOCOL))     continue;
+  Set<ProtocolMapperModel> requestedProtocolMappers=new ClientSessionCode(clientSession.getRealm(),clientSession).getRequestedProtocolMappers();
+  for (  ProtocolMapperModel mapping : requestedProtocolMappers) {
     ProtocolMapper mapper=(ProtocolMapper)sessionFactory.getProviderFactory(ProtocolMapper.class,mapping.getProtocolMapper());
     if (mapper == null)     continue;
     if (mapper instanceof SAMLRoleNameMapper) {

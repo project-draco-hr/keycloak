@@ -8,10 +8,11 @@
     throw new ErrorResponseException(OAuthErrorException.INVALID_GRANT,"Token invalid",Status.FORBIDDEN);
   }
   UserSessionModel userSession=session.sessions().getUserSession(realm,token.getSessionState());
+  ClientSessionModel clientSession=session.sessions().getClientSession(token.getClientSession());
   ClientModel clientModel=realm.getClientByClientId(token.getIssuedFor());
   UserModel userModel=userSession.getUser();
   AccessToken userInfo=new AccessToken();
-  tokenManager.transformAccessToken(session,userInfo,realm,clientModel,userModel,userSession,null);
+  tokenManager.transformAccessToken(session,userInfo,realm,clientModel,userModel,userSession,clientSession);
   event.detail(Details.USERNAME,userModel.getUsername()).client(clientModel).session(userSession).user(userModel).success();
   Map<String,Object> claims=new HashMap<String,Object>();
   claims.putAll(userInfo.getOtherClaims());

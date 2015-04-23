@@ -2,7 +2,16 @@
   this.code=code;
   this.client=client;
   this.realmRolesRequested=realmRolesRequested;
-  this.resourceRolesRequested=resourceRolesRequested;
+  if (resourceRolesRequested != null) {
+    this.resourceRolesRequested=new MultivaluedMapImpl<String,ClientRoleEntry>();
+    for (    List<RoleModel> clientRoles : resourceRolesRequested.values()) {
+      for (      RoleModel role : clientRoles) {
+        ClientModel currentClient=(ClientModel)role.getContainer();
+        ClientRoleEntry roleEntry=new ClientRoleEntry(currentClient.getClientId(),currentClient.getName(),role.getName(),role.getDescription());
+        this.resourceRolesRequested.add(currentClient.getClientId(),roleEntry);
+      }
+    }
+  }
   this.accessRequestMessage=accessRequestMessage;
   List<String> claims=new LinkedList<String>();
   if (protocolMappersRequested != null) {

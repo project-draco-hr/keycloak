@@ -1,0 +1,11 @@
+{
+  ClientModel client=realm.getClientNameMap().get(Constants.BROKER_SERVICE_CLIENT_ID);
+  if (client == null) {
+    client=new ClientManager(this).createClient(realm,Constants.BROKER_SERVICE_CLIENT_ID);
+    client.setEnabled(true);
+    client.setFullScopeAllowed(false);
+    for (    String role : IdentityBrokerService.ROLES) {
+      client.addRole(role).setDescription("${role_" + role + "}");
+    }
+  }
+}

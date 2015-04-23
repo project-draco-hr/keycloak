@@ -37,6 +37,10 @@
   federatedUser.setEmail(updatedIdentity.getEmail());
   federatedUser.setFirstName(updatedIdentity.getFirstName());
   federatedUser.setLastName(updatedIdentity.getLastName());
+  if (updatedIdentity.getIdpConfig().isStoreToken()) {
+    RoleModel readTokenRole=realmModel.getClientByClientId(Constants.BROKER_SERVICE_CLIENT_ID).getRole(READ_TOKEN_ROLE);
+    federatedUser.grantRole(readTokenRole);
+  }
   this.session.users().addFederatedIdentity(this.realmModel,federatedUser,federatedIdentityModel);
   updatedIdentity.getIdp().importNewUser(session,realmModel,federatedUser,updatedIdentity);
   Set<IdentityProviderMapperModel> mappers=realmModel.getIdentityProviderMappersByAlias(updatedIdentity.getIdpConfig().getAlias());

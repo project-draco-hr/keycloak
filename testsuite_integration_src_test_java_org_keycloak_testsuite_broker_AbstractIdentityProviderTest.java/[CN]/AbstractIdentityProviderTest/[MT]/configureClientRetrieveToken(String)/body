@@ -1,0 +1,8 @@
+{
+  RealmModel realm=getRealm();
+  RoleModel readTokenRole=realm.getClientByClientId(Constants.BROKER_SERVICE_CLIENT_ID).getRole(IdentityBrokerService.READ_TOKEN_ROLE);
+  ClientModel client=realm.getClientByClientId(clientId);
+  if (!client.hasScope(readTokenRole))   client.addScopeMapping(readTokenRole);
+  brokerServerRule.stopSession(session,true);
+  session=brokerServerRule.startSession();
+}

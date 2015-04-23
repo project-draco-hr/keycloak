@@ -7,7 +7,6 @@
     this.realm.updateIdentityProvider(RepresentationToModel.toModel(providerRep));
     if (oldProviderId != null && !oldProviderId.equals(newProviderId)) {
       logger.debug("Changing providerId in all clients and linked users. oldProviderId=" + oldProviderId + ", newProviderId="+ newProviderId);
-      updateClientsAfterProviderAliasChange(this.realm.getClients(),oldProviderId,newProviderId);
       updateUsersAfterProviderAliasChange(this.session.users().getUsers(this.realm),oldProviderId,newProviderId);
     }
     return Response.noContent().build();

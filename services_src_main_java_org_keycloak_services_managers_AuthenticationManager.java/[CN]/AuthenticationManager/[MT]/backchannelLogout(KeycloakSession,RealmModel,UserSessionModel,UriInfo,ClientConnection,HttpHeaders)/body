@@ -5,15 +5,7 @@
   logger.debugv("Logging out: {0} ({1})",user.getUsername(),userSession.getId());
   expireUserSessionCookie(session,userSession,realm,uriInfo,headers,connection);
   for (  ClientSessionModel clientSession : userSession.getClientSessions()) {
-    ClientModel client=clientSession.getClient();
-    if (client instanceof ClientModel && !client.isFrontchannelLogout() && clientSession.getAction() != ClientSessionModel.Action.LOGGED_OUT) {
-      String authMethod=clientSession.getAuthMethod();
-      if (authMethod == null)       continue;
-      LoginProtocol protocol=session.getProvider(LoginProtocol.class,authMethod);
-      protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo);
-      protocol.backchannelLogout(userSession,clientSession);
-      clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT);
-    }
+    backchannelLogoutClientSession(session,realm,clientSession,userSession,uriInfo,headers);
   }
   userSession.setState(UserSessionModel.State.LOGGED_OUT);
   session.sessions().removeUserSession(realm,userSession);

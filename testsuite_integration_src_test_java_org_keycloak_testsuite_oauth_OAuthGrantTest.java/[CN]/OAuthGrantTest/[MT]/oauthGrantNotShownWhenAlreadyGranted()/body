@@ -1,0 +1,23 @@
+{
+  oauth.clientId("third-party");
+  oauth.doLoginGrant("test-user@localhost","password");
+  grantPage.assertCurrent();
+  grantPage.accept();
+  events.expectLogin().client("third-party").assertEvent();
+  accountAppsPage.open();
+  AccountApplicationsPage.AppEntry thirdPartyEntry=accountAppsPage.getApplications().get("third-party");
+  Assert.assertTrue(thirdPartyEntry.getRolesGranted().contains(ROLE_USER));
+  Assert.assertTrue(thirdPartyEntry.getRolesGranted().contains("Have Customer User privileges in test-app"));
+  Assert.assertTrue(thirdPartyEntry.getProtocolMappersGranted().contains("Full name"));
+  Assert.assertTrue(thirdPartyEntry.getProtocolMappersGranted().contains("Email"));
+  oauth.openLoginForm();
+  appPage.assertCurrent();
+  events.expectLogin().detail(Details.AUTH_METHOD,"sso").removeDetail(Details.USERNAME).client("third-party").assertEvent();
+  accountAppsPage.open();
+  accountAppsPage.revokeGrant("third-party");
+  events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,"third-party").assertEvent();
+  oauth.openLoginForm();
+  grantPage.assertCurrent();
+  Assert.assertTrue(driver.getPageSource().contains(ROLE_USER));
+  Assert.assertTrue(driver.getPageSource().contains(ROLE_CUSTOMER));
+}

@@ -22,4 +22,7 @@
   assertEquals(1,resourceAccess.get("test-app").getRoles().size());
   Assert.assertTrue(resourceAccess.get("test-app").isUserInRole("customer-user"));
   events.expectCodeToToken(codeId,loginEvent.getSessionId()).client("third-party").assertEvent();
+  accountAppsPage.open();
+  accountAppsPage.revokeGrant("third-party");
+  events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,"third-party").assertEvent();
 }

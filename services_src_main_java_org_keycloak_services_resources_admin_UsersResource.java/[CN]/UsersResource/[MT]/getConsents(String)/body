@@ -1,0 +1,14 @@
+{
+  auth.requireView();
+  UserModel user=session.users().getUserByUsername(username,realm);
+  if (user == null) {
+    throw new NotFoundException("User not found");
+  }
+  List<UserConsentModel> consents=user.getConsents();
+  List<UserConsentRepresentation> result=new ArrayList<UserConsentRepresentation>();
+  for (  UserConsentModel consent : consents) {
+    UserConsentRepresentation rep=ModelToRepresentation.toRepresentation(consent);
+    result.add(rep);
+  }
+  return result;
+}

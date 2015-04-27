@@ -1,0 +1,15 @@
+{
+  KeycloakSession session=sessionFactory.create();
+  try {
+    session.getTransaction().begin();
+    MigrationModelManager.migrate(session);
+    session.getTransaction().commit();
+  }
+ catch (  Exception e) {
+    session.getTransaction().rollback();
+    log.error("Failed to migrate datamodel",e);
+  }
+ finally {
+    session.close();
+  }
+}

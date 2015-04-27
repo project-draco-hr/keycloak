@@ -4,5 +4,8 @@
   for (  RealmModel realm : realms) {
     reps.add(ExportUtils.exportRealm(session,realm,true));
   }
-  JsonSerialization.prettyMapper.writeValue(outStream,reps);
+  Model model=new Model();
+  model.setRealms(reps);
+  model.setModelVersion(session.realms().getMigrationModel().getStoredVersion());
+  JsonSerialization.prettyMapper.writeValue(outStream,model);
 }

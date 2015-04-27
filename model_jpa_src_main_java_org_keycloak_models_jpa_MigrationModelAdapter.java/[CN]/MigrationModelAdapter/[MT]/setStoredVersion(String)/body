@@ -1,0 +1,13 @@
+{
+  MigrationModelEntity entity=em.find(MigrationModelEntity.class,MigrationModelEntity.SINGLETON_ID);
+  if (entity == null) {
+    entity=new MigrationModelEntity();
+    entity.setId(MigrationModelEntity.SINGLETON_ID);
+    entity.setVersion(version);
+    em.persist(entity);
+  }
+ else {
+    entity.setVersion(version);
+    em.flush();
+  }
+}

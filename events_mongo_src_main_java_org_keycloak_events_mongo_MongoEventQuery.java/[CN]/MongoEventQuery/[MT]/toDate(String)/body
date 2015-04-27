@@ -7,6 +7,8 @@
  catch (  ParseException e) {
     e.printStackTrace();
   }
-  query.put("time",BasicDBObjectBuilder.start("$lte",to).get());
+  BasicDBObject time=query.containsField("time") ? (BasicDBObject)query.get("time") : new BasicDBObject();
+  time.append("$lte",to);
+  query.put("time",time);
   return this;
 }

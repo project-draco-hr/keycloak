@@ -1,6 +1,7 @@
 {
   DBCollection clients=db.getCollection("clients");
   DBCollection oauthClients=db.getCollection("oauthClients");
+  oauthClients.dropIndex("realmId_1_name_1");
   oauthClients.update(new BasicDBObject(),new BasicDBObject("$rename",new BasicDBObject("name","clientId")),false,true);
   oauthClients.update(new BasicDBObject(),new BasicDBObject("$set",new BasicDBObject("consentRequired",true)),false,true);
   DBCursor curs=oauthClients.find();

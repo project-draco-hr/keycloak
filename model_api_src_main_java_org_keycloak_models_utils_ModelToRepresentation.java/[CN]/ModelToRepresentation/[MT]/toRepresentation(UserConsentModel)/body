@@ -1,0 +1,36 @@
+{
+  String clientId=model.getClient().getClientId();
+  Map<String,List<String>> grantedProtocolMappers=new HashMap<String,List<String>>();
+  for (  ProtocolMapperModel protocolMapper : model.getGrantedProtocolMappers()) {
+    String protocol=protocolMapper.getProtocol();
+    List<String> currentProtocolMappers=grantedProtocolMappers.get(protocol);
+    if (currentProtocolMappers == null) {
+      currentProtocolMappers=new LinkedList<String>();
+      grantedProtocolMappers.put(protocol,currentProtocolMappers);
+    }
+    currentProtocolMappers.add(protocolMapper.getName());
+  }
+  List<String> grantedRealmRoles=new LinkedList<String>();
+  Map<String,List<String>> grantedClientRoles=new HashMap<String,List<String>>();
+  for (  RoleModel role : model.getGrantedRoles()) {
+    if (role.getContainer() instanceof RealmModel) {
+      grantedRealmRoles.add(role.getName());
+    }
+ else {
+      ClientModel client2=(ClientModel)role.getContainer();
+      String clientId2=client2.getClientId();
+      List<String> currentClientRoles=grantedClientRoles.get(clientId2);
+      if (currentClientRoles == null) {
+        currentClientRoles=new LinkedList<String>();
+        grantedClientRoles.put(clientId2,currentClientRoles);
+      }
+      currentClientRoles.add(role.getName());
+    }
+  }
+  UserConsentRepresentation consentRep=new UserConsentRepresentation();
+  consentRep.setClientId(clientId);
+  consentRep.setGrantedProtocolMappers(grantedProtocolMappers);
+  consentRep.setGrantedRealmRoles(grantedRealmRoles);
+  consentRep.setGrantedClientRoles(grantedClientRoles);
+  return consentRep;
+}

@@ -8,5 +8,7 @@
   }
  catch (  ClientErrorException e) {
     assertEquals(409,e.getResponse().getStatus());
+    ErrorRepresentation error=e.getResponse().readEntity(ErrorRepresentation.class);
+    Assert.assertEquals("User exists with same username",error.getErrorMessage());
   }
 }

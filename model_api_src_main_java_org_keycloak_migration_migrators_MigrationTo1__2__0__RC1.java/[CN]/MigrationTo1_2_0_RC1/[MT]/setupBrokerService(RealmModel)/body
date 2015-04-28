@@ -3,9 +3,10 @@
   if (client == null) {
     client=KeycloakModelUtils.createClient(realm,Constants.BROKER_SERVICE_CLIENT_ID);
     client.setEnabled(true);
+    client.setName("${client_" + Constants.BROKER_SERVICE_CLIENT_ID + "}");
     client.setFullScopeAllowed(false);
     for (    String role : Constants.BROKER_SERVICE_ROLES) {
-      client.addRole(role).setDescription("${role_" + role + "}");
+      client.addRole(role).setDescription("${role_" + role.toLowerCase().replaceAll("_","-") + "}");
     }
   }
 }

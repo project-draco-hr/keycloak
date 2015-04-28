@@ -1,0 +1,7 @@
+{
+  SAML2LogoutRequestBuilder logoutBuilder=new SAML2LogoutRequestBuilder().assertionExpiration(realm.getAccessCodeLifespan()).issuer(getEntityId(uriInfo,realm)).sessionIndex(userSession.getNote(SAMLEndpoint.SAML_FEDERATED_SESSION_INDEX)).userPrincipal(userSession.getNote(SAMLEndpoint.SAML_FEDERATED_SUBJECT),userSession.getNote(SAMLEndpoint.SAML_FEDERATED_SUBJECT_NAMEFORMAT)).destination(singleLogoutServiceUrl).relayState(userSession.getId());
+  if (getConfig().isWantAuthnRequestsSigned()) {
+    logoutBuilder.signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
+  }
+  return logoutBuilder;
+}

@@ -17,7 +17,8 @@
     String preferredUsername=(String)idToken.getOtherClaims().get(IDToken.PREFERRED_USERNAME);
     String email=(String)idToken.getOtherClaims().get(IDToken.EMAIL);
     if (getConfig().getUserInfoUrl() != null && (id == null || name == null || preferredUsername == null || email == null)) {
-      JsonNode userInfo=SimpleHttp.doGet(getConfig().getUserInfoUrl()).header("Authorization","Bearer " + accessToken).asJson();
+      SimpleHttp request=JsonSimpleHttp.doGet(getConfig().getUserInfoUrl()).header("Authorization","Bearer " + accessToken);
+      JsonNode userInfo=JsonSimpleHttp.asJson(request);
       id=getJsonProperty(userInfo,"sub");
       name=getJsonProperty(userInfo,"name");
       preferredUsername=getJsonProperty(userInfo,"preferred_username");

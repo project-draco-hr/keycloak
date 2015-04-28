@@ -26,20 +26,43 @@
     logger.debug("browser Logout");
     return authManager.browserLogout(session,realm,userSession,uriInfo,clientConnection,headers);
   }
-  String redirectUri=null;
-  if (client instanceof ClientModel) {
-    redirectUri=((ClientModel)client).getBaseUrl();
-  }
-  if (redirectUri != null) {
-    redirectUri=RedirectUtils.verifyRedirectUri(uriInfo,redirectUri,realm,client);
-    if (redirectUri == null) {
-      return ErrorPage.error(session,Messages.INVALID_REDIRECT_URI);
+ else   if (logoutRequest.getSessionIndex() != null) {
+    for (    String sessionIndex : logoutRequest.getSessionIndex()) {
+      ClientSessionModel clientSession=session.sessions().getClientSession(realm,sessionIndex);
+      if (clientSession == null)       continue;
+      if (clientSession.getClient().getClientId().equals(client.getClientId())) {
+        clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT);
+      }
+      UserSessionModel userSession=clientSession.getUserSession();
+      try {
+        authManager.backchannelLogout(session,realm,userSession,uriInfo,clientConnection,headers,true);
+      }
+ catch (      Exception e) {
+        logger.warn("Failure with backchannel logout",e);
+      }
     }
   }
-  if (redirectUri != null) {
-    return Response.status(302).location(UriBuilder.fromUri(redirectUri).build()).build();
+  String logoutBinding=getBindingType();
+  String logoutBindingUri=SamlProtocol.getLogoutServiceUrl(uriInfo,client,logoutBinding);
+  String logoutRelayState=relayState;
+  SAML2LogoutResponseBuilder builder=new SAML2LogoutResponseBuilder();
+  builder.logoutRequestID(logoutRequest.getID());
+  builder.destination(logoutBindingUri);
+  builder.issuer(RealmsResource.realmBaseUrl(uriInfo).build(realm.getName()).toString());
+  builder.relayState(logoutRelayState);
+  if (SamlProtocol.requiresRealmSignature(client)) {
+    SignatureAlgorithm algorithm=SamlProtocol.getSignatureAlgorithm(client);
+    builder.signatureAlgorithm(algorithm).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
   }
+  try {
+    if (SamlProtocol.SAML_POST_BINDING.equals(logoutBinding)) {
+      return builder.postBinding().response(logoutBindingUri);
+    }
  else {
-    return Response.ok().build();
+      return builder.redirectBinding().response(logoutBindingUri);
+    }
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
   }
 }

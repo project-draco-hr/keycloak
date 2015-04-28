@@ -7,6 +7,17 @@
   for (  ClientSessionModel clientSession : userSession.getClientSessions()) {
     backchannelLogoutClientSession(session,realm,clientSession,userSession,uriInfo,headers);
   }
+  if (logoutBroker) {
+    String brokerId=userSession.getNote(IdentityBrokerService.BROKER_PROVIDER_ID);
+    if (brokerId != null) {
+      IdentityProvider identityProvider=IdentityBrokerService.getIdentityProvider(session,realm,brokerId);
+      try {
+        identityProvider.backchannelLogout(userSession,uriInfo,realm);
+      }
+ catch (      Exception e) {
+      }
+    }
+  }
   userSession.setState(UserSessionModel.State.LOGGED_OUT);
   session.sessions().removeUserSession(realm,userSession);
 }

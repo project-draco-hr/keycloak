@@ -47,19 +47,30 @@
  else {
       connection.setDoOutput(false);
     }
-    String ce=connection.getHeaderField("Content-Encoding");
     is=connection.getInputStream();
-    if ("gzip".equals(ce)) {
-      is=new GZIPInputStream(is);
-    }
-    return toString(is);
+    return connection.getResponseCode();
   }
   finally {
     if (os != null) {
-      os.close();
+      try {
+        os.close();
+      }
+ catch (      IOException e) {
+      }
     }
     if (is != null) {
-      is.close();
+      try {
+        is.close();
+      }
+ catch (      IOException e) {
+      }
+    }
+    if (connection != null) {
+      try {
+        connection.disconnect();
+      }
+ catch (      Exception e) {
+      }
     }
   }
 }

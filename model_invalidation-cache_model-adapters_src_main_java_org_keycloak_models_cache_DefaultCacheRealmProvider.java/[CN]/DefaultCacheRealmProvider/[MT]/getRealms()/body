@@ -1,3 +1,9 @@
 {
-  return getDelegate().getRealms();
+  List<RealmModel> backendRealms=getDelegate().getRealms();
+  List<RealmModel> cachedRealms=new LinkedList<RealmModel>();
+  for (  RealmModel realm : backendRealms) {
+    RealmModel cached=session.realms().getRealm(realm.getId());
+    cachedRealms.add(cached);
+  }
+  return cachedRealms;
 }

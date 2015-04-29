@@ -1,0 +1,8 @@
+{
+  Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+  if (authentication != null) {
+    throw new IllegalStateException("Went to save Keycloak account {}, but already have {}");
+  }
+  logger.debug("Saving account info {}",account);
+  SecurityContextHolder.getContext().setAuthentication(new KeycloakAuthenticationToken(account));
+}

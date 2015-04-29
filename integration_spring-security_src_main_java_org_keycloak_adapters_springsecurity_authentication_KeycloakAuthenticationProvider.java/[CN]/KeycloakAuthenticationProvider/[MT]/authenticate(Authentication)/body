@@ -1,0 +1,8 @@
+{
+  KeycloakAuthenticationToken token=(KeycloakAuthenticationToken)authentication;
+  List<GrantedAuthority> grantedAuthorities=new ArrayList<GrantedAuthority>();
+  for (  String role : token.getAccount().getRoles()) {
+    grantedAuthorities.add(new KeycloakRole(role));
+  }
+  return new KeycloakAuthenticationToken(token.getAccount(),grantedAuthorities);
+}

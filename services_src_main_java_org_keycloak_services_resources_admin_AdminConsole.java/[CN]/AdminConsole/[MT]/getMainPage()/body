@@ -7,7 +7,7 @@
     if (adminTheme == null) {
       adminTheme="keycloak";
     }
-    Map<String,String> map=new HashMap<String,String>();
+    Map<String,Object> map=new HashMap<>();
     URI baseUri=uriInfo.getBaseUri();
     String authUrl=baseUri.toString();
     authUrl=authUrl.substring(0,authUrl.length() - 1);
@@ -16,6 +16,7 @@
     map.put("resourceVersion",Version.RESOURCES_VERSION);
     ThemeProvider themeProvider=session.getProvider(ThemeProvider.class,"extending");
     Theme theme=themeProvider.getTheme(realm.getAdminTheme(),Theme.Type.ADMIN);
+    map.put("properties",theme.getProperties());
     FreeMarkerUtil freeMarkerUtil=new FreeMarkerUtil();
     String result=freeMarkerUtil.processTemplate(map,"index.ftl",theme);
     Response.ResponseBuilder builder=Response.status(Response.Status.OK).type(MediaType.TEXT_HTML).entity(result);

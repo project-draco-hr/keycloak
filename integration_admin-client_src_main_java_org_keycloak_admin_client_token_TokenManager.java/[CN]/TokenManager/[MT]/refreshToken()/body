@@ -8,7 +8,12 @@
     target.register(new BasicAuthFilter(config.getClientId(),config.getClientSecret()));
   }
   TokenService tokenService=target.proxy(TokenService.class);
-  AccessTokenResponse response=tokenService.refreshToken(config.getRealm(),form.asMap());
-  defineCurrentToken(response);
-  return response;
+  try {
+    AccessTokenResponse response=tokenService.refreshToken(config.getRealm(),form.asMap());
+    defineCurrentToken(response);
+    return response;
+  }
+ catch (  BadRequestException e) {
+    return grantToken();
+  }
 }

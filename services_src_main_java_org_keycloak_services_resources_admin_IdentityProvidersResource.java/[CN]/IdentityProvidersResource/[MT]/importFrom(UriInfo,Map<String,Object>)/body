@@ -2,15 +2,18 @@
   this.auth.requireManage();
   String providerId=data.get("providerId").toString();
   String from=data.get("fromUrl").toString();
-  ApacheHttpClient4Executor executor=ResourceAdminManager.createExecutor();
-  InputStream inputStream=null;
+  InputStream inputStream=session.getProvider(HttpClientProvider.class).get(from);
   try {
-    inputStream=executor.createRequest(from).getTarget(InputStream.class);
+    IdentityProviderFactory providerFactory=getProviderFactorytById(providerId);
+    Map<String,String> config;
+    config=providerFactory.parseConfig(inputStream);
+    return config;
   }
- catch (  Exception e) {
-    throw new RuntimeException(e);
+  finally {
+    try {
+      inputStream.close();
+    }
+ catch (    IOException e) {
+    }
   }
-  IdentityProviderFactory providerFactory=getProviderFactorytById(providerId);
-  Map<String,String> config=providerFactory.parseConfig(inputStream);
-  return config;
 }

@@ -1,0 +1,46 @@
+{
+  X509HostnameVerifier verifier=null;
+  if (this.verifier != null)   verifier=new VerifierWrapper(this.verifier);
+ else {
+switch (policy) {
+case ANY:
+      verifier=new AllowAllHostnameVerifier();
+    break;
+case WILDCARD:
+  verifier=new BrowserCompatHostnameVerifier();
+break;
+case STRICT:
+verifier=new StrictHostnameVerifier();
+break;
+}
+}
+try {
+SSLConnectionSocketFactory sslsf=null;
+SSLContext theContext=sslContext;
+if (disableTrustManager) {
+theContext=SSLContext.getInstance("TLS");
+theContext.init(null,new TrustManager[]{new PassthroughTrustManager()},new SecureRandom());
+verifier=new AllowAllHostnameVerifier();
+sslsf=new SSLConnectionSocketFactory(theContext,verifier);
+}
+ else if (theContext != null) {
+sslsf=new SSLConnectionSocketFactory(theContext,verifier);
+}
+ else if (clientKeyStore != null || truststore != null) {
+theContext=createSslContext("TLS",clientKeyStore,clientPrivateKeyPassword,truststore,null);
+sslsf=new SSLConnectionSocketFactory(theContext,verifier);
+}
+ else {
+final SSLContext tlsContext=SSLContext.getInstance("TLS");
+tlsContext.init(null,null,null);
+sslsf=new SSLConnectionSocketFactory(tlsContext,verifier);
+}
+RequestConfig requestConfig=RequestConfig.custom().setConnectTimeout((int)establishConnectionTimeout).setSocketTimeout((int)socketTimeout).build();
+org.apache.http.impl.client.HttpClientBuilder builder=HttpClients.custom().setDefaultRequestConfig(requestConfig).setSSLSocketFactory(sslsf).setMaxConnTotal(connectionPoolSize).setMaxConnPerRoute(maxPooledPerRoute);
+if (disableCookies) builder.disableCookieManagement();
+return builder.build();
+}
+ catch (Exception e) {
+throw new RuntimeException(e);
+}
+}

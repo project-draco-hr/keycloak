@@ -1,11 +1,5 @@
 {
   if (!(clientSession.getClient() instanceof ClientModel))   return;
   ClientModel app=clientSession.getClient();
-  ApacheHttpClient4Executor executor=ResourceAdminManager.createExecutor();
-  try {
-    new ResourceAdminManager().logoutClientSession(uriInfo.getRequestUri(),realm,app,clientSession,executor);
-  }
-  finally {
-    executor.getHttpClient().getConnectionManager().shutdown();
-  }
+  new ResourceAdminManager(session).logoutClientSession(uriInfo.getRequestUri(),realm,app,clientSession);
 }

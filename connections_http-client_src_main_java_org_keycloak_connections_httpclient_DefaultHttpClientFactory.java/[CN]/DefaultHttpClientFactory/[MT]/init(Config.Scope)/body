@@ -1,0 +1,39 @@
+{
+  long socketTimeout=config.getLong("socketTimeoutMillis",-1L);
+  long establishConnectionTimeout=config.getLong("establishConnectionTimeoutMillis",-1L);
+  long connectionTTL=config.getLong("connectionTTLMillis",-1L);
+  int maxPooledPerRoute=config.getInt("maxPooledPerRoute",0);
+  int connectionPoolSize=config.getInt("connectionPoolSize",200);
+  boolean disableTrustManager=config.getBoolean("disableTrustManager",true);
+  boolean disableCookies=config.getBoolean("disableCookies",true);
+  String hostnameVerificationPolicy=config.get("hostnameVerificationPolicy","WILDCARD");
+  HttpClientBuilder.HostnameVerificationPolicy hostnamePolicy=HttpClientBuilder.HostnameVerificationPolicy.valueOf(hostnameVerificationPolicy);
+  String truststore=config.get("truststore");
+  String truststorePassword=config.get("truststorePassword");
+  String clientKeystore=config.get("clientKeyStore");
+  String clientKeystorePassword=config.get("clientKeyStorePassword");
+  String clientPrivateKeyPassword=config.get("clientPrivateKeyPassword");
+  HttpClientBuilder builder=new HttpClientBuilder();
+  builder.socketTimeout(socketTimeout,TimeUnit.MILLISECONDS).establishConnectionTimeout(establishConnectionTimeout,TimeUnit.MILLISECONDS).connectionTTL(connectionTTL,TimeUnit.MILLISECONDS).maxPooledPerRoute(maxPooledPerRoute).connectionPoolSize(connectionPoolSize).hostnameVerification(hostnamePolicy).disableCookies(disableCookies);
+  if (disableTrustManager)   builder.disableTrustManager();
+  if (truststore != null) {
+    truststore=EnvUtil.replace(truststore);
+    try {
+      builder.trustStore(KeystoreUtil.loadKeyStore(truststore,truststorePassword));
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to load truststore",e);
+    }
+  }
+  if (clientKeystore != null) {
+    clientKeystore=EnvUtil.replace(clientKeystore);
+    try {
+      KeyStore clientCertKeystore=KeystoreUtil.loadKeyStore(clientKeystore,clientKeystorePassword);
+      builder.keyStore(clientCertKeystore,clientPrivateKeyPassword);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to load keystore",e);
+    }
+  }
+  httpClient=builder.build();
+}

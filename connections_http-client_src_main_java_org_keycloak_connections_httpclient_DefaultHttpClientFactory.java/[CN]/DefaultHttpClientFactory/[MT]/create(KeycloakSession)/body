@@ -1,0 +1,32 @@
+{
+  return new HttpClientProvider(){
+    @Override public HttpClient getHttpClient(){
+      return httpClient;
+    }
+    @Override public void close(){
+    }
+    @Override public int postText(    String uri,    String text) throws IOException {
+      HttpPost request=new HttpPost(uri);
+      request.setEntity(EntityBuilder.create().setText(text).setContentType(ContentType.TEXT_PLAIN).build());
+      HttpResponse response=httpClient.execute(request);
+      try {
+        return response.getStatusLine().getStatusCode();
+      }
+  finally {
+        HttpEntity entity=response.getEntity();
+        if (entity != null) {
+          InputStream is=entity.getContent();
+          if (is != null)           is.close();
+        }
+      }
+    }
+    @Override public InputStream get(    String uri) throws IOException {
+      HttpGet request=new HttpGet(uri);
+      HttpResponse response=httpClient.execute(request);
+      HttpEntity entity=response.getEntity();
+      if (entity == null)       return null;
+      return entity.getContent();
+    }
+  }
+;
+}

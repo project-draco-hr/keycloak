@@ -14,32 +14,38 @@
     logger.warn("failed to send saml logout",e);
     return;
   }
-  ApacheHttpClient4Executor executor=ResourceAdminManager.createExecutor();
-  try {
-    ClientRequest request=executor.createRequest(logoutUrl);
-    request.formParameter(GeneralConstants.SAML_REQUEST_KEY,logoutRequestString);
-    request.formParameter("BACK_CHANNEL_LOGOUT","BACK_CHANNEL_LOGOUT");
-    ClientResponse response=null;
+  HttpClient httpClient=session.getProvider(HttpClientProvider.class).getHttpClient();
+  for (int i=0; i < 2; i++) {
     try {
-      response=request.post();
-      response.releaseConnection();
-      if (response.getStatus() == 302 && !logoutUrl.endsWith("/")) {
-        String redirect=(String)response.getHeaders().getFirst(HttpHeaders.LOCATION);
-        String withSlash=logoutUrl + "/";
-        if (withSlash.equals(redirect)) {
-          request=executor.createRequest(withSlash);
-          request.formParameter(GeneralConstants.SAML_REQUEST_KEY,logoutRequestString);
-          request.formParameter("BACK_CHANNEL_LOGOUT","BACK_CHANNEL_LOGOUT");
-          response=request.post();
-          response.releaseConnection();
+      List<NameValuePair> formparams=new ArrayList<NameValuePair>();
+      formparams.add(new BasicNameValuePair(GeneralConstants.SAML_REQUEST_KEY,logoutRequestString));
+      formparams.add(new BasicNameValuePair("BACK_CHANNEL_LOGOUT","BACK_CHANNEL_LOGOUT"));
+      UrlEncodedFormEntity form=new UrlEncodedFormEntity(formparams,"UTF-8");
+      HttpPost post=new HttpPost(logoutUrl);
+      post.setEntity(form);
+      HttpResponse response=httpClient.execute(post);
+      try {
+        int status=response.getStatusLine().getStatusCode();
+        if (status == 302 && !logoutUrl.endsWith("/")) {
+          String redirect=response.getFirstHeader(HttpHeaders.LOCATION).getValue();
+          String withSlash=logoutUrl + "/";
+          if (withSlash.equals(redirect)) {
+            logoutUrl=withSlash;
+            continue;
+          }
+        }
+      }
+  finally {
+        HttpEntity entity=response.getEntity();
+        if (entity != null) {
+          InputStream is=entity.getContent();
+          if (is != null)           is.close();
         }
       }
     }
- catch (    Exception e) {
+ catch (    IOException e) {
       logger.warn("failed to send saml logout",e);
     }
-  }
-  finally {
-    executor.getHttpClient().getConnectionManager().shutdown();
+    break;
   }
 }

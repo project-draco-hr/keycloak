@@ -1,5 +1,6 @@
 {
-  ProtocolMappersResource mappers=new ProtocolMappersResource(client,auth);
+  ProtocolMappersResource mappers=new ProtocolMappersResource(client,auth,adminEvent);
   ResteasyProviderFactory.getInstance().injectProperties(mappers);
+  adminEvent.operation(OperationType.VIEW).resourcePath(uriInfo.getPath()).success();
   return mappers;
 }

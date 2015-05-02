@@ -1,7 +1,9 @@
 {
   auth.requireManage();
+  ProtocolMapperModel model=null;
   for (  ProtocolMapperRepresentation rep : reps) {
-    ProtocolMapperModel model=RepresentationToModel.toModel(rep);
+    model=RepresentationToModel.toModel(rep);
     model=client.addProtocolMapper(model);
   }
+  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo.getPath()).representation(reps).success();
 }

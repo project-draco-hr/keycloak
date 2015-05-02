@@ -1,0 +1,9 @@
+{
+  auth.requireManage();
+  RoleModel role=roleContainer.getRole(roleName);
+  if (role == null) {
+    throw new NotFoundException("Could not find role: " + roleName);
+  }
+  adminEvent.operation(OperationType.VIEW).resourcePath(uriInfo.getPath()).success();
+  return getRealmRoleComposites(role);
+}

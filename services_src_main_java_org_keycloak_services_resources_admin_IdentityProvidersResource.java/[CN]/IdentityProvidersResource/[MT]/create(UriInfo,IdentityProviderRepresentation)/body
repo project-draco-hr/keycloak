@@ -2,6 +2,7 @@
   this.auth.requireManage();
   try {
     this.realm.addIdentityProvider(RepresentationToModel.toModel(representation));
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo.getAbsolutePathBuilder().path(representation.getProviderId()).build().toString().substring(uriInfo.getBaseUri().toString().length())).representation(representation).success();
     return Response.created(uriInfo.getAbsolutePathBuilder().path(representation.getProviderId()).build()).build();
   }
  catch (  ModelDuplicateException e) {

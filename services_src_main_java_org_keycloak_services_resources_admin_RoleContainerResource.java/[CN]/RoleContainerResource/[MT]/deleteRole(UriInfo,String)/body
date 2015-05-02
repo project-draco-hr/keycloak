@@ -1,0 +1,10 @@
+{
+  auth.requireManage();
+  RoleRepresentation rep=getRole(uriInfo,roleName);
+  RoleModel role=roleContainer.getRole(roleName);
+  if (role == null) {
+    throw new NotFoundException("Could not find role: " + roleName);
+  }
+  deleteRole(role);
+  adminEvent.operation(OperationType.DELETE).resourcePath(uriInfo.getPath()).success();
+}

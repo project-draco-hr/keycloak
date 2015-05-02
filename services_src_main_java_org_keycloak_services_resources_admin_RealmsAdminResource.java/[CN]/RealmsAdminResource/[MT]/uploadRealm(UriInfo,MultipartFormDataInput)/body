@@ -9,8 +9,9 @@
   }
   Map<String,List<InputPart>> uploadForm=input.getFormDataMap();
   List<InputPart> inputParts=uploadForm.get("file");
+  RealmRepresentation rep=null;
   for (  InputPart inputPart : inputParts) {
-    RealmRepresentation rep=JsonSerialization.readValue(inputPart.getBodyAsString(),RealmRepresentation.class);
+    rep=JsonSerialization.readValue(inputPart.getBodyAsString(),RealmRepresentation.class);
     RealmModel realm;
     try {
       realm=realmManager.importRealm(rep);
@@ -19,8 +20,10 @@
       return ErrorResponse.exists("Realm " + rep.getRealm() + " already exists");
     }
     grantPermissionsToRealmCreator(realm);
+    URI location=null;
     if (inputParts.size() == 1) {
-      URI location=AdminRoot.realmsUrl(uriInfo).path(realm.getName()).build();
+      location=AdminRoot.realmsUrl(uriInfo).path(realm.getName()).build();
+      adminEvent.operation(OperationType.CREATE).resourcePath(location.toString()).representation(rep).success();
       return Response.created(location).build();
     }
   }

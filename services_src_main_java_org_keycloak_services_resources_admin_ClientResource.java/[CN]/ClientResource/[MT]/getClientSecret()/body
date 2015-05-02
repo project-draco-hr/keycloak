@@ -3,5 +3,6 @@
   logger.debug("getClientSecret");
   UserCredentialModel model=UserCredentialModel.secret(client.getSecret());
   if (model == null)   throw new NotFoundException("Client does not have a secret");
+  adminEvent.operation(OperationType.VIEW).resourcePath(uriInfo.getPath()).success();
   return ModelToRepresentation.toRepresentation(model);
 }

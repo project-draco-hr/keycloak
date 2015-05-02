@@ -1,0 +1,47 @@
+{
+  auth.init(RealmAuth.Resource.EVENTS).requireView();
+  EventStoreProvider eventStore=session.getProvider(EventStoreProvider.class);
+  AdminEventQuery query=null;
+  if (realm.getName().equals(Config.getAdminRealm())) {
+    query=eventStore.createAdminQuery();
+    if (authRealm != null) {
+      query.authRealm(authRealm);
+    }
+  }
+ else {
+    query=eventStore.createAdminQuery().authRealm(realm.getId());
+  }
+  if (authClient != null) {
+    query.authClient(authClient);
+  }
+  if (authUser != null) {
+    query.authUser(authUser);
+  }
+  if (authIpAddress != null) {
+    query.authIpAddress(authIpAddress);
+  }
+  if (resourcePath != null) {
+    query.resourcePath(resourcePath);
+  }
+  List<String> operationTypes=uriInfo.getQueryParameters().get("operationTypes");
+  if (operationTypes != null) {
+    OperationType[] t=new OperationType[operationTypes.size()];
+    for (int i=0; i < t.length; i++) {
+      t[i]=OperationType.valueOf(operationTypes.get(i));
+    }
+    query.operation(t);
+  }
+  if (dateFrom != null) {
+    query.fromTime(dateFrom);
+  }
+  if (dateTo != null) {
+    query.toTime(dateTo);
+  }
+  if (firstResult != null) {
+    query.firstResult(firstResult);
+  }
+  if (maxResults != null) {
+    query.maxResults(maxResults);
+  }
+  return query.getResultList();
+}

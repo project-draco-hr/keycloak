@@ -43,6 +43,7 @@
     String link=builder.build(realm.getName()).toString();
     long expiration=TimeUnit.SECONDS.toMinutes(realm.getAccessCodeLifespanUserAction());
     this.session.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendPasswordReset(link,expiration);
+    adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo.getPath()).success();
     return Response.ok().build();
   }
  catch (  EmailException e) {

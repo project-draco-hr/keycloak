@@ -3,7 +3,8 @@
   if (clientModel == null) {
     throw new NotFoundException("Could not find client: " + name);
   }
-  ClientResource clientResource=new ClientResource(realm,auth,clientModel,session);
+  ClientResource clientResource=new ClientResource(realm,auth,clientModel,session,adminEvent);
   ResteasyProviderFactory.getInstance().injectProperties(clientResource);
+  adminEvent.operation(OperationType.VIEW).resourcePath(session.getContext().getUri().getPath()).success();
   return clientResource;
 }

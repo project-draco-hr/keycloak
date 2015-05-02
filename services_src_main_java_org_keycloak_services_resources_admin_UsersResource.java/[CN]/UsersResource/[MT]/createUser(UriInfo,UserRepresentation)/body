@@ -9,6 +9,7 @@
   try {
     UserModel user=session.users().addUser(realm,rep.getUsername());
     updateUserFromRep(user,rep);
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo.getAbsolutePathBuilder().path(user.getUsername()).build().toString().substring(uriInfo.getBaseUri().toString().length())).representation(rep).success();
     if (session.getTransaction().isActive()) {
       session.getTransaction().commit();
     }

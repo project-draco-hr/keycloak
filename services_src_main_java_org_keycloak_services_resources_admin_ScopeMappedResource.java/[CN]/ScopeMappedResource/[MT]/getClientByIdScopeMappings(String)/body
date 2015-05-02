@@ -3,5 +3,6 @@
   if (app == null) {
     throw new NotFoundException("Client not found");
   }
-  return new ScopeMappedClientResource(realm,auth,client,session,app);
+  adminEvent.operation(OperationType.VIEW).resourcePath(session.getContext().getUri().getPath()).success();
+  return new ScopeMappedClientResource(realm,auth,client,session,app,adminEvent);
 }

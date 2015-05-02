@@ -1,0 +1,18 @@
+{
+  if (!predicates.isEmpty()) {
+    cq.where(cb.and(predicates.toArray(new Predicate[predicates.size()])));
+  }
+  cq.orderBy(cb.desc(root.get("time")));
+  TypedQuery<AdminEventEntity> query=em.createQuery(cq);
+  if (firstResult != null) {
+    query.setFirstResult(firstResult);
+  }
+  if (maxResults != null) {
+    query.setMaxResults(maxResults);
+  }
+  List<AdminEvent> events=new LinkedList<AdminEvent>();
+  for (  AdminEventEntity e : query.getResultList()) {
+    events.add(JpaEventStoreProvider.convertAdminEvent(e));
+  }
+  return events;
+}

@@ -1,0 +1,27 @@
+{
+  this.realm=realm;
+  adminEvent=new AdminEvent();
+  if (realm.isAdminEventsEnabled()) {
+    EventStoreProvider store=session.getProvider(EventStoreProvider.class);
+    if (store != null) {
+      this.store=store;
+    }
+ else {
+      log.error("Admin Events enabled, but no event store provider configured");
+    }
+  }
+  if (realm.getEventsListeners() != null && !realm.getEventsListeners().isEmpty()) {
+    this.listeners=new LinkedList<>();
+    for (    String id : realm.getEventsListeners()) {
+      EventListenerProvider listener=session.getProvider(EventListenerProvider.class,id);
+      if (listener != null) {
+        listeners.add(listener);
+      }
+ else {
+        log.error("Event listener '" + id + "' registered, but provider not found");
+      }
+    }
+  }
+  realm(realm);
+  ipAddress(clientConnection.getRemoteAddr());
+}

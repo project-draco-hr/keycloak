@@ -1,0 +1,12 @@
+{
+  for (  RoleModel role : inputRoles) {
+    if (role.getContainer() instanceof RealmModel) {
+      realmRoles.add(role);
+    }
+ else {
+      ClientModel currentClient=(ClientModel)role.getContainer();
+      ClientRoleEntry clientRole=new ClientRoleEntry(currentClient.getClientId(),currentClient.getName(),role.getName(),role.getDescription());
+      clientRoles.add(currentClient.getClientId(),clientRole);
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  RealmManager realmManager=new RealmManager(session);
+  if (auth.getRealm().equals(realmManager.getKeycloakAdminstrationRealm())) {
+    if (auth.hasOneOfRealmRole(AdminRoles.ADMIN,AdminRoles.CREATE_REALM)) {
+      return true;
+    }
+    for (    RealmModel realm : session.realms().getRealms()) {
+      ClientModel client=realm.getMasterAdminClient();
+      if (auth.hasOneOfAppRole(client,AdminRoles.ALL_REALM_ROLES)) {
+        return true;
+      }
+    }
+    return false;
+  }
+ else {
+    ClientModel client=auth.getRealm().getClientByClientId(realmManager.getRealmAdminClientId(auth.getRealm()));
+    return auth.hasOneOfAppRole(client,AdminRoles.ALL_REALM_ROLES);
+  }
+}

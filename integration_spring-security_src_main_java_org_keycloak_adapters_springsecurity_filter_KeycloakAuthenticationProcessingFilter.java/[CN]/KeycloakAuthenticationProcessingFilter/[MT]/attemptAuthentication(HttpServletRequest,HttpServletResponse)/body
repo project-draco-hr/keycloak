@@ -1,0 +1,19 @@
+{
+  log.debug("Attempting Keycloak authentication");
+  KeycloakDeployment deployment=adapterDeploymentContextBean.getDeployment();
+  SimpleHttpFacade facade=new SimpleHttpFacade(request,response);
+  SpringSecurityTokenStore tokenStore=new SpringSecurityTokenStore(deployment,request);
+  SpringSecurityRequestAuthenticator authenticator=new SpringSecurityRequestAuthenticator(facade,request,deployment,tokenStore,-1);
+  AuthOutcome result=authenticator.authenticate();
+  AuthChallenge challenge=authenticator.getChallenge();
+  log.debug("Auth outcome: {}",result);
+  if (challenge != null) {
+    challenge.challenge(facade);
+  }
+  if (AuthOutcome.AUTHENTICATED.equals(result)) {
+    Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+    Assert.notNull(authentication,"Authentication SecurityContextHolder was null");
+    return authenticationManager.authenticate(authentication);
+  }
+  return null;
+}

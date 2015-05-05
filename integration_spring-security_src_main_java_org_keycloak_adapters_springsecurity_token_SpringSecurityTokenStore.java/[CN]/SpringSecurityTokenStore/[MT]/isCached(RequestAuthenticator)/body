@@ -1,0 +1,27 @@
+{
+  logger.debug("Checking if {} is cached",authenticator);
+  SecurityContext context=SecurityContextHolder.getContext();
+  KeycloakAuthenticationToken token;
+  KeycloakSecurityContext keycloakSecurityContext;
+  if (context == null || context.getAuthentication() == null) {
+    return false;
+  }
+  if (KeycloakAuthenticationToken.class.isAssignableFrom(context.getAuthentication().getClass())) {
+    logger.warn("Expected a KeycloakAuthenticationToken, but found {}",context.getAuthentication());
+    return false;
+  }
+  logger.info("Remote logged in already. Establishing state from security context.");
+  token=(KeycloakAuthenticationToken)context.getAuthentication();
+  keycloakSecurityContext=token.getAccount().getKeycloakSecurityContext();
+  if (!deployment.getRealm().equals(keycloakSecurityContext.getRealm())) {
+    logger.info("Account from security context is from a different realm than for the request.");
+    logout();
+    return false;
+  }
+  if (keycloakSecurityContext.getToken().isExpired()) {
+    logger.warn("Security token expired ... not returning from cache");
+    return false;
+  }
+  request.setAttribute(KeycloakSecurityContext.class.getName(),keycloakSecurityContext);
+  return true;
+}

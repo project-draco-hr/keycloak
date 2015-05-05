@@ -11,7 +11,14 @@
   }
 {
     KeycloakSession session=kc.startSession();
-    RealmModel realm=session.realms().getRealmByName("test");
+    RealmModel realm=null;
+    List<RealmModel> realms=session.realms().getRealms();
+    for (    RealmModel current : realms) {
+      if ("test".equals(current.getName())) {
+        realm=current;
+        break;
+      }
+    }
     Assert.assertTrue(realm instanceof org.keycloak.models.cache.RealmAdapter);
     realm.setAccessCodeLifespanLogin(200);
     ClientModel testApp=realm.getClientByClientId("test-app");
@@ -22,6 +29,7 @@
 {
     KeycloakSession session=kc.startSession();
     RealmModel realm=session.realms().getRealmByName("test");
+    Assert.assertEquals(200,realm.getAccessCodeLifespanLogin());
     ClientModel testApp=session.realms().getClientById(appId,realm);
     Assert.assertFalse(testApp.isEnabled());
     kc.stopSession(session,true);

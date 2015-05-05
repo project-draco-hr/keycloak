@@ -1,0 +1,18 @@
+{
+  ClientModel client=realm.getClientById(entity.getClientId());
+  if (client == null) {
+    throw new ModelException("Client with id " + entity.getClientId() + " is not available");
+  }
+  UserConsentModel model=new UserConsentModel(client);
+  for (  String roleId : entity.getGrantedRoles()) {
+    RoleModel roleModel=realm.getRoleById(roleId);
+    if (roleModel != null) {
+      model.addGrantedRole(roleModel);
+    }
+  }
+  for (  String protMapperId : entity.getGrantedProtocolMappers()) {
+    ProtocolMapperModel protocolMapper=client.getProtocolMapperById(protMapperId);
+    model.addGrantedProtocolMapper(protocolMapper);
+  }
+  return model;
+}

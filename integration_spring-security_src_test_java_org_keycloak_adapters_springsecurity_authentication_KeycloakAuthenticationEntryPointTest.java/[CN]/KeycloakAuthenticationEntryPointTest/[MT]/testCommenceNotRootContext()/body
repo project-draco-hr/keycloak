@@ -1,0 +1,7 @@
+{
+  String contextPath="/foo";
+  request.setContextPath(contextPath);
+  authenticationEntryPoint.commence(request,response,null);
+  assertEquals(HttpStatus.FOUND.value(),response.getStatus());
+  assertEquals(contextPath + KeycloakAuthenticationEntryPoint.DEFAULT_LOGIN_URI,response.getHeader("Location"));
+}

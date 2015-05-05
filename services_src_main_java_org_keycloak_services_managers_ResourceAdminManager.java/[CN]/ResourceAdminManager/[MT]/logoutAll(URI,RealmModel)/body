@@ -1,17 +1,11 @@
 {
-  ApacheHttpClient4Executor executor=createExecutor();
-  try {
-    realm.setNotBefore(Time.currentTime());
-    List<ClientModel> resources=realm.getClients();
-    logger.debugv("logging out {0} resources ",resources.size());
-    GlobalRequestResult finalResult=new GlobalRequestResult();
-    for (    ClientModel resource : resources) {
-      GlobalRequestResult currentResult=logoutClient(requestUri,realm,resource,executor,realm.getNotBefore());
-      finalResult.addAll(currentResult);
-    }
-    return finalResult;
+  realm.setNotBefore(Time.currentTime());
+  List<ClientModel> resources=realm.getClients();
+  logger.debugv("logging out {0} resources ",resources.size());
+  GlobalRequestResult finalResult=new GlobalRequestResult();
+  for (  ClientModel resource : resources) {
+    GlobalRequestResult currentResult=logoutClient(requestUri,realm,resource,realm.getNotBefore());
+    finalResult.addAll(currentResult);
   }
-  finally {
-    executor.getHttpClient().getConnectionManager().shutdown();
-  }
+  return finalResult;
 }

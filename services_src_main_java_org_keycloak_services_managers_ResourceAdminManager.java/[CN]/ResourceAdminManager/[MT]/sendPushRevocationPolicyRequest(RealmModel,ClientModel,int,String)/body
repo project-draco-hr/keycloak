@@ -1,0 +1,16 @@
+{
+  PushNotBeforeAction adminAction=new PushNotBeforeAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,resource.getClientId(),notBefore);
+  String token=new TokenManager().encodeToken(realm,adminAction);
+  logger.infov("pushRevocation resource: {0} url: {1}",resource.getClientId(),managementUrl);
+  URI target=UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_PUSH_NOT_BEFORE).build();
+  try {
+    int status=session.getProvider(HttpClientProvider.class).postText(target.toString(),token);
+    boolean success=status == 204 || status == 200;
+    logger.debugf("pushRevocation success for %s: %s",managementUrl,success);
+    return success;
+  }
+ catch (  IOException e) {
+    logger.warn("Failed to send revocation request",e);
+    return false;
+  }
+}

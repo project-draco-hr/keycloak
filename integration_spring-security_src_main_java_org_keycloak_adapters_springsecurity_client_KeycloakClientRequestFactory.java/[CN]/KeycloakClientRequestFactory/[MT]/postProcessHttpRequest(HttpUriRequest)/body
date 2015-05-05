@@ -1,0 +1,6 @@
+{
+  Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+  KeycloakAuthenticationToken token=(KeycloakAuthenticationToken)authentication;
+  KeycloakSecurityContext context=token.getAccount().getKeycloakSecurityContext();
+  request.setHeader(AUTHORIZATION_HEADER,"Bearer " + context.getTokenString());
+}

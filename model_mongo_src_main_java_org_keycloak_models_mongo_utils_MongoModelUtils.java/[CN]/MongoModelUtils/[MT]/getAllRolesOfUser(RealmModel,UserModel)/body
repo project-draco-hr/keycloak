@@ -1,0 +1,15 @@
+{
+  MongoUserEntity userEntity=((UserAdapter)user).getUser();
+  List<String> roleIds=userEntity.getRoleIds();
+  if (roleIds == null || roleIds.isEmpty()) {
+    return Collections.emptyList();
+  }
+  List<RoleModel> roles=new LinkedList<RoleModel>();
+  for (  String roleId : roleIds) {
+    RoleModel role=realm.getRoleById(roleId);
+    if (role != null) {
+      roles.add(role);
+    }
+  }
+  return roles;
+}

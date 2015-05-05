@@ -4,17 +4,21 @@
     AppAuthManager authManager=new AppAuthManager();
     AuthResult authResult=authManager.authenticateBearerToken(this.session,this.realmModel,this.uriInfo,this.clientConnection,this.request.getHttpHeaders());
     if (authResult != null) {
-      String audience=authResult.getToken().getAudience();
+      AccessToken token=authResult.getToken();
+      String audience=token.getAudience();
       ClientModel clientModel=this.realmModel.getClientByClientId(audience);
       if (clientModel == null) {
         return badRequest("Invalid client.");
       }
       session.getContext().setClient(clientModel);
-      if (!clientModel.isAllowedRetrieveTokenFromIdentityProvider(providerId)) {
-        return corsResponse(badRequest("Client [" + audience + "] not authorized to retrieve tokens from identity provider ["+ providerId+ "]."),clientModel);
+      ClientModel brokerClient=realmModel.getClientByClientId(Constants.BROKER_SERVICE_CLIENT_ID);
+      if (brokerClient == null) {
+        return corsResponse(forbidden("Realm has not migrated to support the broker token exchange service"),clientModel);
       }
-      if (clientModel.isConsentRequired()) {
-        return corsResponse(session.getProvider(LoginFormsProvider.class).setClientSessionCode(authManager.extractAuthorizationHeaderToken(this.request.getHttpHeaders())).setAccessRequest("Your information from " + providerId + " identity provider.").setActionUri(this.uriInfo.getRequestUri()).createOAuthGrant(null),clientModel);
+      Map<String,AccessToken.Access> resourceAccess=token.getResourceAccess();
+      AccessToken.Access brokerRoles=resourceAccess == null ? null : resourceAccess.get(Constants.BROKER_SERVICE_CLIENT_ID);
+      if (brokerRoles == null || !brokerRoles.isUserInRole(Constants.READ_TOKEN_ROLE)) {
+        return corsResponse(forbidden("Client [" + audience + "] not authorized to retrieve tokens from identity provider ["+ providerId+ "]."),clientModel);
       }
       IdentityProvider identityProvider=getIdentityProvider(session,realmModel,providerId);
       IdentityProviderModel identityProviderConfig=getIdentityProviderConfig(providerId);

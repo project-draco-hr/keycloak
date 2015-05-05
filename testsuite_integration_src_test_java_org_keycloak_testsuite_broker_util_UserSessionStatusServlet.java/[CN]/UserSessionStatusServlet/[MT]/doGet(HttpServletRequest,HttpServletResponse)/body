@@ -1,7 +1,7 @@
 {
   if (req.getRequestURI().toString().endsWith("logout")) {
-    resp.setStatus(200);
-    req.logout();
+    String redirect=UriBuilder.fromUri("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/logout").queryParam("redirect_uri","http://localhost:8081/test-app").build().toString();
+    resp.sendRedirect(redirect);
     return;
   }
   writeSessionStatus(req,resp);

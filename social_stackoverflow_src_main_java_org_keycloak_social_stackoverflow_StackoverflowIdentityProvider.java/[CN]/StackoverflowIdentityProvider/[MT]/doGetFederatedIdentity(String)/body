@@ -5,7 +5,7 @@
     if (log.isDebugEnabled()) {
       log.debug("StackOverflow profile request to: " + URL);
     }
-    JsonNode profile=SimpleHttp.doGet(URL).asJson().get("items").get(0);
+    JsonNode profile=JsonSimpleHttp.asJson(SimpleHttp.doGet(URL)).get("items").get(0);
     BrokeredIdentityContext user=new BrokeredIdentityContext(getJsonProperty(profile,"user_id"));
     user.setUsername(extractUsernameFromProfileURL(getJsonProperty(profile,"link")));
     user.setName(unescapeHtml3(getJsonProperty(profile,"display_name")));

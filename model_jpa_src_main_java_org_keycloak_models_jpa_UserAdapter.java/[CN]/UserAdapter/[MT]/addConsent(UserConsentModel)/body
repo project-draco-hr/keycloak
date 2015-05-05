@@ -1,0 +1,14 @@
+{
+  String clientId=consent.getClient().getId();
+  UserConsentEntity consentEntity=getGrantedConsentEntity(clientId);
+  if (consentEntity != null) {
+    throw new ModelDuplicateException("Consent already exists for client [" + clientId + "] and user ["+ user.getId()+ "]");
+  }
+  consentEntity=new UserConsentEntity();
+  consentEntity.setId(KeycloakModelUtils.generateId());
+  consentEntity.setUser(user);
+  consentEntity.setClientId(clientId);
+  em.persist(consentEntity);
+  em.flush();
+  updateGrantedConsentEntity(consentEntity,consent);
+}

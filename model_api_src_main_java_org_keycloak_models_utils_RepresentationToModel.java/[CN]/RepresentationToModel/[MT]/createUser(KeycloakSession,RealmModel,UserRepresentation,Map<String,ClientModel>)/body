@@ -46,5 +46,11 @@
       createClientRoleMappings(client,user,entry.getValue());
     }
   }
+  if (userRep.getClientConsents() != null) {
+    for (    UserConsentRepresentation consentRep : userRep.getClientConsents()) {
+      UserConsentModel consentModel=toModel(newRealm,consentRep);
+      user.addConsent(consentModel);
+    }
+  }
   return user;
 }

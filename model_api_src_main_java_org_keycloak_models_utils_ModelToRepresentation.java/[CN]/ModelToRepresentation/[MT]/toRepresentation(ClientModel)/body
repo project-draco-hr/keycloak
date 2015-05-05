@@ -2,6 +2,7 @@
   ClientRepresentation rep=new ClientRepresentation();
   rep.setId(clientModel.getId());
   rep.setClientId(clientModel.getClientId());
+  rep.setName(clientModel.getName());
   rep.setEnabled(clientModel.isEnabled());
   rep.setAdminUrl(clientModel.getManagementUrl());
   rep.setPublicClient(clientModel.isPublicClient());
@@ -11,6 +12,7 @@
   rep.setFullScopeAllowed(clientModel.isFullScopeAllowed());
   rep.setBearerOnly(clientModel.isBearerOnly());
   rep.setConsentRequired(clientModel.isConsentRequired());
+  rep.setDirectGrantsOnly(clientModel.isDirectGrantsOnly());
   rep.setSurrogateAuthRequired(clientModel.isSurrogateAuthRequired());
   rep.setBaseUrl(clientModel.getBaseUrl());
   rep.setNotBefore(clientModel.getNotBefore());
@@ -28,9 +30,6 @@
   }
   if (!clientModel.getRegisteredNodes().isEmpty()) {
     rep.setRegisteredNodes(new HashMap<>(clientModel.getRegisteredNodes()));
-  }
-  if (!clientModel.getIdentityProviders().isEmpty()) {
-    rep.setIdentityProviders(toRepresentation(clientModel.getIdentityProviders()));
   }
   if (!clientModel.getProtocolMappers().isEmpty()) {
     List<ProtocolMapperRepresentation> mappings=new LinkedList<>();

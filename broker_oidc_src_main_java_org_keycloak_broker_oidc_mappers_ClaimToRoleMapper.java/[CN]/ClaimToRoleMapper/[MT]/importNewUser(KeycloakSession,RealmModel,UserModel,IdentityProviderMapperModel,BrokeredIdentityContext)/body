@@ -1,0 +1,8 @@
+{
+  String roleName=mapperModel.getConfig().get(HardcodedRoleMapper.ROLE);
+  if (hasClaimValue(mapperModel,context)) {
+    RoleModel role=HardcodedRoleMapper.getRoleFromString(realm,roleName);
+    if (role == null)     throw new IdentityBrokerException("Unable to find role: " + roleName);
+    user.grantRole(role);
+  }
+}

@@ -41,5 +41,14 @@
   }
   userRep.setCredentials(credReps);
   userRep.setFederationLink(user.getFederationLink());
+  List<UserConsentModel> consents=user.getConsents();
+  LinkedList<UserConsentRepresentation> consentReps=new LinkedList<UserConsentRepresentation>();
+  for (  UserConsentModel consent : consents) {
+    UserConsentRepresentation consentRep=ModelToRepresentation.toRepresentation(consent);
+    consentReps.add(consentRep);
+  }
+  if (consentReps.size() > 0) {
+    userRep.setClientConsents(consentReps);
+  }
   return userRep;
 }

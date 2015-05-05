@@ -1,0 +1,13 @@
+{
+  MockitoAnnotations.initMocks(this);
+  request=spy(new MockHttpServletRequest());
+  response=new MockHttpServletResponse();
+  HttpFacade facade=new SimpleHttpFacade(request,response);
+  authenticator=new SpringSecurityRequestAuthenticator(facade,request,deployment,tokenStore,443);
+  when(principal.getKeycloakSecurityContext()).thenReturn(refreshableKeycloakSecurityContext);
+  when(refreshableKeycloakSecurityContext.getDeployment()).thenReturn(deployment);
+  when(refreshableKeycloakSecurityContext.getToken()).thenReturn(accessToken);
+  when(accessToken.getRealmAccess()).thenReturn(access);
+  when(access.getRoles()).thenReturn(Sets.newSet("user","admin"));
+  when(deployment.isUseResourceRoleMappings()).thenReturn(false);
+}

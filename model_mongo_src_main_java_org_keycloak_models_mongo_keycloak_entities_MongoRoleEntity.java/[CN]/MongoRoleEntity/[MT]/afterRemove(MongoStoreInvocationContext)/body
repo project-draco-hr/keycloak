@@ -1,14 +1,9 @@
 {
   MongoStore mongoStore=invContext.getMongoStore();
-  DBObject query=new QueryBuilder().and("roleIds").is(getId()).get();
-  List<MongoUserEntity> users=mongoStore.loadEntities(MongoUserEntity.class,query,invContext);
-  for (  MongoUserEntity user : users) {
-    mongoStore.pullItemFromList(user,"roleIds",getId(),invContext);
-  }
-  query=new QueryBuilder().and("scopeIds").is(getId()).get();
-  users=mongoStore.loadEntities(MongoUserEntity.class,query,invContext);
-  for (  MongoUserEntity user : users) {
-    mongoStore.pullItemFromList(user,"scopeIds",getId(),invContext);
+  DBObject query=new QueryBuilder().and("scopeIds").is(getId()).get();
+  List<MongoClientEntity> clients=mongoStore.loadEntities(MongoClientEntity.class,query,invContext);
+  for (  MongoClientEntity client : clients) {
+    mongoStore.pullItemFromList(client,"scopeIds",getId(),invContext);
   }
   if (getRealmId() != null) {
     MongoRealmEntity realmEntity=mongoStore.loadEntity(MongoRealmEntity.class,getRealmId(),invContext);

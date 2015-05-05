@@ -1,0 +1,41 @@
+{
+  Collection<UserConsentProtocolMapperEntity> grantedProtocolMapperEntities=consentEntity.getGrantedProtocolMappers();
+  Collection<UserConsentProtocolMapperEntity> mappersToRemove=new HashSet<UserConsentProtocolMapperEntity>(grantedProtocolMapperEntities);
+  for (  ProtocolMapperModel protocolMapper : consentModel.getGrantedProtocolMappers()) {
+    UserConsentProtocolMapperEntity grantedProtocolMapperEntity=new UserConsentProtocolMapperEntity();
+    grantedProtocolMapperEntity.setUserConsent(consentEntity);
+    grantedProtocolMapperEntity.setProtocolMapperId(protocolMapper.getId());
+    if (!grantedProtocolMapperEntities.contains(grantedProtocolMapperEntity)) {
+      em.persist(grantedProtocolMapperEntity);
+      em.flush();
+      grantedProtocolMapperEntities.add(grantedProtocolMapperEntity);
+    }
+ else {
+      mappersToRemove.remove(grantedProtocolMapperEntity);
+    }
+  }
+  for (  UserConsentProtocolMapperEntity toRemove : mappersToRemove) {
+    grantedProtocolMapperEntities.remove(toRemove);
+    em.remove(toRemove);
+  }
+  Collection<UserConsentRoleEntity> grantedRoleEntities=consentEntity.getGrantedRoles();
+  Set<UserConsentRoleEntity> rolesToRemove=new HashSet<UserConsentRoleEntity>(grantedRoleEntities);
+  for (  RoleModel role : consentModel.getGrantedRoles()) {
+    UserConsentRoleEntity consentRoleEntity=new UserConsentRoleEntity();
+    consentRoleEntity.setUserConsent(consentEntity);
+    consentRoleEntity.setRoleId(role.getId());
+    if (!grantedRoleEntities.contains(consentRoleEntity)) {
+      em.persist(consentRoleEntity);
+      em.flush();
+      grantedRoleEntities.add(consentRoleEntity);
+    }
+ else {
+      rolesToRemove.remove(consentRoleEntity);
+    }
+  }
+  for (  UserConsentRoleEntity toRemove : rolesToRemove) {
+    grantedRoleEntities.remove(toRemove);
+    em.remove(toRemove);
+  }
+  em.flush();
+}

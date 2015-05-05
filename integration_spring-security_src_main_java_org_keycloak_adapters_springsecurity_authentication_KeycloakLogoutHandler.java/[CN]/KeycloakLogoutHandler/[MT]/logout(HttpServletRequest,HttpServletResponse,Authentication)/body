@@ -1,0 +1,15 @@
+{
+  if (authentication instanceof AnonymousAuthenticationToken) {
+    log.warn("Attempt to log out an anonymous authentication");
+    return;
+  }
+  if (Boolean.valueOf(request.getParameter(SSO_LOGOUT_COMPLETE_PARAM))) {
+    return;
+  }
+  try {
+    handleSingleSignOut(request,response);
+  }
+ catch (  IOException e) {
+    throw new IllegalStateException("Unable to redirect to SSO url!",e);
+  }
+}

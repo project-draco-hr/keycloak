@@ -5,7 +5,10 @@
   require(AccountRoles.MANAGE_ACCOUNT);
   csrfCheck(stateChecker);
   UserModel user=auth.getUser();
-  session.sessions().removeUserSessions(realm,user);
+  List<UserSessionModel> userSessions=session.sessions().getUserSessions(realm,user);
+  for (  UserSessionModel userSession : userSessions) {
+    AuthenticationManager.backchannelLogout(session,realm,userSession,uriInfo,clientConnection,headers,true);
+  }
   UriBuilder builder=Urls.accountBase(uriInfo.getBaseUri()).path(AccountService.class,"sessionsPage");
   String referrer=uriInfo.getQueryParameters().getFirst("referrer");
   if (referrer != null) {

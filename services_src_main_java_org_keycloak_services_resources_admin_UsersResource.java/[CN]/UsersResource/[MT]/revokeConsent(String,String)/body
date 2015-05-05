@@ -1,0 +1,15 @@
+{
+  auth.requireManage();
+  UserModel user=session.users().getUserByUsername(username,realm);
+  if (user == null) {
+    throw new NotFoundException("User not found");
+  }
+  ClientModel client=realm.getClientByClientId(clientId);
+  boolean revoked=user.revokeConsentForClient(client.getId());
+  if (revoked) {
+    AuthenticationManager.backchannelUserFromClient(session,realm,user,client,uriInfo,headers);
+  }
+ else {
+    throw new NotFoundException("Consent not found for user " + username + " and client "+ clientId);
+  }
+}

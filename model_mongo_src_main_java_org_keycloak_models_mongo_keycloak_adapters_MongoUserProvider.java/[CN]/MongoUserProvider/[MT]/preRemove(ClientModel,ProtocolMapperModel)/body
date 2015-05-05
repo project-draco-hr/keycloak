@@ -1,2 +1,5 @@
 {
+  DBObject query=new QueryBuilder().and("grantedProtocolMappers").is(protocolMapper.getId()).get();
+  DBObject pull=new BasicDBObject("$pull",query);
+  getMongoStore().updateEntities(MongoUserConsentEntity.class,query,pull,invocationContext);
 }

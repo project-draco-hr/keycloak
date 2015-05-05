@@ -1,0 +1,39 @@
+{
+  RealmModel realm=realmManager.createRealm("original");
+  ClientModel fooClient=realm.addClient("foo-client");
+  ClientModel barClient=realm.addClient("bar-client");
+  RoleModel realmRole=realm.addRole("realm-role");
+  RoleModel barClientRole=barClient.addRole("bar-client-role");
+  ProtocolMapperModel fooMapper=new ProtocolMapperModel();
+  fooMapper.setName("foo");
+  fooMapper.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);
+  fooMapper.setProtocolMapper(UserPropertyMapper.PROVIDER_ID);
+  fooMapper=fooClient.addProtocolMapper(fooMapper);
+  ProtocolMapperModel barMapper=new ProtocolMapperModel();
+  barMapper.setName("bar");
+  barMapper.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);
+  barMapper.setProtocolMapper(UserPropertyMapper.PROVIDER_ID);
+  barMapper=barClient.addProtocolMapper(barMapper);
+  UserModel john=session.users().addUser(realm,"john");
+  UserModel mary=session.users().addUser(realm,"mary");
+  UserConsentModel johnFooGrant=new UserConsentModel(fooClient);
+  johnFooGrant.addGrantedRole(realmRole);
+  johnFooGrant.addGrantedRole(barClientRole);
+  johnFooGrant.addGrantedProtocolMapper(fooMapper);
+  john.addConsent(johnFooGrant);
+  UserConsentModel johnBarGrant=new UserConsentModel(barClient);
+  johnBarGrant.addGrantedProtocolMapper(barMapper);
+  johnBarGrant.addGrantedRole(realmRole);
+  try {
+    john.updateConsent(johnBarGrant);
+    Assert.fail("Not expected to end here");
+  }
+ catch (  ModelException expected) {
+  }
+  john.addConsent(johnBarGrant);
+  UserConsentModel maryFooGrant=new UserConsentModel(fooClient);
+  maryFooGrant.addGrantedRole(realmRole);
+  maryFooGrant.addGrantedProtocolMapper(fooMapper);
+  mary.addConsent(maryFooGrant);
+  commit();
+}

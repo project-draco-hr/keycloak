@@ -1,0 +1,20 @@
+{
+  JsonWebToken token=(JsonWebToken)context.getContextData().get(KeycloakOIDCIdentityProvider.VALIDATED_ACCESS_TOKEN);
+  String roleName=mapperModel.getConfig().get(HardcodedRoleMapper.ROLE);
+  String[] parseRole=HardcodedRoleMapper.parseRole(mapperModel.getConfig().get(EXTERNAL_ROLE));
+  String externalRoleName=parseRole[1];
+  String claimName=null;
+  if (parseRole[0] == null) {
+    claimName="realm_access.roles";
+  }
+ else {
+    claimName="resource_access." + parseRole[0] + ".roles";
+  }
+  Object claim=getClaimValue(token,claimName);
+  if (valueEquals(externalRoleName,claim)) {
+    RoleModel role=HardcodedRoleMapper.getRoleFromString(realm,roleName);
+    if (role == null)     throw new IdentityBrokerException("Unable to find role: " + roleName);
+    return role;
+  }
+  return null;
+}

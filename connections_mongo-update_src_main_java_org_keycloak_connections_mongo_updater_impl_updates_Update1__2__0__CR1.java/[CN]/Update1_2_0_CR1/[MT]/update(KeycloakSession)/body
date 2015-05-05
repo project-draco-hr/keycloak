@@ -1,0 +1,8 @@
+{
+  deleteEntries("clientSessions");
+  deleteEntries("sessions");
+  convertApplicationsToClients();
+  convertOAuthClientsToClients();
+  db.getCollection("realms").update(new BasicDBObject(),new BasicDBObject("$rename",new BasicDBObject("adminAppId","masterAdminClient")),false,true);
+  ensureIndex("userConsents",new String[]{"clientId","userId"},true,false);
+}

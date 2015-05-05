@@ -1,2 +1,8 @@
 {
+  DBObject query=new QueryBuilder().and("roleIds").is(role.getId()).get();
+  DBObject pull=new BasicDBObject("$pull",query);
+  getMongoStore().updateEntities(MongoUserEntity.class,query,pull,invocationContext);
+  query=new QueryBuilder().and("grantedRoles").is(role.getId()).get();
+  pull=new BasicDBObject("$pull",query);
+  getMongoStore().updateEntities(MongoUserConsentEntity.class,query,pull,invocationContext);
 }

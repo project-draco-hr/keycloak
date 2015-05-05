@@ -1,0 +1,13 @@
+{
+  beforeDBSearch(entityType);
+  Set<String> toRemove=new HashSet<String>();
+  for (  Map.Entry<String,MongoIdentifiableEntity> entry : loadedObjects.entrySet()) {
+    MongoIdentifiableEntity entity=entry.getValue();
+    if (entity.getClass().equals(entityType)) {
+      toRemove.add(entry.getKey());
+    }
+  }
+  for (  String objectId : toRemove) {
+    loadedObjects.remove(objectId);
+  }
+}

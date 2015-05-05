@@ -1,0 +1,18 @@
+{
+  List<String> mgmtUrls=getAllManagementUrls(requestUri,resource);
+  if (mgmtUrls.isEmpty()) {
+    logger.debugf("No management URL or no registered cluster nodes for the client %s",resource.getClientId());
+    return new GlobalRequestResult();
+  }
+  if (logger.isDebugEnabled())   logger.debug("Sending push revocation to URLS: " + mgmtUrls);
+  GlobalRequestResult result=new GlobalRequestResult();
+  for (  String mgmtUrl : mgmtUrls) {
+    if (sendPushRevocationPolicyRequest(realm,resource,notBefore,mgmtUrl)) {
+      result.addSuccessRequest(mgmtUrl);
+    }
+ else {
+      result.addFailedRequest(mgmtUrl);
+    }
+  }
+  return result;
+}

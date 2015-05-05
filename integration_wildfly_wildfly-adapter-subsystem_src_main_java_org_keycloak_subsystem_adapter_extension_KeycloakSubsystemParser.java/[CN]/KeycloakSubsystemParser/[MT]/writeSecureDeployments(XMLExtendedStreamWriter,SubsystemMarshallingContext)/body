@@ -1,0 +1,18 @@
+{
+  if (!context.getModelNode().get(SecureDeploymentDefinition.TAG_NAME).isDefined()) {
+    return;
+  }
+  for (  Property deployment : context.getModelNode().get(SecureDeploymentDefinition.TAG_NAME).asPropertyList()) {
+    writer.writeStartElement(SecureDeploymentDefinition.TAG_NAME);
+    writer.writeAttribute("name",deployment.getName());
+    ModelNode deploymentElements=deployment.getValue();
+    for (    AttributeDefinition element : SecureDeploymentDefinition.ALL_ATTRIBUTES) {
+      element.marshallAsElement(deploymentElements,writer);
+    }
+    ModelNode credentials=deploymentElements.get(CredentialDefinition.TAG_NAME);
+    if (credentials.isDefined()) {
+      writeCredentials(writer,credentials);
+    }
+    writer.writeEndElement();
+  }
+}

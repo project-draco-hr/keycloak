@@ -2,8 +2,8 @@
   log.debug("Attempting Keycloak authentication");
   KeycloakDeployment deployment=adapterDeploymentContextBean.getDeployment();
   SimpleHttpFacade facade=new SimpleHttpFacade(request,response);
-  SpringSecurityTokenStore tokenStore=new SpringSecurityTokenStore(deployment,request);
-  SpringSecurityRequestAuthenticator authenticator=new SpringSecurityRequestAuthenticator(facade,request,deployment,tokenStore,-1);
+  AdapterTokenStore tokenStore=adapterTokenStoreFactory.createAdapterTokenStore(deployment,request);
+  RequestAuthenticator authenticator=new SpringSecurityRequestAuthenticator(facade,request,deployment,tokenStore,-1);
   AuthOutcome result=authenticator.authenticate();
   AuthChallenge challenge=authenticator.getChallenge();
   log.debug("Auth outcome: {}",result);

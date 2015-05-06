@@ -1,0 +1,19 @@
+{
+  if (!this.isBearerTokenRequest(request)) {
+    super.successfulAuthentication(request,response,chain,authResult);
+    return;
+  }
+  if (log.isDebugEnabled()) {
+    log.debug("Authentication success using bearer token. Updating SecurityContextHolder to contain: {}",authResult);
+  }
+  SecurityContextHolder.getContext().setAuthentication(authResult);
+  if (this.eventPublisher != null) {
+    eventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult,this.getClass()));
+  }
+  try {
+    chain.doFilter(request,response);
+  }
+  finally {
+    SecurityContextHolder.clearContext();
+  }
+}

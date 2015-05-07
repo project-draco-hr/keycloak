@@ -4,14 +4,15 @@
   for (  UserFederationProviderModel model : realm.getUserFederationProviders()) {
     if (model.getId().equals(providerId)) {
       UsersSyncManager syncManager=new UsersSyncManager();
+      UserFederationSyncResult syncResult=null;
       if ("triggerFullSync".equals(action)) {
-        syncManager.syncAllUsers(session.getKeycloakSessionFactory(),realm.getId(),model);
+        syncResult=syncManager.syncAllUsers(session.getKeycloakSessionFactory(),realm.getId(),model);
       }
  else       if ("triggerChangedUsersSync".equals(action)) {
-        syncManager.syncChangedUsers(session.getKeycloakSessionFactory(),realm.getId(),model);
+        syncResult=syncManager.syncChangedUsers(session.getKeycloakSessionFactory(),realm.getId(),model);
       }
       adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).success();
-      return Response.noContent().build();
+      return syncResult;
     }
   }
   throw new NotFoundException("could not find provider");

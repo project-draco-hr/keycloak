@@ -1,0 +1,83 @@
+{
+  if (OrCondition.class.isInstance(condition)) {
+    OrCondition orCondition=(OrCondition)condition;
+    filter.append("(|");
+    for (    Condition innerCondition : orCondition.getInnerConditions()) {
+      applyCondition(filter,innerCondition,ldapEntryConfig);
+    }
+    filter.append(")");
+    return;
+  }
+  QueryParameter queryParameter=condition.getParameter();
+  if (!IdentityType.ID.equals(queryParameter)) {
+    if (AttributeParameter.class.isInstance(queryParameter)) {
+      AttributeParameter attributeParameter=(AttributeParameter)queryParameter;
+      String attributeName=ldapEntryConfig.getMappedProperties().get(attributeParameter.getName());
+      if (attributeName != null) {
+        if (EqualCondition.class.isInstance(condition)) {
+          EqualCondition equalCondition=(EqualCondition)condition;
+          Object parameterValue=equalCondition.getValue();
+          if (Date.class.isInstance(parameterValue)) {
+            parameterValue=LDAPUtil.formatDate((Date)parameterValue);
+          }
+          filter.append("(").append(attributeName).append(LDAPConstants.EQUAL).append(parameterValue).append(")");
+        }
+ else         if (LikeCondition.class.isInstance(condition)) {
+          LikeCondition likeCondition=(LikeCondition)condition;
+          String parameterValue=(String)likeCondition.getValue();
+        }
+ else         if (GreaterThanCondition.class.isInstance(condition)) {
+          GreaterThanCondition greaterThanCondition=(GreaterThanCondition)condition;
+          Comparable parameterValue=(Comparable)greaterThanCondition.getValue();
+          if (Date.class.isInstance(parameterValue)) {
+            parameterValue=LDAPUtil.formatDate((Date)parameterValue);
+          }
+          if (greaterThanCondition.isOrEqual()) {
+            filter.append("(").append(attributeName).append(">=").append(parameterValue).append(")");
+          }
+ else {
+            filter.append("(").append(attributeName).append(">").append(parameterValue).append(")");
+          }
+        }
+ else         if (LessThanCondition.class.isInstance(condition)) {
+          LessThanCondition lessThanCondition=(LessThanCondition)condition;
+          Comparable parameterValue=(Comparable)lessThanCondition.getValue();
+          if (Date.class.isInstance(parameterValue)) {
+            parameterValue=LDAPUtil.formatDate((Date)parameterValue);
+          }
+          if (lessThanCondition.isOrEqual()) {
+            filter.append("(").append(attributeName).append("<=").append(parameterValue).append(")");
+          }
+ else {
+            filter.append("(").append(attributeName).append("<").append(parameterValue).append(")");
+          }
+        }
+ else         if (BetweenCondition.class.isInstance(condition)) {
+          BetweenCondition betweenCondition=(BetweenCondition)condition;
+          Comparable x=betweenCondition.getX();
+          Comparable y=betweenCondition.getY();
+          if (Date.class.isInstance(x)) {
+            x=LDAPUtil.formatDate((Date)x);
+          }
+          if (Date.class.isInstance(y)) {
+            y=LDAPUtil.formatDate((Date)y);
+          }
+          filter.append("(").append(x).append("<=").append(attributeName).append("<=").append(y).append(")");
+        }
+ else         if (InCondition.class.isInstance(condition)) {
+          InCondition inCondition=(InCondition)condition;
+          Object[] valuesToCompare=inCondition.getValue();
+          filter.append("(&(");
+          for (int i=0; i < valuesToCompare.length; i++) {
+            Object value=valuesToCompare[i];
+            filter.append("(").append(attributeName).append(LDAPConstants.EQUAL).append(value).append(")");
+          }
+          filter.append("))");
+        }
+ else {
+          throw new ModelException("Unsupported query condition [" + condition + "].");
+        }
+      }
+    }
+  }
+}

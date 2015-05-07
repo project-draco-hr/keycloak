@@ -1,4 +1,5 @@
 {
+  final UserFederationSyncResult syncResult=new UserFederationSyncResult();
   boolean pagination=Boolean.parseBoolean(fedModel.getConfig().get(LDAPConstants.PAGINATION));
   if (pagination) {
     String pageSizeConfig=fedModel.getConfig().get(LDAPConstants.BATCH_SIZE_FOR_SYNC);
@@ -10,7 +11,8 @@
       nextPage=userQuery.getPaginationContext() != null;
       KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
         @Override public void run(        KeycloakSession session){
-          importLdapUsers(session,realmId,fedModel,users);
+          UserFederationSyncResult currentPageSync=importLdapUsers(session,realmId,fedModel,users);
+          syncResult.add(currentPageSync);
         }
       }
 );
@@ -20,9 +22,11 @@
     final List<LDAPUser> users=userQuery.getResultList();
     KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
       @Override public void run(      KeycloakSession session){
-        importLdapUsers(session,realmId,fedModel,users);
+        UserFederationSyncResult currentSync=importLdapUsers(session,realmId,fedModel,users);
+        syncResult.add(currentSync);
       }
     }
 );
   }
+  return syncResult;
 }

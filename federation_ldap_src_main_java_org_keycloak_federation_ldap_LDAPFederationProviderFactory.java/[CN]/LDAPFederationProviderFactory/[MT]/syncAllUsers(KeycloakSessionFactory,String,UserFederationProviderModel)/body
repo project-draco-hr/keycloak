@@ -1,6 +1,8 @@
 {
-  logger.infof("Sync all users from LDAP to local store: realm: %s, federation provider: %s, current time: " + new Date(),realmId,model.getDisplayName());
+  logger.infof("Sync all users from LDAP to local store: realm: %s, federation provider: %s",realmId,model.getDisplayName());
   LDAPIdentityStore ldapIdentityStore=this.ldapStoreRegistry.getLdapStore(model);
   IdentityQuery<LDAPUser> userQuery=ldapIdentityStore.createQueryBuilder().createIdentityQuery(LDAPUser.class);
-  syncImpl(sessionFactory,userQuery,realmId,model);
+  UserFederationSyncResult syncResult=syncImpl(sessionFactory,userQuery,realmId,model);
+  logger.infof("Sync all users finished: %s",syncResult.getStatus());
+  return syncResult;
 }

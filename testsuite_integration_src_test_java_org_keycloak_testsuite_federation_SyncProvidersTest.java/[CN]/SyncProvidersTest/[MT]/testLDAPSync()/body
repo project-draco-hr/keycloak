@@ -4,7 +4,8 @@
   KeycloakSession session=keycloakRule.startSession();
   try {
     KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
-    usersSyncManager.syncAllUsers(sessionFactory,"test",ldapModel);
+    UserFederationSyncResult syncResult=usersSyncManager.syncAllUsers(sessionFactory,"test",ldapModel);
+    assertSyncEquals(syncResult,5,0,0);
   }
   finally {
     keycloakRule.stopSession(session,false);
@@ -34,7 +35,8 @@
     assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5@email.org");
     Assert.assertNull(userProvider.getUserByUsername("user6",testRealm));
     KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
-    usersSyncManager.syncChangedUsers(sessionFactory,"test",ldapModel);
+    UserFederationSyncResult syncResult=usersSyncManager.syncChangedUsers(sessionFactory,"test",ldapModel);
+    assertSyncEquals(syncResult,1,1,0);
   }
   finally {
     keycloakRule.stopSession(session,false);

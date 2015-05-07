@@ -1,4 +1,5 @@
 {
+  final UserFederationSyncResult syncResult=new UserFederationSyncResult();
   KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
     @Override public void run(    KeycloakSession session){
       RealmModel realm=session.realms().getRealm(realmId);
@@ -8,10 +9,14 @@
       for (      String username : allUsernames) {
         UserModel localUser=localProvider.getUserByUsername(username,realm);
         if (localUser == null) {
-          federationProvider.getUserByUsername(realm,username);
+          UserModel imported=federationProvider.getUserByUsername(realm,username);
+          if (imported != null) {
+            syncResult.increaseAdded();
+          }
         }
       }
     }
   }
 );
+  return syncResult;
 }

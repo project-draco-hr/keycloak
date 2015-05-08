@@ -1,3 +1,3 @@
 {
-  http.sessionManagement().sessionAuthenticationStrategy(sessionAuthenticationStrategy()).and().addFilterBefore(keycloakPreAuthActionsFilter(),LogoutFilter.class).addFilterBefore(keycloakAuthenticationProcessingFilter(),X509AuthenticationFilter.class).exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
+  http.csrf().requireCsrfProtectionMatcher(keycloakCsrfRequestMatcher()).and().sessionManagement().sessionAuthenticationStrategy(sessionAuthenticationStrategy()).and().addFilterBefore(keycloakPreAuthActionsFilter(),LogoutFilter.class).addFilterBefore(keycloakAuthenticationProcessingFilter(),BasicAuthenticationFilter.class).exceptionHandling().authenticationEntryPoint(authenticationEntryPoint()).and().logout().addLogoutHandler(keycloakLogoutHandler()).logoutUrl("/sso/logout").permitAll().logoutSuccessUrl("/");
 }

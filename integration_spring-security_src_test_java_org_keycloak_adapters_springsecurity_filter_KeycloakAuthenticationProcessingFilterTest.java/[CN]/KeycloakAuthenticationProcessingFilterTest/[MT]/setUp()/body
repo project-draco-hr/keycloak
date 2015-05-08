@@ -1,0 +1,12 @@
+{
+  MockitoAnnotations.initMocks(this);
+  request=spy(new MockHttpServletRequest());
+  filter=new KeycloakAuthenticationProcessingFilter(authenticationManager);
+  filter.setApplicationContext(applicationContext);
+  filter.setAuthenticationSuccessHandler(successHandler);
+  filter.setAuthenticationFailureHandler(failureHandler);
+  when(applicationContext.getBean(eq(AdapterDeploymentContextBean.class))).thenReturn(adapterDeploymentContextBean);
+  when(adapterDeploymentContextBean.getDeployment()).thenReturn(keycloakDeployment);
+  when(keycloakAccount.getPrincipal()).thenReturn(new KeycloakPrincipal<KeycloakSecurityContext>(UUID.randomUUID().toString(),keycloakSecurityContext));
+  filter.afterPropertiesSet();
+}

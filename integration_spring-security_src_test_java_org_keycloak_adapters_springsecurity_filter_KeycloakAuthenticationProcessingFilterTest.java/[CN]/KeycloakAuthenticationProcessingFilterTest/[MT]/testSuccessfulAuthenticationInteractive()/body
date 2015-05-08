@@ -1,0 +1,6 @@
+{
+  Authentication authentication=new KeycloakAuthenticationToken(keycloakAccount,authorities);
+  filter.successfulAuthentication(request,response,chain,authentication);
+  verify(successHandler).onAuthenticationSuccess(eq(request),eq(response),eq(authentication));
+  verify(chain,never()).doFilter(any(HttpServletRequest.class),any(HttpServletResponse.class));
+}

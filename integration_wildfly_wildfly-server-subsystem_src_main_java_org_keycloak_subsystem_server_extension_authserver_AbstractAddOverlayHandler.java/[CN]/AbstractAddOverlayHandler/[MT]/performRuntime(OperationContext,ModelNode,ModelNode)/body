@@ -1,0 +1,35 @@
+{
+  final String uploadFileName=UPLOADED_FILE_NAME.resolveModelAttribute(context,model).asString();
+  final boolean isRedeploy=isRedeploy(context,operation);
+  final boolean isOverwrite=OVERWRITE.resolveModelAttribute(context,model).asBoolean();
+  String overlayPath=getOverlayPath(uploadFileName);
+  String overlayName=AuthServerUtil.getOverlayName(operation);
+  PathAddress overlayAddress=AuthServerUtil.getOverlayAddress(overlayName);
+  String deploymentName=AuthServerUtil.getDeploymentName(operation);
+  boolean isOverlayExists=AuthServerUtil.isOverlayExists(context,overlayName,PathAddress.EMPTY_ADDRESS);
+  if (!isOverlayExists) {
+    addOverlay(context,overlayAddress);
+    if (!isHostController(context)) {
+      addDeploymentToOverlay(context,overlayAddress,deploymentName);
+    }
+  }
+  if (isHostController(context)) {
+    addOverlayToServerGroups(context,overlayAddress,operation,overlayName);
+  }
+  if (isOverlayExists && isContentExists(context,overlayAddress,overlayPath)) {
+    if (isOverwrite) {
+      removeContent(context,overlayAddress,overlayPath);
+    }
+ else {
+      throw new OperationFailedException(pathExistsMessage(overlayAddress,overlayPath));
+    }
+  }
+  addContent(context,overlayAddress,BYTES_TO_UPLOAD.resolveModelAttribute(context,model).asBytes(),overlayPath);
+  if (isRedeploy) {
+    AuthServerUtil.addStepToRedeployAuthServer(context,deploymentName);
+  }
+  if (!isRedeploy) {
+    context.restartRequired();
+  }
+  context.completeStep(OperationContext.ResultHandler.NOOP_RESULT_HANDLER);
+}

@@ -15,6 +15,15 @@
     context.setToken(null);
   }
   ClientSessionModel clientSession=clientCode.getClientSession();
+  context.getIdp().preprocessFederatedIdentity(session,realmModel,context);
+  Set<IdentityProviderMapperModel> mappers=realmModel.getIdentityProviderMappersByAlias(context.getIdpConfig().getAlias());
+  if (mappers != null) {
+    KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+    for (    IdentityProviderMapperModel mapper : mappers) {
+      IdentityProviderMapper target=(IdentityProviderMapper)sessionFactory.getProviderFactory(IdentityProviderMapper.class,mapper.getIdentityProviderMapper());
+      target.preprocessFederatedIdentity(session,realmModel,mapper,context);
+    }
+  }
   FederatedIdentityModel federatedIdentityModel=new FederatedIdentityModel(providerId,context.getId(),context.getUsername(),context.getToken());
   this.event.event(EventType.IDENTITY_PROVIDER_LOGIN).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.IDENTITY_PROVIDER_USERNAME,context.getUsername());
   UserModel federatedUser=this.session.users().getUserByFederatedIdentity(federatedIdentityModel,this.realmModel);

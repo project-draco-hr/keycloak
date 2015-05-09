@@ -7,7 +7,8 @@
     }
     JsonNode profile=JsonSimpleHttp.asJson(SimpleHttp.doGet(URL)).get("items").get(0);
     BrokeredIdentityContext user=new BrokeredIdentityContext(getJsonProperty(profile,"user_id"));
-    user.setUsername(extractUsernameFromProfileURL(getJsonProperty(profile,"link")));
+    String username=extractUsernameFromProfileURL(getJsonProperty(profile,"link"));
+    user.setUsername(username);
     user.setName(unescapeHtml3(getJsonProperty(profile,"display_name")));
     user.setIdpConfig(getConfig());
     user.setIdp(this);

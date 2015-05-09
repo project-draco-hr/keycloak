@@ -3,7 +3,8 @@
   try {
     JsonNode profile=JsonSimpleHttp.asJson(SimpleHttp.doGet(PROFILE_URL).header("Authorization","Bearer " + accessToken));
     BrokeredIdentityContext user=new BrokeredIdentityContext(getJsonProperty(profile,"id"));
-    user.setUsername(extractUsernameFromProfileURL(getJsonProperty(profile,"publicProfileUrl")));
+    String username=extractUsernameFromProfileURL(getJsonProperty(profile,"publicProfileUrl"));
+    user.setUsername(username);
     user.setName(getJsonProperty(profile,"formattedName"));
     user.setEmail(getJsonProperty(profile,"emailAddress"));
     user.setIdpConfig(getConfig());

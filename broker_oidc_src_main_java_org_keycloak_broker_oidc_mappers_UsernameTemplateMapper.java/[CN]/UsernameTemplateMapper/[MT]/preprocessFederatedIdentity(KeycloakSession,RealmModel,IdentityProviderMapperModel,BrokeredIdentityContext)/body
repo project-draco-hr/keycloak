@@ -1,0 +1,26 @@
+{
+  String template=mapperModel.getConfig().get(TEMPLATE);
+  Matcher m=substitution.matcher(template);
+  StringBuffer sb=new StringBuffer();
+  while (m.find()) {
+    String variable=m.group(1);
+    if (variable.equals("ALIAS")) {
+      m.appendReplacement(sb,context.getIdpConfig().getAlias());
+    }
+ else     if (variable.equals("UUID")) {
+      m.appendReplacement(sb,KeycloakModelUtils.generateId());
+    }
+ else     if (variable.startsWith("CLAIM.")) {
+      String name=variable.substring("CLAIM.".length());
+      Object value=AbstractClaimMapper.getClaimValue(context,name);
+      if (value == null)       value="";
+      m.appendReplacement(sb,value.toString());
+    }
+ else {
+      m.appendReplacement(sb,m.group(1));
+    }
+  }
+  m.appendTail(sb);
+  String username=sb.toString();
+  context.setModelUsername(username);
+}

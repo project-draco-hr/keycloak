@@ -1,5 +1,11 @@
 {
+  KeycloakAuthenticationToken authentication=(KeycloakAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
   KeycloakDeployment deployment=deploymentContextBean.getDeployment();
-  String redirectUrl=createRedirectUrl(request);
-  response.sendRedirect(deployment.getLogoutUrl().queryParam("redirect_uri",redirectUrl).build().toASCIIString());
+  RefreshableKeycloakSecurityContext session=(RefreshableKeycloakSecurityContext)authentication.getAccount().getKeycloakSecurityContext();
+  try {
+    session.logout(deployment);
+  }
+ catch (  Exception e) {
+    log.error("Unable to complete Keycloak single sign out",e);
+  }
 }

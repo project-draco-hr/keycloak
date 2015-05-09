@@ -8,19 +8,25 @@
     fireErrorEvent(Errors.FEDERATED_IDENTITY_EMAIL_EXISTS);
     throw new IdentityBrokerException(Messages.FEDERATED_IDENTITY_EMAIL_EXISTS);
   }
-  String username=context.getUsername();
-  if (this.realmModel.isRegistrationEmailAsUsername() && !Validation.isEmpty(context.getEmail())) {
-    username=context.getEmail();
-  }
- else   if (username == null) {
-    username=context.getIdpConfig().getAlias() + "." + context.getId();
-  }
+  String username=context.getModelUsername();
+  if (username == null) {
+    username=context.getUsername();
+    if (this.realmModel.isRegistrationEmailAsUsername() && !Validation.isEmpty(context.getEmail())) {
+      username=context.getEmail();
+    }
+ else     if (username == null) {
+      username=context.getIdpConfig().getAlias() + "." + context.getId();
+    }
  else {
-    username=context.getIdpConfig().getAlias() + "." + context.getUsername();
+      username=context.getIdpConfig().getAlias() + "." + context.getUsername();
+    }
   }
-  if (username != null) {
-    username=username.trim();
+  if (username == null) {
+    LOGGER.warn("Unknown username");
+    fireErrorEvent(Errors.FEDERATED_IDENTITY_USERNAME_EXISTS);
+    throw new IdentityBrokerException(Messages.FEDERATED_IDENTITY_USERNAME_EXISTS);
   }
+  username=username.trim();
   existingUser=this.session.users().getUserByUsername(username,this.realmModel);
   if (existingUser != null) {
     fireErrorEvent(Errors.FEDERATED_IDENTITY_USERNAME_EXISTS);

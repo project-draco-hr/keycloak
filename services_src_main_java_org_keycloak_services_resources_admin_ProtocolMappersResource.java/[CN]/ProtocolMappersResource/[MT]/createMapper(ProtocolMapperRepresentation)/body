@@ -2,5 +2,6 @@
   auth.requireManage();
   ProtocolMapperModel model=RepresentationToModel.toModel(rep);
   model=client.addProtocolMapper(model);
+  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo.getAbsolutePathBuilder().path(model.getId()).build().toString().substring(uriInfo.getBaseUri().toString().length())).representation(rep).success();
   return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
 }

@@ -7,5 +7,6 @@
   if (client == null) {
     throw new NotFoundException("Client not found");
   }
-  return new UserClientRoleMappingsResource(realm,auth,user,client);
+  adminEvent.operation(OperationType.VIEW).resourcePath(uriInfo.getPath()).success();
+  return new UserClientRoleMappingsResource(realm,auth,user,client,adminEvent);
 }

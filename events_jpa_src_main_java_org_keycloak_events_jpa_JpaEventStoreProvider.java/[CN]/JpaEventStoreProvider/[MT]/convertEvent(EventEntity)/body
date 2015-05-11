@@ -1,0 +1,19 @@
+{
+  Event event=new Event();
+  event.setTime(eventEntity.getTime());
+  event.setType(EventType.valueOf(eventEntity.getType()));
+  event.setRealmId(eventEntity.getRealmId());
+  event.setClientId(eventEntity.getClientId());
+  event.setUserId(eventEntity.getUserId());
+  event.setSessionId(eventEntity.getSessionId());
+  event.setIpAddress(eventEntity.getIpAddress());
+  event.setError(eventEntity.getError());
+  try {
+    Map<String,String> details=mapper.readValue(eventEntity.getDetailsJson(),mapType);
+    event.setDetails(details);
+  }
+ catch (  IOException ex) {
+    logger.error("Failed to read log details",ex);
+  }
+  return event;
+}

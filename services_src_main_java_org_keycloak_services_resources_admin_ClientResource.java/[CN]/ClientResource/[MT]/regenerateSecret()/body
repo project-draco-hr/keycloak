@@ -3,5 +3,6 @@
   logger.debug("regenerateSecret");
   UserCredentialModel cred=KeycloakModelUtils.generateSecret(client);
   CredentialRepresentation rep=ModelToRepresentation.toRepresentation(cred);
+  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo.getPath()).representation(rep).success();
   return rep;
 }

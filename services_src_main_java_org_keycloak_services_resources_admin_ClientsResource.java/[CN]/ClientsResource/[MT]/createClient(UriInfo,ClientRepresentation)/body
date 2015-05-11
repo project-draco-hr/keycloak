@@ -2,6 +2,7 @@
   auth.requireManage();
   try {
     ClientModel clientModel=RepresentationToModel.createClient(session,realm,rep,true);
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo.getAbsolutePathBuilder().path(getClientPath(clientModel)).build().toString().substring(uriInfo.getBaseUri().toString().length())).representation(rep).success();
     return Response.created(uriInfo.getAbsolutePathBuilder().path(getClientPath(clientModel)).build()).build();
   }
  catch (  ModelDuplicateException e) {

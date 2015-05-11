@@ -1,0 +1,19 @@
+{
+  BasicDBObject e=new BasicDBObject();
+  e.put("time",event.getTime());
+  e.put("type",event.getType().toString());
+  e.put("realmId",event.getRealmId());
+  e.put("clientId",event.getClientId());
+  e.put("userId",event.getUserId());
+  e.put("sessionId",event.getSessionId());
+  e.put("ipAddress",event.getIpAddress());
+  e.put("error",event.getError());
+  BasicDBObject details=new BasicDBObject();
+  if (event.getDetails() != null) {
+    for (    Map.Entry<String,String> entry : event.getDetails().entrySet()) {
+      details.put(entry.getKey(),entry.getValue());
+    }
+  }
+  e.put("details",details);
+  return e;
+}

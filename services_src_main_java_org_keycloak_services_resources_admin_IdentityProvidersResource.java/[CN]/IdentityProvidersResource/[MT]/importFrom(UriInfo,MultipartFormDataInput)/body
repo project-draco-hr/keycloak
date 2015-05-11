@@ -6,5 +6,6 @@
   InputStream inputStream=file.getBody(InputStream.class,null);
   IdentityProviderFactory providerFactory=getProviderFactorytById(providerId);
   Map<String,String> config=providerFactory.parseConfig(inputStream);
+  adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo.getPath()).representation(config).success();
   return config;
 }

@@ -5,7 +5,9 @@
     logger.debug("authenticated admin access for: " + auth.getUser().getUsername());
   }
   Cors.add(request).allowedOrigins(auth.getToken()).allowedMethods("GET","PUT","POST","DELETE").auth().build(response);
-  RealmsAdminResource adminResource=new RealmsAdminResource(auth,tokenManager);
+  AdminEventBuilder adminEvent=new AdminEventBuilder(auth.getRealm(),session,clientConnection);
+  adminEvent.user(auth.getUser()).client(auth.getClient());
+  RealmsAdminResource adminResource=new RealmsAdminResource(auth,tokenManager,adminEvent);
   ResteasyProviderFactory.getInstance().injectProperties(adminResource);
   return adminResource;
 }

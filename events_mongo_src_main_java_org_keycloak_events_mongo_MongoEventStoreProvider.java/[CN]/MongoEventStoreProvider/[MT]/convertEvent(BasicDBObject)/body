@@ -1,0 +1,20 @@
+{
+  Event event=new Event();
+  event.setTime(o.getLong("time"));
+  event.setType(EventType.valueOf(o.getString("type")));
+  event.setRealmId(o.getString("realmId"));
+  event.setClientId(o.getString("clientId"));
+  event.setUserId(o.getString("userId"));
+  event.setSessionId(o.getString("sessionId"));
+  event.setIpAddress(o.getString("ipAddress"));
+  event.setError(o.getString("error"));
+  BasicDBObject d=(BasicDBObject)o.get("details");
+  if (d != null) {
+    Map<String,String> details=new HashMap<String,String>();
+    for (    Object k : d.keySet()) {
+      details.put((String)k,d.getString((String)k));
+    }
+    event.setDetails(details);
+  }
+  return event;
+}

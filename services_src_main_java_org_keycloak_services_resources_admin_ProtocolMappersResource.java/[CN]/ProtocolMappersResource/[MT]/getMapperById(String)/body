@@ -2,5 +2,6 @@
   auth.requireView();
   ProtocolMapperModel model=client.getProtocolMapperById(id);
   if (model == null)   throw new NotFoundException("Model not found");
+  adminEvent.operation(OperationType.VIEW).resourcePath(uriInfo.getPath()).success();
   return ModelToRepresentation.toRepresentation(model);
 }

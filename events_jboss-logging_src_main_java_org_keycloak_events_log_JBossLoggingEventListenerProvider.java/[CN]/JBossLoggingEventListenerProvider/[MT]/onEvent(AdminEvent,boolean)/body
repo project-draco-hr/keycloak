@@ -1,0 +1,26 @@
+{
+  Logger.Level level=adminEvent.getError() != null ? errorLevel : successLevel;
+  if (logger.isEnabled(level)) {
+    StringBuilder sb=new StringBuilder();
+    sb.append("operationType=");
+    sb.append(adminEvent.getOperationType());
+    sb.append(", realmId=");
+    sb.append(adminEvent.getAuthDetails().getRealmId());
+    sb.append(", clientId=");
+    sb.append(adminEvent.getAuthDetails().getClientId());
+    sb.append(", userId=");
+    sb.append(adminEvent.getAuthDetails().getUserId());
+    sb.append(", ipAddress=");
+    sb.append(adminEvent.getAuthDetails().getIpAddress());
+    sb.append(", resourcePath=");
+    sb.append(adminEvent.getResourcePath());
+    if (adminEvent.getError() != null) {
+      sb.append(", error=");
+      sb.append(adminEvent.getError());
+    }
+    if (logger.isTraceEnabled()) {
+      setKeycloakContext(sb);
+    }
+    logger.log(logger.isTraceEnabled() ? Logger.Level.TRACE : level,sb.toString());
+  }
+}

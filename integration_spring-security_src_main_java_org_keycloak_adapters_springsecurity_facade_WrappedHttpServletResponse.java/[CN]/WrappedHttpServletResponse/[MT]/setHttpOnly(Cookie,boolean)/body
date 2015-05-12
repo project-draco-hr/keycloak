@@ -1,0 +1,13 @@
+{
+  Method method;
+  try {
+    method=Cookie.class.getMethod("setHttpOnly",boolean.class);
+    method.invoke(cookie,httpOnly);
+  }
+ catch (  NoSuchMethodException e) {
+    log.warn("Unable to set httpOnly on cookie [{}]; no such method on javax.servlet.http.Cookie",cookie.getName());
+  }
+catch (  ReflectiveOperationException e) {
+    log.error("Unable to set httpOnly on cookie [{}]",cookie.getName(),e);
+  }
+}

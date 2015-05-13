@@ -1,0 +1,8 @@
+{
+  SimpleAuthorityMapper grantedAuthorityMapper=new SimpleAuthorityMapper();
+  grantedAuthorityMapper.setPrefix("ROLE_");
+  grantedAuthorityMapper.setConvertToUpperCase(true);
+  provider.setGrantedAuthoritiesMapper(grantedAuthorityMapper);
+  Authentication result=provider.authenticate(token);
+  assertEquals(Sets.newSet("ROLE_USER","ROLE_ADMIN"),AuthorityUtils.authorityListToSet(result.getAuthorities()));
+}

@@ -1,0 +1,19 @@
+{
+  UserModel proxied=local;
+switch (editMode) {
+case READ_ONLY:
+    proxied=new ReadonlyLDAPUserModelDelegate(local,this);
+  break;
+case WRITABLE:
+proxied=new WritableLDAPUserModelDelegate(local,this,ldapObject);
+break;
+case UNSYNCED:
+proxied=new UnsyncedLDAPUserModelDelegate(local,this);
+}
+List<UserFederationMapperModel> federationMappers=realm.getUserFederationMappers();
+for (UserFederationMapperModel mapperModel : federationMappers) {
+LDAPFederationMapper ldapMapper=getMapper(mapperModel);
+proxied=ldapMapper.proxy(mapperModel,this,ldapObject,proxied);
+}
+return proxied;
+}

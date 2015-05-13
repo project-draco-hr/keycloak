@@ -1,0 +1,14 @@
+{
+  String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
+  String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
+  Serializable ldapAttrValue=ldapObject.getAttribute(ldapAttrName);
+  if (ldapAttrValue != null) {
+    Property<Object> userModelProperty=userModelProperties.get(userModelAttrName);
+    if (userModelProperty != null) {
+      userModelProperty.setValue(user,ldapAttrValue);
+    }
+ else {
+      user.setAttribute(userModelAttrName,(String)ldapAttrValue);
+    }
+  }
+}

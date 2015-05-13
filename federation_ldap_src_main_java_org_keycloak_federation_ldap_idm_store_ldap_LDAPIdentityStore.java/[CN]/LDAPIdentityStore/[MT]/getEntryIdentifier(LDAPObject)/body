@@ -1,0 +1,14 @@
+{
+  try {
+    String uuidAttrName=getConfig().getUuidAttributeName();
+    List<SearchResult> search=this.operationManager.search(ldapObject.getDn().toString(),"(" + ldapObject.getDn().getFirstRdn() + ")",Arrays.asList(uuidAttrName),SearchControls.OBJECT_SCOPE);
+    Attribute id=search.get(0).getAttributes().get(getConfig().getUuidAttributeName());
+    if (id == null) {
+      throw new ModelException("Could not retrieve identifier for entry [" + ldapObject.getDn().toString() + "].");
+    }
+    return this.operationManager.decodeEntryUUID(id.get());
+  }
+ catch (  NamingException ne) {
+    throw new ModelException("Could not retrieve identifier for entry [" + ldapObject.getDn().toString() + "].");
+  }
+}

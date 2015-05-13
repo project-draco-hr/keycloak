@@ -1,0 +1,14 @@
+{
+  String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
+  String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
+  query.addReturningLdapAttribute(ldapAttrName);
+  if (isReadOnly(mapperModel)) {
+    query.addReturningReadOnlyLdapAttribute(ldapAttrName);
+  }
+  for (  Condition condition : query.getConditions()) {
+    QueryParameter param=condition.getParameter();
+    if (param != null && param.getName().equals(userModelAttrName)) {
+      param.setName(ldapAttrName);
+    }
+  }
+}

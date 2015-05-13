@@ -1,0 +1,37 @@
+{
+  BasicAttributes entryAttributes=new BasicAttributes();
+  for (  Map.Entry<String,Serializable> attrEntry : ldapObject.getAttributes().entrySet()) {
+    String attrName=attrEntry.getKey();
+    Serializable attrValue=attrEntry.getValue();
+    if (!ldapObject.getReadOnlyAttributeNames().contains(attrName) && (isCreate || !ldapObject.getRdnAttributeName().equals(attrName))) {
+      if (String.class.isInstance(attrValue)) {
+        entryAttributes.put(attrName,attrValue);
+      }
+ else       if (Collection.class.isInstance(attrValue)) {
+        BasicAttribute attr=new BasicAttribute(attrName);
+        Collection<String> valueCollection=(Collection<String>)attr;
+        for (        String val : valueCollection) {
+          attr.add(val);
+        }
+        entryAttributes.put(attr);
+      }
+ else       if (attrValue == null || attrValue.toString().trim().length() == 0) {
+        entryAttributes.put(attrName,LDAPConstants.EMPTY_ATTRIBUTE_VALUE);
+      }
+ else {
+        throw new IllegalArgumentException("Unexpected type of value of argument " + attrName + ". Value is "+ attrValue);
+      }
+    }
+  }
+  if (isCreate) {
+    BasicAttribute objectClassAttribute=new BasicAttribute(LDAPConstants.OBJECT_CLASS);
+    for (    String objectClassValue : ldapObject.getObjectClasses()) {
+      objectClassAttribute.add(objectClassValue);
+      if (objectClassValue.equals(LDAPConstants.GROUP_OF_NAMES) || objectClassValue.equals(LDAPConstants.GROUP_OF_ENTRIES) || objectClassValue.equals(LDAPConstants.GROUP_OF_UNIQUE_NAMES)) {
+        entryAttributes.put(LDAPConstants.MEMBER,LDAPConstants.EMPTY_ATTRIBUTE_VALUE);
+      }
+    }
+    entryAttributes.put(objectClassAttribute);
+  }
+  return entryAttributes;
+}

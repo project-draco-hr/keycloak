@@ -1,0 +1,10 @@
+{
+  String rdnLdapAttrName=config.getRdnLdapAttribute();
+  String rdnLdapAttrValue=(String)ldapObject.getAttribute(rdnLdapAttrName);
+  if (rdnLdapAttrValue == null) {
+    throw new ModelException("RDN Attribute [" + rdnLdapAttrName + "] is not filled. Filled attributes: "+ ldapObject.getAttributes());
+  }
+  LDAPDn dn=LDAPDn.fromString(config.getSingleUserDn());
+  dn.addToHead(rdnLdapAttrName,rdnLdapAttrValue);
+  ldapObject.setDn(dn);
+}

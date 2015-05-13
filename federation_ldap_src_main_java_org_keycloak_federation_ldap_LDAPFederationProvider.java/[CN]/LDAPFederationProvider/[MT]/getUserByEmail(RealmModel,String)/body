@@ -1,10 +1,6 @@
 {
-  LDAPUser ldapUser=queryByEmail(email);
+  LDAPObject ldapUser=queryByEmail(realm,email);
   if (ldapUser == null) {
-    return null;
-  }
-  if (!email.equals(ldapUser.getEmail())) {
-    logger.warnf("User found in LDAP but with different email. LDAP email: %s, Searched email: %s",email,ldapUser.getEmail());
     return null;
   }
   return importUserFromLDAP(realm,ldapUser);

@@ -1,24 +1,24 @@
 {
   KeycloakSession session=keycloakRule.startSession();
-  LDAPIdentityStore ldapStore=getLdapIdentityStore(session,ldapModel);
   try {
     RealmModel appRealm=session.realms().getRealmByName("test");
-    LDAPUtils.addUser(ldapStore,"username1","John1","Doel1","user1@email.org");
-    LDAPUtils.addUser(ldapStore,"username2","John2","Doel2","user2@email.org");
-    LDAPUtils.addUser(ldapStore,"username3","John3","Doel3","user3@email.org");
-    LDAPUtils.addUser(ldapStore,"username4","John4","Doel4","user4@email.org");
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    FederationTestUtils.addLDAPUser(ldapProvider,appRealm,"username1","John1","Doel1","user1@email.org","121");
+    FederationTestUtils.addLDAPUser(ldapProvider,appRealm,"username2","John2","Doel2","user2@email.org","122");
+    FederationTestUtils.addLDAPUser(ldapProvider,appRealm,"username3","John3","Doel3","user3@email.org","123");
+    FederationTestUtils.addLDAPUser(ldapProvider,appRealm,"username4","John4","Doel4","user4@email.org","124");
     Assert.assertNull(session.userStorage().getUserByUsername("username1",appRealm));
     Assert.assertNull(session.userStorage().getUserByUsername("username2",appRealm));
     Assert.assertNull(session.userStorage().getUserByUsername("username3",appRealm));
     Assert.assertNull(session.userStorage().getUserByUsername("username4",appRealm));
     session.users().searchForUser("username1",appRealm);
-    SyncProvidersTest.assertUserImported(session.userStorage(),appRealm,"username1","John1","Doel1","user1@email.org");
+    FederationTestUtils.assertUserImported(session.userStorage(),appRealm,"username1","John1","Doel1","user1@email.org","121");
     session.users().searchForUser("user2@email.org",appRealm);
-    SyncProvidersTest.assertUserImported(session.userStorage(),appRealm,"username2","John2","Doel2","user2@email.org");
+    FederationTestUtils.assertUserImported(session.userStorage(),appRealm,"username2","John2","Doel2","user2@email.org","122");
     session.users().searchForUser("Doel3",appRealm);
-    SyncProvidersTest.assertUserImported(session.userStorage(),appRealm,"username3","John3","Doel3","user3@email.org");
+    FederationTestUtils.assertUserImported(session.userStorage(),appRealm,"username3","John3","Doel3","user3@email.org","123");
     session.users().searchForUser("John4 Doel4",appRealm);
-    SyncProvidersTest.assertUserImported(session.userStorage(),appRealm,"username4","John4","Doel4","user4@email.org");
+    FederationTestUtils.assertUserImported(session.userStorage(),appRealm,"username4","John4","Doel4","user4@email.org","124");
   }
   finally {
     keycloakRule.stopSession(session,true);

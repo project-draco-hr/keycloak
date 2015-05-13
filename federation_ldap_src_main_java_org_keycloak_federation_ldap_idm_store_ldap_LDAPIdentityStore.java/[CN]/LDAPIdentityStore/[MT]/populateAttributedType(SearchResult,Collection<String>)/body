@@ -1,0 +1,54 @@
+{
+  try {
+    String entryDN=searchResult.getNameInNamespace();
+    Attributes attributes=searchResult.getAttributes();
+    LDAPObject ldapObject=new LDAPObject();
+    LDAPDn dn=LDAPDn.fromString(entryDN);
+    ldapObject.setDn(dn);
+    ldapObject.setRdnAttributeName(dn.getFirstRdnAttrName());
+    if (logger.isTraceEnabled()) {
+      logger.tracef("Populating LDAP Object from DN [%s]",entryDN);
+    }
+    NamingEnumeration<? extends Attribute> ldapAttributes=attributes.getAll();
+    List<String> uppercasedReadOnlyAttrNames=new ArrayList<String>();
+    for (    String readonlyAttr : readOnlyAttrNames) {
+      uppercasedReadOnlyAttrNames.add(readonlyAttr.toUpperCase());
+    }
+    while (ldapAttributes.hasMore()) {
+      Attribute ldapAttribute=ldapAttributes.next();
+      Serializable ldapAttributeValue;
+      try {
+        ldapAttributeValue=(Serializable)ldapAttribute.get();
+      }
+ catch (      NoSuchElementException nsee) {
+        continue;
+      }
+      String ldapAttributeName=ldapAttribute.getID();
+      if (ldapAttributeName.toLowerCase().equals(getConfig().getUuidAttributeName().toLowerCase())) {
+        ldapObject.setUuid(this.operationManager.decodeEntryUUID(ldapAttributeValue));
+      }
+ else       if (ldapAttributeName.toLowerCase().equals(LDAPConstants.OBJECT_CLASS)) {
+        List<String> objectClasses=new LinkedList<String>();
+        NamingEnumeration<?> enumm=ldapAttribute.getAll();
+        while (enumm.hasMoreElements()) {
+          String objectClass=enumm.next().toString();
+          objectClasses.add(objectClass);
+        }
+        ldapObject.setObjectClasses(objectClasses);
+      }
+ else {
+        if (logger.isTraceEnabled()) {
+          logger.tracef("Populating ldap attribute [%s] with value [%s] for DN [%s].",ldapAttributeName,ldapAttributeValue,entryDN);
+        }
+        ldapObject.setAttribute(ldapAttributeName,ldapAttributeValue);
+        if (uppercasedReadOnlyAttrNames.contains(ldapAttributeName.toUpperCase())) {
+          ldapObject.addReadOnlyAttributeName(ldapAttributeName);
+        }
+      }
+    }
+    return ldapObject;
+  }
+ catch (  Exception e) {
+    throw new ModelException("Could not populate attribute type " + searchResult.getNameInNamespace() + ".",e);
+  }
+}

@@ -3,5 +3,11 @@
     logger.warnf("User '%s' can't be deleted in LDAP as editMode is '%s'",user.getUsername(),editMode.toString());
     return false;
   }
-  return LDAPUtils.removeUser(this.ldapIdentityStore,user.getUsername());
+  LDAPObject ldapObject=loadAndValidateUser(realm,user);
+  if (ldapObject == null) {
+    logger.warnf("User '%s' can't be deleted from LDAP as it doesn't exist here",user.getUsername());
+    return false;
+  }
+  ldapIdentityStore.remove(ldapObject);
+  return true;
 }

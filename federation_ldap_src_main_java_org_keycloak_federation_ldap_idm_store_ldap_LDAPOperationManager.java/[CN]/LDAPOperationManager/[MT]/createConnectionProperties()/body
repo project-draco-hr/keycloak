@@ -2,7 +2,7 @@
   HashMap<String,Object> env=new HashMap<String,Object>();
   env.put(Context.INITIAL_CONTEXT_FACTORY,this.config.getFactoryName());
   env.put(Context.SECURITY_AUTHENTICATION,this.config.getAuthType());
-  String protocol=this.config.getProtocol();
+  String protocol=this.config.getSecurityProtocol();
   if (protocol != null) {
     env.put(Context.SECURITY_PROTOCOL,protocol);
   }
@@ -15,12 +15,16 @@
     env.put(Context.SECURITY_PRINCIPAL,bindDN);
     env.put(Context.SECURITY_CREDENTIALS,bindCredential);
   }
-  String url=this.config.getLdapURL();
+  String url=this.config.getConnectionUrl();
   if (url == null) {
     throw new RuntimeException("url");
   }
   env.put(Context.PROVIDER_URL,url);
-  Properties additionalProperties=this.config.getConnectionProperties();
+  String connectionPooling=this.config.getConnectionPooling();
+  if (connectionPooling != null) {
+    env.put("com.sun.jndi.ldap.connect.pool",connectionPooling);
+  }
+  Properties additionalProperties=this.config.getAdditionalConnectionProperties();
   if (additionalProperties != null) {
     for (    Object key : additionalProperties.keySet()) {
       env.put(key.toString(),additionalProperties.getProperty(key.toString()));

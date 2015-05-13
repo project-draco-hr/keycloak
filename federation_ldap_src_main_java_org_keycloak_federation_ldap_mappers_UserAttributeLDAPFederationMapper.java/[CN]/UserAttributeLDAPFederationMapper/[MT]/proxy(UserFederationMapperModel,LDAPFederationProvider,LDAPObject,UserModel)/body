@@ -1,0 +1,18 @@
+{
+  if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE && !isReadOnly(mapperModel)) {
+    TxAwareLDAPUserModelDelegate txDelegate;
+    if (delegate instanceof TxAwareLDAPUserModelDelegate) {
+      txDelegate=(TxAwareLDAPUserModelDelegate)delegate;
+    }
+ else {
+      txDelegate=new TxAwareLDAPUserModelDelegate(delegate,ldapProvider,ldapObject);
+    }
+    String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
+    String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
+    txDelegate.addMappedAttribute(userModelAttrName,ldapAttrName);
+    return txDelegate;
+  }
+ else {
+    return delegate;
+  }
+}

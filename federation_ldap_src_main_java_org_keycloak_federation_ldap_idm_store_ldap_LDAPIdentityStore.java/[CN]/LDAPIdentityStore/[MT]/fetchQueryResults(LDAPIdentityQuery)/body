@@ -1,0 +1,39 @@
+{
+  List<LDAPObject> results=new ArrayList<LDAPObject>();
+  try {
+    if (identityQuery.getSorting() != null && !identityQuery.getSorting().isEmpty()) {
+      throw new ModelException("LDAP Identity Store does not yet support sorted queries.");
+    }
+    String baseDN=identityQuery.getSearchDns().iterator().next();
+    for (    Condition condition : identityQuery.getConditions()) {
+      String uuidAttrName=getConfig().getUuidAttributeName();
+      if (condition.getParameter() != null && condition.getParameter().getName().equals(uuidAttrName)) {
+        if (EqualCondition.class.isInstance(condition)) {
+          EqualCondition equalCondition=(EqualCondition)condition;
+          SearchResult search=this.operationManager.lookupById(baseDN,equalCondition.getValue().toString(),identityQuery.getReturningLdapAttributes());
+          if (search != null) {
+            results.add(populateAttributedType(search,identityQuery.getReturningReadOnlyLdapAttributes()));
+          }
+        }
+        return results;
+      }
+    }
+    StringBuilder filter=createIdentityTypeSearchFilter(identityQuery);
+    List<SearchResult> search;
+    if (getConfig().isPagination() && identityQuery.getLimit() > 0) {
+      search=this.operationManager.searchPaginated(baseDN,filter.toString(),identityQuery);
+    }
+ else {
+      search=this.operationManager.search(baseDN,filter.toString(),identityQuery.getReturningLdapAttributes(),identityQuery.getSearchScope());
+    }
+    for (    SearchResult result : search) {
+      if (!result.getNameInNamespace().equals(baseDN)) {
+        results.add(populateAttributedType(result,identityQuery.getReturningReadOnlyLdapAttributes()));
+      }
+    }
+  }
+ catch (  Exception e) {
+    throw new ModelException("Querying of identity type failed " + identityQuery,e);
+  }
+  return results;
+}

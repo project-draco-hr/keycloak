@@ -1,10 +1,6 @@
 {
-  LDAPUser ldapUser=LDAPUtils.getUser(this.ldapIdentityStore,username);
+  LDAPObject ldapUser=loadLDAPUserByUsername(realm,username);
   if (ldapUser == null) {
-    return null;
-  }
-  if (!username.equals(ldapUser.getLoginName())) {
-    logger.warnf("User found in LDAP but with different username. LDAP username: %s, Searched username: %s",username,ldapUser.getLoginName());
     return null;
   }
   return importUserFromLDAP(realm,ldapUser);

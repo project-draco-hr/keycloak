@@ -1,0 +1,26 @@
+{
+  UserFederationSyncResult syncResult=new UserFederationSyncResult();
+  for (  LDAPObject ldapUser : ldapUsers) {
+    String username=LDAPUtils.getUsername(ldapUser,ldapIdentityStore.getConfig());
+    UserModel currentUser=session.userStorage().getUserByUsername(username,realm);
+    if (currentUser == null) {
+      importUserFromLDAP(realm,ldapUser);
+      syncResult.increaseAdded();
+    }
+ else {
+      if ((fedModel.getId().equals(currentUser.getFederationLink())) && (ldapUser.getUuid().equals(currentUser.getAttribute(LDAPConstants.LDAP_ID)))) {
+        List<UserFederationMapperModel> federationMappers=realm.getUserFederationMappers();
+        for (        UserFederationMapperModel mapperModel : federationMappers) {
+          LDAPFederationMapper ldapMapper=getMapper(mapperModel);
+          ldapMapper.importUserFromLDAP(mapperModel,this,ldapUser,currentUser,false);
+        }
+        logger.debugf("Updated user from LDAP: %s",currentUser.getUsername());
+        syncResult.increaseUpdated();
+      }
+ else {
+        logger.warnf("User '%s' is not updated during sync as he is not linked to federation provider '%s'",username,fedModel.getDisplayName());
+      }
+    }
+  }
+  return syncResult;
+}

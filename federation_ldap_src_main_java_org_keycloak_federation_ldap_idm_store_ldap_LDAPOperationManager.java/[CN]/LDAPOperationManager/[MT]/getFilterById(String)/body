@@ -1,0 +1,23 @@
+{
+  String filter=null;
+  if (this.config.isActiveDirectory()) {
+    final String strObjectGUID="<GUID=" + id + ">";
+    try {
+      Attributes attributes=execute(new LdapOperation<Attributes>(){
+        @Override public Attributes execute(        LdapContext context) throws NamingException {
+          return context.getAttributes(strObjectGUID);
+        }
+      }
+);
+      byte[] objectGUID=(byte[])attributes.get(LDAPConstants.OBJECT_GUID).get();
+      filter="(&(objectClass=*)(" + getUuidAttributeName() + LDAPConstants.EQUAL+ LDAPUtil.convertObjectGUIToByteString(objectGUID)+ "))";
+    }
+ catch (    NamingException ne) {
+      return filter;
+    }
+  }
+  if (filter == null) {
+    filter="(&(objectClass=*)(" + getUuidAttributeName() + LDAPConstants.EQUAL+ id+ "))";
+  }
+  return filter;
+}

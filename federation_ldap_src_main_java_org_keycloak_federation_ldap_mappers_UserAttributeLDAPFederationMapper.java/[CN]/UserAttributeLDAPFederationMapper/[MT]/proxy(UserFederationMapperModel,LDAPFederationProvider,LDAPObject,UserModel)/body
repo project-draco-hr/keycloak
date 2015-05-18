@@ -1,15 +1,35 @@
 {
   if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE && !isReadOnly(mapperModel)) {
-    TxAwareLDAPUserModelDelegate txDelegate;
-    if (delegate instanceof TxAwareLDAPUserModelDelegate) {
-      txDelegate=(TxAwareLDAPUserModelDelegate)delegate;
+    final String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
+    final String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
+    AbstractTxAwareLDAPUserModelDelegate txDelegate=new AbstractTxAwareLDAPUserModelDelegate(delegate,ldapProvider,ldapObject){
+      @Override public void setAttribute(      String name,      String value){
+        setLDAPAttribute(name,value);
+        super.setAttribute(name,value);
+      }
+      @Override public void setEmail(      String email){
+        setLDAPAttribute(UserModel.EMAIL,email);
+        super.setEmail(email);
+      }
+      @Override public void setLastName(      String lastName){
+        setLDAPAttribute(UserModel.LAST_NAME,lastName);
+        super.setLastName(lastName);
+      }
+      @Override public void setFirstName(      String firstName){
+        setLDAPAttribute(UserModel.FIRST_NAME,firstName);
+        super.setFirstName(firstName);
+      }
+      protected void setLDAPAttribute(      String modelAttrName,      String value){
+        if (modelAttrName.equals(userModelAttrName)) {
+          if (logger.isTraceEnabled()) {
+            logger.tracef("Pushing user attribute to LDAP. Model attribute name: %s, LDAP attribute name: %s, Attribute value: %s",modelAttrName,ldapAttrName,value);
+          }
+          ensureTransactionStarted();
+          ldapObject.setAttribute(ldapAttrName,value);
+        }
+      }
     }
- else {
-      txDelegate=new TxAwareLDAPUserModelDelegate(delegate,ldapProvider,ldapObject);
-    }
-    String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
-    String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
-    txDelegate.addMappedAttribute(userModelAttrName,ldapAttrName);
+;
     return txDelegate;
   }
  else {

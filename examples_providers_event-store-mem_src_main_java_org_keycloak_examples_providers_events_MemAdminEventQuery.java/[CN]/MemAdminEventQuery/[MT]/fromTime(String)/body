@@ -1,0 +1,17 @@
+{
+  SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");
+  Long from=null;
+  try {
+    from=df.parse(fromTime).getTime();
+  }
+ catch (  ParseException e) {
+    e.printStackTrace();
+  }
+  Iterator<AdminEvent> itr=this.adminEvents.iterator();
+  while (itr.hasNext()) {
+    if (!(itr.next().getTime() >= from)) {
+      itr.remove();
+    }
+  }
+  return this;
+}

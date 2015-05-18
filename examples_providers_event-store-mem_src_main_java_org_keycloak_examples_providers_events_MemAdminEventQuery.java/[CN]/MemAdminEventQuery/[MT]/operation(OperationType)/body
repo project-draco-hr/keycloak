@@ -1,0 +1,17 @@
+{
+  Iterator<AdminEvent> itr=this.adminEvents.iterator();
+  while (itr.hasNext()) {
+    AdminEvent next=itr.next();
+    boolean include=false;
+    for (    OperationType e : operations) {
+      if (next.getOperationType().equals(e)) {
+        include=true;
+        break;
+      }
+    }
+    if (!include) {
+      itr.remove();
+    }
+  }
+  return this;
+}

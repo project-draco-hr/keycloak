@@ -1,0 +1,12 @@
+{
+  final ModelNode result=context.getResult();
+  result.setEmptyList();
+  String overlayName=AuthServerUtil.getOverlayName(operation);
+  boolean isOverlayExists=AuthServerUtil.isOverlayExists(context,overlayName,PathAddress.EMPTY_ADDRESS);
+  if (isOverlayExists) {
+    Set<String> overlays=new TreeSet<String>(getOverlayNames(context,overlayName));
+    for (    final String key : overlays) {
+      result.add(key);
+    }
+  }
+}

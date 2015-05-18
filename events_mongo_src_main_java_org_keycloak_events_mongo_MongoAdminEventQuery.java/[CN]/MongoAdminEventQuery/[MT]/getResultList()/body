@@ -1,0 +1,14 @@
+{
+  DBCursor cur=audit.find(query).sort(new BasicDBObject("time",-1));
+  if (firstResult != null) {
+    cur.skip(firstResult);
+  }
+  if (maxResults != null) {
+    cur.limit(maxResults);
+  }
+  List<AdminEvent> events=new LinkedList<AdminEvent>();
+  while (cur.hasNext()) {
+    events.add(MongoEventStoreProvider.convertAdminEvent((BasicDBObject)cur.next()));
+  }
+  return events;
+}

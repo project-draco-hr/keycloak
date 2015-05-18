@@ -9,6 +9,7 @@
   try {
     UserModel user=session.users().addUser(realm,rep.getUsername());
     updateUserFromRep(user,rep);
+    adminEvent.operation(OperationType.CREATE).resourcePath(user).representation(rep).success();
     if (session.getTransaction().isActive()) {
       session.getTransaction().commit();
     }

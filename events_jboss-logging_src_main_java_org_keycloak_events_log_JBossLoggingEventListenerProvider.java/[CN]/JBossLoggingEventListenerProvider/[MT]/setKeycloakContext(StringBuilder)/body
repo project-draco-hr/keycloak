@@ -1,0 +1,23 @@
+{
+  KeycloakContext context=session.getContext();
+  UriInfo uriInfo=context.getUri();
+  HttpHeaders headers=context.getRequestHeaders();
+  if (uriInfo != null) {
+    sb.append(", requestUri=");
+    sb.append(uriInfo.getRequestUri().toString());
+  }
+  if (headers != null) {
+    sb.append(", cookies=[");
+    boolean f=true;
+    for (    Map.Entry<String,Cookie> e : headers.getCookies().entrySet()) {
+      if (f) {
+        f=false;
+      }
+ else {
+        sb.append(", ");
+      }
+      sb.append(e.getValue().toString());
+    }
+    sb.append("]");
+  }
+}

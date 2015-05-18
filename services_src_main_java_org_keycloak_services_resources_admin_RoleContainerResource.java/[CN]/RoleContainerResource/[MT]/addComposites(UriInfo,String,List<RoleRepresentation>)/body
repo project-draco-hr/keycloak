@@ -1,0 +1,9 @@
+{
+  auth.requireManage();
+  RoleModel role=roleContainer.getRole(roleName);
+  if (role == null) {
+    throw new NotFoundException("Could not find role: " + roleName);
+  }
+  addComposites(roles,role);
+  adminEvent.operation(OperationType.ACTION).resourcePath(role,uriInfo.getPath()).representation(roles).success();
+}

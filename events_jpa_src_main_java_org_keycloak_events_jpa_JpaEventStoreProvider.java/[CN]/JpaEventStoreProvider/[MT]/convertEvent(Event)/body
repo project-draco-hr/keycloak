@@ -1,0 +1,19 @@
+{
+  EventEntity eventEntity=new EventEntity();
+  eventEntity.setId(UUID.randomUUID().toString());
+  eventEntity.setTime(event.getTime());
+  eventEntity.setType(event.getType().toString());
+  eventEntity.setRealmId(event.getRealmId());
+  eventEntity.setClientId(event.getClientId());
+  eventEntity.setUserId(event.getUserId());
+  eventEntity.setSessionId(event.getSessionId());
+  eventEntity.setIpAddress(event.getIpAddress());
+  eventEntity.setError(event.getError());
+  try {
+    eventEntity.setDetailsJson(mapper.writeValueAsString(event.getDetails()));
+  }
+ catch (  IOException ex) {
+    logger.error("Failed to write log details",ex);
+  }
+  return eventEntity;
+}

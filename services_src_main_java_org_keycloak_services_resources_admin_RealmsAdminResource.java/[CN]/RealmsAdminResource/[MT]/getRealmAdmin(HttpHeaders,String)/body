@@ -12,7 +12,8 @@
  else {
     realmAuth=new RealmAuth(auth,realm.getClientByClientId(realmManager.getRealmAdminClientId(auth.getRealm())));
   }
-  RealmAdminResource adminResource=new RealmAdminResource(realmAuth,realm,tokenManager);
+  AdminEventBuilder adminEvent=new AdminEventBuilder(realm,auth,session,clientConnection);
+  RealmAdminResource adminResource=new RealmAdminResource(realmAuth,realm,tokenManager,adminEvent);
   ResteasyProviderFactory.getInstance().injectProperties(adminResource);
   return adminResource;
 }

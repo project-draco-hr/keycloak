@@ -9,5 +9,6 @@
   }
   FederatedIdentityModel socialLink=new FederatedIdentityModel(provider,rep.getUserId(),rep.getUserName());
   session.users().addFederatedIdentity(realm,user,socialLink);
+  adminEvent.operation(OperationType.CREATE).resourcePath(user,uriInfo.getPath(),true).representation(rep).success();
   return Response.noContent().build();
 }

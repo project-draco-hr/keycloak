@@ -1,0 +1,10 @@
+{
+  eventStore.onEvent(create(System.currentTimeMillis() - 30000,"realmId",OperationType.CREATE,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  eventStore.onEvent(create(System.currentTimeMillis() - 20000,"realmId",OperationType.CREATE,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  eventStore.onEvent(create(System.currentTimeMillis(),"realmId",OperationType.CREATE,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  eventStore.onEvent(create(System.currentTimeMillis(),"realmId",OperationType.CREATE,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  eventStore.onEvent(create(System.currentTimeMillis() - 30000,"realmId",OperationType.CREATE,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  resetSession();
+  eventStore.clearAdmin("realmId",System.currentTimeMillis() - 10000);
+  Assert.assertEquals(2,eventStore.createAdminQuery().getResultList().size());
+}

@@ -1,0 +1,25 @@
+{
+  boolean includeRepresentation=false;
+  if (realm.isAdminEventsDetailsEnabled()) {
+    includeRepresentation=true;
+  }
+  adminEvent.setTime(Time.toMillis(Time.currentTime()));
+  if (store != null) {
+    try {
+      store.onEvent(adminEvent,includeRepresentation);
+    }
+ catch (    Throwable t) {
+      log.error("Failed to save event",t);
+    }
+  }
+  if (listeners != null) {
+    for (    EventListenerProvider l : listeners) {
+      try {
+        l.onEvent(adminEvent,includeRepresentation);
+      }
+ catch (      Throwable t) {
+        log.error("Failed to send type to " + l,t);
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  AuthenticationManager.AuthResult authResult=AuthenticationManager.authenticateIdentityCookie(context.getSession(),context.getRealm(),context.getUriInfo(),context.getConnection(),context.getHttpRequest().getHttpHeaders(),true);
+  if (authResult == null) {
+    context.attempted();
+  }
+ else {
+    context.setUser(authResult.getUser());
+    context.attachUserSession(authResult.getSession());
+    context.success();
+  }
+}

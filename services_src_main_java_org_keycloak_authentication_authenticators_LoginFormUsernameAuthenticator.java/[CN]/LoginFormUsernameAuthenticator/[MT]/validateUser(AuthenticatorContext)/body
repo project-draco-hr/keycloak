@@ -1,0 +1,12 @@
+{
+  MultivaluedMap<String,String> inputData=context.getHttpRequest().getFormParameters();
+  String username=inputData.getFirst(AuthenticationManager.FORM_USERNAME);
+  if (username == null) {
+    Response challengeResponse=challenge(context);
+    context.failureChallenge(AuthenticationProcessor.Error.INVALID_USER,challengeResponse);
+    return;
+  }
+  UserModel user=KeycloakModelUtils.findUserByNameOrEmail(context.getSession(),context.getRealm(),username);
+  if (invalidUser(context,user))   return;
+  context.setUser(user);
+}

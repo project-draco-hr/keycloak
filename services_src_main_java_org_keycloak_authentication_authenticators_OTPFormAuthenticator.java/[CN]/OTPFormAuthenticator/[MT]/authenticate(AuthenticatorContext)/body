@@ -1,0 +1,9 @@
+{
+  URI expected=LoginActionsService.authenticationFormProcessor(context.getUriInfo()).build(context.getRealm().getName());
+  if (!expected.getPath().equals(context.getUriInfo().getPath())) {
+    Response challengeResponse=challenge(context);
+    context.challenge(challengeResponse);
+    return;
+  }
+  validateOTP(context);
+}

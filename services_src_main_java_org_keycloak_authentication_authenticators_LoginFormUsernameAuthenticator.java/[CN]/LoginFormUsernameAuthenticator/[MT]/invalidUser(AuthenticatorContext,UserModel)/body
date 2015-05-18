@@ -1,0 +1,18 @@
+{
+  if (user == null) {
+    Response challengeResponse=challenge(context);
+    context.failureChallenge(AuthenticationProcessor.Error.INVALID_USER,challengeResponse);
+    return true;
+  }
+  if (!user.isEnabled()) {
+    context.failure(AuthenticationProcessor.Error.USER_DISABLED);
+    return true;
+  }
+  if (context.getRealm().isBruteForceProtected()) {
+    if (context.getProtector().isTemporarilyDisabled(context.getSession(),context.getRealm(),user.getUsername())) {
+      context.failure(AuthenticationProcessor.Error.USER_TEMPORARILY_DISABLED);
+      return true;
+    }
+  }
+  return false;
+}

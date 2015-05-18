@@ -8,22 +8,22 @@
   ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
   logger.debugv("processAccessCode: go to oauth page?: {0}",client.isConsentRequired());
   event.detail(Details.CODE_ID,clientSession.getId());
-  Set<UserModel.RequiredAction> requiredActions=user.getRequiredActions();
+  Set<String> requiredActions=user.getRequiredActions();
   if (!requiredActions.isEmpty()) {
-    Iterator<RequiredAction> i=user.getRequiredActions().iterator();
-    UserModel.RequiredAction action=i.next();
-    if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL) && Validation.isEmpty(user.getEmail())) {
+    Iterator<String> i=user.getRequiredActions().iterator();
+    String action=i.next();
+    if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL.name()) && Validation.isEmpty(user.getEmail())) {
       if (i.hasNext())       action=i.next();
  else       action=null;
     }
     if (action != null) {
-      accessCode.setRequiredAction(action);
+      accessCode.setRequiredAction(RequiredAction.valueOf(action));
       LoginFormsProvider loginFormsProvider=session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setUser(user);
-      if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL)) {
+      if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL.name())) {
         event.clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
         LoginActionsService.createActionCookie(realm,uriInfo,clientConnection,userSession.getId());
       }
-      return loginFormsProvider.createResponse(action);
+      return loginFormsProvider.createResponse(RequiredAction.valueOf(action));
     }
   }
   if (client.isConsentRequired()) {

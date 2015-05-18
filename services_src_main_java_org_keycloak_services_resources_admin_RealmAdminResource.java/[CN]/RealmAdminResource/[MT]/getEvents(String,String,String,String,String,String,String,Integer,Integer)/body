@@ -1,15 +1,10 @@
 {
   auth.init(RealmAuth.Resource.EVENTS).requireView();
   EventStoreProvider eventStore=session.getProvider(EventStoreProvider.class);
-  AdminEventQuery query=null;
-  if (realm.getName().equals(Config.getAdminRealm())) {
-    query=eventStore.createAdminQuery();
-    if (authRealm != null) {
-      query.authRealm(authRealm);
-    }
-  }
- else {
-    query=eventStore.createAdminQuery().authRealm(realm.getId());
+  AdminEventQuery query=eventStore.createAdminQuery().realm(realm.getId());
+  ;
+  if (authRealm != null) {
+    query.authRealm(authRealm);
   }
   if (authClient != null) {
     query.authClient(authClient);

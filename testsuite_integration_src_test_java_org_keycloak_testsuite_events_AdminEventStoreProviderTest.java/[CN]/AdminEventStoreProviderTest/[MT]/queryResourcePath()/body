@@ -1,12 +1,12 @@
 {
   long oldest=System.currentTimeMillis() - 30000;
   long newest=System.currentTimeMillis() + 30000;
-  eventStore.onEvent(create(OperationType.VIEW,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
-  eventStore.onEvent(create(newest,OperationType.ACTION,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
-  eventStore.onEvent(create(newest,OperationType.ACTION,"realmId","clientId","userId2","127.0.0.1","/admin/realms/master","error"),false);
-  eventStore.onEvent(create(OperationType.VIEW,"realmId2","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
-  eventStore.onEvent(create(oldest,OperationType.VIEW,"realmId","clientId2","userId","127.0.0.1","/admin/realms/master","error"),false);
-  eventStore.onEvent(create(OperationType.VIEW,"realmId","clientId","userId2","127.0.0.1","/admin/realms/master","error"),false);
+  eventStore.onEvent(create("realmId",OperationType.CREATE,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  eventStore.onEvent(create(newest,"realmId",OperationType.ACTION,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  eventStore.onEvent(create(newest,"realmId",OperationType.ACTION,"realmId","clientId","userId2","127.0.0.1","/admin/realms/master","error"),false);
+  eventStore.onEvent(create("realmId2",OperationType.CREATE,"realmId2","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  eventStore.onEvent(create(oldest,"realmId",OperationType.CREATE,"realmId","clientId2","userId","127.0.0.1","/admin/realms/master","error"),false);
+  eventStore.onEvent(create("realmId",OperationType.CREATE,"realmId","clientId","userId2","127.0.0.1","/admin/realms/master","error"),false);
   resetSession();
   Assert.assertEquals(6,eventStore.createAdminQuery().resourcePath("/admin").getResultList().size());
   Assert.assertEquals(6,eventStore.createAdminQuery().resourcePath("/realms").getResultList().size());

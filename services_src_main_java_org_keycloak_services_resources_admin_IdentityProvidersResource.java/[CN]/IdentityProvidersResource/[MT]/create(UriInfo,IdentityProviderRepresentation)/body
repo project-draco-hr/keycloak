@@ -3,7 +3,7 @@
   try {
     IdentityProviderModel identityProvider=RepresentationToModel.toModel(representation);
     this.realm.addIdentityProvider(identityProvider);
-    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo.getAbsolutePathBuilder().path(representation.getProviderId()).build().toString().substring(uriInfo.getBaseUri().toString().length())).representation(representation).success();
+    adminEvent.operation(OperationType.CREATE).resourcePath(identityProvider).representation(representation).success();
     return Response.created(uriInfo.getAbsolutePathBuilder().path(representation.getProviderId()).build()).build();
   }
  catch (  ModelDuplicateException e) {

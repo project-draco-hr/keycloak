@@ -2,6 +2,6 @@
   auth.requireManage();
   IdentityProviderMapperModel model=RepresentationToModel.toModel(mapper);
   model=realm.addIdentityProviderMapper(model);
-  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo.getAbsolutePathBuilder().path(model.getId()).build().toString().substring(uriInfo.getBaseUri().toString().length())).representation(mapper).success();
+  adminEvent.operation(OperationType.CREATE).resourcePath(model,uriInfo.getPath()).representation(mapper).success();
   return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
 }

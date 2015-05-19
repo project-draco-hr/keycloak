@@ -7,6 +7,6 @@
   UserFederationProviderModel model=realm.addUserFederationProvider(rep.getProviderName(),rep.getConfig(),rep.getPriority(),displayName,rep.getFullSyncPeriod(),rep.getChangedSyncPeriod(),rep.getLastSync());
   new UsersSyncManager().refreshPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),model,realm.getId());
   checkKerberosCredential(model);
-  adminEvent.operation(OperationType.CREATE).resourcePath(model).representation(rep).success();
+  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo).representation(rep).success();
   return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
 }

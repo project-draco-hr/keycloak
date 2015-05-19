@@ -1,0 +1,16 @@
+{
+  Properties properties=new Properties();
+  if (locale == null) {
+    return properties;
+  }
+  URL url=getClass().getClassLoader().getResource("theme/base/admin/messages/messages_" + locale.toString() + ".properties");
+  if (url != null) {
+    try {
+      properties.load(url.openStream());
+    }
+ catch (    IOException ex) {
+      logger.warn("Failed to load messages",ex);
+    }
+  }
+  return properties;
+}

@@ -1,15 +1,15 @@
 {
   BasicAttributes entryAttributes=new BasicAttributes();
-  for (  Map.Entry<String,Serializable> attrEntry : ldapObject.getAttributes().entrySet()) {
+  for (  Map.Entry<String,Object> attrEntry : ldapObject.getAttributes().entrySet()) {
     String attrName=attrEntry.getKey();
-    Serializable attrValue=attrEntry.getValue();
+    Object attrValue=attrEntry.getValue();
     if (!ldapObject.getReadOnlyAttributeNames().contains(attrName) && (isCreate || !ldapObject.getRdnAttributeName().equals(attrName))) {
       if (String.class.isInstance(attrValue)) {
         entryAttributes.put(attrName,attrValue);
       }
  else       if (Collection.class.isInstance(attrValue)) {
         BasicAttribute attr=new BasicAttribute(attrName);
-        Collection<String> valueCollection=(Collection<String>)attr;
+        Collection<String> valueCollection=(Collection<String>)attrValue;
         for (        String val : valueCollection) {
           attr.add(val);
         }

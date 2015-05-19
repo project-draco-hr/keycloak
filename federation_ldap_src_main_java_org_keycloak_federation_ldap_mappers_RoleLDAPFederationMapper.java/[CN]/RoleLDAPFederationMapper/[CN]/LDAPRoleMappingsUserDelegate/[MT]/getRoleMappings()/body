@@ -1,0 +1,15 @@
+{
+  Set<RoleModel> modelRoleMappings=super.getRoleMappings();
+  RoleContainerModel targetRoleContainer=getTargetRoleContainer(mapperModel,realm);
+  Set<RoleModel> ldapRoleMappings=getLDAPRoleMappingsConverted(mapperModel,ldapProvider,ldapUser,targetRoleContainer);
+  if (mode == Mode.LDAP_ONLY) {
+    Set<RoleModel> modelRolesCopy=new HashSet<RoleModel>(modelRoleMappings);
+    for (    RoleModel role : modelRolesCopy) {
+      if (role.getContainer().equals(targetRoleContainer)) {
+        modelRoleMappings.remove(role);
+      }
+    }
+  }
+  modelRoleMappings.addAll(ldapRoleMappings);
+  return modelRoleMappings;
+}

@@ -1,0 +1,13 @@
+{
+  LDAPIdentityQuery ldapQuery=new LDAPIdentityQuery(ldapProvider);
+  ldapQuery.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+  String rolesDn=getRolesDn(mapperModel);
+  ldapQuery.addSearchDns(Arrays.asList(rolesDn));
+  Collection<String> roleObjectClasses=getRoleObjectClasses(mapperModel);
+  ldapQuery.addObjectClasses(roleObjectClasses);
+  String rolesRdnAttr=getRoleNameLdapAttribute(mapperModel);
+  String membershipAttr=getMembershipLdapAttribute(mapperModel);
+  ldapQuery.addReturningLdapAttribute(rolesRdnAttr);
+  ldapQuery.addReturningLdapAttribute(membershipAttr);
+  return ldapQuery;
+}

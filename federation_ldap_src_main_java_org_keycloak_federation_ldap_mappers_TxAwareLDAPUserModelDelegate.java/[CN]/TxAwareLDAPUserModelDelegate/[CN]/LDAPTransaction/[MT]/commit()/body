@@ -1,0 +1,10 @@
+{
+  if (state != TransactionState.STARTED) {
+    throw new IllegalStateException("Transaction in illegal state for commit: " + state);
+  }
+  if (logger.isTraceEnabled()) {
+    logger.trace("Transaction commit! Updating LDAP attributes for object " + ldapUser.getDn().toString() + ", attributes: "+ ldapUser.getAttributes());
+  }
+  provider.getLdapIdentityStore().update(ldapUser);
+  state=TransactionState.FINISHED;
+}

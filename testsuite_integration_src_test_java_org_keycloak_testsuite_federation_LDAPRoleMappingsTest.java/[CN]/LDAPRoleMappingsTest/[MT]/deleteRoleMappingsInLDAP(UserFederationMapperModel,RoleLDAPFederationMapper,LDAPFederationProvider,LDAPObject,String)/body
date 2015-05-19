@@ -1,0 +1,8 @@
+{
+  LDAPIdentityQuery ldapQuery=roleMapper.createRoleQuery(roleMapperModel,ldapProvider);
+  LDAPQueryConditionsBuilder conditionsBuilder=new LDAPQueryConditionsBuilder();
+  Condition roleNameCondition=conditionsBuilder.equal(new QueryParameter(LDAPConstants.CN),roleName);
+  ldapQuery.where(roleNameCondition);
+  LDAPObject ldapRole1=ldapQuery.getFirstResult();
+  roleMapper.deleteRoleMappingInLDAP(roleMapperModel,ldapProvider,ldapUser,ldapRole1);
+}

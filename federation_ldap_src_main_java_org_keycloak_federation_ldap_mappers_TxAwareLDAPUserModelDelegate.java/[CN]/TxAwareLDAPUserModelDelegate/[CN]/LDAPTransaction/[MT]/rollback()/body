@@ -1,0 +1,7 @@
+{
+  if (state != TransactionState.STARTED && state != TransactionState.ROLLBACK_ONLY) {
+    throw new IllegalStateException("Transaction in illegal state for rollback: " + state);
+  }
+  logger.warn("Transaction rollback! Ignoring LDAP updates for object " + ldapUser.getDn().toString());
+  state=TransactionState.FINISHED;
+}

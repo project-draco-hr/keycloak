@@ -1,0 +1,46 @@
+{
+  RealmAdapter.LDAP_MODE="READ_ONLY";
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    UserModel mary=session.users().getUserByUsername("marykeycloak",appRealm);
+    RoleModel realmRole1=appRealm.getRole("realmRole1");
+    RoleModel realmRole2=appRealm.getRole("realmRole2");
+    RoleModel realmRole3=appRealm.getRole("realmRole3");
+    if (realmRole3 == null) {
+      realmRole3=appRealm.addRole("realmRole3");
+    }
+    RoleLDAPFederationMapper roleMapper=new RoleLDAPFederationMapper();
+    UserFederationMapperModel roleMapperModel=findRoleMapperModel(appRealm);
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    LDAPObject maryLdap=ldapProvider.loadLDAPUserByUsername(appRealm,"marykeycloak");
+    roleMapper.addRoleMappingInLDAP(roleMapperModel,"realmRole1",ldapProvider,maryLdap);
+    roleMapper.addRoleMappingInLDAP(roleMapperModel,"realmRole2",ldapProvider,maryLdap);
+    mary.grantRole(realmRole3);
+    Set<RoleModel> maryRoles=mary.getRealmRoleMappings();
+    Assert.assertTrue(maryRoles.contains(realmRole1));
+    Assert.assertTrue(maryRoles.contains(realmRole2));
+    Assert.assertTrue(maryRoles.contains(realmRole3));
+    UserModel maryDB=session.userStorage().getUserByUsername("marykeycloak",appRealm);
+    Set<RoleModel> maryDBRoles=maryDB.getRealmRoleMappings();
+    Assert.assertFalse(maryDBRoles.contains(realmRole1));
+    Assert.assertFalse(maryDBRoles.contains(realmRole2));
+    Assert.assertTrue(maryDBRoles.contains(realmRole3));
+    mary.deleteRoleMapping(realmRole3);
+    try {
+      mary.deleteRoleMapping(realmRole1);
+      Assert.fail("It wasn't expected to successfully delete LDAP role mappings in READ_ONLY mode");
+    }
+ catch (    ModelException expected) {
+    }
+    deleteRoleMappingsInLDAP(roleMapperModel,roleMapper,ldapProvider,maryLdap,"realmRole1");
+    deleteRoleMappingsInLDAP(roleMapperModel,roleMapper,ldapProvider,maryLdap,"realmRole2");
+    maryRoles=mary.getRealmRoleMappings();
+    Assert.assertFalse(maryRoles.contains(realmRole1));
+    Assert.assertFalse(maryRoles.contains(realmRole2));
+    Assert.assertFalse(maryRoles.contains(realmRole3));
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

@@ -16,33 +16,40 @@
     }
     while (ldapAttributes.hasMore()) {
       Attribute ldapAttribute=ldapAttributes.next();
-      Serializable ldapAttributeValue;
       try {
-        ldapAttributeValue=(Serializable)ldapAttribute.get();
+        ldapAttribute.get();
       }
  catch (      NoSuchElementException nsee) {
         continue;
       }
       String ldapAttributeName=ldapAttribute.getID();
       if (ldapAttributeName.toLowerCase().equals(getConfig().getUuidAttributeName().toLowerCase())) {
-        ldapObject.setUuid(this.operationManager.decodeEntryUUID(ldapAttributeValue));
+        Object uuidValue=ldapAttribute.get();
+        ldapObject.setUuid(this.operationManager.decodeEntryUUID(uuidValue));
       }
- else       if (ldapAttributeName.toLowerCase().equals(LDAPConstants.OBJECT_CLASS)) {
-        List<String> objectClasses=new LinkedList<String>();
+ else {
+        Set<String> attrValues=new TreeSet<String>();
         NamingEnumeration<?> enumm=ldapAttribute.getAll();
         while (enumm.hasMoreElements()) {
           String objectClass=enumm.next().toString();
-          objectClasses.add(objectClass);
+          attrValues.add(objectClass);
         }
-        ldapObject.setObjectClasses(objectClasses);
-      }
+        if (ldapAttributeName.toLowerCase().equals(LDAPConstants.OBJECT_CLASS)) {
+          ldapObject.setObjectClasses(attrValues);
+        }
  else {
-        if (logger.isTraceEnabled()) {
-          logger.tracef("Populating ldap attribute [%s] with value [%s] for DN [%s].",ldapAttributeName,ldapAttributeValue,entryDN);
-        }
-        ldapObject.setAttribute(ldapAttributeName,ldapAttributeValue);
-        if (uppercasedReadOnlyAttrNames.contains(ldapAttributeName.toUpperCase())) {
-          ldapObject.addReadOnlyAttributeName(ldapAttributeName);
+          if (logger.isTraceEnabled()) {
+            logger.tracef("Populating ldap attribute [%s] with value [%s] for DN [%s].",ldapAttributeName,attrValues.toString(),entryDN);
+          }
+          if (attrValues.size() == 1) {
+            ldapObject.setAttribute(ldapAttributeName,attrValues.iterator().next());
+          }
+ else {
+            ldapObject.setAttribute(ldapAttributeName,attrValues);
+          }
+          if (uppercasedReadOnlyAttrNames.contains(ldapAttributeName.toUpperCase())) {
+            ldapObject.addReadOnlyAttributeName(ldapAttributeName);
+          }
         }
       }
     }

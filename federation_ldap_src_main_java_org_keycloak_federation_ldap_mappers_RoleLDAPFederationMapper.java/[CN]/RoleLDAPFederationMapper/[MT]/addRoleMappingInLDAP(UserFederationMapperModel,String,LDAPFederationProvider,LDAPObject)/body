@@ -1,0 +1,10 @@
+{
+  LDAPObject ldapRole=loadLDAPRoleByName(mapperModel,ldapProvider,roleName);
+  if (ldapRole == null) {
+    ldapRole=createLDAPRole(mapperModel,roleName,ldapProvider);
+  }
+  Set<String> memberships=getExistingMemberships(mapperModel,ldapRole);
+  memberships.add(ldapUser.getDn().toString());
+  ldapRole.setAttribute(getMembershipLdapAttribute(mapperModel),memberships);
+  ldapProvider.getLdapIdentityStore().update(ldapRole);
+}

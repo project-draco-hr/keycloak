@@ -16,10 +16,12 @@
     env.put(Context.SECURITY_CREDENTIALS,bindCredential);
   }
   String url=this.config.getConnectionUrl();
-  if (url == null) {
-    throw new RuntimeException("url");
+  if (url != null) {
+    env.put(Context.PROVIDER_URL,url);
   }
-  env.put(Context.PROVIDER_URL,url);
+ else {
+    logger.warn("LDAP URL is null. LDAPOperationManager won't work correctly");
+  }
   String connectionPooling=this.config.getConnectionPooling();
   if (connectionPooling != null) {
     env.put("com.sun.jndi.ldap.connect.pool",connectionPooling);

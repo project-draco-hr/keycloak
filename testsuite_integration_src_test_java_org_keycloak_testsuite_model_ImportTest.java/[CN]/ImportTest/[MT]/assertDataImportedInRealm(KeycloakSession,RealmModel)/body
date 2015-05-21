@@ -119,6 +119,13 @@
   Assert.assertEquals("dummy",ldap.getProviderName());
   Assert.assertEquals(1,ldap.getPriority());
   Assert.assertEquals("ldap://foo",ldap.getConfig().get("important.config"));
+  Set<UserFederationMapperModel> fedMappers=realm.getUserFederationMappers();
+  Assert.assertTrue(fedMappers.size() == 1);
+  UserFederationMapperModel fullNameMapper=fedMappers.iterator().next();
+  Assert.assertEquals("FullNameMapper",fullNameMapper.getName());
+  Assert.assertEquals(FullNameLDAPFederationMapperFactory.ID,fullNameMapper.getFederationMapperType());
+  Assert.assertEquals(ldap.getId(),fullNameMapper.getFederationProviderId());
+  Assert.assertEquals("cn",fullNameMapper.getConfig().get(FullNameLDAPFederationMapper.LDAP_FULL_NAME_ATTRIBUTE));
   UserFederationProviderFactory factory=(UserFederationProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(UserFederationProvider.class,"dummy");
   Assert.assertNull(factory.getInstance(session,null).getUserByUsername(realm,"wburke"));
   Assert.assertNotNull(application.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,"username"));

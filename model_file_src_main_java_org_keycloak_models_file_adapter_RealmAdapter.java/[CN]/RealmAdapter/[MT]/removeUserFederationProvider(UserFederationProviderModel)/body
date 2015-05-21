@@ -4,6 +4,10 @@
     UserFederationProviderEntity entity=it.next();
     if (entity.getId().equals(provider.getId())) {
       session.users().preRemove(this,new UserFederationProviderModel(entity.getId(),entity.getProviderName(),entity.getConfig(),entity.getPriority(),entity.getDisplayName(),entity.getFullSyncPeriod(),entity.getChangedSyncPeriod(),entity.getLastSync()));
+      Set<UserFederationMapperEntity> mappers=getUserFederationMapperEntitiesByFederationProvider(provider.getId());
+      for (      UserFederationMapperEntity mapper : mappers) {
+        realm.getUserFederationMappers().remove(mapper);
+      }
       it.remove();
     }
   }

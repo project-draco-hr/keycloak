@@ -160,6 +160,11 @@
     List<UserFederationProviderModel> providerModels=convertFederationProviders(rep.getUserFederationProviders());
     newRealm.setUserFederationProviders(providerModels);
   }
+  if (rep.getUserFederationMappers() != null) {
+    for (    UserFederationMapperRepresentation representation : rep.getUserFederationMappers()) {
+      newRealm.addUserFederationMapper(toModel(newRealm,representation));
+    }
+  }
   if (rep.getUsers() != null) {
     for (    UserRepresentation userRep : rep.getUsers()) {
       UserModel user=createUser(session,newRealm,userRep,appMap);

@@ -4,7 +4,8 @@
   KeycloakSession session=keycloakRule.startSession();
   try {
     KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
-    usersSyncManager.syncAllUsers(sessionFactory,"test",ldapModel);
+    UserFederationSyncResult syncResult=usersSyncManager.syncAllUsers(sessionFactory,"test",ldapModel);
+    assertSyncEquals(syncResult,5,0,0);
   }
   finally {
     keycloakRule.stopSession(session,false);
@@ -13,11 +14,11 @@
   try {
     RealmModel testRealm=session.realms().getRealm("test");
     UserProvider userProvider=session.userStorage();
-    assertUserImported(userProvider,testRealm,"user1","User1FN","User1LN","user1@email.org");
-    assertUserImported(userProvider,testRealm,"user2","User2FN","User2LN","user2@email.org");
-    assertUserImported(userProvider,testRealm,"user3","User3FN","User3LN","user3@email.org");
-    assertUserImported(userProvider,testRealm,"user4","User4FN","User4LN","user4@email.org");
-    assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5@email.org");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user1","User1FN","User1LN","user1@email.org","121");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user2","User2FN","User2LN","user2@email.org","122");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user3","User3FN","User3LN","user3@email.org","123");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user4","User4FN","User4LN","user4@email.org","124");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5@email.org","125");
     Assert.assertTrue(ldapModel.getLastSync() > 0);
     for (    UserFederationProviderModel persistentFedModel : testRealm.getUserFederationProviders()) {
       if (LDAPFederationProviderFactory.PROVIDER_NAME.equals(persistentFedModel.getProviderName())) {
@@ -28,13 +29,17 @@
       }
     }
     sleep(1000);
-    LDAPIdentityStore ldapStore=FederationProvidersIntegrationTest.getLdapIdentityStore(session,ldapModel);
-    LDAPUtils.addUser(ldapStore,"user6","User6FN","User6LN","user6@email.org");
-    LDAPUtils.updateUser(ldapStore,"user5","User5FNUpdated","User5LNUpdated","user5Updated@email.org");
-    assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5@email.org");
+    LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    FederationTestUtils.addLDAPUser(ldapFedProvider,testRealm,"user6","User6FN","User6LN","user6@email.org","126");
+    LDAPObject ldapUser5=ldapFedProvider.loadLDAPUserByUsername(testRealm,"user5");
+    ldapUser5.setAttribute(LDAPConstants.EMAIL,"user5Updated@email.org");
+    ldapUser5.setAttribute(LDAPConstants.POSTAL_CODE,"521");
+    ldapFedProvider.getLdapIdentityStore().update(ldapUser5);
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5@email.org","125");
     Assert.assertNull(userProvider.getUserByUsername("user6",testRealm));
     KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
-    usersSyncManager.syncChangedUsers(sessionFactory,"test",ldapModel);
+    UserFederationSyncResult syncResult=usersSyncManager.syncChangedUsers(sessionFactory,"test",ldapModel);
+    assertSyncEquals(syncResult,1,1,0);
   }
   finally {
     keycloakRule.stopSession(session,false);
@@ -43,8 +48,8 @@
   try {
     RealmModel testRealm=session.realms().getRealm("test");
     UserProvider userProvider=session.userStorage();
-    assertUserImported(userProvider,testRealm,"user5","User5FNUpdated","User5LNUpdated","user5Updated@email.org");
-    assertUserImported(userProvider,testRealm,"user6","User6FN","User6LN","user6@email.org");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5Updated@email.org","521");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user6","User6FN","User6LN","user6@email.org","126");
   }
   finally {
     keycloakRule.stopSession(session,false);

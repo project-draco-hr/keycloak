@@ -1,0 +1,21 @@
+{
+  RealmModel realm=realmManager.createRealm("test-realm");
+  UserFederationProviderModel fedProvider=realm.addUserFederationProvider("dummy",new TreeMap<String,String>(),1,"my-cool-provider",-1,-1,0);
+  UserFederationProviderModel fedProvider2=realm.addUserFederationProvider("dummy",new TreeMap<String,String>(),1,"my-cool-provider2",-1,-1,0);
+  UserFederationMapperModel mapperModel1=createMapper("name1",fedProvider.getId(),"key1","value1");
+  UserFederationMapperModel mapperModel2=createMapper("name2",fedProvider.getId(),"key2","value2");
+  UserFederationMapperModel mapperModel3=createMapper("name1",fedProvider2.getId(),"key3","value3");
+  mapperModel1=realm.addUserFederationMapper(mapperModel1);
+  mapperModel2=realm.addUserFederationMapper(mapperModel2);
+  mapperModel3=realm.addUserFederationMapper(mapperModel3);
+  commit();
+  realmManager.getRealmByName("test-realm").removeUserFederationProvider(fedProvider);
+  commit();
+  realm=realmManager.getRealmByName("test-realm");
+  Set<UserFederationMapperModel> mappers=realm.getUserFederationMappers();
+  Assert.assertEquals(1,mappers.size());
+  Assert.assertEquals(mapperModel3,mappers.iterator().next());
+  realm=realmManager.getRealmByName("test-realm");
+  realmManager.removeRealm(realm);
+  commit();
+}

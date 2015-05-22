@@ -14,7 +14,9 @@
     UserCredentialValueModel userCredentialValueModel=user.getCredentialsDirectly().get(0);
     Assert.assertEquals(UserCredentialModel.PASSWORD,userCredentialValueModel.getType());
     Assert.assertTrue(session.users().validCredentials(appRealm,user,cred));
-    Assert.assertTrue(LDAPUtils.validatePassword(getLdapIdentityStore(session,model),user,"Password1"));
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,model);
+    LDAPObject ldapUser=ldapProvider.loadLDAPUserByUsername(appRealm,"johnkeycloak");
+    ldapProvider.getLdapIdentityStore().validatePassword(ldapUser,"Password1");
     Assert.assertFalse(session.users().removeUser(appRealm,user));
   }
   finally {

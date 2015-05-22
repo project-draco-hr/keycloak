@@ -1,11 +1,12 @@
 {
-  logger.infof("Sync changed users from LDAP to local store: realm: %s, federation provider: %s, current time: %s, last sync time: " + lastSync,realmId,model.getDisplayName(),new Date().toString());
-  LDAPIdentityStore ldapIdentityStore=this.ldapStoreRegistry.getLdapStore(model);
-  IdentityQueryBuilder queryBuilder=ldapIdentityStore.createQueryBuilder();
-  Condition condition=queryBuilder.greaterThanOrEqualTo(IdentityType.CREATED_DATE,lastSync);
-  IdentityQuery<LDAPUser> userQuery=queryBuilder.createIdentityQuery(LDAPUser.class).where(condition);
-  syncImpl(sessionFactory,userQuery,realmId,model);
-  condition=queryBuilder.greaterThanOrEqualTo(LDAPUtils.MODIFY_DATE,lastSync);
-  userQuery=queryBuilder.createIdentityQuery(LDAPUser.class).where(condition);
-  syncImpl(sessionFactory,userQuery,realmId,model);
+  logger.infof("Sync changed users from LDAP to local store: realm: %s, federation provider: %s, last sync time: " + lastSync,realmId,model.getDisplayName());
+  LDAPQueryConditionsBuilder conditionsBuilder=new LDAPQueryConditionsBuilder();
+  Condition createCondition=conditionsBuilder.greaterThanOrEqualTo(new QueryParameter(LDAPConstants.CREATE_TIMESTAMP),lastSync);
+  Condition modifyCondition=conditionsBuilder.greaterThanOrEqualTo(new QueryParameter(LDAPConstants.MODIFY_TIMESTAMP),lastSync);
+  Condition orCondition=conditionsBuilder.orCondition(createCondition,modifyCondition);
+  LDAPIdentityQuery userQuery=createQuery(sessionFactory,realmId,model);
+  userQuery.where(orCondition);
+  UserFederationSyncResult result=syncImpl(sessionFactory,userQuery,realmId,model);
+  logger.infof("Sync changed users finished: %s",result.getStatus());
+  return result;
 }

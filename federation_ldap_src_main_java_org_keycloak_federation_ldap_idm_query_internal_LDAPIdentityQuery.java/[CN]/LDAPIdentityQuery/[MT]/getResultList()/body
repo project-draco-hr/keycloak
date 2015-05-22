@@ -1,0 +1,16 @@
+{
+  for (  UserFederationMapperModel mapperModel : mappers) {
+    LDAPFederationMapper fedMapper=ldapFedProvider.getMapper(mapperModel);
+    fedMapper.beforeLDAPQuery(mapperModel,this);
+  }
+  List<LDAPObject> result=new ArrayList<LDAPObject>();
+  try {
+    for (    LDAPObject ldapObject : ldapFedProvider.getLdapIdentityStore().fetchQueryResults(this)) {
+      result.add(ldapObject);
+    }
+  }
+ catch (  Exception e) {
+    throw new ModelException("LDAP Query failed",e);
+  }
+  return result;
+}

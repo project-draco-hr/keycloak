@@ -1,0 +1,15 @@
+{
+class QueryHolder {
+    LDAPIdentityQuery query;
+  }
+  final QueryHolder queryHolder=new QueryHolder();
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      LDAPFederationProvider ldapFedProvider=getInstance(session,model);
+      RealmModel realm=session.realms().getRealm(realmId);
+      queryHolder.query=LDAPUtils.createQueryForUserSearch(ldapFedProvider,realm);
+    }
+  }
+);
+  return queryHolder.query;
+}

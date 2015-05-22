@@ -1,8 +1,9 @@
 {
   List<UserModel> searchResults=new LinkedList<UserModel>();
-  Map<String,LDAPUser> ldapUsers=searchLDAP(attributes,maxResults);
-  for (  LDAPUser ldapUser : ldapUsers.values()) {
-    if (session.userStorage().getUserByUsername(ldapUser.getLoginName(),realm) == null) {
+  List<LDAPObject> ldapUsers=searchLDAP(realm,attributes,maxResults);
+  for (  LDAPObject ldapUser : ldapUsers) {
+    String ldapUsername=LDAPUtils.getUsername(ldapUser,this.ldapIdentityStore.getConfig());
+    if (session.userStorage().getUserByUsername(ldapUsername,realm) == null) {
       UserModel imported=importUserFromLDAP(realm,ldapUser);
       searchResults.add(imported);
     }

@@ -1,0 +1,13 @@
+{
+  UserFederationMapperModel model=new UserFederationMapperModel();
+  model.setId(rep.getId());
+  model.setName(rep.getName());
+  model.setFederationMapperType(rep.getFederationMapperType());
+  model.setConfig(rep.getConfig());
+  UserFederationProviderModel fedProvider=KeycloakModelUtils.findUserFederationProviderByDisplayName(rep.getFederationProviderDisplayName(),realm);
+  if (fedProvider == null) {
+    throw new ModelException("Couldn't find federation provider with display name [" + rep.getFederationProviderDisplayName() + "] referenced from mapper ["+ rep.getName());
+  }
+  model.setFederationProviderId(fedProvider.getId());
+  return model;
+}

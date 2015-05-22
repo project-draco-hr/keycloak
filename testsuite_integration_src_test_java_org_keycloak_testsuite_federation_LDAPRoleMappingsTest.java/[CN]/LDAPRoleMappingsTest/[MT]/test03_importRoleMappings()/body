@@ -1,0 +1,42 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    FederationTestUtils.addOrUpdateRoleLDAPMappers(appRealm,ldapModel,RoleLDAPFederationMapper.Mode.IMPORT);
+    RoleLDAPFederationMapper roleMapper=new RoleLDAPFederationMapper();
+    UserFederationMapperModel roleMapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"realmRolesMapper");
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    LDAPObject robLdap=ldapProvider.loadLDAPUserByUsername(appRealm,"robkeycloak");
+    roleMapper.addRoleMappingInLDAP(roleMapperModel,"realmRole1",ldapProvider,robLdap);
+    roleMapper.addRoleMappingInLDAP(roleMapperModel,"realmRole2",ldapProvider,robLdap);
+    UserModel rob=session.users().getUserByUsername("robkeycloak",appRealm);
+    RoleModel realmRole1=appRealm.getRole("realmRole1");
+    RoleModel realmRole2=appRealm.getRole("realmRole2");
+    RoleModel realmRole3=appRealm.getRole("realmRole3");
+    if (realmRole3 == null) {
+      realmRole3=appRealm.addRole("realmRole3");
+    }
+    Set<RoleModel> robRoles=rob.getRealmRoleMappings();
+    Assert.assertTrue(robRoles.contains(realmRole1));
+    Assert.assertTrue(robRoles.contains(realmRole2));
+    Assert.assertFalse(robRoles.contains(realmRole3));
+    rob.grantRole(realmRole3);
+    robRoles=rob.getRealmRoleMappings();
+    Assert.assertTrue(robRoles.contains(realmRole3));
+    deleteRoleMappingsInLDAP(roleMapperModel,roleMapper,ldapProvider,robLdap,"realmRole1");
+    deleteRoleMappingsInLDAP(roleMapperModel,roleMapper,ldapProvider,robLdap,"realmRole2");
+    robRoles=rob.getRealmRoleMappings();
+    Assert.assertTrue(robRoles.contains(realmRole1));
+    Assert.assertTrue(robRoles.contains(realmRole2));
+    rob.deleteRoleMapping(realmRole1);
+    rob.deleteRoleMapping(realmRole2);
+    rob.deleteRoleMapping(realmRole3);
+    robRoles=rob.getRealmRoleMappings();
+    Assert.assertFalse(robRoles.contains(realmRole1));
+    Assert.assertFalse(robRoles.contains(realmRole2));
+    Assert.assertFalse(robRoles.contains(realmRole3));
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

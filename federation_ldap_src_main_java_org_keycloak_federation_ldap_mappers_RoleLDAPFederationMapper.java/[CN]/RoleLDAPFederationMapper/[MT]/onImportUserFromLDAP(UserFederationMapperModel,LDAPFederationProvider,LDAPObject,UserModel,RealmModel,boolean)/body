@@ -1,0 +1,15 @@
+{
+  syncRolesFromLDAP(mapperModel,ldapProvider,realm);
+  Mode mode=getMode(mapperModel);
+  if (mode == Mode.IMPORT && isCreate) {
+    List<LDAPObject> ldapRoles=getLDAPRoleMappings(mapperModel,ldapProvider,ldapUser);
+    String roleNameAttr=getRoleNameLdapAttribute(mapperModel);
+    for (    LDAPObject ldapRole : ldapRoles) {
+      String roleName=ldapRole.getAttributeAsString(roleNameAttr);
+      RoleContainerModel roleContainer=getTargetRoleContainer(mapperModel,realm);
+      RoleModel role=roleContainer.getRole(roleName);
+      logger.infof("Granting role [%s] to user [%s] during import from LDAP",roleName,user.getUsername());
+      user.grantRole(role);
+    }
+  }
+}

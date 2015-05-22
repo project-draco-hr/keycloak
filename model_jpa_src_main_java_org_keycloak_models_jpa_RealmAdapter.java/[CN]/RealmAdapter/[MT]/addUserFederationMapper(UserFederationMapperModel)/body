@@ -1,0 +1,16 @@
+{
+  if (getUserFederationMapperByName(model.getFederationProviderId(),model.getName()) != null) {
+    throw new ModelDuplicateException("User federation mapper must be unique per federation provider. There is already: " + model.getName());
+  }
+  String id=KeycloakModelUtils.generateId();
+  UserFederationMapperEntity entity=new UserFederationMapperEntity();
+  entity.setId(id);
+  entity.setName(model.getName());
+  entity.setFederationProvider(getUserFederationProviderEntityById(model.getFederationProviderId()));
+  entity.setFederationMapperType(model.getFederationMapperType());
+  entity.setRealm(this.realm);
+  entity.setConfig(model.getConfig());
+  em.persist(entity);
+  this.realm.getUserFederationMappers().add(entity);
+  return entityToModel(entity);
+}

@@ -1,0 +1,59 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    FederationTestUtils.addOrUpdateRoleLDAPMappers(appRealm,ldapModel,RoleLDAPFederationMapper.Mode.LDAP_ONLY);
+    UserModel john=session.users().getUserByUsername("johnkeycloak",appRealm);
+    UserModel mary=session.users().getUserByUsername("marykeycloak",appRealm);
+    RoleModel realmRole1=appRealm.getRole("realmRole1");
+    john.grantRole(realmRole1);
+    RoleModel realmRole2=appRealm.getRole("realmRole2");
+    mary.grantRole(realmRole2);
+    RoleModel realmRole3=appRealm.addRole("realmRole3");
+    john.grantRole(realmRole3);
+    mary.grantRole(realmRole3);
+    ClientModel accountApp=appRealm.getClientByClientId(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID);
+    ClientModel financeApp=appRealm.getClientByClientId("finance");
+    RoleModel manageAccountRole=accountApp.getRole(AccountRoles.MANAGE_ACCOUNT);
+    RoleModel financeRole1=financeApp.getRole("financeRole1");
+    john.grantRole(financeRole1);
+    UserModel johnDb=session.userStorage().getUserByUsername("johnkeycloak",appRealm);
+    Set<RoleModel> johnDbRoles=johnDb.getRoleMappings();
+    Assert.assertFalse(johnDbRoles.contains(realmRole1));
+    Assert.assertFalse(johnDbRoles.contains(realmRole2));
+    Assert.assertFalse(johnDbRoles.contains(realmRole3));
+    Assert.assertFalse(johnDbRoles.contains(financeRole1));
+    Assert.assertTrue(johnDbRoles.contains(manageAccountRole));
+    Set<RoleModel> johnRoles=john.getRoleMappings();
+    Assert.assertTrue(johnRoles.contains(realmRole1));
+    Assert.assertFalse(johnRoles.contains(realmRole2));
+    Assert.assertTrue(johnRoles.contains(realmRole3));
+    Assert.assertTrue(johnRoles.contains(financeRole1));
+    Assert.assertTrue(johnRoles.contains(manageAccountRole));
+    Set<RoleModel> johnRealmRoles=john.getRealmRoleMappings();
+    Assert.assertEquals(2,johnRealmRoles.size());
+    Assert.assertTrue(johnRealmRoles.contains(realmRole1));
+    Assert.assertTrue(johnRealmRoles.contains(realmRole3));
+    Set<RoleModel> johnAccountRoles=john.getClientRoleMappings(accountApp);
+    Assert.assertTrue(johnAccountRoles.contains(manageAccountRole));
+    Set<RoleModel> johnFinanceRoles=john.getClientRoleMappings(financeApp);
+    Assert.assertEquals(1,johnFinanceRoles.size());
+    Assert.assertTrue(johnFinanceRoles.contains(financeRole1));
+    john.deleteRoleMapping(realmRole3);
+    john.deleteRoleMapping(realmRole1);
+    john.deleteRoleMapping(financeRole1);
+    john.deleteRoleMapping(manageAccountRole);
+    johnRoles=john.getRoleMappings();
+    Assert.assertFalse(johnRoles.contains(realmRole1));
+    Assert.assertFalse(johnRoles.contains(realmRole2));
+    Assert.assertFalse(johnRoles.contains(realmRole3));
+    Assert.assertFalse(johnRoles.contains(financeRole1));
+    Assert.assertFalse(johnRoles.contains(manageAccountRole));
+    mary.deleteRoleMapping(realmRole2);
+    mary.deleteRoleMapping(realmRole3);
+    john.grantRole(manageAccountRole);
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

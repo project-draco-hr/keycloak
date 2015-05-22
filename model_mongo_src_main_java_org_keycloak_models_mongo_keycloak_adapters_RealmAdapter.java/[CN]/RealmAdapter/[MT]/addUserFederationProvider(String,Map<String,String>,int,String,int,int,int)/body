@@ -14,5 +14,7 @@
   entity.setLastSync(lastSync);
   realm.getUserFederationProviders().add(entity);
   updateRealm();
-  return new UserFederationProviderModel(entity.getId(),providerName,config,priority,displayName,fullSyncPeriod,changedSyncPeriod,lastSync);
+  UserFederationProviderModel providerModel=new UserFederationProviderModel(entity.getId(),providerName,config,priority,displayName,fullSyncPeriod,changedSyncPeriod,lastSync);
+  session.getKeycloakSessionFactory().publish(new UserFederationProviderCreationEventImpl(this,providerModel));
+  return providerModel;
 }

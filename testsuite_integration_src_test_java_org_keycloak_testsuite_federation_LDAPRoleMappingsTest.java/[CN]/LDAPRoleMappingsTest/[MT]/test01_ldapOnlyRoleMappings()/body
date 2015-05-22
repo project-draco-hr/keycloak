@@ -2,6 +2,7 @@
   KeycloakSession session=keycloakRule.startSession();
   try {
     RealmModel appRealm=session.realms().getRealmByName("test");
+    FederationTestUtils.addOrUpdateRoleLDAPMappers(appRealm,ldapModel,RoleLDAPFederationMapper.Mode.LDAP_ONLY);
     UserModel john=session.users().getUserByUsername("johnkeycloak",appRealm);
     UserModel mary=session.users().getUserByUsername("marykeycloak",appRealm);
     RoleModel realmRole1=appRealm.getRole("realmRole1");

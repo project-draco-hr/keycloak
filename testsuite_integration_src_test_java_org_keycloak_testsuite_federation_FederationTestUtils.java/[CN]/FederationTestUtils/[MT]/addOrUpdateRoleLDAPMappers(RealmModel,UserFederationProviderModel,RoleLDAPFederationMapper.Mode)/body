@@ -1,0 +1,20 @@
+{
+  UserFederationMapperModel mapperModel=realm.getUserFederationMapperByName(providerModel.getId(),"realmRolesMapper");
+  if (mapperModel != null) {
+    mapperModel.getConfig().put(RoleLDAPFederationMapper.MODE,mode.toString());
+    realm.updateUserFederationMapper(mapperModel);
+  }
+ else {
+    mapperModel=KeycloakModelUtils.createUserFederationMapperModel("realmRolesMapper",providerModel.getId(),RoleLDAPFederationMapperFactory.ID,RoleLDAPFederationMapper.ROLES_DN,"ou=RealmRoles,dc=keycloak,dc=org",RoleLDAPFederationMapper.USE_REALM_ROLES_MAPPING,"true",RoleLDAPFederationMapper.MODE,mode.toString());
+    realm.addUserFederationMapper(mapperModel);
+  }
+  mapperModel=realm.getUserFederationMapperByName(providerModel.getId(),"financeRolesMapper");
+  if (mapperModel != null) {
+    mapperModel.getConfig().put(RoleLDAPFederationMapper.MODE,mode.toString());
+    realm.updateUserFederationMapper(mapperModel);
+  }
+ else {
+    mapperModel=KeycloakModelUtils.createUserFederationMapperModel("financeRolesMapper",providerModel.getId(),RoleLDAPFederationMapperFactory.ID,RoleLDAPFederationMapper.ROLES_DN,"ou=FinanceRoles,dc=keycloak,dc=org",RoleLDAPFederationMapper.USE_REALM_ROLES_MAPPING,"false",RoleLDAPFederationMapper.CLIENT_ID,"finance",RoleLDAPFederationMapper.MODE,mode.toString());
+    realm.addUserFederationMapper(mapperModel);
+  }
+}

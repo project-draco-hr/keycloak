@@ -1,15 +1,15 @@
 {
-  LDAPObject ldapObject=new LDAPObject();
+  LDAPObject ldapUser=new LDAPObject();
   LDAPIdentityStore ldapStore=ldapProvider.getLdapIdentityStore();
   LDAPConfig ldapConfig=ldapStore.getConfig();
-  ldapObject.setRdnAttributeName(ldapConfig.getRdnLdapAttribute());
-  ldapObject.setObjectClasses(ldapConfig.getObjectClasses());
+  ldapUser.setRdnAttributeName(ldapConfig.getRdnLdapAttribute());
+  ldapUser.setObjectClasses(ldapConfig.getUserObjectClasses());
   Set<UserFederationMapperModel> federationMappers=realm.getUserFederationMappers();
   for (  UserFederationMapperModel mapperModel : federationMappers) {
     LDAPFederationMapper ldapMapper=ldapProvider.getMapper(mapperModel);
-    ldapMapper.onRegisterUserToLDAP(mapperModel,ldapProvider,ldapObject,user,realm);
+    ldapMapper.onRegisterUserToLDAP(mapperModel,ldapProvider,ldapUser,user,realm);
   }
-  LDAPUtils.computeAndSetDn(ldapConfig,ldapObject);
-  ldapStore.add(ldapObject);
-  return ldapObject;
+  LDAPUtils.computeAndSetDn(ldapConfig,ldapUser);
+  ldapStore.add(ldapUser);
+  return ldapUser;
 }

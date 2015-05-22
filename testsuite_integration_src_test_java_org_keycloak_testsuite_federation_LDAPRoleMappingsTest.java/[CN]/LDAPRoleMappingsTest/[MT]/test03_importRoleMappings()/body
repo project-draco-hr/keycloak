@@ -2,8 +2,9 @@
   KeycloakSession session=keycloakRule.startSession();
   try {
     RealmModel appRealm=session.realms().getRealmByName("test");
+    FederationTestUtils.addOrUpdateRoleLDAPMappers(appRealm,ldapModel,RoleLDAPFederationMapper.Mode.IMPORT);
     RoleLDAPFederationMapper roleMapper=new RoleLDAPFederationMapper();
-    UserFederationMapperModel roleMapperModel=findRoleMapperModel(appRealm);
+    UserFederationMapperModel roleMapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"realmRolesMapper");
     LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
     LDAPObject robLdap=ldapProvider.loadLDAPUserByUsername(appRealm,"robkeycloak");
     roleMapper.addRoleMappingInLDAP(roleMapperModel,"realmRole1",ldapProvider,robLdap);

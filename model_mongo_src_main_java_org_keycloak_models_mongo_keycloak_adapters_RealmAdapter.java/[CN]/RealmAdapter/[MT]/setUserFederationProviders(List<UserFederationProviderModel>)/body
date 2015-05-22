@@ -5,8 +5,14 @@
   List<UserFederationProviderEntity> entities=new LinkedList<UserFederationProviderEntity>();
   for (  UserFederationProviderModel model : providers) {
     UserFederationProviderEntity entity=new UserFederationProviderEntity();
-    if (model.getId() != null)     entity.setId(model.getId());
- else     entity.setId(KeycloakModelUtils.generateId());
+    if (model.getId() != null) {
+      entity.setId(model.getId());
+    }
+ else {
+      String id=KeycloakModelUtils.generateId();
+      entity.setId(id);
+      model.setId(id);
+    }
     entity.setProviderName(model.getProviderName());
     entity.setConfig(model.getConfig());
     entity.setPriority(model.getPriority());
@@ -19,6 +25,7 @@
     entity.setChangedSyncPeriod(model.getChangedSyncPeriod());
     entity.setLastSync(model.getLastSync());
     entities.add(entity);
+    session.getKeycloakSessionFactory().publish(new UserFederationProviderCreationEventImpl(this,model));
   }
   realm.setUserFederationProviders(entities);
   updateRealm();

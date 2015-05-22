@@ -1,0 +1,12 @@
+{
+  AuthenticationFlowEntity entity=new AuthenticationFlowEntity();
+  entity.setId(KeycloakModelUtils.generateId());
+  entity.setAlias(model.getAlias());
+  entity.setDescription(model.getDescription());
+  entity.setRealm(realm);
+  realm.getAuthenticationFlows().add(entity);
+  em.persist(entity);
+  em.flush();
+  model.setId(entity.getId());
+  return model;
+}

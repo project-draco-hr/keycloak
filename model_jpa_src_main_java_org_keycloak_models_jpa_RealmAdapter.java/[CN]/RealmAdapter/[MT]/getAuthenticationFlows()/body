@@ -1,0 +1,12 @@
+{
+  TypedQuery<AuthenticationFlowEntity> query=em.createNamedQuery("getAuthenticationFlowsByRealm",AuthenticationFlowEntity.class);
+  query.setParameter("realm",realm);
+  List<AuthenticationFlowEntity> flows=query.getResultList();
+  if (flows.size() == 0)   return Collections.EMPTY_LIST;
+  List<AuthenticationFlowModel> models=new LinkedList<>();
+  for (  AuthenticationFlowEntity entity : flows) {
+    AuthenticationFlowModel model=entityToModel(entity);
+    models.add(model);
+  }
+  return models;
+}

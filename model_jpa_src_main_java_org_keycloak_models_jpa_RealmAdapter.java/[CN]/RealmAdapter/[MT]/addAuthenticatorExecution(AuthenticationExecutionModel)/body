@@ -1,0 +1,17 @@
+{
+  AuthenticationExecutionEntity entity=new AuthenticationExecutionEntity();
+  entity.setId(KeycloakModelUtils.generateId());
+  entity.setAuthenticator(model.getAuthenticator());
+  entity.setPriority(model.getPriority());
+  entity.setRequirement(model.getRequirement());
+  AuthenticationFlowEntity flow=em.find(AuthenticationFlowEntity.class,model.getParentFlow());
+  entity.setFlow(flow);
+  flow.getExecutions().add(entity);
+  entity.setRealm(realm);
+  entity.setUserSetupAllowed(model.isUserSetupAllowed());
+  entity.setAutheticatorFlow(model.isAutheticatorFlow());
+  em.persist(entity);
+  em.flush();
+  model.setId(entity.getId());
+  return model;
+}

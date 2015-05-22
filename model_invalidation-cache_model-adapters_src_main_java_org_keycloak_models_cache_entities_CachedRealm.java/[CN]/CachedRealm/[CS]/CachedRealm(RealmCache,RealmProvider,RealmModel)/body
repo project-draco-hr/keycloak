@@ -65,4 +65,14 @@
   internationalizationEnabled=model.isInternationalizationEnabled();
   supportedLocales.addAll(model.getSupportedLocales());
   defaultLocale=model.getDefaultLocale();
+  for (  AuthenticationFlowModel flow : model.getAuthenticationFlows()) {
+    authenticationFlows.put(flow.getId(),flow);
+    for (    AuthenticationExecutionModel execution : model.getAuthenticationExecutions(flow.getId())) {
+      authenticationExecutions.add(flow.getId(),execution);
+      executionsById.put(execution.getId(),execution);
+    }
+  }
+  for (  AuthenticatorModel authenticator : model.getAuthenticators()) {
+    authenticators.put(authenticator.getId(),authenticator);
+  }
 }

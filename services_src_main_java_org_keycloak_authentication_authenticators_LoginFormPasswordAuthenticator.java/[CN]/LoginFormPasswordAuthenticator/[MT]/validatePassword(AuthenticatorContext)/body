@@ -3,14 +3,14 @@
   List<UserCredentialModel> credentials=new LinkedList<>();
   String password=inputData.getFirst(CredentialRepresentation.PASSWORD);
   if (password == null) {
-    Response challengeResponse=challenge(context);
+    Response challengeResponse=badPassword(context);
     context.failureChallenge(AuthenticationProcessor.Error.INVALID_CREDENTIALS,challengeResponse);
     return;
   }
   credentials.add(UserCredentialModel.password(password));
   boolean valid=context.getSession().users().validCredentials(context.getRealm(),context.getUser(),credentials);
   if (!valid) {
-    Response challengeResponse=challenge(context);
+    Response challengeResponse=badPassword(context);
     context.failureChallenge(AuthenticationProcessor.Error.INVALID_CREDENTIALS,challengeResponse);
     return;
   }

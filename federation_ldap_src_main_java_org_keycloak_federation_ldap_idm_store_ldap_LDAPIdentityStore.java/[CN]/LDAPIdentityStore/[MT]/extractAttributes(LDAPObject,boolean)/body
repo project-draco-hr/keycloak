@@ -5,6 +5,9 @@
     Object attrValue=attrEntry.getValue();
     if (!ldapObject.getReadOnlyAttributeNames().contains(attrName) && (isCreate || !ldapObject.getRdnAttributeName().equals(attrName))) {
       if (String.class.isInstance(attrValue)) {
+        if (attrValue.toString().trim().length() == 0) {
+          attrValue=LDAPConstants.EMPTY_ATTRIBUTE_VALUE;
+        }
         entryAttributes.put(attrName,attrValue);
       }
  else       if (Collection.class.isInstance(attrValue)) {

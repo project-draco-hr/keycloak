@@ -1,8 +1,8 @@
 {
   try {
-    String uuidAttrName=getConfig().getUuidAttributeName();
+    String uuidAttrName=getConfig().getUuidLDAPAttributeName();
     List<SearchResult> search=this.operationManager.search(ldapObject.getDn().toString(),"(" + ldapObject.getDn().getFirstRdn() + ")",Arrays.asList(uuidAttrName),SearchControls.OBJECT_SCOPE);
-    Attribute id=search.get(0).getAttributes().get(getConfig().getUuidAttributeName());
+    Attribute id=search.get(0).getAttributes().get(getConfig().getUuidLDAPAttributeName());
     if (id == null) {
       throw new ModelException("Could not retrieve identifier for entry [" + ldapObject.getDn().toString() + "].");
     }

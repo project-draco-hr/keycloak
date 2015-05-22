@@ -6,13 +6,16 @@
       logger.warnf("User with username [%s] already exists, but is not linked to provider [%s]",username,model.getDisplayName());
       return null;
     }
- else     if (isValid(user)) {
-      return proxy(user);
-    }
  else {
-      logger.warnf("User with username [%s] aready exists and is linked to provider [%s] but is not valid. Stale LDAP_ID on local user is: %s",username,model.getDisplayName(),user.getAttribute(LDAPConstants.LDAP_ID));
-      logger.warn("Will re-create user");
-      session.userStorage().removeUser(realm,user);
+      LDAPObject ldapObject=loadAndValidateUser(realm,user);
+      if (ldapObject != null) {
+        return proxy(realm,user,ldapObject);
+      }
+ else {
+        logger.warnf("User with username [%s] aready exists and is linked to provider [%s] but is not valid. Stale LDAP_ID on local user is: %s",username,model.getDisplayName(),user.getAttribute(LDAPConstants.LDAP_ID));
+        logger.warn("Will re-create user");
+        session.userStorage().removeUser(realm,user);
+      }
     }
   }
   logger.debugf("Kerberos authenticated user [%s] not in Keycloak storage. Creating him",username);

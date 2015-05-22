@@ -11,6 +11,6 @@
       throw new NotFoundException("Role not found");
     }
     user.grantRole(roleModel);
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,role.getId()).representation(roles).success();
   }
-  adminEvent.operation(OperationType.CREATE).resourcePath(user,realm,uriInfo.getPath()).representation(roles).success();
 }

@@ -1,0 +1,27 @@
+{
+  RoleContainerModel roleContainer=getTargetRoleContainer(mapperModel,realm);
+  if (role.getContainer().equals(roleContainer)) {
+    LDAPIdentityQuery ldapQuery=createRoleQuery(mapperModel,ldapProvider);
+    LDAPQueryConditionsBuilder conditionsBuilder=new LDAPQueryConditionsBuilder();
+    Condition roleNameCondition=conditionsBuilder.equal(new QueryParameter(getRoleNameLdapAttribute(mapperModel)),role.getName());
+    Condition membershipCondition=conditionsBuilder.equal(new QueryParameter(getMembershipLdapAttribute(mapperModel)),ldapUser.getDn().toString());
+    ldapQuery.where(roleNameCondition).where(membershipCondition);
+    LDAPObject ldapRole=ldapQuery.getFirstResult();
+    if (ldapRole == null) {
+      if (mode == Mode.READ_ONLY) {
+        super.deleteRoleMapping(role);
+      }
+    }
+ else {
+      if (mode == Mode.READ_ONLY) {
+        throw new ModelException("Not possible to delete LDAP role mappings as mapper mode is READ_ONLY");
+      }
+ else {
+        deleteRoleMappingInLDAP(mapperModel,ldapProvider,ldapUser,ldapRole);
+      }
+    }
+  }
+ else {
+    super.deleteRoleMapping(role);
+  }
+}

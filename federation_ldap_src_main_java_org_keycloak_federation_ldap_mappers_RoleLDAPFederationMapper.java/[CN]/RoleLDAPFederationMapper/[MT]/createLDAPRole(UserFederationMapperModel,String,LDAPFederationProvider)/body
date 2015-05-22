@@ -1,0 +1,13 @@
+{
+  LDAPObject ldapObject=new LDAPObject();
+  String roleNameAttribute=getRoleNameLdapAttribute(mapperModel);
+  ldapObject.setRdnAttributeName(roleNameAttribute);
+  ldapObject.setObjectClasses(getRoleObjectClasses(mapperModel));
+  ldapObject.setAttribute(roleNameAttribute,roleName);
+  LDAPDn roleDn=LDAPDn.fromString(getRolesDn(mapperModel));
+  roleDn.addToHead(roleNameAttribute,roleName);
+  ldapObject.setDn(roleDn);
+  logger.infof("Creating role to [%s] to LDAP with DN [%s]",roleName,roleDn.toString());
+  ldapProvider.getLdapIdentityStore().add(ldapObject);
+  return ldapObject;
+}

@@ -1,0 +1,13 @@
+{
+  LDAPObject ldapUser=loadLDAPUserByUsername(realm,local.getUsername());
+  if (ldapUser == null) {
+    return null;
+  }
+  if (ldapUser.getUuid().equals(local.getAttribute(LDAPConstants.LDAP_ID))) {
+    return ldapUser;
+  }
+ else {
+    logger.warnf("LDAP User invalid. ID doesn't match. ID from LDAP [%s], ID from local DB: [%s]",ldapUser.getUuid(),local.getAttribute(LDAPConstants.LDAP_ID));
+    return null;
+  }
+}

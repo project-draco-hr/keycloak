@@ -1,0 +1,11 @@
+{
+  StringBuilder filter=new StringBuilder();
+  for (  Condition condition : identityQuery.getConditions()) {
+    applyCondition(filter,condition);
+  }
+  filter.insert(0,"(&");
+  filter.append(getObjectClassesFilter(identityQuery.getObjectClasses()));
+  filter.append(")");
+  logger.infof("Using filter for LDAP search: %s",filter);
+  return filter;
+}

@@ -1,0 +1,22 @@
+{
+  UserFederationMapperModel mapperModel=new UserFederationMapperModel();
+  mapperModel.setName(name);
+  mapperModel.setFederationProviderId(federationProviderId);
+  mapperModel.setFederationMapperType(mapperType);
+  Map<String,String> configMap=new HashMap<String,String>();
+  String key=null;
+  for (  String configEntry : config) {
+    if (key == null) {
+      key=configEntry;
+    }
+ else {
+      configMap.put(key,configEntry);
+      key=null;
+    }
+  }
+  if (key != null) {
+    throw new IllegalStateException("Invalid count of arguments for config. Maybe mistake?");
+  }
+  mapperModel.setConfig(configMap);
+  return mapperModel;
+}

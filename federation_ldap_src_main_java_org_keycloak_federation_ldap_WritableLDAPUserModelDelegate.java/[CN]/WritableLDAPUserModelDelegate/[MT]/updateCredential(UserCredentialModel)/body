@@ -3,13 +3,10 @@
     delegate.updateCredential(cred);
     return;
   }
-  LDAPIdentityStore ldapIdentityStore=provider.getLdapIdentityStore();
-  LDAPUser ldapUser=LDAPUtils.getUser(ldapIdentityStore,delegate.getUsername());
-  if (ldapUser == null) {
-    throw new IllegalStateException("User " + delegate.getUsername() + " not found in LDAP storage!");
-  }
   if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
-    LDAPUtils.updatePassword(ldapIdentityStore,delegate,cred.getValue());
+    LDAPIdentityStore ldapIdentityStore=provider.getLdapIdentityStore();
+    String password=cred.getValue();
+    ldapIdentityStore.updatePassword(ldapObject,password);
   }
  else {
     logger.warnf("Don't know how to update credential of type [%s] for user [%s]",cred.getType(),delegate.getUsername());

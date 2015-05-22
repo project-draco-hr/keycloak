@@ -1,0 +1,10 @@
+{
+  LDAPIdentityQuery ldapQuery=new LDAPIdentityQuery(ldapProvider);
+  LDAPConfig config=ldapProvider.getLdapIdentityStore().getConfig();
+  ldapQuery.setSearchScope(config.getSearchScope());
+  ldapQuery.addSearchDns(config.getUserDns());
+  ldapQuery.addObjectClasses(config.getUserObjectClasses());
+  Set<UserFederationMapperModel> mapperModels=realm.getUserFederationMappers();
+  ldapQuery.addMappers(mapperModels);
+  return ldapQuery;
+}

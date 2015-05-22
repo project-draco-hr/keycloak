@@ -1,16 +1,7 @@
 {
   Set<IdentityProviderMapperModel> mappings=new HashSet<>();
   for (  IdentityProviderMapperEntity entity : this.realm.getIdentityProviderMappers()) {
-    IdentityProviderMapperModel mapping=new IdentityProviderMapperModel();
-    mapping.setId(entity.getId());
-    mapping.setName(entity.getName());
-    mapping.setIdentityProviderAlias(entity.getIdentityProviderAlias());
-    mapping.setIdentityProviderMapper(entity.getIdentityProviderMapper());
-    Map<String,String> config=new HashMap<String,String>();
-    if (entity.getConfig() != null) {
-      config.putAll(entity.getConfig());
-    }
-    mapping.setConfig(config);
+    IdentityProviderMapperModel mapping=entityToModel(entity);
     mappings.add(mapping);
   }
   return mappings;

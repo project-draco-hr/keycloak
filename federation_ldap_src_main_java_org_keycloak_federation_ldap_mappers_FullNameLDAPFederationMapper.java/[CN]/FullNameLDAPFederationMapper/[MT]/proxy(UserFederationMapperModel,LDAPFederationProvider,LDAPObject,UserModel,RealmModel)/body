@@ -1,0 +1,28 @@
+{
+  if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE && !isReadOnly(mapperModel)) {
+    TxAwareLDAPUserModelDelegate txDelegate=new TxAwareLDAPUserModelDelegate(delegate,ldapProvider,ldapUser){
+      @Override public void setFirstName(      String firstName){
+        super.setFirstName(firstName);
+        setFullNameToLDAPObject();
+      }
+      @Override public void setLastName(      String lastName){
+        super.setLastName(lastName);
+        setFullNameToLDAPObject();
+      }
+      private void setFullNameToLDAPObject(){
+        String fullName=getFullName(getFirstName(),getLastName());
+        if (logger.isTraceEnabled()) {
+          logger.tracef("Pushing full name attribute to LDAP. Full name: %s",fullName);
+        }
+        ensureTransactionStarted();
+        String ldapFullNameAttrName=getLdapFullNameAttrName(mapperModel);
+        ldapUser.setAttribute(ldapFullNameAttrName,fullName);
+      }
+    }
+;
+    return txDelegate;
+  }
+ else {
+    return delegate;
+  }
+}

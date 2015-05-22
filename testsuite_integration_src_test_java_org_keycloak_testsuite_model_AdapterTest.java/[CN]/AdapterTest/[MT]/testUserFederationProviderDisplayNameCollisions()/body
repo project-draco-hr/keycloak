@@ -1,0 +1,45 @@
+{
+  RealmModel realm=realmManager.createRealm("JUGGLER1");
+  Map<String,String> cfg=Collections.emptyMap();
+  realm.addUserFederationProvider("ldap",cfg,1,"providerName1",-1,-1,0);
+  realm.addUserFederationProvider("ldap",cfg,1,"providerName2",-1,-1,0);
+  commit();
+  try {
+    realmManager.getRealmByName("JUGGLER1").addUserFederationProvider("ldap",cfg,1,"providerName1",-1,-1,0);
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  commit(true);
+  try {
+    List<UserFederationProviderModel> fedProviders=realmManager.getRealmByName("JUGGLER1").getUserFederationProviders();
+    for (    UserFederationProviderModel fedProvider : fedProviders) {
+      if ("providerName1".equals(fedProvider.getDisplayName())) {
+        fedProvider.setDisplayName("providerName2");
+        realm.updateUserFederationProvider(fedProvider);
+        break;
+      }
+    }
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  commit(true);
+  try {
+    List<UserFederationProviderModel> fedProviders=realmManager.getRealmByName("JUGGLER1").getUserFederationProviders();
+    for (    UserFederationProviderModel fedProvider : fedProviders) {
+      if ("providerName1".equals(fedProvider.getDisplayName())) {
+        fedProvider.setDisplayName("providerName2");
+        break;
+      }
+    }
+    realm.setUserFederationProviders(fedProviders);
+    commit();
+    Assert.fail("Expected exception");
+  }
+ catch (  ModelDuplicateException e) {
+  }
+  commit(true);
+}

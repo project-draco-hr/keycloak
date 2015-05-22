@@ -1,0 +1,14 @@
+{
+  factory.register(new ProviderEventListener(){
+    @Override public void onEvent(    ProviderEvent event){
+      if (event instanceof RealmModel.UserFederationProviderCreationEvent) {
+        RealmModel.UserFederationProviderCreationEvent fedCreationEvent=(RealmModel.UserFederationProviderCreationEvent)event;
+        UserFederationProviderModel providerModel=fedCreationEvent.getCreatedFederationProvider();
+        if (providerModel.getProviderName().equals(getId())) {
+          onProviderModelCreated(fedCreationEvent.getRealm(),providerModel);
+        }
+      }
+    }
+  }
+);
+}

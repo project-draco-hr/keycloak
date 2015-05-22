@@ -1,0 +1,17 @@
+{
+  RoleContainerModel roleContainer=getTargetRoleContainer(mapperModel,realm);
+  if (roleContainer.equals(client)) {
+    Set<RoleModel> ldapRoleMappings=getLDAPRoleMappingsConverted(mapperModel,ldapProvider,ldapUser,roleContainer);
+    if (mode == Mode.LDAP_ONLY) {
+      return ldapRoleMappings;
+    }
+ else {
+      Set<RoleModel> modelRoleMappings=super.getClientRoleMappings(client);
+      ldapRoleMappings.addAll(modelRoleMappings);
+      return ldapRoleMappings;
+    }
+  }
+ else {
+    return super.getClientRoleMappings(client);
+  }
+}

@@ -1,4 +1,7 @@
 {
+  for (  UserFederationProviderModel currentProvider : providers) {
+    KeycloakModelUtils.ensureUniqueDisplayName(currentProvider.getDisplayName(),currentProvider,providers);
+  }
   Iterator<UserFederationProviderEntity> it=realm.getUserFederationProviders().iterator();
   while (it.hasNext()) {
     UserFederationProviderEntity entity=it.next();
@@ -38,8 +41,14 @@
   }
   for (  UserFederationProviderModel model : add) {
     UserFederationProviderEntity entity=new UserFederationProviderEntity();
-    if (model.getId() != null)     entity.setId(model.getId());
- else     entity.setId(KeycloakModelUtils.generateId());
+    if (model.getId() != null) {
+      entity.setId(model.getId());
+    }
+ else {
+      String id=KeycloakModelUtils.generateId();
+      entity.setId(id);
+      model.setId(id);
+    }
     entity.setConfig(model.getConfig());
     entity.setPriority(model.getPriority());
     entity.setProviderName(model.getProviderName());
@@ -54,5 +63,6 @@
     entity.setLastSync(model.getLastSync());
     em.persist(entity);
     realm.getUserFederationProviders().add(entity);
+    session.getKeycloakSessionFactory().publish(new UserFederationProviderCreationEventImpl(this,model));
   }
 }

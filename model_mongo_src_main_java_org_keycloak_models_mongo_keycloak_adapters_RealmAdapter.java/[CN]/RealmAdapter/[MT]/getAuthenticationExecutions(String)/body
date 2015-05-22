@@ -1,0 +1,11 @@
+{
+  AuthenticationFlowEntity flow=getFlowEntity(flowId);
+  if (flow == null)   return Collections.EMPTY_LIST;
+  List<AuthenticationExecutionEntity> queryResult=flow.getExecutions();
+  List<AuthenticationExecutionModel> executions=new LinkedList<>();
+  for (  AuthenticationExecutionEntity entity : queryResult) {
+    AuthenticationExecutionModel model=entityToModel(entity);
+    executions.add(model);
+  }
+  return executions;
+}

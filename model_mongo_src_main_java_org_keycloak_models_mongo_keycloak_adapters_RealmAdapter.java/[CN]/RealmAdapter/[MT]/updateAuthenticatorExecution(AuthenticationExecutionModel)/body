@@ -1,0 +1,16 @@
+{
+  AuthenticationExecutionEntity entity=null;
+  AuthenticationFlowEntity flow=getFlowEntity(model.getParentFlow());
+  for (  AuthenticationExecutionEntity exe : flow.getExecutions()) {
+    if (exe.getId().equals(model.getId())) {
+      entity=exe;
+    }
+  }
+  if (entity == null)   return;
+  entity.setAutheticatorFlow(model.isAutheticatorFlow());
+  entity.setAuthenticator(model.getAuthenticator());
+  entity.setPriority(model.getPriority());
+  entity.setRequirement(model.getRequirement());
+  entity.setUserSetupAllowed(model.isUserSetupAllowed());
+  updateMongoEntity();
+}

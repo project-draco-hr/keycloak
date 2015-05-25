@@ -1,0 +1,28 @@
+{
+  this.auth.requireView();
+  KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+  Map<String,UserFederationMapperTypeRepresentation> types=new HashMap<>();
+  List<ProviderFactory> factories=sessionFactory.getProviderFactories(UserFederationMapper.class);
+  for (  ProviderFactory factory : factories) {
+    UserFederationMapperFactory mapperFactory=(UserFederationMapperFactory)factory;
+    if (mapperFactory.getFederationProviderType().equals(this.federationProviderModel.getProviderName())) {
+      UserFederationMapperTypeRepresentation rep=new UserFederationMapperTypeRepresentation();
+      rep.setId(mapperFactory.getId());
+      rep.setCategory(mapperFactory.getDisplayCategory());
+      rep.setName(mapperFactory.getDisplayType());
+      rep.setHelpText(mapperFactory.getHelpText());
+      List<ProviderConfigProperty> configProperties=mapperFactory.getConfigProperties(realm);
+      for (      ProviderConfigProperty prop : configProperties) {
+        ConfigPropertyRepresentation propRep=new ConfigPropertyRepresentation();
+        propRep.setName(prop.getName());
+        propRep.setLabel(prop.getLabel());
+        propRep.setType(prop.getType());
+        propRep.setDefaultValue(prop.getDefaultValue());
+        propRep.setHelpText(prop.getHelpText());
+        rep.getProperties().add(propRep);
+      }
+      types.put(rep.getId(),rep);
+    }
+  }
+  return types;
+}

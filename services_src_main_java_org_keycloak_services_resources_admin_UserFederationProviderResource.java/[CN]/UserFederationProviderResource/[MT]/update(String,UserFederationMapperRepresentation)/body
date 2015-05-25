@@ -1,0 +1,9 @@
+{
+  auth.requireManage();
+  UserFederationMapperModel model=realm.getUserFederationMapperById(id);
+  if (model == null)   throw new NotFoundException("Model not found");
+  model=RepresentationToModel.toModel(realm,rep);
+  validateModel(model);
+  realm.updateUserFederationMapper(model);
+  adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();
+}

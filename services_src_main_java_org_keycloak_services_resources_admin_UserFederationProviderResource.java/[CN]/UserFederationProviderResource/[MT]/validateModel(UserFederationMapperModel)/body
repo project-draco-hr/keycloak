@@ -1,0 +1,9 @@
+{
+  try {
+    UserFederationMapperFactory mapperFactory=(UserFederationMapperFactory)session.getKeycloakSessionFactory().getProviderFactory(UserFederationMapper.class,model.getFederationMapperType());
+    mapperFactory.validateConfig(model);
+  }
+ catch (  MapperConfigValidationException ex) {
+    throw new ErrorResponseException("Validation error",ex.getMessage(),Response.Status.BAD_REQUEST);
+  }
+}

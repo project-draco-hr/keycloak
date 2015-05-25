@@ -1,0 +1,15 @@
+{
+  auth.requireManage();
+  String displayName=rep.getDisplayName();
+  if (displayName != null && displayName.trim().equals("")) {
+    displayName=null;
+  }
+  UserFederationProviderModel model=new UserFederationProviderModel(rep.getId(),rep.getProviderName(),rep.getConfig(),rep.getPriority(),displayName,rep.getFullSyncPeriod(),rep.getChangedSyncPeriod(),rep.getLastSync());
+  realm.updateUserFederationProvider(model);
+  new UsersSyncManager().refreshPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),model,realm.getId());
+  boolean kerberosCredsAdded=KeycloakModelUtils.checkKerberosCredential(realm,model);
+  if (kerberosCredsAdded) {
+    logger.info("Added 'kerberos' to required realm credentials");
+  }
+  adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();
+}

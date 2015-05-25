@@ -1,0 +1,10 @@
+{
+  this.auth.requireView();
+  UserFederationProviderModel model=KeycloakModelUtils.findUserFederationProviderById(id,realm);
+  if (model == null) {
+    throw new NotFoundException("Could not find federation provider with id: " + id);
+  }
+  UserFederationProviderResource instanceResource=new UserFederationProviderResource(session,realm,this.auth,model,adminEvent);
+  ResteasyProviderFactory.getInstance().injectProperties(instanceResource);
+  return instanceResource;
+}

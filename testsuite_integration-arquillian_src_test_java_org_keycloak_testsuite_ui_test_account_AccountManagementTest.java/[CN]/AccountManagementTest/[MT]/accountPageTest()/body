@@ -1,0 +1,16 @@
+{
+  page.account();
+  Account adminAccount=accountPage.getAccount();
+  assertEquals(adminAccount.getUsername(),USERNAME);
+  adminAccount.setEmail("a@b");
+  adminAccount.setFirstName("John");
+  adminAccount.setLastName("Smith");
+  accountPage.setAccount(adminAccount);
+  accountPage.save();
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isSuccess());
+  page.signOut();
+  loginPage.login(USERNAME,ADMIN_PSSWD);
+  page.account();
+  assertEquals(adminAccount,accountPage.getAccount());
+}

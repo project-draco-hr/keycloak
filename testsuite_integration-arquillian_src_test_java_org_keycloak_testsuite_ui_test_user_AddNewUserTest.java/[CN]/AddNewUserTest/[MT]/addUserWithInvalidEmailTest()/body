@@ -1,0 +1,10 @@
+{
+  String testUsername="testUserInvEmail";
+  String invalidEmail="user.redhat.com";
+  User testUser=new User(testUsername,"pass",invalidEmail);
+  page.addUser(testUser);
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isDanger());
+  navigation.users();
+  assertNull(page.findUser(testUsername));
+}

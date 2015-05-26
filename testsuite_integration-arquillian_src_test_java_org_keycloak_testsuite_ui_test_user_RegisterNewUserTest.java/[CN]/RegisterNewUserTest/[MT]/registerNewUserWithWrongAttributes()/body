@@ -1,0 +1,25 @@
+{
+  User testUser=new User();
+  page.registerNewUser(testUser);
+  assertFalse(page.isAttributeSpecified("first name"));
+  testUser.setFirstName("name");
+  page.registerNewUser(testUser);
+  assertFalse(page.isAttributeSpecified("last name"));
+  testUser.setLastName("surname");
+  page.registerNewUser(testUser);
+  assertFalse(page.isAttributeSpecified("email"));
+  testUser.setEmail("mail@redhat.com");
+  page.registerNewUser(testUser);
+  assertFalse(page.isAttributeSpecified("username"));
+  testUser.setUserName("user");
+  page.registerNewUser(testUser);
+  assertFalse(page.isAttributeSpecified("password"));
+  testUser.setPassword("password");
+  page.registerNewUser(testUser);
+  logOut();
+  loginAsAdmin();
+  navigation.users();
+  userPage.deleteUser(TEST_USER1.getUserName());
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isSuccess());
+}

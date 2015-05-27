@@ -1,0 +1,15 @@
+{
+  switchEditUsernameAllowedOn();
+  createUser();
+  try {
+    UserResource user=realm.users().get("user1");
+    UserRepresentation userRep=user.toRepresentation();
+    userRep.setUsername("user1");
+    user.update(userRep);
+    realm.users().get("user11").toRepresentation();
+    fail("Expected failure");
+  }
+ catch (  ClientErrorException e) {
+    assertEquals(404,e.getResponse().getStatus());
+  }
+}

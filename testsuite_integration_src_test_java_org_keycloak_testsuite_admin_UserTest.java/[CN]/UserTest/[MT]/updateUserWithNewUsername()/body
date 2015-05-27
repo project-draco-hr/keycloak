@@ -1,0 +1,10 @@
+{
+  switchEditUsernameAllowedOn();
+  String id=createUser();
+  UserResource user=realm.users().get(id);
+  UserRepresentation userRep=user.toRepresentation();
+  userRep.setUsername("user11");
+  user.update(userRep);
+  userRep=realm.users().get(id).toRepresentation();
+  assertEquals("user11",userRep.getUsername());
+}

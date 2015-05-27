@@ -2,9 +2,9 @@
   event.event(EventType.LOGOUT);
   SAMLDocumentHolder holder=extractResponseDocument(samlResponse);
   StatusResponseType statusResponse=(StatusResponseType)holder.getSamlObject();
-  if (!uriInfo.getAbsolutePath().toString().equals(statusResponse.getDestination())) {
-    event.error(Errors.INVALID_SAML_LOGOUT_RESPONSE);
+  if (statusResponse.getDestination() != null && !uriInfo.getAbsolutePath().toString().equals(statusResponse.getDestination())) {
     event.detail(Details.REASON,"invalid_destination");
+    event.error(Errors.INVALID_SAML_LOGOUT_RESPONSE);
     return ErrorPage.error(session,Messages.INVALID_REQUEST);
   }
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers,false);

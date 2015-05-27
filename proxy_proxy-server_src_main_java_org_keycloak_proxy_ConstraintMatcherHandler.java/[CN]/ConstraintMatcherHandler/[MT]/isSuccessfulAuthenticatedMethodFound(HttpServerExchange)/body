@@ -1,0 +1,11 @@
+{
+  boolean successfulAuthenticatedMethodFound=false;
+  List<AuthenticationMechanism> authenticationMechanisms=exchange.getSecurityContext().getAuthenticationMechanisms();
+  for (  AuthenticationMechanism authenticationMechanism : authenticationMechanisms) {
+    AuthenticationMechanism.AuthenticationMechanismOutcome authenticationMechanismOutcome=authenticationMechanism.authenticate(exchange,exchange.getSecurityContext());
+    if (authenticationMechanismOutcome.equals(AuthenticationMechanism.AuthenticationMechanismOutcome.AUTHENTICATED)) {
+      successfulAuthenticatedMethodFound=true;
+    }
+  }
+  return successfulAuthenticatedMethodFound;
+}

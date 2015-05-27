@@ -1,65 +1,9 @@
 {
   UserModel authUser=clientSession.getAuthenticatedUser();
   validateUser(authUser);
-  Response challenge=null;
-  Map<String,UserSessionModel.AuthenticatorStatus> previousAttempts=clientSession.getAuthenticators();
-  for (  AuthenticationExecutionModel model : executions) {
-    UserSessionModel.AuthenticatorStatus oldStatus=previousAttempts.get(model.getId());
-    if (isProcessed(oldStatus))     continue;
-    AuthenticatorModel authenticatorModel=realm.getAuthenticatorById(model.getAuthenticator());
-    AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,authenticatorModel.getProviderId());
-    Authenticator authenticator=factory.create(authenticatorModel);
-    if (authenticator.requiresUser() && authUser == null) {
-      if (authenticator.requiresUser()) {
-        if (challenge != null)         return challenge;
-        throw new AuthException(Error.UNKNOWN_USER);
-      }
-    }
-    if (authUser != null && model.getRequirement() == AuthenticationExecutionModel.Requirement.ALTERNATIVE) {
-      clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SKIPPED);
-      continue;
-    }
-    authUser=clientSession.getAuthenticatedUser();
-    if (authenticator.requiresUser() && authUser != null && !authenticator.configuredFor(authUser)) {
-      if (model.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
-        if (model.isUserSetupAllowed()) {
-          clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SETUP_REQUIRED);
-          authUser.addRequiredAction(authenticator.getRequiredAction());
-        }
- else {
-          throw new AuthException(Error.CREDENTIAL_SETUP_REQUIRED);
-        }
-      }
-      continue;
-    }
-    Result context=new Result(authenticatorModel,authenticator);
-    authenticator.authenticate(context);
-    Status result=context.getStatus();
-    if (result == Status.SUCCESS) {
-      clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SUCCESS);
-      continue;
-    }
- else     if (result == Status.FAILED) {
-      if (context.challenge != null)       return context.challenge;
-      throw new AuthException(context.error);
-    }
- else     if (result == Status.CHALLENGE) {
-      if (model.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED)       return context.challenge;
-      if (challenge != null)       challenge=context.challenge;
-      continue;
-    }
- else     if (result == Status.FAILURE_CHALLENGE) {
-      logUserFailure();
-      return context.challenge;
-    }
- else     if (result == Status.ATTEMPTED) {
-      if (model.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED)       throw new AuthException(Error.INVALID_CREDENTIALS);
-      clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.ATTEMPTED);
-      continue;
-    }
-  }
-  if (authUser == null) {
-    if (challenge != null)     return challenge;
+  Response challenge=processFlow(flowId);
+  if (challenge != null)   return challenge;
+  if (clientSession.getAuthenticatedUser() == null) {
     throw new AuthException(Error.UNKNOWN_USER);
   }
   return authenticationComplete();

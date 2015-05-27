@@ -1,0 +1,14 @@
+{
+  logger.debug("Syncing users");
+  auth.requireManage();
+  UsersSyncManager syncManager=new UsersSyncManager();
+  UserFederationSyncResult syncResult=null;
+  if ("triggerFullSync".equals(action)) {
+    syncResult=syncManager.syncAllUsers(session.getKeycloakSessionFactory(),realm.getId(),this.federationProviderModel);
+  }
+ else   if ("triggerChangedUsersSync".equals(action)) {
+    syncResult=syncManager.syncChangedUsers(session.getKeycloakSessionFactory(),realm.getId(),this.federationProviderModel);
+  }
+  adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).success();
+  return syncResult;
+}

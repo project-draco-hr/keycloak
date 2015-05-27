@@ -1,0 +1,11 @@
+{
+  checkMandatoryConfigAttribute(RoleLDAPFederationMapper.ROLES_DN,"LDAP Roles DN",mapperModel);
+  String realmMappings=mapperModel.getConfig().get(RoleLDAPFederationMapper.USE_REALM_ROLES_MAPPING);
+  boolean useRealmMappings=Boolean.parseBoolean(realmMappings);
+  if (!useRealmMappings) {
+    String clientId=mapperModel.getConfig().get(RoleLDAPFederationMapper.CLIENT_ID);
+    if (clientId == null || clientId.trim().isEmpty()) {
+      throw new MapperConfigValidationException("Client ID needs to be provided in config when Realm Roles Mapping is not used");
+    }
+  }
+}

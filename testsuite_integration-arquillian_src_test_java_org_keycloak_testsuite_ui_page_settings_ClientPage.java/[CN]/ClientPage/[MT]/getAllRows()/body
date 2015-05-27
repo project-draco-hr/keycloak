@@ -1,0 +1,16 @@
+{
+  List<Client> rows=new ArrayList<Client>();
+  List<WebElement> allRows=dataTable.findElements(cssSelector("tbody tr"));
+  if (allRows.size() > 1) {
+    for (    WebElement rowElement : allRows) {
+      if (rowElement.isDisplayed()) {
+        Client client=new Client();
+        List<WebElement> tds=rowElement.findElements(tagName("td"));
+        client.setClientId(tds.get(0).getText());
+        client.setUri(tds.get(2).getText());
+        rows.add(client);
+      }
+    }
+  }
+  return rows;
+}

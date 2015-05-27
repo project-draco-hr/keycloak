@@ -1,0 +1,18 @@
+{
+  String testUsername="test_duplicated_user";
+  User testUser=new User(testUsername);
+  page.addUser(testUser);
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isSuccess());
+  navigation.users();
+  assertNotNull(page.findUser(testUsername));
+  User testUser2=new User(testUsername);
+  page.addUser(testUser2);
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isDanger());
+  navigation.users();
+  page.deleteUser(testUsername);
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isSuccess());
+  assertNull(page.findUser(testUser2.getUserName()));
+}

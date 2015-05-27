@@ -1,0 +1,11 @@
+{
+  page.registerNewUser(TEST_USER1,"psswd");
+  assertFalse(page.isPasswordSame());
+  page.registerNewUser(TEST_USER1);
+  logOut();
+  loginAsAdmin();
+  navigation.users();
+  userPage.deleteUser(TEST_USER1.getUserName());
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isSuccess());
+}

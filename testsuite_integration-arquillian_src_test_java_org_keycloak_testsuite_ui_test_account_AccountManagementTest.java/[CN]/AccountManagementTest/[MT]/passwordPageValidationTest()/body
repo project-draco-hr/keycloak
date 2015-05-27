@@ -1,0 +1,16 @@
+{
+  page.password();
+  passwordPage.save();
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isError());
+  passwordPage.setPassword(WRONG_PASSWORD,NEW_PASSWORD);
+  passwordPage.save();
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isError());
+  passwordPage.setOldPasswordField(ADMIN_PSSWD);
+  passwordPage.setNewPasswordField("something");
+  passwordPage.setConfirmField("something else");
+  passwordPage.save();
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isError());
+}

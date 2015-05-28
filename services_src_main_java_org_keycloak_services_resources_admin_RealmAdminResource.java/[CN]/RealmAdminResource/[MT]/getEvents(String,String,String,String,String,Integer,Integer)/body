@@ -17,10 +17,26 @@
     query.user(user);
   }
   if (dateFrom != null) {
-    query.fromDate(dateFrom);
+    SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");
+    Date from=null;
+    try {
+      from=df.parse(dateFrom);
+    }
+ catch (    ParseException e) {
+      throw new BadRequestException("Invalid value for 'Date(From)', excepted format is yyyy-MM-dd");
+    }
+    query.fromDate(from);
   }
   if (dateTo != null) {
-    query.toDate(dateTo);
+    SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");
+    Date to=null;
+    try {
+      to=df.parse(dateTo);
+    }
+ catch (    ParseException e) {
+      throw new BadRequestException("Invalid value for 'Date(To)', excepted format is yyyy-MM-dd");
+    }
+    query.toDate(to);
   }
   if (ipAddress != null) {
     query.ipAddress(ipAddress);

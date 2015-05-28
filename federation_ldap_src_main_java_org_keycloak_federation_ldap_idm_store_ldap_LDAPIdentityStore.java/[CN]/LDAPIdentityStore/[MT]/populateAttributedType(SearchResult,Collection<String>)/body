@@ -10,7 +10,7 @@
       logger.tracef("Populating LDAP Object from DN [%s]",entryDN);
     }
     NamingEnumeration<? extends Attribute> ldapAttributes=attributes.getAll();
-    List<String> uppercasedReadOnlyAttrNames=new ArrayList<String>();
+    List<String> uppercasedReadOnlyAttrNames=new ArrayList<>();
     for (    String readonlyAttr : readOnlyAttrNames) {
       uppercasedReadOnlyAttrNames.add(readonlyAttr.toUpperCase());
     }
@@ -28,11 +28,11 @@
         ldapObject.setUuid(this.operationManager.decodeEntryUUID(uuidValue));
       }
  else {
-        Set<String> attrValues=new TreeSet<String>();
+        Set<String> attrValues=new TreeSet<>();
         NamingEnumeration<?> enumm=ldapAttribute.getAll();
         while (enumm.hasMoreElements()) {
-          String objectClass=enumm.next().toString();
-          attrValues.add(objectClass);
+          String attrVal=enumm.next().toString();
+          attrValues.add(attrVal);
         }
         if (ldapAttributeName.toLowerCase().equals(LDAPConstants.OBJECT_CLASS)) {
           ldapObject.setObjectClasses(attrValues);

@@ -5,7 +5,7 @@
   }
   UserModel imported=session.userStorage().addUser(realm,ldapUsername);
   imported.setEnabled(true);
-  Set<UserFederationMapperModel> federationMappers=realm.getUserFederationMappers();
+  Set<UserFederationMapperModel> federationMappers=realm.getUserFederationMappersByFederationProvider(getModel().getId());
   for (  UserFederationMapperModel mapperModel : federationMappers) {
     LDAPFederationMapper ldapMapper=getMapper(mapperModel);
     ldapMapper.onImportUserFromLDAP(mapperModel,this,ldapUser,imported,realm,true);

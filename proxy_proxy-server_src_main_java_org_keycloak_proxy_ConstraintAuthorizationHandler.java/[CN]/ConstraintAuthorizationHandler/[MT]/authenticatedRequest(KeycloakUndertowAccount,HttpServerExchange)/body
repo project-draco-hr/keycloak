@@ -3,19 +3,19 @@
     IDToken idToken=account.getKeycloakSecurityContext().getToken();
     if (idToken == null)     return;
     if (idToken.getSubject() != null) {
-      exchange.getRequestHeaders().put(httpHeaderNames.get("KEYCLOAK_SUBJECT"),idToken.getSubject());
+      exchange.getRequestHeaders().put(httpHeaderNames.get(KEYCLOAK_SUBJECT),idToken.getSubject());
     }
     if (idToken.getPreferredUsername() != null) {
-      exchange.getRequestHeaders().put(httpHeaderNames.get("KEYCLOAK_USERNAME"),idToken.getPreferredUsername());
+      exchange.getRequestHeaders().put(httpHeaderNames.get(KEYCLOAK_USERNAME),idToken.getPreferredUsername());
     }
     if (idToken.getEmail() != null) {
-      exchange.getRequestHeaders().put(httpHeaderNames.get("KEYCLOAK_EMAIL"),idToken.getEmail());
+      exchange.getRequestHeaders().put(httpHeaderNames.get(KEYCLOAK_EMAIL),idToken.getEmail());
     }
     if (idToken.getName() != null) {
-      exchange.getRequestHeaders().put(httpHeaderNames.get("KEYCLOAK_NAME"),idToken.getName());
+      exchange.getRequestHeaders().put(httpHeaderNames.get(KEYCLOAK_NAME),idToken.getName());
     }
     if (sendAccessToken) {
-      exchange.getRequestHeaders().put(httpHeaderNames.get("KEYCLOAK_ACCESS_TOKEN"),account.getKeycloakSecurityContext().getTokenString());
+      exchange.getRequestHeaders().put(httpHeaderNames.get(KEYCLOAK_ACCESS_TOKEN),account.getKeycloakSecurityContext().getTokenString());
     }
   }
   next.handleRequest(exchange);

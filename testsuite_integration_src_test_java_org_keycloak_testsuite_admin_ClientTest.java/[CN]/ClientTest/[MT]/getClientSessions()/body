@@ -4,7 +4,7 @@
   OAuthClient.AuthorizationCodeResponse codeResponse=oauth.doLogin("test-user@localhost","password");
   OAuthClient.AccessTokenResponse response2=oauth.doAccessTokenRequest(codeResponse.getCode(),"password");
   assertEquals(200,response2.getStatusCode());
-  ClientResource app=keycloak.realm("test").clients().get("test-app");
+  ClientResource app=ApiUtil.findClientByClientId(keycloak.realm("test"),"test-app");
   assertEquals(2,(long)app.getApplicationSessionCount().get("count"));
   List<UserSessionRepresentation> userSessions=app.getUserSessions(0,100);
   assertEquals(2,userSessions.size());

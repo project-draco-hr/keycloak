@@ -3,7 +3,7 @@
   try {
     ClientModel clientModel=RepresentationToModel.createClient(session,realm,rep,true);
     adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,clientModel.getId()).representation(rep).success();
-    return Response.created(uriInfo.getAbsolutePathBuilder().path(getClientPath(clientModel)).build()).build();
+    return Response.created(uriInfo.getAbsolutePathBuilder().path(clientModel.getId()).build()).build();
   }
  catch (  ModelDuplicateException e) {
     return ErrorResponse.exists("Client " + rep.getClientId() + " already exists");

@@ -1,12 +1,8 @@
 {
   createUser();
-  try {
-    UserRepresentation user=new UserRepresentation();
-    user.setUsername("User1");
-    realm.users().create(user);
-    fail("Expected failure");
-  }
- catch (  ClientErrorException e) {
-    assertEquals(409,e.getResponse().getStatus());
-  }
+  UserRepresentation user=new UserRepresentation();
+  user.setUsername("User1");
+  Response response=realm.users().create(user);
+  assertEquals(409,response.getStatus());
+  response.close();
 }

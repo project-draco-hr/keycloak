@@ -1,14 +1,14 @@
 {
   addSampleIdentityProvider();
-  createUser();
-  UserResource user=realm.users().get("user1");
+  String id=createUser();
+  UserResource user=realm.users().get(id);
   assertEquals(0,user.getFederatedIdentity().size());
   FederatedIdentityRepresentation link=new FederatedIdentityRepresentation();
   link.setUserId("social-user-id");
   link.setUserName("social-username");
   Response response=user.addFederatedIdentity("social-provider-id",link);
   assertEquals(204,response.getStatus());
-  user=realm.users().get("user1");
+  user=realm.users().get(id);
   List<FederatedIdentityRepresentation> federatedIdentities=user.getFederatedIdentity();
   assertEquals(1,federatedIdentities.size());
   link=federatedIdentities.get(0);

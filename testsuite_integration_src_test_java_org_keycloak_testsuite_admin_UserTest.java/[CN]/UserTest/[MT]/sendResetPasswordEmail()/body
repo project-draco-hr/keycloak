@@ -1,8 +1,10 @@
 {
   UserRepresentation userRep=new UserRepresentation();
   userRep.setUsername("user1");
-  realm.users().create(userRep);
-  UserResource user=realm.users().get("user1");
+  Response response=realm.users().create(userRep);
+  String id=ApiUtil.getCreatedId(response);
+  response.close();
+  UserResource user=realm.users().get(id);
   try {
     user.resetPasswordEmail();
     fail("Expected failure");

@@ -1,7 +1,12 @@
 {
-  addRequiredAction();
-  UserResource user=realm.users().get("user1");
+  String id=createUser();
+  UserResource user=realm.users().get(id);
+  assertTrue(user.toRepresentation().getRequiredActions().isEmpty());
   UserRepresentation userRep=user.toRepresentation();
+  userRep.getRequiredActions().add("UPDATE_PASSWORD");
+  user.update(userRep);
+  user=realm.users().get(id);
+  userRep=user.toRepresentation();
   userRep.getRequiredActions().clear();
   user.update(userRep);
   assertTrue(user.toRepresentation().getRequiredActions().isEmpty());

@@ -13,20 +13,19 @@
   pageSource=driver.getPageSource();
   System.out.println(pageSource);
   Assert.assertTrue(pageSource.contains("iPhone") && pageSource.contains("iPad"));
-  String adminToken=createAdminToken();
-  Client client=ClientBuilder.newClient();
-  UriBuilder authBase=UriBuilder.fromUri(AUTH_SERVER_URL);
-  WebTarget adminTarget=client.target(AdminRoot.realmsUrl(authBase)).path("demo");
-  Map<String,Integer> stats=adminTarget.path("client-session-stats").request().header(HttpHeaders.AUTHORIZATION,"Bearer " + adminToken).get(new GenericType<Map<String,Integer>>(){
+  List<Map<String,String>> stats=Keycloak.getInstance("http://localhost:8081/auth","master","admin","admin","security-admin-console").realm("demo").getClientSessionStats();
+  Map<String,String> customerPortalStats=null;
+  Map<String,String> productPortalStats=null;
+  for (  Map<String,String> s : stats) {
+    if (s.get("clientId").equals("customer-portal")) {
+      customerPortalStats=s;
+    }
+ else     if (s.get("clientId").equals("product-portal")) {
+      productPortalStats=s;
+    }
   }
-);
-  Integer custSessionsCount=stats.get("customer-portal");
-  Assert.assertNotNull(custSessionsCount);
-  Assert.assertEquals(1,custSessionsCount.intValue());
-  Integer prodStatsCount=stats.get("product-portal");
-  Assert.assertNotNull(prodStatsCount);
-  Assert.assertTrue(1 == prodStatsCount);
-  client.close();
+  Assert.assertEquals(1,Integer.parseInt(customerPortalStats.get("active")));
+  Assert.assertEquals(1,Integer.parseInt(productPortalStats.get("active")));
   String logoutUri=OIDCLoginProtocolService.logoutUrl(UriBuilder.fromUri(AUTH_SERVER_URL)).queryParam(OAuth2Constants.REDIRECT_URI,APP_SERVER_BASE_URL + "/customer-portal").build("demo").toString();
   driver.navigate().to(logoutUri);
   Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));

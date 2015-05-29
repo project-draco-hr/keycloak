@@ -2,13 +2,15 @@
   ClientRepresentation rep=new ClientRepresentation();
   rep.setClientId("my-app");
   rep.setEnabled(true);
-  realm.clients().create(rep);
+  Response response=realm.clients().create(rep);
+  response.close();
+  String id=ApiUtil.getCreatedId(response);
   RoleRepresentation role=new RoleRepresentation("test","test");
-  realm.clients().get("my-app").roles().create(role);
-  rep=realm.clients().get("my-app").toRepresentation();
+  realm.clients().get(id).roles().create(role);
+  rep=realm.clients().get(id).toRepresentation();
   rep.setDefaultRoles(new String[]{"test"});
-  realm.clients().get("my-app").update(rep);
-  assertArrayEquals(new String[]{"test"},realm.clients().get("my-app").toRepresentation().getDefaultRoles());
-  realm.clients().get("my-app").roles().deleteRole("test");
-  assertNull(realm.clients().get("my-app").toRepresentation().getDefaultRoles());
+  realm.clients().get(id).update(rep);
+  assertArrayEquals(new String[]{"test"},realm.clients().get(id).toRepresentation().getDefaultRoles());
+  realm.clients().get(id).roles().deleteRole("test");
+  assertNull(realm.clients().get(id).toRepresentation().getDefaultRoles());
 }

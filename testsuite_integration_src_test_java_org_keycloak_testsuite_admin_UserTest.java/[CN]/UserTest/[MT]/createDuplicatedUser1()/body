@@ -1,14 +1,10 @@
 {
   createUser();
-  try {
-    UserRepresentation user=new UserRepresentation();
-    user.setUsername("user1");
-    realm.users().create(user);
-    fail("Expected failure");
-  }
- catch (  ClientErrorException e) {
-    assertEquals(409,e.getResponse().getStatus());
-    ErrorRepresentation error=e.getResponse().readEntity(ErrorRepresentation.class);
-    Assert.assertEquals("User exists with same username",error.getErrorMessage());
-  }
+  UserRepresentation user=new UserRepresentation();
+  user.setUsername("user1");
+  Response response=realm.users().create(user);
+  assertEquals(409,response.getStatus());
+  ErrorRepresentation error=response.readEntity(ErrorRepresentation.class);
+  Assert.assertEquals("User exists with same username",error.getErrorMessage());
+  response.close();
 }

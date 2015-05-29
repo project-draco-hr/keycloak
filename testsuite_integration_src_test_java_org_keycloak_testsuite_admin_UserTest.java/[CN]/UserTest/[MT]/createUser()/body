@@ -2,5 +2,8 @@
   UserRepresentation user=new UserRepresentation();
   user.setUsername("user1");
   user.setEmail("user1@localhost");
-  realm.users().create(user);
+  Response response=realm.users().create(user);
+  String createdId=ApiUtil.getCreatedId(response);
+  response.close();
+  return createdId;
 }

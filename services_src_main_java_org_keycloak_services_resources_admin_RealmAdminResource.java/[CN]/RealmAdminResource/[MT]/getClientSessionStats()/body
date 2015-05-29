@@ -1,10 +1,14 @@
 {
   auth.requireView();
-  Map<String,Integer> stats=new HashMap<String,Integer>();
+  List<Map<String,String>> data=new LinkedList<Map<String,String>>();
   for (  ClientModel client : realm.getClients()) {
     int size=session.sessions().getActiveUserSessions(client.getRealm(),client);
     if (size == 0)     continue;
-    stats.put(client.getClientId(),size);
+    Map<String,String> map=new HashMap<String,String>();
+    map.put("id",client.getId());
+    map.put("clientId",client.getClientId());
+    map.put("active",size + "");
+    data.add(map);
   }
-  return stats;
+  return data;
 }

@@ -7,8 +7,23 @@
     Properties rb=theme.getMessages(locale);
     attributes.put("msg",new MessageFormatterMethod(locale,rb));
     String subject=new MessageFormat(rb.getProperty(subjectKey,subjectKey),locale).format(new Object[0]);
-    String body=freeMarker.processTemplate(attributes,template,theme);
-    send(subject,body);
+    String textTemplate=String.format("text/%s",template);
+    String textBody;
+    try {
+      textBody=freeMarker.processTemplate(attributes,textTemplate,theme);
+    }
+ catch (    final FreeMarkerException e) {
+      textBody=null;
+    }
+    String htmlTemplate=String.format("html/%s",template);
+    String htmlBody;
+    try {
+      htmlBody=freeMarker.processTemplate(attributes,htmlTemplate,theme);
+    }
+ catch (    final FreeMarkerException e) {
+      htmlBody=null;
+    }
+    send(subject,textBody,htmlBody);
   }
  catch (  Exception e) {
     throw new EmailException("Failed to template email",e);

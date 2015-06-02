@@ -22,11 +22,22 @@
     }
     String from=config.get("from");
     Session session=Session.getInstance(props);
+    Multipart multipart=new MimeMultipart("alternative");
+    if (textBody != null) {
+      MimeBodyPart textPart=new MimeBodyPart();
+      textPart.setText(textBody,"UTF-8");
+      multipart.addBodyPart(textPart);
+    }
+    if (htmlBody != null) {
+      MimeBodyPart htmlPart=new MimeBodyPart();
+      htmlPart.setContent(htmlBody,"text/html; charset=UTF-8");
+      multipart.addBodyPart(htmlPart);
+    }
     Message msg=new MimeMessage(session);
     msg.setFrom(new InternetAddress(from));
     msg.setHeader("To",address);
     msg.setSubject(subject);
-    msg.setText(body);
+    msg.setContent(multipart);
     msg.saveChanges();
     msg.setSentDate(new Date());
     Transport transport=session.getTransport("smtp");

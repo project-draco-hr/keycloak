@@ -1,8 +1,13 @@
 {
+  UserModel managed=managedUsers.get(user.getId());
+  if (managed != null) {
+    return managed;
+  }
   UserFederationProvider link=getFederationLink(realm,user);
   if (link != null) {
     UserModel validatedProxyUser=link.validateAndProxy(realm,user);
     if (validatedProxyUser != null) {
+      managedUsers.put(user.getId(),user);
       return validatedProxyUser;
     }
  else {

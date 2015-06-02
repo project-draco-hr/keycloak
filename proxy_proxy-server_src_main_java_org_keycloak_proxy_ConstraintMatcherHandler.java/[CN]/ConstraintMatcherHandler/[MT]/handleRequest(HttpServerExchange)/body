@@ -18,6 +18,18 @@
     }
     return;
   }
+  if (match.getRequiredRoles().isEmpty() && match.getEmptyRoleSemantic() == SecurityInfo.EmptyRoleSemantic.PERMIT_AND_INJECT_IF_AUTHENTICATED) {
+    boolean successfulAuthenticatedMethodFound=isSuccessfulAuthenticatedMethodFound(exchange);
+    if (successfulAuthenticatedMethodFound) {
+      exchange.putAttachment(CONSTRAINT_KEY,match);
+      securedHandler.handleRequest(exchange);
+      return;
+    }
+ else {
+      unsecuredHandler.handleRequest(exchange);
+      return;
+    }
+  }
   log.debug("found constraint");
   exchange.getSecurityContext().setAuthenticationRequired();
   exchange.putAttachment(CONSTRAINT_KEY,match);

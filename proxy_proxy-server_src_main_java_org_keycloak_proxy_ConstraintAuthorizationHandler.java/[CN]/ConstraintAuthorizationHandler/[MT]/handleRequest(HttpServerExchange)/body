@@ -6,10 +6,16 @@
     return;
   }
   if (match != null) {
-    for (    String role : match.getRequiredRoles()) {
-      if (account.getRoles().contains(role)) {
-        authenticatedRequest(account,exchange);
-        return;
+    if (SecurityInfo.EmptyRoleSemantic.PERMIT_AND_INJECT_IF_AUTHENTICATED.equals(match.getEmptyRoleSemantic())) {
+      authenticatedRequest(account,exchange);
+      return;
+    }
+ else {
+      for (      String role : match.getRequiredRoles()) {
+        if (account.getRoles().contains(role)) {
+          authenticatedRequest(account,exchange);
+          return;
+        }
       }
     }
   }

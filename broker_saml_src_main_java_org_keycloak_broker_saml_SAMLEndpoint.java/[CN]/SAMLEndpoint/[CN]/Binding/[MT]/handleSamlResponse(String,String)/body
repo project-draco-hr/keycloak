@@ -1,10 +1,10 @@
 {
   SAMLDocumentHolder holder=extractResponseDocument(samlResponse);
   StatusResponseType statusResponse=(StatusResponseType)holder.getSamlObject();
-  if (!uriInfo.getAbsolutePath().toString().equals(statusResponse.getDestination())) {
+  if (statusResponse.getDestination() != null && !uriInfo.getAbsolutePath().toString().equals(statusResponse.getDestination())) {
     event.event(EventType.IDENTITY_PROVIDER_RESPONSE);
-    event.error(Errors.INVALID_SAML_RESPONSE);
     event.detail(Details.REASON,"invalid_destination");
+    event.error(Errors.INVALID_SAML_RESPONSE);
     return ErrorPage.error(session,Messages.INVALID_FEDERATED_IDENTITY_ACTION);
   }
   if (config.isValidateSignature()) {

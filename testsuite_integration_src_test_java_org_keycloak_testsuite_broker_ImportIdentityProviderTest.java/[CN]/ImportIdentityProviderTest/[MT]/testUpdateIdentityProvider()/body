@@ -7,6 +7,7 @@
   identityProviderModel.getConfig().put("config-added","value-added");
   identityProviderModel.setEnabled(false);
   identityProviderModel.setUpdateProfileFirstLogin(false);
+  identityProviderModel.setTrustEmail(true);
   identityProviderModel.setStoreToken(true);
   identityProviderModel.setAuthenticateByDefault(true);
   realm.updateIdentityProvider(identityProviderModel);
@@ -16,11 +17,13 @@
   assertEquals("value-added",identityProviderModel.getConfig().get("config-added"));
   assertFalse(identityProviderModel.isEnabled());
   assertFalse(identityProviderModel.isUpdateProfileFirstLogin());
+  assertTrue(identityProviderModel.isTrustEmail());
   assertTrue(identityProviderModel.isStoreToken());
   assertTrue(identityProviderModel.isAuthenticateByDefault());
   identityProviderModel.getConfig().remove("config-added");
   identityProviderModel.setEnabled(true);
   identityProviderModel.setUpdateProfileFirstLogin(true);
+  identityProviderModel.setTrustEmail(false);
   identityProviderModel.setAuthenticateByDefault(false);
   realm.updateIdentityProvider(identityProviderModel);
   commit();
@@ -29,6 +32,7 @@
   assertFalse(identityProviderModel.getConfig().containsKey("config-added"));
   assertTrue(identityProviderModel.isEnabled());
   assertTrue(identityProviderModel.isUpdateProfileFirstLogin());
+  assertFalse(identityProviderModel.isTrustEmail());
   assertFalse(identityProviderModel.isAuthenticateByDefault());
   this.realmManager.removeRealm(realm);
 }

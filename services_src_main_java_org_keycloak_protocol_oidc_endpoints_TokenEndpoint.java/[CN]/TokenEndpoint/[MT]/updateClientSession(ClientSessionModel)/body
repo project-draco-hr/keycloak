@@ -1,0 +1,15 @@
+{
+  if (clientSession == null) {
+    logger.error("client session is null");
+    return;
+  }
+  String adapterSessionId=formParams.getFirst(AdapterConstants.CLIENT_SESSION_STATE);
+  if (adapterSessionId != null) {
+    String adapterSessionHost=formParams.getFirst(AdapterConstants.CLIENT_SESSION_HOST);
+    logger.debugf("Adapter Session '%s' saved in ClientSession for client '%s'. Host is '%s'",adapterSessionId,client.getClientId(),adapterSessionHost);
+    event.detail(AdapterConstants.CLIENT_SESSION_STATE,adapterSessionId);
+    clientSession.setNote(AdapterConstants.CLIENT_SESSION_STATE,adapterSessionId);
+    event.detail(AdapterConstants.CLIENT_SESSION_HOST,adapterSessionHost);
+    clientSession.setNote(AdapterConstants.CLIENT_SESSION_HOST,adapterSessionHost);
+  }
+}

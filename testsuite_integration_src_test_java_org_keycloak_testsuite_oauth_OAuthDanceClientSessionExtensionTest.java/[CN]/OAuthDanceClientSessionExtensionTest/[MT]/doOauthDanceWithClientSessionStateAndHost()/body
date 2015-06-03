@@ -1,0 +1,15 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  Event loginEvent=events.expectLogin().assertEvent();
+  String sessionId=loginEvent.getSessionId();
+  String codeId=loginEvent.getDetails().get(Details.CODE_ID);
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  String clientSessionState="1234";
+  String clientSessionHost="test-client-host";
+  OAuthClient.AccessTokenResponse tokenResponse=oauth.clientSessionState(clientSessionState).clientSessionHost(clientSessionHost).doAccessTokenRequest(code,"password");
+  String refreshTokenString=tokenResponse.getRefreshToken();
+  Event tokenEvent=events.expectCodeToToken(codeId,sessionId).detail(Details.CLIENT_SESSION_STATE,clientSessionState).detail(Details.CLIENT_SESSION_HOST,clientSessionHost).assertEvent();
+  String updatedClientSessionState="5678";
+  oauth.clientSessionState(updatedClientSessionState).clientSessionHost(clientSessionHost).doRefreshTokenRequest(refreshTokenString,"password");
+  events.expectRefresh(tokenEvent.getDetails().get(Details.REFRESH_TOKEN_ID),sessionId).detail(Details.CLIENT_SESSION_STATE,updatedClientSessionState).detail(Details.CLIENT_SESSION_HOST,clientSessionHost).assertEvent();
+}

@@ -6,6 +6,7 @@
     return true;
   }
   if (!user.isEnabled()) {
+    context.getEvent().user(user);
     context.getEvent().error(Errors.USER_DISABLED);
     Response challengeResponse=disabledUser(context);
     context.failureChallenge(AuthenticationProcessor.Error.USER_DISABLED,challengeResponse);
@@ -13,6 +14,7 @@
   }
   if (context.getRealm().isBruteForceProtected()) {
     if (context.getProtector().isTemporarilyDisabled(context.getSession(),context.getRealm(),user.getUsername())) {
+      context.getEvent().user(user);
       context.getEvent().error(Errors.USER_TEMPORARILY_DISABLED);
       Response challengeResponse=temporarilyDisabledUser(context);
       context.failureChallenge(AuthenticationProcessor.Error.USER_TEMPORARILY_DISABLED,challengeResponse);

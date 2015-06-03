@@ -4,8 +4,8 @@
   this.session=brokerServerRule.startSession();
   try {
     IdentityProviderModel identityProviderModel=getIdentityProviderModel();
-    identityProviderModel.setUpdateProfileFirstLogin(false);
-    authenticateWithIdentityProvider(identityProviderModel,"test-user");
+    identityProviderModel.setUpdateProfileFirstLoginMode(IdentityProviderRepresentation.UPFLM_OFF);
+    authenticateWithIdentityProvider(identityProviderModel,"test-user",false);
     assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
     brokerServerRule.stopSession(session,true);
     session=brokerServerRule.startSession();
@@ -13,7 +13,7 @@
     UserModel federatedUser=session.users().getUserByUsername("test-user@localhost",realm);
     assertNotNull(federatedUser);
     assertEquals("test-user@localhost",federatedUser.getUsername());
-    doAssertFederatedUser(federatedUser,identityProviderModel,"test-user@localhost");
+    doAssertFederatedUser(federatedUser,identityProviderModel,"test-user@localhost",false);
     Set<FederatedIdentityModel> federatedIdentities=this.session.users().getFederatedIdentities(federatedUser,realm);
     assertEquals(1,federatedIdentities.size());
     FederatedIdentityModel federatedIdentityModel=federatedIdentities.iterator().next();

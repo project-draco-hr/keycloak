@@ -1,0 +1,15 @@
+{
+  String username=inputData.getFirst(AuthenticationManager.FORM_USERNAME);
+  if (username == null) {
+    context.getEvent().error(Errors.USER_NOT_FOUND);
+    Response challengeResponse=invalidUser(context);
+    context.failureChallenge(AuthenticationProcessor.Error.INVALID_USER,challengeResponse);
+    return;
+  }
+  context.getEvent().detail(Details.USERNAME,username);
+  context.getClientSession().setNote("FORM_USERNAME",username);
+  UserModel user=KeycloakModelUtils.findUserByNameOrEmail(context.getSession(),context.getRealm(),username);
+  if (invalidUser(context,user))   return;
+  context.setUser(user);
+  context.success();
+}

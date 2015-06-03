@@ -1,8 +1,10 @@
 {
+  String username=clientSession.getAuthenticatedUser().getUsername();
   if (userSession == null) {
-    userSession=session.sessions().createUserSession(realm,clientSession.getAuthenticatedUser(),clientSession.getAuthenticatedUser().getUsername(),connection.getRemoteAddr(),"form",false,null,null);
+    userSession=session.sessions().createUserSession(realm,clientSession.getAuthenticatedUser(),username,connection.getRemoteAddr(),"form",false,null,null);
     userSession.setState(UserSessionModel.State.LOGGING_IN);
   }
   TokenManager.attachClientSession(userSession,clientSession);
+  event.user(userSession.getUser()).detail(Details.USERNAME,username).session(userSession);
   return processRequiredActions();
 }

@@ -1,0 +1,12 @@
+{
+  UserFederationProvider link=getFederationLink(realm,user);
+  if (link != null) {
+    Set<String> supportedCredentialTypes=link.getSupportedCredentialTypes(user);
+    if (supportedCredentialTypes.contains(type))     return true;
+  }
+  List<UserCredentialValueModel> creds=user.getCredentialsDirectly();
+  for (  UserCredentialValueModel cred : creds) {
+    if (cred.getType().equals(type))     return true;
+  }
+  return false;
+}

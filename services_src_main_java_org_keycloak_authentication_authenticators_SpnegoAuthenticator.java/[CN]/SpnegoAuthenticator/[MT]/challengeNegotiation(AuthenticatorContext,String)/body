@@ -1,0 +1,10 @@
+{
+  String negotiateHeader=negotiateToken == null ? KerberosConstants.NEGOTIATE : KerberosConstants.NEGOTIATE + " " + negotiateToken;
+  if (logger.isTraceEnabled()) {
+    logger.trace("Sending back " + HttpHeaders.WWW_AUTHENTICATE + ": "+ negotiateHeader);
+  }
+  LoginFormsProvider loginForm=loginForm(context);
+  loginForm.setStatus(Response.Status.UNAUTHORIZED);
+  loginForm.setResponseHeader(HttpHeaders.WWW_AUTHENTICATE,negotiateHeader);
+  return loginForm.createLogin();
+}

@@ -1,4 +1,11 @@
 {
+  List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
+  for (  IdentityProviderModel identityProvider : identityProviders) {
+    if (identityProvider.isAuthenticateByDefault()) {
+      return buildRedirectToIdentityProvider(identityProvider.getAlias(),accessCode);
+    }
+  }
+  clientSession.setNote(Details.AUTH_TYPE,CODE_AUTH_TYPE);
   String flowId=null;
   for (  AuthenticationFlowModel flow : realm.getAuthenticationFlows()) {
     if (flow.getAlias().equals("browser")) {

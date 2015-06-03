@@ -13,5 +13,14 @@
     context.challenge(challengeResponse);
     return;
   }
-  validateUser(context);
+  MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
+  if (formData.containsKey("cancel")) {
+    context.getEvent().error(Errors.REJECTED_BY_USER);
+    LoginProtocol protocol=context.getSession().getProvider(LoginProtocol.class,context.getClientSession().getAuthMethod());
+    protocol.setRealm(context.getRealm()).setHttpHeaders(context.getHttpRequest().getHttpHeaders()).setUriInfo(context.getUriInfo());
+    Response response=protocol.cancelLogin(context.getClientSession());
+    context.challenge(response);
+    return;
+  }
+  validateUser(context,formData);
 }

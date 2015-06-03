@@ -1,0 +1,16 @@
+{
+  getRealm().setVerifyEmail(true);
+  brokerServerRule.stopSession(this.session,true);
+  this.session=brokerServerRule.startSession();
+  IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+  try {
+    identityProviderModel.setUpdateProfileFirstLogin(true);
+    identityProviderModel.setTrustEmail(true);
+    UserModel user=assertSuccessfulAuthenticationWithEmailVerifycation(identityProviderModel,"test-user","new@email.com");
+    Assert.assertEquals("617-666-7777",user.getAttribute("mobile"));
+  }
+  finally {
+    identityProviderModel.setTrustEmail(false);
+    getRealm().setVerifyEmail(false);
+  }
+}

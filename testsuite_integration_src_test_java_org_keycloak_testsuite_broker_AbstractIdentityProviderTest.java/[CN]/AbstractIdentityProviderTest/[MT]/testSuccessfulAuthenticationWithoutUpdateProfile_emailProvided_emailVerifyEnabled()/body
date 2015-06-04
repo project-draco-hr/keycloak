@@ -4,9 +4,9 @@
   this.session=brokerServerRule.startSession();
   IdentityProviderModel identityProviderModel=getIdentityProviderModel();
   try {
-    identityProviderModel.setUpdateProfileFirstLogin(false);
+    identityProviderModel.setUpdateProfileFirstLoginMode(IdentityProviderRepresentation.UPFLM_OFF);
     identityProviderModel.setTrustEmail(false);
-    UserModel federatedUser=assertSuccessfulAuthenticationWithEmailVerification(identityProviderModel,"test-user","test-user@localhost");
+    UserModel federatedUser=assertSuccessfulAuthenticationWithEmailVerification(identityProviderModel,"test-user","test-user@localhost",false);
     assertFalse(federatedUser.getRequiredActions().contains(RequiredAction.VERIFY_EMAIL.name()));
   }
   finally {

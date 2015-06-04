@@ -12,7 +12,7 @@
       }
       Config.Scope scope=Config.scope(spi.getName(),provider);
       factory.init(scope);
-      if (spi.isPrivate() && !isInternal(factory)) {
+      if (spi.isInternal() && !isInternal(factory)) {
         log.warnv("{0} ({1}) is implementing the internal SPI {2}. This SPI is internal and may change without notice",factory.getId(),factory.getClass().getName(),spi.getName());
       }
       factories.put(factory.getId(),factory);
@@ -22,7 +22,7 @@
       for (      ProviderFactory factory : pm.load(spi)) {
         Config.Scope scope=Config.scope(spi.getName(),factory.getId());
         factory.init(scope);
-        if (spi.isPrivate() && !isInternal(factory)) {
+        if (spi.isInternal() && !isInternal(factory)) {
           log.warnv("{0} ({1}) is implementing the internal SPI {2}. This SPI is internal and may change without notice",factory.getId(),factory.getClass().getName(),spi.getName());
         }
         factories.put(factory.getId(),factory);

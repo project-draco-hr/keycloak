@@ -1,7 +1,7 @@
 {
   Set<String> memberships=getExistingMemberships(mapperModel,ldapRole);
   memberships.remove(ldapUser.getDn().toString());
-  if (memberships.size() == 0) {
+  if (memberships.size() == 0 && !ldapProvider.getLdapIdentityStore().getConfig().isActiveDirectory()) {
     memberships.add(LDAPConstants.EMPTY_MEMBER_ATTRIBUTE_VALUE);
   }
   ldapRole.setAttribute(getMembershipLdapAttribute(mapperModel),memberships);

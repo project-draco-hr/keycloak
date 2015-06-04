@@ -35,10 +35,18 @@
     }
     deleteRoleMappingsInLDAP(roleMapperModel,roleMapper,ldapProvider,maryLdap,"realmRole1");
     deleteRoleMappingsInLDAP(roleMapperModel,roleMapper,ldapProvider,maryLdap,"realmRole2");
-    maryRoles=mary.getRealmRoleMappings();
-    Assert.assertFalse(maryRoles.contains(realmRole1));
-    Assert.assertFalse(maryRoles.contains(realmRole2));
-    Assert.assertFalse(maryRoles.contains(realmRole3));
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    UserModel mary=session.users().getUserByUsername("marykeycloak",appRealm);
+    Set<RoleModel> maryRoles=mary.getRealmRoleMappings();
+    Assert.assertFalse(maryRoles.contains(appRealm.getRole("realmRole1")));
+    Assert.assertFalse(maryRoles.contains(appRealm.getRole("realmRole2")));
+    Assert.assertFalse(maryRoles.contains(appRealm.getRole("realmRole3")));
   }
   finally {
     keycloakRule.stopSession(session,false);

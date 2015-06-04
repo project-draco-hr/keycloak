@@ -3,7 +3,7 @@
   for (  Map.Entry<String,Object> attrEntry : ldapObject.getAttributes().entrySet()) {
     String attrName=attrEntry.getKey();
     Object attrValue=attrEntry.getValue();
-    if (!ldapObject.getReadOnlyAttributeNames().contains(attrName) && (isCreate || !ldapObject.getRdnAttributeName().equals(attrName))) {
+    if (!ldapObject.getReadOnlyAttributeNames().contains(attrName) && (isCreate || !ldapObject.getRdnAttributeName().equalsIgnoreCase(attrName))) {
       if (String.class.isInstance(attrValue)) {
         if (attrValue.toString().trim().length() == 0) {
           attrValue=LDAPConstants.EMPTY_ATTRIBUTE_VALUE;
@@ -22,7 +22,7 @@
         entryAttributes.put(attrName,LDAPConstants.EMPTY_ATTRIBUTE_VALUE);
       }
  else {
-        throw new IllegalArgumentException("Unexpected type of value of argument " + attrName + ". Value is "+ attrValue);
+        throw new ModelException("Unexpected type of value of argument " + attrName + ". Value is "+ attrValue);
       }
     }
   }
@@ -30,7 +30,7 @@
     BasicAttribute objectClassAttribute=new BasicAttribute(LDAPConstants.OBJECT_CLASS);
     for (    String objectClassValue : ldapObject.getObjectClasses()) {
       objectClassAttribute.add(objectClassValue);
-      if (objectClassValue.equals(LDAPConstants.GROUP_OF_NAMES) || objectClassValue.equals(LDAPConstants.GROUP_OF_ENTRIES) || objectClassValue.equals(LDAPConstants.GROUP_OF_UNIQUE_NAMES)) {
+      if (objectClassValue.equalsIgnoreCase(LDAPConstants.GROUP_OF_NAMES) || objectClassValue.equalsIgnoreCase(LDAPConstants.GROUP_OF_ENTRIES) || objectClassValue.equalsIgnoreCase(LDAPConstants.GROUP_OF_UNIQUE_NAMES)) {
         entryAttributes.put(LDAPConstants.MEMBER,LDAPConstants.EMPTY_MEMBER_ATTRIBUTE_VALUE);
       }
     }

@@ -1,0 +1,16 @@
+{
+  if (!needRecovery())   return;
+  KeycloakSession session=sessionFactory.create();
+  session.getTransaction().begin();
+  try {
+    doRecover(session);
+    session.getTransaction().commit();
+    log.info("*******************************");
+    log.info("Recovered Master Admin account.");
+    log.info("*******************************");
+  }
+  finally {
+    session.close();
+    System.setProperty(AdminRecovery.RECOVER_ADMIN_ACCOUNT,"false");
+  }
+}

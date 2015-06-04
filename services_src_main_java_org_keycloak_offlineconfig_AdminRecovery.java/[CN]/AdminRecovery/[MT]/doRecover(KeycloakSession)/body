@@ -1,0 +1,11 @@
+{
+  RealmProvider realmProvider=session.realms();
+  UserProvider userProvider=session.users();
+  String adminRealmName=Config.getAdminRealm();
+  RealmModel realm=realmProvider.getRealmByName(adminRealmName);
+  UserModel adminUser=userProvider.getUserByUsername("admin",realm);
+  if (adminUser == null) {
+    adminUser=userProvider.addUser(realm,"admin");
+  }
+  ApplianceBootstrap.setupAdminUser(session,realm,adminUser);
+}

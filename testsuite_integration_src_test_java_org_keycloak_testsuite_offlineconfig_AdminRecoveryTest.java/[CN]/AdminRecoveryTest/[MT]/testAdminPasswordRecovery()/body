@@ -1,0 +1,12 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  RealmModel masterRealm=session.realms().getRealmByName("master");
+  UserModel adminUser=session.users().getUserByUsername("admin",masterRealm);
+  UserCredentialValueModel password=adminUser.getCredentialsDirectly().get(0);
+  password.setValue("forgotten-password");
+  adminUser.updateCredentialDirectly(password);
+  keycloakRule.stopSession(session,true);
+  Assert.assertEquals("forgotten-password",getAdminPassword());
+  doAdminRecovery(session);
+  Assert.assertNotEquals("forgotten-password",getAdminPassword());
+}

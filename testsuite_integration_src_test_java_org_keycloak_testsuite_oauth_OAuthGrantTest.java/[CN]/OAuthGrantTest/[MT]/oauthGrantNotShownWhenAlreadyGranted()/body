@@ -12,7 +12,7 @@
   Assert.assertTrue(thirdPartyEntry.getProtocolMappersGranted().contains("Email"));
   oauth.openLoginForm();
   appPage.assertCurrent();
-  events.expectLogin().detail(Details.AUTH_METHOD,"sso").removeDetail(Details.USERNAME).client("third-party").assertEvent();
+  events.expectLogin().removeDetail(Details.USERNAME).client("third-party").assertEvent();
   accountAppsPage.open();
   accountAppsPage.revokeGrant("third-party");
   events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,"third-party").assertEvent();

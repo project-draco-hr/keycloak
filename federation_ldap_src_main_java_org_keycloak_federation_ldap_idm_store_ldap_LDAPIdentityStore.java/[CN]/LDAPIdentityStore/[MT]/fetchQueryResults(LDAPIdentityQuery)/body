@@ -1,13 +1,13 @@
 {
+  if (identityQuery.getSorting() != null && !identityQuery.getSorting().isEmpty()) {
+    throw new ModelException("LDAP Identity Store does not yet support sorted queries.");
+  }
   List<LDAPObject> results=new ArrayList<>();
   try {
-    if (identityQuery.getSorting() != null && !identityQuery.getSorting().isEmpty()) {
-      throw new ModelException("LDAP Identity Store does not yet support sorted queries.");
-    }
     String baseDN=identityQuery.getSearchDn();
     for (    Condition condition : identityQuery.getConditions()) {
       String uuidAttrName=getConfig().getUuidLDAPAttributeName();
-      if (condition.getParameter() != null && condition.getParameter().getName().equals(uuidAttrName)) {
+      if (condition.getParameter() != null && condition.getParameter().getName().equalsIgnoreCase(uuidAttrName)) {
         if (EqualCondition.class.isInstance(condition)) {
           EqualCondition equalCondition=(EqualCondition)condition;
           SearchResult search=this.operationManager.lookupById(baseDN,equalCondition.getValue().toString(),identityQuery.getReturningLdapAttributes());
@@ -27,7 +27,7 @@
       search=this.operationManager.search(baseDN,filter.toString(),identityQuery.getReturningLdapAttributes(),identityQuery.getSearchScope());
     }
     for (    SearchResult result : search) {
-      if (!result.getNameInNamespace().equals(baseDN)) {
+      if (!result.getNameInNamespace().equalsIgnoreCase(baseDN)) {
         results.add(populateAttributedType(result,identityQuery.getReturningReadOnlyLdapAttributes()));
       }
     }

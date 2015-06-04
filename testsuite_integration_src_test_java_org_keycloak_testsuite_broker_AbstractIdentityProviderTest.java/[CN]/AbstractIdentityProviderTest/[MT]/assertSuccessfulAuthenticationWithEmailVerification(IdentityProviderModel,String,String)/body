@@ -3,8 +3,7 @@
   Assert.assertTrue(verifyEmailPage.isCurrent());
   Assert.assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];
-  String body=(String)message.getContent();
-  String verificationUrl=MailUtil.getLink(body);
+  String verificationUrl=getVerificationEmailLink(message);
   driver.navigate().to(verificationUrl.trim());
   assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
   UserModel federatedUser=getFederatedUser();

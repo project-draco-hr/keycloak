@@ -13,8 +13,7 @@
   assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
   assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];
-  String body=(String)message.getContent();
-  String changePasswordUrl=MailUtil.getLink(body);
+  String changePasswordUrl=getPasswordResetEmailLink(message);
   String sessionId=events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).user(userId).detail(Details.USERNAME,"login-test").detail(Details.EMAIL,"login@test.com").assertEvent().getSessionId();
   driver.navigate().to(changePasswordUrl.trim());
   updatePasswordPage.assertCurrent();

@@ -7,9 +7,23 @@
   UserFederationMapperModel mapperModel;
   mapperModel=KeycloakModelUtils.createUserFederationMapperModel("username",newProviderModel.getId(),UserAttributeLDAPFederationMapperFactory.PROVIDER_ID,UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,UserModel.USERNAME,UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,usernameLdapAttribute,UserAttributeLDAPFederationMapper.READ_ONLY,readOnly);
   realm.addUserFederationMapper(mapperModel);
-  if (activeDirectory && usernameLdapAttribute.equalsIgnoreCase(LDAPConstants.SAM_ACCOUNT_NAME)) {
-    mapperModel=KeycloakModelUtils.createUserFederationMapperModel("full name",newProviderModel.getId(),FullNameLDAPFederationMapperFactory.PROVIDER_ID,FullNameLDAPFederationMapper.LDAP_FULL_NAME_ATTRIBUTE,LDAPConstants.CN,UserAttributeLDAPFederationMapper.READ_ONLY,readOnly);
-    realm.addUserFederationMapper(mapperModel);
+  if (ldapConfig.getRdnLdapAttribute().equalsIgnoreCase(LDAPConstants.CN)) {
+    if (usernameLdapAttribute.equalsIgnoreCase(LDAPConstants.CN)) {
+      mapperModel=KeycloakModelUtils.createUserFederationMapperModel("first name",newProviderModel.getId(),UserAttributeLDAPFederationMapperFactory.PROVIDER_ID,UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,UserModel.FIRST_NAME,UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,LDAPConstants.GIVENNAME,UserAttributeLDAPFederationMapper.READ_ONLY,readOnly);
+      realm.addUserFederationMapper(mapperModel);
+    }
+ else {
+      if (editMode == UserFederationProvider.EditMode.WRITABLE) {
+        mapperModel=KeycloakModelUtils.createUserFederationMapperModel("first name",newProviderModel.getId(),UserAttributeLDAPFederationMapperFactory.PROVIDER_ID,UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,UserModel.FIRST_NAME,UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,LDAPConstants.GIVENNAME,UserAttributeLDAPFederationMapper.READ_ONLY,readOnly);
+        realm.addUserFederationMapper(mapperModel);
+        mapperModel=KeycloakModelUtils.createUserFederationMapperModel("username2",newProviderModel.getId(),UserAttributeLDAPFederationMapperFactory.PROVIDER_ID,UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,UserModel.USERNAME,UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,LDAPConstants.CN,UserAttributeLDAPFederationMapper.READ_ONLY,readOnly);
+        realm.addUserFederationMapper(mapperModel);
+      }
+ else {
+        mapperModel=KeycloakModelUtils.createUserFederationMapperModel("full name",newProviderModel.getId(),FullNameLDAPFederationMapperFactory.PROVIDER_ID,FullNameLDAPFederationMapper.LDAP_FULL_NAME_ATTRIBUTE,LDAPConstants.CN,UserAttributeLDAPFederationMapper.READ_ONLY,readOnly);
+        realm.addUserFederationMapper(mapperModel);
+      }
+    }
   }
  else {
     mapperModel=KeycloakModelUtils.createUserFederationMapperModel("first name",newProviderModel.getId(),UserAttributeLDAPFederationMapperFactory.PROVIDER_ID,UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,UserModel.FIRST_NAME,UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,LDAPConstants.CN,UserAttributeLDAPFederationMapper.READ_ONLY,readOnly);

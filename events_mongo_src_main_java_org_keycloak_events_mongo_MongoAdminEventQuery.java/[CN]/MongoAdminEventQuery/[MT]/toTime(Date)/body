@@ -1,4 +1,6 @@
 {
-  query.put("time",BasicDBObjectBuilder.start("$lte",toTime.getTime()).get());
+  BasicDBObject time=query.containsField("time") ? (BasicDBObject)query.get("time") : new BasicDBObject();
+  time.append("$lte",toTime.getTime());
+  query.put("time",time);
   return this;
 }

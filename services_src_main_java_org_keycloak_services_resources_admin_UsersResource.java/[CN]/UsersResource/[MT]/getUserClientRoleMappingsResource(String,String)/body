@@ -1,11 +1,11 @@
 {
-  UserModel user=session.users().getUserByUsername(username,realm);
+  UserModel user=session.users().getUserById(id,realm);
   if (user == null) {
     throw new NotFoundException("User not found");
   }
-  ClientModel client=realm.getClientByClientId(clientId);
+  ClientModel clientModel=realm.getClientById(client);
   if (client == null) {
     throw new NotFoundException("Client not found");
   }
-  return new UserClientRoleMappingsResource(uriInfo,realm,auth,user,client,adminEvent);
+  return new UserClientRoleMappingsResource(uriInfo,realm,auth,user,clientModel,adminEvent);
 }

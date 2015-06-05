@@ -10,5 +10,7 @@
   entity.setFederationMapperType(model.getFederationMapperType());
   entity.setConfig(model.getConfig());
   this.realm.getUserFederationMappers().add(entity);
-  return entityToModel(entity);
+  UserFederationMapperModel mapperModel=entityToModel(entity);
+  session.getKeycloakSessionFactory().publish(new UserFederationMapperEventImpl(mapperModel,this,session));
+  return mapperModel;
 }

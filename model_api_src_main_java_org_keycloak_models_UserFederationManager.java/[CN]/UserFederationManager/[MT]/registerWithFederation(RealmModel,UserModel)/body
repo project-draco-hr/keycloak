@@ -3,7 +3,9 @@
     UserFederationProvider fed=getFederationProvider(federation);
     if (fed.synchronizeRegistrations()) {
       user.setFederationLink(federation.getId());
-      return fed.register(realm,user);
+      UserModel registered=fed.register(realm,user);
+      managedUsers.put(registered.getId(),registered);
+      return registered;
     }
   }
   return user;

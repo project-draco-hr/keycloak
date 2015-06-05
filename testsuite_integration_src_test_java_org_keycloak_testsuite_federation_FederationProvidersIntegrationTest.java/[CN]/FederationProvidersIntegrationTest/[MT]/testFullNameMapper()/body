@@ -1,0 +1,32 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  UserFederationMapperModel firstNameMapper=null;
+  try {
+    RealmModel appRealm=new RealmManager(session).getRealmByName("test");
+    Assert.assertNull(session.users().getUserByUsername("fullname",appRealm));
+    LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    FederationTestUtils.addLDAPUser(ldapFedProvider,appRealm,"fullname","James Dee","Dee","fullname@email.org","4578");
+    firstNameMapper=appRealm.getUserFederationMapperByName(ldapModel.getId(),"first name");
+    String ldapFirstNameAttributeName=firstNameMapper.getConfig().get(UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE);
+    appRealm.removeUserFederationMapper(firstNameMapper);
+    UserFederationMapperModel fullNameMapperModel=KeycloakModelUtils.createUserFederationMapperModel("full name",ldapModel.getId(),FullNameLDAPFederationMapperFactory.PROVIDER_ID,FullNameLDAPFederationMapper.LDAP_FULL_NAME_ATTRIBUTE,ldapFirstNameAttributeName,UserAttributeLDAPFederationMapper.READ_ONLY,"false");
+    appRealm.addUserFederationMapper(fullNameMapperModel);
+    FederationTestUtils.assertUserImported(session.users(),appRealm,"fullname","James","Dee","fullname@email.org","4578");
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=new RealmManager(session).getRealmByName("test");
+    UserModel fullnameUser=session.users().getUserByUsername("fullname",appRealm);
+    session.users().removeUser(appRealm,fullnameUser);
+    UserFederationMapperModel fullNameMapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"full name");
+    appRealm.removeUserFederationMapper(fullNameMapperModel);
+    firstNameMapper.setId(null);
+    appRealm.addUserFederationMapper(firstNameMapper);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

@@ -1,7 +1,7 @@
 {
-  if (!uriInfo.getAbsolutePath().equals(logoutRequest.getDestination())) {
-    event.error(Errors.INVALID_SAML_LOGOUT_REQUEST);
+  if (logoutRequest.getDestination() != null && !uriInfo.getAbsolutePath().equals(logoutRequest.getDestination())) {
     event.detail(Details.REASON,"invalid_destination");
+    event.error(Errors.INVALID_SAML_LOGOUT_REQUEST);
     return ErrorPage.error(session,Messages.INVALID_REQUEST);
   }
   AuthenticationManager.AuthResult authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers,false);

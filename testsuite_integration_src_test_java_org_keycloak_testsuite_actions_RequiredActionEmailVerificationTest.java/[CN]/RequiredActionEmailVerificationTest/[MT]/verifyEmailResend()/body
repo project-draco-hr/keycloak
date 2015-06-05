@@ -9,9 +9,8 @@
   verifyEmailPage.clickResendEmail();
   Assert.assertEquals(2,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[1];
-  String body=(String)message.getContent();
   events.expectRequiredAction(EventType.SEND_VERIFY_EMAIL).session(sessionId).detail("email","test-user@localhost").assertEvent(sendEvent);
-  String verificationUrl=MailUtil.getLink(body);
+  String verificationUrl=getPasswordResetEmailLink(message);
   driver.navigate().to(verificationUrl.trim());
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   events.expectRequiredAction(EventType.VERIFY_EMAIL).session(sessionId).detail("email","test-user@localhost").detail(Details.CODE_ID,mailCodeId).assertEvent();

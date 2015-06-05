@@ -1,6 +1,6 @@
 {
   auth.requireManage();
-  UserModel user=session.users().getUserByUsername(username,realm);
+  UserModel user=session.users().getUserById(id,realm);
   if (user == null) {
     throw new NotFoundException("User not found");
   }
@@ -10,7 +10,7 @@
     AuthenticationManager.backchannelUserFromClient(session,realm,user,client,uriInfo,headers);
   }
  else {
-    throw new NotFoundException("Consent not found for user " + username + " and client "+ clientId);
+    throw new NotFoundException("Consent not found for user " + id + " and client "+ clientId);
   }
   adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).success();
 }

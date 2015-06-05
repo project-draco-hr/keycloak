@@ -1,0 +1,19 @@
+{
+  switchEditUsernameAllowedOn();
+  createUser();
+  UserRepresentation userRep=new UserRepresentation();
+  userRep.setUsername("user2");
+  Response response=realm.users().create(userRep);
+  String createdId=ApiUtil.getCreatedId(response);
+  response.close();
+  try {
+    UserResource user=realm.users().get(createdId);
+    userRep=user.toRepresentation();
+    userRep.setUsername("user1");
+    user.update(userRep);
+    fail("Expected failure");
+  }
+ catch (  ClientErrorException e) {
+    assertEquals(409,e.getResponse().getStatus());
+  }
+}

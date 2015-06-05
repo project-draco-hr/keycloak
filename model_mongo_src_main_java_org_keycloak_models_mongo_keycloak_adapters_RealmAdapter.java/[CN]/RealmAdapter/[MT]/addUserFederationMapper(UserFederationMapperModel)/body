@@ -11,5 +11,7 @@
   entity.setConfig(model.getConfig());
   getMongoEntity().getUserFederationMappers().add(entity);
   updateMongoEntity();
-  return entityToModel(entity);
+  UserFederationMapperModel mapperModel=entityToModel(entity);
+  session.getKeycloakSessionFactory().publish(new UserFederationMapperEventImpl(mapperModel,this,session));
+  return mapperModel;
 }

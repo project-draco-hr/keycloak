@@ -1,9 +1,9 @@
 {
   this.session=session;
   URI accountIdentityUpdateUri=Urls.accountFederatedIdentityUpdate(baseUri,realm.getName());
-  this.identities=new LinkedList<FederatedIdentityEntry>();
   List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
   Set<FederatedIdentityModel> identities=session.users().getFederatedIdentities(user,realm);
+  Set<FederatedIdentityEntry> orderedSet=new TreeSet<>(IdentityProviderComparator.INSTANCE);
   int availableIdentities=0;
   if (identityProviders != null && !identityProviders.isEmpty()) {
     for (    IdentityProviderModel provider : identityProviders) {
@@ -14,9 +14,10 @@
       }
       String action=identity != null ? "remove" : "add";
       String actionUrl=UriBuilder.fromUri(accountIdentityUpdateUri).queryParam("action",action).queryParam("provider_id",providerId).queryParam("stateChecker",stateChecker).build().toString();
-      FederatedIdentityEntry entry=new FederatedIdentityEntry(identity,provider.getAlias(),provider.getAlias(),actionUrl);
-      this.identities.add(entry);
+      FederatedIdentityEntry entry=new FederatedIdentityEntry(identity,provider.getAlias(),provider.getAlias(),actionUrl,provider.getConfig() != null ? provider.getConfig().get("guiOrder") : null);
+      orderedSet.add(entry);
     }
   }
+  this.identities=new LinkedList<FederatedIdentityEntry>(orderedSet);
   this.removeLinkPossible=availableIdentities > 1 || user.getFederationLink() != null || AccountService.isPasswordSet(user);
 }

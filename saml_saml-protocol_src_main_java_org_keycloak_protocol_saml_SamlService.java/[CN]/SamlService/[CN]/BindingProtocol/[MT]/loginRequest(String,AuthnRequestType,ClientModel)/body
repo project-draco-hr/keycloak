@@ -1,7 +1,7 @@
 {
-  if (!uriInfo.getAbsolutePath().equals(requestAbstractType.getDestination())) {
-    event.error(Errors.INVALID_SAML_AUTHN_REQUEST);
+  if (requestAbstractType.getDestination() != null && !uriInfo.getAbsolutePath().equals(requestAbstractType.getDestination())) {
     event.detail(Details.REASON,"invalid_destination");
+    event.error(Errors.INVALID_SAML_AUTHN_REQUEST);
     return ErrorPage.error(session,Messages.INVALID_REQUEST);
   }
   String bindingType=getBindingType(requestAbstractType);
@@ -41,8 +41,8 @@
       clientSession.setNote(GeneralConstants.NAMEID_FORMAT,nameIdFormat);
     }
  else {
-      event.error(Errors.INVALID_SAML_AUTHN_REQUEST);
       event.detail(Details.REASON,"unsupported_nameid_format");
+      event.error(Errors.INVALID_SAML_AUTHN_REQUEST);
       return ErrorPage.error(session,Messages.UNSUPPORTED_NAME_ID_FORMAT);
     }
   }

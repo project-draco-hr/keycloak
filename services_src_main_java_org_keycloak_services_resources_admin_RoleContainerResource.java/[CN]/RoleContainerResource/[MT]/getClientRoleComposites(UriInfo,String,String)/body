@@ -1,0 +1,12 @@
+{
+  auth.requireManage();
+  RoleModel role=roleContainer.getRole(roleName);
+  if (role == null) {
+    throw new NotFoundException("Could not find role: " + roleName);
+  }
+  ClientModel clientModel=realm.getClientById(client);
+  if (client == null) {
+    throw new NotFoundException("Could not find client: " + client);
+  }
+  return getClientRoleComposites(clientModel,role);
+}

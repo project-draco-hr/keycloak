@@ -1,0 +1,25 @@
+{
+  Client client=ClientBuilder.newClient();
+  WebTarget target=client.target(APP_SERVER_BASE_URL + "/customer-db-error-page/");
+  Response response=target.request().get();
+  if (response.getStatus() == 302) {
+    String location=response.getHeaderString(HttpHeaders.LOCATION);
+    response.close();
+    response=client.target(location).request().get();
+  }
+  Assert.assertEquals(200,response.getStatus());
+  String errorPageResponse=response.readEntity(String.class);
+  Assert.assertTrue(errorPageResponse.contains("Error Page"));
+  response.close();
+  response=target.request().header(HttpHeaders.AUTHORIZATION,"Bearer null").get();
+  if (response.getStatus() == 302) {
+    String location=response.getHeaderString(HttpHeaders.LOCATION);
+    response.close();
+    response=client.target(location).request().get();
+  }
+  Assert.assertEquals(200,response.getStatus());
+  errorPageResponse=response.readEntity(String.class);
+  Assert.assertTrue(errorPageResponse.contains("Error Page"));
+  response.close();
+  client.close();
+}

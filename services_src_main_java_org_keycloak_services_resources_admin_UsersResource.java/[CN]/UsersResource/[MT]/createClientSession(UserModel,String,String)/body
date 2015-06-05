@@ -1,0 +1,31 @@
+{
+  if (!user.isEnabled()) {
+    throw new WebApplicationException(ErrorResponse.error("User is disabled",Response.Status.BAD_REQUEST));
+  }
+  if (redirectUri != null && clientId == null) {
+    throw new WebApplicationException(ErrorResponse.error("Client id missing",Response.Status.BAD_REQUEST));
+  }
+  if (clientId == null) {
+    clientId=Constants.ACCOUNT_MANAGEMENT_CLIENT_ID;
+  }
+  ClientModel client=realm.getClientByClientId(clientId);
+  if (client == null || !client.isEnabled()) {
+    throw new WebApplicationException(ErrorResponse.error(clientId + " not enabled",Response.Status.BAD_REQUEST));
+  }
+  String redirect;
+  if (redirectUri != null) {
+    redirect=RedirectUtils.verifyRedirectUri(uriInfo,redirectUri,realm,client);
+    if (redirect == null) {
+      throw new WebApplicationException(ErrorResponse.error("Invalid redirect uri.",Response.Status.BAD_REQUEST));
+    }
+  }
+ else {
+    redirect=Urls.accountBase(uriInfo.getBaseUri()).path("/").build(realm.getName()).toString();
+  }
+  UserSessionModel userSession=session.sessions().createUserSession(realm,user,user.getUsername(),clientConnection.getRemoteAddr(),"form",false,null,null);
+  ClientSessionModel clientSession=session.sessions().createClientSession(realm,client);
+  clientSession.setAuthMethod(OIDCLoginProtocol.LOGIN_PROTOCOL);
+  clientSession.setRedirectUri(redirect);
+  clientSession.setUserSession(userSession);
+  return clientSession;
+}

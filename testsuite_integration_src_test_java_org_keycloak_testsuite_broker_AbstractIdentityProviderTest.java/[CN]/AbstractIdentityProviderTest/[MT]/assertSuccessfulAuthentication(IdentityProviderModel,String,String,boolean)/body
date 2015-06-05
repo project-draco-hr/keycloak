@@ -1,0 +1,19 @@
+{
+  authenticateWithIdentityProvider(identityProviderModel,username,isProfileUpdateExpected);
+  assertTrue("Bad current URL " + this.driver.getCurrentUrl() + " and page source: "+ this.driver.getPageSource(),this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
+  UserModel federatedUser=getFederatedUser();
+  assertNotNull(federatedUser);
+  doAssertFederatedUser(federatedUser,identityProviderModel,expectedEmail,isProfileUpdateExpected);
+  brokerServerRule.stopSession(session,true);
+  session=brokerServerRule.startSession();
+  RealmModel realm=getRealm();
+  Set<FederatedIdentityModel> federatedIdentities=this.session.users().getFederatedIdentities(federatedUser,realm);
+  assertEquals(1,federatedIdentities.size());
+  FederatedIdentityModel federatedIdentityModel=federatedIdentities.iterator().next();
+  assertEquals(getProviderId(),federatedIdentityModel.getIdentityProvider());
+  assertEquals(federatedUser.getUsername(),federatedIdentityModel.getIdentityProvider() + "." + federatedIdentityModel.getUserName());
+  driver.navigate().to("http://localhost:8081/test-app/logout");
+  driver.navigate().to("http://localhost:8081/test-app");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/auth"));
+  return federatedUser;
+}

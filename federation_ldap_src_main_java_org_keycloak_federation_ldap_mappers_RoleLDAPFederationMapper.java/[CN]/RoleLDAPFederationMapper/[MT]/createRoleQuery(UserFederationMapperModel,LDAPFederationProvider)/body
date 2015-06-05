@@ -1,9 +1,9 @@
 {
   LDAPIdentityQuery ldapQuery=new LDAPIdentityQuery(ldapProvider);
-  ldapQuery.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+  ldapQuery.setSearchScope(ldapProvider.getLdapIdentityStore().getConfig().getSearchScope());
   String rolesDn=getRolesDn(mapperModel);
-  ldapQuery.addSearchDns(Arrays.asList(rolesDn));
-  Collection<String> roleObjectClasses=getRoleObjectClasses(mapperModel);
+  ldapQuery.setSearchDn(rolesDn);
+  Collection<String> roleObjectClasses=getRoleObjectClasses(mapperModel,ldapProvider);
   ldapQuery.addObjectClasses(roleObjectClasses);
   String rolesRdnAttr=getRoleNameLdapAttribute(mapperModel);
   String membershipAttr=getMembershipLdapAttribute(mapperModel);

@@ -1,0 +1,30 @@
+{
+  if (realm.isEditUsernameAllowed()) {
+    user.setUsername(rep.getUsername());
+  }
+  user.setEmail(rep.getEmail());
+  user.setFirstName(rep.getFirstName());
+  user.setLastName(rep.getLastName());
+  user.setEnabled(rep.isEnabled());
+  user.setTotp(rep.isTotp());
+  user.setEmailVerified(rep.isEmailVerified());
+  List<String> reqActions=rep.getRequiredActions();
+  if (reqActions != null) {
+    for (    UserModel.RequiredAction ra : UserModel.RequiredAction.values()) {
+      if (reqActions.contains(ra.name())) {
+        user.addRequiredAction(ra);
+      }
+ else {
+        user.removeRequiredAction(ra);
+      }
+    }
+  }
+  if (rep.getAttributes() != null) {
+    for (    Map.Entry<String,String> attr : rep.getAttributes().entrySet()) {
+      user.setAttribute(attr.getKey(),attr.getValue());
+    }
+    for (    String attr : attrsToRemove) {
+      user.removeAttribute(attr);
+    }
+  }
+}

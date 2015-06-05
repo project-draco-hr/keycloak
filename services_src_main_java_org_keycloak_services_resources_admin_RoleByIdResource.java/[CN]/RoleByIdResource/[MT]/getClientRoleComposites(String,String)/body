@@ -1,9 +1,9 @@
 {
   RoleModel role=getRoleModel(id);
   auth.requireView();
-  ClientModel app=realm.getClientByClientId(appName);
-  if (app == null) {
-    throw new NotFoundException("Could not find client: " + appName);
+  ClientModel clientModel=realm.getClientById(client);
+  if (clientModel == null) {
+    throw new NotFoundException("Could not find client: " + client);
   }
-  return getClientRoleComposites(app,role);
+  return getClientRoleComposites(clientModel,role);
 }

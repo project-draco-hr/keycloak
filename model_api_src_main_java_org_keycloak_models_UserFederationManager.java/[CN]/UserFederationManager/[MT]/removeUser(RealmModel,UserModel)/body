@@ -4,6 +4,7 @@
     boolean fedRemoved=link.removeUser(realm,user);
     if (fedRemoved) {
       boolean localRemoved=session.userStorage().removeUser(realm,user);
+      managedUsers.remove(user.getId());
       if (!localRemoved) {
         logger.warn("User removed from federation provider, but failed to remove him from keycloak model");
       }

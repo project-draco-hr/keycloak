@@ -2,9 +2,13 @@
   if (!isActionUrl(context)) {
     MultivaluedMap<String,String> formData=new MultivaluedMapImpl<>();
     String loginHint=context.getClientSession().getNote(OIDCLoginProtocol.LOGIN_HINT_PARAM);
-    if (loginHint == null) {
-      loginHint=AuthenticationManager.getRememberMeUsername(context.getRealm(),context.getHttpRequest().getHttpHeaders());
+    String rememberMeUsername=AuthenticationManager.getRememberMeUsername(context.getRealm(),context.getHttpRequest().getHttpHeaders());
+    if (loginHint != null || rememberMeUsername != null) {
       if (loginHint != null) {
+        formData.add(AuthenticationManager.FORM_USERNAME,loginHint);
+      }
+ else {
+        formData.add(AuthenticationManager.FORM_USERNAME,rememberMeUsername);
         formData.add("rememberMe","on");
       }
     }

@@ -1,0 +1,20 @@
+{
+  ModelNode model=resource.getModel();
+  for (  AttributeDefinition attrDef : ALL_ATTRIBUTES) {
+    attrDef.validateAndSet(operation,model);
+  }
+  if (!requiresRuntime(context)) {
+    return;
+  }
+  if (!context.isNormalServer()) {
+    return;
+  }
+  ModelNode webContextNode=resource.getModel().get(WEB_CONTEXT.getName());
+  if (!webContextNode.isDefined()) {
+    webContextNode=WEB_CONTEXT.getDefaultValue();
+  }
+  String webContext=webContextNode.asString();
+  ServerUtil serverUtil=new ServerUtil(operation);
+  serverUtil.addStepToUploadServerWar(context);
+  KeycloakAdapterConfigService.INSTANCE.setWebContext(webContext);
+}

@@ -1,0 +1,12 @@
+{
+  if (!context.isNormalServer() || attribNotChanging(attributeName,newValue,oldValue)) {
+    super.finishModelStage(context,operation,attributeName,newValue,oldValue,model);
+    return;
+  }
+  String deploymentName=ServerUtil.getDeploymentName(operation);
+  if (attributeName.equals(KeycloakSubsystemDefinition.WEB_CONTEXT.getName())) {
+    KeycloakAdapterConfigService.INSTANCE.setWebContext(newValue.asString());
+    ServerUtil.addStepToRedeployServerWar(context,deploymentName);
+  }
+  super.finishModelStage(context,operation,attributeName,newValue,oldValue,model);
+}

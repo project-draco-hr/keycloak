@@ -1,0 +1,20 @@
+{
+  String jsonField=mapperModel.getConfig().get(CONF_JSON_FIELD);
+  if (jsonField == null) {
+    logger.debug("JSON field is not configured");
+    return null;
+  }
+  JsonNode profileJsonNode=(JsonNode)context.getContextData().get(CONTEXT_JSON_NODE);
+  if (profileJsonNode != null) {
+    JsonNode value=profileJsonNode.get(jsonField);
+    if (value != null) {
+      String ret=value.asText();
+      if (ret != null && !ret.trim().isEmpty())       return ret.trim();
+ else       return null;
+    }
+  }
+ else {
+    logger.debug("User profile JSON node is not available.");
+  }
+  return null;
+}

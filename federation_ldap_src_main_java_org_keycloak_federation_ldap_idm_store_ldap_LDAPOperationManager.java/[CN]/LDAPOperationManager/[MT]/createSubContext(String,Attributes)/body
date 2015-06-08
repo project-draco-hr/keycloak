@@ -1,13 +1,13 @@
 {
   try {
-    if (logger.isDebugEnabled()) {
-      logger.debugf("Creating entry [%s] with attributes: [",name);
+    if (logger.isTraceEnabled()) {
+      logger.tracef("Creating entry [%s] with attributes: [",name);
       NamingEnumeration<? extends Attribute> all=attributes.getAll();
       while (all.hasMore()) {
         Attribute attribute=all.next();
-        logger.debugf("  %s = %s",attribute.getID(),attribute.get());
+        logger.tracef("  %s = %s",attribute.getID(),attribute.get());
       }
-      logger.debugf("]");
+      logger.tracef("]");
     }
     execute(new LdapOperation<Void>(){
       @Override public Void execute(      LdapContext context) throws NamingException {

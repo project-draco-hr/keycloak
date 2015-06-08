@@ -1,7 +1,7 @@
 {
   try {
-    if (logger.isDebugEnabled()) {
-      logger.debugf("Modifying attributes for entry [%s]: [",dn);
+    if (logger.isTraceEnabled()) {
+      logger.tracef("Modifying attributes for entry [%s]: [",dn);
       for (      ModificationItem item : mods) {
         Object values;
         if (item.getAttribute().size() > 0) {
@@ -10,9 +10,9 @@
  else {
           values="No values";
         }
-        logger.debugf("  Op [%s]: %s = %s",item.getModificationOp(),item.getAttribute().getID(),values);
+        logger.tracef("  Op [%s]: %s = %s",item.getModificationOp(),item.getAttribute().getID(),values);
       }
-      logger.debugf("]");
+      logger.tracef("]");
     }
     execute(new LdapOperation<Void>(){
       @Override public Void execute(      LdapContext context) throws NamingException {

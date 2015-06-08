@@ -1,0 +1,24 @@
+{
+  DBCollection realms=db.getCollection("realms");
+  DBCursor realmsCursor=realms.find();
+  try {
+    while (realmsCursor.hasNext()) {
+      BasicDBObject realm=(BasicDBObject)realmsCursor.next();
+      BasicDBList identityProviders=(BasicDBList)realm.get("identityProviders");
+      if (identityProviders != null) {
+        for (        Object ipObj : identityProviders) {
+          BasicDBObject identityProvider=(BasicDBObject)ipObj;
+          boolean updateProfileFirstLogin=identityProvider.getBoolean("updateProfileFirstLogin");
+          String upflMode=updateProfileFirstLogin ? IdentityProviderRepresentation.UPFLM_ON : IdentityProviderRepresentation.UPFLM_OFF;
+          identityProvider.put("updateProfileFirstLoginMode",upflMode);
+          identityProvider.removeField("updateProfileFirstLogin");
+          identityProvider.put("trustEmail",false);
+        }
+      }
+      realms.save(realm);
+    }
+  }
+  finally {
+    realmsCursor.close();
+  }
+}

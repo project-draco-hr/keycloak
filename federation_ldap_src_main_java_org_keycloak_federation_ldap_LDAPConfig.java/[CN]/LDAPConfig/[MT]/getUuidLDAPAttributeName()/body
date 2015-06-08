@@ -2,24 +2,7 @@
   String uuidAttrName=config.get(LDAPConstants.UUID_LDAP_ATTRIBUTE);
   if (uuidAttrName == null) {
     String vendor=getVendor();
-    if (vendor != null) {
-switch (vendor) {
-case LDAPConstants.VENDOR_RHDS:
-        uuidAttrName="nsuniqueid";
-      break;
-case LDAPConstants.VENDOR_TIVOLI:
-    uuidAttrName="uniqueidentifier";
-  break;
-case LDAPConstants.VENDOR_NOVELL_EDIRECTORY:
-uuidAttrName="guid";
-break;
-case LDAPConstants.VENDOR_ACTIVE_DIRECTORY:
-uuidAttrName=LDAPConstants.OBJECT_GUID;
-}
-}
-if (uuidAttrName == null) {
-uuidAttrName=LDAPConstants.ENTRY_UUID;
-}
-}
-return uuidAttrName;
+    uuidAttrName=LDAPConstants.getUuidAttributeName(vendor);
+  }
+  return uuidAttrName;
 }

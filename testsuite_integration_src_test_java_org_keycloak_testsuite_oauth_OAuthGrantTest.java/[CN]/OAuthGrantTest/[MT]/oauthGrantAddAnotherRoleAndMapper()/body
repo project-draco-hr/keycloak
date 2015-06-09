@@ -15,7 +15,7 @@
 );
   grantPage.assertCurrent();
   grantPage.accept();
-  events.expectLogin().client("third-party").assertEvent();
+  events.expectLogin().client("third-party").detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
   accountAppsPage.open();
   AccountApplicationsPage.AppEntry appEntry=accountAppsPage.getApplications().get("third-party");
   Assert.assertFalse(appEntry.getRolesGranted().contains("new-role"));
@@ -27,7 +27,7 @@
   Assert.assertTrue(driver.getPageSource().contains("new-role"));
   Assert.assertTrue(driver.getPageSource().contains(KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME));
   grantPage.accept();
-  events.expectLogin().client("third-party").assertEvent();
+  events.expectLogin().client("third-party").detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
   accountAppsPage.open();
   appEntry=accountAppsPage.getApplications().get("third-party");
   Assert.assertTrue(appEntry.getRolesGranted().contains("new-role"));

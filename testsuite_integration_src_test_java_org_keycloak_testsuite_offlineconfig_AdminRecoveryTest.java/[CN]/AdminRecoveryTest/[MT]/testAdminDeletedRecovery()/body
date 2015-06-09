@@ -1,0 +1,14 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  RealmModel masterRealm=session.realms().getRealmByName("master");
+  UserModel adminUser=session.users().getUserByUsername("admin",masterRealm);
+  session.users().removeUser(masterRealm,adminUser);
+  adminUser=session.users().getUserByUsername("admin",masterRealm);
+  keycloakRule.stopSession(session,true);
+  Assert.assertNull(adminUser);
+  doAdminRecovery(session);
+  session=keycloakRule.startSession();
+  adminUser=session.users().getUserByUsername("admin",masterRealm);
+  Assert.assertNotNull(adminUser);
+  Assert.assertTrue(adminUser.getRequiredActions().contains(RequiredAction.UPDATE_PASSWORD.toString()));
+}

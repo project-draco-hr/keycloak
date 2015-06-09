@@ -1,24 +1,29 @@
 {
-  HttpClient client=new DefaultHttpClient();
-  HttpPost post=new HttpPost(getLogoutUrl(null,null));
-  List<NameValuePair> parameters=new LinkedList<NameValuePair>();
-  if (refreshToken != null) {
-    parameters.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN,refreshToken));
-  }
-  if (clientId != null && clientSecret != null) {
-    String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
-    post.setHeader("Authorization",authorization);
-  }
- else   if (clientId != null) {
-    parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,clientId));
-  }
-  UrlEncodedFormEntity formEntity;
+  CloseableHttpClient client=new DefaultHttpClient();
   try {
-    formEntity=new UrlEncodedFormEntity(parameters,"UTF-8");
+    HttpPost post=new HttpPost(getLogoutUrl(null,null));
+    List<NameValuePair> parameters=new LinkedList<NameValuePair>();
+    if (refreshToken != null) {
+      parameters.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN,refreshToken));
+    }
+    if (clientId != null && clientSecret != null) {
+      String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
+      post.setHeader("Authorization",authorization);
+    }
+ else     if (clientId != null) {
+      parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,clientId));
+    }
+    UrlEncodedFormEntity formEntity;
+    try {
+      formEntity=new UrlEncodedFormEntity(parameters,"UTF-8");
+    }
+ catch (    UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    post.setEntity(formEntity);
+    return client.execute(post);
   }
- catch (  UnsupportedEncodingException e) {
-    throw new RuntimeException(e);
+  finally {
+    closeClient(client);
   }
-  post.setEntity(formEntity);
-  return client.execute(post);
 }

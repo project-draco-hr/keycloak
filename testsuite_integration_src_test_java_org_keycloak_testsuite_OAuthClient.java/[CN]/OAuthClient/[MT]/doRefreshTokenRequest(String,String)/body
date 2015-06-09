@@ -1,36 +1,41 @@
 {
-  HttpClient client=new DefaultHttpClient();
-  HttpPost post=new HttpPost(getRefreshTokenUrl());
-  List<NameValuePair> parameters=new LinkedList<NameValuePair>();
-  parameters.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,OAuth2Constants.REFRESH_TOKEN));
-  if (refreshToken != null) {
-    parameters.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN,refreshToken));
-  }
-  if (clientId != null && password != null) {
-    String authorization=BasicAuthHelper.createHeader(clientId,password);
-    post.setHeader("Authorization",authorization);
-  }
- else   if (clientId != null) {
-    parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,clientId));
-  }
-  if (clientSessionState != null) {
-    parameters.add(new BasicNameValuePair(AdapterConstants.CLIENT_SESSION_STATE,clientSessionState));
-  }
-  if (clientSessionHost != null) {
-    parameters.add(new BasicNameValuePair(AdapterConstants.CLIENT_SESSION_HOST,clientSessionHost));
-  }
-  UrlEncodedFormEntity formEntity;
+  CloseableHttpClient client=new DefaultHttpClient();
   try {
-    formEntity=new UrlEncodedFormEntity(parameters,"UTF-8");
+    HttpPost post=new HttpPost(getRefreshTokenUrl());
+    List<NameValuePair> parameters=new LinkedList<NameValuePair>();
+    parameters.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,OAuth2Constants.REFRESH_TOKEN));
+    if (refreshToken != null) {
+      parameters.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN,refreshToken));
+    }
+    if (clientId != null && password != null) {
+      String authorization=BasicAuthHelper.createHeader(clientId,password);
+      post.setHeader("Authorization",authorization);
+    }
+ else     if (clientId != null) {
+      parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,clientId));
+    }
+    if (clientSessionState != null) {
+      parameters.add(new BasicNameValuePair(AdapterConstants.CLIENT_SESSION_STATE,clientSessionState));
+    }
+    if (clientSessionHost != null) {
+      parameters.add(new BasicNameValuePair(AdapterConstants.CLIENT_SESSION_HOST,clientSessionHost));
+    }
+    UrlEncodedFormEntity formEntity;
+    try {
+      formEntity=new UrlEncodedFormEntity(parameters,"UTF-8");
+    }
+ catch (    UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    post.setEntity(formEntity);
+    try {
+      return new AccessTokenResponse(client.execute(post));
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to retrieve access token",e);
+    }
   }
- catch (  UnsupportedEncodingException e) {
-    throw new RuntimeException(e);
-  }
-  post.setEntity(formEntity);
-  try {
-    return new AccessTokenResponse(client.execute(post));
-  }
- catch (  Exception e) {
-    throw new RuntimeException("Failed to retrieve access token",e);
+  finally {
+    closeClient(client);
   }
 }

@@ -15,7 +15,13 @@
   }
   AuthenticationProcessor processor=new AuthenticationProcessor();
   processor.setClientSession(clientSession).setFlowId(flowId).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setSession(session).setUriInfo(uriInfo).setRequest(request);
-  Response challenge=processor.authenticateOnly();
+  Response challenge=null;
+  try {
+    challenge=processor.authenticateOnly();
+  }
+ catch (  Exception e) {
+    return processor.handleBrowserException(e);
+  }
   if (challenge != null && prompt != null && prompt.equals("none")) {
     if (processor.isUserSessionCreated()) {
       session.sessions().removeUserSession(realm,processor.getUserSession());

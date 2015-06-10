@@ -34,7 +34,7 @@ case ADD:
   try {
     ClientSessionModel clientSession=auth.getClientSession();
     ClientSessionCode clientSessionCode=new ClientSessionCode(realm,clientSession);
-    clientSessionCode.setAction(ClientSessionModel.Action.AUTHENTICATE);
+    clientSessionCode.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
     clientSession.setRedirectUri(redirectUri);
     clientSession.setNote(OIDCLoginProtocol.STATE_PARAM,UUID.randomUUID().toString());
     return Response.temporaryRedirect(Urls.identityProviderAuthnRequest(this.uriInfo.getBaseUri(),providerId,realm.getName(),clientSessionCode.getCode())).build();

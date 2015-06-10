@@ -1,11 +1,11 @@
 {
   ClientModel client=clientSession.getClient();
-  if (client instanceof ClientModel && !client.isFrontchannelLogout() && clientSession.getAction() != ClientSessionModel.Action.LOGGED_OUT) {
+  if (client instanceof ClientModel && !client.isFrontchannelLogout() && !ClientSessionModel.Action.LOGGED_OUT.name().equals(clientSession.getAction())) {
     String authMethod=clientSession.getAuthMethod();
     if (authMethod == null)     return;
     LoginProtocol protocol=session.getProvider(LoginProtocol.class,authMethod);
     protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo);
     protocol.backchannelLogout(userSession,clientSession);
-    clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT);
+    clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT.name());
   }
 }

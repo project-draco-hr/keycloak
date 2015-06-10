@@ -20,7 +20,7 @@
     userSession.setNote(AuthenticationManager.KEYCLOAK_LOGOUT_PROTOCOL,SamlProtocol.LOGIN_PROTOCOL);
     for (    ClientSessionModel clientSession : userSession.getClientSessions()) {
       if (clientSession.getClient().getId().equals(client.getId())) {
-        clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT);
+        clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT.name());
       }
     }
     logger.debug("browser Logout");
@@ -31,7 +31,7 @@
       ClientSessionModel clientSession=session.sessions().getClientSession(realm,sessionIndex);
       if (clientSession == null)       continue;
       if (clientSession.getClient().getClientId().equals(client.getClientId())) {
-        clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT);
+        clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT.name());
       }
       UserSessionModel userSession=clientSession.getUserSession();
       try {

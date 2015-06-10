@@ -7,9 +7,9 @@
   event.detail(Details.CODE_ID,code);
   ClientSessionCode clientSessionCode=checks.clientCode;
   ClientSessionModel clientSession=clientSessionCode.getClientSession();
-  if (clientSession.getAction().equals(ClientSessionModel.Action.RECOVER_PASSWORD)) {
+  if (clientSession.getAction().equals(ClientSessionModel.Action.RECOVER_PASSWORD.name())) {
     TokenManager.dettachClientSession(session.sessions(),realm,clientSession);
-    clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE);
+    clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
   }
   return session.getProvider(LoginFormsProvider.class).setClientSessionCode(clientSessionCode.getCode()).createLogin();
 }

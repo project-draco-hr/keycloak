@@ -1,4 +1,10 @@
 {
+  List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
+  for (  IdentityProviderModel identityProvider : identityProviders) {
+    if (identityProvider.isAuthenticateByDefault()) {
+      return buildRedirectToIdentityProvider(identityProvider.getAlias(),new ClientSessionCode(realm,clientSession).getCode());
+    }
+  }
   String flowId=null;
   for (  AuthenticationFlowModel flow : realm.getAuthenticationFlows()) {
     if (flow.getAlias().equals("browser")) {
@@ -8,5 +14,10 @@
   }
   AuthenticationProcessor processor=new AuthenticationProcessor();
   processor.setClientSession(clientSession).setFlowId(flowId).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setSession(session).setUriInfo(uriInfo).setRequest(request);
-  return processor.authenticate();
+  try {
+    return processor.authenticate();
+  }
+ catch (  Exception e) {
+    return processor.handleBrowserException(e);
+  }
 }

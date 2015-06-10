@@ -1,0 +1,14 @@
+{
+  oauth.clientId("resource-owner");
+  DefaultHttpClient client=new DefaultHttpClient();
+  try {
+    HttpPost post=new HttpPost(oauth.getResourceOwnerPasswordCredentialGrantUrl());
+    OAuthClient.AccessTokenResponse response=new OAuthClient.AccessTokenResponse(client.execute(post));
+    assertEquals(400,response.getStatusCode());
+    assertEquals("invalid_request",response.getError());
+    assertEquals("Missing form parameter: grant_type",response.getErrorDescription());
+  }
+  finally {
+    client.close();
+  }
+}

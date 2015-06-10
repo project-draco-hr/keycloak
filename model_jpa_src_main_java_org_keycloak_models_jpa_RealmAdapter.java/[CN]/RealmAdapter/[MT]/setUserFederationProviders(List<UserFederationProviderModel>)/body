@@ -11,10 +11,9 @@
         entity.setConfig(model.getConfig());
         entity.setPriority(model.getPriority());
         entity.setProviderName(model.getProviderName());
-        entity.setPriority(model.getPriority());
         String displayName=model.getDisplayName();
         if (displayName != null) {
-          entity.setDisplayName(model.getDisplayName());
+          entity.setDisplayName(displayName);
         }
         entity.setFullSyncPeriod(model.getFullSyncPeriod());
         entity.setChangedSyncPeriod(model.getChangedSyncPeriod());
@@ -25,6 +24,7 @@
     }
     if (found)     continue;
     session.users().preRemove(this,new UserFederationProviderModel(entity.getId(),entity.getProviderName(),entity.getConfig(),entity.getPriority(),entity.getDisplayName(),entity.getFullSyncPeriod(),entity.getChangedSyncPeriod(),entity.getLastSync()));
+    removeFederationMappersForProvider(entity.getId());
     it.remove();
     em.remove(entity);
   }

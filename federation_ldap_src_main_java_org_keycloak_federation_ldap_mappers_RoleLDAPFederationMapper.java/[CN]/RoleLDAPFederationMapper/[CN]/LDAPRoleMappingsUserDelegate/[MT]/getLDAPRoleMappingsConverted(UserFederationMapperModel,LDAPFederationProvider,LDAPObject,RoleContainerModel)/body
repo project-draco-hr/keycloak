@@ -1,0 +1,18 @@
+{
+  if (cachedLDAPRoleMappings != null) {
+    return new HashSet<>(cachedLDAPRoleMappings);
+  }
+  List<LDAPObject> ldapRoles=getLDAPRoleMappings(mapperModel,ldapProvider,ldapUser);
+  Set<RoleModel> roles=new HashSet<RoleModel>();
+  String roleNameLdapAttr=getRoleNameLdapAttribute(mapperModel);
+  for (  LDAPObject role : ldapRoles) {
+    String roleName=role.getAttributeAsString(roleNameLdapAttr);
+    RoleModel modelRole=roleContainer.getRole(roleName);
+    if (modelRole == null) {
+      modelRole=roleContainer.addRole(roleName);
+    }
+    roles.add(modelRole);
+  }
+  cachedLDAPRoleMappings=new HashSet<>(roles);
+  return roles;
+}

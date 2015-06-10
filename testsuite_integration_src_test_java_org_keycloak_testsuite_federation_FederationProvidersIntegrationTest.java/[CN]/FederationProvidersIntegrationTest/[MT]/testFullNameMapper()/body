@@ -6,10 +6,11 @@
     Assert.assertNull(session.users().getUserByUsername("fullname",appRealm));
     LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
     FederationTestUtils.addLDAPUser(ldapFedProvider,appRealm,"fullname","James Dee","Dee","fullname@email.org","4578");
-    UserFederationMapperModel fullNameMapperModel=KeycloakModelUtils.createUserFederationMapperModel("full name",ldapModel.getId(),FullNameLDAPFederationMapperFactory.PROVIDER_ID,FullNameLDAPFederationMapper.LDAP_FULL_NAME_ATTRIBUTE,LDAPConstants.CN,UserAttributeLDAPFederationMapper.READ_ONLY,"false");
-    appRealm.addUserFederationMapper(fullNameMapperModel);
     firstNameMapper=appRealm.getUserFederationMapperByName(ldapModel.getId(),"first name");
+    String ldapFirstNameAttributeName=firstNameMapper.getConfig().get(UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE);
     appRealm.removeUserFederationMapper(firstNameMapper);
+    UserFederationMapperModel fullNameMapperModel=KeycloakModelUtils.createUserFederationMapperModel("full name",ldapModel.getId(),FullNameLDAPFederationMapperFactory.PROVIDER_ID,FullNameLDAPFederationMapper.LDAP_FULL_NAME_ATTRIBUTE,ldapFirstNameAttributeName,UserAttributeLDAPFederationMapper.READ_ONLY,"false");
+    appRealm.addUserFederationMapper(fullNameMapperModel);
     FederationTestUtils.assertUserImported(session.users(),appRealm,"fullname","James","Dee","fullname@email.org","4578");
   }
   finally {

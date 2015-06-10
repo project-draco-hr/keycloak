@@ -6,7 +6,8 @@
   String identityProviderId=identityProviderModel.getAlias();
   identityProviderModel.getConfig().put("config-added","value-added");
   identityProviderModel.setEnabled(false);
-  identityProviderModel.setUpdateProfileFirstLogin(false);
+  identityProviderModel.setUpdateProfileFirstLoginMode(IdentityProviderRepresentation.UPFLM_OFF);
+  identityProviderModel.setTrustEmail(true);
   identityProviderModel.setStoreToken(true);
   identityProviderModel.setAuthenticateByDefault(true);
   realm.updateIdentityProvider(identityProviderModel);
@@ -15,12 +16,14 @@
   identityProviderModel=realm.getIdentityProviderByAlias(identityProviderId);
   assertEquals("value-added",identityProviderModel.getConfig().get("config-added"));
   assertFalse(identityProviderModel.isEnabled());
-  assertFalse(identityProviderModel.isUpdateProfileFirstLogin());
+  assertEquals(IdentityProviderRepresentation.UPFLM_OFF,identityProviderModel.getUpdateProfileFirstLoginMode());
+  assertTrue(identityProviderModel.isTrustEmail());
   assertTrue(identityProviderModel.isStoreToken());
   assertTrue(identityProviderModel.isAuthenticateByDefault());
   identityProviderModel.getConfig().remove("config-added");
   identityProviderModel.setEnabled(true);
-  identityProviderModel.setUpdateProfileFirstLogin(true);
+  identityProviderModel.setUpdateProfileFirstLoginMode(IdentityProviderRepresentation.UPFLM_MISSING);
+  identityProviderModel.setTrustEmail(false);
   identityProviderModel.setAuthenticateByDefault(false);
   realm.updateIdentityProvider(identityProviderModel);
   commit();
@@ -28,7 +31,8 @@
   identityProviderModel=realm.getIdentityProviderByAlias(identityProviderId);
   assertFalse(identityProviderModel.getConfig().containsKey("config-added"));
   assertTrue(identityProviderModel.isEnabled());
-  assertTrue(identityProviderModel.isUpdateProfileFirstLogin());
+  assertEquals(IdentityProviderRepresentation.UPFLM_MISSING,identityProviderModel.getUpdateProfileFirstLoginMode());
+  assertFalse(identityProviderModel.isTrustEmail());
   assertFalse(identityProviderModel.isAuthenticateByDefault());
   this.realmManager.removeRealm(realm);
 }

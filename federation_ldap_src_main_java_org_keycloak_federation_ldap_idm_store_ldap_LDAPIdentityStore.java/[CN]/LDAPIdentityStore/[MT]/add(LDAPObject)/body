@@ -1,9 +1,10 @@
 {
   if (ldapObject.getUuid() != null) {
-    throw new IllegalStateException("Can't add object with already assigned uuid");
+    throw new ModelException("Can't add object with already assigned uuid");
   }
   String entryDN=ldapObject.getDn().toString();
-  this.operationManager.createSubContext(entryDN,extractAttributes(ldapObject,true));
+  BasicAttributes ldapAttributes=extractAttributes(ldapObject,true);
+  this.operationManager.createSubContext(entryDN,ldapAttributes);
   ldapObject.setUuid(getEntryIdentifier(ldapObject));
   if (logger.isTraceEnabled()) {
     logger.tracef("Type with identifier [%s] and dn [%s] successfully added to LDAP store.",ldapObject.getUuid(),entryDN);

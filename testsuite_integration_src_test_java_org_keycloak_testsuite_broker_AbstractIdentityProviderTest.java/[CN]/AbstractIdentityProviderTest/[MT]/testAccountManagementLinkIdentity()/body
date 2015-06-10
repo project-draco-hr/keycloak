@@ -21,7 +21,6 @@
   accountFederatedIdentityPage.clickRemoveProvider(identityProviderModel.getAlias());
   assertTrue(driver.getPageSource().contains("id=\"add-" + identityProviderModel.getAlias() + "\""));
   revokeGrant();
-  String pageSource=driver.getPageSource();
   System.out.println("*** logout from account management");
   accountFederatedIdentityPage.logout();
   assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
@@ -29,6 +28,5 @@
   this.loginPage.clickSocial(identityProviderModel.getAlias());
   this.loginPage.login("test-user","password");
   doAfterProviderAuthentication();
-  String current=driver.getCurrentUrl();
   this.updateProfilePage.assertCurrent();
 }

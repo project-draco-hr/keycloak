@@ -1,0 +1,28 @@
+{
+  factory.register(new ProviderEventListener(){
+    @Override public void onEvent(    ProviderEvent event){
+      if (event instanceof RealmModel.UserFederationMapperEvent) {
+        RealmModel.UserFederationMapperEvent mapperEvent=(RealmModel.UserFederationMapperEvent)event;
+        UserFederationMapperModel mapperModel=mapperEvent.getFederationMapper();
+        RealmModel realm=mapperEvent.getRealm();
+        KeycloakSession session=mapperEvent.getSession();
+        if (mapperModel.getFederationMapperType().equals(PROVIDER_ID)) {
+          try {
+            String federationProviderId=mapperModel.getFederationProviderId();
+            UserFederationProviderModel providerModel=KeycloakModelUtils.findUserFederationProviderById(federationProviderId,realm);
+            if (providerModel == null) {
+              throw new IllegalStateException("Can't find federation provider with ID [" + federationProviderId + "] in realm "+ realm.getName());
+            }
+            UserFederationProviderFactory ldapFactory=(UserFederationProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(UserFederationProvider.class,providerModel.getProviderName());
+            LDAPFederationProvider ldapProvider=(LDAPFederationProvider)ldapFactory.getInstance(session,providerModel);
+            new RoleLDAPFederationMapper().syncRolesFromLDAP(mapperModel,ldapProvider,realm);
+          }
+ catch (          Exception e) {
+            logger.warn("Exception during initial sync of roles from LDAP.",e);
+          }
+        }
+      }
+    }
+  }
+);
+}

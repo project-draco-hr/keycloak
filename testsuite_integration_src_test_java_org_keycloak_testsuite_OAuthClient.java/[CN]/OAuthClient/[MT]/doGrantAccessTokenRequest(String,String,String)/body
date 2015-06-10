@@ -1,19 +1,30 @@
 {
-  HttpClient client=new DefaultHttpClient();
-  HttpPost post=new HttpPost(getResourceOwnerPasswordCredentialGrantUrl());
-  String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
-  post.setHeader("Authorization",authorization);
-  List<NameValuePair> parameters=new LinkedList<NameValuePair>();
-  parameters.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD));
-  parameters.add(new BasicNameValuePair("username",username));
-  parameters.add(new BasicNameValuePair("password",password));
-  UrlEncodedFormEntity formEntity;
+  CloseableHttpClient client=new DefaultHttpClient();
   try {
-    formEntity=new UrlEncodedFormEntity(parameters,"UTF-8");
+    HttpPost post=new HttpPost(getResourceOwnerPasswordCredentialGrantUrl());
+    String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
+    post.setHeader("Authorization",authorization);
+    List<NameValuePair> parameters=new LinkedList<NameValuePair>();
+    parameters.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD));
+    parameters.add(new BasicNameValuePair("username",username));
+    parameters.add(new BasicNameValuePair("password",password));
+    if (clientSessionState != null) {
+      parameters.add(new BasicNameValuePair(AdapterConstants.CLIENT_SESSION_STATE,clientSessionState));
+    }
+    if (clientSessionHost != null) {
+      parameters.add(new BasicNameValuePair(AdapterConstants.CLIENT_SESSION_HOST,clientSessionHost));
+    }
+    UrlEncodedFormEntity formEntity;
+    try {
+      formEntity=new UrlEncodedFormEntity(parameters,"UTF-8");
+    }
+ catch (    UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    post.setEntity(formEntity);
+    return new AccessTokenResponse(client.execute(post));
   }
- catch (  UnsupportedEncodingException e) {
-    throw new RuntimeException(e);
+  finally {
+    closeClient(client);
   }
-  post.setEntity(formEntity);
-  return new AccessTokenResponse(client.execute(post));
 }

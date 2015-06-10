@@ -4,8 +4,7 @@
   Assert.assertTrue(verifyEmailPage.isCurrent());
   Assert.assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];
-  String body=(String)message.getContent();
-  String verificationUrl=MailUtil.getLink(body);
+  String verificationUrl=getPasswordResetEmailLink(message);
   AssertEvents.ExpectedEvent emailEvent=events.expectRequiredAction(EventType.SEND_VERIFY_EMAIL).detail("email","test-user@localhost");
   Event sendEvent=emailEvent.assertEvent();
   String sessionId=sendEvent.getSessionId();

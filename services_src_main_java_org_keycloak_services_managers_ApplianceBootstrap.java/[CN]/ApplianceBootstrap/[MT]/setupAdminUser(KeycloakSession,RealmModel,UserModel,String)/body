@@ -1,0 +1,14 @@
+{
+  adminUser.setEnabled(true);
+  UserCredentialModel usrCredModel=new UserCredentialModel();
+  usrCredModel.setType(UserCredentialModel.PASSWORD);
+  usrCredModel.setValue(password);
+  session.users().updateCredential(realm,adminUser,usrCredModel);
+  adminUser.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+  RoleModel adminRole=realm.getRole(AdminRoles.ADMIN);
+  adminUser.grantRole(adminRole);
+  ClientModel accountApp=realm.getClientNameMap().get(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID);
+  for (  String r : accountApp.getDefaultRoles()) {
+    adminUser.grantRole(accountApp.getRole(r));
+  }
+}

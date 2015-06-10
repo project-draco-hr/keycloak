@@ -1,0 +1,17 @@
+{
+  if (!needRecovery())   return;
+  KeycloakSession session=sessionFactory.create();
+  session.getTransaction().begin();
+  try {
+    doRecover(session,getTempAdminPassword());
+    session.getTransaction().commit();
+    log.info("*******************************");
+    log.info("Recovered Master Admin account.");
+    log.info("*******************************");
+  }
+  finally {
+    session.close();
+    System.clearProperty(RECOVER_ADMIN_ACCOUNT);
+    System.clearProperty(TEMP_ADMIN_PASSWORD);
+  }
+}

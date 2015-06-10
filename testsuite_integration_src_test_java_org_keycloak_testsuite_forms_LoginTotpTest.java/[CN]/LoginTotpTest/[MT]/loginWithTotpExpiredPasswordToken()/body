@@ -7,7 +7,7 @@
     loginTotpPage.login(totp.generate("totpSecret"));
     loginPage.assertCurrent();
     Assert.assertEquals("Invalid username or password.",loginPage.getError());
-    AssertEvents.ExpectedEvent expectedEvent=events.expectLogin().error("invalid_user_credentials").session((String)null);
+    AssertEvents.ExpectedEvent expectedEvent=events.expectLogin().error("invalid_user_credentials").session((String)null).removeDetail(Details.CONSENT);
     expectedEvent.assertEvent();
   }
   finally {

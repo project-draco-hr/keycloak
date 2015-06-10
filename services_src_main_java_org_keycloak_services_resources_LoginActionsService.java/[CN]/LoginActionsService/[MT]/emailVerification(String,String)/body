@@ -18,7 +18,7 @@
       return session.getProvider(LoginFormsProvider.class).setSuccess(Messages.EMAIL_VERIFIED).createInfoPage();
     }
     event=event.clone().removeDetail(Details.EMAIL).event(EventType.LOGIN);
-    return redirectOauth(user,accessCode,clientSession,userSession);
+    return AuthenticationManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
   }
  else {
     Checks checks=new Checks();

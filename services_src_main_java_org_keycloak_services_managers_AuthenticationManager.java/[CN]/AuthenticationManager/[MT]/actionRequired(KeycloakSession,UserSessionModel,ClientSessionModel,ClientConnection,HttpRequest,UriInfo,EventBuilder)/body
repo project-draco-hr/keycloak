@@ -1,36 +1,55 @@
 {
-  RealmModel realm=clientSession.getRealm();
-  UserModel user=userSession.getUser();
-  isForcePasswordUpdateRequired(realm,user);
-  isTotpConfigurationRequired(realm,user);
-  isEmailVerificationRequired(realm,user);
-  ClientModel client=clientSession.getClient();
+  final RealmModel realm=clientSession.getRealm();
+  final UserModel user=userSession.getUser();
+  final ClientModel client=clientSession.getClient();
+  RequiredActionContext context=new RequiredActionContext(){
+    @Override public EventBuilder getEvent(){
+      return event;
+    }
+    @Override public UserModel getUser(){
+      return user;
+    }
+    @Override public RealmModel getRealm(){
+      return realm;
+    }
+    @Override public ClientSessionModel getClientSession(){
+      return clientSession;
+    }
+    @Override public UserSessionModel getUserSession(){
+      return userSession;
+    }
+    @Override public ClientConnection getConnection(){
+      return clientConnection;
+    }
+    @Override public UriInfo getUriInfo(){
+      return uriInfo;
+    }
+    @Override public KeycloakSession getSession(){
+      return session;
+    }
+    @Override public HttpRequest getHttpRequest(){
+      return request;
+    }
+  }
+;
+  for (  ProviderFactory factory : session.getKeycloakSessionFactory().getProviderFactories(RequiredActionProvider.class)) {
+    RequiredActionProvider provider=((RequiredActionFactory)factory).create(session);
+    provider.evaluateTriggers(context);
+  }
   ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
   logger.debugv("processAccessCode: go to oauth page?: {0}",client.isConsentRequired());
   event.detail(Details.CODE_ID,clientSession.getId());
   Set<String> requiredActions=user.getRequiredActions();
-  if (!requiredActions.isEmpty()) {
-    Iterator<String> i=user.getRequiredActions().iterator();
-    String action=i.next();
-    if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL.name()) && Validation.isBlank(user.getEmail())) {
-      if (i.hasNext())       action=i.next();
- else       action=null;
-    }
-    if (action != null) {
-      accessCode.setRequiredAction(RequiredAction.valueOf(action));
-      LoginFormsProvider loginFormsProvider=session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setUser(user);
-      if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL.name())) {
-        event.clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
-        LoginActionsService.createActionCookie(realm,uriInfo,clientConnection,userSession.getId());
-      }
-      return loginFormsProvider.createResponse(RequiredAction.valueOf(action));
-    }
+  for (  String action : requiredActions) {
+    RequiredActionProvider actionProvider=session.getProvider(RequiredActionProvider.class,action);
+    Response challenge=actionProvider.invokeRequiredAction(context);
+    if (challenge != null)     return challenge;
   }
   if (client.isConsentRequired()) {
     accessCode.setAction(ClientSessionModel.Action.OAUTH_GRANT.name());
     UserConsentModel grantedConsent=user.getConsentByClient(client.getId());
-    List<RoleModel> realmRoles=new LinkedList<RoleModel>();
-    MultivaluedMap<String,RoleModel> resourceRoles=new MultivaluedMapImpl<String,RoleModel>();
+    List<RoleModel> realmRoles=new LinkedList<>();
+    MultivaluedMap<String,RoleModel> resourceRoles=new MultivaluedMapImpl<>();
     for (    RoleModel r : accessCode.getRequestedRoles()) {
       if (grantedConsent != null && grantedConsent.isRoleGranted(r)) {
         continue;
@@ -42,7 +61,7 @@
         resourceRoles.add(((ClientModel)r.getContainer()).getClientId(),r);
       }
     }
-    List<ProtocolMapperModel> protocolMappers=new LinkedList<ProtocolMapperModel>();
+    List<ProtocolMapperModel> protocolMappers=new LinkedList<>();
     for (    ProtocolMapperModel protocolMapper : accessCode.getRequestedProtocolMappers()) {
       if (protocolMapper.isConsentRequired() && protocolMapper.getConsentText() != null) {
         if (grantedConsent == null || !grantedConsent.isProtocolMapperGranted(protocolMapper)) {

@@ -30,10 +30,17 @@
     for (    String sessionIndex : logoutRequest.getSessionIndex()) {
       ClientSessionModel clientSession=session.sessions().getClientSession(realm,sessionIndex);
       if (clientSession == null)       continue;
+      UserSessionModel userSession=clientSession.getUserSession();
       if (clientSession.getClient().getClientId().equals(client.getClientId())) {
         clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT);
+        if (userSession != null) {
+          for (          ClientSessionModel clientSession2 : userSession.getClientSessions()) {
+            if (clientSession2.getClient().getId().equals(client.getId())) {
+              clientSession2.setAction(ClientSessionModel.Action.LOGGED_OUT);
+            }
+          }
+        }
       }
-      UserSessionModel userSession=clientSession.getUserSession();
       try {
         authManager.backchannelLogout(session,realm,userSession,uriInfo,clientConnection,headers,true);
       }

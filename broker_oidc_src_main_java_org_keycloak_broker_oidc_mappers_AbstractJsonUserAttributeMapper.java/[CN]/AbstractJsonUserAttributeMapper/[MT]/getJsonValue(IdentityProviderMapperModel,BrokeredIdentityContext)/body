@@ -1,0 +1,18 @@
+{
+  String jsonField=mapperModel.getConfig().get(CONF_JSON_FIELD);
+  if (jsonField == null || jsonField.trim().isEmpty()) {
+    logger.debug("JSON field path is not configured");
+    return null;
+  }
+  jsonField=jsonField.trim();
+  if (jsonField.startsWith(JSON_PATH_DELIMITER) || jsonField.endsWith(JSON_PATH_DELIMITER) || jsonField.startsWith("[")) {
+    logger.debug("JSON field path is invalid " + jsonField);
+    return null;
+  }
+  JsonNode profileJsonNode=(JsonNode)context.getContextData().get(CONTEXT_JSON_NODE);
+  String value=getJsonValue(profileJsonNode,jsonField);
+  if (value == null) {
+    logger.debug("User profile JSON value '" + jsonField + "' is not available.");
+  }
+  return value;
+}

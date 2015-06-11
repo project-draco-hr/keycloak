@@ -1,0 +1,70 @@
+{
+  event.event(EventType.LOGIN);
+  if (!checkSsl()) {
+    event.error(Errors.SSL_REQUIRED);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.HTTPS_REQUIRED));
+  }
+  if (!realm.isEnabled()) {
+    event.error(Errors.REALM_DISABLED);
+    return ErrorPage.error(session,Messages.REALM_NOT_ENABLED);
+  }
+  ClientSessionCode clientCode=ClientSessionCode.parse(code,session,realm);
+  if (clientCode == null) {
+    event.error(Errors.INVALID_CODE);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
+  }
+  final ClientSessionModel clientSession=clientCode.getClientSession();
+  event.detail(Details.CODE_ID,clientSession.getId());
+  ClientModel client=clientSession.getClient();
+  if (client == null) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.UNKNOWN_LOGIN_REQUESTER));
+  }
+  session.getContext().setClient(client);
+  if (!client.isEnabled()) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.LOGIN_REQUESTER_NOT_ENABLED));
+  }
+  if (action == null) {
+    logger.error("required action was null");
+    event.error(Errors.INVALID_CODE);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
+  }
+  RequiredActionProvider provider=session.getProvider(RequiredActionProvider.class,action);
+  if (provider == null) {
+    logger.error("required action provider was null");
+    event.error(Errors.INVALID_CODE);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
+  }
+  RequiredActionContext context=new RequiredActionContext(){
+    @Override public EventBuilder getEvent(){
+      return event;
+    }
+    @Override public UserModel getUser(){
+      return getUserSession().getUser();
+    }
+    @Override public RealmModel getRealm(){
+      return realm;
+    }
+    @Override public ClientSessionModel getClientSession(){
+      return clientSession;
+    }
+    @Override public UserSessionModel getUserSession(){
+      return clientSession.getUserSession();
+    }
+    @Override public ClientConnection getConnection(){
+      return clientConnection;
+    }
+    @Override public UriInfo getUriInfo(){
+      return uriInfo;
+    }
+    @Override public KeycloakSession getSession(){
+      return session;
+    }
+    @Override public HttpRequest getHttpRequest(){
+      return request;
+    }
+  }
+;
+  return provider.jaxrsService(context);
+}

@@ -1,0 +1,13 @@
+{
+  ParseUtils.requireNoAttributes(reader);
+  ModelNode addKeycloakSub=Util.createAddOperation(PathAddress.pathAddress(PATH_SUBSYSTEM));
+  list.add(addKeycloakSub);
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    if (reader.getLocalName().equals(WEB_CONTEXT.getXmlName())) {
+      WEB_CONTEXT.parseAndSetParameter(reader.getElementText(),addKeycloakSub,reader);
+    }
+ else {
+      throw new XMLStreamException("Unknown keycloak-server subsystem tag: " + reader.getLocalName());
+    }
+  }
+}

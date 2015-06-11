@@ -5,13 +5,8 @@
       return buildRedirectToIdentityProvider(identityProvider.getAlias(),new ClientSessionCode(realm,clientSession).getCode());
     }
   }
-  String flowId=null;
-  for (  AuthenticationFlowModel flow : realm.getAuthenticationFlows()) {
-    if (flow.getAlias().equals("browser")) {
-      flowId=flow.getId();
-      break;
-    }
-  }
+  AuthenticationFlowModel flow=realm.getFlowByAlias(DefaultAuthenticationFlows.BROWSER_FLOW);
+  String flowId=flow.getId();
   AuthenticationProcessor processor=new AuthenticationProcessor();
   processor.setClientSession(clientSession).setFlowId(flowId).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setSession(session).setUriInfo(uriInfo).setRequest(request);
   try {

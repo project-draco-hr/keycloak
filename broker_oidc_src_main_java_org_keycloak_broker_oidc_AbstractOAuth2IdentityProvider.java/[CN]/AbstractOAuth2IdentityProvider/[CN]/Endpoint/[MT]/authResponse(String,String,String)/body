@@ -1,8 +1,11 @@
 {
   if (error != null) {
-    event.event(EventType.LOGIN);
-    event.error(error);
-    return ErrorPage.error(session,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
+    if (error.equals(ACCESS_DENIED)) {
+      return callback.cancelled(state);
+    }
+ else {
+      return callback.error(state,Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
+    }
   }
   try {
     if (authorizationCode != null) {

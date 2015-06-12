@@ -1,4 +1,5 @@
 {
+  MultivaluedMap<String,String> formData=request.getDecodedFormParameters();
   event.event(EventType.REGISTER);
   if (!checkSsl()) {
     event.error(Errors.SSL_REQUIRED);
@@ -43,29 +44,30 @@
     return ErrorPage.error(session,Messages.LOGIN_REQUESTER_NOT_ENABLED);
   }
   session.getContext().setClient(client);
-  List<String> requiredCredentialTypes=new LinkedList<String>();
-  for (  RequiredCredentialModel m : realm.getRequiredCredentials()) {
-    requiredCredentialTypes.add(m.getType());
+  List<String> requiredCredentialTypes=new LinkedList<>();
+  boolean passwordRequired=isPasswordRequired();
+  if (passwordRequired) {
+    requiredCredentialTypes.add(CredentialRepresentation.PASSWORD);
   }
   List<FormMessage> errors=Validation.validateRegistrationForm(realm,formData,requiredCredentialTypes,realm.getPasswordPolicy());
   if (errors != null && !errors.isEmpty()) {
     event.error(Errors.INVALID_REGISTRATION);
-    return session.getProvider(LoginFormsProvider.class).setErrors(errors).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
+    return session.getProvider(LoginFormsProvider.class).setErrors(errors).setFormData(formData).setClientSessionCode(clientCode.getCode()).setAttribute("passwordRequired",isPasswordRequired()).createRegistration();
   }
   if (session.users().getUserByUsername(username,realm) != null) {
     event.error(Errors.USERNAME_IN_USE);
-    return session.getProvider(LoginFormsProvider.class).setError(Messages.USERNAME_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
+    return session.getProvider(LoginFormsProvider.class).setError(Messages.USERNAME_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).setAttribute("passwordRequired",isPasswordRequired()).createRegistration();
   }
   if (email != null && session.users().getUserByEmail(email,realm) != null) {
     event.error(Errors.EMAIL_IN_USE);
-    return session.getProvider(LoginFormsProvider.class).setError(Messages.EMAIL_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).createRegistration();
+    return session.getProvider(LoginFormsProvider.class).setError(Messages.EMAIL_EXISTS).setFormData(formData).setClientSessionCode(clientCode.getCode()).setAttribute("passwordRequired",isPasswordRequired()).createRegistration();
   }
   UserModel user=session.users().addUser(realm,username);
   user.setEnabled(true);
   user.setFirstName(formData.getFirst("firstName"));
   user.setLastName(formData.getFirst("lastName"));
   user.setEmail(email);
-  if (requiredCredentialTypes.contains(CredentialRepresentation.PASSWORD)) {
+  if (passwordRequired) {
     UserCredentialModel credentials=new UserCredentialModel();
     credentials.setType(CredentialRepresentation.PASSWORD);
     credentials.setValue(formData.getFirst("password"));
@@ -90,8 +92,18 @@ catch (    Exception ape) {
       return session.getProvider(LoginFormsProvider.class).setError(passwordUpdateError,passwordUpdateErrorParameters).setClientSessionCode(clientCode.getCode()).createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
     }
   }
+  clientSession.setNote(OIDCLoginProtocol.LOGIN_HINT_PARAM,username);
   AttributeFormDataProcessor.process(formData,realm,user);
   event.user(user).success();
   event=new EventBuilder(realm,session,clientConnection);
-  return processLogin(code,formData);
+  clientSession.setAuthenticatedUser(user);
+  AuthenticationFlowModel flow=realm.getFlowByAlias(DefaultAuthenticationFlows.BROWSER_FLOW);
+  AuthenticationProcessor processor=new AuthenticationProcessor();
+  processor.setClientSession(clientSession).setFlowId(flow.getId()).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setAction(AbstractFormAuthenticator.REGISTRATION_FORM_ACTION).setSession(session).setUriInfo(uriInfo).setRequest(request);
+  try {
+    return processor.authenticate();
+  }
+ catch (  Exception e) {
+    return processor.handleBrowserException(e);
+  }
 }

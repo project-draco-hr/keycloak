@@ -65,6 +65,9 @@
       attributes.put("locale",new LocaleBean(realm,locale,b,messagesBundle));
     }
   }
+  if (realm != null && user != null && session != null) {
+    attributes.put("authenticatorConfigured",new AuthenticatorConfiguredMethod(realm,user,session));
+  }
   try {
     String result=freeMarker.processTemplate(attributes,form,theme);
     Response.ResponseBuilder builder=Response.status(status).type(MediaType.TEXT_HTML).entity(result);

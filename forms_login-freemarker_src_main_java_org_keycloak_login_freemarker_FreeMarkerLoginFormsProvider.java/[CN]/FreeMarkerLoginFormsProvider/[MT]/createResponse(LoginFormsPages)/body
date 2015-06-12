@@ -13,7 +13,6 @@
   if (accessCode != null) {
     uriBuilder.replaceQueryParam(OAuth2Constants.CODE,accessCode);
   }
-  Map<String,Object> attributes=new HashMap<String,Object>();
   ThemeProvider themeProvider=session.getProvider(ThemeProvider.class,"extending");
   Theme theme;
   try {
@@ -57,6 +56,9 @@
   }
   URI baseUri=uriBuilder.build();
   attributes.put("requiredActionUrl",new RequiredActionUrlFormatterMethod(realm,baseUri));
+  if (realm != null && user != null && session != null) {
+    attributes.put("authenticatorConfigured",new AuthenticatorConfiguredMethod(realm,user,session));
+  }
   if (realm != null) {
     attributes.put("realm",new RealmBean(realm));
     attributes.put("social",new IdentityProviderBean(realm,baseUri,uriInfo));

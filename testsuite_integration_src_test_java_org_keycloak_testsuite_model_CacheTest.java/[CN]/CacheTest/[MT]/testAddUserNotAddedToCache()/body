@@ -1,0 +1,17 @@
+{
+  KeycloakSession session=kc.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    UserModel user=session.users().addUser(realm,"testAddUserNotAddedToCache");
+    user.setFirstName("firstName");
+    user.addRequiredAction(UserModel.RequiredAction.CONFIGURE_TOTP);
+    UserSessionModel userSession=session.sessions().createUserSession(realm,user,"testAddUserNotAddedToCache","127.0.0.1","auth",false,null,null);
+    UserModel user2=userSession.getUser();
+    user.setLastName("lastName");
+    assertNotNull(user2.getLastName());
+  }
+  finally {
+    session.getTransaction().commit();
+    session.close();
+  }
+}

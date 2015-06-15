@@ -15,6 +15,20 @@
     response=ErrorPage.error(session,Messages.INVALID_CODE);
     return false;
   }
+  ClientSessionModel clientSession=clientCode.getClientSession();
+  event.detail(Details.CODE_ID,clientSession.getId());
+  ClientModel client=clientSession.getClient();
+  if (client == null) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    response=ErrorPage.error(session,Messages.UNKNOWN_LOGIN_REQUESTER);
+    return false;
+  }
+  session.getContext().setClient(client);
+  if (!client.isEnabled()) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    response=ErrorPage.error(session,Messages.LOGIN_REQUESTER_NOT_ENABLED);
+    return false;
+  }
   session.getContext().setClient(clientCode.getClientSession().getClient());
   return true;
 }

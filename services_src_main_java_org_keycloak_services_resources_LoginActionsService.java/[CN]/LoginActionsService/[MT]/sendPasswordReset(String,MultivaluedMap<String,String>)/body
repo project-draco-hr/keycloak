@@ -1,31 +1,17 @@
 {
   event.event(EventType.SEND_RESET_PASSWORD);
-  if (!checkSsl()) {
-    return ErrorPage.error(session,Messages.HTTPS_REQUIRED);
+  Checks checks=new Checks();
+  if (!checks.check(code)) {
+    return checks.response;
   }
-  if (!realm.isEnabled()) {
-    event.error(Errors.REALM_DISABLED);
-    return ErrorPage.error(session,Messages.REALM_NOT_ENABLED);
-  }
-  ClientSessionCode accessCode=ClientSessionCode.parse(code,session,realm);
-  if (accessCode == null) {
-    event.error(Errors.INVALID_CODE);
-    return ErrorPage.error(session,Messages.INVALID_CODE);
-  }
-  ClientSessionModel clientSession=accessCode.getClientSession();
+  final ClientSessionCode accessCode=checks.clientCode;
+  final ClientSessionModel clientSession=accessCode.getClientSession();
+  ClientModel client=clientSession.getClient();
   String username=formData.getFirst("username");
   if (username == null || username.isEmpty()) {
     event.error(Errors.USERNAME_MISSING);
     return session.getProvider(LoginFormsProvider.class).setError(Messages.MISSING_USERNAME).setClientSessionCode(accessCode.getCode()).createPasswordReset();
   }
-  ClientModel client=clientSession.getClient();
-  if (client == null) {
-    return ErrorPage.error(session,Messages.UNKNOWN_LOGIN_REQUESTER);
-  }
-  if (!client.isEnabled()) {
-    return ErrorPage.error(session,Messages.LOGIN_REQUESTER_NOT_ENABLED);
-  }
-  session.getContext().setClient(client);
   event.client(client.getClientId()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.RESPONSE_TYPE,"code").detail(Details.AUTH_METHOD,"form").detail(Details.USERNAME,username);
   UserModel user=session.users().getUserByUsername(username,realm);
   if (user == null && username.contains("@")) {

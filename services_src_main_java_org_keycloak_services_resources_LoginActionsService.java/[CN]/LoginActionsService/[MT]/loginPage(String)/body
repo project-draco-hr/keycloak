@@ -11,5 +11,14 @@
     TokenManager.dettachClientSession(session.sessions(),realm,clientSession);
     clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
   }
-  return session.getProvider(LoginFormsProvider.class).setClientSessionCode(clientSessionCode.getCode()).createLogin();
+  AuthenticationFlowModel flow=realm.getFlowByAlias(DefaultAuthenticationFlows.BROWSER_FLOW);
+  String flowId=flow.getId();
+  AuthenticationProcessor processor=new AuthenticationProcessor();
+  processor.setClientSession(clientSession).setFlowId(flowId).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setSession(session).setUriInfo(uriInfo).setRequest(request);
+  try {
+    return processor.authenticate();
+  }
+ catch (  Exception e) {
+    return processor.handleBrowserException(e);
+  }
 }

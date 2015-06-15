@@ -1,4 +1,7 @@
 {
+  if (!ClientSessionModel.Action.AUTHENTICATE.name().equals(clientSession.getAction())) {
+    throw new AuthException(Error.INVALID_CLIENT_SESSION);
+  }
   logger.debug("AUTHENTICATE");
   event.event(EventType.LOGIN);
   event.client(clientSession.getClient().getClientId()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.AUTH_METHOD,clientSession.getAuthMethod());

@@ -1,13 +1,17 @@
 {
   HttpRequest request=context.getHttpRequest();
   String authHeader=request.getHttpHeaders().getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+  if (isAction(context,KERBEROS_DISABLED)) {
+    context.attempted();
+    return;
+  }
   if (authHeader == null) {
     if (isAlreadyChallenged(context)) {
       context.attempted();
       return;
     }
     Response challenge=challengeNegotiation(context,null);
-    context.challenge(challenge);
+    context.forceChallenge(challenge);
     return;
   }
   String[] tokens=authHeader.split(" ");

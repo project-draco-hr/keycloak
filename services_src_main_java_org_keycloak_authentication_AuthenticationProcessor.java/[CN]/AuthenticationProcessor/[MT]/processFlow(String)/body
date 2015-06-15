@@ -6,7 +6,6 @@
   }
   List<AuthenticationExecutionModel> executions=realm.getAuthenticationExecutions(flowId);
   if (executions == null)   return null;
-  Collections.sort(executions,AuthenticationExecutionModel.ExecutionComparator.SINGLETON);
   Response alternativeChallenge=null;
   AuthenticationExecutionModel challengedAlternativeExecution=null;
   boolean alternativeSuccessful=false;
@@ -83,6 +82,10 @@
       clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.FAILED);
       if (context.challenge != null)       return context.challenge;
       throw new AuthException(context.error);
+    }
+ else     if (result == Status.FORCE_CHALLENGE) {
+      clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.CHALLENGED);
+      return context.challenge;
     }
  else     if (result == Status.CHALLENGE) {
       logger.debugv("authenticator CHALLENGE: {0}",authenticatorModel.getProviderId());

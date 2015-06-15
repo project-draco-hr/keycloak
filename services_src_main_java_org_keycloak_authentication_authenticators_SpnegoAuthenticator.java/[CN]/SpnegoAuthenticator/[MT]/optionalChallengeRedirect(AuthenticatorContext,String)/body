@@ -1,0 +1,23 @@
+{
+  ClientSessionCode code=new ClientSessionCode(context.getRealm(),context.getClientSession());
+  code.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
+  URI action=getActionUrl(context,code,KERBEROS_DISABLED);
+  StringBuilder builder=new StringBuilder();
+  builder.append("<HTML>");
+  builder.append("<HEAD>");
+  builder.append("<TITLE>Kerberos Unsupported</TITLE>");
+  builder.append("</HEAD>");
+  if (bypassChallengeJavascript) {
+    builder.append("<BODY>");
+  }
+ else {
+    builder.append("<BODY Onload=\"document.forms[0].submit()\">");
+  }
+  builder.append("<FORM METHOD=\"POST\" ACTION=\"" + action.toString() + "\">");
+  builder.append("<NOSCRIPT>");
+  builder.append("<P>JavaScript is disabled. We strongly recommend to enable it. You were unable to login via Kerberos.  Click the button below to login via an alternative method .</P>");
+  builder.append("<INPUT name=\"continue\" TYPE=\"SUBMIT\" VALUE=\"CONTINUE\" />");
+  builder.append("</NOSCRIPT>");
+  builder.append("</FORM></BODY></HTML>");
+  return Response.status(Response.Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE,negotiateHeader).type(MediaType.TEXT_HTML_TYPE).entity(builder.toString()).build();
+}

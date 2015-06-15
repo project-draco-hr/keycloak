@@ -1,5 +1,6 @@
 {
   initHttpClient(false);
+  SpnegoAuthenticator.bypassChallengeJavascript=true;
   driver.navigate().to(KERBEROS_APP_URL);
   String kcLoginPageLocation=driver.getCurrentUrl();
   Response response=client.target(kcLoginPageLocation).request().get();
@@ -8,4 +9,5 @@
   String responseText=response.readEntity(String.class);
   responseText.contains("Log in to test");
   response.close();
+  SpnegoAuthenticator.bypassChallengeJavascript=false;
 }

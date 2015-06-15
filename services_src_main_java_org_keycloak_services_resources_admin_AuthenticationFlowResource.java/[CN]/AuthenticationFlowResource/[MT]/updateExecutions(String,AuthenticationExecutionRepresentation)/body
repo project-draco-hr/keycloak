@@ -1,0 +1,17 @@
+{
+  this.auth.requireManage();
+  AuthenticationFlowModel flow=realm.getFlowByAlias(flowAlias);
+  if (flow == null) {
+    logger.debug("flow not found: " + flowAlias);
+    throw new NotFoundException("flow not found");
+  }
+  AuthenticationExecutionModel model=realm.getAuthenticationExecutionById(rep.getExecution());
+  if (model == null) {
+    session.getTransaction().setRollbackOnly();
+    throw new NotFoundException("Illegal execution");
+  }
+  if (!model.getRequirement().name().equals(rep.getRequirement())) {
+    model.setRequirement(AuthenticationExecutionModel.Requirement.valueOf(rep.getRequirement()));
+    realm.updateAuthenticatorExecution(model);
+  }
+}

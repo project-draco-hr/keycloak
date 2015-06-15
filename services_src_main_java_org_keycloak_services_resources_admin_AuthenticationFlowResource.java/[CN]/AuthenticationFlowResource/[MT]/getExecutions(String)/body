@@ -1,0 +1,44 @@
+{
+  this.auth.requireView();
+  AuthenticationFlowModel flow=realm.getFlowByAlias(flowAlias);
+  if (flow == null) {
+    logger.debug("flow not found: " + flowAlias);
+    return Response.status(NOT_FOUND).build();
+  }
+  List<AuthenticationExecutionRepresentation> result=new LinkedList<>();
+  List<AuthenticationExecutionModel> executions=AuthenticatorUtil.getEnabledExecutionsRecursively(realm,flow.getId());
+  for (  AuthenticationExecutionModel execution : executions) {
+    AuthenticationExecutionRepresentation rep=new AuthenticationExecutionRepresentation();
+    rep.setSubFlow(false);
+    rep.setRequirementChoices(new LinkedList<String>());
+    if (execution.isAutheticatorFlow()) {
+      AuthenticationFlowModel flowRef=realm.getAuthenticationFlowById(execution.getAuthenticator());
+      rep.setReferenceType(flowRef.getAlias());
+      rep.setExecution(execution.getId());
+      rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.ALTERNATIVE.name());
+      rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.REQUIRED.name());
+      rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.DISABLED.name());
+      rep.setConfigurable(false);
+      rep.setExecution(execution.getId());
+      rep.setRequirement(execution.getRequirement().name());
+      result.add(rep);
+    }
+ else {
+      if (!flow.getId().equals(execution.getParentFlow())) {
+        rep.setSubFlow(true);
+      }
+      AuthenticatorModel authenticator=realm.getAuthenticatorById(execution.getAuthenticator());
+      AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,authenticator.getProviderId());
+      if (factory.getReferenceType() == null)       continue;
+      rep.setReferenceType(factory.getReferenceType());
+      rep.setConfigurable(factory.isConfigurable());
+      for (      AuthenticationExecutionModel.Requirement choice : factory.getRequirementChoices()) {
+        rep.getRequirementChoices().add(choice.name());
+      }
+      rep.setExecution(execution.getId());
+      rep.setRequirement(execution.getRequirement().name());
+      result.add(rep);
+    }
+  }
+  return Response.ok(result).build();
+}

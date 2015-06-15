@@ -3,8 +3,10 @@
   if (logger.isTraceEnabled()) {
     logger.trace("Sending back " + HttpHeaders.WWW_AUTHENTICATE + ": "+ negotiateHeader);
   }
-  LoginFormsProvider loginForm=loginForm(context);
-  loginForm.setStatus(Response.Status.UNAUTHORIZED);
-  loginForm.setResponseHeader(HttpHeaders.WWW_AUTHENTICATE,negotiateHeader);
-  return loginForm.createLogin();
+  if (context.getExecution().isRequired()) {
+    return context.getSession().getProvider(LoginFormsProvider.class).setStatus(Response.Status.UNAUTHORIZED).setResponseHeader(HttpHeaders.WWW_AUTHENTICATE,negotiateHeader).setError(Messages.KERBEROS_NOT_ENABLED).createErrorPage();
+  }
+ else {
+    return optionalChallengeRedirect(context,negotiateHeader);
+  }
 }

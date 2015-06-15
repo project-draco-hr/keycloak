@@ -1,0 +1,6 @@
+{
+  ClientSessionCode code=new ClientSessionCode(context.getRealm(),context.getClientSession());
+  code.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
+  URI action=getActionUrl(context,code,KERBEROS_DISABLED);
+  return context.getSession().getProvider(LoginFormsProvider.class).setClientSessionCode(new ClientSessionCode(context.getRealm(),context.getClientSession()).getCode()).setActionUri(action).setStatus(Response.Status.UNAUTHORIZED).setResponseHeader(HttpHeaders.WWW_AUTHENTICATE,negotiateHeader).setUser(context.getUser()).createForm("bypass_kerberos.ftl",new HashMap<String,Object>());
+}

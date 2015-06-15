@@ -1,66 +1,7 @@
 {
-  RealmModel realm=clientSession.getRealm();
-  UserModel user=userSession.getUser();
-  isForcePasswordUpdateRequired(realm,user);
-  isTotpConfigurationRequired(realm,user);
-  isEmailVerificationRequired(realm,user);
-  ClientModel client=clientSession.getClient();
-  ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
-  logger.debugv("processAccessCode: go to oauth page?: {0}",client.isConsentRequired());
-  event.detail(Details.CODE_ID,clientSession.getId());
-  Set<String> requiredActions=user.getRequiredActions();
-  if (!requiredActions.isEmpty()) {
-    Iterator<String> i=user.getRequiredActions().iterator();
-    String action=i.next();
-    if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL.name()) && Validation.isBlank(user.getEmail())) {
-      if (i.hasNext())       action=i.next();
- else       action=null;
-    }
-    if (action != null) {
-      accessCode.setRequiredAction(RequiredAction.valueOf(action));
-      LoginFormsProvider loginFormsProvider=session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setUser(user);
-      if (action.equals(UserModel.RequiredAction.VERIFY_EMAIL.name())) {
-        event.clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
-        LoginActionsService.createActionCookie(realm,uriInfo,clientConnection,userSession.getId());
-      }
-      return loginFormsProvider.createResponse(RequiredAction.valueOf(action));
-    }
-  }
-  if (client.isConsentRequired()) {
-    UserConsentModel grantedConsent=user.getConsentByClient(client.getId());
-    List<RoleModel> realmRoles=new LinkedList<RoleModel>();
-    MultivaluedMap<String,RoleModel> resourceRoles=new MultivaluedMapImpl<String,RoleModel>();
-    for (    RoleModel r : accessCode.getRequestedRoles()) {
-      if (grantedConsent != null && grantedConsent.isRoleGranted(r)) {
-        continue;
-      }
-      if (r.getContainer() instanceof RealmModel) {
-        realmRoles.add(r);
-      }
- else {
-        resourceRoles.add(((ClientModel)r.getContainer()).getClientId(),r);
-      }
-    }
-    List<ProtocolMapperModel> protocolMappers=new LinkedList<ProtocolMapperModel>();
-    for (    ProtocolMapperModel protocolMapper : accessCode.getRequestedProtocolMappers()) {
-      if (protocolMapper.isConsentRequired() && protocolMapper.getConsentText() != null) {
-        if (grantedConsent == null || !grantedConsent.isProtocolMapperGranted(protocolMapper)) {
-          protocolMappers.add(protocolMapper);
-        }
-      }
-    }
-    if (realmRoles.size() > 0 || resourceRoles.size() > 0 || protocolMappers.size() > 0) {
-      accessCode.setAction(ClientSessionModel.Action.OAUTH_GRANT);
-      return session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setAccessRequest(realmRoles,resourceRoles,protocolMappers).createOAuthGrant(clientSession);
-    }
- else {
-      String consentDetail=(grantedConsent != null) ? Details.CONSENT_VALUE_PERSISTED_CONSENT : Details.CONSENT_VALUE_NO_CONSENT_REQUIRED;
-      event.detail(Details.CONSENT,consentDetail);
-    }
-  }
- else {
-    event.detail(Details.CONSENT,Details.CONSENT_VALUE_NO_CONSENT_REQUIRED);
-  }
+  Response requiredAction=actionRequired(session,userSession,clientSession,clientConnection,request,uriInfo,event);
+  if (requiredAction != null)   return requiredAction;
   event.success();
+  RealmModel realm=clientSession.getRealm();
   return redirectAfterSuccessfulFlow(session,realm,userSession,clientSession,request,uriInfo,clientConnection);
 }

@@ -1,7 +1,7 @@
 {
   event.event(EventType.UPDATE_PROFILE);
   Checks checks=new Checks();
-  if (!checks.check(code,ClientSessionModel.Action.UPDATE_PROFILE)) {
+  if (!checks.check(code,ClientSessionModel.Action.UPDATE_PROFILE.name())) {
     return checks.response;
   }
   ClientSessionCode accessCode=checks.clientCode;
@@ -32,5 +32,5 @@
   if (emailChanged) {
     event.clone().event(EventType.UPDATE_EMAIL).detail(Details.PREVIOUS_EMAIL,oldEmail).detail(Details.UPDATED_EMAIL,email).success();
   }
-  return redirectOauth(user,accessCode,clientSession,userSession);
+  return AuthenticationManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
 }

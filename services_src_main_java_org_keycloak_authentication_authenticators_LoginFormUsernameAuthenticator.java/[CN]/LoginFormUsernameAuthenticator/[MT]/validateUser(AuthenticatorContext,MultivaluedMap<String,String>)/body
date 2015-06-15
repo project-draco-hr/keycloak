@@ -1,0 +1,21 @@
+{
+  String username=inputData.getFirst(AuthenticationManager.FORM_USERNAME);
+  if (username == null) {
+    context.getEvent().error(Errors.USER_NOT_FOUND);
+    Response challengeResponse=invalidUser(context);
+    context.failureChallenge(AuthenticationProcessor.Error.INVALID_USER,challengeResponse);
+    return;
+  }
+  context.getEvent().detail(Details.USERNAME,username);
+  context.getClientSession().setNote(FORM_USERNAME,username);
+  UserModel user=KeycloakModelUtils.findUserByNameOrEmail(context.getSession(),context.getRealm(),username);
+  if (invalidUser(context,user))   return;
+  String rememberMe=inputData.getFirst("rememberMe");
+  boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("on");
+  if (remember) {
+    context.getClientSession().setNote(Details.REMEMBER_ME,"true");
+    context.getEvent().detail(Details.REMEMBER_ME,"true");
+  }
+  context.setUser(user);
+  context.success();
+}

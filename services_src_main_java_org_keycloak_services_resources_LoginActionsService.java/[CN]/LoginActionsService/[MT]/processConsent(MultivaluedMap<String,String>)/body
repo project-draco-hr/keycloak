@@ -5,7 +5,7 @@
   }
   String code=formData.getFirst("code");
   ClientSessionCode accessCode=ClientSessionCode.parse(code,session,realm);
-  if (accessCode == null || !accessCode.isValid(ClientSessionModel.Action.OAUTH_GRANT)) {
+  if (accessCode == null || !accessCode.isValid(ClientSessionModel.Action.OAUTH_GRANT.name())) {
     event.error(Errors.INVALID_CODE);
     return ErrorPage.error(session,Messages.INVALID_ACCESS_CODE);
   }
@@ -27,9 +27,9 @@
     return ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE);
   }
   event.session(userSession);
-  LoginProtocol protocol=session.getProvider(LoginProtocol.class,clientSession.getAuthMethod());
-  protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo);
   if (formData.containsKey("cancel")) {
+    LoginProtocol protocol=session.getProvider(LoginProtocol.class,clientSession.getAuthMethod());
+    protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo);
     event.error(Errors.REJECTED_BY_USER);
     return protocol.consentDenied(clientSession);
   }

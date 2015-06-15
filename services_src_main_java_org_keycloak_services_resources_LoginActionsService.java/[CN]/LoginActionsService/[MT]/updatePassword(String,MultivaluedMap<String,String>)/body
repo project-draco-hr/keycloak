@@ -1,7 +1,7 @@
 {
   event.event(EventType.UPDATE_PASSWORD);
   Checks checks=new Checks();
-  if (!checks.check(code,ClientSessionModel.Action.UPDATE_PASSWORD,ClientSessionModel.Action.RECOVER_PASSWORD)) {
+  if (!checks.check(code,ClientSessionModel.Action.UPDATE_PASSWORD.name(),ClientSessionModel.Action.RECOVER_PASSWORD.name())) {
     return checks.response;
   }
   ClientSessionCode accessCode=checks.clientCode;
@@ -29,12 +29,12 @@ catch (  Exception ape) {
   }
   user.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
   event.event(EventType.UPDATE_PASSWORD).success();
-  if (clientSession.getAction().equals(ClientSessionModel.Action.RECOVER_PASSWORD)) {
+  if (clientSession.getAction().equals(ClientSessionModel.Action.RECOVER_PASSWORD.name())) {
     String actionCookieValue=getActionCookie();
     if (actionCookieValue == null || !actionCookieValue.equals(userSession.getId())) {
       return session.getProvider(LoginFormsProvider.class).setSuccess(Messages.ACCOUNT_PASSWORD_UPDATED).createInfoPage();
     }
   }
   event=event.clone().event(EventType.LOGIN);
-  return redirectOauth(user,accessCode,clientSession,userSession);
+  return AuthenticationManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
 }

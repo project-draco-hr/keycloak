@@ -1,0 +1,19 @@
+{
+  UserAdapter userModel=addUserEntity(realm,id,username.toLowerCase());
+  if (addDefaultRoles) {
+    for (    String r : realm.getDefaultRoles()) {
+      userModel.grantRole(realm.getRole(r));
+    }
+    for (    ClientModel application : realm.getClients()) {
+      for (      String r : application.getDefaultRoles()) {
+        userModel.grantRole(application.getRole(r));
+      }
+    }
+  }
+  if (addDefaultRequiredActions) {
+    for (    String r : realm.getDefaultRequiredActions()) {
+      userModel.addRequiredAction(r);
+    }
+  }
+  return userModel;
+}

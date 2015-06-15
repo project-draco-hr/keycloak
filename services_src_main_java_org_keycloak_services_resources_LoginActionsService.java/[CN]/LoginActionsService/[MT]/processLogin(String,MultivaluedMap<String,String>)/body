@@ -15,8 +15,8 @@
   }
   ClientSessionModel clientSession=clientCode.getClientSession();
   event.detail(Details.CODE_ID,clientSession.getId());
-  if (!clientCode.isValid(ClientSessionModel.Action.AUTHENTICATE) || clientSession.getUserSession() != null) {
-    clientCode.setAction(ClientSessionModel.Action.AUTHENTICATE);
+  if (!clientCode.isValid(ClientSessionModel.Action.AUTHENTICATE.name()) || clientSession.getUserSession() != null) {
+    clientCode.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
     event.client(clientSession.getClient()).error(Errors.EXPIRED_CODE);
     return session.getProvider(LoginFormsProvider.class).setError(Messages.EXPIRED_CODE).setClientSessionCode(clientCode.getCode()).createLogin();
   }

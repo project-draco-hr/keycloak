@@ -1,0 +1,6 @@
+{
+  ClientSessionCode accessCode=new ClientSessionCode(context.getRealm(),context.getClientSession());
+  accessCode.setAction(ClientSessionModel.Action.UPDATE_PASSWORD.name());
+  LoginFormsProvider loginFormsProvider=context.getSession().getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setUser(context.getUser());
+  return loginFormsProvider.createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
+}

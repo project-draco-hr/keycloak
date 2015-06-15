@@ -1,8 +1,15 @@
 {
+  String username=clientSession.getAuthenticatedUser().getUsername();
+  String rememberMe=clientSession.getNote(Details.REMEMBER_ME);
+  boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("true");
   if (userSession == null) {
-    userSession=session.sessions().createUserSession(realm,clientSession.getAuthenticatedUser(),clientSession.getAuthenticatedUser().getUsername(),connection.getRemoteAddr(),"form",false,null,null);
+    userSession=session.sessions().createUserSession(realm,clientSession.getAuthenticatedUser(),username,connection.getRemoteAddr(),clientSession.getAuthMethod(),remember,null,null);
     userSession.setState(UserSessionModel.State.LOGGING_IN);
   }
+  if (remember) {
+    event.detail(Details.REMEMBER_ME,"true");
+  }
   TokenManager.attachClientSession(userSession,clientSession);
+  event.user(userSession.getUser()).detail(Details.USERNAME,username).session(userSession);
   return processRequiredActions();
 }

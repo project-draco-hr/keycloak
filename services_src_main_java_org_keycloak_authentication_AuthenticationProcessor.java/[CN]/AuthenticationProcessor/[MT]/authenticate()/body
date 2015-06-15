@@ -1,4 +1,11 @@
 {
+  logger.debug("AUTHENTICATE");
+  event.event(EventType.LOGIN);
+  event.client(clientSession.getClient().getClientId()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.AUTH_METHOD,clientSession.getAuthMethod());
+  String authType=clientSession.getNote(Details.AUTH_TYPE);
+  if (authType != null) {
+    event.detail(Details.AUTH_TYPE,authType);
+  }
   UserModel authUser=clientSession.getAuthenticatedUser();
   validateUser(authUser);
   Response challenge=processFlow(flowId);

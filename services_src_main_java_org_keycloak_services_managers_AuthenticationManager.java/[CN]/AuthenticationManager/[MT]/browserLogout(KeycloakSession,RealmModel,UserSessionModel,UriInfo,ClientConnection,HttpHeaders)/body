@@ -8,7 +8,7 @@
   List<ClientSessionModel> redirectClients=new LinkedList<ClientSessionModel>();
   for (  ClientSessionModel clientSession : userSession.getClientSessions()) {
     ClientModel client=clientSession.getClient();
-    if (clientSession.getAction() == ClientSessionModel.Action.LOGGED_OUT)     continue;
+    if (ClientSessionModel.Action.LOGGED_OUT.name().equals(clientSession.getAction()))     continue;
     if (client.isFrontchannelLogout()) {
       String authMethod=clientSession.getAuthMethod();
       if (authMethod == null)       continue;
@@ -23,7 +23,7 @@
       try {
         logger.debugv("backchannel logout to: {0}",client.getClientId());
         protocol.backchannelLogout(userSession,clientSession);
-        clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT);
+        clientSession.setAction(ClientSessionModel.Action.LOGGED_OUT.name());
       }
  catch (      Exception e) {
         logger.warn("Failed to logout client, continuing",e);
@@ -34,7 +34,7 @@
     String authMethod=nextRedirectClient.getAuthMethod();
     LoginProtocol protocol=session.getProvider(LoginProtocol.class,authMethod);
     protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo);
-    nextRedirectClient.setAction(ClientSessionModel.Action.LOGGED_OUT);
+    nextRedirectClient.setAction(ClientSessionModel.Action.LOGGED_OUT.name());
     try {
       logger.debugv("frontchannel logout to: {0}",nextRedirectClient.getClient().getClientId());
       Response response=protocol.frontchannelLogout(userSession,nextRedirectClient);

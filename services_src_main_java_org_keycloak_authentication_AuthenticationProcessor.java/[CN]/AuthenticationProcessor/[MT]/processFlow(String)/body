@@ -7,9 +7,11 @@
   List<AuthenticationExecutionModel> executions=realm.getAuthenticationExecutions(flowId);
   if (executions == null)   return null;
   Response alternativeChallenge=null;
+  AuthenticationExecutionModel challengedAlternativeExecution=null;
   boolean alternativeSuccessful=false;
   for (  AuthenticationExecutionModel model : executions) {
     if (isProcessed(model)) {
+      logger.debug("execution is processed");
       if (!alternativeSuccessful && model.isAlternative() && isSuccessful(model))       alternativeSuccessful=true;
       continue;
     }
@@ -32,52 +34,90 @@
     AuthenticatorModel authenticatorModel=realm.getAuthenticatorById(model.getAuthenticator());
     AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,authenticatorModel.getProviderId());
     Authenticator authenticator=factory.create(authenticatorModel);
+    logger.debugv("authenticator: {0}",authenticatorModel.getProviderId());
     UserModel authUser=clientSession.getAuthenticatedUser();
     if (authenticator.requiresUser() && authUser == null) {
-      if (alternativeChallenge != null)       return alternativeChallenge;
-      throw new AuthException(Error.UNKNOWN_USER);
+      if (alternativeChallenge != null) {
+        clientSession.setAuthenticatorStatus(challengedAlternativeExecution.getId(),UserSessionModel.AuthenticatorStatus.CHALLENGED);
+        return alternativeChallenge;
+      }
+      throw new AuthException("authenticator: " + authenticatorModel.getProviderId(),Error.UNKNOWN_USER);
     }
-    if (authenticator.requiresUser() && authUser != null && !authenticator.configuredFor(authUser)) {
-      if (model.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
-        if (model.isUserSetupAllowed()) {
-          clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SETUP_REQUIRED);
-          authUser.addRequiredAction(authenticator.getRequiredAction());
-        }
+    boolean configuredFor=false;
+    if (authenticator.requiresUser() && authUser != null) {
+      configuredFor=authenticator.configuredFor(session,realm,authUser);
+      if (!configuredFor) {
+        if (model.isRequired()) {
+          if (model.isUserSetupAllowed()) {
+            logger.debugv("authenticator SETUP_REQUIRED: {0}",authenticatorModel.getProviderId());
+            clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SETUP_REQUIRED);
+            String requiredAction=authenticator.getRequiredAction();
+            if (!authUser.getRequiredActions().contains(requiredAction)) {
+              authUser.addRequiredAction(requiredAction);
+            }
+            continue;
+          }
  else {
-          throw new AuthException(Error.CREDENTIAL_SETUP_REQUIRED);
+            throw new AuthException(Error.CREDENTIAL_SETUP_REQUIRED);
+          }
+        }
+ else         if (model.isOptional()) {
+          clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SKIPPED);
+          continue;
         }
       }
-      continue;
     }
-    context=new Result(authenticatorModel,authenticator);
+    context=new Result(model,authenticatorModel,authenticator);
     authenticator.authenticate(context);
     Status result=context.getStatus();
     if (result == Status.SUCCESS) {
+      logger.debugv("authenticator SUCCESS: {0}",authenticatorModel.getProviderId());
       clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SUCCESS);
       if (model.isAlternative())       alternativeSuccessful=true;
       continue;
     }
  else     if (result == Status.FAILED) {
+      logger.debugv("authenticator FAILED: {0}",authenticatorModel.getProviderId());
       logUserFailure();
+      clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.FAILED);
       if (context.challenge != null)       return context.challenge;
       throw new AuthException(context.error);
     }
+ else     if (result == Status.FORCE_CHALLENGE) {
+      clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.CHALLENGED);
+      return context.challenge;
+    }
  else     if (result == Status.CHALLENGE) {
-      if (model.isRequired())       return context.challenge;
- else       if (model.isAlternative())       alternativeChallenge=context.challenge;
- else       clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SKIPPED);
+      logger.debugv("authenticator CHALLENGE: {0}",authenticatorModel.getProviderId());
+      if (model.isRequired() || (model.isOptional() && configuredFor)) {
+        clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.CHALLENGED);
+        return context.challenge;
+      }
+ else       if (model.isAlternative()) {
+        alternativeChallenge=context.challenge;
+        challengedAlternativeExecution=model;
+      }
+ else {
+        clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SKIPPED);
+      }
       continue;
     }
  else     if (result == Status.FAILURE_CHALLENGE) {
+      logger.debugv("authenticator FAILURE_CHALLENGE: {0}",authenticatorModel.getProviderId());
       logUserFailure();
+      clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.CHALLENGED);
       return context.challenge;
     }
  else     if (result == Status.ATTEMPTED) {
-      if (model.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED)       throw new AuthException(Error.INVALID_CREDENTIALS);
+      logger.debugv("authenticator ATTEMPTED: {0}",authenticatorModel.getProviderId());
+      if (model.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
+        throw new AuthException(Error.INVALID_CREDENTIALS);
+      }
       clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.ATTEMPTED);
       continue;
     }
  else {
+      logger.debugv("authenticator INTERNAL_ERROR: {0}",authenticatorModel.getProviderId());
       logger.error("Unknown result status");
       throw new AuthException(Error.INTERNAL_ERROR);
     }

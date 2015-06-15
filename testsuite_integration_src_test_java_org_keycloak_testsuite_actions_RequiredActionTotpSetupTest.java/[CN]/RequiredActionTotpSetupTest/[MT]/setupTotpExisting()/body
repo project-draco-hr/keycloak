@@ -11,6 +11,7 @@
   events.expectLogout(loginEvent.getSessionId()).assertEvent();
   loginPage.open();
   loginPage.login("test-user@localhost","password");
+  String src=driver.getPageSource();
   loginTotpPage.login(totp.generate(totpSecret));
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   events.expectLogin().assertEvent();

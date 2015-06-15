@@ -1,17 +1,33 @@
 {
-  if (!isActionUrl(context)) {
+  if (isAction(context,REGISTRATION_FORM_ACTION) && context.getUser() != null) {
+    context.success();
+    return;
+  }
+  if (!isAction(context,LOGIN_FORM_ACTION)) {
     MultivaluedMap<String,String> formData=new MultivaluedMapImpl<>();
     String loginHint=context.getClientSession().getNote(OIDCLoginProtocol.LOGIN_HINT_PARAM);
-    if (loginHint == null) {
-      loginHint=AuthenticationManager.getRememberMeUsername(context.getRealm(),context.getHttpRequest().getHttpHeaders());
+    String rememberMeUsername=AuthenticationManager.getRememberMeUsername(context.getRealm(),context.getHttpRequest().getHttpHeaders());
+    if (loginHint != null || rememberMeUsername != null) {
       if (loginHint != null) {
+        formData.add(AuthenticationManager.FORM_USERNAME,loginHint);
+      }
+ else {
+        formData.add(AuthenticationManager.FORM_USERNAME,rememberMeUsername);
         formData.add("rememberMe","on");
       }
     }
-    if (loginHint != null)     formData.add(AuthenticationManager.FORM_USERNAME,loginHint);
     Response challengeResponse=challenge(context,formData);
     context.challenge(challengeResponse);
     return;
   }
-  validateUser(context);
+  MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
+  if (formData.containsKey("cancel")) {
+    context.getEvent().error(Errors.REJECTED_BY_USER);
+    LoginProtocol protocol=context.getSession().getProvider(LoginProtocol.class,context.getClientSession().getAuthMethod());
+    protocol.setRealm(context.getRealm()).setHttpHeaders(context.getHttpRequest().getHttpHeaders()).setUriInfo(context.getUriInfo());
+    Response response=protocol.cancelLogin(context.getClientSession());
+    context.challenge(response);
+    return;
+  }
+  validateUser(context,formData);
 }

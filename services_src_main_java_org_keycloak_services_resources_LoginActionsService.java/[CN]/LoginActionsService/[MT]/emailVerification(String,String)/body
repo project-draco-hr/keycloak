@@ -2,7 +2,7 @@
   event.event(EventType.VERIFY_EMAIL);
   if (key != null) {
     Checks checks=new Checks();
-    if (!checks.check(key,ClientSessionModel.Action.VERIFY_EMAIL)) {
+    if (!checks.check(key,ClientSessionModel.Action.VERIFY_EMAIL.name())) {
       return checks.response;
     }
     ClientSessionCode accessCode=checks.clientCode;
@@ -18,11 +18,11 @@
       return session.getProvider(LoginFormsProvider.class).setSuccess(Messages.EMAIL_VERIFIED).createInfoPage();
     }
     event=event.clone().removeDetail(Details.EMAIL).event(EventType.LOGIN);
-    return redirectOauth(user,accessCode,clientSession,userSession);
+    return AuthenticationManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
   }
  else {
     Checks checks=new Checks();
-    if (!checks.check(code,ClientSessionModel.Action.VERIFY_EMAIL)) {
+    if (!checks.check(code,ClientSessionModel.Action.VERIFY_EMAIL.name())) {
       return checks.response;
     }
     ClientSessionCode accessCode=checks.clientCode;

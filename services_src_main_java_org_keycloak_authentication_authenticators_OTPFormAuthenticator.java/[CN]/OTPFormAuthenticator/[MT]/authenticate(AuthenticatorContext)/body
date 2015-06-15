@@ -1,7 +1,6 @@
 {
-  URI expected=LoginActionsService.authenticationFormProcessor(context.getUriInfo()).build(context.getRealm().getName());
-  if (!expected.getPath().equals(context.getUriInfo().getPath())) {
-    Response challengeResponse=challenge(context);
+  if (!isAction(context,TOTP_FORM_ACTION)) {
+    Response challengeResponse=challenge(context,null);
     context.challenge(challengeResponse);
     return;
   }

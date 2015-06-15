@@ -3,8 +3,7 @@
     loginPage.open();
     Time.setOffset(5000);
     loginPage.login("login@test.com","password");
-    loginPage.assertCurrent();
-    Assert.assertEquals("Login timeout. Please login again.",loginPage.getError());
+    errorPage.assertCurrent();
     events.expectLogin().user((String)null).session((String)null).error("expired_code").clearDetails().detail(Details.CODE_ID,AssertEvents.isCodeId()).removeDetail(Details.CONSENT).assertEvent();
   }
   finally {

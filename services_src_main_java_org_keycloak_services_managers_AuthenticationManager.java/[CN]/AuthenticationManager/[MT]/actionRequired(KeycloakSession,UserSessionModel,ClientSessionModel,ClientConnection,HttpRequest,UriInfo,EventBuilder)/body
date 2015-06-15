@@ -1,0 +1,84 @@
+{
+  final RealmModel realm=clientSession.getRealm();
+  final UserModel user=userSession.getUser();
+  final ClientModel client=clientSession.getClient();
+  RequiredActionContext context=new RequiredActionContext(){
+    @Override public EventBuilder getEvent(){
+      return event;
+    }
+    @Override public UserModel getUser(){
+      return user;
+    }
+    @Override public RealmModel getRealm(){
+      return realm;
+    }
+    @Override public ClientSessionModel getClientSession(){
+      return clientSession;
+    }
+    @Override public UserSessionModel getUserSession(){
+      return userSession;
+    }
+    @Override public ClientConnection getConnection(){
+      return clientConnection;
+    }
+    @Override public UriInfo getUriInfo(){
+      return uriInfo;
+    }
+    @Override public KeycloakSession getSession(){
+      return session;
+    }
+    @Override public HttpRequest getHttpRequest(){
+      return request;
+    }
+  }
+;
+  for (  ProviderFactory factory : session.getKeycloakSessionFactory().getProviderFactories(RequiredActionProvider.class)) {
+    RequiredActionProvider provider=((RequiredActionFactory)factory).create(session);
+    provider.evaluateTriggers(context);
+  }
+  ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
+  logger.debugv("processAccessCode: go to oauth page?: {0}",client.isConsentRequired());
+  event.detail(Details.CODE_ID,clientSession.getId());
+  Set<String> requiredActions=user.getRequiredActions();
+  for (  String action : requiredActions) {
+    RequiredActionProvider actionProvider=session.getProvider(RequiredActionProvider.class,action);
+    Response challenge=actionProvider.invokeRequiredAction(context);
+    if (challenge != null)     return challenge;
+  }
+  if (client.isConsentRequired()) {
+    UserConsentModel grantedConsent=user.getConsentByClient(client.getId());
+    List<RoleModel> realmRoles=new LinkedList<>();
+    MultivaluedMap<String,RoleModel> resourceRoles=new MultivaluedMapImpl<>();
+    for (    RoleModel r : accessCode.getRequestedRoles()) {
+      if (grantedConsent != null && grantedConsent.isRoleGranted(r)) {
+        continue;
+      }
+      if (r.getContainer() instanceof RealmModel) {
+        realmRoles.add(r);
+      }
+ else {
+        resourceRoles.add(((ClientModel)r.getContainer()).getClientId(),r);
+      }
+    }
+    List<ProtocolMapperModel> protocolMappers=new LinkedList<>();
+    for (    ProtocolMapperModel protocolMapper : accessCode.getRequestedProtocolMappers()) {
+      if (protocolMapper.isConsentRequired() && protocolMapper.getConsentText() != null) {
+        if (grantedConsent == null || !grantedConsent.isProtocolMapperGranted(protocolMapper)) {
+          protocolMappers.add(protocolMapper);
+        }
+      }
+    }
+    if (realmRoles.size() > 0 || resourceRoles.size() > 0 || protocolMappers.size() > 0) {
+      accessCode.setAction(ClientSessionModel.Action.OAUTH_GRANT.name());
+      return session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).setAccessRequest(realmRoles,resourceRoles,protocolMappers).createOAuthGrant(clientSession);
+    }
+ else {
+      String consentDetail=(grantedConsent != null) ? Details.CONSENT_VALUE_PERSISTED_CONSENT : Details.CONSENT_VALUE_NO_CONSENT_REQUIRED;
+      event.detail(Details.CONSENT,consentDetail);
+    }
+  }
+ else {
+    event.detail(Details.CONSENT,Details.CONSENT_VALUE_NO_CONSENT_REQUIRED);
+  }
+  return null;
+}

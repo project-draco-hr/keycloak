@@ -1,12 +1,33 @@
 {
-  String flowId=null;
-  for (  AuthenticationFlowModel flow : realm.getAuthenticationFlows()) {
-    if (flow.getAlias().equals("browser")) {
-      flowId=flow.getId();
-      break;
+  List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
+  for (  IdentityProviderModel identityProvider : identityProviders) {
+    if (identityProvider.isAuthenticateByDefault()) {
+      return buildRedirectToIdentityProvider(identityProvider.getAlias(),accessCode);
     }
   }
+  clientSession.setNote(Details.AUTH_TYPE,CODE_AUTH_TYPE);
+  AuthenticationFlowModel flow=realm.getFlowByAlias(DefaultAuthenticationFlows.BROWSER_FLOW);
+  String flowId=flow.getId();
   AuthenticationProcessor processor=new AuthenticationProcessor();
   processor.setClientSession(clientSession).setFlowId(flowId).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setSession(session).setUriInfo(uriInfo).setRequest(request);
-  return processor.authenticate();
+  Response challenge=null;
+  try {
+    challenge=processor.authenticateOnly();
+  }
+ catch (  Exception e) {
+    return processor.handleBrowserException(e);
+  }
+  if (challenge != null && prompt != null && prompt.equals("none")) {
+    if (processor.isUserSessionCreated()) {
+      session.sessions().removeUserSession(realm,processor.getUserSession());
+    }
+    OIDCLoginProtocol oauth=new OIDCLoginProtocol(session,realm,uriInfo,headers,event);
+    return oauth.cancelLogin(clientSession);
+  }
+  if (challenge == null) {
+    return processor.finishAuthentication();
+  }
+ else {
+    return challenge;
+  }
 }

@@ -1,12 +1,4 @@
 {
-switch (oauthClient.getRelativeUrlsUsed()) {
-case ALL_REQUESTS:
-    return UriUtils.getOrigin(request.getRequestURL().toString());
-case BROWSER_ONLY:
-  return UriUtils.getOrigin(oauthClient.getTokenUrl());
-case NEVER:
-return "";
-default :
-return "";
-}
+  KeycloakSecurityContext session=(KeycloakSecurityContext)request.getAttribute(KeycloakSecurityContext.class.getName());
+  return AdapterUtils.getOriginForRestCalls(request.getRequestURL().toString(),session);
 }

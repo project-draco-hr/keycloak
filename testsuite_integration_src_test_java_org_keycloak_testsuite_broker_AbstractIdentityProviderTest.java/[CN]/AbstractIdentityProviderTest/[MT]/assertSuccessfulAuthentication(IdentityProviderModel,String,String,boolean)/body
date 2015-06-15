@@ -3,6 +3,8 @@
   assertTrue("Bad current URL " + this.driver.getCurrentUrl() + " and page source: "+ this.driver.getPageSource(),this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
   UserModel federatedUser=getFederatedUser();
   assertNotNull(federatedUser);
+  assertNotNull(federatedUser.getCreatedTimestamp());
+  Assert.assertTrue((System.currentTimeMillis() - federatedUser.getCreatedTimestamp()) < 10000);
   doAssertFederatedUser(federatedUser,identityProviderModel,expectedEmail,isProfileUpdateExpected);
   brokerServerRule.stopSession(session,true);
   session=brokerServerRule.startSession();

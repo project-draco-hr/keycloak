@@ -1,0 +1,13 @@
+{
+  AuthenticationFlowModel flow=realmModel.getFlowByAlias(DefaultAuthenticationFlows.BROWSER_FLOW);
+  String flowId=flow.getId();
+  AuthenticationProcessor processor=new AuthenticationProcessor();
+  processor.setClientSession(clientSession).setFlowId(flowId).setConnection(clientConnection).setEventBuilder(event).setProtector(protector).setRealm(realmModel).setSession(session).setUriInfo(uriInfo).setRequest(request);
+  if (errorMessage != null)   processor.setForwardedErrorMessage(errorMessage);
+  try {
+    return processor.authenticate();
+  }
+ catch (  Exception e) {
+    return processor.handleBrowserException(e);
+  }
+}

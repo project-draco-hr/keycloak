@@ -2,8 +2,15 @@
   if (!check(code)) {
     return false;
   }
- else   if (!clientCode.isValid(requiredAction)) {
+ else   if (!clientCode.isValidAction(requiredAction)) {
+    event.client(clientCode.getClientSession().getClient());
     event.error(Errors.INVALID_CODE);
+    response=ErrorPage.error(session,Messages.INVALID_CODE);
+    return false;
+  }
+ else   if (!clientCode.isActionActive(requiredAction)) {
+    event.client(clientCode.getClientSession().getClient());
+    event.error(Errors.EXPIRED_CODE);
     response=ErrorPage.error(session,Messages.INVALID_CODE);
     return false;
   }

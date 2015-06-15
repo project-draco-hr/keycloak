@@ -1,43 +1,15 @@
 {
   event.event(EventType.LOGIN);
-  if (!checkSsl()) {
-    event.error(Errors.SSL_REQUIRED);
-    return ErrorPage.error(session,Messages.HTTPS_REQUIRED);
+  Checks checks=new Checks();
+  if (!checks.check(code,ClientSessionModel.Action.AUTHENTICATE.name())) {
+    return checks.response;
   }
-  if (!realm.isEnabled()) {
-    event.error(Errors.REALM_DISABLED);
-    return ErrorPage.error(session,Messages.REALM_NOT_ENABLED);
-  }
-  ClientSessionCode clientCode=ClientSessionCode.parse(code,session,realm);
-  if (clientCode == null) {
-    event.error(Errors.INVALID_CODE);
-    return ErrorPage.error(session,Messages.INVALID_CODE);
-  }
-  ClientSessionModel clientSession=clientCode.getClientSession();
-  event.detail(Details.CODE_ID,clientSession.getId());
-  if (!clientCode.isValid(ClientSessionModel.Action.AUTHENTICATE.name()) || clientSession.getUserSession() != null) {
-    event.client(clientSession.getClient()).error(Errors.EXPIRED_CODE);
-    return ErrorPage.error(session,Messages.EXPIRED_CODE);
-  }
-  ClientModel client=clientSession.getClient();
-  if (client == null) {
-    event.error(Errors.CLIENT_NOT_FOUND);
-    return ErrorPage.error(session,Messages.UNKNOWN_LOGIN_REQUESTER);
-  }
-  session.getContext().setClient(client);
-  if (!client.isEnabled()) {
-    event.error(Errors.CLIENT_DISABLED);
-    return ErrorPage.error(session,Messages.LOGIN_REQUESTER_NOT_ENABLED);
-  }
-  String flowId=null;
-  for (  AuthenticationFlowModel flow : realm.getAuthenticationFlows()) {
-    if (flow.getAlias().equals("browser")) {
-      flowId=flow.getId();
-      break;
-    }
-  }
+  final ClientSessionCode clientCode=checks.clientCode;
+  final ClientSessionModel clientSession=clientCode.getClientSession();
+  String flowAlias=DefaultAuthenticationFlows.BROWSER_FLOW;
+  AuthenticationFlowModel flow=realm.getFlowByAlias(flowAlias);
   AuthenticationProcessor processor=new AuthenticationProcessor();
-  processor.setClientSession(clientSession).setFlowId(flowId).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setSession(session).setUriInfo(uriInfo).setAction(action).setRequest(request);
+  processor.setClientSession(clientSession).setFlowId(flow.getId()).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setSession(session).setUriInfo(uriInfo).setAction(action).setRequest(request);
   try {
     return processor.authenticate();
   }

@@ -1,30 +1,5 @@
 {
   event.event(EventType.LOGIN);
-  if (!checkSsl()) {
-    event.error(Errors.SSL_REQUIRED);
-    throw new WebApplicationException(ErrorPage.error(session,Messages.HTTPS_REQUIRED));
-  }
-  if (!realm.isEnabled()) {
-    event.error(Errors.REALM_DISABLED);
-    return ErrorPage.error(session,Messages.REALM_NOT_ENABLED);
-  }
-  ClientSessionCode clientCode=ClientSessionCode.parse(code,session,realm);
-  if (clientCode == null) {
-    event.error(Errors.INVALID_CODE);
-    throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
-  }
-  final ClientSessionModel clientSession=clientCode.getClientSession();
-  event.detail(Details.CODE_ID,clientSession.getId());
-  ClientModel client=clientSession.getClient();
-  if (client == null) {
-    event.error(Errors.CLIENT_NOT_FOUND);
-    throw new WebApplicationException(ErrorPage.error(session,Messages.UNKNOWN_LOGIN_REQUESTER));
-  }
-  session.getContext().setClient(client);
-  if (!client.isEnabled()) {
-    event.error(Errors.CLIENT_NOT_FOUND);
-    throw new WebApplicationException(ErrorPage.error(session,Messages.LOGIN_REQUESTER_NOT_ENABLED));
-  }
   if (action == null) {
     logger.error("required action was null");
     event.error(Errors.INVALID_CODE);
@@ -35,6 +10,17 @@
     logger.error("required action provider was null");
     event.error(Errors.INVALID_CODE);
     throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
+  }
+  Checks checks=new Checks();
+  if (!checks.check(code,action)) {
+    return checks.response;
+  }
+  final ClientSessionCode clientCode=checks.clientCode;
+  final ClientSessionModel clientSession=clientCode.getClientSession();
+  if (clientSession.getUserSession() == null) {
+    logger.error("user session was null");
+    event.error(Errors.USER_SESSION_NOT_FOUND);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE));
   }
   RequiredActionContext context=new RequiredActionContext(){
     @Override public EventBuilder getEvent(){
@@ -63,6 +49,11 @@
     }
     @Override public HttpRequest getHttpRequest(){
       return request;
+    }
+    @Override public String generateAccessCode(    String action){
+      ClientSessionCode code=new ClientSessionCode(getRealm(),getClientSession());
+      code.setAction(action);
+      return code.getCode();
     }
   }
 ;

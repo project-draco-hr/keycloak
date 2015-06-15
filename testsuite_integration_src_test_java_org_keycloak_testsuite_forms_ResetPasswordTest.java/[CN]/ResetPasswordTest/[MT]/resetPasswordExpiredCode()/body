@@ -14,7 +14,7 @@
     driver.navigate().to(changePasswordUrl.trim());
     errorPage.assertCurrent();
     assertEquals("An error occurred, please login again through your application.",errorPage.getError());
-    events.expectRequiredAction(EventType.RESET_PASSWORD).error("invalid_code").client((String)null).user((String)null).session((String)null).clearDetails().assertEvent();
+    events.expectRequiredAction(EventType.RESET_PASSWORD).error("expired_code").client("test-app").user((String)null).session((String)null).clearDetails().assertEvent();
   }
   finally {
     Time.setOffset(0);

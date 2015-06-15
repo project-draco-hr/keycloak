@@ -1,0 +1,14 @@
+{
+  int timestamp=clientSession.getTimestamp();
+  int lifespan;
+  if (requestedAction.equals(ClientSessionModel.Action.CODE_TO_TOKEN.name())) {
+    lifespan=realm.getAccessCodeLifespan();
+  }
+ else   if (requestedAction.equals(ClientSessionModel.Action.AUTHENTICATE.name())) {
+    lifespan=realm.getAccessCodeLifespanLogin() > 0 ? realm.getAccessCodeLifespanLogin() : realm.getAccessCodeLifespanUserAction();
+  }
+ else {
+    lifespan=realm.getAccessCodeLifespanUserAction();
+  }
+  return timestamp + lifespan > Time.currentTime();
+}

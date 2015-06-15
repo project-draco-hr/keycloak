@@ -2,8 +2,15 @@
   if (!check(code)) {
     return false;
   }
- else   if (!(clientCode.isValid(requiredAction) || clientCode.isValid(alternativeRequiredAction))) {
+ else   if (!(clientCode.isValidAction(requiredAction) || clientCode.isValidAction(alternativeRequiredAction))) {
+    event.client(clientCode.getClientSession().getClient());
     event.error(Errors.INVALID_CODE);
+    response=ErrorPage.error(session,Messages.INVALID_CODE);
+    return false;
+  }
+ else   if (!(clientCode.isActionActive(requiredAction) || clientCode.isActionActive(alternativeRequiredAction))) {
+    event.client(clientCode.getClientSession().getClient());
+    event.error(Errors.EXPIRED_CODE);
     response=ErrorPage.error(session,Messages.INVALID_CODE);
     return false;
   }

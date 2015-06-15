@@ -1,0 +1,17 @@
+{
+  String testUsername="tester2";
+  User testUser=new User(testUsername,"pass");
+  userPage.addUser(testUser);
+  flashMessage.waitUntilPresent();
+  assertTrue(flashMessage.getText(),flashMessage.isSuccess());
+  navigation.users();
+  userPage.findUser(testUsername);
+  driver.findElement(linkText(testUsername)).click();
+  navigation.roleMappings(testUsername);
+  page.addAvailableRole("create-realm");
+  assertTrue(flashMessage.getText(),flashMessage.isSuccess());
+  page.removeAssignedRole("create-realm");
+  assertTrue(flashMessage.getText(),flashMessage.isSuccess());
+  navigation.users();
+  userPage.deleteUser(testUsername);
+}

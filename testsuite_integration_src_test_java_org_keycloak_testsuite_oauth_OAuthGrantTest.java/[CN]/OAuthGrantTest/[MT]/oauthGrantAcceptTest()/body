@@ -6,7 +6,7 @@
   Assert.assertTrue(driver.getPageSource().contains(ROLE_CUSTOMER));
   grantPage.accept();
   Assert.assertTrue(oauth.getCurrentQuery().containsKey(OAuth2Constants.CODE));
-  Event loginEvent=events.expectLogin().client("third-party").assertEvent();
+  Event loginEvent=events.expectLogin().client("third-party").detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
   String codeId=loginEvent.getDetails().get(Details.CODE_ID);
   String sessionId=loginEvent.getSessionId();
   OAuthClient.AccessTokenResponse accessToken=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get(OAuth2Constants.CODE),"password");

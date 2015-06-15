@@ -1,0 +1,19 @@
+{
+  try {
+    URL subsysResource=this.subsysModule.getExportedResource("module.xml");
+    File subsysDir=new File(subsysResource.toURI()).getParentFile();
+    File serverWarDir=new File(subsysDir,"server-war");
+    if (this.isServerWarExploded) {
+      return serverWarDir.toURI();
+    }
+ else {
+      return new File(serverWarDir,"keycloak-server-" + keycloakVersion + ".war").toURI();
+    }
+  }
+ catch (  URISyntaxException e) {
+    throw new IllegalStateException(e);
+  }
+catch (  IllegalArgumentException e) {
+    throw new IllegalStateException(e);
+  }
+}

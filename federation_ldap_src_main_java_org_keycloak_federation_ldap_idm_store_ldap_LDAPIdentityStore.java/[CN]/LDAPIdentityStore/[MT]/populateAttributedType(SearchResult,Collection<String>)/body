@@ -6,9 +6,6 @@
     LDAPDn dn=LDAPDn.fromString(entryDN);
     ldapObject.setDn(dn);
     ldapObject.setRdnAttributeName(dn.getFirstRdnAttrName());
-    if (logger.isTraceEnabled()) {
-      logger.tracef("Populating LDAP Object from DN [%s]",entryDN);
-    }
     NamingEnumeration<? extends Attribute> ldapAttributes=attributes.getAll();
     List<String> uppercasedReadOnlyAttrNames=new ArrayList<>();
     for (    String readonlyAttr : readOnlyAttrNames) {
@@ -38,9 +35,6 @@
           ldapObject.setObjectClasses(attrValues);
         }
  else {
-          if (logger.isTraceEnabled()) {
-            logger.tracef("Populating ldap attribute [%s] with value [%s] for DN [%s].",ldapAttributeName,attrValues.toString(),entryDN);
-          }
           if (attrValues.size() == 1) {
             ldapObject.setAttribute(ldapAttributeName,attrValues.iterator().next());
           }
@@ -52,6 +46,9 @@
           }
         }
       }
+    }
+    if (logger.isTraceEnabled()) {
+      logger.tracef("Found ldap object [%s] and populated with the attributes [%s]. Read-only attributes are [%s]",ldapObject.getDn().toString(),ldapObject.getAttributes(),ldapObject.getReadOnlyAttributeNames());
     }
     return ldapObject;
   }

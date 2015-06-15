@@ -1,12 +1,7 @@
 {
-  if (authentication instanceof AnonymousAuthenticationToken) {
-    log.warn("Attempt to log out an anonymous authentication");
+  if (!KeycloakAuthenticationToken.class.isAssignableFrom(authentication.getClass())) {
+    log.warn("Cannot log out a non-Keycloak authentication: {}",authentication);
     return;
   }
-  try {
-    handleSingleSignOut(request,response);
-  }
- catch (  IOException e) {
-    throw new IllegalStateException("Unable to make logout admin request!",e);
-  }
+  handleSingleSignOut(request,response,(KeycloakAuthenticationToken)authentication);
 }

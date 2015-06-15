@@ -4,7 +4,7 @@
   assertEquals(200,response.getStatusCode());
   AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
   RefreshToken refreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
-  events.expectLogin().client("resource-owner").user(userId).session(accessToken.getSessionState()).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token").detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).detail(Details.USERNAME,login).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).assertEvent();
+  events.expectLogin().client("resource-owner").user(userId).session(accessToken.getSessionState()).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token").detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).detail(Details.USERNAME,login).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).assertEvent();
   assertEquals(accessToken.getSessionState(),refreshToken.getSessionState());
   OAuthClient.AccessTokenResponse refreshedResponse=oauth.doRefreshTokenRequest(response.getRefreshToken(),"secret");
   AccessToken refreshedAccessToken=oauth.verifyToken(refreshedResponse.getAccessToken());

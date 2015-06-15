@@ -6,6 +6,8 @@
   filter.insert(0,"(&");
   filter.append(getObjectClassesFilter(identityQuery.getObjectClasses()));
   filter.append(")");
-  logger.infof("Using filter for LDAP search: %s",filter);
+  if (logger.isTraceEnabled()) {
+    logger.tracef("Using filter for LDAP search: %s . Searching in DN: %s",filter,identityQuery.getSearchDn());
+  }
   return filter;
 }

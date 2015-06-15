@@ -1,0 +1,53 @@
+{
+  logger.debug("Going to process JsonNode path " + fieldPath + " on data "+ baseNode);
+  if (baseNode != null) {
+    int idx=fieldPath.indexOf(JSON_PATH_DELIMITER);
+    String currentFieldName=fieldPath;
+    if (idx > 0) {
+      currentFieldName=fieldPath.substring(0,idx).trim();
+      if (currentFieldName.isEmpty()) {
+        logger.debug("JSON path is invalid " + fieldPath);
+        return null;
+      }
+    }
+    String currentNodeName=currentFieldName;
+    int arrayIndex=-1;
+    if (currentFieldName.endsWith("]")) {
+      int bi=currentFieldName.indexOf("[");
+      if (bi == -1) {
+        logger.debug("Invalid array index construct in " + currentFieldName);
+        return null;
+      }
+      try {
+        String is=currentFieldName.substring(bi + 1,currentFieldName.length() - 1).trim();
+        arrayIndex=Integer.parseInt(is);
+      }
+ catch (      Exception e) {
+        logger.debug("Invalid array index construct in " + currentFieldName);
+        return null;
+      }
+      currentNodeName=currentFieldName.substring(0,bi).trim();
+    }
+    JsonNode currentNode=baseNode.get(currentNodeName);
+    if (arrayIndex > -1 && currentNode.isArray()) {
+      logger.debug("Going to take array node at index " + arrayIndex);
+      currentNode=currentNode.get(arrayIndex);
+    }
+    if (currentNode == null) {
+      logger.debug("JsonNode not found for name " + currentFieldName);
+      return null;
+    }
+    if (idx < 0) {
+      if (!currentNode.isValueNode()) {
+        logger.debug("JsonNode is not value node for name " + currentFieldName);
+        return null;
+      }
+      String ret=currentNode.asText();
+      if (ret != null && !ret.trim().isEmpty())       return ret.trim();
+    }
+ else {
+      return getJsonValue(currentNode,fieldPath.substring(idx + 1));
+    }
+  }
+  return null;
+}

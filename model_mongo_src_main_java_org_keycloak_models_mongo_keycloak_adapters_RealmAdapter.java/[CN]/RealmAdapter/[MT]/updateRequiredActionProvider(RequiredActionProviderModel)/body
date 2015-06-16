@@ -1,0 +1,16 @@
+{
+  RequiredActionProviderEntity entity=getRequiredActionProviderEntity(model.getId());
+  if (entity == null)   return;
+  entity.setAlias(model.getAlias());
+  entity.setProviderId(model.getProviderId());
+  entity.setEnabled(model.isEnabled());
+  entity.setDefaultAction(model.isDefaultAction());
+  if (entity.getConfig() == null) {
+    entity.setConfig(model.getConfig());
+  }
+ else {
+    entity.getConfig().clear();
+    entity.getConfig().putAll(model.getConfig());
+  }
+  updateMongoEntity();
+}

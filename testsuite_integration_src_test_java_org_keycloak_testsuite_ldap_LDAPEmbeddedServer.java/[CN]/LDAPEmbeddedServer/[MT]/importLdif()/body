@@ -4,7 +4,13 @@
   if (this.ldapSaslPrincipal != null) {
     map.put("ldapSaslPrincipal",this.ldapSaslPrincipal);
   }
-  InputStream is=getClass().getClassLoader().getResourceAsStream(ldifFile);
+  InputStream is;
+  if (ldifFile.startsWith("file:")) {
+    is=new URL(ldifFile).openStream();
+  }
+ else {
+    is=getClass().getClassLoader().getResourceAsStream(ldifFile);
+  }
   if (is == null) {
     throw new IllegalStateException("LDIF file not found on classpath. Location was: " + ldifFile);
   }

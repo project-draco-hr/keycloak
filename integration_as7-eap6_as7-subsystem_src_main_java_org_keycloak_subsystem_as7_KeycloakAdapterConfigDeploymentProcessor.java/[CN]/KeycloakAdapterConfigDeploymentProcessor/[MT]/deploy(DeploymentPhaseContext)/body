@@ -1,8 +1,26 @@
 {
   DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
   String deploymentName=deploymentUnit.getName();
-  KeycloakAdapterConfigService service=KeycloakAdapterConfigService.getInstance();
-  if (service.isSecureDeployment(deploymentName)) {
-    addKeycloakAuthData(phaseContext,deploymentName,service);
+  WarMetaData warMetaData=deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
+  if (warMetaData == null) {
+    return;
   }
+  JBossWebMetaData webMetaData=warMetaData.getMergedJBossWebMetaData();
+  if (webMetaData == null) {
+    webMetaData=new JBossWebMetaData();
+    warMetaData.setMergedJBossWebMetaData(webMetaData);
+  }
+  KeycloakAdapterConfigService service=KeycloakAdapterConfigService.getInstance();
+  LoginConfigMetaData loginConfig=webMetaData.getLoginConfig();
+  if (!service.isSecureDeployment(deploymentName) && (loginConfig == null || !loginConfig.getAuthMethod().equalsIgnoreCase("KEYCLOAK"))) {
+    return;
+  }
+  log.debug("Setting up KEYCLOAK auth method for WAR: " + deploymentName);
+  loginConfig.setAuthMethod("KEYCLOAK");
+  if (service.isSecureDeployment(deploymentName)) {
+    addJSONData(service.getJSON(deploymentName),warMetaData);
+    loginConfig.setRealmName(service.getRealmName(deploymentName));
+  }
+  addValve(webMetaData);
+  KeycloakLogger.ROOT_LOGGER.deploymentSecured(deploymentName);
 }

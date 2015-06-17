@@ -37,15 +37,17 @@
     }
   }
 ;
-  for (  ProviderFactory factory : session.getKeycloakSessionFactory().getProviderFactories(RequiredActionProvider.class)) {
-    RequiredActionProvider provider=((RequiredActionFactory)factory).create(session);
+  for (  RequiredActionProviderModel model : realm.getRequiredActionProviders()) {
+    if (!model.isEnabled())     continue;
+    RequiredActionProvider provider=session.getProvider(RequiredActionProvider.class,model.getProviderId());
     provider.evaluateTriggers(context);
   }
   logger.debugv("processAccessCode: go to oauth page?: {0}",client.isConsentRequired());
   event.detail(Details.CODE_ID,clientSession.getId());
   Set<String> requiredActions=user.getRequiredActions();
   for (  String action : requiredActions) {
-    RequiredActionProvider actionProvider=session.getProvider(RequiredActionProvider.class,action);
+    RequiredActionProviderModel model=realm.getRequiredActionProviderByAlias(action);
+    RequiredActionProvider actionProvider=session.getProvider(RequiredActionProvider.class,model.getProviderId());
     Response challenge=actionProvider.invokeRequiredAction(context);
     if (challenge != null) {
       return challenge;

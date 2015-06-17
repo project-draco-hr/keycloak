@@ -1,0 +1,23 @@
+{
+  List<UserCredentialModel> credentials=new LinkedList<>();
+  String password=inputData.getFirst(CredentialRepresentation.PASSWORD);
+  if (password == null) {
+    if (context.getUser() != null) {
+      context.getEvent().user(context.getUser());
+    }
+    context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
+    Response challengeResponse=invalidCredentials(context);
+    context.failureChallenge(AuthenticationProcessor.Error.INVALID_CREDENTIALS,challengeResponse);
+    return false;
+  }
+  credentials.add(UserCredentialModel.password(password));
+  boolean valid=context.getSession().users().validCredentials(context.getRealm(),context.getUser(),credentials);
+  if (!valid) {
+    context.getEvent().user(context.getUser());
+    context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
+    Response challengeResponse=invalidCredentials(context);
+    context.failureChallenge(AuthenticationProcessor.Error.INVALID_CREDENTIALS,challengeResponse);
+    return false;
+  }
+  return true;
+}

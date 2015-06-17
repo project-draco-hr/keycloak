@@ -1,0 +1,9 @@
+{
+  ClientSessionCode code=new ClientSessionCode(realm,clientSession);
+  if (!code.isValidAction(ClientSessionModel.Action.AUTHENTICATE.name())) {
+    throw new AuthException(Error.INVALID_CLIENT_SESSION);
+  }
+  if (!code.isActionActive(ClientSessionModel.Action.AUTHENTICATE.name())) {
+    throw new AuthException(Error.EXPIRED_CODE);
+  }
+}

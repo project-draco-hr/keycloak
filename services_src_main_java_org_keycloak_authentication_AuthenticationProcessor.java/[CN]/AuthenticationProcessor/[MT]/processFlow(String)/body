@@ -51,10 +51,7 @@
           if (model.isUserSetupAllowed()) {
             logger.debugv("authenticator SETUP_REQUIRED: {0}",authenticatorModel.getProviderId());
             clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SETUP_REQUIRED);
-            String requiredAction=authenticator.getRequiredAction();
-            if (!authUser.getRequiredActions().contains(requiredAction)) {
-              authUser.addRequiredAction(requiredAction);
-            }
+            authenticator.setRequiredActions(session,realm,clientSession.getAuthenticatedUser());
             continue;
           }
  else {

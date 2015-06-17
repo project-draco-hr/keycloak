@@ -1,0 +1,16 @@
+{
+  RequiredActionProviderEntity auth=new RequiredActionProviderEntity();
+  auth.setId(KeycloakModelUtils.generateId());
+  auth.setAlias(model.getAlias());
+  auth.setName(model.getName());
+  auth.setRealm(realm);
+  auth.setProviderId(model.getProviderId());
+  auth.setConfig(model.getConfig());
+  auth.setEnabled(model.isEnabled());
+  auth.setDefaultAction(model.isDefaultAction());
+  realm.getRequiredActionProviders().add(auth);
+  em.persist(auth);
+  em.flush();
+  model.setId(auth.getId());
+  return model;
+}

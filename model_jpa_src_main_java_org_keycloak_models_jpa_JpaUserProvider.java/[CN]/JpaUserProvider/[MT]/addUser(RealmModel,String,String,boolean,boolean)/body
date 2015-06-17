@@ -19,9 +19,9 @@
       }
     }
   }
-  if (addDefaultRequiredActions) {
-    for (    String r : realm.getDefaultRequiredActions()) {
-      userModel.addRequiredAction(r);
+  for (  RequiredActionProviderModel r : realm.getRequiredActionProviders()) {
+    if (r.isEnabled() && r.isDefaultAction()) {
+      userModel.addRequiredAction(r.getAlias());
     }
   }
   return userModel;

@@ -1,0 +1,17 @@
+{
+  RequiredActionProviderEntity entity=em.find(RequiredActionProviderEntity.class,model.getId());
+  if (entity == null)   return;
+  entity.setAlias(model.getAlias());
+  entity.setProviderId(model.getProviderId());
+  entity.setEnabled(model.isEnabled());
+  entity.setDefaultAction(model.isDefaultAction());
+  entity.setName(model.getName());
+  if (entity.getConfig() == null) {
+    entity.setConfig(model.getConfig());
+  }
+ else {
+    entity.getConfig().clear();
+    entity.getConfig().putAll(model.getConfig());
+  }
+  em.flush();
+}

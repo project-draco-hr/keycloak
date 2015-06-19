@@ -7,14 +7,14 @@
       continue;
     }
     if (model.isAlternative() && alternativeSuccessful) {
-      clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SKIPPED);
+      clientSession.setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
       continue;
     }
     if (model.isAutheticatorFlow()) {
       FlowExecution flowExecution=createFlowExecution(model.getAuthenticator());
       Response flowResponse=flowExecution.processFlow();
       if (flowResponse == null) {
-        clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SUCCESS);
+        clientSession.setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SUCCESS);
         if (model.isAlternative())         alternativeSuccessful=true;
         continue;
       }
@@ -29,7 +29,7 @@
     UserModel authUser=clientSession.getAuthenticatedUser();
     if (authenticator.requiresUser() && authUser == null) {
       if (alternativeChallenge != null) {
-        clientSession.setAuthenticatorStatus(challengedAlternativeExecution.getId(),UserSessionModel.AuthenticatorStatus.CHALLENGED);
+        clientSession.setExecutionStatus(challengedAlternativeExecution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
         return alternativeChallenge;
       }
       throw new AuthException("authenticator: " + authenticatorModel.getProviderId(),Error.UNKNOWN_USER);
@@ -41,7 +41,7 @@
         if (model.isRequired()) {
           if (model.isUserSetupAllowed()) {
             logger.debugv("authenticator SETUP_REQUIRED: {0}",authenticatorModel.getProviderId());
-            clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SETUP_REQUIRED);
+            clientSession.setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SETUP_REQUIRED);
             authenticator.setRequiredActions(session,realm,clientSession.getAuthenticatedUser());
             continue;
           }
@@ -50,7 +50,7 @@
           }
         }
  else         if (model.isOptional()) {
-          clientSession.setAuthenticatorStatus(model.getId(),UserSessionModel.AuthenticatorStatus.SKIPPED);
+          clientSession.setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
           continue;
         }
       }

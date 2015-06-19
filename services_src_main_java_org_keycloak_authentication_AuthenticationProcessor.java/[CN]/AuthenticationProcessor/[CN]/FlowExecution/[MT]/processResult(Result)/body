@@ -4,53 +4,55 @@
   Status status=result.getStatus();
   if (status == Status.SUCCESS) {
     logger.debugv("authenticator SUCCESS: {0}",authenticatorModel.getProviderId());
-    clientSession.setAuthenticatorStatus(execution.getId(),UserSessionModel.AuthenticatorStatus.SUCCESS);
+    clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.SUCCESS);
     if (execution.isAlternative())     alternativeSuccessful=true;
     return null;
   }
  else   if (status == Status.FAILED) {
     logger.debugv("authenticator FAILED: {0}",authenticatorModel.getProviderId());
-    logUserFailure();
-    clientSession.setAuthenticatorStatus(execution.getId(),UserSessionModel.AuthenticatorStatus.FAILED);
-    if (result.challenge != null)     return result.challenge;
+    logFailure();
+    clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.FAILED);
+    if (result.challenge != null) {
+      return sendChallenge(result,execution);
+    }
     throw new AuthException(result.error);
   }
  else   if (status == Status.FORCE_CHALLENGE) {
-    clientSession.setAuthenticatorStatus(execution.getId(),UserSessionModel.AuthenticatorStatus.CHALLENGED);
-    return result.challenge;
+    clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+    return sendChallenge(result,execution);
   }
  else   if (status == Status.CHALLENGE) {
     logger.debugv("authenticator CHALLENGE: {0}",authenticatorModel.getProviderId());
     if (execution.isRequired()) {
-      clientSession.setAuthenticatorStatus(execution.getId(),UserSessionModel.AuthenticatorStatus.CHALLENGED);
-      return result.challenge;
+      clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+      return sendChallenge(result,execution);
     }
     UserModel authenticatedUser=clientSession.getAuthenticatedUser();
     if (execution.isOptional() && authenticatedUser != null && result.getAuthenticator().configuredFor(session,realm,authenticatedUser)) {
-      clientSession.setAuthenticatorStatus(execution.getId(),UserSessionModel.AuthenticatorStatus.CHALLENGED);
-      return result.challenge;
+      clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+      return sendChallenge(result,execution);
     }
     if (execution.isAlternative()) {
       alternativeChallenge=result.challenge;
       challengedAlternativeExecution=execution;
     }
  else {
-      clientSession.setAuthenticatorStatus(execution.getId(),UserSessionModel.AuthenticatorStatus.SKIPPED);
+      clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
     }
     return null;
   }
  else   if (status == Status.FAILURE_CHALLENGE) {
     logger.debugv("authenticator FAILURE_CHALLENGE: {0}",authenticatorModel.getProviderId());
-    logUserFailure();
-    clientSession.setAuthenticatorStatus(execution.getId(),UserSessionModel.AuthenticatorStatus.CHALLENGED);
-    return result.challenge;
+    logFailure();
+    clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+    return sendChallenge(result,execution);
   }
  else   if (status == Status.ATTEMPTED) {
     logger.debugv("authenticator ATTEMPTED: {0}",authenticatorModel.getProviderId());
     if (execution.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
       throw new AuthException(Error.INVALID_CREDENTIALS);
     }
-    clientSession.setAuthenticatorStatus(execution.getId(),UserSessionModel.AuthenticatorStatus.ATTEMPTED);
+    clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.ATTEMPTED);
     return null;
   }
  else {

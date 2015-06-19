@@ -51,6 +51,11 @@
       return request;
     }
     @Override public String generateAccessCode(    String action){
+      String clientSessionAction=clientSession.getAction();
+      if (action.equals(clientSessionAction)) {
+        clientSession.setTimestamp(Time.currentTime());
+        return code;
+      }
       ClientSessionCode code=new ClientSessionCode(getRealm(),getClientSession());
       code.setAction(action);
       return code.getCode();

@@ -16,19 +16,25 @@
     return false;
   }
   ClientSessionModel clientSession=clientCode.getClientSession();
+  if (clientSession == null) {
+    event.error(Errors.INVALID_CODE);
+    response=ErrorPage.error(session,Messages.INVALID_CODE);
+    return false;
+  }
   event.detail(Details.CODE_ID,clientSession.getId());
   ClientModel client=clientSession.getClient();
   if (client == null) {
     event.error(Errors.CLIENT_NOT_FOUND);
     response=ErrorPage.error(session,Messages.UNKNOWN_LOGIN_REQUESTER);
+    session.sessions().removeClientSession(realm,clientSession);
     return false;
   }
-  session.getContext().setClient(client);
   if (!client.isEnabled()) {
     event.error(Errors.CLIENT_NOT_FOUND);
     response=ErrorPage.error(session,Messages.LOGIN_REQUESTER_NOT_ENABLED);
+    session.sessions().removeClientSession(realm,clientSession);
     return false;
   }
-  session.getContext().setClient(clientCode.getClientSession().getClient());
+  session.getContext().setClient(client);
   return true;
 }

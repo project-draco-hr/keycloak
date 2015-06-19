@@ -11,7 +11,16 @@
  else   if (!(clientCode.isActionActive(requiredAction) || clientCode.isActionActive(alternativeRequiredAction))) {
     event.client(clientCode.getClientSession().getClient());
     event.error(Errors.EXPIRED_CODE);
-    response=ErrorPage.error(session,Messages.EXPIRED_CODE);
+    if (clientCode.getClientSession().getAction().equals(ClientSessionModel.Action.AUTHENTICATE.name())) {
+      AuthenticationProcessor.resetFlow(clientCode.getClientSession());
+      response=processAuthentication(null,clientCode.getClientSession());
+    }
+ else {
+      if (clientCode.getClientSession().getUserSession() == null) {
+        session.sessions().removeClientSession(realm,clientCode.getClientSession());
+      }
+      response=ErrorPage.error(session,Messages.EXPIRED_CODE);
+    }
     return false;
   }
  else {

@@ -7,7 +7,7 @@
     return false;
   }
   context.getEvent().detail(Details.USERNAME,username);
-  context.getClientSession().setNote(AbstractFormAuthenticator.FORM_USERNAME,username);
+  context.getClientSession().setNote(AbstractFormAuthenticator.ATTEMPTED_USERNAME,username);
   UserModel user=KeycloakModelUtils.findUserByNameOrEmail(context.getSession(),context.getRealm(),username);
   if (invalidUser(context,user))   return false;
   String rememberMe=inputData.getFirst("rememberMe");
@@ -15,6 +15,9 @@
   if (remember) {
     context.getClientSession().setNote(Details.REMEMBER_ME,"true");
     context.getEvent().detail(Details.REMEMBER_ME,"true");
+  }
+ else {
+    context.getClientSession().removeNote(Details.REMEMBER_ME);
   }
   context.setUser(user);
   return true;

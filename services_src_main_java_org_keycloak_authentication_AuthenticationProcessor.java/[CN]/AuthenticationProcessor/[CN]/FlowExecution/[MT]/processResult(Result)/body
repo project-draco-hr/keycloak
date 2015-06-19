@@ -1,0 +1,63 @@
+{
+  AuthenticationExecutionModel execution=result.getExecution();
+  AuthenticatorModel authenticatorModel=result.getAuthenticatorModel();
+  Status status=result.getStatus();
+  if (status == Status.SUCCESS) {
+    logger.debugv("authenticator SUCCESS: {0}",authenticatorModel.getProviderId());
+    clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.SUCCESS);
+    if (execution.isAlternative())     alternativeSuccessful=true;
+    return null;
+  }
+ else   if (status == Status.FAILED) {
+    logger.debugv("authenticator FAILED: {0}",authenticatorModel.getProviderId());
+    logFailure();
+    clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.FAILED);
+    if (result.challenge != null) {
+      return sendChallenge(result,execution);
+    }
+    throw new AuthException(result.error);
+  }
+ else   if (status == Status.FORCE_CHALLENGE) {
+    clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+    return sendChallenge(result,execution);
+  }
+ else   if (status == Status.CHALLENGE) {
+    logger.debugv("authenticator CHALLENGE: {0}",authenticatorModel.getProviderId());
+    if (execution.isRequired()) {
+      clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+      return sendChallenge(result,execution);
+    }
+    UserModel authenticatedUser=clientSession.getAuthenticatedUser();
+    if (execution.isOptional() && authenticatedUser != null && result.getAuthenticator().configuredFor(session,realm,authenticatedUser)) {
+      clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+      return sendChallenge(result,execution);
+    }
+    if (execution.isAlternative()) {
+      alternativeChallenge=result.challenge;
+      challengedAlternativeExecution=execution;
+    }
+ else {
+      clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
+    }
+    return null;
+  }
+ else   if (status == Status.FAILURE_CHALLENGE) {
+    logger.debugv("authenticator FAILURE_CHALLENGE: {0}",authenticatorModel.getProviderId());
+    logFailure();
+    clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+    return sendChallenge(result,execution);
+  }
+ else   if (status == Status.ATTEMPTED) {
+    logger.debugv("authenticator ATTEMPTED: {0}",authenticatorModel.getProviderId());
+    if (execution.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
+      throw new AuthException(Error.INVALID_CREDENTIALS);
+    }
+    clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.ATTEMPTED);
+    return null;
+  }
+ else {
+    logger.debugv("authenticator INTERNAL_ERROR: {0}",authenticatorModel.getProviderId());
+    logger.error("Unknown result status");
+    throw new AuthException(Error.INTERNAL_ERROR);
+  }
+}

@@ -1,0 +1,25 @@
+{
+  while (executions.hasNext()) {
+    AuthenticationExecutionModel model=executions.next();
+    if (isProcessed(model)) {
+      logger.debug("execution is processed");
+      if (!alternativeSuccessful && model.isAlternative() && isSuccessful(model))       alternativeSuccessful=true;
+      continue;
+    }
+    if (!model.getId().equals(actionExecution)) {
+      if (model.isAutheticatorFlow()) {
+        FlowExecution flowExecution=createFlowExecution(model.getAuthenticator());
+        return flowExecution.action(actionExecution,actionResult);
+      }
+ else {
+        throw new AuthException("action is not current execution",Error.INTERNAL_ERROR);
+      }
+    }
+ else {
+      Response response=processResult(actionResult);
+      if (response == null)       return processFlow();
+ else       return response;
+    }
+  }
+  throw new AuthException("action is not in current execution",Error.INTERNAL_ERROR);
+}

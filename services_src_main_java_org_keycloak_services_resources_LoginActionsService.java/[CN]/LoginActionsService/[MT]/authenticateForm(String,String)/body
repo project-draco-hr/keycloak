@@ -6,14 +6,5 @@
   }
   final ClientSessionCode clientCode=checks.clientCode;
   final ClientSessionModel clientSession=clientCode.getClientSession();
-  String flowAlias=DefaultAuthenticationFlows.BROWSER_FLOW;
-  AuthenticationFlowModel flow=realm.getFlowByAlias(flowAlias);
-  AuthenticationProcessor processor=new AuthenticationProcessor();
-  processor.setClientSession(clientSession).setFlowId(flow.getId()).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setSession(session).setUriInfo(uriInfo).setAction(action).setRequest(request);
-  try {
-    return processor.authenticate();
-  }
- catch (  Exception e) {
-    return processor.handleBrowserException(e);
-  }
+  return processAuthentication(execution,clientSession);
 }

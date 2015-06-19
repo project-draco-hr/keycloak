@@ -1,0 +1,35 @@
+{
+  checkClientSession();
+  String current=clientSession.getNote(CURRENT_AUTHENTICATION_EXECUTION);
+  if (!execution.equals(current)) {
+    logger.debug("Current execution does not equal executed execution.  Might be a page refresh");
+    logFailure();
+    resetFlow();
+    return authenticate();
+  }
+  AuthenticationExecutionModel model=realm.getAuthenticationExecutionById(execution);
+  if (model == null) {
+    logger.debug("Cannot find execution, reseting flow");
+    logFailure();
+    resetFlow();
+    return authenticate();
+  }
+  event.event(EventType.LOGIN);
+  event.client(clientSession.getClient().getClientId()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.AUTH_METHOD,clientSession.getAuthMethod());
+  String authType=clientSession.getNote(Details.AUTH_TYPE);
+  if (authType != null) {
+    event.detail(Details.AUTH_TYPE,authType);
+  }
+  AuthenticatorModel authenticatorModel=realm.getAuthenticatorById(model.getAuthenticator());
+  AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,authenticatorModel.getProviderId());
+  Authenticator authenticator=factory.create(authenticatorModel);
+  Result context=new Result(model,authenticatorModel,authenticator);
+  authenticator.action(context);
+  FlowExecution flowExecution=createFlowExecution(this.flowId);
+  Response challenge=flowExecution.action(execution,context);
+  if (challenge != null)   return challenge;
+  if (clientSession.getAuthenticatedUser() == null) {
+    throw new AuthException(Error.UNKNOWN_USER);
+  }
+  return authenticationComplete();
+}

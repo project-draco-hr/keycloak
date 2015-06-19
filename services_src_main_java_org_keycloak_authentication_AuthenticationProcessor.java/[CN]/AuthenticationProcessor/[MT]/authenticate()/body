@@ -9,7 +9,8 @@
   }
   UserModel authUser=clientSession.getAuthenticatedUser();
   validateUser(authUser);
-  Response challenge=processFlow(flowId);
+  FlowExecution flowExecution=createFlowExecution(this.flowId);
+  Response challenge=flowExecution.processFlow();
   if (challenge != null)   return challenge;
   if (clientSession.getAuthenticatedUser() == null) {
     throw new AuthException(Error.UNKNOWN_USER);

@@ -1,0 +1,13 @@
+{
+  AuthenticatorConfigEntity entity=em.find(AuthenticatorConfigEntity.class,model.getId());
+  if (entity == null)   return;
+  entity.setAlias(model.getAlias());
+  if (entity.getConfig() == null) {
+    entity.setConfig(model.getConfig());
+  }
+ else {
+    entity.getConfig().clear();
+    entity.getConfig().putAll(model.getConfig());
+  }
+  em.flush();
+}

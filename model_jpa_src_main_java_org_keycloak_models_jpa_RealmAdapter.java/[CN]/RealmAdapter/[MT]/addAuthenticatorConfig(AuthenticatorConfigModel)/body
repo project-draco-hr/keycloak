@@ -1,0 +1,12 @@
+{
+  AuthenticatorConfigEntity auth=new AuthenticatorConfigEntity();
+  auth.setId(KeycloakModelUtils.generateId());
+  auth.setAlias(model.getAlias());
+  auth.setRealm(realm);
+  auth.setConfig(model.getConfig());
+  realm.getAuthenticatorConfigs().add(auth);
+  em.persist(auth);
+  em.flush();
+  model.setId(auth.getId());
+  return model;
+}

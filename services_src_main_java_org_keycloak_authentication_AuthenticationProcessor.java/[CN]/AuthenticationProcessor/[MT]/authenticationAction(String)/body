@@ -20,10 +20,9 @@
   if (authType != null) {
     event.detail(Details.AUTH_TYPE,authType);
   }
-  AuthenticatorModel authenticatorModel=realm.getAuthenticatorById(model.getAuthenticator());
-  AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,authenticatorModel.getProviderId());
-  Authenticator authenticator=factory.create(authenticatorModel);
-  Result context=new Result(model,authenticatorModel,authenticator);
+  AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,model.getAuthenticator());
+  Authenticator authenticator=factory.create();
+  Result context=new Result(model,authenticator);
   authenticator.action(context);
   FlowExecution flowExecution=createFlowExecution(this.flowId);
   Response challenge=flowExecution.action(execution,context);

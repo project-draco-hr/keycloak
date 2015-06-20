@@ -1,15 +1,14 @@
 {
   AuthenticationExecutionModel execution=result.getExecution();
-  AuthenticatorModel authenticatorModel=result.getAuthenticatorModel();
   Status status=result.getStatus();
   if (status == Status.SUCCESS) {
-    logger.debugv("authenticator SUCCESS: {0}",authenticatorModel.getProviderId());
+    logger.debugv("authenticator SUCCESS: {0}",execution.getAuthenticator());
     clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.SUCCESS);
     if (execution.isAlternative())     alternativeSuccessful=true;
     return null;
   }
  else   if (status == Status.FAILED) {
-    logger.debugv("authenticator FAILED: {0}",authenticatorModel.getProviderId());
+    logger.debugv("authenticator FAILED: {0}",execution.getAuthenticator());
     logFailure();
     clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.FAILED);
     if (result.challenge != null) {
@@ -22,7 +21,7 @@
     return sendChallenge(result,execution);
   }
  else   if (status == Status.CHALLENGE) {
-    logger.debugv("authenticator CHALLENGE: {0}",authenticatorModel.getProviderId());
+    logger.debugv("authenticator CHALLENGE: {0}",execution.getAuthenticator());
     if (execution.isRequired()) {
       clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
       return sendChallenge(result,execution);
@@ -42,13 +41,13 @@
     return null;
   }
  else   if (status == Status.FAILURE_CHALLENGE) {
-    logger.debugv("authenticator FAILURE_CHALLENGE: {0}",authenticatorModel.getProviderId());
+    logger.debugv("authenticator FAILURE_CHALLENGE: {0}",execution.getAuthenticator());
     logFailure();
     clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
     return sendChallenge(result,execution);
   }
  else   if (status == Status.ATTEMPTED) {
-    logger.debugv("authenticator ATTEMPTED: {0}",authenticatorModel.getProviderId());
+    logger.debugv("authenticator ATTEMPTED: {0}",execution.getAuthenticator());
     if (execution.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
       throw new AuthException(Error.INVALID_CREDENTIALS);
     }
@@ -56,7 +55,7 @@
     return null;
   }
  else {
-    logger.debugv("authenticator INTERNAL_ERROR: {0}",authenticatorModel.getProviderId());
+    logger.debugv("authenticator INTERNAL_ERROR: {0}",execution.getAuthenticator());
     logger.error("Unknown result status");
     throw new AuthException(Error.INTERNAL_ERROR);
   }

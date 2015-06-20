@@ -27,8 +27,7 @@
       if (!flow.getId().equals(execution.getParentFlow())) {
         rep.setSubFlow(true);
       }
-      AuthenticatorModel authenticator=realm.getAuthenticatorById(execution.getAuthenticator());
-      AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,authenticator.getProviderId());
+      AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,execution.getAuthenticator());
       if (factory.getReferenceType() == null)       continue;
       rep.setReferenceType(factory.getReferenceType());
       rep.setConfigurable(factory.isConfigurable());

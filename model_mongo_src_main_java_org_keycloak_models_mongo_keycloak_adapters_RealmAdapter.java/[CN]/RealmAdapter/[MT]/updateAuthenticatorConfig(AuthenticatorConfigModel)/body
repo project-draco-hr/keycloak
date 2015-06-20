@@ -1,0 +1,13 @@
+{
+  AuthenticatorConfigEntity entity=getAuthenticatorConfigEntity(model.getId());
+  if (entity == null)   return;
+  entity.setAlias(model.getAlias());
+  if (entity.getConfig() == null) {
+    entity.setConfig(model.getConfig());
+  }
+ else {
+    entity.getConfig().clear();
+    entity.getConfig().putAll(model.getConfig());
+  }
+  updateMongoEntity();
+}

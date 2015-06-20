@@ -22,17 +22,16 @@
         return flowResponse;
       }
     }
-    AuthenticatorModel authenticatorModel=realm.getAuthenticatorById(model.getAuthenticator());
-    AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,authenticatorModel.getProviderId());
-    Authenticator authenticator=factory.create(authenticatorModel);
-    logger.debugv("authenticator: {0}",authenticatorModel.getProviderId());
+    AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,model.getAuthenticator());
+    Authenticator authenticator=factory.create();
+    logger.debugv("authenticator: {0}",factory.getId());
     UserModel authUser=clientSession.getAuthenticatedUser();
     if (authenticator.requiresUser() && authUser == null) {
       if (alternativeChallenge != null) {
         clientSession.setExecutionStatus(challengedAlternativeExecution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
         return alternativeChallenge;
       }
-      throw new AuthException("authenticator: " + authenticatorModel.getProviderId(),Error.UNKNOWN_USER);
+      throw new AuthException("authenticator: " + factory.getId(),Error.UNKNOWN_USER);
     }
     boolean configuredFor=false;
     if (authenticator.requiresUser() && authUser != null) {
@@ -40,7 +39,7 @@
       if (!configuredFor) {
         if (model.isRequired()) {
           if (model.isUserSetupAllowed()) {
-            logger.debugv("authenticator SETUP_REQUIRED: {0}",authenticatorModel.getProviderId());
+            logger.debugv("authenticator SETUP_REQUIRED: {0}",factory.getId());
             clientSession.setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SETUP_REQUIRED);
             authenticator.setRequiredActions(session,realm,clientSession.getAuthenticatedUser());
             continue;
@@ -55,7 +54,7 @@
         }
       }
     }
-    Result context=new Result(model,authenticatorModel,authenticator);
+    Result context=new Result(model,authenticator);
     authenticator.authenticate(context);
     Response response=processResult(context);
     if (response != null)     return response;

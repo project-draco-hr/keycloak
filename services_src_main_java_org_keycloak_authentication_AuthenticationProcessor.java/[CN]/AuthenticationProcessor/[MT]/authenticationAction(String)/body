@@ -20,12 +20,8 @@
   if (authType != null) {
     event.detail(Details.AUTH_TYPE,authType);
   }
-  AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,model.getAuthenticator());
-  Authenticator authenticator=factory.create();
-  Result context=new Result(model,authenticator);
-  authenticator.action(context);
   FlowExecution flowExecution=createFlowExecution(this.flowId);
-  Response challenge=flowExecution.action(execution,context);
+  Response challenge=flowExecution.action(execution);
   if (challenge != null)   return challenge;
   if (clientSession.getAuthenticatedUser() == null) {
     throw new AuthException(Error.UNKNOWN_USER);

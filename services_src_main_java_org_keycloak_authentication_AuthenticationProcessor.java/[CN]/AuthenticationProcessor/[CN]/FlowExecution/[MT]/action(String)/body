@@ -9,14 +9,18 @@
     if (!model.getId().equals(actionExecution)) {
       if (model.isAutheticatorFlow()) {
         FlowExecution flowExecution=createFlowExecution(model.getAuthenticator());
-        return flowExecution.action(actionExecution,actionResult);
+        return flowExecution.action(actionExecution);
       }
  else {
         throw new AuthException("action is not current execution",Error.INTERNAL_ERROR);
       }
     }
  else {
-      Response response=processResult(actionResult);
+      AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,model.getAuthenticator());
+      Authenticator authenticator=factory.create();
+      Result result=new Result(model,authenticator);
+      authenticator.action(result);
+      Response response=processResult(result);
       if (response == null)       return processFlow();
  else       return response;
     }

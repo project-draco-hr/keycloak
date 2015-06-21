@@ -11,10 +11,10 @@
     logger.debugv("authenticator FAILED: {0}",execution.getAuthenticator());
     logFailure();
     clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.FAILED);
-    if (result.challenge != null) {
+    if (result.getChallenge() != null) {
       return sendChallenge(result,execution);
     }
-    throw new AuthException(result.error);
+    throw new AuthException(result.getError());
   }
  else   if (status == Status.FORCE_CHALLENGE) {
     clientSession.setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
@@ -32,7 +32,7 @@
       return sendChallenge(result,execution);
     }
     if (execution.isAlternative()) {
-      alternativeChallenge=result.challenge;
+      alternativeChallenge=result.getChallenge();
       challengedAlternativeExecution=execution;
     }
  else {

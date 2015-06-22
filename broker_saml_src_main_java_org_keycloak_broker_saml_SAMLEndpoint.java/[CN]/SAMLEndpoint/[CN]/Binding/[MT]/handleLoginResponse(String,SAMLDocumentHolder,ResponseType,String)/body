@@ -9,7 +9,7 @@
     identity.getContextData().put(SAML_LOGIN_RESPONSE,responseType);
     identity.getContextData().put(SAML_ASSERTION,assertion);
     identity.setUsername(subjectNameID.getValue());
-    if (subjectNameID.getFormat().toString().equals(JBossSAMLURIConstants.NAMEID_FORMAT_EMAIL.get())) {
+    if (subjectNameID.getFormat() != null && subjectNameID.getFormat().toString().equals(JBossSAMLURIConstants.NAMEID_FORMAT_EMAIL.get())) {
       identity.setEmail(subjectNameID.getValue());
     }
     if (config.isStoreToken()) {

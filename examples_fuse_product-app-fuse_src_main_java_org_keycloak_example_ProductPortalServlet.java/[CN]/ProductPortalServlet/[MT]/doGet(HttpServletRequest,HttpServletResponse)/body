@@ -6,10 +6,12 @@
   String acctUri=KeycloakUriBuilder.fromUri("http://localhost:8080/auth").path(ServiceUrlConstants.ACCOUNT_SERVICE_PATH).queryParam("referrer","product-portal").build("demo").toString();
   out.println("<p>Goto: <a href=\"/customer-portal\">customers</a> | <a href=\"" + logoutUri + "\">logout</a> | <a href=\""+ acctUri+ "\">manage acct</a></p>");
   out.println("Servlet User Principal <b>" + req.getUserPrincipal() + "</b> made this request.");
-  String unsecuredWsClientResponse=sendWsReq(req,false);
-  String securedWsClientResponse=sendWsReq(req,true);
-  out.println("<p>Person with ID 1 - unsecured request: <b>" + unsecuredWsClientResponse + "</b></p>");
-  out.println("<p>Person with ID 1 - secured request: <b>" + securedWsClientResponse + "</b></p>");
+  String unsecuredWsClientResponse=sendWsReq(req,"1",false);
+  String securedWsClientResponse=sendWsReq(req,"1",true);
+  String securedWsClient2Response=sendWsReq(req,"2",true);
+  out.println("<p>Product with ID 1 - unsecured request (it should end with failure): <b>" + unsecuredWsClientResponse + "</b></p><br>");
+  out.println("<p>Product with ID 1 - secured request: <b>" + securedWsClientResponse + "</b></p><br>");
+  out.println("<p>Product with ID 2 - secured request: <b>" + securedWsClient2Response + "</b></p><br>");
   out.println("</body></html>");
   out.flush();
   out.close();

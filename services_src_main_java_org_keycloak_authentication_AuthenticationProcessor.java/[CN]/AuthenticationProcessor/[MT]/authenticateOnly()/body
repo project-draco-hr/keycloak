@@ -8,8 +8,8 @@
   }
   UserModel authUser=clientSession.getAuthenticatedUser();
   validateUser(authUser);
-  FlowExecution flowExecution=createFlowExecution(this.flowId);
-  Response challenge=flowExecution.processFlow();
+  AuthenticationFlow authenticationFlow=createFlowExecution(this.flowId,null);
+  Response challenge=authenticationFlow.processFlow();
   if (challenge != null)   return challenge;
   String username=clientSession.getAuthenticatedUser().getUsername();
   if (userSession == null) {

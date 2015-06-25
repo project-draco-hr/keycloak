@@ -1,0 +1,79 @@
+{
+  while (executions.hasNext()) {
+    AuthenticationExecutionModel model=executions.next();
+    if (isProcessed(model)) {
+      AuthenticationProcessor.logger.debug("execution is processed");
+      if (!alternativeSuccessful && model.isAlternative() && processor.isSuccessful(model))       alternativeSuccessful=true;
+      continue;
+    }
+    if (model.isAlternative() && alternativeSuccessful) {
+      processor.getClientSession().setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
+      continue;
+    }
+    if (model.isAutheticatorFlow()) {
+      AuthenticationFlow authenticationFlow=processor.createFlowExecution(model.getFlowId(),model);
+      Response flowChallenge=authenticationFlow.processFlow();
+      if (flowChallenge == null) {
+        processor.getClientSession().setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SUCCESS);
+        if (model.isAlternative())         alternativeSuccessful=true;
+        continue;
+      }
+ else {
+        if (model.isAlternative()) {
+          alternativeChallenge=flowChallenge;
+          challengedAlternativeExecution=model;
+        }
+ else         if (model.isRequired()) {
+          processor.getClientSession().setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+          return flowChallenge;
+        }
+ else         if (model.isOptional()) {
+          processor.getClientSession().setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
+          continue;
+        }
+ else {
+          processor.getClientSession().setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
+          continue;
+        }
+        return flowChallenge;
+      }
+    }
+    AuthenticatorFactory factory=(AuthenticatorFactory)processor.getSession().getKeycloakSessionFactory().getProviderFactory(Authenticator.class,model.getAuthenticator());
+    Authenticator authenticator=factory.create();
+    AuthenticationProcessor.logger.debugv("authenticator: {0}",factory.getId());
+    UserModel authUser=processor.getClientSession().getAuthenticatedUser();
+    if (authenticator.requiresUser() && authUser == null) {
+      if (alternativeChallenge != null) {
+        processor.getClientSession().setExecutionStatus(challengedAlternativeExecution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+        return alternativeChallenge;
+      }
+      throw new AuthenticationProcessor.AuthException("authenticator: " + factory.getId(),AuthenticationProcessor.Error.UNKNOWN_USER);
+    }
+    boolean configuredFor=false;
+    if (authenticator.requiresUser() && authUser != null) {
+      configuredFor=authenticator.configuredFor(processor.getSession(),processor.getRealm(),authUser);
+      if (!configuredFor) {
+        if (model.isRequired()) {
+          if (model.isUserSetupAllowed()) {
+            AuthenticationProcessor.logger.debugv("authenticator SETUP_REQUIRED: {0}",factory.getId());
+            processor.getClientSession().setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SETUP_REQUIRED);
+            authenticator.setRequiredActions(processor.getSession(),processor.getRealm(),processor.getClientSession().getAuthenticatedUser());
+            continue;
+          }
+ else {
+            throw new AuthenticationProcessor.AuthException(AuthenticationProcessor.Error.CREDENTIAL_SETUP_REQUIRED);
+          }
+        }
+ else         if (model.isOptional()) {
+          processor.getClientSession().setExecutionStatus(model.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
+          continue;
+        }
+      }
+    }
+    AuthenticatorContext context=processor.createAuthenticatorContext(model,authenticator);
+    authenticator.authenticate(context);
+    Response response=processResult(context);
+    if (response != null)     return response;
+  }
+  return null;
+}

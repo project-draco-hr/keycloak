@@ -2,7 +2,7 @@
   TypedQuery<AuthenticationExecutionEntity> query=em.createNamedQuery("getAuthenticationExecutionsByFlow",AuthenticationExecutionEntity.class);
   AuthenticationFlowEntity flow=em.getReference(AuthenticationFlowEntity.class,flowId);
   query.setParameter("realm",realm);
-  query.setParameter("flow",flow);
+  query.setParameter("parentFlow",flow);
   List<AuthenticationExecutionEntity> queryResult=query.getResultList();
   List<AuthenticationExecutionModel> executions=new LinkedList<>();
   for (  AuthenticationExecutionEntity entity : queryResult) {

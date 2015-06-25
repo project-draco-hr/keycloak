@@ -1,0 +1,42 @@
+{
+  AuthenticationProcessor.Status status=result.getStatus();
+  if (status == AuthenticationProcessor.Status.SUCCESS) {
+    return null;
+  }
+ else   if (status == AuthenticationProcessor.Status.FAILED) {
+    AuthenticationProcessor.logger.debugv("authenticator FAILED: {0}",execution.getAuthenticator());
+    processor.logFailure();
+    processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.FAILED);
+    if (result.getChallenge() != null) {
+      return sendChallenge(result,execution);
+    }
+    throw new AuthenticationProcessor.AuthException(result.getError());
+  }
+ else   if (status == AuthenticationProcessor.Status.FORCE_CHALLENGE) {
+    processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+    return sendChallenge(result,execution);
+  }
+ else   if (status == AuthenticationProcessor.Status.CHALLENGE) {
+    processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+    return sendChallenge(result,execution);
+  }
+ else   if (status == AuthenticationProcessor.Status.FAILURE_CHALLENGE) {
+    AuthenticationProcessor.logger.debugv("authenticator FAILURE_CHALLENGE: {0}",execution.getAuthenticator());
+    processor.logFailure();
+    processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+    return sendChallenge(result,execution);
+  }
+ else   if (status == AuthenticationProcessor.Status.ATTEMPTED) {
+    AuthenticationProcessor.logger.debugv("authenticator ATTEMPTED: {0}",execution.getAuthenticator());
+    if (execution.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
+      throw new AuthenticationProcessor.AuthException(AuthenticationProcessor.Error.INVALID_CREDENTIALS);
+    }
+    processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.ATTEMPTED);
+    return null;
+  }
+ else {
+    AuthenticationProcessor.logger.debugv("authenticator INTERNAL_ERROR: {0}",execution.getAuthenticator());
+    AuthenticationProcessor.logger.error("Unknown result status");
+    throw new AuthenticationProcessor.AuthException(AuthenticationProcessor.Error.INTERNAL_ERROR);
+  }
+}

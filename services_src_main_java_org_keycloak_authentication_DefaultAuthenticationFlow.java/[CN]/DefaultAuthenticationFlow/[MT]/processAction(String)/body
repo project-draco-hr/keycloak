@@ -1,0 +1,29 @@
+{
+  while (executions.hasNext()) {
+    AuthenticationExecutionModel model=executions.next();
+    if (isProcessed(model)) {
+      AuthenticationProcessor.logger.debug("execution is processed");
+      if (!alternativeSuccessful && model.isAlternative() && processor.isSuccessful(model))       alternativeSuccessful=true;
+      continue;
+    }
+    if (!model.getId().equals(actionExecution)) {
+      if (model.isAutheticatorFlow()) {
+        AuthenticationFlow authenticationFlow=processor.createFlowExecution(model.getFlowId(),model);
+        return authenticationFlow.processAction(actionExecution);
+      }
+ else {
+        throw new AuthenticationProcessor.AuthException("action is not current execution",AuthenticationProcessor.Error.INTERNAL_ERROR);
+      }
+    }
+ else {
+      AuthenticatorFactory factory=(AuthenticatorFactory)processor.getSession().getKeycloakSessionFactory().getProviderFactory(Authenticator.class,model.getAuthenticator());
+      Authenticator authenticator=factory.create();
+      AuthenticatorContext result=processor.createAuthenticatorContext(model,authenticator);
+      authenticator.action(result);
+      Response response=processResult(result);
+      if (response == null)       return processFlow();
+ else       return response;
+    }
+  }
+  throw new AuthenticationProcessor.AuthException("action is not in current execution",AuthenticationProcessor.Error.INTERNAL_ERROR);
+}

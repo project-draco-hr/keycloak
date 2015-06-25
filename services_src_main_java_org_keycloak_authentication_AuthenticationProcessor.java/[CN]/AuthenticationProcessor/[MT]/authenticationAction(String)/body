@@ -20,8 +20,8 @@
   if (authType != null) {
     event.detail(Details.AUTH_TYPE,authType);
   }
-  FlowExecution flowExecution=createFlowExecution(this.flowId);
-  Response challenge=flowExecution.action(execution);
+  AuthenticationFlow authenticationFlow=createFlowExecution(this.flowId,model);
+  Response challenge=authenticationFlow.processAction(execution);
   if (challenge != null)   return challenge;
   if (clientSession.getAuthenticatedUser() == null) {
     throw new AuthException(Error.UNKNOWN_USER);

@@ -7,10 +7,6 @@
     ldapObject.setDn(dn);
     ldapObject.setRdnAttributeName(dn.getFirstRdnAttrName());
     NamingEnumeration<? extends Attribute> ldapAttributes=attributes.getAll();
-    List<String> uppercasedReadOnlyAttrNames=new ArrayList<>();
-    for (    String readonlyAttr : readOnlyAttrNames) {
-      uppercasedReadOnlyAttrNames.add(readonlyAttr.toUpperCase());
-    }
     while (ldapAttributes.hasMore()) {
       Attribute ldapAttribute=ldapAttributes.next();
       try {
@@ -25,7 +21,7 @@
         ldapObject.setUuid(this.operationManager.decodeEntryUUID(uuidValue));
       }
  else {
-        Set<String> attrValues=new TreeSet<>();
+        Set<String> attrValues=new LinkedHashSet<>();
         NamingEnumeration<?> enumm=ldapAttribute.getAll();
         while (enumm.hasMoreElements()) {
           String attrVal=enumm.next().toString();
@@ -41,7 +37,7 @@
  else {
             ldapObject.setAttribute(ldapAttributeName,attrValues);
           }
-          if (uppercasedReadOnlyAttrNames.contains(ldapAttributeName.toUpperCase())) {
+          if (readOnlyAttrNames.contains(ldapAttributeName.toLowerCase())) {
             ldapObject.addReadOnlyAttributeName(ldapAttributeName);
           }
         }

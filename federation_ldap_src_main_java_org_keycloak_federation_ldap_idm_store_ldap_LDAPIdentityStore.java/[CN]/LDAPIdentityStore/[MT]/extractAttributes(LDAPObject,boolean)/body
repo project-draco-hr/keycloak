@@ -3,7 +3,7 @@
   for (  Map.Entry<String,Object> attrEntry : ldapObject.getAttributes().entrySet()) {
     String attrName=attrEntry.getKey();
     Object attrValue=attrEntry.getValue();
-    if (!ldapObject.getReadOnlyAttributeNames().contains(attrName) && (isCreate || !ldapObject.getRdnAttributeName().equalsIgnoreCase(attrName))) {
+    if (!ldapObject.getReadOnlyAttributeNames().contains(attrName.toLowerCase()) && (isCreate || !ldapObject.getRdnAttributeName().equalsIgnoreCase(attrName))) {
       if (String.class.isInstance(attrValue)) {
         if (attrValue.toString().trim().length() == 0) {
           attrValue=LDAPConstants.EMPTY_ATTRIBUTE_VALUE;

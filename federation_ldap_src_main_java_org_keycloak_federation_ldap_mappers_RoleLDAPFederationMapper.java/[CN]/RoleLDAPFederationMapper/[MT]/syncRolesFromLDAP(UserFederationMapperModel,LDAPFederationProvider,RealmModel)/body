@@ -6,7 +6,7 @@
     RoleContainerModel roleContainer=getTargetRoleContainer(mapperModel,realm);
     String rolesRdnAttr=getRoleNameLdapAttribute(mapperModel);
     for (    LDAPObject ldapRole : ldapRoles) {
-      String roleName=ldapRole.getAttributeAsString(rolesRdnAttr);
+      String roleName=ldapRole.getAttributeAsStringCaseInsensitive(rolesRdnAttr);
       if (roleContainer.getRole(roleName) == null) {
         logger.infof("Syncing role [%s] from LDAP to keycloak DB",roleName);
         roleContainer.addRole(roleName);

@@ -1,8 +1,9 @@
 {
+  final String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
+  final String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
+  boolean isAlwaysReadValueFromLDAP=parseBooleanParameter(mapperModel,ALWAYS_READ_VALUE_FROM_LDAP);
   if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE && !isReadOnly(mapperModel)) {
-    final String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
-    final String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
-    TxAwareLDAPUserModelDelegate txDelegate=new TxAwareLDAPUserModelDelegate(delegate,ldapProvider,ldapUser){
+    delegate=new TxAwareLDAPUserModelDelegate(delegate,ldapProvider,ldapUser){
       @Override public void setAttribute(      String name,      String value){
         setLDAPAttribute(name,value);
         super.setAttribute(name,value);
@@ -30,9 +31,51 @@
       }
     }
 ;
-    return txDelegate;
   }
+  if (isAlwaysReadValueFromLDAP) {
+    delegate=new UserModelDelegate(delegate){
+      @Override public String getAttribute(      String name){
+        if (name.equalsIgnoreCase(userModelAttrName)) {
+          return ldapUser.getAttributeAsStringCaseInsensitive(ldapAttrName);
+        }
  else {
-    return delegate;
+          return super.getAttribute(name);
+        }
+      }
+      @Override public Map<String,String> getAttributes(){
+        Map<String,String> attrs=new HashMap<>(super.getAttributes());
+        if (UserModel.EMAIL.equalsIgnoreCase(userModelAttrName) || UserModel.FIRST_NAME.equalsIgnoreCase(userModelAttrName) || UserModel.LAST_NAME.equalsIgnoreCase(userModelAttrName)) {
+          return attrs;
+        }
+        attrs.put(userModelAttrName,ldapUser.getAttributeAsStringCaseInsensitive(ldapAttrName));
+        return attrs;
+      }
+      @Override public String getEmail(){
+        if (UserModel.EMAIL.equalsIgnoreCase(userModelAttrName)) {
+          return ldapUser.getAttributeAsStringCaseInsensitive(ldapAttrName);
+        }
+ else {
+          return super.getEmail();
+        }
+      }
+      @Override public String getLastName(){
+        if (UserModel.LAST_NAME.equalsIgnoreCase(userModelAttrName)) {
+          return ldapUser.getAttributeAsStringCaseInsensitive(ldapAttrName);
+        }
+ else {
+          return super.getLastName();
+        }
+      }
+      @Override public String getFirstName(){
+        if (UserModel.FIRST_NAME.equalsIgnoreCase(userModelAttrName)) {
+          return ldapUser.getAttributeAsStringCaseInsensitive(ldapAttrName);
+        }
+ else {
+          return super.getFirstName();
+        }
+      }
+    }
+;
   }
+  return delegate;
 }

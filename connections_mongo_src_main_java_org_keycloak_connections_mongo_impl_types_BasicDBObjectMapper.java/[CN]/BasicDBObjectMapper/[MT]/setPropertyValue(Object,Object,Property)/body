@@ -8,10 +8,7 @@
   if (type instanceof ParameterizedType) {
     ParameterizedType parameterized=(ParameterizedType)type;
     Type[] genericTypeArguments=parameterized.getActualTypeArguments();
-    List<Class<?>> genericTypes=new ArrayList<Class<?>>();
-    for (    Type genericType : genericTypeArguments) {
-      genericTypes.add((Class<?>)genericType);
-    }
+    List<Type> genericTypes=Arrays.asList(genericTypeArguments);
     Class<?> expectedReturnType=(Class<?>)parameterized.getRawType();
     context=new MapperContext<Object,Object>(valueFromDB,expectedReturnType,genericTypes);
   }

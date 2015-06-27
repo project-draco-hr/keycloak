@@ -9,8 +9,16 @@
   user.setFederationLink(userRep.getFederationLink());
   user.setTotp(userRep.isTotp());
   if (userRep.getAttributes() != null) {
-    for (    Map.Entry<String,String> entry : userRep.getAttributes().entrySet()) {
-      user.setAttribute(entry.getKey(),entry.getValue());
+    for (    Map.Entry<String,Object> entry : userRep.getAttributes().entrySet()) {
+      Object value=entry.getValue();
+      if (value instanceof Collection) {
+        Collection<String> colVal=(Collection<String>)value;
+        user.setAttribute(entry.getKey(),new ArrayList<>(colVal));
+      }
+ else       if (value instanceof String) {
+        String stringVal=(String)value;
+        user.setSingleAttribute(entry.getKey(),stringVal);
+      }
     }
   }
   if (userRep.getRequiredActions() != null) {

@@ -1,22 +1,8 @@
 {
   String memberAttrName=getMembershipLdapAttribute(mapperModel);
-  Set<String> memberships=new TreeSet<String>();
-  Object existingMemberships=ldapRole.getAttributeCaseInsensitive(memberAttrName);
-  if (existingMemberships != null) {
-    if (existingMemberships instanceof String) {
-      String existingMembership=existingMemberships.toString().trim();
-      if (existingMemberships != null && existingMembership.length() > 0) {
-        memberships.add(existingMembership);
-      }
-    }
- else     if (existingMemberships instanceof Collection) {
-      Collection<String> exMemberships=(Collection<String>)existingMemberships;
-      for (      String membership : exMemberships) {
-        if (membership.trim().length() > 0) {
-          memberships.add(membership);
-        }
-      }
-    }
+  Set<String> memberships=ldapRole.getAttributeAsSet(memberAttrName);
+  if (memberships == null) {
+    memberships=new HashSet<>();
   }
   return memberships;
 }

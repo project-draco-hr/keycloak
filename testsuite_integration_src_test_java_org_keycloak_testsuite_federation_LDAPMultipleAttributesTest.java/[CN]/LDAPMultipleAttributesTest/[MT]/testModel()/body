@@ -1,0 +1,32 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    FederationTestUtils.assertUserImported(session.users(),appRealm,"jbrown","James","Brown","jbrown@keycloak.org","88441");
+    UserModel user=session.users().getUserByUsername("bwilson",appRealm);
+    Assert.assertEquals("bwilson@keycloak.org",user.getEmail());
+    Assert.assertEquals("Bruce",user.getFirstName());
+    Assert.assertTrue("Wilson".equals(user.getLastName()) || "Schneider".equals(user.getLastName()));
+    List<String> postalCodes=user.getAttribute("postal_code");
+    assertPostalCodes(postalCodes,"88441","77332");
+    postalCodes.remove("77332");
+    user.setAttribute("postal_code",postalCodes);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    UserModel user=session.users().getUserByUsername("bwilson",appRealm);
+    List<String> postalCodes=user.getAttribute("postal_code");
+    assertPostalCodes(postalCodes,"88441");
+    postalCodes.add("77332");
+    user.setAttribute("postal_code",postalCodes);
+    assertPostalCodes(user.getAttribute("postal_code"),"88441","77332");
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

@@ -1,13 +1,14 @@
 {
-  if (!actionExecution.equals(execution.getId())) {
+  if (!actionExecution.equals(formExecution.getId())) {
     throw new AuthenticationProcessor.AuthException("action is not current execution",AuthenticationProcessor.Error.INTERNAL_ERROR);
   }
-  FormAuthenticator authenticator=processor.getSession().getProvider(FormAuthenticator.class,execution.getAuthenticator());
-  for (  AuthenticationExecutionModel formActionExecution : processor.getRealm().getAuthenticationExecutions(execution.getFlowId())) {
-    FormAction action=processor.getSession().getProvider(FormAction.class,execution.getAuthenticator());
+  Map<String,ClientSessionModel.ExecutionStatus> executionStatus=new HashMap<>();
+  List<FormAction> requiredActions=new LinkedList<>();
+  for (  AuthenticationExecutionModel formActionExecution : formActionExecutions) {
+    FormAction action=processor.getSession().getProvider(FormAction.class,formActionExecution.getAuthenticator());
     UserModel authUser=processor.getClientSession().getAuthenticatedUser();
     if (action.requiresUser() && authUser == null) {
-      throw new AuthenticationProcessor.AuthException("form action: " + execution.getAuthenticator() + " requires user",AuthenticationProcessor.Error.UNKNOWN_USER);
+      throw new AuthenticationProcessor.AuthException("form action: " + formExecution.getAuthenticator() + " requires user",AuthenticationProcessor.Error.UNKNOWN_USER);
     }
     boolean configuredFor=false;
     if (action.requiresUser() && authUser != null) {
@@ -15,9 +16,9 @@
       if (!configuredFor) {
         if (formActionExecution.isRequired()) {
           if (formActionExecution.isUserSetupAllowed()) {
-            AuthenticationProcessor.logger.debugv("authenticator SETUP_REQUIRED: {0}",execution.getAuthenticator());
-            processor.getClientSession().setExecutionStatus(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.SETUP_REQUIRED);
-            action.setRequiredActions(processor.getSession(),processor.getRealm(),authUser);
+            AuthenticationProcessor.logger.debugv("authenticator SETUP_REQUIRED: {0}",formExecution.getAuthenticator());
+            executionStatus.put(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.SETUP_REQUIRED);
+            requiredActions.add(action);
             continue;
           }
  else {
@@ -25,14 +26,23 @@
           }
         }
  else         if (formActionExecution.isOptional()) {
-          processor.getClientSession().setExecutionStatus(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
+          executionStatus.put(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
           continue;
         }
       }
     }
-    FormActionResult result=new FormActionResult(processor.createAuthenticatorContext(formActionExecution,null),authenticator);
+    AuthenticatorContext delegate=processor.createAuthenticatorContext(formActionExecution,null,formActionExecutions);
+    FormActionContext result=new FormContext(delegate);
     action.authenticate(result);
-    return processResult(result,formActionExecution);
+    Response challenge=processResult(executionStatus,result,formActionExecution);
+    if (challenge != null)     return challenge;
+    executionStatus.put(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.SUCCESS);
+  }
+  for (  Map.Entry<String,ClientSessionModel.ExecutionStatus> entry : executionStatus.entrySet()) {
+    processor.getClientSession().setExecutionStatus(entry.getKey(),entry.getValue());
+  }
+  for (  FormAction action : requiredActions) {
+    action.setRequiredActions(processor.getSession(),processor.getRealm(),processor.getClientSession().getAuthenticatedUser());
   }
   return null;
 }

@@ -1,0 +1,29 @@
+{
+  UserModel helperUser=new UserModelDelegate(null){
+    @Override public String getUsername(){
+      return username;
+    }
+    @Override public String getFirstName(){
+      return firstName;
+    }
+    @Override public String getLastName(){
+      return lastName;
+    }
+    @Override public String getEmail(){
+      return email;
+    }
+    @Override public List<String> getAttribute(    String name){
+      if ("postal_code".equals(name)) {
+        return Arrays.asList(postalCode);
+      }
+ else       if ("street".equals(name)) {
+        return Arrays.asList(street);
+      }
+ else {
+        return Collections.emptyList();
+      }
+    }
+  }
+;
+  return LDAPUtils.addUserToLDAP(ldapProvider,realm,helperUser);
+}

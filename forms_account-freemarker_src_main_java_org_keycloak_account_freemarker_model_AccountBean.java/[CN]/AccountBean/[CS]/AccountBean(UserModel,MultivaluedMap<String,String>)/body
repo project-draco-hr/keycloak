@@ -1,7 +1,15 @@
 {
   this.user=user;
   this.profileFormData=profileFormData;
-  attributes.putAll(user.getAttributes());
+  for (  Map.Entry<String,List<String>> attr : user.getAttributes().entrySet()) {
+    List<String> attrValue=attr.getValue();
+    if (attrValue.size() > 0) {
+      attributes.put(attr.getKey(),attrValue.get(0));
+    }
+    if (attrValue.size() > 1) {
+      logger.warnf("There are more values for attribute '%s' of user '%s' . Will display just first value",attr.getKey(),user.getUsername());
+    }
+  }
   if (profileFormData != null) {
     for (    String key : profileFormData.keySet()) {
       if (key.startsWith("user.attributes.")) {

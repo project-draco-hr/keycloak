@@ -1,8 +1,11 @@
 {
   String ldapFullNameAttrName=getLdapFullNameAttrName(mapperModel);
-  String fullName=ldapUser.getAttributeAsStringCaseInsensitive(ldapFullNameAttrName);
+  String fullName=ldapUser.getAttributeAsString(ldapFullNameAttrName);
+  if (fullName == null) {
+    return;
+  }
   fullName=fullName.trim();
-  if (fullName != null && !fullName.trim().isEmpty()) {
+  if (!fullName.isEmpty()) {
     int lastSpaceIndex=fullName.lastIndexOf(" ");
     if (lastSpaceIndex == -1) {
       user.setLastName(fullName);

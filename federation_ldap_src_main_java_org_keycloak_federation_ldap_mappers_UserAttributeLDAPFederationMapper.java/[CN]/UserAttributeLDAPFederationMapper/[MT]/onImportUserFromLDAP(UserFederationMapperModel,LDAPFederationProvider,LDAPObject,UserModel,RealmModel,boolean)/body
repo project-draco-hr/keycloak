@@ -1,14 +1,18 @@
 {
   String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
   String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
-  Object ldapAttrValue=ldapUser.getAttributeCaseInsensitive(ldapAttrName);
-  if (ldapAttrValue != null && !ldapAttrValue.toString().trim().isEmpty()) {
-    Property<Object> userModelProperty=userModelProperties.get(userModelAttrName);
-    if (userModelProperty != null) {
-      userModelProperty.setValue(user,ldapAttrValue);
+  Property<Object> userModelProperty=userModelProperties.get(userModelAttrName.toLowerCase());
+  if (userModelProperty != null) {
+    String ldapAttrValue=ldapUser.getAttributeAsString(ldapAttrName);
+    setPropertyOnUserModel(userModelProperty,user,ldapAttrValue);
+  }
+ else {
+    Set<String> ldapAttrValue=ldapUser.getAttributeAsSet(ldapAttrName);
+    if (ldapAttrValue != null) {
+      user.setAttribute(userModelAttrName,new ArrayList<>(ldapAttrValue));
     }
  else {
-      user.setAttribute(userModelAttrName,(String)ldapAttrValue);
+      user.removeAttribute(userModelAttrName);
     }
   }
 }

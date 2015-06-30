@@ -1,15 +1,21 @@
 {
   String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
   String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
-  Property<Object> userModelProperty=userModelProperties.get(userModelAttrName);
-  Object attrValue;
+  Property<Object> userModelProperty=userModelProperties.get(userModelAttrName.toLowerCase());
   if (userModelProperty != null) {
-    attrValue=userModelProperty.getValue(localUser);
+    Object attrValue=userModelProperty.getValue(localUser);
+    String valueAsString=(attrValue == null) ? null : attrValue.toString();
+    ldapUser.setSingleAttribute(ldapAttrName,valueAsString);
   }
  else {
-    attrValue=localUser.getAttribute(userModelAttrName);
+    List<String> attrValues=localUser.getAttribute(userModelAttrName);
+    if (attrValues.size() == 0) {
+      ldapUser.setAttribute(ldapAttrName,null);
+    }
+ else {
+      ldapUser.setAttribute(ldapAttrName,new LinkedHashSet<>(attrValues));
+    }
   }
-  ldapUser.setAttribute(ldapAttrName,attrValue);
   if (isReadOnly(mapperModel)) {
     ldapUser.addReadOnlyAttributeName(ldapAttrName);
   }

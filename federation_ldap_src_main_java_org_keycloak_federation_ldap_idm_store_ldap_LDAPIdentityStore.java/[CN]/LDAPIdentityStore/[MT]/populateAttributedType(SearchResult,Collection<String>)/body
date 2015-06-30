@@ -24,19 +24,14 @@
         Set<String> attrValues=new LinkedHashSet<>();
         NamingEnumeration<?> enumm=ldapAttribute.getAll();
         while (enumm.hasMoreElements()) {
-          String attrVal=enumm.next().toString();
+          String attrVal=enumm.next().toString().trim();
           attrValues.add(attrVal);
         }
         if (ldapAttributeName.equalsIgnoreCase(LDAPConstants.OBJECT_CLASS)) {
           ldapObject.setObjectClasses(attrValues);
         }
  else {
-          if (attrValues.size() == 1) {
-            ldapObject.setAttribute(ldapAttributeName,attrValues.iterator().next());
-          }
- else {
-            ldapObject.setAttribute(ldapAttributeName,attrValues);
-          }
+          ldapObject.setAttribute(ldapAttributeName,attrValues);
           if (readOnlyAttrNames.contains(ldapAttributeName.toLowerCase())) {
             ldapObject.addReadOnlyAttributeName(ldapAttributeName);
           }

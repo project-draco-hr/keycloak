@@ -1,6 +1,6 @@
 {
-  while (executions.hasNext()) {
-    AuthenticationExecutionModel model=executions.next();
+  while (executionIterator.hasNext()) {
+    AuthenticationExecutionModel model=executionIterator.next();
     if (isProcessed(model)) {
       AuthenticationProcessor.logger.debug("execution is processed");
       if (!alternativeSuccessful && model.isAlternative() && processor.isSuccessful(model))       alternativeSuccessful=true;
@@ -70,7 +70,7 @@
         }
       }
     }
-    AuthenticatorContext context=processor.createAuthenticatorContext(model,authenticator);
+    AuthenticatorContext context=processor.createAuthenticatorContext(model,authenticator,executions);
     authenticator.authenticate(context);
     Response response=processResult(context);
     if (response != null)     return response;

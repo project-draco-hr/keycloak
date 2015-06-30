@@ -1,6 +1,11 @@
 {
-  FormAuthenticator authenticator=processor.getSession().getProvider(FormAuthenticator.class,execution.getAuthenticator());
-  AuthenticatorContext context=processor.createAuthenticatorContext(execution,null);
-  authenticator.authenticate(context);
-  return processResult(context,execution);
+  AuthenticatorContext delegate=processor.createAuthenticatorContext(formExecution,null,formActionExecutions);
+  FormActionContext result=new FormContext(delegate);
+  formAuthenticator.authenticate(result);
+  Map<String,ClientSessionModel.ExecutionStatus> executionStatus=new HashMap<>();
+  Response response=processResult(executionStatus,result,formExecution);
+  for (  Map.Entry<String,ClientSessionModel.ExecutionStatus> entry : executionStatus.entrySet()) {
+    processor.getClientSession().setExecutionStatus(entry.getKey(),entry.getValue());
+  }
+  return response;
 }

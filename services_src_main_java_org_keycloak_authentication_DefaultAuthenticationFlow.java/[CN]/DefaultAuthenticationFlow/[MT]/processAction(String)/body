@@ -1,24 +1,19 @@
 {
-  while (executions.hasNext()) {
-    AuthenticationExecutionModel model=executions.next();
+  while (executionIterator.hasNext()) {
+    AuthenticationExecutionModel model=executionIterator.next();
     if (isProcessed(model)) {
       AuthenticationProcessor.logger.debug("execution is processed");
       if (!alternativeSuccessful && model.isAlternative() && processor.isSuccessful(model))       alternativeSuccessful=true;
       continue;
     }
-    if (!model.getId().equals(actionExecution)) {
-      if (model.isAutheticatorFlow()) {
-        AuthenticationFlow authenticationFlow=processor.createFlowExecution(model.getFlowId(),model);
-        return authenticationFlow.processAction(actionExecution);
-      }
- else {
-        throw new AuthenticationProcessor.AuthException("action is not current execution",AuthenticationProcessor.Error.INTERNAL_ERROR);
-      }
+    if (model.isAutheticatorFlow()) {
+      AuthenticationFlow authenticationFlow=processor.createFlowExecution(model.getFlowId(),model);
+      return authenticationFlow.processAction(actionExecution);
     }
- else {
+ else     if (model.getId().equals(actionExecution)) {
       AuthenticatorFactory factory=(AuthenticatorFactory)processor.getSession().getKeycloakSessionFactory().getProviderFactory(Authenticator.class,model.getAuthenticator());
       Authenticator authenticator=factory.create();
-      AuthenticatorContext result=processor.createAuthenticatorContext(model,authenticator);
+      AuthenticatorContext result=processor.createAuthenticatorContext(model,authenticator,executions);
       authenticator.action(result);
       Response response=processResult(result);
       if (response == null)       return processFlow();

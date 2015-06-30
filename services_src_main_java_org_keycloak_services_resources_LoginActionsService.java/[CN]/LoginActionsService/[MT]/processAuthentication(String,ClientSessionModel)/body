@@ -1,17 +1,4 @@
 {
   String flowAlias=DefaultAuthenticationFlows.BROWSER_FLOW;
-  AuthenticationFlowModel flow=realm.getFlowByAlias(flowAlias);
-  AuthenticationProcessor processor=new AuthenticationProcessor();
-  processor.setClientSession(clientSession).setFlowId(flow.getId()).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setSession(session).setUriInfo(uriInfo).setRequest(request);
-  try {
-    if (execution != null) {
-      return processor.authenticationAction(execution);
-    }
- else {
-      return processor.authenticate();
-    }
-  }
- catch (  Exception e) {
-    return processor.handleBrowserException(e);
-  }
+  return processFlow(execution,clientSession,flowAlias);
 }

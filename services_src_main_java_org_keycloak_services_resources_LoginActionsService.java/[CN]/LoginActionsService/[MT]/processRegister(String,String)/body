@@ -1,0 +1,14 @@
+{
+  event.event(EventType.REGISTER);
+  Checks checks=new Checks();
+  if (!checks.check(code,ClientSessionModel.Action.AUTHENTICATE.name())) {
+    return checks.response;
+  }
+  if (!realm.isRegistrationAllowed()) {
+    event.error(Errors.REGISTRATION_DISABLED);
+    return ErrorPage.error(session,Messages.REGISTRATION_NOT_ALLOWED);
+  }
+  ClientSessionCode clientCode=checks.clientCode;
+  ClientSessionModel clientSession=clientCode.getClientSession();
+  return processRegistration(execution,clientSession);
+}

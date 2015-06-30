@@ -1,0 +1,24 @@
+{
+  driver.navigate().to(APP_SERVER_BASE_URL + "/ldap-portal");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  loginPage.login("bwilson","password");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(APP_SERVER_BASE_URL + "/ldap-portal"));
+  String pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("bwilson") && pageSource.contains("Bruce"));
+  Assert.assertTrue(pageSource.contains("street") && pageSource.contains("Elm 5"));
+  Assert.assertTrue(pageSource.contains("postal_code") && pageSource.contains("88441") && pageSource.contains("77332"));
+  String logoutUri=OIDCLoginProtocolService.logoutUrl(UriBuilder.fromUri(APP_SERVER_BASE_URL + "/auth")).queryParam(OAuth2Constants.REDIRECT_URI,APP_SERVER_BASE_URL + "/ldap-portal").build("test").toString();
+  driver.navigate().to(logoutUri);
+  driver.navigate().to(APP_SERVER_BASE_URL + "/ldap-portal");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));
+  loginPage.login("jbrown","password");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(APP_SERVER_BASE_URL + "/ldap-portal"));
+  pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("jbrown") && pageSource.contains("James Brown"));
+  Assert.assertFalse(pageSource.contains("street"));
+  Assert.assertTrue(pageSource.contains("postal_code") && pageSource.contains("88441"));
+  Assert.assertFalse(pageSource.contains("77332"));
+  driver.navigate().to(logoutUri);
+}

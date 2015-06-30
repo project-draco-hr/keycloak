@@ -1,29 +1,22 @@
 {
   BasicAttributes entryAttributes=new BasicAttributes();
-  for (  Map.Entry<String,Object> attrEntry : ldapObject.getAttributes().entrySet()) {
+  for (  Map.Entry<String,Set<String>> attrEntry : ldapObject.getAttributes().entrySet()) {
     String attrName=attrEntry.getKey();
-    Object attrValue=attrEntry.getValue();
-    if (!ldapObject.getReadOnlyAttributeNames().contains(attrName) && (isCreate || !ldapObject.getRdnAttributeName().equalsIgnoreCase(attrName))) {
-      if (String.class.isInstance(attrValue)) {
-        if (attrValue.toString().trim().length() == 0) {
-          attrValue=LDAPConstants.EMPTY_ATTRIBUTE_VALUE;
-        }
-        entryAttributes.put(attrName,attrValue);
-      }
- else       if (Collection.class.isInstance(attrValue)) {
-        BasicAttribute attr=new BasicAttribute(attrName);
-        Collection<String> valueCollection=(Collection<String>)attrValue;
-        for (        String val : valueCollection) {
-          attr.add(val);
-        }
-        entryAttributes.put(attr);
-      }
- else       if (attrValue == null || attrValue.toString().trim().length() == 0) {
-        entryAttributes.put(attrName,LDAPConstants.EMPTY_ATTRIBUTE_VALUE);
+    Set<String> attrValue=attrEntry.getValue();
+    if (!ldapObject.getReadOnlyAttributeNames().contains(attrName.toLowerCase()) && (isCreate || !ldapObject.getRdnAttributeName().equalsIgnoreCase(attrName))) {
+      BasicAttribute attr=new BasicAttribute(attrName);
+      if (attrValue == null) {
+        attr.add(LDAPConstants.EMPTY_ATTRIBUTE_VALUE);
       }
  else {
-        throw new ModelException("Unexpected type of value of argument " + attrName + ". Value is "+ attrValue);
+        for (        String val : attrValue) {
+          if (val == null || val.toString().trim().length() == 0) {
+            val=LDAPConstants.EMPTY_ATTRIBUTE_VALUE;
+          }
+          attr.add(val);
+        }
       }
+      entryAttributes.put(attr);
     }
   }
   if (isCreate) {

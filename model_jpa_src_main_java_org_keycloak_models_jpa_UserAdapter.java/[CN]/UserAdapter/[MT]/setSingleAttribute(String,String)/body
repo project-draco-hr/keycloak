@@ -1,0 +1,23 @@
+{
+  boolean found=false;
+  List<UserAttributeEntity> toRemove=new ArrayList<>();
+  for (  UserAttributeEntity attr : user.getAttributes()) {
+    if (attr.getName().equals(name)) {
+      if (!found) {
+        attr.setValue(value);
+        found=true;
+      }
+ else {
+        toRemove.add(attr);
+      }
+    }
+  }
+  for (  UserAttributeEntity attr : toRemove) {
+    em.remove(attr);
+    user.getAttributes().remove(attr);
+  }
+  if (found) {
+    return;
+  }
+  persistAttributeValue(name,value);
+}

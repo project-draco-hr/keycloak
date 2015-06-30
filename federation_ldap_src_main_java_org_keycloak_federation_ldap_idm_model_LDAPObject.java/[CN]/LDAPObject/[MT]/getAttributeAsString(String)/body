@@ -1,7 +1,10 @@
 {
-  Object attrValue=attributes.get(name);
-  if (attrValue != null && !(attrValue instanceof String)) {
-    throw new IllegalStateException("Expected String but attribute was " + attrValue + " of type "+ attrValue.getClass().getName());
+  Set<String> attrValue=lowerCasedAttributes.get(name.toLowerCase());
+  if (attrValue == null || attrValue.size() == 0) {
+    return null;
   }
-  return (String)attrValue;
+ else   if (attrValue.size() > 1) {
+    logger.warnf("Expected String but attribute '%s' has more values '%s' on object '%s' . Returning just first value",name,attrValue,dn);
+  }
+  return attrValue.iterator().next();
 }

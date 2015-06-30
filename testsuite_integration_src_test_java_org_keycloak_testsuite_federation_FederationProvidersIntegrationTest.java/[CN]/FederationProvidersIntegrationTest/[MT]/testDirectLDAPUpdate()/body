@@ -1,0 +1,45 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=new RealmManager(session).getRealmByName("test");
+    LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    LDAPObject johnDirect=FederationTestUtils.addLDAPUser(ldapFedProvider,appRealm,"johndirect","John","Direct","johndirect@email.org","12399");
+    UserModel user=session.users().getUserByUsername("johndirect",appRealm);
+    String postalCode=user.getFirstAttribute("postal_code");
+    Assert.assertEquals("12399",postalCode);
+    johnDirect.setSingleAttribute(LDAPConstants.POSTAL_CODE,"12400");
+    johnDirect.setSingleAttribute(LDAPConstants.SN,"DirectLDAPUpdated");
+    ldapFedProvider.getLdapIdentityStore().update(johnDirect);
+    user=session.users().getUserByUsername("johndirect",appRealm);
+    postalCode=user.getFirstAttribute("postal_code");
+    Assert.assertEquals("12399",postalCode);
+    postalCode=user.getAttributes().get("postal_code").get(0);
+    Assert.assertEquals("12399",postalCode);
+    String lastName=user.getLastName();
+    Assert.assertEquals("DirectLDAPUpdated",lastName);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=new RealmManager(session).getRealmByName("test");
+    UserFederationMapperModel zipMapper=appRealm.getUserFederationMapperByName(ldapModel.getId(),"zipCodeMapper");
+    zipMapper.getConfig().put(UserAttributeLDAPFederationMapper.ALWAYS_READ_VALUE_FROM_LDAP,"true");
+    appRealm.updateUserFederationMapper(zipMapper);
+    UserFederationMapperModel lastNameMapper=appRealm.getUserFederationMapperByName(ldapModel.getId(),"last name");
+    lastNameMapper.getConfig().put(UserAttributeLDAPFederationMapper.ALWAYS_READ_VALUE_FROM_LDAP,"false");
+    appRealm.updateUserFederationMapper(lastNameMapper);
+    UserModel user=session.users().getUserByUsername("johndirect",appRealm);
+    String postalCode=user.getFirstAttribute("postal_code");
+    Assert.assertEquals("12400",postalCode);
+    postalCode=user.getAttributes().get("postal_code").get(0);
+    Assert.assertEquals("12400",postalCode);
+    Assert.assertFalse(user.getAttributes().containsKey(UserModel.LAST_NAME));
+    String lastName=user.getLastName();
+    Assert.assertEquals("Direct",lastName);
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

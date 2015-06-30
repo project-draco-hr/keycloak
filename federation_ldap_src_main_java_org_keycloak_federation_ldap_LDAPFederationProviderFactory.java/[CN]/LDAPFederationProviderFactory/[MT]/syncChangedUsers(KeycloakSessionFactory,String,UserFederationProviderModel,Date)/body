@@ -4,7 +4,7 @@
   Condition createCondition=conditionsBuilder.greaterThanOrEqualTo(new QueryParameter(LDAPConstants.CREATE_TIMESTAMP),lastSync);
   Condition modifyCondition=conditionsBuilder.greaterThanOrEqualTo(new QueryParameter(LDAPConstants.MODIFY_TIMESTAMP),lastSync);
   Condition orCondition=conditionsBuilder.orCondition(createCondition,modifyCondition);
-  LDAPIdentityQuery userQuery=createQuery(sessionFactory,realmId,model);
+  LDAPQuery userQuery=createQuery(sessionFactory,realmId,model);
   userQuery.where(orCondition);
   UserFederationSyncResult result=syncImpl(sessionFactory,userQuery,realmId,model);
   logger.infof("Sync changed users finished: %s",result.getStatus());

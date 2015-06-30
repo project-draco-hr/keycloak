@@ -1,5 +1,22 @@
 {
   if (attributeValue == null)   return null;
+  if (attributeValue instanceof List) {
+    List<Object> valueAsList=(List<Object>)attributeValue;
+    if (valueAsList.size() == 0)     return null;
+    if (isMultivalued(mappingModel)) {
+      List<Object> result=new ArrayList<>();
+      for (      Object valueItem : valueAsList) {
+        result.add(mapAttributeValue(mappingModel,valueItem));
+      }
+      return result;
+    }
+ else {
+      if (valueAsList.size() > 1) {
+        logger.warnf("Multiple values found '%s' for protocol mapper '%s' but expected just single value",attributeValue.toString(),mappingModel.getName());
+      }
+      attributeValue=valueAsList.get(0);
+    }
+  }
   String type=mappingModel.getConfig().get(JSON_TYPE);
   if (type == null)   return attributeValue;
   if (type.equals("boolean")) {

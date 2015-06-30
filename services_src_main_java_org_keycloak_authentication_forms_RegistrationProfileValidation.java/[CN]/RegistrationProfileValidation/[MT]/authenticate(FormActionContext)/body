@@ -1,6 +1,7 @@
 {
   MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
   List<FormMessage> errors=new ArrayList<>();
+  context.getEvent().detail(Details.REGISTER_METHOD,"form");
   String eventError=Errors.INVALID_REGISTRATION;
   if (Validation.isBlank(formData.getFirst((RegistrationPage.FIELD_FIRST_NAME)))) {
     errors.add(new FormMessage(RegistrationPage.FIELD_FIRST_NAME,Messages.MISSING_FIRST_NAME));
@@ -14,11 +15,13 @@
   }
  else   if (!Validation.isEmailValid(email)) {
     formData.remove(Validation.FIELD_EMAIL);
+    context.getEvent().detail(Details.EMAIL,email);
     errors.add(new FormMessage(RegistrationPage.FIELD_EMAIL,Messages.INVALID_EMAIL));
   }
   if (context.getSession().users().getUserByEmail(email,context.getRealm()) != null) {
     eventError=Errors.EMAIL_IN_USE;
     formData.remove(Validation.FIELD_EMAIL);
+    context.getEvent().detail(Details.EMAIL,email);
     errors.add(new FormMessage(RegistrationPage.FIELD_EMAIL,Messages.EMAIL_EXISTS));
   }
   if (errors.size() > 0) {

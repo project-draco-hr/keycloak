@@ -4,11 +4,13 @@
   boolean success=false;
   context.getEvent().detail(Details.REGISTER_METHOD,"form");
   String captcha=formData.getFirst(G_RECAPTCHA_RESPONSE);
-  if (Validation.isBlank(captcha)) {
+  if (!Validation.isBlank(captcha)) {
+    AuthenticatorConfigModel captchaConfig=context.getAuthenticatorConfig();
+    String secret=captchaConfig.getConfig().get("secret");
     HttpClient httpClient=context.getSession().getProvider(HttpClientProvider.class).getHttpClient();
     HttpPost post=new HttpPost("https://www.google.com/recaptcha/api/siteverify");
-    List<NameValuePair> formparams=new ArrayList<NameValuePair>();
-    formparams.add(new BasicNameValuePair("secret","6LcFEAkTAAAAAM0SErEs9NlfhYpOTRj_vOVJSAMI"));
+    List<NameValuePair> formparams=new LinkedList<>();
+    formparams.add(new BasicNameValuePair("secret",secret));
     formparams.add(new BasicNameValuePair("response",captcha));
     formparams.add(new BasicNameValuePair("remoteip",context.getConnection().getRemoteAddr()));
     try {
@@ -33,11 +35,7 @@
     context.success();
   }
  else {
-    String usernameField=RegistrationPage.FIELD_USERNAME;
-    if (context.getRealm().isRegistrationEmailAsUsername()) {
-      usernameField=RegistrationPage.FIELD_EMAIL;
-    }
-    errors.add(new FormMessage(usernameField,Messages.RECAPTCHA_FAILED));
+    errors.add(new FormMessage(null,Messages.RECAPTCHA_FAILED));
     formData.remove(G_RECAPTCHA_RESPONSE);
     context.getEvent().error(Errors.INVALID_REGISTRATION);
     context.validationError(formData,errors);

@@ -1,6 +1,12 @@
 {
+  AuthenticatorConfigModel captchaConfig=context.getAuthenticatorConfig();
+  if (captchaConfig == null || captchaConfig.getConfig() == null || captchaConfig.getConfig().get("site.key") == null || captchaConfig.getConfig().get("secret") == null) {
+    form.addError(new FormMessage(null,Messages.RECAPTCHA_NOT_CONFIGURED));
+    return;
+  }
+  String siteKey=captchaConfig.getConfig().get("site.key");
   form.setAttribute("recaptchaRequired",true);
-  form.setAttribute("recaptchaSiteKey","6LcFEAkTAAAAAOaY-5RJk3zIYw4AalNtqfac27Bn");
+  form.setAttribute("recaptchaSiteKey",siteKey);
   List<String> scripts=new LinkedList<>();
   scripts.add("https://www.google.com/recaptcha/api.js");
   form.setAttribute("scripts",scripts);

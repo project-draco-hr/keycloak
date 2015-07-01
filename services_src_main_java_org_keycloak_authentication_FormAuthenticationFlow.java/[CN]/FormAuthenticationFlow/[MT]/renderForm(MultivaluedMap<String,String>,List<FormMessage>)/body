@@ -1,0 +1,15 @@
+{
+  String executionId=formExecution.getId();
+  processor.getClientSession().setNote(AuthenticationProcessor.CURRENT_AUTHENTICATION_EXECUTION,executionId);
+  String code=processor.generateCode();
+  URI actionUrl=getActionUrl(executionId,code);
+  LoginFormsProvider form=processor.getSession().getProvider(LoginFormsProvider.class).setActionUri(actionUrl).setClientSessionCode(code).setFormData(formData).setErrors(errors);
+  for (  AuthenticationExecutionModel formActionExecution : formActionExecutions) {
+    if (!formActionExecution.isEnabled())     continue;
+    FormAction action=processor.getSession().getProvider(FormAction.class,formActionExecution.getAuthenticator());
+    FormContext result=new FormContextImpl(formActionExecution);
+    action.buildPage(result,form);
+  }
+  FormContext context=new FormContextImpl(formExecution);
+  return formAuthenticator.render(context,form);
+}

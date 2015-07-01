@@ -4,7 +4,12 @@
   }
   Map<String,ClientSessionModel.ExecutionStatus> executionStatus=new HashMap<>();
   List<FormAction> requiredActions=new LinkedList<>();
+  List<ValidationContextImpl> successes=new LinkedList<>();
   for (  AuthenticationExecutionModel formActionExecution : formActionExecutions) {
+    if (!formActionExecution.isEnabled()) {
+      executionStatus.put(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
+      continue;
+    }
     FormAction action=processor.getSession().getProvider(FormAction.class,formActionExecution.getAuthenticator());
     UserModel authUser=processor.getClientSession().getAuthenticatedUser();
     if (action.requiresUser() && authUser == null) {
@@ -31,12 +36,20 @@
         }
       }
     }
-    AuthenticatorContext delegate=processor.createAuthenticatorContext(formActionExecution,null,formActionExecutions);
-    FormActionContext result=new FormContext(delegate);
-    action.authenticate(result);
-    Response challenge=processResult(executionStatus,result,formActionExecution);
-    if (challenge != null)     return challenge;
-    executionStatus.put(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.SUCCESS);
+    ValidationContextImpl result=new ValidationContextImpl(formActionExecution,action);
+    action.validate(result);
+    if (result.success) {
+      executionStatus.put(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.SUCCESS);
+      successes.add(result);
+    }
+ else {
+      processor.logFailure();
+      executionStatus.put(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
+      return renderForm(result.formData,result.errors);
+    }
+  }
+  for (  ValidationContextImpl context : successes) {
+    context.action.success(context);
   }
   for (  Map.Entry<String,ClientSessionModel.ExecutionStatus> entry : executionStatus.entrySet()) {
     processor.getClientSession().setExecutionStatus(entry.getKey(),entry.getValue());

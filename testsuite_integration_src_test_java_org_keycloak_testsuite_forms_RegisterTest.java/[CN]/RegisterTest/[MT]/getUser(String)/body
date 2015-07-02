@@ -1,0 +1,10 @@
+{
+  KeycloakSession samlServerSession=keycloakRule.startSession();
+  try {
+    RealmModel brokerRealm=samlServerSession.realms().getRealm("test");
+    return samlServerSession.users().getUserById(userId,brokerRealm);
+  }
+  finally {
+    keycloakRule.stopSession(samlServerSession,false);
+  }
+}

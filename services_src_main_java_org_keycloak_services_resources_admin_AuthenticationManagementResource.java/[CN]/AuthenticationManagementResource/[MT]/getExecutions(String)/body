@@ -13,11 +13,16 @@
     rep.setRequirementChoices(new LinkedList<String>());
     if (execution.isAutheticatorFlow()) {
       AuthenticationFlowModel flowRef=realm.getAuthenticationFlowById(execution.getFlowId());
+      if (AuthenticationFlow.BASIC_FLOW.equals(flowRef.getProviderId())) {
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.ALTERNATIVE.name());
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.REQUIRED.name());
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.DISABLED.name());
+      }
+ else       if (AuthenticationFlow.FORM_FLOW.equals(flowRef.getProviderId())) {
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.REQUIRED.name());
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.DISABLED.name());
+      }
       rep.setReferenceType(flowRef.getAlias());
-      rep.setExecution(execution.getId());
-      rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.ALTERNATIVE.name());
-      rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.REQUIRED.name());
-      rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.DISABLED.name());
       rep.setConfigurable(false);
       rep.setExecution(execution.getId());
       rep.setRequirement(execution.getRequirement().name());
@@ -27,9 +32,11 @@
       if (!flow.getId().equals(execution.getParentFlow())) {
         rep.setSubFlow(true);
       }
-      AuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,execution.getAuthenticator());
-      if (factory.getReferenceCategory() == null)       continue;
-      rep.setReferenceType(factory.getReferenceCategory());
+      ConfigurableAuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,execution.getAuthenticator());
+      if (factory == null) {
+        factory=(FormActionFactory)session.getKeycloakSessionFactory().getProviderFactory(FormAction.class,execution.getAuthenticator());
+      }
+      rep.setReferenceType(factory.getDisplayType());
       rep.setConfigurable(factory.isConfigurable());
       for (      AuthenticationExecutionModel.Requirement choice : factory.getRequirementChoices()) {
         rep.getRequirementChoices().add(choice.name());

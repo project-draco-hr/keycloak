@@ -15,5 +15,8 @@
   }
   LogFactory.setInstance(new LogWrapper());
   Database database=DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+  if (defaultSchema != null) {
+    database.setDefaultSchemaName(defaultSchema);
+  }
   return new Liquibase(CHANGELOG,new ClassLoaderResourceAccessor(getClass().getClassLoader()),database);
 }

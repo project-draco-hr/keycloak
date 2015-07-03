@@ -2,7 +2,7 @@
   logger.debug("Starting database update");
   ThreadLocalSessionContext.setCurrentSession(session);
   try {
-    Liquibase liquibase=getLiquibase(connection);
+    Liquibase liquibase=getLiquibase(connection,defaultSchema);
     List<ChangeSet> changeSets=liquibase.listUnrunChangeSets((Contexts)null);
     if (!changeSets.isEmpty()) {
       if (changeSets.get(0).getId().equals(FIRST_VERSION)) {

@@ -1,0 +1,16 @@
+{
+  LdifReader ldifReader=new LdifReader(IOUtils.toInputStream(ldifContent));
+  try {
+    for (    LdifEntry ldifEntry : ldifReader) {
+      try {
+        directoryService.getAdminSession().add(new DefaultEntry(directoryService.getSchemaManager(),ldifEntry.getEntry()));
+      }
+ catch (      LdapEntryAlreadyExistsException ignore) {
+        log.info("Entry " + ldifEntry.getDn() + " already exists. Ignoring");
+      }
+    }
+  }
+  finally {
+    ldifReader.close();
+  }
+}

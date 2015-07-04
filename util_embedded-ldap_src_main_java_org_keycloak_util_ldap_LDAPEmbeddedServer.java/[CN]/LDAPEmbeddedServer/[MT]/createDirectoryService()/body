@@ -1,0 +1,29 @@
+{
+  String dcName=baseDN.split(",")[0];
+  dcName=dcName.substring(dcName.indexOf("=") + 1);
+  DirectoryServiceFactory dsf;
+  if (this.directoryServiceFactory.equals(DSF_INMEMORY)) {
+    dsf=new InMemoryDirectoryServiceFactory();
+  }
+ else   if (this.directoryServiceFactory.equals(DSF_FILE)) {
+    dsf=new FileDirectoryServiceFactory();
+  }
+ else {
+    throw new IllegalStateException("Unknown value of directoryServiceFactory: " + this.directoryServiceFactory);
+  }
+  DirectoryService service=dsf.getDirectoryService();
+  service.setAccessControlEnabled(false);
+  service.setAllowAnonymousAccess(false);
+  service.getChangeLog().setEnabled(false);
+  dsf.init(dcName + "DS");
+  SchemaManager schemaManager=service.getSchemaManager();
+  PartitionFactory partitionFactory=dsf.getPartitionFactory();
+  Partition partition=partitionFactory.createPartition(schemaManager,service.getDnFactory(),dcName,this.baseDN,1000,new File(service.getInstanceLayout().getPartitionsDirectory(),dcName));
+  partition.setCacheService(service.getCacheService());
+  partition.initialize();
+  partition.setSchemaManager(schemaManager);
+  service.addPartition(partition);
+  String entryLdif="dn: " + baseDN + "\n"+ "dc: "+ dcName+ "\n"+ "objectClass: top\n"+ "objectClass: domain\n\n";
+  importLdifContent(service,entryLdif);
+  return service;
+}

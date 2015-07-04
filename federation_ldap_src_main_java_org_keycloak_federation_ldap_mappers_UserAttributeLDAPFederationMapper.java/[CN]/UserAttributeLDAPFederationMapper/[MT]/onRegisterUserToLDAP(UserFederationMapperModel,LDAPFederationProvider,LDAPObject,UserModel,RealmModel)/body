@@ -1,16 +1,31 @@
 {
   String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
   String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
+  boolean isMandatoryInLdap=parseBooleanParameter(mapperModel,IS_MANDATORY_IN_LDAP);
   Property<Object> userModelProperty=userModelProperties.get(userModelAttrName.toLowerCase());
   if (userModelProperty != null) {
     Object attrValue=userModelProperty.getValue(localUser);
-    String valueAsString=(attrValue == null) ? null : attrValue.toString();
-    ldapUser.setSingleAttribute(ldapAttrName,valueAsString);
+    if (attrValue == null) {
+      if (isMandatoryInLdap) {
+        ldapUser.setSingleAttribute(ldapAttrName,LDAPConstants.EMPTY_ATTRIBUTE_VALUE);
+      }
+ else {
+        ldapUser.setAttribute(ldapAttrName,new LinkedHashSet<String>());
+      }
+    }
+ else {
+      ldapUser.setSingleAttribute(ldapAttrName,attrValue.toString());
+    }
   }
  else {
     List<String> attrValues=localUser.getAttribute(userModelAttrName);
     if (attrValues.size() == 0) {
-      ldapUser.setAttribute(ldapAttrName,null);
+      if (isMandatoryInLdap) {
+        ldapUser.setSingleAttribute(ldapAttrName,LDAPConstants.EMPTY_ATTRIBUTE_VALUE);
+      }
+ else {
+        ldapUser.setAttribute(ldapAttrName,new LinkedHashSet<String>());
+      }
     }
  else {
       ldapUser.setAttribute(ldapAttrName,new LinkedHashSet<>(attrValues));

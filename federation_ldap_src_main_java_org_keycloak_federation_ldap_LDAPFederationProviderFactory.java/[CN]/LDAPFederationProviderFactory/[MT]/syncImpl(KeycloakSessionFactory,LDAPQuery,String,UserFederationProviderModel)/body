@@ -9,24 +9,14 @@
       userQuery.setLimit(pageSize);
       final List<LDAPObject> users=userQuery.getResultList();
       nextPage=userQuery.getPaginationContext() != null;
-      KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
-        @Override public void run(        KeycloakSession session){
-          UserFederationSyncResult currentPageSync=importLdapUsers(session,realmId,fedModel,users);
-          syncResult.add(currentPageSync);
-        }
-      }
-);
+      UserFederationSyncResult currentPageSync=importLdapUsers(sessionFactory,realmId,fedModel,users);
+      syncResult.add(currentPageSync);
     }
   }
  else {
     final List<LDAPObject> users=userQuery.getResultList();
-    KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
-      @Override public void run(      KeycloakSession session){
-        UserFederationSyncResult currentSync=importLdapUsers(session,realmId,fedModel,users);
-        syncResult.add(currentSync);
-      }
-    }
-);
+    UserFederationSyncResult currentSync=importLdapUsers(sessionFactory,realmId,fedModel,users);
+    syncResult.add(currentSync);
   }
   return syncResult;
 }

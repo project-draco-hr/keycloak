@@ -1,0 +1,57 @@
+{
+  UsersSyncManager usersSyncManager=new UsersSyncManager();
+  sleep(1000);
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+    UserFederationSyncResult syncResult=usersSyncManager.syncAllUsers(sessionFactory,"test",ldapModel);
+    assertSyncEquals(syncResult,5,0,0,0);
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    UserProvider userProvider=session.userStorage();
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user1","User1FN","User1LN","user1@email.org","121");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user2","User2FN","User2LN","user2@email.org","122");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user3","User3FN","User3LN","user3@email.org","123");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user4","User4FN","User4LN","user4@email.org","124");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5@email.org","125");
+    Assert.assertTrue(ldapModel.getLastSync() > 0);
+    for (    UserFederationProviderModel persistentFedModel : testRealm.getUserFederationProviders()) {
+      if (LDAPFederationProviderFactory.PROVIDER_NAME.equals(persistentFedModel.getProviderName())) {
+        Assert.assertTrue(persistentFedModel.getLastSync() > 0);
+      }
+ else {
+        Assert.assertEquals(0,persistentFedModel.getLastSync());
+      }
+    }
+    sleep(1000);
+    LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    FederationTestUtils.addLDAPUser(ldapFedProvider,testRealm,"user6","User6FN","User6LN","user6@email.org",null,"126");
+    LDAPObject ldapUser5=ldapFedProvider.loadLDAPUserByUsername(testRealm,"user5");
+    ldapUser5.setSingleAttribute(LDAPConstants.EMAIL,"user5Updated@email.org");
+    ldapUser5.setSingleAttribute(LDAPConstants.POSTAL_CODE,"521");
+    ldapFedProvider.getLdapIdentityStore().update(ldapUser5);
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5@email.org","125");
+    Assert.assertNull(userProvider.getUserByUsername("user6",testRealm));
+    KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+    UserFederationSyncResult syncResult=usersSyncManager.syncChangedUsers(sessionFactory,"test",ldapModel);
+    assertSyncEquals(syncResult,1,1,0,0);
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    UserProvider userProvider=session.userStorage();
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user5","User5FN","User5LN","user5Updated@email.org","521");
+    FederationTestUtils.assertUserImported(userProvider,testRealm,"user6","User6FN","User6LN","user6@email.org","126");
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

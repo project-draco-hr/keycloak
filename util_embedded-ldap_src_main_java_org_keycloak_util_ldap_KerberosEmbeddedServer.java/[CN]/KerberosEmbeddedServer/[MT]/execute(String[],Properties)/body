@@ -1,0 +1,16 @@
+{
+  final KerberosEmbeddedServer kerberosEmbeddedServer=new KerberosEmbeddedServer(defaultProperties);
+  kerberosEmbeddedServer.init();
+  kerberosEmbeddedServer.start();
+  Runtime.getRuntime().addShutdownHook(new Thread(){
+    @Override public void run(){
+      try {
+        kerberosEmbeddedServer.stop();
+      }
+ catch (      Exception e) {
+        e.printStackTrace();
+      }
+    }
+  }
+);
+}

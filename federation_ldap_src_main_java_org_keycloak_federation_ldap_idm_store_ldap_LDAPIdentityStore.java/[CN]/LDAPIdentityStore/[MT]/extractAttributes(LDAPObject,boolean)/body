@@ -4,17 +4,19 @@
     String attrName=attrEntry.getKey();
     Set<String> attrValue=attrEntry.getValue();
     if (!ldapObject.getReadOnlyAttributeNames().contains(attrName.toLowerCase()) && (isCreate || !ldapObject.getRdnAttributeName().equalsIgnoreCase(attrName))) {
-      BasicAttribute attr=new BasicAttribute(attrName);
       if (attrValue == null) {
-        attr.add(LDAPConstants.EMPTY_ATTRIBUTE_VALUE);
+        logger.warnf("Attribute '%s' is null on LDAP object '%s' . Using empty value to be saved to LDAP",attrName,ldapObject.getDn().toString());
+        attrValue=Collections.emptySet();
       }
- else {
-        for (        String val : attrValue) {
-          if (val == null || val.toString().trim().length() == 0) {
-            val=LDAPConstants.EMPTY_ATTRIBUTE_VALUE;
-          }
-          attr.add(val);
+      if (isCreate && attrValue.isEmpty()) {
+        continue;
+      }
+      BasicAttribute attr=new BasicAttribute(attrName);
+      for (      String val : attrValue) {
+        if (val == null || val.toString().trim().length() == 0) {
+          val=LDAPConstants.EMPTY_ATTRIBUTE_VALUE;
         }
+        attr.add(val);
       }
       entryAttributes.put(attr);
     }

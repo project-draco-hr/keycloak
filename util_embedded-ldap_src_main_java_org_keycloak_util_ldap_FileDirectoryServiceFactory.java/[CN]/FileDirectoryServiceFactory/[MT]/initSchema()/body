@@ -1,0 +1,29 @@
+{
+  File workingDirectory=directoryService.getInstanceLayout().getPartitionsDirectory();
+  File schemaRepository=new File(workingDirectory,"schema");
+  SchemaLdifExtractor extractor=new DefaultSchemaLdifExtractor(workingDirectory);
+  try {
+    extractor.extractOrCopy();
+  }
+ catch (  IOException ioe) {
+  }
+  SchemaLoader loader=new LdifSchemaLoader(schemaRepository);
+  SchemaManager schemaManager=new DefaultSchemaManager(loader);
+  schemaManager.loadAllEnabled();
+  ComparatorRegistry comparatorRegistry=schemaManager.getComparatorRegistry();
+  for (  LdapComparator<?> comparator : comparatorRegistry) {
+    if (comparator instanceof NormalizingComparator) {
+      ((NormalizingComparator)comparator).setOnServer();
+    }
+  }
+  directoryService.setSchemaManager(schemaManager);
+  LdifPartition ldifPartition=new LdifPartition(schemaManager,directoryService.getDnFactory());
+  ldifPartition.setPartitionPath(new File(workingDirectory,"schema").toURI());
+  SchemaPartition schemaPartition=new SchemaPartition(schemaManager);
+  schemaPartition.setWrappedPartition(ldifPartition);
+  directoryService.setSchemaPartition(schemaPartition);
+  List<Throwable> errors=schemaManager.getErrors();
+  if (errors.size() != 0) {
+    throw new Exception(I18n.err(I18n.ERR_317,Exceptions.printErrors(errors)));
+  }
+}

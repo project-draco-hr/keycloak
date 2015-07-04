@@ -1,0 +1,59 @@
+{
+  final UserFederationSyncResult syncResult=new UserFederationSyncResult();
+class BooleanHolder {
+    private boolean value=true;
+  }
+  final BooleanHolder exists=new BooleanHolder();
+  for (  final LDAPObject ldapUser : ldapUsers) {
+    try {
+      KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+        @Override public void run(        KeycloakSession session){
+          LDAPFederationProvider ldapFedProvider=getInstance(session,fedModel);
+          RealmModel currentRealm=session.realms().getRealm(realmId);
+          String username=LDAPUtils.getUsername(ldapUser,ldapFedProvider.getLdapIdentityStore().getConfig());
+          UserModel currentUser=session.userStorage().getUserByUsername(username,currentRealm);
+          if (currentUser == null) {
+            exists.value=false;
+            ldapFedProvider.importUserFromLDAP(session,currentRealm,ldapUser);
+            syncResult.increaseAdded();
+          }
+ else {
+            if ((fedModel.getId().equals(currentUser.getFederationLink())) && (ldapUser.getUuid().equals(currentUser.getFirstAttribute(LDAPConstants.LDAP_ID)))) {
+              Set<UserFederationMapperModel> federationMappers=currentRealm.getUserFederationMappersByFederationProvider(fedModel.getId());
+              for (              UserFederationMapperModel mapperModel : federationMappers) {
+                LDAPFederationMapper ldapMapper=ldapFedProvider.getMapper(mapperModel);
+                ldapMapper.onImportUserFromLDAP(mapperModel,ldapFedProvider,ldapUser,currentUser,currentRealm,false);
+              }
+              logger.debugf("Updated user from LDAP: %s",currentUser.getUsername());
+              syncResult.increaseUpdated();
+            }
+ else {
+              logger.warnf("User '%s' is not updated during sync as he already exists in Keycloak database but is not linked to federation provider '%s'",username,fedModel.getDisplayName());
+              syncResult.increaseFailed();
+            }
+          }
+        }
+      }
+);
+    }
+ catch (    ModelException me) {
+      logger.error("Failed during import user from LDAP",me);
+      syncResult.increaseFailed();
+      if (!exists.value) {
+        KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+          @Override public void run(          KeycloakSession session){
+            LDAPFederationProvider ldapFedProvider=getInstance(session,fedModel);
+            RealmModel currentRealm=session.realms().getRealm(realmId);
+            String username=LDAPUtils.getUsername(ldapUser,ldapFedProvider.getLdapIdentityStore().getConfig());
+            UserModel existing=session.userStorage().getUserByUsername(username,currentRealm);
+            if (existing != null) {
+              session.userStorage().removeUser(currentRealm,existing);
+            }
+          }
+        }
+);
+      }
+    }
+  }
+  return syncResult;
+}

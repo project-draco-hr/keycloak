@@ -6,7 +6,7 @@
   String captcha=formData.getFirst(G_RECAPTCHA_RESPONSE);
   if (!Validation.isBlank(captcha)) {
     AuthenticatorConfigModel captchaConfig=context.getAuthenticatorConfig();
-    String secret=captchaConfig.getConfig().get("secret");
+    String secret=captchaConfig.getConfig().get(SITE_SECRET);
     HttpClient httpClient=context.getSession().getProvider(HttpClientProvider.class).getHttpClient();
     HttpPost post=new HttpPost("https://www.google.com/recaptcha/api/siteverify");
     List<NameValuePair> formparams=new LinkedList<>();

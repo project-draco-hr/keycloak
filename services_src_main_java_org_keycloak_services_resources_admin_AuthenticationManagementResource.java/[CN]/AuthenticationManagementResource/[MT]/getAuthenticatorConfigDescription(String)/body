@@ -1,0 +1,22 @@
+{
+  ConfigurableAuthenticatorFactory factory=getConfigurableAuthenticatorFactory(providerId);
+  if (factory == null) {
+    throw new NotFoundException("Could not find authenticator provider");
+  }
+  AuthenticatorConfigDescription rep=new AuthenticatorConfigDescription();
+  rep.setProviderId(providerId);
+  rep.setName(factory.getDisplayType());
+  rep.setHelpText(factory.getHelpText());
+  rep.setProperties(new LinkedList<ConfigPropertyRepresentation>());
+  List<ProviderConfigProperty> configProperties=factory.getConfigProperties();
+  for (  ProviderConfigProperty prop : configProperties) {
+    ConfigPropertyRepresentation propRep=new ConfigPropertyRepresentation();
+    propRep.setName(prop.getName());
+    propRep.setLabel(prop.getLabel());
+    propRep.setType(prop.getType());
+    propRep.setDefaultValue(prop.getDefaultValue());
+    propRep.setHelpText(prop.getHelpText());
+    rep.getProperties().add(propRep);
+  }
+  return rep;
+}

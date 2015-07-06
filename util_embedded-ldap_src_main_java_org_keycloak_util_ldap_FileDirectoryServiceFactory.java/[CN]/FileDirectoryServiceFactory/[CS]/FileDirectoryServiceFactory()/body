@@ -1,0 +1,23 @@
+{
+  try {
+    directoryService=new DefaultDirectoryService();
+    directoryService.setShutdownHookEnabled(false);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  try {
+    String typeName=System.getProperty("apacheds.partition.factory");
+    if (typeName != null) {
+      Class<? extends PartitionFactory> type=(Class<? extends PartitionFactory>)Class.forName(typeName);
+      partitionFactory=type.newInstance();
+    }
+ else {
+      partitionFactory=new LdifPartitionFactory();
+    }
+  }
+ catch (  Exception e) {
+    LOG.error("Error instantiating custom partiton factory",e);
+    throw new RuntimeException(e);
+  }
+}

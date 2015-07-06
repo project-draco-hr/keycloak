@@ -8,12 +8,24 @@
       exception=exception == null ? e : exception;
     }
   }
-  for (  KeycloakTransaction tx : afterCompletion) {
-    try {
-      tx.commit();
+  if (exception == null) {
+    for (    KeycloakTransaction tx : afterCompletion) {
+      try {
+        tx.commit();
+      }
+ catch (      RuntimeException e) {
+        exception=exception == null ? e : exception;
+      }
     }
- catch (    RuntimeException e) {
-      exception=exception == null ? e : exception;
+  }
+ else {
+    for (    KeycloakTransaction tx : afterCompletion) {
+      try {
+        tx.rollback();
+      }
+ catch (      RuntimeException e) {
+        logger.error("Exception during rollback",e);
+      }
     }
   }
   active=false;

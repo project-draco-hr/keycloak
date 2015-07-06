@@ -1,0 +1,33 @@
+{
+  String arg=args.length == 0 ? null : args[0];
+  if (arg == null) {
+    System.err.println("Missing argument: either 'kerberos', 'ldap' or 'keytabCreator' must be passed as argument");
+    System.exit(1);
+  }
+  String clazz=null;
+  File home=getHome();
+  Properties defaultProperties=new Properties();
+  if (arg.equalsIgnoreCase("ldap")) {
+    clazz="org.keycloak.util.ldap.LDAPEmbeddedServer";
+    File ldapLdif=file(home,"..","ldap-app","users.ldif");
+    defaultProperties.put("ldap.ldif",ldapLdif.getAbsolutePath());
+  }
+ else   if (arg.equalsIgnoreCase("kerberos")) {
+    clazz="org.keycloak.util.ldap.KerberosEmbeddedServer";
+    File kerberosLdif=file(home,"..","..","kerberos","users.ldif");
+    defaultProperties.put("ldap.ldif",kerberosLdif.getAbsolutePath());
+  }
+ else   if (arg.equalsIgnoreCase("keytabCreator")) {
+    clazz="org.keycloak.util.ldap.KerberosKeytabCreator";
+  }
+ else {
+    System.err.println("Invalid argument: '" + arg + "' . Either 'kerberos', 'ldap' or 'keytabCreator' must be passed as argument");
+    System.exit(1);
+  }
+  String[] newArgs=new String[args.length - 1];
+  for (int i=0; i < (args.length - 1); i++) {
+    newArgs[i]=args[i + 1];
+  }
+  System.out.println("Executing " + clazz);
+  runClass(clazz,newArgs,defaultProperties);
+}

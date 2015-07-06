@@ -1,0 +1,15 @@
+{
+  Map<String,String> map=new HashMap<String,String>();
+  map.put("hostname",this.bindHost);
+  if (this.ldapSaslPrincipal != null) {
+    map.put("ldapSaslPrincipal",this.ldapSaslPrincipal);
+  }
+  InputStream is=FindFile.findFile(ldifFile);
+  if (is == null) {
+    throw new IllegalStateException("LDIF file not found on classpath or on file system. Location was: " + ldifFile);
+  }
+  final String ldifContent=StrSubstitutor.replace(StreamUtil.readString(is),map);
+  log.info("Content of LDIF: " + ldifContent);
+  final SchemaManager schemaManager=directoryService.getSchemaManager();
+  importLdifContent(directoryService,ldifContent);
+}

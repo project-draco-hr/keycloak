@@ -2,6 +2,7 @@
   final String userModelAttrName=mapperModel.getConfig().get(USER_MODEL_ATTRIBUTE);
   final String ldapAttrName=mapperModel.getConfig().get(LDAP_ATTRIBUTE);
   boolean isAlwaysReadValueFromLDAP=parseBooleanParameter(mapperModel,ALWAYS_READ_VALUE_FROM_LDAP);
+  final boolean isMandatoryInLdap=parseBooleanParameter(mapperModel,IS_MANDATORY_IN_LDAP);
   if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE && !isReadOnly(mapperModel)) {
     delegate=new TxAwareLDAPUserModelDelegate(delegate,ldapProvider,ldapUser){
       @Override public void setSingleAttribute(      String name,      String value){
@@ -35,14 +36,24 @@
           }
           ensureTransactionStarted();
           if (value == null) {
-            ldapUser.setAttribute(ldapAttrName,null);
+            if (isMandatoryInLdap) {
+              ldapUser.setSingleAttribute(ldapAttrName,LDAPConstants.EMPTY_ATTRIBUTE_VALUE);
+            }
+ else {
+              ldapUser.setAttribute(ldapAttrName,new LinkedHashSet<String>());
+            }
           }
  else           if (value instanceof String) {
             ldapUser.setSingleAttribute(ldapAttrName,(String)value);
           }
  else {
             List<String> asList=(List<String>)value;
-            ldapUser.setAttribute(ldapAttrName,new LinkedHashSet<>(asList));
+            if (asList.isEmpty() && isMandatoryInLdap) {
+              ldapUser.setSingleAttribute(ldapAttrName,LDAPConstants.EMPTY_ATTRIBUTE_VALUE);
+            }
+ else {
+              ldapUser.setAttribute(ldapAttrName,new LinkedHashSet<>(asList));
+            }
           }
         }
       }
@@ -63,7 +74,7 @@
         if (name.equalsIgnoreCase(userModelAttrName)) {
           Collection<String> ldapAttrValue=ldapUser.getAttributeAsSet(ldapAttrName);
           if (ldapAttrValue == null) {
-            return null;
+            return Collections.emptyList();
           }
  else {
             return new ArrayList<>(ldapAttrValue);

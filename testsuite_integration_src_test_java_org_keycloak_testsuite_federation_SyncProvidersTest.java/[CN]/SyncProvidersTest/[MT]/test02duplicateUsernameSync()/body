@@ -1,0 +1,41 @@
+{
+  LDAPObject duplicatedLdapUser;
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    FederationTestUtils.addLocalUser(session,testRealm,"user7","user7@email.org","password");
+    LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    duplicatedLdapUser=FederationTestUtils.addLDAPUser(ldapFedProvider,testRealm,"user7","User7FN","User7LN","user7-something@email.org",null,"126");
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    UserFederationSyncResult result=new UsersSyncManager().syncAllUsers(session.getKeycloakSessionFactory(),"test",ldapModel);
+    Assert.assertEquals(1,result.getFailed());
+    LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    ldapFedProvider.getLdapIdentityStore().remove(duplicatedLdapUser);
+    duplicatedLdapUser=FederationTestUtils.addLDAPUser(ldapFedProvider,testRealm,"user7-something","User7FNN","User7LNL","user7@email.org",null,"126");
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    UserFederationSyncResult result=new UsersSyncManager().syncAllUsers(session.getKeycloakSessionFactory(),"test",ldapModel);
+    Assert.assertEquals(1,result.getFailed());
+    Assert.assertNull(session.userStorage().getUserByUsername("user7-something",testRealm));
+    duplicatedLdapUser.setSingleAttribute(LDAPConstants.EMAIL,"user7-changed@email.org");
+    LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    ldapFedProvider.getLdapIdentityStore().update(duplicatedLdapUser);
+    result=new UsersSyncManager().syncAllUsers(session.getKeycloakSessionFactory(),"test",ldapModel);
+    Assert.assertEquals(0,result.getFailed());
+    FederationTestUtils.assertUserImported(session.userStorage(),testRealm,"user7-something","User7FNN","User7LNL","user7-changed@email.org","126");
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

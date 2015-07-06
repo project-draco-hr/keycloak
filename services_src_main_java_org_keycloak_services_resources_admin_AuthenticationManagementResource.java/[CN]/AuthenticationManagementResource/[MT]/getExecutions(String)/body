@@ -21,10 +21,12 @@
  else       if (AuthenticationFlow.FORM_FLOW.equals(flowRef.getProviderId())) {
         rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.REQUIRED.name());
         rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.DISABLED.name());
+        rep.setProviderId(execution.getAuthenticator());
+        rep.setAuthenticationConfig(execution.getAuthenticatorConfig());
       }
       rep.setReferenceType(flowRef.getAlias());
       rep.setConfigurable(false);
-      rep.setExecution(execution.getId());
+      rep.setId(execution.getId());
       rep.setRequirement(execution.getRequirement().name());
       result.add(rep);
     }
@@ -32,17 +34,17 @@
       if (!flow.getId().equals(execution.getParentFlow())) {
         rep.setSubFlow(true);
       }
-      ConfigurableAuthenticatorFactory factory=(AuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,execution.getAuthenticator());
-      if (factory == null) {
-        factory=(FormActionFactory)session.getKeycloakSessionFactory().getProviderFactory(FormAction.class,execution.getAuthenticator());
-      }
+      String providerId=execution.getAuthenticator();
+      ConfigurableAuthenticatorFactory factory=getConfigurableAuthenticatorFactory(providerId);
       rep.setReferenceType(factory.getDisplayType());
       rep.setConfigurable(factory.isConfigurable());
       for (      AuthenticationExecutionModel.Requirement choice : factory.getRequirementChoices()) {
         rep.getRequirementChoices().add(choice.name());
       }
-      rep.setExecution(execution.getId());
+      rep.setId(execution.getId());
       rep.setRequirement(execution.getRequirement().name());
+      rep.setProviderId(execution.getAuthenticator());
+      rep.setAuthenticationConfig(execution.getAuthenticatorConfig());
       result.add(rep);
     }
   }

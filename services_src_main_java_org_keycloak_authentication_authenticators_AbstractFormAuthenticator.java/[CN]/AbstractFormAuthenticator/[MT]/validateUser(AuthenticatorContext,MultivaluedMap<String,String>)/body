@@ -8,7 +8,20 @@
   }
   context.getEvent().detail(Details.USERNAME,username);
   context.getClientSession().setNote(AbstractFormAuthenticator.ATTEMPTED_USERNAME,username);
-  UserModel user=KeycloakModelUtils.findUserByNameOrEmail(context.getSession(),context.getRealm(),username);
+  UserModel user=null;
+  try {
+    user=KeycloakModelUtils.findUserByNameOrEmail(context.getSession(),context.getRealm(),username);
+  }
+ catch (  ModelDuplicateException mde) {
+    logger.error(mde.getMessage(),mde);
+    if (mde.getDuplicateFieldName() != null && mde.getDuplicateFieldName().equals(UserModel.EMAIL)) {
+      setDuplicateUserChallenge(context,Errors.EMAIL_IN_USE,Messages.EMAIL_EXISTS,AuthenticationProcessor.Error.INVALID_USER);
+    }
+ else {
+      setDuplicateUserChallenge(context,Errors.USERNAME_IN_USE,Messages.USERNAME_EXISTS,AuthenticationProcessor.Error.INVALID_USER);
+    }
+    return false;
+  }
   if (invalidUser(context,user))   return false;
   String rememberMe=inputData.getFirst("rememberMe");
   boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("on");

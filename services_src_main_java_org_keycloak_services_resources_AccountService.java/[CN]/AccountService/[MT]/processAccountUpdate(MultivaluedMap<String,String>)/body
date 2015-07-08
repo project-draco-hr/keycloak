@@ -17,14 +17,25 @@
   }
   try {
     if (realm.isEditUsernameAllowed()) {
-      user.setUsername(formData.getFirst("username"));
+      String username=formData.getFirst("username");
+      UserModel existing=session.users().getUserByUsername(username,realm);
+      if (existing != null && !existing.getId().equals(user.getId())) {
+        throw new ModelDuplicateException(Messages.USERNAME_EXISTS);
+      }
+      user.setUsername(username);
     }
     user.setFirstName(formData.getFirst("firstName"));
     user.setLastName(formData.getFirst("lastName"));
     String email=formData.getFirst("email");
     String oldEmail=user.getEmail();
     boolean emailChanged=oldEmail != null ? !oldEmail.equals(email) : email != null;
-    user.setEmail(formData.getFirst("email"));
+    if (emailChanged) {
+      UserModel existing=session.users().getUserByEmail(email,realm);
+      if (existing != null && !existing.getId().equals(user.getId())) {
+        throw new ModelDuplicateException(Messages.EMAIL_EXISTS);
+      }
+    }
+    user.setEmail(email);
     AttributeFormDataProcessor.process(formData,realm,user);
     event.event(EventType.UPDATE_PROFILE).client(auth.getClient()).user(auth.getUser()).success();
     if (emailChanged) {
@@ -37,5 +48,9 @@
  catch (  ModelReadOnlyException roe) {
     setReferrerOnPage();
     return account.setError(Messages.READ_ONLY_USER).setProfileFormData(formData).createResponse(AccountPages.ACCOUNT);
+  }
+catch (  ModelDuplicateException mde) {
+    setReferrerOnPage();
+    return account.setError(mde.getMessage()).setProfileFormData(formData).createResponse(AccountPages.ACCOUNT);
   }
 }

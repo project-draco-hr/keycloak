@@ -20,6 +20,13 @@
     Assert.assertEquals("New last",profilePage.getLastName());
     Assert.assertEquals("new@email.com",profilePage.getEmail());
     events.assertEmpty();
+    profilePage.updateProfile("test-user-no-access@localhost","New first","New last","new@email.com");
+    Assert.assertEquals("Username already exists.",profilePage.getError());
+    Assert.assertEquals("test-user-no-access@localhost",profilePage.getUsername());
+    Assert.assertEquals("New first",profilePage.getFirstName());
+    Assert.assertEquals("New last",profilePage.getLastName());
+    Assert.assertEquals("new@email.com",profilePage.getEmail());
+    events.assertEmpty();
     profilePage.updateProfile("test-user-new@localhost","New first","New last","new@email.com");
     Assert.assertEquals("Your account has been updated.",profilePage.getSuccess());
     Assert.assertEquals("test-user-new@localhost",profilePage.getUsername());

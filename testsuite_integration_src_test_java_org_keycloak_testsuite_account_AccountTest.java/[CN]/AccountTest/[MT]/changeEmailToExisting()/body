@@ -1,0 +1,22 @@
+{
+  profilePage.open();
+  loginPage.login("test-user@localhost","password");
+  events.expectLogin().client("account").detail(Details.REDIRECT_URI,ACCOUNT_REDIRECT).assertEvent();
+  Assert.assertEquals("test-user@localhost",profilePage.getUsername());
+  Assert.assertEquals("test-user@localhost",profilePage.getEmail());
+  profilePage.updateProfile("New first","New last","test-user-no-access@localhost");
+  profilePage.assertCurrent();
+  Assert.assertEquals("Email already exists.",profilePage.getError());
+  Assert.assertEquals("New first",profilePage.getFirstName());
+  Assert.assertEquals("New last",profilePage.getLastName());
+  Assert.assertEquals("test-user-no-access@localhost",profilePage.getEmail());
+  events.assertEmpty();
+  profilePage.updateProfile("New first","New last","test-user@localhost");
+  Assert.assertEquals("Your account has been updated.",profilePage.getSuccess());
+  Assert.assertEquals("New first",profilePage.getFirstName());
+  Assert.assertEquals("New last",profilePage.getLastName());
+  Assert.assertEquals("test-user@localhost",profilePage.getEmail());
+  events.expectAccount(EventType.UPDATE_PROFILE).assertEvent();
+  profilePage.updateProfile("Tom","Brady","test-user@localhost");
+  events.expectAccount(EventType.UPDATE_PROFILE).assertEvent();
+}

@@ -1,0 +1,24 @@
+{
+  auth.init(RealmAuth.Resource.IMPERSONATION);
+  auth.requireManage();
+  UserModel user=session.users().getUserById(id,realm);
+  if (user == null) {
+    throw new NotFoundException("User not found");
+  }
+  RealmModel authenticatedRealm=auth.getAuth().getRealm();
+  boolean sameRealm=false;
+  if (authenticatedRealm.getId().equals(realm.getId())) {
+    sameRealm=true;
+    UserSessionModel userSession=session.sessions().getUserSession(authenticatedRealm,auth.getAuth().getToken().getSessionState());
+    AuthenticationManager.expireIdentityCookie(realm,uriInfo,clientConnection);
+    AuthenticationManager.expireRememberMeCookie(realm,uriInfo,clientConnection);
+    AuthenticationManager.backchannelLogout(session,authenticatedRealm,userSession,uriInfo,clientConnection,headers,true);
+  }
+  UserSessionModel userSession=session.sessions().createUserSession(realm,user,user.getUsername(),clientConnection.getRemoteAddr(),"impersonate",false,null,null);
+  AuthenticationManager.createLoginCookie(realm,userSession.getUser(),userSession,uriInfo,clientConnection);
+  URI redirect=AccountService.accountServiceApplicationPage(uriInfo).build(realm.getName());
+  Map<String,Object> result=new HashMap<>();
+  result.put("sameRealm",sameRealm);
+  result.put("redirect",redirect.toString());
+  return result;
+}

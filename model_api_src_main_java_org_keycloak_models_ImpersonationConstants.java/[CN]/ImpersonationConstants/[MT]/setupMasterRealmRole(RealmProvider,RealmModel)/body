@@ -10,7 +10,8 @@
     adminRole=adminRealm.getRole(AdminRoles.ADMIN);
   }
   ClientModel realmAdminApp=adminRealm.getClientByClientId(KeycloakModelUtils.getMasterRealmAdminApplicationClientId(realm));
-  RoleModel impersonationRole=realmAdminApp.addRole(IMPERSONATION_ALLOWED);
-  impersonationRole.setDescription("${role_" + IMPERSONATION_ALLOWED + "}");
+  if (realmAdminApp.getRole(IMPERSONATION_ROLE) != null)   return;
+  RoleModel impersonationRole=realmAdminApp.addRole(IMPERSONATION_ROLE);
+  impersonationRole.setDescription("${role_" + IMPERSONATION_ROLE + "}");
   adminRole.addCompositeRole(impersonationRole);
 }

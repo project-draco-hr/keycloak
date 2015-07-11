@@ -6,19 +6,10 @@
     auth=new Auth(realm,authResult.getToken(),authResult.getUser(),client,authResult.getSession(),false);
   }
  else {
-    authResult=authManager.authenticateIdentityCookie(session,realm,uriInfo,clientConnection,headers);
+    authResult=authManager.authenticateIdentityCookie(session,realm);
     if (authResult != null) {
       auth=new Auth(realm,authResult.getToken(),authResult.getUser(),client,authResult.getSession(),true);
-      Cookie cookie=headers.getCookies().get(KEYCLOAK_STATE_CHECKER);
-      if (cookie != null) {
-        stateChecker=cookie.getValue();
-      }
- else {
-        stateChecker=UUID.randomUUID().toString();
-        String cookiePath=AuthenticationManager.getRealmCookiePath(realm,uriInfo);
-        boolean secureOnly=realm.getSslRequired().isRequired(clientConnection);
-        CookieHelper.addCookie(KEYCLOAK_STATE_CHECKER,stateChecker,cookiePath,null,null,-1,secureOnly,true);
-      }
+      updateCsrfChecks();
       account.setStateChecker(stateChecker);
     }
   }

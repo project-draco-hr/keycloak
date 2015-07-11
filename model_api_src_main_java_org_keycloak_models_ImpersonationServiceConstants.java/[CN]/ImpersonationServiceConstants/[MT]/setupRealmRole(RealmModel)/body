@@ -1,0 +1,11 @@
+{
+  if (realm.getName().equals(Config.getAdminRealm())) {
+    return;
+  }
+  String realmAdminApplicationClientId=Constants.REALM_MANAGEMENT_CLIENT_ID;
+  ClientModel realmAdminApp=realm.getClientByClientId(realmAdminApplicationClientId);
+  RoleModel impersonationRole=realmAdminApp.addRole(IMPERSONATION_ALLOWED);
+  impersonationRole.setDescription("${role_" + IMPERSONATION_ALLOWED + "}");
+  RoleModel adminRole=realmAdminApp.getRole(AdminRoles.REALM_ADMIN);
+  adminRole.addCompositeRole(impersonationRole);
+}

@@ -1,0 +1,15 @@
+{
+  Cookie cookie=session.getContext().getRequestHeaders().getCookies().get(KEYCLOAK_IDENTITY_COOKIE);
+  if (cookie == null || "".equals(cookie.getValue())) {
+    logger.debugv("Could not find cookie: {0}",KEYCLOAK_IDENTITY_COOKIE);
+    return null;
+  }
+  String tokenString=cookie.getValue();
+  AuthResult authResult=verifyIdentityToken(session,realm,session.getContext().getUri(),session.getContext().getConnection(),checkActive,tokenString,session.getContext().getRequestHeaders());
+  if (authResult == null) {
+    expireIdentityCookie(realm,session.getContext().getUri(),session.getContext().getConnection());
+    return null;
+  }
+  authResult.getSession().setLastSessionRefresh(Time.currentTime());
+  return authResult;
+}

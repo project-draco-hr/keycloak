@@ -1,0 +1,47 @@
+{
+  Response challenge=authenticateBrowser();
+  if (challenge != null)   return challenge;
+  MultivaluedMap<String,String> formData=request.getDecodedFormParameters();
+  String realmName=formData.getFirst("realm");
+  RealmModel chosenRealm=null;
+  if (realmName == null) {
+    chosenRealm=realm;
+  }
+ else {
+    chosenRealm=session.realms().getRealmByName(realmName);
+    if (chosenRealm == null) {
+      throw new NotFoundException("Could not find realm");
+    }
+  }
+  if (realm.getName().equals(Config.getAdminRealm())) {
+    authorizeMaster(chosenRealm.getName());
+  }
+ else {
+    if (realmName == null)     authorizeCurrentRealm();
+ else {
+      throw new ForbiddenException("not authorized to access impersonation",ErrorPage.error(session,Messages.NO_ACCESS));
+    }
+  }
+  csrfCheck(formData);
+  if (formData.containsKey("cancel")) {
+    return renderPage(page());
+  }
+  String username=formData.getFirst(AuthenticationManager.FORM_USERNAME);
+  if (username == null) {
+    return renderPage(page().setError(UNKNOWN_USER_MESSAGE));
+  }
+  UserModel user=session.users().getUserByUsername(username,chosenRealm);
+  if (user == null) {
+    user=session.users().getUserByEmail(username,chosenRealm);
+  }
+  if (user == null) {
+    return renderPage(page().setError(UNKNOWN_USER_MESSAGE));
+  }
+  if (chosenRealm.getId().equals(realm.getId())) {
+    AuthenticationManager.backchannelLogout(session,realm,auth.getSession(),uriInfo,clientConnection,headers,true);
+  }
+  UserSessionModel userSession=session.sessions().createUserSession(chosenRealm,user,username,clientConnection.getRemoteAddr(),"impersonate",false,null,null);
+  AuthenticationManager.createLoginCookie(chosenRealm,userSession.getUser(),userSession,uriInfo,clientConnection);
+  URI redirect=AccountService.accountServiceApplicationPage(uriInfo).build(chosenRealm.getName());
+  return Response.status(302).location(redirect).build();
+}

@@ -1,0 +1,13 @@
+{
+  Set<FederatedIdentityModel> identities=session.users().getFederatedIdentities(user,realm);
+  List<FederatedIdentityRepresentation> result=new ArrayList<FederatedIdentityRepresentation>();
+  for (  FederatedIdentityModel identity : identities) {
+    for (    IdentityProviderModel identityProviderModel : realm.getIdentityProviders()) {
+      if (identityProviderModel.getAlias().equals(identity.getIdentityProvider())) {
+        FederatedIdentityRepresentation rep=ModelToRepresentation.toRepresentation(identity);
+        result.add(rep);
+      }
+    }
+  }
+  return result;
+}

@@ -1,0 +1,24 @@
+{
+  UserModel user=auth.getUser();
+  LoginFormsProvider page=session.getProvider(LoginFormsProvider.class).setActionUri(getBaseRedirectUri()).setAttribute("stateChecker",stateChecker);
+  if (realm.getName().equals(Config.getAdminRealm())) {
+    List<String> realms=new LinkedList<>();
+    for (    RealmModel possibleRealm : session.realms().getRealms()) {
+      ClientModel realmAdminApp=realm.getClientByClientId(KeycloakModelUtils.getMasterRealmAdminApplicationClientId(possibleRealm));
+      RoleModel role=realmAdminApp.getRole(ImpersonationServiceConstants.IMPERSONATION_ALLOWED);
+      if (user.hasRole(role)) {
+        realms.add(possibleRealm.getName());
+      }
+    }
+    if (realms.isEmpty()) {
+      throw new ForbiddenException("not authorized to access impersonation",ErrorPage.error(session,Messages.NO_ACCESS));
+    }
+    if (realms.size() > 1 || !realms.get(0).equals(realm.getName())) {
+      page.setAttribute("realmList",realms);
+    }
+  }
+ else {
+    authorizeCurrentRealm();
+  }
+  return page;
+}

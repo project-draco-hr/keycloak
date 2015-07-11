@@ -1,0 +1,9 @@
+{
+  UserModel user=auth.getUser();
+  String realmAdminApplicationClientId=Constants.REALM_MANAGEMENT_CLIENT_ID;
+  ClientModel realmAdminApp=realm.getClientByClientId(realmAdminApplicationClientId);
+  RoleModel role=realmAdminApp.getRole(ImpersonationServiceConstants.IMPERSONATION_ALLOWED);
+  if (!user.hasRole(role)) {
+    throw new ForbiddenException("not authorized to access impersonation",ErrorPage.error(session,Messages.NO_ACCESS));
+  }
+}

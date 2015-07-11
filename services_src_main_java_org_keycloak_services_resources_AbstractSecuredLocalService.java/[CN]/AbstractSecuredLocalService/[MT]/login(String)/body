@@ -1,0 +1,21 @@
+{
+  OAuthRedirect oauth=new OAuthRedirect();
+  String authUrl=OIDCLoginProtocolService.authUrl(uriInfo).build(realm.getName()).toString();
+  oauth.setAuthUrl(authUrl);
+  oauth.setClientId(client.getClientId());
+  UriBuilder uriBuilder=UriBuilder.fromUri(getBaseRedirectUri()).path("login-redirect");
+  if (path != null) {
+    uriBuilder.queryParam("path",path);
+  }
+  String referrer=uriInfo.getQueryParameters().getFirst("referrer");
+  if (referrer != null) {
+    uriBuilder.queryParam("referrer",referrer);
+  }
+  String referrerUri=uriInfo.getQueryParameters().getFirst("referrer_uri");
+  if (referrerUri != null) {
+    uriBuilder.queryParam("referrer_uri",referrerUri);
+  }
+  URI accountUri=uriBuilder.build(realm.getName());
+  oauth.setStateCookiePath(accountUri.getRawPath());
+  return oauth.redirect(uriInfo,accountUri.toString());
+}

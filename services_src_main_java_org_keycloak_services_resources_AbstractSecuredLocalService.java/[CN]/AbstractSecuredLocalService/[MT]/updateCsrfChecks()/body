@@ -1,0 +1,12 @@
+{
+  Cookie cookie=headers.getCookies().get(AccountService.KEYCLOAK_STATE_CHECKER);
+  if (cookie != null) {
+    stateChecker=cookie.getValue();
+  }
+ else {
+    stateChecker=UUID.randomUUID().toString();
+    String cookiePath=AuthenticationManager.getRealmCookiePath(realm,uriInfo);
+    boolean secureOnly=realm.getSslRequired().isRequired(clientConnection);
+    CookieHelper.addCookie(AccountService.KEYCLOAK_STATE_CHECKER,stateChecker,cookiePath,null,null,-1,secureOnly,true);
+  }
+}

@@ -1,0 +1,33 @@
+{
+  Map<String,RealmRepresentation> result=new HashMap<String,RealmRepresentation>();
+  JsonFactory factory=mapper.getJsonFactory();
+  JsonParser parser=factory.createJsonParser(is);
+  try {
+    parser.nextToken();
+    if (parser.getCurrentToken() == JsonToken.START_ARRAY) {
+      parser.nextToken();
+      List<RealmRepresentation> realmReps=new ArrayList<RealmRepresentation>();
+      while (parser.getCurrentToken() == JsonToken.START_OBJECT) {
+        RealmRepresentation realmRep=parser.readValueAs(RealmRepresentation.class);
+        parser.nextToken();
+        if (Config.getAdminRealm().equals(realmRep.getRealm())) {
+          realmReps.add(0,realmRep);
+        }
+ else {
+          realmReps.add(realmRep);
+        }
+      }
+      for (      RealmRepresentation realmRep : realmReps) {
+        result.put(realmRep.getId(),realmRep);
+      }
+    }
+ else     if (parser.getCurrentToken() == JsonToken.START_OBJECT) {
+      RealmRepresentation realmRep=parser.readValueAs(RealmRepresentation.class);
+      result.put(realmRep.getId(),realmRep);
+    }
+  }
+  finally {
+    parser.close();
+  }
+  return result;
+}

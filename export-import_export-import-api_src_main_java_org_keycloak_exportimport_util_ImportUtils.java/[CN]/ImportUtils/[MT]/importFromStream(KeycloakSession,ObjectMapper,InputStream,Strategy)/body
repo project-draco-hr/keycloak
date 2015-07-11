@@ -1,31 +1,6 @@
 {
-  JsonFactory factory=mapper.getJsonFactory();
-  JsonParser parser=factory.createJsonParser(is);
-  try {
-    parser.nextToken();
-    if (parser.getCurrentToken() == JsonToken.START_ARRAY) {
-      parser.nextToken();
-      List<RealmRepresentation> realmReps=new ArrayList<RealmRepresentation>();
-      while (parser.getCurrentToken() == JsonToken.START_OBJECT) {
-        RealmRepresentation realmRep=parser.readValueAs(RealmRepresentation.class);
-        parser.nextToken();
-        if (Config.getAdminRealm().equals(realmRep.getRealm())) {
-          realmReps.add(0,realmRep);
-        }
- else {
-          realmReps.add(realmRep);
-        }
-      }
-      for (      RealmRepresentation realmRep : realmReps) {
-        importRealm(session,realmRep,strategy);
-      }
-    }
- else     if (parser.getCurrentToken() == JsonToken.START_OBJECT) {
-      RealmRepresentation realmRep=parser.readValueAs(RealmRepresentation.class);
-      importRealm(session,realmRep,strategy);
-    }
-  }
-  finally {
-    parser.close();
+  Map<String,RealmRepresentation> realmReps=getRealmsFromStream(mapper,is);
+  for (  RealmRepresentation realmRep : realmReps.values()) {
+    importRealm(session,realmRep,strategy);
   }
 }

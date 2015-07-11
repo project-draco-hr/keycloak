@@ -9,10 +9,21 @@
   setupMasterAdminManagement(realm);
   if (!hasRealmAdminManagementClient(rep))   setupRealmAdminManagement(realm);
   if (!hasAccountManagementClient(rep))   setupAccountManagement(realm);
-  if (!hasImpersonationServiceClient(rep))   setupImpersonationService(realm);
+  boolean postponeImpersonationSetup=false;
+  if (!hasImpersonationServiceClient(rep)) {
+    if (hasRealmAdminManagementClient(rep)) {
+      postponeImpersonationSetup=true;
+    }
+ else {
+      setupImpersonationService(realm);
+    }
+  }
   if (!hasBrokerClient(rep))   setupBrokerService(realm);
   if (!hasAdminConsoleClient(rep))   setupAdminConsole(realm);
   RepresentationToModel.importRealm(session,rep,realm);
+  if (postponeImpersonationSetup) {
+    setupImpersonationService(realm);
+  }
   setupAuthenticationFlows(realm);
   setupRequiredActions(realm);
   List<UserFederationProviderModel> federationProviders=realm.getUserFederationProviders();

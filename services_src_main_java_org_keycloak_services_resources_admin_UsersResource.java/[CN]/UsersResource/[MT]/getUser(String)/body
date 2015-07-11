@@ -6,14 +6,8 @@
   }
   UserRepresentation rep=ModelToRepresentation.toRepresentation(user);
   if (realm.isIdentityFederationEnabled()) {
-    Set<FederatedIdentityModel> identities=session.users().getFederatedIdentities(user,realm);
-    if (!identities.isEmpty()) {
-      List<FederatedIdentityRepresentation> reps=new LinkedList<>();
-      for (      FederatedIdentityModel m : identities) {
-        reps.add(ModelToRepresentation.toRepresentation(m));
-      }
-      rep.setFederatedIdentities(reps);
-    }
+    List<FederatedIdentityRepresentation> reps=getFederatedIdentities(user);
+    rep.setFederatedIdentities(reps);
   }
   if ((protector != null) && protector.isTemporarilyDisabled(session,realm,rep.getUsername())) {
     rep.setEnabled(false);

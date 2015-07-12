@@ -1,0 +1,9 @@
+{
+  Client client=createClient(admin,adminRealm);
+  WebTarget impersonate=createImpersonateTarget(client);
+  Map data=impersonate.request().post(null,Map.class);
+  Assert.assertNotNull(data);
+  Assert.assertNotNull(data.get("redirect"));
+  events.expect(EventType.IMPERSONATE).session(AssertEvents.isUUID()).user(impersonatedUserId).detail(Details.IMPERSONATOR,admin).detail(Details.IMPERSONATOR_REALM,adminRealm).client((String)null).assertEvent();
+  client.close();
+}

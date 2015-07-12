@@ -1,0 +1,11 @@
+{
+  String token=createAdminToken(admin,adminRealm);
+  final String authHeader="Bearer " + token;
+  ClientRequestFilter authFilter=new ClientRequestFilter(){
+    @Override public void filter(    ClientRequestContext requestContext) throws IOException {
+      requestContext.getHeaders().add(HttpHeaders.AUTHORIZATION,authHeader);
+    }
+  }
+;
+  return ClientBuilder.newBuilder().register(authFilter).build();
+}

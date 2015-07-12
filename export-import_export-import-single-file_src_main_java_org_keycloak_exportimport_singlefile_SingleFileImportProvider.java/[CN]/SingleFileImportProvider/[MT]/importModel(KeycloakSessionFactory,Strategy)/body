@@ -1,9 +1,11 @@
 {
   logger.infof("Full importing from file %s",this.file.getAbsolutePath());
+  checkRealmReps();
   KeycloakModelUtils.runJobInTransaction(factory,new ExportImportSessionTask(){
     @Override protected void runExportImportTask(    KeycloakSession session) throws IOException {
-      FileInputStream is=new FileInputStream(file);
-      ImportUtils.importFromStream(session,JsonSerialization.mapper,is,strategy);
+      for (      RealmRepresentation realmRep : realmReps.values()) {
+        ImportUtils.importRealm(session,realmRep,strategy);
+      }
     }
   }
 );

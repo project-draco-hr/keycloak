@@ -1,9 +1,15 @@
 {
   AuthenticationExecutionModel model=new AuthenticationExecutionModel();
-  model.setAuthenticatorConfig(rep.getAuthenticatorConfig());
+  if (rep.getAuthenticatorConfig() != null) {
+    AuthenticatorConfigModel config=realm.getAuthenticatorConfigByAlias(rep.getAuthenticatorConfig());
+    model.setAuthenticatorConfig(config.getId());
+  }
   model.setAuthenticator(rep.getAuthenticator());
   model.setAutheticatorFlow(rep.isAutheticatorFlow());
-  model.setFlowId(rep.getFlowId());
+  if (rep.getFlowAlias() != null) {
+    AuthenticationFlowModel flow=realm.getFlowByAlias(rep.getFlowAlias());
+    model.setFlowId(flow.getId());
+  }
   model.setPriority(rep.getPriority());
   model.setUserSetupAllowed(rep.isUserSetupAllowed());
   model.setRequirement(AuthenticationExecutionModel.Requirement.valueOf(rep.getRequirement()));

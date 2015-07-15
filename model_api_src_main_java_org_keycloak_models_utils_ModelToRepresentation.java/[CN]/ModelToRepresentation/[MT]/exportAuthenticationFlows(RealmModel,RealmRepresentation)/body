@@ -2,11 +2,7 @@
   rep.setAuthenticationFlows(new LinkedList<AuthenticationFlowRepresentation>());
   rep.setAuthenticatorConfig(new LinkedList<AuthenticatorConfigRepresentation>());
   for (  AuthenticationFlowModel model : realm.getAuthenticationFlows()) {
-    AuthenticationFlowRepresentation flowRep=toRepresentation(model);
-    flowRep.setAuthenticationExecutions(new LinkedList<AuthenticationExecutionRepresentation>());
-    for (    AuthenticationExecutionModel execution : realm.getAuthenticationExecutions(model.getId())) {
-      flowRep.getAuthenticationExecutions().add(toRepresentation(execution));
-    }
+    AuthenticationFlowRepresentation flowRep=toRepresentation(realm,model);
     rep.getAuthenticationFlows().add(flowRep);
   }
   for (  AuthenticatorConfigModel model : realm.getAuthenticatorConfigs()) {

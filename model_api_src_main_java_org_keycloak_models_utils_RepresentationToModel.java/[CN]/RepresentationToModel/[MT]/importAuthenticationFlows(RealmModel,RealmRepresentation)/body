@@ -1,0 +1,23 @@
+{
+  if (rep.getAuthenticationFlows() == null) {
+    DefaultAuthenticationFlows.addFlows(newRealm);
+  }
+ else {
+    for (    AuthenticatorConfigRepresentation configRep : rep.getAuthenticatorConfig()) {
+      AuthenticatorConfigModel model=toModel(configRep);
+      newRealm.addAuthenticatorConfig(model);
+    }
+    for (    AuthenticationFlowRepresentation flowRep : rep.getAuthenticationFlows()) {
+      AuthenticationFlowModel model=toModel(flowRep);
+      model=newRealm.addAuthenticationFlow(model);
+    }
+    for (    AuthenticationFlowRepresentation flowRep : rep.getAuthenticationFlows()) {
+      AuthenticationFlowModel model=newRealm.getFlowByAlias(flowRep.getAlias());
+      for (      AuthenticationExecutionRepresentation exeRep : flowRep.getAuthenticationExecutions()) {
+        AuthenticationExecutionModel execution=toModel(newRealm,exeRep);
+        execution.setParentFlow(model.getId());
+        newRealm.addAuthenticatorExecution(execution);
+      }
+    }
+  }
+}

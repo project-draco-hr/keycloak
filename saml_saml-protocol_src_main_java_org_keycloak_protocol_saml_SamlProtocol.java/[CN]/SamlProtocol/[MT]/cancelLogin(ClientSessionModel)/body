@@ -1,5 +1,16 @@
 {
-  Response error=getErrorResponse(clientSession,JBossSAMLURIConstants.STATUS_REQUEST_DENIED.get());
-  session.sessions().removeClientSession(realm,clientSession);
-  return error;
+  if ("true".equals(clientSession.getClient().getAttribute(SAML_IDP_INITIATED_LOGIN))) {
+    UriBuilder builder=RealmsResource.protocolUrl(uriInfo).path(SamlService.class,"idpInitiatedSSO");
+    Map<String,String> params=new HashMap<>();
+    params.put("realm",realm.getName());
+    params.put("protocol",LOGIN_PROTOCOL);
+    params.put("client",clientSession.getClient().getAttribute(SAML_IDP_INITIATED_SSO_URL_NAME));
+    session.sessions().removeClientSession(realm,clientSession);
+    URI redirect=builder.buildFromMap(params);
+    return Response.status(302).location(redirect).build();
+  }
+ else {
+    session.sessions().removeClientSession(realm,clientSession);
+    return getErrorResponse(clientSession,JBossSAMLURIConstants.STATUS_REQUEST_DENIED.get());
+  }
 }

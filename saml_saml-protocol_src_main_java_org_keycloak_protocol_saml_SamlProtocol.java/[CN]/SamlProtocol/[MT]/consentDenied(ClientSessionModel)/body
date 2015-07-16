@@ -1,3 +1,8 @@
 {
-  return getErrorResponse(clientSession,JBossSAMLURIConstants.STATUS_REQUEST_DENIED.get());
+  if ("true".equals(clientSession.getClient().getAttribute(SAML_IDP_INITIATED_LOGIN))) {
+    return ErrorPage.error(session,Messages.CONSENT_DENIED);
+  }
+ else {
+    return getErrorResponse(clientSession,JBossSAMLURIConstants.STATUS_REQUEST_DENIED.get());
+  }
 }

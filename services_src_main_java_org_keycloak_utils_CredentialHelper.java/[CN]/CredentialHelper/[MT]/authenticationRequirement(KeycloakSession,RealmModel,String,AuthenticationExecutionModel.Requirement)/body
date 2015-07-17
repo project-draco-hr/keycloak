@@ -1,0 +1,13 @@
+{
+  for (  AuthenticationFlowModel flow : realm.getAuthenticationFlows()) {
+    for (    AuthenticationExecutionModel execution : realm.getAuthenticationExecutions(flow.getId())) {
+      String providerId=execution.getAuthenticator();
+      ConfigurableAuthenticatorFactory factory=getConfigurableAuthenticatorFactory(session,providerId);
+      if (factory == null)       continue;
+      if (type.equals(factory.getReferenceCategory())) {
+        execution.setRequirement(requirement);
+        realm.updateAuthenticatorExecution(execution);
+      }
+    }
+  }
+}

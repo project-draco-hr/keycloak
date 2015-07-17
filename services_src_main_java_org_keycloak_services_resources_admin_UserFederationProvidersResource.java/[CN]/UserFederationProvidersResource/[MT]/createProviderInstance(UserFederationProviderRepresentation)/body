@@ -6,7 +6,7 @@
   }
   UserFederationProviderModel model=realm.addUserFederationProvider(rep.getProviderName(),rep.getConfig(),rep.getPriority(),displayName,rep.getFullSyncPeriod(),rep.getChangedSyncPeriod(),rep.getLastSync());
   new UsersSyncManager().refreshPeriodicSyncForProvider(session.getKeycloakSessionFactory(),session.getProvider(TimerProvider.class),model,realm.getId());
-  boolean kerberosCredsAdded=KeycloakModelUtils.checkKerberosCredential(realm,model);
+  boolean kerberosCredsAdded=checkKerberosCredential(session,realm,model);
   if (kerberosCredsAdded) {
     logger.info("Added 'kerberos' to required realm credentials");
   }

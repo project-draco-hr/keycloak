@@ -1,0 +1,10 @@
+{
+  List<UserModel> users=session.userStorage().getUsers(realm);
+  for (  UserModel user : users) {
+    String email=user.getEmail();
+    email=KeycloakModelUtils.toLowerCaseSafe(email);
+    if (email != null && !email.equals(user.getEmail())) {
+      user.setEmail(email);
+    }
+  }
+}

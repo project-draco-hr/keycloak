@@ -197,4 +197,13 @@
     newRealm.setDefaultLocale(rep.getDefaultLocale());
   }
   importAuthenticationFlows(newRealm,rep);
+  if (rep.getRequiredActions() != null) {
+    for (    RequiredActionProviderRepresentation action : rep.getRequiredActions()) {
+      RequiredActionProviderModel model=toModel(action);
+      newRealm.addRequiredActionProvider(model);
+    }
+  }
+ else {
+    DefaultRequiredActions.addActions(newRealm);
+  }
 }

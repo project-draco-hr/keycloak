@@ -1,0 +1,19 @@
+{
+  oauth.clientId("service-account-cl");
+  OAuthClient.AccessTokenResponse response=oauth.doClientCredentialsGrantAccessTokenRequest("secret1");
+  assertEquals(200,response.getStatusCode());
+  AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
+  RefreshToken refreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
+  events.expectClientLogin().client("service-account-cl").user(userId).session(accessToken.getSessionState()).detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).detail(Details.USERNAME,ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX + "service-account-cl").assertEvent();
+  assertEquals(accessToken.getSessionState(),refreshToken.getSessionState());
+  System.out.println("Access token other claims: " + accessToken.getOtherClaims());
+  Assert.assertEquals("service-account-cl",accessToken.getOtherClaims().get(ServiceAccountConstants.CLIENT_ID));
+  Assert.assertTrue(accessToken.getOtherClaims().containsKey(ServiceAccountConstants.CLIENT_ADDRESS));
+  Assert.assertTrue(accessToken.getOtherClaims().containsKey(ServiceAccountConstants.CLIENT_HOST));
+  OAuthClient.AccessTokenResponse refreshedResponse=oauth.doRefreshTokenRequest(response.getRefreshToken(),"secret1");
+  AccessToken refreshedAccessToken=oauth.verifyToken(refreshedResponse.getAccessToken());
+  RefreshToken refreshedRefreshToken=oauth.verifyRefreshToken(refreshedResponse.getRefreshToken());
+  assertEquals(accessToken.getSessionState(),refreshedAccessToken.getSessionState());
+  assertEquals(accessToken.getSessionState(),refreshedRefreshToken.getSessionState());
+  events.expectRefresh(refreshToken.getId(),refreshToken.getSessionState()).user(userId).client("service-account-cl").assertEvent();
+}

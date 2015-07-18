@@ -1,0 +1,25 @@
+{
+  RealmModel realm=realmManager.createRealm("original");
+  UserModel user1=session.users().addUser(realm,"user1");
+  UserModel user2=session.users().addUser(realm,"user2");
+  UserModel user3=session.users().addUser(realm,"user3");
+  user1.setSingleAttribute("key1","value1");
+  user1.setSingleAttribute("key2","value21");
+  user2.setSingleAttribute("key1","value1");
+  user2.setSingleAttribute("key2","value22");
+  user3.setSingleAttribute("key2","value21");
+  commit();
+  Map<String,String> attributes=new HashMap<String,String>();
+  attributes.put("key1","value1");
+  List<UserModel> users=session.users().searchForUserByUserAttributes(attributes,realm);
+  Assert.assertEquals(2,users.size());
+  Assert.assertTrue(users.contains(user1));
+  Assert.assertTrue(users.contains(user2));
+  attributes.put("key2","value21");
+  users=session.users().searchForUserByUserAttributes(attributes,realm);
+  Assert.assertEquals(1,users.size());
+  Assert.assertTrue(users.contains(user1));
+  attributes.put("key3","value3");
+  users=session.users().searchForUserByUserAttributes(attributes,realm);
+  Assert.assertEquals(0,users.size());
+}

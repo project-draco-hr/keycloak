@@ -1,0 +1,10 @@
+{
+  Resource resource=applicationContext.getResource(KEYCLOAK_CONFIG_WEB_RESOURCE);
+  if (!resource.isReadable()) {
+    resource=applicationContext.getResource(KEYCLOAK_CONFIG_CLASSPATH_RESOURCE);
+  }
+  if (!resource.isReadable()) {
+    throw new FileNotFoundException(String.format("Unable to locate Keycloak from %s or %s",KEYCLOAK_CONFIG_WEB_RESOURCE,KEYCLOAK_CONFIG_CLASSPATH_RESOURCE));
+  }
+  return KeycloakDeploymentBuilder.build(resource.getInputStream());
+}

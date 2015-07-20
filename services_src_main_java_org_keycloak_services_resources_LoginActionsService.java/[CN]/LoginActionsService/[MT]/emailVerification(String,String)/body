@@ -15,6 +15,7 @@
     event.event(EventType.VERIFY_EMAIL).detail(Details.EMAIL,user.getEmail()).success();
     String actionCookieValue=getActionCookie();
     if (actionCookieValue == null || !actionCookieValue.equals(userSession.getId())) {
+      session.sessions().removeClientSession(realm,clientSession);
       return session.getProvider(LoginFormsProvider.class).setSuccess(Messages.EMAIL_VERIFIED).createInfoPage();
     }
     event=event.clone().removeDetail(Details.EMAIL).event(EventType.LOGIN);

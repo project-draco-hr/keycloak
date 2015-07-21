@@ -12,7 +12,7 @@
           EqualCondition equalCondition=(EqualCondition)condition;
           SearchResult search=this.operationManager.lookupById(baseDN,equalCondition.getValue().toString(),identityQuery.getReturningLdapAttributes());
           if (search != null) {
-            results.add(populateAttributedType(search,identityQuery.getReturningReadOnlyLdapAttributes()));
+            results.add(populateAttributedType(search,identityQuery));
           }
         }
         return results;
@@ -28,7 +28,7 @@
     }
     for (    SearchResult result : search) {
       if (!result.getNameInNamespace().equalsIgnoreCase(baseDN)) {
-        results.add(populateAttributedType(result,identityQuery.getReturningReadOnlyLdapAttributes()));
+        results.add(populateAttributedType(result,identityQuery));
       }
     }
   }

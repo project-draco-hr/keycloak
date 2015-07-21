@@ -1,5 +1,6 @@
 {
   if (UserModel.EMAIL.equalsIgnoreCase(userModelAttrName)) {
+    email=KeycloakModelUtils.toLowerCaseSafe(email);
     UserModel that=session.userStorage().getUserByEmail(email,realm);
     if (that != null && !that.getId().equals(user.getId())) {
       session.getTransaction().setRollbackOnly();

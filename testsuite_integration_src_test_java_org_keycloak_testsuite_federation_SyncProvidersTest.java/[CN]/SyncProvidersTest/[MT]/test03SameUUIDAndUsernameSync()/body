@@ -1,0 +1,45 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  String origUuidAttrName;
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    for (    UserModel user : session.userStorage().getUsers(testRealm)) {
+      session.userStorage().removeUser(testRealm,user);
+    }
+    UserFederationProviderModel providerModel=KeycloakModelUtils.findUserFederationProviderByDisplayName(ldapModel.getDisplayName(),testRealm);
+    LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    String uidAttrName=ldapFedProvider.getLdapIdentityStore().getConfig().getUsernameLdapAttribute();
+    origUuidAttrName=providerModel.getConfig().get(LDAPConstants.UUID_LDAP_ATTRIBUTE);
+    providerModel.getConfig().put(LDAPConstants.UUID_LDAP_ATTRIBUTE,uidAttrName);
+    providerModel.getConfig().put(LDAPConstants.BATCH_SIZE_FOR_SYNC,"10");
+    testRealm.updateUserFederationProvider(providerModel);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    UserFederationProviderModel providerModel=KeycloakModelUtils.findUserFederationProviderByDisplayName(ldapModel.getDisplayName(),testRealm);
+    KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+    UserFederationSyncResult syncResult=new UsersSyncManager().syncAllUsers(sessionFactory,"test",providerModel);
+    Assert.assertEquals(0,syncResult.getFailed());
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    FederationTestUtils.assertUserImported(session.users(),testRealm,"user1","User1FN","User1LN","user1@email.org","121");
+    FederationTestUtils.assertUserImported(session.users(),testRealm,"user2","User2FN","User2LN","user2@email.org","122");
+    UserModel user1=session.users().getUserByUsername("user1",testRealm);
+    Assert.assertEquals("user1",user1.getFirstAttribute(LDAPConstants.LDAP_ID));
+    UserFederationProviderModel providerModel=KeycloakModelUtils.findUserFederationProviderByDisplayName(ldapModel.getDisplayName(),testRealm);
+    providerModel.getConfig().put(LDAPConstants.UUID_LDAP_ATTRIBUTE,origUuidAttrName);
+    testRealm.updateUserFederationProvider(providerModel);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

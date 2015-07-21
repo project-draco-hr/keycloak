@@ -1,4 +1,9 @@
 {
+  Set<String> readOnlyAttrNames=ldapQuery.getReturningReadOnlyLdapAttributes();
+  Set<String> lowerCasedAttrNames=new TreeSet<>();
+  for (  String attrName : ldapQuery.getReturningLdapAttributes()) {
+    lowerCasedAttrNames.add(attrName.toLowerCase());
+  }
   try {
     String entryDN=searchResult.getNameInNamespace();
     Attributes attributes=searchResult.getAttributes();
@@ -20,7 +25,7 @@
         Object uuidValue=ldapAttribute.get();
         ldapObject.setUuid(this.operationManager.decodeEntryUUID(uuidValue));
       }
- else {
+      if (!ldapAttributeName.equalsIgnoreCase(getConfig().getUuidLDAPAttributeName()) || (lowerCasedAttrNames.contains(ldapAttributeName.toLowerCase()))) {
         Set<String> attrValues=new LinkedHashSet<>();
         NamingEnumeration<?> enumm=ldapAttribute.getAll();
         while (enumm.hasMoreElements()) {

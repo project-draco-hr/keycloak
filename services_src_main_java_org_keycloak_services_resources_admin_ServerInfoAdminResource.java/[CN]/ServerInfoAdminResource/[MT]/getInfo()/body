@@ -3,6 +3,8 @@
   info.version=Version.VERSION;
   info.serverTime=new Date().toString();
   info.serverStartupTime=session.getKeycloakSessionFactory().getServerStartupTimestamp();
+  info.memoryInfo=(new MemoryInfo()).init(Runtime.getRuntime());
+  info.systemInfo=(new SystemInfo()).init();
   setSocialProviders(info);
   setIdentityProviders(info);
   setThemes(info);
@@ -13,5 +15,19 @@
   setProtocolMapperTypes(info);
   setBuiltinProtocolMappers(info);
   info.setEnums(ENUMS);
+  ProviderFactory<JpaConnectionProvider> jpf=session.getKeycloakSessionFactory().getProviderFactory(JpaConnectionProvider.class);
+  if (jpf != null && jpf instanceof MonitorableProviderFactory) {
+    info.jpaInfo=((MonitorableProviderFactory<?>)jpf).getOperationalInfo();
+  }
+ else {
+    logger.debug("JPA provider not found or is not monitorable");
+  }
+  ProviderFactory<MongoConnectionProvider> mpf=session.getKeycloakSessionFactory().getProviderFactory(MongoConnectionProvider.class);
+  if (mpf != null && mpf instanceof MonitorableProviderFactory) {
+    info.mongoDbInfo=((MonitorableProviderFactory<?>)mpf).getOperationalInfo();
+  }
+ else {
+    logger.debug("Mongo provider not found or is not monitorable");
+  }
   return info;
 }

@@ -1,0 +1,13 @@
+{
+  try {
+    databaseInfo=new DatabaseInfo();
+    DatabaseMetaData md=connection.getMetaData();
+    databaseInfo.databaseDriver=md.getDriverName() + " " + md.getDriverVersion();
+    databaseInfo.databaseProduct=md.getDatabaseProductName() + " " + md.getDatabaseProductVersion();
+    databaseInfo.databaseUser=md.getUserName();
+    databaseInfo.jdbcUrl=md.getURL();
+  }
+ catch (  SQLException e) {
+    logger.warn("Unable to get database info due " + e.getMessage());
+  }
+}

@@ -13,6 +13,11 @@
  else {
     client=new MongoClient(new ServerAddress(host,port),clientOptions);
   }
+  mongoDbInfo=new MongoDbInfo();
+  mongoDbInfo.driverVersion=client.getVersion();
+  mongoDbInfo.address=client.getAddress().toString();
+  mongoDbInfo.database=dbName;
+  mongoDbInfo.user=user;
   logger.debugv("Initialized mongo model. host: %s, port: %d, db: %s",host,port,dbName);
   return client;
 }

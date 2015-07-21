@@ -48,13 +48,14 @@ synchronized (this) {
         }
         properties.put("hibernate.show_sql",config.getBoolean("showSql",false));
         properties.put("hibernate.format_sql",config.getBoolean("formatSql",true));
+        connection=getConnection();
+        prepareDatabaseInfo(connection);
         if (databaseSchema != null) {
           logger.trace("Updating database");
           JpaUpdaterProvider updater=session.getProvider(JpaUpdaterProvider.class);
           if (updater == null) {
             throw new RuntimeException("Can't update database: JPA updater provider not found");
           }
-          connection=getConnection();
           if (databaseSchema.equals("update")) {
             String currentVersion=null;
             try {

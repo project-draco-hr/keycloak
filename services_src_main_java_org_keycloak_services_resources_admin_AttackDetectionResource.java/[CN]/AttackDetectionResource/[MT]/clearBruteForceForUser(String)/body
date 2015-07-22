@@ -1,0 +1,8 @@
+{
+  auth.requireManage();
+  UsernameLoginFailureModel model=session.sessions().getUserLoginFailure(realm,username);
+  if (model != null) {
+    session.sessions().removeUserLoginFailure(realm,username);
+    adminEvent.operation(OperationType.DELETE).success();
+  }
+}

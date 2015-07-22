@@ -1,0 +1,8 @@
+{
+  String token=getAdminToken();
+  Client client=ClientBuilder.newClient();
+  Response response=client.target(AppPage.AUTH_SERVER_URL).path("admin/realms/test/attack-detection/brute-force/usernames/test-user@localhost").request().header(HttpHeaders.AUTHORIZATION,"Bearer " + token).delete();
+  Assert.assertEquals(204,response.getStatus());
+  response.close();
+  client.close();
+}

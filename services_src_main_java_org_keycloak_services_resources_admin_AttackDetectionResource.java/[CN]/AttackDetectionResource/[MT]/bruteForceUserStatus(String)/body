@@ -1,0 +1,18 @@
+{
+  auth.hasView();
+  Map<String,Object> data=new HashMap<>();
+  data.put("disabled",false);
+  data.put("numFailures",0);
+  data.put("lastFailure",0);
+  data.put("lastIPFailure","n/a");
+  if (!realm.isBruteForceProtected())   return data;
+  UsernameLoginFailureModel model=session.sessions().getUserLoginFailure(realm,username);
+  if (model == null)   return data;
+  if (protector.isTemporarilyDisabled(session,realm,username)) {
+    data.put("disabled",true);
+  }
+  data.put("numFailures",model.getNumFailures());
+  data.put("lastFailure",model.getLastFailure());
+  data.put("lastIPFailure",model.getLastIPFailure());
+  return data;
+}

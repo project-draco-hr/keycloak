@@ -1,0 +1,16 @@
+{
+  String reqUri=req.getRequestURI();
+  if (reqUri.endsWith("/login")) {
+    serviceAccountLogin(req);
+  }
+ else   if (reqUri.endsWith("/refresh")) {
+    refreshToken(req);
+  }
+ else   if (reqUri.endsWith("/logout")) {
+    logout(req);
+  }
+  if (req.getAttribute(ERROR) == null) {
+    loadProducts(req);
+  }
+  req.getRequestDispatcher("/WEB-INF/page.jsp").forward(req,resp);
+}

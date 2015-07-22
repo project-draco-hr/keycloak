@@ -9,14 +9,5 @@
   validateUser(authUser);
   AuthenticationFlow authenticationFlow=createFlowExecution(this.flowId,null);
   Response challenge=authenticationFlow.processFlow();
-  if (challenge != null)   return challenge;
-  String username=clientSession.getAuthenticatedUser().getUsername();
-  if (userSession == null) {
-    userSession=session.sessions().createUserSession(realm,clientSession.getAuthenticatedUser(),username,connection.getRemoteAddr(),"form",false,null,null);
-    userSession.setState(UserSessionModel.State.LOGGING_IN);
-    userSessionCreated=true;
-  }
-  TokenManager.attachClientSession(userSession,clientSession);
-  event.user(userSession.getUser()).detail(Details.USERNAME,username).session(userSession);
-  return AuthenticationManager.actionRequired(session,userSession,clientSession,connection,request,uriInfo,event);
+  return challenge;
 }

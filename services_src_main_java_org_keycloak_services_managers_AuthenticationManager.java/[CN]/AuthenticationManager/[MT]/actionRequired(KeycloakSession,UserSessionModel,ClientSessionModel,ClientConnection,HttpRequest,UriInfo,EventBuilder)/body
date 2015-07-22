@@ -2,46 +2,7 @@
   final RealmModel realm=clientSession.getRealm();
   final UserModel user=userSession.getUser();
   final ClientModel client=clientSession.getClient();
-  RequiredActionContext context=new RequiredActionContext(){
-    @Override public EventBuilder getEvent(){
-      return event;
-    }
-    @Override public UserModel getUser(){
-      return user;
-    }
-    @Override public RealmModel getRealm(){
-      return realm;
-    }
-    @Override public ClientSessionModel getClientSession(){
-      return clientSession;
-    }
-    @Override public UserSessionModel getUserSession(){
-      return userSession;
-    }
-    @Override public ClientConnection getConnection(){
-      return clientConnection;
-    }
-    @Override public UriInfo getUriInfo(){
-      return uriInfo;
-    }
-    @Override public KeycloakSession getSession(){
-      return session;
-    }
-    @Override public HttpRequest getHttpRequest(){
-      return request;
-    }
-    @Override public String generateAccessCode(    String action){
-      ClientSessionCode code=new ClientSessionCode(getRealm(),getClientSession());
-      code.setAction(action);
-      return code.getCode();
-    }
-  }
-;
-  for (  RequiredActionProviderModel model : realm.getRequiredActionProviders()) {
-    if (!model.isEnabled())     continue;
-    RequiredActionProvider provider=session.getProvider(RequiredActionProvider.class,model.getProviderId());
-    provider.evaluateTriggers(context);
-  }
+  RequiredActionContext context=evaluateRequiredActionTriggers(session,userSession,clientSession,clientConnection,request,uriInfo,event,realm,user);
   logger.debugv("processAccessCode: go to oauth page?: {0}",client.isConsentRequired());
   event.detail(Details.CODE_ID,clientSession.getId());
   Set<String> requiredActions=user.getRequiredActions();

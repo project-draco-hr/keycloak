@@ -3,5 +3,5 @@
   OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("secret","invalid","invalid");
   assertEquals(401,response.getStatusCode());
   assertEquals("invalid_grant",response.getError());
-  events.expectLogin().client("resource-owner").user((String)null).session((String)null).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token").detail(Details.USERNAME,"invalid").removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).error(Errors.INVALID_USER_CREDENTIALS).assertEvent();
+  events.expectLogin().client("resource-owner").user((String)null).session((String)null).detail(Details.RESPONSE_TYPE,"token").detail(Details.USERNAME,"invalid").removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).error(Errors.INVALID_USER_CREDENTIALS).assertEvent();
 }

@@ -1,0 +1,15 @@
+{
+  oauth.clientId("service-account-cl");
+  OAuthClient.AccessTokenResponse response=oauth.doClientCredentialsGrantAccessTokenRequest("secret1");
+  assertEquals(200,response.getStatusCode());
+  AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
+  RefreshToken refreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
+  events.expectClientLogin().client("service-account-cl").user(userId).session(accessToken.getSessionState()).detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).detail(Details.USERNAME,ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX + "service-account-cl").assertEvent();
+  HttpResponse logoutResponse=oauth.doLogout(response.getRefreshToken(),"secret1");
+  assertEquals(204,logoutResponse.getStatusLine().getStatusCode());
+  events.expectLogout(accessToken.getSessionState()).client("service-account-cl").user(userId).removeDetail(Details.REDIRECT_URI).assertEvent();
+  response=oauth.doRefreshTokenRequest(response.getRefreshToken(),"secret1");
+  assertEquals(400,response.getStatusCode());
+  assertEquals("invalid_grant",response.getError());
+  events.expectRefresh(refreshToken.getId(),refreshToken.getSessionState()).client("service-account-cl").user(userId).removeDetail(Details.TOKEN_ID).removeDetail(Details.UPDATED_REFRESH_TOKEN_ID).error(Errors.INVALID_TOKEN).assertEvent();
+}

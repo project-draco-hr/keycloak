@@ -1,0 +1,39 @@
+{
+  event.detail(Details.RESPONSE_TYPE,ServiceAccountConstants.CLIENT_AUTH);
+  Map<String,String> search=new HashMap<>();
+  search.put(ServiceAccountConstants.SERVICE_ACCOUNT_CLIENT_ATTRIBUTE,client.getId());
+  List<UserModel> users=session.users().searchForUserByUserAttributes(search,realm);
+  if (users.size() == 0) {
+    logger.warnf("Service account user for client '%s' not found. Creating now",client.getClientId());
+    new ClientManager(new RealmManager(session)).enableServiceAccount(client);
+    users=session.users().searchForUserByUserAttributes(search,realm);
+    clientUser=users.get(0);
+  }
+ else   if (users.size() == 1) {
+    clientUser=users.get(0);
+  }
+ else {
+    throw new ModelDuplicateException("Multiple service account users found for client '" + client.getClientId() + "' . Check your DB");
+  }
+  String clientUsername=clientUser.getUsername();
+  event.detail(Details.USERNAME,clientUsername);
+  event.user(clientUser);
+  if (!clientUser.isEnabled()) {
+    event.error(Errors.USER_DISABLED);
+    throw new ErrorResponseException("invalid_request","User '" + clientUsername + "' disabled",Response.Status.UNAUTHORIZED);
+  }
+  String scope=formParams.getFirst(OAuth2Constants.SCOPE);
+  UserSessionProvider sessions=session.sessions();
+  ClientSessionModel clientSession=sessions.createClientSession(realm,client);
+  clientSession.setAuthMethod(OIDCLoginProtocol.LOGIN_PROTOCOL);
+  clientSession.setNote(OIDCLoginProtocol.ISSUER,Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName()));
+  UserSessionModel userSession=sessions.createUserSession(realm,clientUser,clientUsername,clientConnection.getRemoteAddr(),ServiceAccountConstants.CLIENT_AUTH,false,null,null);
+  event.session(userSession);
+  TokenManager.attachClientSession(userSession,clientSession);
+  userSession.setNote(ServiceAccountConstants.CLIENT_ID,client.getClientId());
+  userSession.setNote(ServiceAccountConstants.CLIENT_HOST,clientConnection.getRemoteHost());
+  userSession.setNote(ServiceAccountConstants.CLIENT_ADDRESS,clientConnection.getRemoteAddr());
+  AccessTokenResponse res=tokenManager.responseBuilder(realm,client,event,session,userSession,clientSession).generateAccessToken(session,scope,client,clientUser,userSession,clientSession).generateRefreshToken().generateIDToken().build();
+  event.success();
+  return Cors.add(request,Response.ok(res,MediaType.APPLICATION_JSON_TYPE)).auth().allowedOrigins(client).allowedMethods("POST").exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build();
+}

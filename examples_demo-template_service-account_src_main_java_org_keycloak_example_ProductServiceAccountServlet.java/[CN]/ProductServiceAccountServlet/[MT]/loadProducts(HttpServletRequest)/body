@@ -1,0 +1,36 @@
+{
+  HttpClient client=getHttpClient();
+  String token=(String)req.getSession().getAttribute(TOKEN);
+  HttpGet get=new HttpGet("http://localhost:8080/database/products");
+  if (token != null) {
+    get.addHeader("Authorization","Bearer " + token);
+  }
+  try {
+    HttpResponse response=client.execute(get);
+    HttpEntity entity=response.getEntity();
+    int status=response.getStatusLine().getStatusCode();
+    if (status != 200) {
+      String json=getContent(entity);
+      String error="Failed retrieve products.";
+      if (status == 401) {
+        error=error + " You need to login first with the service account.";
+      }
+ else       if (status == 403) {
+        error=error + " Maybe service account user doesn't have needed role? Assign role 'user' in Keycloak admin console to user '" + ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX+ getKeycloakDeployment().getResourceName()+ "' and then logout and login again.";
+      }
+      error=error + " Status: " + status+ ", Response: "+ json;
+      req.setAttribute(ERROR,error);
+    }
+ else     if (entity == null) {
+      req.setAttribute(ERROR,"No entity");
+    }
+ else {
+      String products=getContent(entity);
+      req.setAttribute(PRODUCTS,products);
+    }
+  }
+ catch (  IOException ioe) {
+    ioe.printStackTrace();
+    req.setAttribute(ERROR,"Failed retrieve products. IOException occured. See server.log for details. Message is: " + ioe.getMessage());
+  }
+}

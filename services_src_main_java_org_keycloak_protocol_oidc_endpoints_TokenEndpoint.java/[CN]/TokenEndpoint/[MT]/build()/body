@@ -4,7 +4,9 @@
   checkSsl();
   checkRealm();
   checkGrantType();
-  checkClient();
+  if (!grantType.equals(OAuth2Constants.CLIENT_CREDENTIALS)) {
+    checkClient();
+  }
 switch (action) {
 case AUTHORIZATION_CODE:
     return buildAuthorizationCodeAccessTokenResponse();
@@ -12,6 +14,8 @@ case REFRESH_TOKEN:
   return buildRefreshToken();
 case PASSWORD:
 return buildResourceOwnerPasswordCredentialsGrant();
+case CLIENT_CREDENTIALS:
+return buildClientCredentialsGrant();
 }
 throw new RuntimeException("Unknown action " + action);
 }

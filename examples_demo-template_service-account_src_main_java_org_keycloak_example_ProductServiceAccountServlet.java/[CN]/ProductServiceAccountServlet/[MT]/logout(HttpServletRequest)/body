@@ -1,0 +1,23 @@
+{
+  KeycloakDeployment deployment=getKeycloakDeployment();
+  String refreshToken=(String)req.getSession().getAttribute(REFRESH_TOKEN);
+  if (refreshToken == null) {
+    req.setAttribute(ERROR,"No refresh token available. Please login first");
+  }
+ else {
+    try {
+      ServerRequest.invokeLogout(deployment,refreshToken);
+      req.getSession().removeAttribute(TOKEN);
+      req.getSession().removeAttribute(REFRESH_TOKEN);
+      req.getSession().removeAttribute(TOKEN_PARSED);
+    }
+ catch (    IOException ioe) {
+      ioe.printStackTrace();
+      req.setAttribute(ERROR,"Failed refresh token. See server.log for details. Message is: " + ioe.getMessage());
+    }
+catch (    ServerRequest.HttpFailure hfe) {
+      hfe.printStackTrace();
+      req.setAttribute(ERROR,"Failed refresh token. See server.log for details. Status was: " + hfe.getStatus() + ", Error is: "+ hfe.getError());
+    }
+  }
+}

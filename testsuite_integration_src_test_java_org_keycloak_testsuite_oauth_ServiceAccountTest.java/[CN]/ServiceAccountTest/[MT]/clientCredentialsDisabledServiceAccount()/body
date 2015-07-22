@@ -1,0 +1,7 @@
+{
+  oauth.clientId("service-account-disabled");
+  OAuthClient.AccessTokenResponse response=oauth.doClientCredentialsGrantAccessTokenRequest("secret1");
+  assertEquals(401,response.getStatusCode());
+  assertEquals("unauthorized_client",response.getError());
+  events.expectClientLogin().client("service-account-disabled").user((String)null).session((String)null).removeDetail(Details.USERNAME).removeDetail(Details.RESPONSE_TYPE).error(Errors.INVALID_CLIENT).assertEvent();
+}

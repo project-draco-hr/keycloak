@@ -1,6 +1,7 @@
 {
   RealmModel realm=realmManager.createRealm("original");
   UserModel user=session.users().addUser(realm,"user");
+  UserModel userNoAttrs=session.users().addUser(realm,"user-noattrs");
   user.setSingleAttribute("key1","value1");
   List<String> attrVals=new ArrayList<>(Arrays.asList("val21","val22"));
   user.setAttribute("key2",attrVals);
@@ -22,11 +23,6 @@
   Assert.assertEquals(2,allAttrVals.size());
   Assert.assertEquals(allAttrVals.get("key1"),user.getAttribute("key1"));
   Assert.assertEquals(allAttrVals.get("key2"),user.getAttribute("key2"));
-  Map<String,String> attributes=new HashMap<String,String>();
-  attributes.put("key2","val22");
-  List<UserModel> users=session.users().searchForUserByAttributes(attributes,realm);
-  Assert.assertEquals(1,users.size());
-  Assert.assertEquals(users.get(0),user);
   user.removeAttribute("key1");
   user.setSingleAttribute("key2","val23");
   commit();

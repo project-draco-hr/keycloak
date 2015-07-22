@@ -4,7 +4,7 @@
   assertEquals(200,response.getStatusCode());
   AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
   RefreshToken refreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
-  events.expectLogin().client("resource-owner").session(accessToken.getSessionState()).detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,"token").detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).assertEvent();
+  events.expectLogin().client("resource-owner").session(accessToken.getSessionState()).detail(Details.RESPONSE_TYPE,"token").detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).assertEvent();
   HttpResponse logoutResponse=oauth.doLogout(response.getRefreshToken(),"secret");
   assertEquals(204,logoutResponse.getStatusLine().getStatusCode());
   events.expectLogout(accessToken.getSessionState()).client("resource-owner").removeDetail(Details.REDIRECT_URI).assertEvent();

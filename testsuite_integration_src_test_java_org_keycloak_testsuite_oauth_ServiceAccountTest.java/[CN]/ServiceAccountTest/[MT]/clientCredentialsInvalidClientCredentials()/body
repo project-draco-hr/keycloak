@@ -1,0 +1,7 @@
+{
+  oauth.clientId("service-account-cl");
+  OAuthClient.AccessTokenResponse response=oauth.doClientCredentialsGrantAccessTokenRequest("secret2");
+  assertEquals(400,response.getStatusCode());
+  assertEquals("unauthorized_client",response.getError());
+  events.expectClientLogin().client("service-account-cl").session((String)null).clearDetails().error(Errors.INVALID_CLIENT_CREDENTIALS).user((String)null).assertEvent();
+}

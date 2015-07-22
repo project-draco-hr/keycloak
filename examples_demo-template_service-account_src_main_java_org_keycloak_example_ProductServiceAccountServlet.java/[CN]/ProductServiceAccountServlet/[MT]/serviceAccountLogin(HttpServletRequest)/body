@@ -1,0 +1,38 @@
+{
+  KeycloakDeployment deployment=getKeycloakDeployment();
+  HttpClient client=getHttpClient();
+  String clientId=deployment.getResourceName();
+  String clientSecret=deployment.getResourceCredentials().get("secret");
+  try {
+    HttpPost post=new HttpPost(deployment.getTokenUrl());
+    List<NameValuePair> formparams=new ArrayList<NameValuePair>();
+    formparams.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,OAuth2Constants.CLIENT_CREDENTIALS));
+    String authHeader=BasicAuthHelper.createHeader(clientId,clientSecret);
+    post.addHeader("Authorization",authHeader);
+    UrlEncodedFormEntity form=new UrlEncodedFormEntity(formparams,"UTF-8");
+    post.setEntity(form);
+    HttpResponse response=client.execute(post);
+    int status=response.getStatusLine().getStatusCode();
+    HttpEntity entity=response.getEntity();
+    if (status != 200) {
+      String json=getContent(entity);
+      String error="Service account login failed. Bad status: " + status + " response: "+ json;
+      req.setAttribute(ERROR,error);
+    }
+ else     if (entity == null) {
+      req.setAttribute(ERROR,"No entity");
+    }
+ else {
+      String json=getContent(entity);
+      AccessTokenResponse tokenResp=JsonSerialization.readValue(json,AccessTokenResponse.class);
+      setTokens(req,deployment,tokenResp);
+    }
+  }
+ catch (  IOException ioe) {
+    ioe.printStackTrace();
+    req.setAttribute(ERROR,"Service account login failed. IOException occured. See server.log for details. Message is: " + ioe.getMessage());
+  }
+catch (  VerificationException vfe) {
+    req.setAttribute(ERROR,"Service account login failed. Failed to verify token Message is: " + vfe.getMessage());
+  }
+}

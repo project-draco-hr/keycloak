@@ -9,12 +9,13 @@
 ;
   Client client=ClientBuilder.newBuilder().register(authFilter).build();
   UriBuilder authBase=UriBuilder.fromUri("http://localhost:8081/auth");
-  WebTarget target=client.target(AdminRoot.adminBaseUrl(authBase).path("serverinfo"));
+  WebTarget target=client.target(AdminRoot.adminBaseUrl(authBase).path("serverinfopage"));
   Map<?,?> response=target.request().accept("application/json").get(Map.class);
   Assert.assertNotNull(response);
   Assert.assertEquals(Version.VERSION,response.get("version"));
   Assert.assertNotNull(response.get("serverTime"));
   Assert.assertNotNull(response.get("providers"));
-  Assert.assertNotNull(response.get("themes"));
-  Assert.assertNotNull(response.get("enums"));
+  Assert.assertNotNull(response.get("serverStartupTime"));
+  Assert.assertNotNull(response.get("memoryInfo"));
+  Assert.assertNotNull(response.get("systemInfo"));
 }

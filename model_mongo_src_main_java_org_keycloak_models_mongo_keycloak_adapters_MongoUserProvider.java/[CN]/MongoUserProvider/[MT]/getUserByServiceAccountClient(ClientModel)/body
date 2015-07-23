@@ -1,0 +1,5 @@
+{
+  DBObject query=new QueryBuilder().and("serviceAccountClientLink").is(client.getId()).and("realmId").is(client.getRealm().getId()).get();
+  MongoUserEntity userEntity=getMongoStore().loadSingleEntity(MongoUserEntity.class,query,invocationContext);
+  return userEntity == null ? null : new UserAdapter(session,client.getRealm(),userEntity,invocationContext);
+}

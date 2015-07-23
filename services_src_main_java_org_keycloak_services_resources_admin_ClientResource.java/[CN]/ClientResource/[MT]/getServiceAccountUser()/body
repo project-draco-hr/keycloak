@@ -1,0 +1,14 @@
+{
+  auth.requireView();
+  UserModel user=session.users().getUserByServiceAccountClient(client);
+  if (user == null) {
+    if (client.isServiceAccountsEnabled()) {
+      new ClientManager(new RealmManager(session)).enableServiceAccount(client);
+      user=session.users().getUserByServiceAccountClient(client);
+    }
+ else {
+      throw new BadRequestException("Service account not enabled for the client '" + client.getClientId() + "'");
+    }
+  }
+  return ModelToRepresentation.toRepresentation(user);
+}

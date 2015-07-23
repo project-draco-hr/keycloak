@@ -1,0 +1,37 @@
+{
+  RealmModel realm=realmManager.createRealm("original");
+  ClientModel client=realm.addClient("foo");
+  UserModel user1=session.users().addUser(realm,"user1");
+  user1.setFirstName("John");
+  user1.setLastName("Doe");
+  UserModel user2=session.users().addUser(realm,"user2");
+  user2.setFirstName("John");
+  user2.setLastName("Doe");
+  Assert.assertNull(session.users().getUserByServiceAccountClient(client));
+  List<UserModel> users=session.users().searchForUser("John Doe",realm);
+  Assert.assertEquals(2,users.size());
+  Assert.assertTrue(users.contains(user1));
+  Assert.assertTrue(users.contains(user2));
+  user1.setServiceAccountClientLink(client.getId());
+  commit();
+  realm=realmManager.getRealmByName("original");
+  UserModel searched=session.users().getUserByServiceAccountClient(client);
+  Assert.assertEquals(searched,user1);
+  users=session.users().searchForUser("John Doe",realm);
+  Assert.assertEquals(1,users.size());
+  Assert.assertFalse(users.contains(user1));
+  Assert.assertTrue(users.contains(user2));
+  users=session.users().getUsers(realm,false);
+  Assert.assertEquals(1,users.size());
+  Assert.assertFalse(users.contains(user1));
+  Assert.assertTrue(users.contains(user2));
+  users=session.users().getUsers(realm,true);
+  Assert.assertEquals(2,users.size());
+  Assert.assertTrue(users.contains(user1));
+  Assert.assertTrue(users.contains(user2));
+  Assert.assertEquals(2,session.users().getUsersCount(realm));
+  new ClientManager(realmManager).removeClient(realm,client);
+  commit();
+  realm=realmManager.getRealmByName("original");
+  Assert.assertNull(session.users().getUserByUsername("user1",realm));
+}

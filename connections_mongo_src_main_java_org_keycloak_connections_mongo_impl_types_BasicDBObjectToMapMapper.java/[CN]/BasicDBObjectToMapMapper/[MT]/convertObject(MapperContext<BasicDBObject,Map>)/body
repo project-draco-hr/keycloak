@@ -1,12 +1,15 @@
 {
   BasicDBObject dbObjectToConvert=context.getObjectToConvert();
+  Type expectedElementValueType=context.getGenericTypes().get(1);
   HashMap<String,Object> result=new HashMap<String,Object>();
   for (  Map.Entry<String,Object> entry : dbObjectToConvert.entrySet()) {
     String key=entry.getKey();
-    Object value=entry.getValue();
-    if (value instanceof Double && context.getGenericTypes().get(1) == Integer.class) {
-      value=((Double)value).intValue();
+    Object dbValue=entry.getValue();
+    if (dbValue instanceof Double && expectedElementValueType == Integer.class) {
+      dbValue=((Double)dbValue).intValue();
     }
+    MapperContext<Object,Object> newContext=getMapperContext(dbValue,expectedElementValueType);
+    Object value=mapperRegistry.convertDBObjectToApplicationObject(newContext);
     if (key.contains(MapMapper.DOT_PLACEHOLDER)) {
       key=key.replaceAll(MapMapper.DOT_PLACEHOLDER,".");
     }

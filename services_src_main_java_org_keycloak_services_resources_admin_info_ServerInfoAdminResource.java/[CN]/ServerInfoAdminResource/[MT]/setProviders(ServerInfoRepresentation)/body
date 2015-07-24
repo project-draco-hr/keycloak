@@ -1,0 +1,22 @@
+{
+  Map<String,SpiInfoRepresentation> spis=new HashMap<>();
+  for (  Spi spi : ServiceLoader.load(Spi.class)) {
+    SpiInfoRepresentation spiRep=new SpiInfoRepresentation();
+    spiRep.setInternal(spi.isInternal());
+    spiRep.setSystemInfo(ServerInfoAwareProviderFactory.class.isAssignableFrom(spi.getProviderFactoryClass()));
+    Set<String> providerIds=session.listProviderIds(spi.getProviderClass());
+    Map<String,ProviderRepresentation> providers=new HashMap<>();
+    if (providerIds != null) {
+      for (      String name : providerIds) {
+        ProviderRepresentation provider=new ProviderRepresentation();
+        if (spiRep.isSystemInfo()) {
+          provider.setOperationalInfo(((ServerInfoAwareProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(spi.getProviderClass(),name)).getOperationalInfo());
+        }
+        providers.put(name,provider);
+      }
+    }
+    spiRep.setProviders(providers);
+    spis.put(spi.getName(),spiRep);
+  }
+  info.setProviders(spis);
+}

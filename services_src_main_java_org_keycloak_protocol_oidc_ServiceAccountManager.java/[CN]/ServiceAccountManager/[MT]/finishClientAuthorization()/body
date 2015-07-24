@@ -1,19 +1,10 @@
 {
   event.detail(Details.RESPONSE_TYPE,ServiceAccountConstants.CLIENT_AUTH);
-  Map<String,String> search=new HashMap<>();
-  search.put(ServiceAccountConstants.SERVICE_ACCOUNT_CLIENT_ATTRIBUTE,client.getId());
-  List<UserModel> users=session.users().searchForUserByUserAttributes(search,realm);
-  if (users.size() == 0) {
-    logger.warnf("Service account user for client '%s' not found. Creating now",client.getClientId());
+  clientUser=session.users().getUserByServiceAccountClient(client);
+  if (clientUser == null || client.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,ServiceAccountConstants.CLIENT_ID_PROTOCOL_MAPPER) == null) {
+    logger.infof("Service account user for client '%s' not found or default protocol mapper for service account not found. Creating now",client.getClientId());
     new ClientManager(new RealmManager(session)).enableServiceAccount(client);
-    users=session.users().searchForUserByUserAttributes(search,realm);
-    clientUser=users.get(0);
-  }
- else   if (users.size() == 1) {
-    clientUser=users.get(0);
-  }
- else {
-    throw new ModelDuplicateException("Multiple service account users found for client '" + client.getClientId() + "' . Check your DB");
+    clientUser=session.users().getUserByServiceAccountClient(client);
   }
   String clientUsername=clientUser.getUsername();
   event.detail(Details.USERNAME,clientUsername);

@@ -4,6 +4,10 @@
     if (sessions != null) {
       sessions.onClientRemoved(realm,client);
     }
+    UserModel serviceAccountUser=realmManager.getSession().users().getUserByServiceAccountClient(client);
+    if (serviceAccountUser != null) {
+      realmManager.getSession().users().removeUser(realm,serviceAccountUser);
+    }
     return true;
   }
  else {

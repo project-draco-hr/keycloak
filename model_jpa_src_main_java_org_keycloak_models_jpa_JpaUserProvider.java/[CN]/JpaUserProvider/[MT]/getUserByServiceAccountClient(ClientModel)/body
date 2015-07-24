@@ -1,0 +1,16 @@
+{
+  TypedQuery<UserEntity> query=em.createNamedQuery("getRealmUserByServiceAccount",UserEntity.class);
+  query.setParameter("realmId",client.getRealm().getId());
+  query.setParameter("clientInternalId",client.getId());
+  List<UserEntity> results=query.getResultList();
+  if (results.isEmpty()) {
+    return null;
+  }
+ else   if (results.size() > 1) {
+    throw new IllegalStateException("More service account linked users found for client=" + client.getClientId() + ", results="+ results);
+  }
+ else {
+    UserEntity user=results.get(0);
+    return new UserAdapter(client.getRealm(),em,user);
+  }
+}

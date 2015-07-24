@@ -1,0 +1,15 @@
+{
+  if (expectedElementValueType instanceof Class) {
+    Class<?> clazz=(Class<?>)expectedElementValueType;
+    return new MapperContext<>(dbValue,clazz,null);
+  }
+ else   if (expectedElementValueType instanceof ParameterizedType) {
+    ParameterizedType parameterized=(ParameterizedType)expectedElementValueType;
+    Class<?> expectedClazz=(Class<?>)parameterized.getRawType();
+    Type[] generics=parameterized.getActualTypeArguments();
+    return new MapperContext<>(dbValue,expectedClazz,Arrays.asList(generics));
+  }
+ else {
+    throw new IllegalArgumentException("Unexpected type: '" + expectedElementValueType + "' for converting "+ dbValue);
+  }
+}

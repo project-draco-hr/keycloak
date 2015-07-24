@@ -1,0 +1,11 @@
+{
+  info.setBuiltinProtocolMappers(new HashMap<String,List<ProtocolMapperRepresentation>>());
+  for (  ProviderFactory p : session.getKeycloakSessionFactory().getProviderFactories(LoginProtocol.class)) {
+    LoginProtocolFactory factory=(LoginProtocolFactory)p;
+    List<ProtocolMapperRepresentation> mappers=new LinkedList<>();
+    for (    ProtocolMapperModel mapper : factory.getBuiltinMappers()) {
+      mappers.add(ModelToRepresentation.toRepresentation(mapper));
+    }
+    info.getBuiltinProtocolMappers().put(p.getId(),mappers);
+  }
+}

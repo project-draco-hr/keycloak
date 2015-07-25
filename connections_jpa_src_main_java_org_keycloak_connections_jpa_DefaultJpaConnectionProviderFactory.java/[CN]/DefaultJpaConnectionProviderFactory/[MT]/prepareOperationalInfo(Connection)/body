@@ -1,0 +1,13 @@
+{
+  try {
+    operationalInfo=new LinkedHashMap<>();
+    DatabaseMetaData md=connection.getMetaData();
+    operationalInfo.put("databaseUrl",md.getURL());
+    operationalInfo.put("databaseUser",md.getUserName());
+    operationalInfo.put("databaseProduct",md.getDatabaseProductName() + " " + md.getDatabaseProductVersion());
+    operationalInfo.put("databaseDriver",md.getDriverName() + " " + md.getDriverVersion());
+  }
+ catch (  SQLException e) {
+    logger.warn("Unable to prepare operational info due database exception: " + e.getMessage());
+  }
+}

@@ -1,0 +1,33 @@
+{
+  LinkedHashMap<String,SpiInfoRepresentation> spiReps=new LinkedHashMap<>();
+  List<Spi> spis=new LinkedList<>();
+  for (  Spi spi : ServiceLoader.load(Spi.class)) {
+    spis.add(spi);
+  }
+  Collections.sort(spis,new Comparator<Spi>(){
+    @Override public int compare(    Spi s1,    Spi s2){
+      return s1.getName().compareTo(s2.getName());
+    }
+  }
+);
+  for (  Spi spi : spis) {
+    SpiInfoRepresentation spiRep=new SpiInfoRepresentation();
+    spiRep.setInternal(spi.isInternal());
+    spiRep.setSystemInfo(ServerInfoAwareProviderFactory.class.isAssignableFrom(spi.getProviderFactoryClass()));
+    List<String> providerIds=new LinkedList<>(session.listProviderIds(spi.getProviderClass()));
+    Collections.sort(providerIds);
+    Map<String,ProviderRepresentation> providers=new HashMap<>();
+    if (providerIds != null) {
+      for (      String name : providerIds) {
+        ProviderRepresentation provider=new ProviderRepresentation();
+        if (spiRep.isSystemInfo()) {
+          provider.setOperationalInfo(((ServerInfoAwareProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(spi.getProviderClass(),name)).getOperationalInfo());
+        }
+        providers.put(name,provider);
+      }
+    }
+    spiRep.setProviders(providers);
+    spiReps.put(spi.getName(),spiRep);
+  }
+  info.setProviders(spiReps);
+}

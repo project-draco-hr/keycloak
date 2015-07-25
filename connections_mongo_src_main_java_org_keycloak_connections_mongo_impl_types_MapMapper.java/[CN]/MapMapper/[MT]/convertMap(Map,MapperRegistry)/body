@@ -1,0 +1,14 @@
+{
+  BasicDBObject dbObject=new BasicDBObject();
+  Set<Map.Entry> entries=mapToConvert.entrySet();
+  for (  Map.Entry entry : entries) {
+    String key=(String)entry.getKey();
+    Object value=entry.getValue();
+    Object dbValue=mapperRegistry == null ? entry.getValue() : mapperRegistry.convertApplicationObjectToDBObject(value,Object.class);
+    if (key.contains(".")) {
+      key=key.replaceAll("\\.",DOT_PLACEHOLDER);
+    }
+    dbObject.put(key,dbValue);
+  }
+  return dbObject;
+}

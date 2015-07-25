@@ -1,0 +1,9 @@
+{
+  List<String> mandatoryInLdap=Arrays.asList("username","username-cn","first name","last name");
+  for (  UserFederationMapperModel ldapMapper : realm.getUserFederationMappers()) {
+    if (mandatoryInLdap.contains(ldapMapper.getName())) {
+      ldapMapper.getConfig().put("is.mandatory.in.ldap","true");
+      realm.updateUserFederationMapper(ldapMapper);
+    }
+  }
+}

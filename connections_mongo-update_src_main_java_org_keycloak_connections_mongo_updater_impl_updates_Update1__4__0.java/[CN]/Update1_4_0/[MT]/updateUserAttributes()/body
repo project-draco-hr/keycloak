@@ -1,0 +1,26 @@
+{
+  DBCollection users=db.getCollection("users");
+  DBCursor usersCursor=users.find();
+  try {
+    while (usersCursor.hasNext()) {
+      BasicDBObject user=(BasicDBObject)usersCursor.next();
+      BasicDBObject attributes=(BasicDBObject)user.get("attributes");
+      if (attributes != null) {
+        for (        Map.Entry<String,Object> attr : new HashSet<>(attributes.entrySet())) {
+          String attrName=attr.getKey();
+          Object attrValue=attr.getValue();
+          if (attrValue != null && attrValue instanceof String) {
+            BasicDBList asList=new BasicDBList();
+            asList.add(attrValue);
+            attributes.put(attrName,asList);
+          }
+        }
+        user.put("attributes",attributes);
+        users.save(user);
+      }
+    }
+  }
+  finally {
+    usersCursor.close();
+  }
+}

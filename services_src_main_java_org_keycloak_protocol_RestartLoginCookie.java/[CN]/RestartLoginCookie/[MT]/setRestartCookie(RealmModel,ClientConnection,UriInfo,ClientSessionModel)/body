@@ -1,0 +1,9 @@
+{
+  RestartLoginCookie restart=new RestartLoginCookie(clientSession);
+  String encoded=restart.encode(realm);
+  int keySize=realm.getCodeSecret().length();
+  int size=encoded.length();
+  String path=AuthenticationManager.getRealmCookiePath(realm,uriInfo);
+  boolean secureOnly=realm.getSslRequired().isRequired(connection);
+  CookieHelper.addCookie(KC_RESTART,encoded,path,null,null,-1,secureOnly,true);
+}

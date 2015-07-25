@@ -1,0 +1,54 @@
+{
+  if (!checkSsl()) {
+    event.error(Errors.SSL_REQUIRED);
+    response=ErrorPage.error(session,Messages.HTTPS_REQUIRED);
+    return false;
+  }
+  if (!realm.isEnabled()) {
+    event.error(Errors.REALM_DISABLED);
+    response=ErrorPage.error(session,Messages.REALM_NOT_ENABLED);
+    return false;
+  }
+  ClientSessionCode.ParseResult result=ClientSessionCode.parseResult(code,session,realm);
+  clientCode=result.getCode();
+  if (clientCode == null) {
+    if (result.isClientSessionNotFound()) {
+      try {
+        ClientSessionModel clientSession=RestartLoginCookie.restartSession(session,realm,code);
+        if (clientSession != null) {
+          event.clone().detail(Details.RESTART_AFTER_TIMEOUT,"true").error(Errors.EXPIRED_CODE);
+          response=processFlow(null,clientSession,flow);
+          return false;
+        }
+      }
+ catch (      Exception e) {
+        logger.error("failed to parse RestartLoginCookie",e);
+      }
+    }
+    event.error(Errors.INVALID_CODE);
+    response=ErrorPage.error(session,Messages.INVALID_CODE);
+    return false;
+  }
+  ClientSessionModel clientSession=clientCode.getClientSession();
+  if (clientSession == null) {
+    event.error(Errors.INVALID_CODE);
+    response=ErrorPage.error(session,Messages.INVALID_CODE);
+    return false;
+  }
+  event.detail(Details.CODE_ID,clientSession.getId());
+  ClientModel client=clientSession.getClient();
+  if (client == null) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    response=ErrorPage.error(session,Messages.UNKNOWN_LOGIN_REQUESTER);
+    session.sessions().removeClientSession(realm,clientSession);
+    return false;
+  }
+  if (!client.isEnabled()) {
+    event.error(Errors.CLIENT_NOT_FOUND);
+    response=ErrorPage.error(session,Messages.LOGIN_REQUESTER_NOT_ENABLED);
+    session.sessions().removeClientSession(realm,clientSession);
+    return false;
+  }
+  session.getContext().setClient(client);
+  return true;
+}

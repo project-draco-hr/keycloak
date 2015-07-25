@@ -1,0 +1,30 @@
+{
+  Cookie cook=session.getContext().getRequestHeaders().getCookies().get(KC_RESTART);
+  if (cook == null) {
+    logger.debug("KC_RESTART cookie doesn't exist");
+    return null;
+  }
+  String encodedCookie=cook.getValue();
+  JWSInput input=new JWSInput(encodedCookie);
+  if (!HMACProvider.verify(input,(SecretKey)realm.getCodeSecretKey())) {
+    logger.debug("Failed to verify encoded RestartLoginCookie");
+    return null;
+  }
+  RestartLoginCookie cookie=input.readJsonContent(RestartLoginCookie.class);
+  String[] parts=code.split("\\.");
+  String clientSessionId=parts[1];
+  if (!clientSessionId.equals(cookie.getClientSession())) {
+    logger.debug("RestartLoginCookie clientSession does not match code's clientSession");
+    return null;
+  }
+  ClientModel client=realm.getClientByClientId(cookie.getClientId());
+  if (client == null)   return null;
+  ClientSessionModel clientSession=session.sessions().createClientSession(realm,client);
+  clientSession.setAuthMethod(cookie.getAuthMethod());
+  clientSession.setRedirectUri(cookie.getRedirectUri());
+  clientSession.setAction(cookie.getAction());
+  for (  Map.Entry<String,String> entry : cookie.getNotes().entrySet()) {
+    clientSession.setNote(entry.getKey(),entry.getValue());
+  }
+  return clientSession;
+}

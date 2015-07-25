@@ -2,9 +2,15 @@
   try {
     loginPage.open();
     Time.setOffset(5000);
+    keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        manager.getSession().sessions().removeExpiredUserSessions(appRealm);
+      }
+    }
+);
     loginPage.login("login@test.com","password");
-    errorPage.assertCurrent();
-    events.expectLogin().user((String)null).session((String)null).error("expired_code").clearDetails().detail(Details.CODE_ID,AssertEvents.isCodeId()).removeDetail(Details.CONSENT).assertEvent();
+    loginPage.assertCurrent();
+    events.expectLogin().user((String)null).session((String)null).error("expired_code").clearDetails().detail(Details.RESTART_AFTER_TIMEOUT,"true").client((String)null).assertEvent();
   }
   finally {
     Time.setOffset(0);

@@ -10,6 +10,7 @@
   AuthenticationProcessor processor=new AuthenticationProcessor();
   processor.setClientSession(clientSession).setFlowId(flowId).setConnection(clientConnection).setEventBuilder(event).setProtector(authManager.getProtector()).setRealm(realm).setSession(session).setUriInfo(uriInfo).setRequest(request);
   try {
+    RestartLoginCookie.setRestartCookie(realm,clientConnection,uriInfo,clientSession);
     return processor.authenticate();
   }
  catch (  Exception e) {

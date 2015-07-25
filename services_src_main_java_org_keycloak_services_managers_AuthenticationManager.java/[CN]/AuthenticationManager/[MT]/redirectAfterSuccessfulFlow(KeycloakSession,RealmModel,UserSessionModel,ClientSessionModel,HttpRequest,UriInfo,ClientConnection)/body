@@ -18,5 +18,6 @@
   if (userSession.isRememberMe())   createRememberMeCookie(realm,userSession.getUser().getUsername(),uriInfo,clientConnection);
   LoginProtocol protocol=session.getProvider(LoginProtocol.class,clientSession.getAuthMethod());
   protocol.setRealm(realm).setHttpHeaders(request.getHttpHeaders()).setUriInfo(uriInfo);
+  RestartLoginCookie.expireRestartCookie(realm,clientConnection,uriInfo);
   return protocol.authenticated(userSession,new ClientSessionCode(realm,clientSession));
 }

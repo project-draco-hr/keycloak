@@ -1,0 +1,22 @@
+{
+  try {
+    ParseResult result=new ParseResult();
+    String[] parts=code.split("\\.");
+    String id=parts[1];
+    ClientSessionModel clientSession=session.sessions().getClientSession(realm,id);
+    if (clientSession == null) {
+      result.clientSessionNotFound=true;
+      return result;
+    }
+    String hash=createHash(realm,clientSession);
+    if (!hash.equals(parts[0])) {
+      result.illegalHash=true;
+      return result;
+    }
+    result.code=new ClientSessionCode(realm,clientSession);
+    return result;
+  }
+ catch (  RuntimeException e) {
+    return null;
+  }
+}

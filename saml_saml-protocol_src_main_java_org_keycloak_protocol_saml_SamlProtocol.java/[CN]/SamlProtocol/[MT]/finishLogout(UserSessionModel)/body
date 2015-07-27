@@ -14,6 +14,10 @@
   String signingAlgorithm=userSession.getNote(SAML_LOGOUT_SIGNATURE_ALGORITHM);
   if (signingAlgorithm != null) {
     SignatureAlgorithm algorithm=SignatureAlgorithm.valueOf(signingAlgorithm);
+    String canonicalization=userSession.getNote(SAML_LOGOUT_CANONICALIZATION);
+    if (canonicalization != null) {
+      builder.canonicalizationMethod(canonicalization);
+    }
     builder.signatureAlgorithm(algorithm).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
   }
   try {

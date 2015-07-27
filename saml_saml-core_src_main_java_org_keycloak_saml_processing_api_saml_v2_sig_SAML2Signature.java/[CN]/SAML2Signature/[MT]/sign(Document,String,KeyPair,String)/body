@@ -1,3 +1,18 @@
 {
-  return sign(doc,idValueOfAssertion,keypair);
+  String referenceURI="#" + referenceID;
+  configureIdAttribute(doc);
+  if (sibling != null) {
+    SignatureUtilTransferObject dto=new SignatureUtilTransferObject();
+    dto.setDocumentToBeSigned(doc);
+    dto.setKeyPair(keyPair);
+    dto.setDigestMethod(digestMethod);
+    dto.setSignatureMethod(signatureMethod);
+    dto.setReferenceURI(referenceURI);
+    dto.setNextSibling(sibling);
+    if (x509Certificate != null) {
+      dto.setX509Certificate(x509Certificate);
+    }
+    return XMLSignatureUtil.sign(dto,canonicalizationMethodType);
+  }
+  return XMLSignatureUtil.sign(doc,keyPair,digestMethod,signatureMethod,referenceURI,canonicalizationMethodType);
 }

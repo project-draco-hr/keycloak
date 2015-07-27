@@ -10,10 +10,10 @@
     throw new NotFoundException("keypair not generated for client");
   }
   if (privatePem != null && config.getKeyPassword() == null) {
-    throw new BadRequestException("Need to specify a key password for jks download");
+    throw new ErrorResponseException("password-missing","Need to specify a key password for jks download",Response.Status.BAD_REQUEST);
   }
   if (config.getStorePassword() == null) {
-    throw new BadRequestException("Need to specify a store password for jks download");
+    throw new ErrorResponseException("password-missing","Need to specify a store password for jks download",Response.Status.BAD_REQUEST);
   }
   final KeyStore keyStore;
   try {

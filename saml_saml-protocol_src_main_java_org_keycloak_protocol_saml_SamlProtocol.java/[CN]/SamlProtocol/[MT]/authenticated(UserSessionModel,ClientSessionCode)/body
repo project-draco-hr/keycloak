@@ -46,9 +46,17 @@
   SAML2BindingBuilder2 bindingBuilder=new SAML2BindingBuilder2();
   bindingBuilder.relayState(relayState);
   if (requiresRealmSignature(client)) {
+    String canonicalization=client.getAttribute(SAML_CANONICALIZATION_METHOD_ATTRIBUTE);
+    if (canonicalization != null) {
+      bindingBuilder.canonicalizationMethod(canonicalization);
+    }
     bindingBuilder.signatureAlgorithm(getSignatureAlgorithm(client)).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
   }
   if (requiresAssertionSignature(client)) {
+    String canonicalization=client.getAttribute(SAML_CANONICALIZATION_METHOD_ATTRIBUTE);
+    if (canonicalization != null) {
+      bindingBuilder.canonicalizationMethod(canonicalization);
+    }
     bindingBuilder.signatureAlgorithm(getSignatureAlgorithm(client)).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signAssertions();
   }
   if (requiresEncryption(client)) {

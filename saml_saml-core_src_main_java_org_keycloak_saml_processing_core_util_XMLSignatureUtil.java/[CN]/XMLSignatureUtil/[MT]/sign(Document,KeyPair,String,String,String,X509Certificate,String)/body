@@ -1,0 +1,8 @@
+{
+  logger.trace("Document to be signed=" + DocumentUtil.asString(doc));
+  PrivateKey signingKey=keyPair.getPrivate();
+  PublicKey publicKey=keyPair.getPublic();
+  DOMSignContext dsc=new DOMSignContext(signingKey,doc.getDocumentElement());
+  signImpl(dsc,digestMethod,signatureMethod,referenceURI,publicKey,x509Certificate,canonicalizationMethodType);
+  return doc;
+}

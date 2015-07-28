@@ -3,9 +3,7 @@
   checkRealmReps();
   KeycloakModelUtils.runJobInTransaction(factory,new ExportImportSessionTask(){
     @Override protected void runExportImportTask(    KeycloakSession session) throws IOException {
-      for (      RealmRepresentation realmRep : realmReps.values()) {
-        ImportUtils.importRealm(session,realmRep,strategy);
-      }
+      ImportUtils.importRealms(session,realmReps.values(),strategy);
     }
   }
 );

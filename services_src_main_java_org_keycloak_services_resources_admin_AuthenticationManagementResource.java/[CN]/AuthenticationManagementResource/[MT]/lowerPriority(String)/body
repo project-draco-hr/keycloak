@@ -1,0 +1,26 @@
+{
+  this.auth.requireManage();
+  AuthenticationExecutionModel model=realm.getAuthenticationExecutionById(execution);
+  if (model == null) {
+    session.getTransaction().setRollbackOnly();
+    throw new NotFoundException("Illegal execution");
+  }
+  AuthenticationFlowModel parentFlow=getParentFlow(model);
+  if (parentFlow.isBuiltIn()) {
+    throw new BadRequestException("It is illegal to modify execution in a built in flow");
+  }
+  List<AuthenticationExecutionModel> executions=getSortedExecutions(parentFlow);
+  int i=0;
+  for (i=0; i < executions.size(); i++) {
+    if (executions.get(i).getId().equals(model.getId())) {
+      break;
+    }
+  }
+  if (i + 1 >= executions.size())   return;
+  AuthenticationExecutionModel next=executions.get(i + 1);
+  int tmp=model.getPriority();
+  model.setPriority(next.getPriority());
+  realm.updateAuthenticatorExecution(model);
+  next.setPriority(tmp);
+  realm.updateAuthenticatorExecution(next);
+}

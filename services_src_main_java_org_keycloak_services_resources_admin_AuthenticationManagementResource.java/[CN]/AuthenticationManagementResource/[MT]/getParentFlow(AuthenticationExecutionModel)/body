@@ -1,0 +1,10 @@
+{
+  if (model.getParentFlow() == null) {
+    throw new BadRequestException("parent flow not set on new execution");
+  }
+  AuthenticationFlowModel parentFlow=realm.getAuthenticationFlowById(model.getParentFlow());
+  if (parentFlow == null) {
+    throw new BadRequestException("execution parent flow does not exist");
+  }
+  return parentFlow;
+}

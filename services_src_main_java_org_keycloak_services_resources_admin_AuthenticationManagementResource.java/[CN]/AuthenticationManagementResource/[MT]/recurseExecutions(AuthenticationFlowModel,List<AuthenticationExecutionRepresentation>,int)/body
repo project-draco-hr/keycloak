@@ -1,0 +1,46 @@
+{
+  int index=0;
+  List<AuthenticationExecutionModel> executions=realm.getAuthenticationExecutions(flow.getId());
+  for (  AuthenticationExecutionModel execution : executions) {
+    AuthenticationExecutionRepresentation rep=new AuthenticationExecutionRepresentation();
+    rep.setLevel(level);
+    rep.setIndex(index++);
+    rep.setRequirementChoices(new LinkedList<String>());
+    if (execution.isAuthenticatorFlow()) {
+      AuthenticationFlowModel flowRef=realm.getAuthenticationFlowById(execution.getFlowId());
+      if (AuthenticationFlow.BASIC_FLOW.equals(flowRef.getProviderId())) {
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.ALTERNATIVE.name());
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.REQUIRED.name());
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.DISABLED.name());
+      }
+ else       if (AuthenticationFlow.FORM_FLOW.equals(flowRef.getProviderId())) {
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.REQUIRED.name());
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.DISABLED.name());
+        rep.setProviderId(execution.getAuthenticator());
+        rep.setAuthenticationConfig(execution.getAuthenticatorConfig());
+      }
+      rep.setDisplayName(flowRef.getAlias());
+      rep.setConfigurable(false);
+      rep.setId(execution.getId());
+      rep.setAuthenticationFlow(execution.isAuthenticatorFlow());
+      rep.setRequirement(execution.getRequirement().name());
+      result.add(rep);
+      AuthenticationFlowModel subFlow=realm.getAuthenticationFlowById(execution.getFlowId());
+      recurseExecutions(subFlow,result,level + 1);
+    }
+ else {
+      String providerId=execution.getAuthenticator();
+      ConfigurableAuthenticatorFactory factory=CredentialHelper.getConfigurableAuthenticatorFactory(session,providerId);
+      rep.setDisplayName(factory.getDisplayType());
+      rep.setConfigurable(factory.isConfigurable());
+      for (      AuthenticationExecutionModel.Requirement choice : factory.getRequirementChoices()) {
+        rep.getRequirementChoices().add(choice.name());
+      }
+      rep.setId(execution.getId());
+      rep.setRequirement(execution.getRequirement().name());
+      rep.setProviderId(execution.getAuthenticator());
+      rep.setAuthenticationConfig(execution.getAuthenticatorConfig());
+      result.add(rep);
+    }
+  }
+}

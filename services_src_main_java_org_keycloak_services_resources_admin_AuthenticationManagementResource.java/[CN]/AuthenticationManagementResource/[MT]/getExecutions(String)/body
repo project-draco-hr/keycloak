@@ -6,47 +6,7 @@
     return Response.status(NOT_FOUND).build();
   }
   List<AuthenticationExecutionRepresentation> result=new LinkedList<>();
-  List<AuthenticationExecutionModel> executions=AuthenticatorUtil.getEnabledExecutionsRecursively(realm,flow.getId());
-  for (  AuthenticationExecutionModel execution : executions) {
-    AuthenticationExecutionRepresentation rep=new AuthenticationExecutionRepresentation();
-    rep.setSubFlow(false);
-    rep.setRequirementChoices(new LinkedList<String>());
-    if (execution.isAutheticatorFlow()) {
-      AuthenticationFlowModel flowRef=realm.getAuthenticationFlowById(execution.getFlowId());
-      if (AuthenticationFlow.BASIC_FLOW.equals(flowRef.getProviderId())) {
-        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.ALTERNATIVE.name());
-        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.REQUIRED.name());
-        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.DISABLED.name());
-      }
- else       if (AuthenticationFlow.FORM_FLOW.equals(flowRef.getProviderId())) {
-        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.REQUIRED.name());
-        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.DISABLED.name());
-        rep.setProviderId(execution.getAuthenticator());
-        rep.setAuthenticationConfig(execution.getAuthenticatorConfig());
-      }
-      rep.setReferenceType(flowRef.getAlias());
-      rep.setConfigurable(false);
-      rep.setId(execution.getId());
-      rep.setRequirement(execution.getRequirement().name());
-      result.add(rep);
-    }
- else {
-      if (!flow.getId().equals(execution.getParentFlow())) {
-        rep.setSubFlow(true);
-      }
-      String providerId=execution.getAuthenticator();
-      ConfigurableAuthenticatorFactory factory=CredentialHelper.getConfigurableAuthenticatorFactory(session,providerId);
-      rep.setReferenceType(factory.getDisplayType());
-      rep.setConfigurable(factory.isConfigurable());
-      for (      AuthenticationExecutionModel.Requirement choice : factory.getRequirementChoices()) {
-        rep.getRequirementChoices().add(choice.name());
-      }
-      rep.setId(execution.getId());
-      rep.setRequirement(execution.getRequirement().name());
-      rep.setProviderId(execution.getAuthenticator());
-      rep.setAuthenticationConfig(execution.getAuthenticatorConfig());
-      result.add(rep);
-    }
-  }
+  int level=0;
+  recurseExecutions(flow,result,level);
   return Response.ok(result).build();
 }

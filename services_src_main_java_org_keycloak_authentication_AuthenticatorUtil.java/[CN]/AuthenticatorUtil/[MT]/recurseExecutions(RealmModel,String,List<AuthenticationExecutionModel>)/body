@@ -1,7 +1,9 @@
 {
-  for (  AuthenticationExecutionModel model : realm.getAuthenticationExecutions(flowId)) {
+  List<AuthenticationExecutionModel> authenticationExecutions=realm.getAuthenticationExecutions(flowId);
+  if (authenticationExecutions == null)   return;
+  for (  AuthenticationExecutionModel model : authenticationExecutions) {
     executions.add(model);
-    if (model.isAutheticatorFlow() && model.isEnabled()) {
+    if (model.isAuthenticatorFlow() && model.isEnabled()) {
       recurseExecutions(realm,model.getFlowId(),executions);
     }
   }

@@ -1,0 +1,14 @@
+{
+  this.auth.requireManage();
+  AuthenticationFlowModel parentFlow=realm.getFlowByAlias(flowAlias);
+  if (parentFlow == null) {
+    throw new BadRequestException("Parent flow doesn't exists");
+  }
+  String provider=data.get("provider");
+  AuthenticationExecutionModel execution=new AuthenticationExecutionModel();
+  execution.setParentFlow(parentFlow.getId());
+  execution.setRequirement(AuthenticationExecutionModel.Requirement.DISABLED);
+  execution.setAuthenticatorFlow(false);
+  execution.setAuthenticator(provider);
+  realm.addAuthenticatorExecution(execution);
+}

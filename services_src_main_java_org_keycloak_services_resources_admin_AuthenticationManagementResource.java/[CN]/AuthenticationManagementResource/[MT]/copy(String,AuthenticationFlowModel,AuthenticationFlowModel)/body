@@ -1,0 +1,19 @@
+{
+  for (  AuthenticationExecutionModel execution : realm.getAuthenticationExecutions(from.getId())) {
+    if (execution.isAuthenticatorFlow()) {
+      AuthenticationFlowModel subFlow=realm.getAuthenticationFlowById(execution.getFlowId());
+      AuthenticationFlowModel copy=new AuthenticationFlowModel();
+      copy.setAlias(newName + " " + subFlow.getAlias());
+      copy.setDescription(subFlow.getDescription());
+      copy.setProviderId(subFlow.getProviderId());
+      copy.setBuiltIn(false);
+      copy.setTopLevel(false);
+      copy=realm.addAuthenticationFlow(copy);
+      execution.setFlowId(copy.getId());
+      copy(newName,subFlow,copy);
+    }
+    execution.setId(null);
+    execution.setParentFlow(to.getId());
+    realm.addAuthenticatorExecution(execution);
+  }
+}

@@ -1,0 +1,13 @@
+{
+  this.auth.requireManage();
+  AuthenticationExecutionModel model=realm.getAuthenticationExecutionById(execution);
+  if (model == null) {
+    session.getTransaction().setRollbackOnly();
+    throw new NotFoundException("Illegal execution");
+  }
+  AuthenticationFlowModel parentFlow=getParentFlow(model);
+  if (parentFlow.isBuiltIn()) {
+    throw new BadRequestException("It is illegal to remove execution from a built in flow");
+  }
+  realm.removeAuthenticatorExecution(model);
+}

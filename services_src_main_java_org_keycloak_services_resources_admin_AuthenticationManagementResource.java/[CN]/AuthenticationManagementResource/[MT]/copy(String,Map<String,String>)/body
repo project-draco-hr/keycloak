@@ -1,0 +1,21 @@
+{
+  this.auth.requireManage();
+  String newName=data.get("newName");
+  if (realm.getFlowByAlias(newName) != null) {
+    return Response.status(Response.Status.CONFLICT).build();
+  }
+  AuthenticationFlowModel flow=realm.getFlowByAlias(flowAlias);
+  if (flow == null) {
+    logger.debug("flow not found: " + flowAlias);
+    return Response.status(NOT_FOUND).build();
+  }
+  AuthenticationFlowModel copy=new AuthenticationFlowModel();
+  copy.setAlias(newName);
+  copy.setDescription(flow.getDescription());
+  copy.setProviderId(flow.getProviderId());
+  copy.setBuiltIn(false);
+  copy.setTopLevel(flow.isTopLevel());
+  copy=realm.addAuthenticationFlow(copy);
+  copy(newName,flow,copy);
+  return Response.status(201).build();
+}

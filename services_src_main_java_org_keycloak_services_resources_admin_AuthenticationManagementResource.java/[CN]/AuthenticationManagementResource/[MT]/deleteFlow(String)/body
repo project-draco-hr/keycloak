@@ -1,0 +1,11 @@
+{
+  this.auth.requireView();
+  AuthenticationFlowModel flow=realm.getAuthenticationFlowById(id);
+  if (flow == null) {
+    throw new NotFoundException("Could not find flow with id");
+  }
+  if (flow.isBuiltIn()) {
+    throw new BadRequestException("Can't delete built in flow");
+  }
+  realm.removeAuthenticationFlow(flow);
+}

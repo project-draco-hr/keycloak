@@ -1,5 +1,6 @@
 {
   String ldapUsername=LDAPUtils.getUsername(ldapUser,ldapIdentityStore.getConfig());
+  LDAPUtils.checkUuid(ldapUser,ldapIdentityStore.getConfig());
   UserModel imported=session.userStorage().addUser(realm,ldapUsername);
   imported.setEnabled(true);
   Set<UserFederationMapperModel> federationMappers=realm.getUserFederationMappersByFederationProvider(getModel().getId());

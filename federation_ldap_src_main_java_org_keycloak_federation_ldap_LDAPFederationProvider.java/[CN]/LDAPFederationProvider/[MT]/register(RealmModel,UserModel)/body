@@ -1,8 +1,9 @@
 {
   if (editMode == EditMode.READ_ONLY || editMode == EditMode.UNSYNCED)   throw new IllegalStateException("Registration is not supported by this ldap server");
   if (!synchronizeRegistrations())   throw new IllegalStateException("Registration is not supported by this ldap server");
-  LDAPObject ldapObject=LDAPUtils.addUserToLDAP(this,realm,user);
-  user.setSingleAttribute(LDAPConstants.LDAP_ID,ldapObject.getUuid());
-  user.setSingleAttribute(LDAPConstants.LDAP_ENTRY_DN,ldapObject.getDn().toString());
-  return proxy(realm,user,ldapObject);
+  LDAPObject ldapUser=LDAPUtils.addUserToLDAP(this,realm,user);
+  LDAPUtils.checkUuid(ldapUser,ldapIdentityStore.getConfig());
+  user.setSingleAttribute(LDAPConstants.LDAP_ID,ldapUser.getUuid());
+  user.setSingleAttribute(LDAPConstants.LDAP_ENTRY_DN,ldapUser.getDn().toString());
+  return proxy(realm,user,ldapUser);
 }

@@ -1,0 +1,45 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  String origUsernameAttrName;
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    for (    UserModel user : session.userStorage().getUsers(testRealm,true)) {
+      session.userStorage().removeUser(testRealm,user);
+    }
+    UserFederationProviderModel providerModel=KeycloakModelUtils.findUserFederationProviderByDisplayName(ldapModel.getDisplayName(),testRealm);
+    UserFederationMapperModel streetMapper=FederationTestUtils.addUserAttributeMapper(testRealm,ldapModel,"streetMapper","street",LDAPConstants.STREET);
+    LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    LDAPObject streetUser=FederationTestUtils.addLDAPUser(ldapFedProvider,testRealm,"user8","User8FN","User8LN","user8@email.org","user8street","126");
+    origUsernameAttrName=providerModel.getConfig().get(LDAPConstants.USERNAME_LDAP_ATTRIBUTE);
+    providerModel.getConfig().put(LDAPConstants.USERNAME_LDAP_ATTRIBUTE,"street");
+    providerModel.getConfig().put(LDAPConstants.BATCH_SIZE_FOR_SYNC,"10");
+    testRealm.updateUserFederationProvider(providerModel);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    UserFederationProviderModel providerModel=KeycloakModelUtils.findUserFederationProviderByDisplayName(ldapModel.getDisplayName(),testRealm);
+    KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+    UserFederationSyncResult syncResult=new UsersSyncManager().syncAllUsers(sessionFactory,"test",providerModel);
+    Assert.assertEquals(1,syncResult.getAdded());
+    Assert.assertTrue(syncResult.getFailed() > 0);
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel testRealm=session.realms().getRealm("test");
+    UserFederationProviderModel providerModel=KeycloakModelUtils.findUserFederationProviderByDisplayName(ldapModel.getDisplayName(),testRealm);
+    providerModel.getConfig().put(LDAPConstants.USERNAME_LDAP_ATTRIBUTE,origUsernameAttrName);
+    testRealm.updateUserFederationProvider(providerModel);
+    UserFederationMapperModel streetMapper=testRealm.getUserFederationMapperByName(providerModel.getId(),"streetMapper");
+    testRealm.removeUserFederationMapper(streetMapper);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

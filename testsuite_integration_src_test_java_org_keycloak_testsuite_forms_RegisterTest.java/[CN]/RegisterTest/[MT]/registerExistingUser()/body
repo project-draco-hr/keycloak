@@ -2,8 +2,15 @@
   loginPage.open();
   loginPage.clickRegister();
   registerPage.assertCurrent();
-  registerPage.register("firstName","lastName","registerExistingUser@email","test-user@localhost","password","password");
+  registerPage.register("firstName","lastName","registerExistingUser@email","test-user@localhost","password","password","mystreet");
   registerPage.assertCurrent();
   Assert.assertEquals("Username already exists.",registerPage.getError());
+  Assert.assertEquals("firstName",registerPage.getFirstName());
+  Assert.assertEquals("lastName",registerPage.getLastName());
+  Assert.assertEquals("",registerPage.getEmail());
+  Assert.assertEquals("",registerPage.getUsername());
+  Assert.assertEquals("",registerPage.getPassword());
+  Assert.assertEquals("",registerPage.getPasswordConfirm());
+  Assert.assertEquals("mystreet",registerPage.getAttributeStreet());
   events.expectRegister("test-user@localhost","registerExistingUser@email").removeDetail(Details.EMAIL).user((String)null).error("username_in_use").assertEvent();
 }

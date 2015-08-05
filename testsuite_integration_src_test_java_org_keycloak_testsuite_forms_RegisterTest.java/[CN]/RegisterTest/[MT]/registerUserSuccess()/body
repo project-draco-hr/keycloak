@@ -2,7 +2,7 @@
   loginPage.open();
   loginPage.clickRegister();
   registerPage.assertCurrent();
-  registerPage.register("firstName","lastName","registerUserSuccess@email","registerUserSuccess","password","password");
+  registerPage.register("firstName","lastName","registerUserSuccess@email","registerUserSuccess","password","password","myStreet");
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   String userId=events.expectRegister("registerUserSuccess","registerUserSuccess@email").assertEvent().getUserId();
   events.expectLogin().detail("username","registerusersuccess").user(userId).assertEvent();
@@ -10,4 +10,9 @@
   Assert.assertNotNull(user);
   Assert.assertNotNull(user.getCreatedTimestamp());
   Assert.assertTrue((System.currentTimeMillis() - user.getCreatedTimestamp()) < 10000);
+  Assert.assertEquals("registerusersuccess",user.getUsername());
+  Assert.assertEquals("registerusersuccess@email",user.getEmail());
+  Assert.assertEquals("firstName",user.getFirstName());
+  Assert.assertEquals("lastName",user.getLastName());
+  Assert.assertEquals("myStreet",user.getAttribute("street").get(0));
 }

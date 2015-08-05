@@ -2,11 +2,12 @@
   loginPage.open();
   loginPage.login("test-user@localhost","password");
   updateProfilePage.assertCurrent();
-  updateProfilePage.update("New first","New last","keycloak-user@localhost",null);
+  updateProfilePage.update("New first","New last","invalidemail",null);
   updateProfilePage.assertCurrent();
   Assert.assertEquals("New first",updateProfilePage.getFirstName());
   Assert.assertEquals("New last",updateProfilePage.getLastName());
-  Assert.assertEquals("keycloak-user@localhost",updateProfilePage.getEmail());
-  Assert.assertEquals("Email already exists.",updateProfilePage.getError());
+  Assert.assertEquals("invalidemail",updateProfilePage.getEmail());
+  Assert.assertEquals("",updateProfilePage.getAttributeStreet());
+  Assert.assertEquals("Invalid email address.",updateProfilePage.getError());
   events.assertEmpty();
 }

@@ -9,9 +9,27 @@
     credModel.setValue(credEntity.getValue());
     credModel.setSalt(credEntity.getSalt());
     credModel.setHashIterations(credEntity.getHashIterations());
-    credModel.setCounter(credEntity.getCounter());
-    credModel.setAlgorithm(credEntity.getAlgorithm());
-    credModel.setDigits(credEntity.getDigits());
+    if (UserCredentialModel.isOtp(credEntity.getType())) {
+      credModel.setCounter(credEntity.getCounter());
+      if (credEntity.getAlgorithm() == null) {
+        credModel.setAlgorithm(realm.getOTPPolicy().getAlgorithm());
+      }
+ else {
+        credModel.setAlgorithm(credEntity.getAlgorithm());
+      }
+      if (credEntity.getDigits() == 0) {
+        credModel.setDigits(realm.getOTPPolicy().getDigits());
+      }
+ else {
+        credModel.setDigits(credEntity.getDigits());
+      }
+      if (credEntity.getPeriod() == 0) {
+        credModel.setPeriod(realm.getOTPPolicy().getPeriod());
+      }
+ else {
+        credModel.setPeriod(credEntity.getPeriod());
+      }
+    }
     result.add(credModel);
   }
   return result;

@@ -1,0 +1,8 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  loginTotpPage.assertCurrent();
+  loginTotpPage.login(otp.generateHOTP("hotpSecret",counter++));
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  events.expectLogin().assertEvent();
+}

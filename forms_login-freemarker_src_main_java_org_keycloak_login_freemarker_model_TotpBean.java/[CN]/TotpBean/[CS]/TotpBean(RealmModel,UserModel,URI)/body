@@ -1,7 +1,8 @@
 {
   this.realmName=realm.getName();
-  this.enabled=user.isTotp();
+  this.enabled=user.isOtpEnabled();
   this.contextUrl=baseUri.getPath();
-  this.totpSecret=randomString(20);
+  this.totpSecret=HmacOTP.generateSecret(20);
   this.totpSecretEncoded=Base32.encode(totpSecret.getBytes());
+  this.keyUri=realm.getOTPPolicy().getKeyURI(realm,this.totpSecret);
 }

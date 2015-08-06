@@ -1,0 +1,16 @@
+{
+  String result=null;
+  byte[] hash;
+  while (counter.length() < 16)   counter="0" + counter;
+  byte[] msg=hexStr2Bytes(counter);
+  byte[] k=key.getBytes();
+  hash=hmac_sha1(crypto,k,msg);
+  int offset=hash[hash.length - 1] & 0xf;
+  int binary=((hash[offset] & 0x7f) << 24) | ((hash[offset + 1] & 0xff) << 16) | ((hash[offset + 2] & 0xff) << 8)| (hash[offset + 3] & 0xff);
+  int otp=binary % DIGITS_POWER[returnDigits];
+  result=Integer.toString(otp);
+  while (result.length() < returnDigits) {
+    result="0" + result;
+  }
+  return result;
+}

@@ -16,15 +16,19 @@
     setReferrerOnPage();
     return account.setError(Messages.MISSING_TOTP).createResponse(AccountPages.TOTP);
   }
- else   if (!new TimeBasedOTP().validate(totp,totpSecret.getBytes())) {
+ else   if (!CredentialValidation.validOTP(realm,totp,totpSecret)) {
     setReferrerOnPage();
     return account.setError(Messages.INVALID_TOTP).createResponse(AccountPages.TOTP);
   }
   UserCredentialModel credentials=new UserCredentialModel();
-  credentials.setType(CredentialRepresentation.TOTP);
+  credentials.setType(realm.getOTPPolicy().getType());
   credentials.setValue(totpSecret);
   session.users().updateCredential(realm,user,credentials);
-  user.setTotp(true);
+  user.setOtpEnabled(true);
+  UserCredentialModel cred=new UserCredentialModel();
+  cred.setType(realm.getOTPPolicy().getType());
+  cred.setValue(totp);
+  session.users().validCredentials(realm,user,cred);
   event.event(EventType.UPDATE_TOTP).client(auth.getClient()).user(auth.getUser()).success();
   setReferrerOnPage();
   return account.setSuccess(Messages.SUCCESS_TOTP).createResponse(AccountPages.TOTP);

@@ -4,8 +4,8 @@
   try {
     token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName()),true);
   }
- catch (  Exception e) {
-    throw new ErrorResponseException(OAuthErrorException.INVALID_GRANT,"Token invalid",Status.FORBIDDEN);
+ catch (  VerificationException e) {
+    throw new ErrorResponseException(OAuthErrorException.INVALID_GRANT,"Token invalid: " + e.getMessage(),Status.FORBIDDEN);
   }
   UserSessionModel userSession=session.sessions().getUserSession(realm,token.getSessionState());
   ClientSessionModel clientSession=session.sessions().getClientSession(token.getClientSession());

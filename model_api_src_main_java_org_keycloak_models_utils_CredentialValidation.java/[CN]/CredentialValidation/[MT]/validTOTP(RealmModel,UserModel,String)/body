@@ -1,8 +1,10 @@
 {
   UserCredentialValueModel passwordCred=null;
+  OTPPolicy policy=realm.getOTPPolicy();
+  TimeBasedOTP validator=new TimeBasedOTP(policy.getAlgorithm(),policy.getDigits(),policy.getPeriod(),policy.getLookAheadWindow());
   for (  UserCredentialValueModel cred : user.getCredentialsDirectly()) {
     if (cred.getType().equals(UserCredentialModel.TOTP)) {
-      if (new TimeBasedOTP().validate(otp,cred.getValue().getBytes())) {
+      if (validator.validateTOTP(otp,cred.getValue().getBytes())) {
         return true;
       }
     }

@@ -1,0 +1,8 @@
+{
+  this.realmName=realm.getName();
+  this.enabled=session.users().configuredForCredentialType(realm.getOTPPolicy().getType(),realm,user);
+  this.contextUrl=baseUri.getPath();
+  this.totpSecret=randomString(20);
+  this.totpSecretEncoded=Base32.encode(totpSecret.getBytes());
+  this.keyUri=realm.getOTPPolicy().getKeyURI(realm,this.totpSecret);
+}

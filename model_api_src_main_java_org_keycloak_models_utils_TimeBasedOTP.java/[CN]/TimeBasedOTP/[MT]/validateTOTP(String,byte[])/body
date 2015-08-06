@@ -1,0 +1,12 @@
+{
+  long currentInterval=this.clock.getCurrentInterval();
+  for (int i=this.lookAheadWindow; i >= 0; --i) {
+    String steps=Long.toHexString(currentInterval - i).toUpperCase();
+    while (steps.length() < 16)     steps="0" + steps;
+    String candidate=generateOTP(new String(secret),steps,this.numberDigits,this.algorithm);
+    if (candidate.equals(token)) {
+      return true;
+    }
+  }
+  return false;
+}

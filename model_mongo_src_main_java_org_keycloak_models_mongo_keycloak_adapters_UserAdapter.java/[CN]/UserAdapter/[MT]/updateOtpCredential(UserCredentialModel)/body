@@ -1,0 +1,21 @@
+{
+  CredentialEntity credentialEntity=getCredentialEntity(user,cred.getType());
+  if (credentialEntity == null) {
+    credentialEntity=setCredentials(user,cred);
+    credentialEntity.setValue(cred.getValue());
+    OTPPolicy otpPolicy=realm.getOTPPolicy();
+    credentialEntity.setAlgorithm(otpPolicy.getAlgorithm());
+    credentialEntity.setDigits(otpPolicy.getDigits());
+    credentialEntity.setCounter(otpPolicy.getInitialCounter());
+    credentialEntity.setPeriod(otpPolicy.getPeriod());
+    user.getCredentials().add(credentialEntity);
+  }
+ else {
+    credentialEntity.setValue(cred.getValue());
+    OTPPolicy policy=realm.getOTPPolicy();
+    credentialEntity.setDigits(policy.getDigits());
+    credentialEntity.setCounter(policy.getInitialCounter());
+    credentialEntity.setAlgorithm(policy.getAlgorithm());
+    credentialEntity.setPeriod(policy.getPeriod());
+  }
+}

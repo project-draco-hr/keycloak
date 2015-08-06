@@ -1,0 +1,15 @@
+{
+  UserCredentialValueModel passwordCred=null;
+  OTPPolicy policy=realm.getOTPPolicy();
+  HmacOTP validator=new HmacOTP(policy.getDigits(),policy.getAlgorithm(),policy.getLookAheadWindow());
+  for (  UserCredentialValueModel cred : user.getCredentialsDirectly()) {
+    if (cred.getType().equals(UserCredentialModel.HOTP)) {
+      int counter=validator.validateHOTP(otp,cred.getValue(),cred.getCounter());
+      if (counter < 0)       return false;
+      cred.setCounter(counter);
+      user.updateCredentialDirectly(cred);
+      return true;
+    }
+  }
+  return false;
+}

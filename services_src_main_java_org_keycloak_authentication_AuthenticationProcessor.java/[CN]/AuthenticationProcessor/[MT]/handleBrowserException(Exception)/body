@@ -1,24 +1,24 @@
 {
-  if (failure instanceof AuthException) {
-    AuthException e=(AuthException)failure;
+  if (failure instanceof AuthenticationFlowException) {
+    AuthenticationFlowException e=(AuthenticationFlowException)failure;
     logger.error("failed authentication: " + e.getError().toString(),e);
-    if (e.getError() == AuthenticationProcessor.Error.INVALID_USER) {
+    if (e.getError() == AuthenticationFlowError.INVALID_USER) {
       event.error(Errors.USER_NOT_FOUND);
       return ErrorPage.error(session,Messages.INVALID_USER);
     }
- else     if (e.getError() == AuthenticationProcessor.Error.USER_DISABLED) {
+ else     if (e.getError() == AuthenticationFlowError.USER_DISABLED) {
       event.error(Errors.USER_DISABLED);
       return ErrorPage.error(session,Messages.ACCOUNT_DISABLED);
     }
- else     if (e.getError() == AuthenticationProcessor.Error.USER_TEMPORARILY_DISABLED) {
+ else     if (e.getError() == AuthenticationFlowError.USER_TEMPORARILY_DISABLED) {
       event.error(Errors.USER_TEMPORARILY_DISABLED);
       return ErrorPage.error(session,Messages.ACCOUNT_TEMPORARILY_DISABLED);
     }
- else     if (e.getError() == Error.INVALID_CLIENT_SESSION) {
+ else     if (e.getError() == AuthenticationFlowError.INVALID_CLIENT_SESSION) {
       event.error(Errors.INVALID_CODE);
       return ErrorPage.error(session,Messages.INVALID_CODE);
     }
- else     if (e.getError() == Error.EXPIRED_CODE) {
+ else     if (e.getError() == AuthenticationFlowError.EXPIRED_CODE) {
       event.error(Errors.EXPIRED_CODE);
       return ErrorPage.error(session,Messages.EXPIRED_CODE);
     }

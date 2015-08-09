@@ -13,12 +13,12 @@
  else     if (model.getId().equals(actionExecution)) {
       AuthenticatorFactory factory=(AuthenticatorFactory)processor.getSession().getKeycloakSessionFactory().getProviderFactory(Authenticator.class,model.getAuthenticator());
       Authenticator authenticator=factory.create();
-      AuthenticatorContext result=processor.createAuthenticatorContext(model,authenticator,executions);
+      AuthenticationProcessor.Result result=processor.createAuthenticatorContext(model,authenticator,executions);
       authenticator.action(result);
       Response response=processResult(result);
       if (response == null)       return processFlow();
  else       return response;
     }
   }
-  throw new AuthenticationProcessor.AuthException("action is not in current execution",AuthenticationProcessor.Error.INTERNAL_ERROR);
+  throw new AuthenticationFlowException("action is not in current execution",AuthenticationFlowError.INTERNAL_ERROR);
 }

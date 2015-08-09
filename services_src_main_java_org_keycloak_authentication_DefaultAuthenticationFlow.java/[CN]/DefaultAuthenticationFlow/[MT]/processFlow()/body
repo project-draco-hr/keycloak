@@ -40,7 +40,7 @@
     }
     AuthenticatorFactory factory=(AuthenticatorFactory)processor.getSession().getKeycloakSessionFactory().getProviderFactory(Authenticator.class,model.getAuthenticator());
     if (factory == null) {
-      throw new AuthenticationProcessor.AuthException("Could not find AuthenticatorFactory for: " + model.getAuthenticator(),AuthenticationProcessor.Error.INTERNAL_ERROR);
+      throw new AuthenticationFlowException("Could not find AuthenticatorFactory for: " + model.getAuthenticator(),AuthenticationFlowError.INTERNAL_ERROR);
     }
     Authenticator authenticator=factory.create();
     AuthenticationProcessor.logger.debugv("authenticator: {0}",factory.getId());
@@ -50,7 +50,7 @@
         processor.getClientSession().setExecutionStatus(challengedAlternativeExecution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
         return alternativeChallenge;
       }
-      throw new AuthenticationProcessor.AuthException("authenticator: " + factory.getId(),AuthenticationProcessor.Error.UNKNOWN_USER);
+      throw new AuthenticationFlowException("authenticator: " + factory.getId(),AuthenticationFlowError.UNKNOWN_USER);
     }
     boolean configuredFor=false;
     if (authenticator.requiresUser() && authUser != null) {
@@ -64,7 +64,7 @@
             continue;
           }
  else {
-            throw new AuthenticationProcessor.AuthException(AuthenticationProcessor.Error.CREDENTIAL_SETUP_REQUIRED);
+            throw new AuthenticationFlowException(AuthenticationFlowError.CREDENTIAL_SETUP_REQUIRED);
           }
         }
  else         if (model.isOptional()) {
@@ -73,7 +73,7 @@
         }
       }
     }
-    AuthenticatorContext context=processor.createAuthenticatorContext(model,authenticator,executions);
+    AuthenticationProcessor.Result context=processor.createAuthenticatorContext(model,authenticator,executions);
     authenticator.authenticate(context);
     Response response=processResult(context);
     if (response != null)     return response;

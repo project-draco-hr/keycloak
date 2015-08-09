@@ -1,0 +1,25 @@
+{
+  if (user == null) {
+    context.getEvent().error(Errors.USER_NOT_FOUND);
+    Response challengeResponse=invalidUser(context);
+    context.failureChallenge(AuthenticationFlowError.INVALID_USER,challengeResponse);
+    return true;
+  }
+  if (!user.isEnabled()) {
+    context.getEvent().user(user);
+    context.getEvent().error(Errors.USER_DISABLED);
+    Response challengeResponse=disabledUser(context);
+    context.failureChallenge(AuthenticationFlowError.USER_DISABLED,challengeResponse);
+    return true;
+  }
+  if (context.getRealm().isBruteForceProtected()) {
+    if (context.getProtector().isTemporarilyDisabled(context.getSession(),context.getRealm(),user.getUsername())) {
+      context.getEvent().user(user);
+      context.getEvent().error(Errors.USER_TEMPORARILY_DISABLED);
+      Response challengeResponse=temporarilyDisabledUser(context);
+      context.failureChallenge(AuthenticationFlowError.USER_TEMPORARILY_DISABLED,challengeResponse);
+      return true;
+    }
+  }
+  return false;
+}

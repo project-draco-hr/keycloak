@@ -1,6 +1,6 @@
 {
   if (!actionExecution.equals(formExecution.getId())) {
-    throw new AuthenticationProcessor.AuthException("action is not current execution",AuthenticationProcessor.Error.INTERNAL_ERROR);
+    throw new AuthenticationFlowException("action is not current execution",AuthenticationFlowError.INTERNAL_ERROR);
   }
   Map<String,ClientSessionModel.ExecutionStatus> executionStatus=new HashMap<>();
   List<FormAction> requiredActions=new LinkedList<>();
@@ -14,7 +14,7 @@
     FormAction action=factory.create(processor.getSession());
     UserModel authUser=processor.getClientSession().getAuthenticatedUser();
     if (action.requiresUser() && authUser == null) {
-      throw new AuthenticationProcessor.AuthException("form action: " + formExecution.getAuthenticator() + " requires user",AuthenticationProcessor.Error.UNKNOWN_USER);
+      throw new AuthenticationFlowException("form action: " + formExecution.getAuthenticator() + " requires user",AuthenticationFlowError.UNKNOWN_USER);
     }
     boolean configuredFor=false;
     if (action.requiresUser() && authUser != null) {
@@ -28,7 +28,7 @@
             continue;
           }
  else {
-            throw new AuthenticationProcessor.AuthException(AuthenticationProcessor.Error.CREDENTIAL_SETUP_REQUIRED);
+            throw new AuthenticationFlowException(AuthenticationFlowError.CREDENTIAL_SETUP_REQUIRED);
           }
         }
  else         if (formActionExecution.isOptional()) {

@@ -2,7 +2,7 @@
   AuthenticationFlowModel flow=realm.getAuthenticationFlowById(flowId);
   if (flow == null) {
     logger.error("Unknown flow to execute with");
-    throw new AuthException(Error.INTERNAL_ERROR);
+    throw new AuthenticationFlowException(AuthenticationFlowError.INTERNAL_ERROR);
   }
   if (flow.getProviderId() == null || flow.getProviderId().equals(AuthenticationFlow.BASIC_FLOW)) {
     DefaultAuthenticationFlow flowExecution=new DefaultAuthenticationFlow(this,flow);
@@ -12,5 +12,5 @@
     FormAuthenticationFlow flowExecution=new FormAuthenticationFlow(this,execution);
     return flowExecution;
   }
-  throw new AuthException("Unknown flow provider type",Error.INTERNAL_ERROR);
+  throw new AuthenticationFlowException("Unknown flow provider type",AuthenticationFlowError.INTERNAL_ERROR);
 }

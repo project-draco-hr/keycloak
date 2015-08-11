@@ -1,0 +1,16 @@
+{
+  boolean validated=new Pbkdf2PasswordEncoder(credential.getSalt()).verify(unhashedCredValue,credential.getValue(),credential.getHashIterations());
+  if (validated) {
+    int iterations=hashIterations(realm);
+    if (iterations > -1 && iterations != credential.getHashIterations()) {
+      UserCredentialValueModel newCred=new UserCredentialValueModel();
+      newCred.setType(credential.getType());
+      newCred.setDevice(credential.getDevice());
+      newCred.setSalt(credential.getSalt());
+      newCred.setHashIterations(iterations);
+      newCred.setValue(new Pbkdf2PasswordEncoder(newCred.getSalt()).encode(unhashedCredValue,iterations));
+      user.updateCredentialDirectly(newCred);
+    }
+  }
+  return validated;
+}

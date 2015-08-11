@@ -1,0 +1,9 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  termsPage.assertCurrent();
+  termsPage.acceptTerms();
+  String sessionId=events.expectRequiredAction(EventType.CUSTOM_REQUIRED_ACTION).removeDetail(Details.REDIRECT_URI).detail(Details.CUSTOM_REQUIRED_ACTION,TermsAndConditions.PROVIDER_ID).assertEvent().getSessionId();
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  events.expectLogin().session(sessionId).assertEvent();
+}

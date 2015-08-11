@@ -1,4 +1,5 @@
 {
   LoginFormsProvider loginFormsProvider=context.getSession().getProvider(LoginFormsProvider.class).setClientSessionCode(context.generateAccessCode(getProviderId())).setUser(context.getUser());
-  return loginFormsProvider.createResponse(UserModel.RequiredAction.CONFIGURE_TOTP);
+  Response challenge=loginFormsProvider.createResponse(UserModel.RequiredAction.CONFIGURE_TOTP);
+  context.challenge(challenge);
 }

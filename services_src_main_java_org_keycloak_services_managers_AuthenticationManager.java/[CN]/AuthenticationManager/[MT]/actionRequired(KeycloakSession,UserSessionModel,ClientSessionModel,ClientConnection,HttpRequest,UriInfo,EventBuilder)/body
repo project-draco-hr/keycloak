@@ -2,16 +2,27 @@
   final RealmModel realm=clientSession.getRealm();
   final UserModel user=userSession.getUser();
   final ClientModel client=clientSession.getClient();
-  RequiredActionContext context=evaluateRequiredActionTriggers(session,userSession,clientSession,clientConnection,request,uriInfo,event,realm,user);
+  evaluateRequiredActionTriggers(session,userSession,clientSession,clientConnection,request,uriInfo,event,realm,user);
+  RequiredActionContextResult context=new RequiredActionContextResult(userSession,clientSession,realm,event,session,request,user);
   logger.debugv("processAccessCode: go to oauth page?: {0}",client.isConsentRequired());
   event.detail(Details.CODE_ID,clientSession.getId());
   Set<String> requiredActions=user.getRequiredActions();
   for (  String action : requiredActions) {
     RequiredActionProviderModel model=realm.getRequiredActionProviderByAlias(action);
     RequiredActionProvider actionProvider=session.getProvider(RequiredActionProvider.class,model.getProviderId());
-    Response challenge=actionProvider.requiredActionChallenge(context);
-    if (challenge != null) {
-      return challenge;
+    actionProvider.requiredActionChallenge(context);
+    if (context.getStatus() == RequiredActionContext.Status.FAILURE) {
+      LoginProtocol protocol=context.getSession().getProvider(LoginProtocol.class,context.getClientSession().getAuthMethod());
+      protocol.setRealm(context.getRealm()).setHttpHeaders(context.getHttpRequest().getHttpHeaders()).setUriInfo(context.getUriInfo());
+      event.error(Errors.REJECTED_BY_USER);
+      return protocol.consentDenied(context.getClientSession());
+    }
+ else     if (context.getStatus() == RequiredActionContext.Status.CHALLENGE) {
+      return context.getChallenge();
+    }
+ else     if (context.getStatus() == RequiredActionContext.Status.SUCCESS) {
+      event.clone().event(EventType.CUSTOM_REQUIRED_ACTION).detail(Details.CUSTOM_REQUIRED_ACTION,actionProvider.getProviderId()).success();
+      clientSession.getUserSession().getUser().removeRequiredAction(actionProvider.getProviderId());
     }
   }
   if (client.isConsentRequired()) {

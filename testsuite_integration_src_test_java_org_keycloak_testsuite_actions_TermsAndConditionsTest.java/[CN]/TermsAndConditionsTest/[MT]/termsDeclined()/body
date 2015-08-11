@@ -1,0 +1,7 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  termsPage.assertCurrent();
+  termsPage.declineTerms();
+  events.expectLogin().detail(Details.CUSTOM_REQUIRED_ACTION,TermsAndConditions.PROVIDER_ID).error(Errors.REJECTED_BY_USER).removeDetail(Details.CONSENT).assertEvent();
+}

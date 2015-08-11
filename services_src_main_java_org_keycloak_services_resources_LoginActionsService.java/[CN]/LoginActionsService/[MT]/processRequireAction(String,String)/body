@@ -1,0 +1,59 @@
+{
+  event.event(EventType.CUSTOM_REQUIRED_ACTION);
+  event.detail(Details.CUSTOM_REQUIRED_ACTION,action);
+  if (action == null) {
+    logger.error("required action query param was null");
+    event.error(Errors.INVALID_CODE);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
+  }
+  RequiredActionProvider provider=session.getProvider(RequiredActionProvider.class,action);
+  if (provider == null) {
+    logger.error("required action provider was null");
+    event.error(Errors.INVALID_CODE);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
+  }
+  Checks checks=new Checks();
+  if (!checks.verifyCode(realm.getBrowserFlow(),code,action)) {
+    return checks.response;
+  }
+  final ClientSessionCode clientCode=checks.clientCode;
+  final ClientSessionModel clientSession=clientCode.getClientSession();
+  if (clientSession.getUserSession() == null) {
+    logger.error("user session was null");
+    event.error(Errors.USER_SESSION_NOT_FOUND);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE));
+  }
+  initEvent(clientSession);
+  RequiredActionContextResult context=new RequiredActionContextResult(clientSession.getUserSession(),clientSession,realm,event,session,request,clientSession.getUserSession().getUser()){
+    @Override public String generateAccessCode(    String action){
+      String clientSessionAction=clientSession.getAction();
+      if (action.equals(clientSessionAction)) {
+        clientSession.setTimestamp(Time.currentTime());
+        return code;
+      }
+      ClientSessionCode code=new ClientSessionCode(getRealm(),getClientSession());
+      code.setAction(action);
+      return code.getCode();
+    }
+    @Override public void ignore(){
+      throw new RuntimeException("Cannot call ignore within processAction()");
+    }
+  }
+;
+  provider.processAction(context);
+  if (context.getStatus() == RequiredActionContext.Status.SUCCESS) {
+    event.clone().event(EventType.CUSTOM_REQUIRED_ACTION).detail(Details.CUSTOM_REQUIRED_ACTION,action).success();
+    clientSession.getUserSession().getUser().removeRequiredAction(provider.getProviderId());
+    return AuthenticationManager.nextActionAfterAuthentication(session,clientSession.getUserSession(),clientSession,clientConnection,request,uriInfo,event);
+  }
+  if (context.getStatus() == RequiredActionContext.Status.CHALLENGE) {
+    return context.getChallenge();
+  }
+  if (context.getStatus() == RequiredActionContext.Status.FAILURE) {
+    LoginProtocol protocol=context.getSession().getProvider(LoginProtocol.class,context.getClientSession().getAuthMethod());
+    protocol.setRealm(context.getRealm()).setHttpHeaders(context.getHttpRequest().getHttpHeaders()).setUriInfo(context.getUriInfo());
+    event.detail(Details.CUSTOM_REQUIRED_ACTION,action).error(Errors.REJECTED_BY_USER);
+    return protocol.consentDenied(context.getClientSession());
+  }
+  throw new RuntimeException("Unreachable");
+}

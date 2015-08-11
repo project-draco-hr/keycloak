@@ -1,23 +1,10 @@
 {
-  boolean validated=false;
   UserCredentialValueModel passwordCred=null;
   for (  UserCredentialValueModel cred : user.getCredentialsDirectly()) {
     if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
-      validated=new Pbkdf2PasswordEncoder(cred.getSalt()).verify(password,cred.getValue(),cred.getHashIterations());
       passwordCred=cred;
     }
   }
-  if (validated) {
-    int iterations=hashIterations(realm);
-    if (iterations > -1 && iterations != passwordCred.getHashIterations()) {
-      UserCredentialValueModel newCred=new UserCredentialValueModel();
-      newCred.setType(passwordCred.getType());
-      newCred.setDevice(passwordCred.getDevice());
-      newCred.setSalt(passwordCred.getSalt());
-      newCred.setHashIterations(iterations);
-      newCred.setValue(new Pbkdf2PasswordEncoder(newCred.getSalt()).encode(password,iterations));
-      user.updateCredentialDirectly(newCred);
-    }
-  }
-  return validated;
+  if (passwordCred == null)   return false;
+  return validateHashedCredential(realm,user,password,passwordCred);
 }

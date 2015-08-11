@@ -1,9 +1,11 @@
 {
   if (Validation.isBlank(context.getUser().getEmail())) {
-    return null;
+    context.ignore();
+    return;
   }
   context.getEvent().clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,context.getUser().getEmail()).success();
   LoginActionsService.createActionCookie(context.getRealm(),context.getUriInfo(),context.getConnection(),context.getUserSession().getId());
   LoginFormsProvider loginFormsProvider=context.getSession().getProvider(LoginFormsProvider.class).setClientSessionCode(context.generateAccessCode(getProviderId())).setUser(context.getUser());
-  return loginFormsProvider.createResponse(UserModel.RequiredAction.VERIFY_EMAIL);
+  Response challenge=loginFormsProvider.createResponse(UserModel.RequiredAction.VERIFY_EMAIL);
+  context.challenge(challenge);
 }

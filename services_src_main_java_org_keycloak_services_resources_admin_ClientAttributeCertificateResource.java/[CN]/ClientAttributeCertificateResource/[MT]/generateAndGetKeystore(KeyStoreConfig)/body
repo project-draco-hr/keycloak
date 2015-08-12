@@ -1,0 +1,17 @@
+{
+  auth.requireManage();
+  if (config.getFormat() != null && !config.getFormat().equals("JKS") && !config.getFormat().equals("PKCS12")) {
+    throw new NotAcceptableException("Only support jks or pkcs12 format.");
+  }
+  if (config.getKeyPassword() == null) {
+    throw new ErrorResponseException("password-missing","Need to specify a key password for jks generation and download",Response.Status.BAD_REQUEST);
+  }
+  if (config.getStorePassword() == null) {
+    throw new ErrorResponseException("password-missing","Need to specify a store password for jks generation and download",Response.Status.BAD_REQUEST);
+  }
+  CertificateRepresentation info=KeycloakModelUtils.generateKeyPairCertificate(client.getClientId());
+  byte[] rtn=getKeystore(config,info.getPrivateKey(),info.getCertificate());
+  client.setAttribute(certificateAttribute,info.getCertificate());
+  adminEvent.operation(OperationType.ACTION).resourcePath(session.getContext().getUri()).representation(info).success();
+  return rtn;
+}

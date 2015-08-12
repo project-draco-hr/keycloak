@@ -1,0 +1,10 @@
+{
+  List<NameValuePair> parameters=new LinkedList<NameValuePair>();
+  parameters.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD));
+  parameters.add(new BasicNameValuePair("username",username));
+  parameters.add(new BasicNameValuePair("password",password));
+  parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ASSERTION_TYPE,OAuth2Constants.CLIENT_ASSERTION_TYPE_JWT));
+  parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ASSERTION,signedJwt));
+  HttpResponse response=sendRequest(oauth.getResourceOwnerPasswordCredentialGrantUrl(),parameters);
+  return new OAuthClient.AccessTokenResponse(response);
+}

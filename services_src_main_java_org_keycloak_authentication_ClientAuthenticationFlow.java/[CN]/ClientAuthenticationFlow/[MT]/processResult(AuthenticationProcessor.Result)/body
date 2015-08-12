@@ -1,0 +1,50 @@
+{
+  AuthenticationExecutionModel execution=result.getExecution();
+  FlowStatus status=result.getStatus();
+  if (status == FlowStatus.SUCCESS) {
+    AuthenticationProcessor.logger.debugv("client authenticator SUCCESS: {0}",execution.getAuthenticator());
+    if (execution.isAlternative())     alternativeSuccessful=true;
+    successAuthenticators.add(execution.getAuthenticator());
+    return null;
+  }
+ else   if (status == FlowStatus.FAILED) {
+    AuthenticationProcessor.logger.debugv("client authenticator FAILED: {0}",execution.getAuthenticator());
+    if (result.getChallenge() != null) {
+      return sendChallenge(result,execution);
+    }
+    throw new AuthenticationFlowException(result.getError());
+  }
+ else   if (status == FlowStatus.FORCE_CHALLENGE) {
+    return sendChallenge(result,execution);
+  }
+ else   if (status == FlowStatus.CHALLENGE) {
+    AuthenticationProcessor.logger.debugv("client authenticator CHALLENGE: {0}",execution.getAuthenticator());
+    if (execution.isRequired()) {
+      return sendChallenge(result,execution);
+    }
+    ClientModel client=processor.getClient();
+    if (execution.isOptional() && client != null && result.getClientAuthenticator().configuredFor(processor.getSession(),processor.getRealm(),client)) {
+      return sendChallenge(result,execution);
+    }
+    if (execution.isAlternative() && alternativeChallenge == null) {
+      alternativeChallenge=result.getChallenge();
+    }
+    return null;
+  }
+ else   if (status == FlowStatus.FAILURE_CHALLENGE) {
+    AuthenticationProcessor.logger.debugv("client authenticator FAILURE_CHALLENGE: {0}",execution.getAuthenticator());
+    return sendChallenge(result,execution);
+  }
+ else   if (status == FlowStatus.ATTEMPTED) {
+    AuthenticationProcessor.logger.debugv("client authenticator ATTEMPTED: {0}",execution.getAuthenticator());
+    if (execution.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
+      throw new AuthenticationFlowException(AuthenticationFlowError.INVALID_CLIENT_CREDENTIALS);
+    }
+    return null;
+  }
+ else {
+    AuthenticationProcessor.logger.debugv("client authenticator INTERNAL_ERROR: {0}",execution.getAuthenticator());
+    AuthenticationProcessor.logger.error("Unknown result status");
+    throw new AuthenticationFlowException(AuthenticationFlowError.INTERNAL_ERROR);
+  }
+}

@@ -1,0 +1,27 @@
+{
+class CertificateHolder {
+    String certificate;
+  }
+  final CertificateHolder backupClient1Cert=new CertificateHolder();
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      backupClient1Cert.certificate=appRealm.getClientByClientId("client1").getAttribute(JWTClientAuthenticator.CERTIFICATE_ATTR);
+      appRealm.getClientByClientId("client1").removeAttribute(JWTClientAuthenticator.CERTIFICATE_ATTR);
+    }
+  }
+);
+  String invalidJwt=getClient1SignedJWT();
+  List<NameValuePair> parameters=new LinkedList<NameValuePair>();
+  parameters.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,OAuth2Constants.CLIENT_CREDENTIALS));
+  parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ASSERTION_TYPE,OAuth2Constants.CLIENT_ASSERTION_TYPE_JWT));
+  parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ASSERTION,invalidJwt));
+  HttpResponse resp=sendRequest(oauth.getServiceAccountUrl(),parameters);
+  OAuthClient.AccessTokenResponse response=new OAuthClient.AccessTokenResponse(resp);
+  assertError(response,"client1","unauthorized_client","client_credentials_setup_required");
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.getClientByClientId("client1").setAttribute(JWTClientAuthenticator.CERTIFICATE_ATTR,backupClient1Cert.certificate);
+    }
+  }
+);
+}

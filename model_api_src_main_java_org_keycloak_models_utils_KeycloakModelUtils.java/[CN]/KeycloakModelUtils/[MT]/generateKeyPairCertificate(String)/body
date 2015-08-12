@@ -1,0 +1,24 @@
+{
+  KeyPair keyPair=null;
+  try {
+    KeyPairGenerator generator=KeyPairGenerator.getInstance("RSA");
+    generator.initialize(2048);
+    keyPair=generator.generateKeyPair();
+  }
+ catch (  NoSuchAlgorithmException e) {
+    throw new RuntimeException(e);
+  }
+  X509Certificate certificate=null;
+  try {
+    certificate=CertificateUtils.generateV1SelfSignedCertificate(keyPair,subject);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  String privateKeyPem=KeycloakModelUtils.getPemFromKey(keyPair.getPrivate());
+  String certPem=KeycloakModelUtils.getPemFromCertificate(certificate);
+  CertificateRepresentation rep=new CertificateRepresentation();
+  rep.setPrivateKey(privateKeyPem);
+  rep.setCertificate(certPem);
+  return rep;
+}

@@ -1,0 +1,30 @@
+{
+  ClientModel client=ClientAuthUtil.getClientFromClientId(context);
+  if (client == null) {
+    return;
+  }
+ else {
+    context.setClient(client);
+  }
+  if (client.isPublicClient()) {
+    context.success();
+    return;
+  }
+  String clientSecret=getClientSecret(context);
+  if (clientSecret == null) {
+    Response challengeResponse=ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client","Client secret not provided in request");
+    context.challenge(challengeResponse);
+    return;
+  }
+  if (client.getSecret() == null) {
+    Response challengeResponse=ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client","Client secret setup required for client " + client.getClientId());
+    context.challenge(challengeResponse);
+    return;
+  }
+  if (!client.validateSecret(clientSecret)) {
+    Response challengeResponse=ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client","Invalid client secret");
+    context.failure(AuthenticationFlowError.INVALID_CLIENT_CREDENTIALS,challengeResponse);
+    return;
+  }
+  context.success();
+}

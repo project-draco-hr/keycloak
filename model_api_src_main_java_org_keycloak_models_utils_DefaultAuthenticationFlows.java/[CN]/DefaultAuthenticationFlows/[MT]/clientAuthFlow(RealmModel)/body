@@ -1,0 +1,24 @@
+{
+  AuthenticationFlowModel clients=new AuthenticationFlowModel();
+  clients.setAlias(CLIENT_AUTHENTICATION_FLOW);
+  clients.setDescription("Base authentication for clients");
+  clients.setProviderId("client-flow");
+  clients.setTopLevel(true);
+  clients.setBuiltIn(true);
+  clients=realm.addAuthenticationFlow(clients);
+  realm.setClientAuthenticationFlow(clients);
+  AuthenticationExecutionModel execution=new AuthenticationExecutionModel();
+  execution.setParentFlow(clients.getId());
+  execution.setRequirement(AuthenticationExecutionModel.Requirement.ALTERNATIVE);
+  execution.setAuthenticator("client-secret");
+  execution.setPriority(10);
+  execution.setAuthenticatorFlow(false);
+  realm.addAuthenticatorExecution(execution);
+  execution=new AuthenticationExecutionModel();
+  execution.setParentFlow(clients.getId());
+  execution.setRequirement(AuthenticationExecutionModel.Requirement.ALTERNATIVE);
+  execution.setAuthenticator("client-signed-jwt");
+  execution.setPriority(20);
+  execution.setAuthenticatorFlow(false);
+  realm.addAuthenticatorExecution(execution);
+}

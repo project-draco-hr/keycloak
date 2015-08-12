@@ -1,0 +1,12 @@
+{
+  Time.setOffset(1000);
+  String invalidJwt=getClient1SignedJWT();
+  Time.setOffset(0);
+  List<NameValuePair> parameters=new LinkedList<NameValuePair>();
+  parameters.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,OAuth2Constants.CLIENT_CREDENTIALS));
+  parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ASSERTION_TYPE,OAuth2Constants.CLIENT_ASSERTION_TYPE_JWT));
+  parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ASSERTION,invalidJwt));
+  HttpResponse resp=sendRequest(oauth.getServiceAccountUrl(),parameters);
+  OAuthClient.AccessTokenResponse response=new OAuthClient.AccessTokenResponse(resp);
+  assertError(response,"client1","unauthorized_client",Errors.INVALID_CLIENT_CREDENTIALS);
+}

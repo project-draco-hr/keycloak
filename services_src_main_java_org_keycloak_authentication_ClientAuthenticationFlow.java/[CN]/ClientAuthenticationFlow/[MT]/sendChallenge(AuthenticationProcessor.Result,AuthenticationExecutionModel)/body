@@ -1,0 +1,16 @@
+{
+  AuthenticationProcessor.logger.debugv("client authenticator: sending challenge for authentication execution {0}",execution.getAuthenticator());
+  if (result.getError() != null) {
+    String errorAsString=result.getError().toString().toLowerCase();
+    result.getEvent().error(errorAsString);
+  }
+ else {
+    if (result.getClient() == null) {
+      result.getEvent().error(Errors.INVALID_CLIENT);
+    }
+ else {
+      result.getEvent().error(Errors.INVALID_CLIENT_CREDENTIALS);
+    }
+  }
+  return result.getChallenge();
+}

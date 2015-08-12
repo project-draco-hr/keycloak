@@ -1,0 +1,8 @@
+{
+  oauth.clientId("client2");
+  OAuthClient.AccessTokenResponse response=doGrantAccessTokenRequest("test-user@localhost","password",getClient2SignedJWT());
+  assertEquals(200,response.getStatusCode());
+  AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
+  RefreshToken refreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
+  events.expectLogin().client("client2").session(accessToken.getSessionState()).detail(Details.RESPONSE_TYPE,"token").detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).detail(Details.USERNAME,"test-user@localhost").detail(Details.CLIENT_AUTH_METHOD,JWTClientAuthenticator.PROVIDER_ID).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).assertEvent();
+}

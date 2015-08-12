@@ -1,0 +1,40 @@
+{
+  try {
+    String format=config.getFormat();
+    KeyStore keyStore;
+    if (format.equals("JKS"))     keyStore=KeyStore.getInstance("JKS");
+ else     keyStore=KeyStore.getInstance(format,"BC");
+    keyStore.load(null,null);
+    String keyAlias=config.getKeyAlias();
+    if (keyAlias == null)     keyAlias=client.getClientId();
+    if (privatePem != null) {
+      PrivateKey privateKey=PemUtils.decodePrivateKey(privatePem);
+      X509Certificate clientCert=PemUtils.decodeCertificate(certPem);
+      Certificate[] chain={clientCert};
+      keyStore.setKeyEntry(keyAlias,privateKey,config.getKeyPassword().trim().toCharArray(),chain);
+    }
+ else {
+      X509Certificate clientCert=PemUtils.decodeCertificate(certPem);
+      keyStore.setCertificateEntry(keyAlias,clientCert);
+    }
+    if (config.isRealmCertificate() == null || config.isRealmCertificate().booleanValue()) {
+      X509Certificate certificate=realm.getCertificate();
+      if (certificate == null) {
+        KeycloakModelUtils.generateRealmCertificate(realm);
+        certificate=realm.getCertificate();
+      }
+      String certificateAlias=config.getRealmAlias();
+      if (certificateAlias == null)       certificateAlias=realm.getName();
+      keyStore.setCertificateEntry(certificateAlias,certificate);
+    }
+    ByteArrayOutputStream stream=new ByteArrayOutputStream();
+    keyStore.store(stream,config.getStorePassword().trim().toCharArray());
+    stream.flush();
+    stream.close();
+    byte[] rtn=stream.toByteArray();
+    return rtn;
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

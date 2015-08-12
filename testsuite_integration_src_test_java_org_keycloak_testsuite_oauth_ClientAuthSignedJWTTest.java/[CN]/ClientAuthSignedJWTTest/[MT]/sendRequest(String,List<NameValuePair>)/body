@@ -1,0 +1,12 @@
+{
+  CloseableHttpClient client=new DefaultHttpClient();
+  try {
+    HttpPost post=new HttpPost(requestUrl);
+    UrlEncodedFormEntity formEntity=new UrlEncodedFormEntity(parameters,"UTF-8");
+    post.setEntity(formEntity);
+    return client.execute(post);
+  }
+  finally {
+    oauth.closeClient(client);
+  }
+}

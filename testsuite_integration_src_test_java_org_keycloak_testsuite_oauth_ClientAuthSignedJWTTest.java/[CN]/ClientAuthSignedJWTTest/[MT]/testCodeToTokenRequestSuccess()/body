@@ -1,0 +1,11 @@
+{
+  oauth.clientId("client2");
+  oauth.doLogin("test-user@localhost","password");
+  Event loginEvent=events.expectLogin().client("client2").assertEvent();
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse response=doAccessTokenRequest(code,getClient2SignedJWT());
+  Assert.assertEquals(200,response.getStatusCode());
+  oauth.verifyToken(response.getAccessToken());
+  oauth.verifyRefreshToken(response.getRefreshToken());
+  events.expectCodeToToken(loginEvent.getDetails().get(Details.CODE_ID),loginEvent.getSessionId()).client("client2").detail(Details.CLIENT_AUTH_METHOD,JWTClientAuthenticator.PROVIDER_ID).assertEvent();
+}

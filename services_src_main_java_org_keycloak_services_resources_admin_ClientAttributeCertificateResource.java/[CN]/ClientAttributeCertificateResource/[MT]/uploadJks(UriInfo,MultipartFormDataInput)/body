@@ -1,43 +1,16 @@
 {
-  auth.requireManage();
-  ClientKeyPairInfo info=new ClientKeyPairInfo();
-  Map<String,List<InputPart>> uploadForm=input.getFormDataMap();
-  List<InputPart> inputParts=uploadForm.get("file");
-  String keystoreFormat=uploadForm.get("keystoreFormat").get(0).getBodyAsString();
-  String keyAlias=uploadForm.get("keyAlias").get(0).getBodyAsString();
-  List<InputPart> keyPasswordPart=uploadForm.get("keyPassword");
-  char[] keyPassword=keyPasswordPart != null ? keyPasswordPart.get(0).getBodyAsString().toCharArray() : null;
-  List<InputPart> storePasswordPart=uploadForm.get("storePassword");
-  char[] storePassword=storePasswordPart != null ? storePasswordPart.get(0).getBodyAsString().toCharArray() : null;
-  PrivateKey privateKey=null;
-  X509Certificate certificate=null;
-  try {
-    KeyStore keyStore=null;
-    if (keystoreFormat.equals("JKS"))     keyStore=KeyStore.getInstance("JKS");
- else     keyStore=KeyStore.getInstance(keystoreFormat,"BC");
-    keyStore.load(inputParts.get(0).getBody(InputStream.class,null),storePassword);
-    try {
-      privateKey=(PrivateKey)keyStore.getKey(keyAlias,keyPassword);
-    }
- catch (    Exception e) {
-    }
-    certificate=(X509Certificate)keyStore.getCertificate(keyAlias);
+  CertificateRepresentation info=getCertFromRequest(uriInfo,input);
+  if (info.getPrivateKey() != null) {
+    client.setAttribute(privateAttribute,info.getPrivateKey());
   }
- catch (  Exception e) {
-    throw new RuntimeException(e);
-  }
-  if (privateKey != null) {
-    String privateKeyPem=KeycloakModelUtils.getPemFromKey(privateKey);
-    client.setAttribute(privateAttribute,privateKeyPem);
-    info.setPrivateKey(privateKeyPem);
-  }
- else   if (certificate != null) {
+ else   if (info.getCertificate() != null) {
     client.removeAttribute(privateAttribute);
   }
-  if (certificate != null) {
-    String certPem=KeycloakModelUtils.getPemFromCertificate(certificate);
-    client.setAttribute(certificateAttribute,certPem);
-    info.setCertificate(certPem);
+ else {
+    throw new ErrorResponseException("certificate-not-found","Certificate or key with given alias not found in the keystore",Response.Status.BAD_REQUEST);
+  }
+  if (info.getCertificate() != null) {
+    client.setAttribute(certificateAttribute,info.getCertificate());
   }
   adminEvent.operation(OperationType.ACTION).resourcePath(session.getContext().getUri()).representation(info).success();
   return info;

@@ -1,9 +1,0 @@
-{
-  List<UserSessionModel> sessions=new LinkedList<UserSessionModel>();
-  TypedQuery<UserSessionNoteEntity> query=em.createNamedQuery("selectNoteByNameValue",UserSessionNoteEntity.class).setParameter("name",noteName).setParameter("value",noteValue);
-  for (  UserSessionNoteEntity note : query.getResultList()) {
-    if (!note.getUserSession().getRealmId().equals(realm.getId()))     continue;
-    sessions.add(new UserSessionAdapter(session,em,realm,note.getUserSession()));
-  }
-  return sessions;
-}

@@ -1,6 +1,6 @@
 {
   MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
-  String secret=formData.getFirst("secret");
+  String secret=formData.getFirst("secret_answer");
   UserCredentialValueModel cred=null;
   for (  UserCredentialValueModel model : context.getUser().getCredentialsDirectly()) {
     if (model.getType().equals(CREDENTIAL_TYPE)) {
@@ -8,5 +8,5 @@
       break;
     }
   }
-  return CredentialValidation.validateHashedCredential(context.getRealm(),context.getUser(),secret,cred);
+  return cred.getValue().equals(secret);
 }

@@ -1,25 +1,10 @@
 {
-  MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
-  String secret=formData.getFirst("secret");
-  if (secret == null || secret.trim().equals("")) {
-    badSecret(context);
-    return;
-  }
-  UserCredentialValueModel cred=null;
-  for (  UserCredentialValueModel model : context.getUser().getCredentialsDirectly()) {
-    if (model.getType().equals(CREDENTIAL_TYPE)) {
-      cred=model;
-      break;
-    }
-  }
-  if (cred == null) {
-    badSecret(context);
-    return;
-  }
-  boolean validated=CredentialValidation.validateHashedCredential(context.getRealm(),context.getUser(),secret,cred);
+  boolean validated=validateAnswer(context);
   if (!validated) {
-    badSecret(context);
+    Response challenge=context.form().setError("badSecret").createForm("secret-question.ftl");
+    context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS,challenge);
     return;
   }
+  setCookie(context);
   context.success();
 }

@@ -1,0 +1,8 @@
+{
+  AuthenticatorConfigModel config=context.getAuthenticatorConfig();
+  int maxCookieAge=60 * 60 * 24* 30;
+  if (config != null) {
+    maxCookieAge=Integer.valueOf(config.getConfig().get("cookie.max.age"));
+  }
+  CookieHelper.addCookie("SECRET_QUESTION_ANSWERED","true",context.getUriInfo().getBaseUri().getPath() + "/realms/" + context.getRealm().getName(),null,null,maxCookieAge,true,true);
+}

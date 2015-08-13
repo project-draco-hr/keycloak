@@ -1,0 +1,9 @@
+{
+  String accessCode=generateAccessCode();
+  URI action=getActionUrl(accessCode);
+  LoginFormsProvider provider=getSession().getProvider(LoginFormsProvider.class).setUser(getUser()).setActionUri(action).setClientSessionCode(accessCode);
+  if (getForwardedErrorMessage() != null) {
+    provider.setError(getForwardedErrorMessage());
+  }
+  return provider;
+}

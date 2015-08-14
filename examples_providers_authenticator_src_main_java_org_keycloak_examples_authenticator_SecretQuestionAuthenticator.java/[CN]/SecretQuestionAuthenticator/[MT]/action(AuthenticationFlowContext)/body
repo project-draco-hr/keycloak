@@ -1,4 +1,9 @@
 {
+  MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
+  if (formData.containsKey("cancel")) {
+    context.cancelLogin();
+    return;
+  }
   boolean validated=validateAnswer(context);
   if (!validated) {
     Response challenge=context.form().setError("badSecret").createForm("secret-question.ftl");

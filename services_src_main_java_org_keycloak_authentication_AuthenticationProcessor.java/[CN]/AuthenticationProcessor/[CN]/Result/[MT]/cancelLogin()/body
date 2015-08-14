@@ -1,0 +1,7 @@
+{
+  getEvent().error(Errors.REJECTED_BY_USER);
+  LoginProtocol protocol=getSession().getProvider(LoginProtocol.class,getClientSession().getAuthMethod());
+  protocol.setRealm(getRealm()).setHttpHeaders(getHttpRequest().getHttpHeaders()).setUriInfo(getUriInfo());
+  Response response=protocol.cancelLogin(getClientSession());
+  forceChallenge(response);
+}

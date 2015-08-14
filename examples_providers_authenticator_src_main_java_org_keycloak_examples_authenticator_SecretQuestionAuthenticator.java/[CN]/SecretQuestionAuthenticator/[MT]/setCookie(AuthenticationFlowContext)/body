@@ -4,5 +4,6 @@
   if (config != null) {
     maxCookieAge=Integer.valueOf(config.getConfig().get("cookie.max.age"));
   }
-  CookieHelper.addCookie("SECRET_QUESTION_ANSWERED","true",context.getUriInfo().getBaseUri().getPath() + "/realms/" + context.getRealm().getName(),null,null,maxCookieAge,true,true);
+  URI uri=context.getUriInfo().getBaseUriBuilder().path("realms").path(context.getRealm().getName()).build();
+  CookieHelper.addCookie("SECRET_QUESTION_ANSWERED","true",uri.getRawPath(),null,null,maxCookieAge,false,true);
 }

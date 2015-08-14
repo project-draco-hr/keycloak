@@ -1,0 +1,26 @@
+{
+  HttpClient httpClient=context.getSession().getProvider(HttpClientProvider.class).getHttpClient();
+  HttpPost post=new HttpPost("https://www.google.com/recaptcha/api/siteverify");
+  List<NameValuePair> formparams=new LinkedList<>();
+  formparams.add(new BasicNameValuePair("secret",secret));
+  formparams.add(new BasicNameValuePair("response",captcha));
+  formparams.add(new BasicNameValuePair("remoteip",context.getConnection().getRemoteAddr()));
+  try {
+    UrlEncodedFormEntity form=new UrlEncodedFormEntity(formparams,"UTF-8");
+    post.setEntity(form);
+    HttpResponse response=httpClient.execute(post);
+    InputStream content=response.getEntity().getContent();
+    try {
+      Map json=JsonSerialization.readValue(content,Map.class);
+      Object val=json.get("success");
+      success=Boolean.TRUE.equals(val);
+    }
+  finally {
+      content.close();
+    }
+  }
+ catch (  Exception e) {
+    logger.error("Recaptcha failed",e);
+  }
+  return success;
+}

@@ -42,7 +42,7 @@
     if (factory == null) {
       throw new AuthenticationFlowException("Could not find AuthenticatorFactory for: " + model.getAuthenticator(),AuthenticationFlowError.INTERNAL_ERROR);
     }
-    Authenticator authenticator=factory.create();
+    Authenticator authenticator=factory.create(processor.getSession());
     AuthenticationProcessor.logger.debugv("authenticator: {0}",factory.getId());
     UserModel authUser=processor.getClientSession().getAuthenticatedUser();
     if (authenticator.requiresUser() && authUser == null) {

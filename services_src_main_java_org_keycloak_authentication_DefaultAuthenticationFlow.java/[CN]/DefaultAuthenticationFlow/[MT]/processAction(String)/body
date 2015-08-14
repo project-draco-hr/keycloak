@@ -12,7 +12,7 @@
     }
  else     if (model.getId().equals(actionExecution)) {
       AuthenticatorFactory factory=(AuthenticatorFactory)processor.getSession().getKeycloakSessionFactory().getProviderFactory(Authenticator.class,model.getAuthenticator());
-      Authenticator authenticator=factory.create();
+      Authenticator authenticator=factory.create(processor.getSession());
       AuthenticationProcessor.Result result=processor.createAuthenticatorContext(model,authenticator,executions);
       authenticator.action(result);
       Response response=processResult(result);

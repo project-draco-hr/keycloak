@@ -1,7 +1,11 @@
 {
   event.event(EventType.REGISTER);
+  if (!realm.isRegistrationAllowed()) {
+    event.error(Errors.REGISTRATION_DISABLED);
+    return ErrorPage.error(session,Messages.REGISTRATION_NOT_ALLOWED);
+  }
   Checks checks=new Checks();
-  if (!checks.verifyCode(realm.getRegistrationFlow(),code,ClientSessionModel.Action.AUTHENTICATE.name())) {
+  if (!checks.verifyCode(code,ClientSessionModel.Action.AUTHENTICATE.name())) {
     return checks.response;
   }
   if (!realm.isRegistrationAllowed()) {

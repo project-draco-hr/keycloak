@@ -17,7 +17,7 @@
         ClientSessionModel clientSession=RestartLoginCookie.restartSession(session,realm,code);
         if (clientSession != null) {
           event.clone().detail(Details.RESTART_AFTER_TIMEOUT,"true").error(Errors.EXPIRED_CODE);
-          response=processFlow(null,clientSession,flow,Messages.LOGIN_TIMEOUT);
+          response=processFlow(null,clientSession,realm.getBrowserFlow(),Messages.LOGIN_TIMEOUT);
           return false;
         }
       }

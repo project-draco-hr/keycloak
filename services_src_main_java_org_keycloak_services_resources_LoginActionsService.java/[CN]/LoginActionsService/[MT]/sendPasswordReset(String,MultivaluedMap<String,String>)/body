@@ -1,7 +1,11 @@
 {
   event.event(EventType.SEND_RESET_PASSWORD);
+  if (!realm.isResetPasswordAllowed()) {
+    event.error(Errors.RESET_CREDENTIAL_DISABLED);
+    return ErrorPage.error(session,Messages.RESET_CREDENTIAL_NOT_ALLOWED);
+  }
   Checks checks=new Checks();
-  if (!checks.verifyCode(realm.getBrowserFlow(),code)) {
+  if (!checks.verifyCode(code)) {
     return checks.response;
   }
   final ClientSessionCode accessCode=checks.clientCode;

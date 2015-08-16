@@ -1,0 +1,29 @@
+{
+  try {
+    String username="login@test.com";
+    loginPage.open();
+    loginPage.resetPassword();
+    resetPasswordPage.assertCurrent();
+    resetPasswordPage.changePassword(username);
+    validateResetPage.assertCurrent();
+    events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).user(userId).detail(Details.USERNAME,username).detail(Details.EMAIL,"login@test.com").session((String)null).assertEvent();
+    assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
+    assertEquals(1,greenMail.getReceivedMessages().length);
+    MimeMessage message=greenMail.getReceivedMessages()[0];
+    String code=getTemporaryCode(message);
+    validateResetPage.submitCode(code);
+    updatePasswordPage.assertCurrent();
+    updatePasswordPage.changePassword("resetPassword","resetPassword");
+    String sessionId=events.expectRequiredAction(EventType.UPDATE_PASSWORD).user(userId).detail(Details.USERNAME,username).assertEvent().getSessionId();
+    assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+    events.expectLogin().user(userId).detail(Details.USERNAME,username).session(sessionId).assertEvent();
+    oauth.openLogout();
+    events.expectLogout(sessionId).user(userId).session(sessionId).assertEvent();
+    loginPage.open();
+    loginPage.login("login-test","resetPassword");
+    events.expectLogin().user(userId).detail(Details.USERNAME,"login-test").assertEvent();
+    assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  }
+  finally {
+  }
+}

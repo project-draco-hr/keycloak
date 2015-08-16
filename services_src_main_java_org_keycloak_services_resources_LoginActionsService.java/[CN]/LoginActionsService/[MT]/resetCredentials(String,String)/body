@@ -1,0 +1,10 @@
+{
+  event.event(EventType.RESET_PASSWORD);
+  Checks checks=new Checks();
+  if (!checks.verifyCode(code,ClientSessionModel.Action.AUTHENTICATE.name())) {
+    return checks.response;
+  }
+  final ClientSessionCode clientCode=checks.clientCode;
+  final ClientSessionModel clientSession=clientCode.getClientSession();
+  return processResetCredentials(execution,clientSession,null);
+}

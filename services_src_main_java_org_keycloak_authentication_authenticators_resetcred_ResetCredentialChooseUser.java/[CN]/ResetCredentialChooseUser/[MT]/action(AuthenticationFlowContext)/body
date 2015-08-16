@@ -1,0 +1,26 @@
+{
+  EventBuilder event=context.getEvent();
+  MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
+  String username=formData.getFirst("username");
+  if (username == null || username.isEmpty()) {
+    event.error(Errors.USERNAME_MISSING);
+    Response challenge=context.form().setError(Messages.MISSING_USERNAME).createPasswordReset();
+    context.failureChallenge(AuthenticationFlowError.INVALID_USER,challenge);
+    return;
+  }
+  UserModel user=context.getSession().users().getUserByUsername(username,context.getRealm());
+  if (user == null && username.contains("@")) {
+    user=context.getSession().users().getUserByEmail(username,context.getRealm());
+  }
+  context.getClientSession().setNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME,username);
+  if (user == null) {
+    event.clone().detail(Details.USERNAME,username).error(Errors.USER_NOT_FOUND);
+  }
+ else   if (!user.isEnabled()) {
+    event.clone().detail(Details.USERNAME,username).user(user).error(Errors.USER_DISABLED);
+  }
+ else {
+    context.setUser(user);
+  }
+  context.success();
+}

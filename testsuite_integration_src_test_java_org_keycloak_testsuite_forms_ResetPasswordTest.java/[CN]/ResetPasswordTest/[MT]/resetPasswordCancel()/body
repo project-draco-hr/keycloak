@@ -3,12 +3,14 @@
   loginPage.resetPassword();
   resetPasswordPage.assertCurrent();
   resetPasswordPage.changePassword("login-test");
-  resetPasswordPage.assertCurrent();
-  events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).user(userId).detail(Details.USERNAME,"login-test").detail(Details.EMAIL,"login@test.com").assertEvent().getSessionId();
-  String src=driver.getPageSource();
-  resetPasswordPage.backToLogin();
+  validateResetPage.assertCurrent();
+  events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).session((String)null).user(userId).detail(Details.USERNAME,"login-test").detail(Details.EMAIL,"login@test.com").assertEvent().getSessionId();
+  validateResetPage.cancel();
   assertTrue(loginPage.isCurrent());
   loginPage.login("login-test","password");
+  String currentUrl=driver.getCurrentUrl();
+  String src=driver.getPageSource();
+  System.out.println("currentUrl: " + currentUrl);
   events.expectLogin().user(userId).detail(Details.USERNAME,"login-test").assertEvent();
   assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];

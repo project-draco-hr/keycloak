@@ -1,0 +1,38 @@
+{
+  AuthenticationFlowModel grant=new AuthenticationFlowModel();
+  grant.setAlias(RESET_CREDENTIALS_FLOW);
+  grant.setDescription("Reset credentials for a user if they forgot their password or something");
+  grant.setProviderId("basic-flow");
+  grant.setTopLevel(true);
+  grant.setBuiltIn(true);
+  grant=realm.addAuthenticationFlow(grant);
+  realm.setResetCredentialsFlow(grant);
+  AuthenticationExecutionModel execution=new AuthenticationExecutionModel();
+  execution.setParentFlow(grant.getId());
+  execution.setRequirement(AuthenticationExecutionModel.Requirement.REQUIRED);
+  execution.setAuthenticator("reset-credentials-choose-user");
+  execution.setPriority(10);
+  execution.setAuthenticatorFlow(false);
+  realm.addAuthenticatorExecution(execution);
+  execution=new AuthenticationExecutionModel();
+  execution.setParentFlow(grant.getId());
+  execution.setRequirement(AuthenticationExecutionModel.Requirement.REQUIRED);
+  execution.setAuthenticator("reset-credential-email");
+  execution.setPriority(20);
+  execution.setAuthenticatorFlow(false);
+  realm.addAuthenticatorExecution(execution);
+  execution=new AuthenticationExecutionModel();
+  execution.setParentFlow(grant.getId());
+  execution.setRequirement(AuthenticationExecutionModel.Requirement.REQUIRED);
+  execution.setAuthenticator("reset-password");
+  execution.setPriority(30);
+  execution.setAuthenticatorFlow(false);
+  realm.addAuthenticatorExecution(execution);
+  execution=new AuthenticationExecutionModel();
+  execution.setParentFlow(grant.getId());
+  execution.setRequirement(AuthenticationExecutionModel.Requirement.OPTIONAL);
+  execution.setAuthenticator("reset-otp");
+  execution.setPriority(40);
+  execution.setAuthenticatorFlow(false);
+  realm.addAuthenticatorExecution(execution);
+}

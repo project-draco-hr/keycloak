@@ -15,7 +15,7 @@
     errorPage.assertCurrent();
     assertEquals("Failed to send email, please try again later.",errorPage.getError());
     assertEquals(0,greenMail.getReceivedMessages().length);
-    events.expectRequiredAction(EventType.SEND_RESET_PASSWORD_ERROR).user(userId).detail(Details.USERNAME,"login-test").removeDetail(Details.CODE_ID).error(Errors.EMAIL_SEND_FAILED).assertEvent();
+    events.expectRequiredAction(EventType.SEND_RESET_PASSWORD_ERROR).user(userId).session((String)null).detail(Details.USERNAME,"login-test").removeDetail(Details.CODE_ID).error(Errors.EMAIL_SEND_FAILED).assertEvent();
   }
   finally {
     keycloakRule.configure(new KeycloakRule.KeycloakSetup(){

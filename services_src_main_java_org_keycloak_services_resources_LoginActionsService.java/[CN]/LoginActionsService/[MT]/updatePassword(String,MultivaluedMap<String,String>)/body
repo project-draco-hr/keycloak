@@ -30,11 +30,8 @@ catch (  Exception ape) {
   user.removeRequiredAction(RequiredAction.UPDATE_PASSWORD);
   event.event(EventType.UPDATE_PASSWORD).success();
   if (clientSession.getAction().equals(ClientSessionModel.Action.RECOVER_PASSWORD.name())) {
-    String actionCookieValue=getActionCookie();
-    if (actionCookieValue == null || !actionCookieValue.equals(userSession.getId())) {
-      session.sessions().removeClientSession(realm,clientSession);
-      return session.getProvider(LoginFormsProvider.class).setSuccess(Messages.ACCOUNT_PASSWORD_UPDATED).createInfoPage();
-    }
+    session.sessions().removeClientSession(realm,clientSession);
+    return session.getProvider(LoginFormsProvider.class).setSuccess(Messages.ACCOUNT_PASSWORD_UPDATED).createInfoPage();
   }
   event=event.clone().event(EventType.LOGIN);
   return AuthenticationManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);

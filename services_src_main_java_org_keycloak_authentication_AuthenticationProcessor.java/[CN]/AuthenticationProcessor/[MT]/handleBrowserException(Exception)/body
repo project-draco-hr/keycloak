@@ -22,6 +22,12 @@
       event.error(Errors.EXPIRED_CODE);
       return ErrorPage.error(session,Messages.EXPIRED_CODE);
     }
+ else     if (e.getError() == AuthenticationFlowError.RESET_TO_BROWSER_LOGIN) {
+      resetFlow(getClientSession());
+      AuthenticationProcessor processor=new AuthenticationProcessor();
+      processor.setClientSession(clientSession).setFlowPath(LoginActionsService.AUTHENTICATE_PATH).setFlowId(realm.getBrowserFlow().getId()).setConnection(connection).setEventBuilder(event).setProtector(protector).setRealm(realm).setSession(session).setUriInfo(uriInfo).setRequest(request);
+      return processor.authenticate();
+    }
  else {
       event.error(Errors.INVALID_USER_CREDENTIALS);
       return ErrorPage.error(session,Messages.INVALID_USER);

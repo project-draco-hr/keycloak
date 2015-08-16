@@ -1,0 +1,35 @@
+{
+  EventBuilder event=context.getEvent();
+  MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
+  String username=formData.getFirst("username");
+  if (username == null || username.isEmpty()) {
+    event.error(Errors.USERNAME_MISSING);
+    Response challenge=context.form().setError(Messages.MISSING_USERNAME).createPasswordReset();
+    context.failureChallenge(AuthenticationFlowError.INVALID_USER,challenge);
+    return;
+  }
+  UserModel user=context.getSession().users().getUserByUsername(username,context.getRealm());
+  if (user == null && username.contains("@")) {
+    user=context.getSession().users().getUserByEmail(username,context.getRealm());
+  }
+  if (user == null) {
+    event.error(Errors.INVALID_USER_CREDENTIALS);
+    Response challenge=context.form().setError(Messages.INVALID_USER).createPasswordReset();
+    context.failureChallenge(AuthenticationFlowError.INVALID_USER,challenge);
+    return;
+  }
+  if (!user.isEnabled()) {
+    event.user(user).error(Errors.USER_DISABLED);
+    Response challenge=context.form().setError(Messages.ACCOUNT_DISABLED).createPasswordReset();
+    context.failureChallenge(AuthenticationFlowError.INVALID_USER,challenge);
+    return;
+  }
+  if (user.getEmail() == null || user.getEmail().trim().length() == 0) {
+    event.user(user).error(Errors.INVALID_EMAIL);
+    Response challenge=context.form().setError(Messages.INVALID_EMAIL).createPasswordReset();
+    context.failureChallenge(AuthenticationFlowError.INVALID_USER,challenge);
+    return;
+  }
+  context.setUser(user);
+  context.success();
+}

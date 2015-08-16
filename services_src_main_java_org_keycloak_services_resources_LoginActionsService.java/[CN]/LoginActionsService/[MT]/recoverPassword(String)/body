@@ -1,0 +1,16 @@
+{
+  event.event(EventType.RESET_PASSWORD);
+  if (key != null) {
+    Checks checks=new Checks();
+    if (!checks.verifyCode(key,ClientSessionModel.Action.RECOVER_PASSWORD.name())) {
+      event.error(Errors.RESET_CREDENTIAL_DISABLED);
+      return ErrorPage.error(session,Messages.INVALID_CODE);
+    }
+    ClientSessionCode accessCode=checks.clientCode;
+    return session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
+  }
+ else {
+    event.error(Errors.RESET_CREDENTIAL_DISABLED);
+    return ErrorPage.error(session,Messages.INVALID_CODE);
+  }
+}

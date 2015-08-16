@@ -1,0 +1,26 @@
+{
+  UserModel user=context.getUser();
+  EventBuilder event=context.getEvent();
+  if (user.getEmail() == null || user.getEmail().trim().length() == 0) {
+    event.user(user).error(Errors.INVALID_EMAIL);
+    Response challenge=context.form().setError(Messages.INVALID_EMAIL).createPasswordReset();
+    context.failureChallenge(AuthenticationFlowError.INVALID_USER,challenge);
+    return;
+  }
+  String secret=HmacOTP.generateSecret(10);
+  context.getClientSession().setNote(RESET_CREDENTIAL_SECRET,secret);
+  String link=UriBuilder.fromUri(context.getActionUrl()).queryParam(KEY,secret).build().toString();
+  long expiration=TimeUnit.SECONDS.toMinutes(context.getRealm().getAccessCodeLifespanUserAction());
+  try {
+    context.getSession().getProvider(EmailProvider.class).setRealm(context.getRealm()).setUser(user).sendPasswordReset(secret,link,expiration);
+    event.detail(Details.EMAIL,user.getEmail()).detail(Details.CODE_ID,context.getClientSession().getId()).success();
+    Response challenge=context.form().setSuccess(Messages.EMAIL_SENT).createForm("validate-reset-email.ftl");
+    context.challenge(challenge);
+  }
+ catch (  EmailException e) {
+    event.error(Errors.EMAIL_SEND_FAILED);
+    logger.error("Failed to send password reset email",e);
+    Response challenge=context.form().setError(Messages.EMAIL_SENT_ERROR).createErrorPage();
+    context.failure(AuthenticationFlowError.INTERNAL_ERROR,challenge);
+  }
+}

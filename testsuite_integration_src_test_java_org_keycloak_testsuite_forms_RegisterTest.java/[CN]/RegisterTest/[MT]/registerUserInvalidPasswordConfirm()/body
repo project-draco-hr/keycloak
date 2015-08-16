@@ -2,8 +2,15 @@
   loginPage.open();
   loginPage.clickRegister();
   registerPage.assertCurrent();
-  registerPage.register("firstName","lastName","registerUserInvalidPasswordConfirm@email","registerUserInvalidPasswordConfirm","password","invalid");
+  registerPage.register("firstName","lastName","registerUserInvalidPasswordConfirm@email","registerUserInvalidPasswordConfirm","password","invalid",null);
   registerPage.assertCurrent();
   Assert.assertEquals("Password confirmation doesn't match.",registerPage.getError());
+  Assert.assertEquals("firstName",registerPage.getFirstName());
+  Assert.assertEquals("lastName",registerPage.getLastName());
+  Assert.assertEquals("registerUserInvalidPasswordConfirm@email",registerPage.getEmail());
+  Assert.assertEquals("registerUserInvalidPasswordConfirm",registerPage.getUsername());
+  Assert.assertEquals("",registerPage.getPassword());
+  Assert.assertEquals("",registerPage.getPasswordConfirm());
+  Assert.assertEquals("",registerPage.getAttributeStreet());
   events.expectRegister("registerUserInvalidPasswordConfirm","registerUserInvalidPasswordConfirm@email").removeDetail(Details.USERNAME).removeDetail(Details.EMAIL).user((String)null).error("invalid_registration").assertEvent();
 }

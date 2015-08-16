@@ -2,8 +2,12 @@
   loginPage.open();
   loginPage.login("test-user@localhost","password");
   updateProfilePage.assertCurrent();
-  updateProfilePage.update("New first","New last","");
+  updateProfilePage.update("New first","New last","","mystreet");
   updateProfilePage.assertCurrent();
+  Assert.assertEquals("New first",updateProfilePage.getFirstName());
+  Assert.assertEquals("New last",updateProfilePage.getLastName());
+  Assert.assertEquals("",updateProfilePage.getEmail());
+  Assert.assertEquals("mystreet",updateProfilePage.getAttributeStreet());
   Assert.assertEquals("Please specify email.",updateProfilePage.getError());
   events.assertEmpty();
 }

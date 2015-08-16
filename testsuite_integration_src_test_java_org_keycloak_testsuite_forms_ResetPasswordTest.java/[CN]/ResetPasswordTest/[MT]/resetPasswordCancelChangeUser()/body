@@ -3,12 +3,12 @@
   loginPage.resetPassword();
   resetPasswordPage.assertCurrent();
   resetPasswordPage.changePassword("test-user@localhost");
-  resetPasswordPage.assertCurrent();
-  events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).detail(Details.USERNAME,"test-user@localhost").detail(Details.EMAIL,"test-user@localhost").assertEvent().getSessionId();
-  resetPasswordPage.backToLogin();
+  validateResetPage.assertCurrent();
+  events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).detail(Details.USERNAME,"test-user@localhost").session((String)null).detail(Details.EMAIL,"test-user@localhost").assertEvent();
+  validateResetPage.cancel();
   assertTrue(loginPage.isCurrent());
   loginPage.login("login@test.com","password");
-  Event loginEvent=events.expectLogin().user(userId).detail(Details.USERNAME,"login-test").assertEvent();
+  Event loginEvent=events.expectLogin().user(userId).detail(Details.USERNAME,"login@test.com").assertEvent();
   String code=oauth.getCurrentQuery().get("code");
   OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
   assertEquals(200,tokenResponse.getStatusCode());

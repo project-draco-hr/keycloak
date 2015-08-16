@@ -2,11 +2,15 @@
   String username=clientSession.getAuthenticatedUser().getUsername();
   String attemptedUsername=clientSession.getNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME);
   if (attemptedUsername != null)   username=attemptedUsername;
+  String rememberMe=clientSession.getNote(Details.REMEMBER_ME);
+  boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("true");
   if (userSession == null) {
-    boolean remember="true".equals(clientSession.getNote(Details.REMEMBER_ME));
-    userSession=session.sessions().createUserSession(realm,clientSession.getAuthenticatedUser(),username,connection.getRemoteAddr(),"form",remember,null,null);
+    userSession=session.sessions().createUserSession(realm,clientSession.getAuthenticatedUser(),username,connection.getRemoteAddr(),clientSession.getAuthMethod(),remember,null,null);
     userSession.setState(UserSessionModel.State.LOGGING_IN);
     userSessionCreated=true;
+  }
+  if (remember) {
+    event.detail(Details.REMEMBER_ME,"true");
   }
   TokenManager.attachClientSession(userSession,clientSession);
   event.user(userSession.getUser()).detail(Details.USERNAME,username).session(userSession);

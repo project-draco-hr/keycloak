@@ -1,9 +1,10 @@
 {
   ClientSessionCode code=new ClientSessionCode(realm,clientSession);
-  if (!code.isValidAction(ClientSessionModel.Action.AUTHENTICATE.name())) {
+  String action=ClientSessionModel.Action.AUTHENTICATE.name();
+  if (!code.isValidAction(action)) {
     throw new AuthenticationFlowException(AuthenticationFlowError.INVALID_CLIENT_SESSION);
   }
-  if (!code.isActionActive(ClientSessionModel.Action.AUTHENTICATE.name())) {
+  if (!code.isActionActive(action)) {
     throw new AuthenticationFlowException(AuthenticationFlowError.EXPIRED_CODE);
   }
   clientSession.setTimestamp(Time.currentTime());

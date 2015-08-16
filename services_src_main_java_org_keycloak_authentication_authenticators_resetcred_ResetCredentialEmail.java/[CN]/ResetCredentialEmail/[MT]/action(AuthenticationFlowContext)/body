@@ -5,7 +5,12 @@
     key=context.getUriInfo().getQueryParameters().getFirst(KEY);
   }
  else   if (context.getHttpRequest().getHttpMethod().equalsIgnoreCase("POST")) {
-    key=context.getHttpRequest().getDecodedFormParameters().getFirst(KEY);
+    MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
+    if (formData.containsKey("cancel")) {
+      context.resetBrowserLogin();
+      return;
+    }
+    key=formData.getFirst(KEY);
   }
   context.getClientSession().removeNote(RESET_CREDENTIAL_SECRET);
   if (secret == null || key == null || !secret.equals(key)) {

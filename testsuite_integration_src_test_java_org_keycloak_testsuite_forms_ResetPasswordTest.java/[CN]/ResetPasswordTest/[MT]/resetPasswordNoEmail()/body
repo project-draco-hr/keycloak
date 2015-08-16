@@ -13,10 +13,10 @@
     loginPage.resetPassword();
     resetPasswordPage.assertCurrent();
     resetPasswordPage.changePassword("login-test");
-    resetPasswordPage.assertCurrent();
+    validateResetPage.assertCurrent();
     assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
     assertEquals(0,greenMail.getReceivedMessages().length);
-    events.expectRequiredAction(EventType.SEND_RESET_PASSWORD_ERROR).session((String)null).user(userId).detail(Details.USERNAME,"login-test").removeDetail(Details.CODE_ID).error("invalid_email").assertEvent();
+    events.expectRequiredAction(EventType.RESET_PASSWORD_ERROR).session((String)null).user(userId).detail(Details.USERNAME,"login-test").removeDetail(Details.CODE_ID).error("invalid_email").assertEvent();
   }
   finally {
     keycloakRule.configure(new KeycloakRule.KeycloakSetup(){

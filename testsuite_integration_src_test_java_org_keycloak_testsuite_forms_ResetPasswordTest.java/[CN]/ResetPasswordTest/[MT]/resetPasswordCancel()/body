@@ -8,6 +8,9 @@
   validateResetPage.cancel();
   assertTrue(loginPage.isCurrent());
   loginPage.login("login-test","password");
+  String currentUrl=driver.getCurrentUrl();
+  String src=driver.getPageSource();
+  System.out.println("currentUrl: " + currentUrl);
   events.expectLogin().user(userId).detail(Details.USERNAME,"login-test").assertEvent();
   assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];

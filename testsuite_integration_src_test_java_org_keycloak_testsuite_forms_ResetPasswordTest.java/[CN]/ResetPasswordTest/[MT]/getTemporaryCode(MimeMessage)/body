@@ -1,0 +1,12 @@
+{
+  Multipart multipart=(Multipart)message.getContent();
+  final String textContentType=multipart.getBodyPart(0).getContentType();
+  assertEquals("text/plain; charset=UTF-8",textContentType);
+  final String textBody=(String)multipart.getBodyPart(0).getContent();
+  Pattern pattern=Pattern.compile("Temporary Code: ([^\\s]*)");
+  Matcher matcher=pattern.matcher(textBody);
+  if (matcher.find()) {
+    return matcher.group(1);
+  }
+  return null;
+}

@@ -1,0 +1,12 @@
+{
+  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      UserModel user=session.users().getUserByUsername("login-test",appRealm);
+      UserCredentialModel creds=new UserCredentialModel();
+      creds.setType(CredentialRepresentation.PASSWORD);
+      creds.setValue("password");
+      user.updateCredential(creds);
+    }
+  }
+);
+}

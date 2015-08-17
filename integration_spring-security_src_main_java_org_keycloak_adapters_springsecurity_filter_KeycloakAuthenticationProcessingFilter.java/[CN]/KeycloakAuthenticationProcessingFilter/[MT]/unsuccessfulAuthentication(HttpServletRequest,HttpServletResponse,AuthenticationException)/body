@@ -1,7 +1,7 @@
 {
-  if (this.isBearerTokenRequest(request)) {
+  if (this.isBearerTokenRequest(request) || this.isBasicAuthRequest(request)) {
     SecurityContextHolder.clearContext();
-    response.sendError(HttpServletResponse.SC_FORBIDDEN,"Unable to authenticate bearer token");
+    response.sendError(HttpServletResponse.SC_FORBIDDEN,"Unable to authenticate bearer token/basic authentication");
     return;
   }
   super.unsuccessfulAuthentication(request,response,failed);

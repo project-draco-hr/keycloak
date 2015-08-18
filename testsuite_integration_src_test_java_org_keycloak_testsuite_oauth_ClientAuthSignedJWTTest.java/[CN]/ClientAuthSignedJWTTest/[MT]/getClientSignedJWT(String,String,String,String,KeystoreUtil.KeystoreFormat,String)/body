@@ -1,0 +1,7 @@
+{
+  PrivateKey privateKey=KeystoreUtil.loadPrivateKeyFromKeystore(keystoreFile,storePassword,keyPassword,keyAlias,format);
+  JWTClientCredentialsProvider jwtProvider=new JWTClientCredentialsProvider();
+  jwtProvider.setPrivateKey(privateKey);
+  jwtProvider.setTokenTimeout(10);
+  return jwtProvider.createSignedRequestToken(clientId,getRealmInfoUrl());
+}

@@ -50,6 +50,7 @@
     throw new ErrorResponseException("invalid_grant","Session not active",Response.Status.BAD_REQUEST);
   }
   updateClientSession(clientSession);
+  updateUserSessionFromClientAuth(userSession);
   AccessToken token=tokenManager.createClientAccessToken(session,accessCode.getRequestedRoles(),realm,client,user,userSession,clientSession);
   AccessTokenResponse res=tokenManager.responseBuilder(realm,client,event,session,userSession,clientSession).accessToken(token).generateIDToken().generateRefreshToken().build();
   event.success();

@@ -19,6 +19,11 @@
         rep.setProviderId(execution.getAuthenticator());
         rep.setAuthenticationConfig(execution.getAuthenticatorConfig());
       }
+ else       if (AuthenticationFlow.CLIENT_FLOW.equals(flowRef.getProviderId())) {
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.ALTERNATIVE.name());
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.REQUIRED.name());
+        rep.getRequirementChoices().add(AuthenticationExecutionModel.Requirement.DISABLED.name());
+      }
       rep.setDisplayName(flowRef.getAlias());
       rep.setConfigurable(false);
       rep.setId(execution.getId());

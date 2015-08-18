@@ -1,0 +1,15 @@
+{
+  String clientSecret=null;
+  String authorizationHeader=context.getHttpRequest().getHttpHeaders().getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+  MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
+  if (authorizationHeader != null) {
+    String[] usernameSecret=BasicAuthHelper.parseHeader(authorizationHeader);
+    if (usernameSecret != null) {
+      clientSecret=usernameSecret[1];
+    }
+  }
+  if (clientSecret == null) {
+    clientSecret=formData.getFirst("client_secret");
+  }
+  return clientSecret;
+}

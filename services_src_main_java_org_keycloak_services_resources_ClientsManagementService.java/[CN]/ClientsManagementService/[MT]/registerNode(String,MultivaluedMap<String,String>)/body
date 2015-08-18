@@ -7,7 +7,7 @@
     event.error(Errors.REALM_DISABLED);
     throw new UnauthorizedException("Realm not enabled");
   }
-  ClientModel client=authorizeClient(authorizationHeader,formData);
+  ClientModel client=authorizeClient();
   String nodeHost=getClientClusterHost(formData);
   event.client(client).detail(Details.NODE_HOST,nodeHost);
   logger.debugf("Registering cluster host '%s' for client '%s'",nodeHost,client.getClientId());

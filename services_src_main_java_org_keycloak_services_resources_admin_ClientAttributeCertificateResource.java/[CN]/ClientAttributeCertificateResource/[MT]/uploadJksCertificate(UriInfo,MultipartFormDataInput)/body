@@ -1,0 +1,11 @@
+{
+  CertificateRepresentation info=getCertFromRequest(uriInfo,input);
+  if (info.getCertificate() != null) {
+    client.setAttribute(certificateAttribute,info.getCertificate());
+  }
+ else {
+    throw new ErrorResponseException("certificate-not-found","Certificate with given alias not found in the keystore",Response.Status.BAD_REQUEST);
+  }
+  adminEvent.operation(OperationType.ACTION).resourcePath(session.getContext().getUri()).representation(info).success();
+  return info;
+}

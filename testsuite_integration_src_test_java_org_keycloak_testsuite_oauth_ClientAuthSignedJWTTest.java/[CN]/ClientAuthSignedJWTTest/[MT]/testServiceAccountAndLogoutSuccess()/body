@@ -1,0 +1,23 @@
+{
+  String client1Jwt=getClient1SignedJWT();
+  OAuthClient.AccessTokenResponse response=doClientCredentialsGrantRequest(client1Jwt);
+  Assert.assertEquals(200,response.getStatusCode());
+  AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
+  RefreshToken refreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
+  events.expectClientLogin().client("client1").user(client1SAUserId).session(accessToken.getSessionState()).detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).detail(Details.USERNAME,ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX + "client1").detail(Details.CLIENT_AUTH_METHOD,JWTClientAuthenticator.PROVIDER_ID).assertEvent();
+  Assert.assertEquals(accessToken.getSessionState(),refreshToken.getSessionState());
+  client1Jwt=getClient1SignedJWT();
+  OAuthClient.AccessTokenResponse refreshedResponse=doRefreshTokenRequest(response.getRefreshToken(),client1Jwt);
+  AccessToken refreshedAccessToken=oauth.verifyToken(refreshedResponse.getAccessToken());
+  RefreshToken refreshedRefreshToken=oauth.verifyRefreshToken(refreshedResponse.getRefreshToken());
+  Assert.assertEquals(accessToken.getSessionState(),refreshedAccessToken.getSessionState());
+  Assert.assertEquals(accessToken.getSessionState(),refreshedRefreshToken.getSessionState());
+  events.expectRefresh(refreshToken.getId(),refreshToken.getSessionState()).user(client1SAUserId).client("client1").detail(Details.CLIENT_AUTH_METHOD,JWTClientAuthenticator.PROVIDER_ID).assertEvent();
+  HttpResponse logoutResponse=doLogout(response.getRefreshToken(),getClient1SignedJWT());
+  assertEquals(204,logoutResponse.getStatusLine().getStatusCode());
+  events.expectLogout(accessToken.getSessionState()).client("client1").user(client1SAUserId).removeDetail(Details.REDIRECT_URI).detail(Details.CLIENT_AUTH_METHOD,JWTClientAuthenticator.PROVIDER_ID).assertEvent();
+  response=doRefreshTokenRequest(response.getRefreshToken(),getClient1SignedJWT());
+  assertEquals(400,response.getStatusCode());
+  assertEquals("invalid_grant",response.getError());
+  events.expectRefresh(refreshToken.getId(),refreshToken.getSessionState()).client("client1").user(client1SAUserId).removeDetail(Details.TOKEN_ID).removeDetail(Details.UPDATED_REFRESH_TOKEN_ID).detail(Details.CLIENT_AUTH_METHOD,JWTClientAuthenticator.PROVIDER_ID).error(Errors.INVALID_TOKEN).assertEvent();
+}

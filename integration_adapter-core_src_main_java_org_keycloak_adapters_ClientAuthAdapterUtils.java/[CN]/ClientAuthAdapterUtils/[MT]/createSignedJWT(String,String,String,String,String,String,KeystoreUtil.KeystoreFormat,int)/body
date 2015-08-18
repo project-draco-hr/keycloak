@@ -1,0 +1,6 @@
+{
+  JsonWebToken jwt=createRequestToken(clientId,realmInfoUrl,tokenTimeout);
+  PrivateKey privateKey=KeystoreUtil.loadPrivateKeyFromKeystore(keystoreFile,storePassword,keyPassword,alias,type);
+  String signedToken=new JWSBuilder().jsonContent(jwt).rsa256(privateKey);
+  return signedToken;
+}

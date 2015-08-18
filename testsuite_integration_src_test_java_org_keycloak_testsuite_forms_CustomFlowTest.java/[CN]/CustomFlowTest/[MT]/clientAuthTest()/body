@@ -1,0 +1,12 @@
+{
+  PassThroughClientAuthenticator.clientId="dummy-client";
+  PassThroughAuthenticator.username="login-test";
+  grantAccessToken("dummy-client","login-test");
+  PassThroughClientAuthenticator.clientId="test-app";
+  grantAccessToken("test-app","login-test");
+  PassThroughClientAuthenticator.clientId="unknown";
+  OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("password","test-user","password");
+  assertEquals(400,response.getStatusCode());
+  assertEquals("invalid_client",response.getError());
+  events.expectLogin().client((String)null).user((String)null).session((String)null).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).error(Errors.CLIENT_NOT_FOUND).assertEvent();
+}

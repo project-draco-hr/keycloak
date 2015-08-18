@@ -1,0 +1,27 @@
+{
+  if (failure instanceof AuthenticationFlowException) {
+    AuthenticationFlowException e=(AuthenticationFlowException)failure;
+    logger.error("Failed client authentication: " + e.getError().toString(),e);
+    if (e.getError() == AuthenticationFlowError.CLIENT_NOT_FOUND) {
+      event.error(Errors.CLIENT_NOT_FOUND);
+      return ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"invalid_client","Could not find client");
+    }
+ else     if (e.getError() == AuthenticationFlowError.CLIENT_DISABLED) {
+      event.error(Errors.CLIENT_DISABLED);
+      return ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"invalid_client","Client is not enabled");
+    }
+ else     if (e.getError() == AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED) {
+      event.error(Errors.INVALID_CLIENT_CREDENTIALS);
+      return ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client",e.getMessage());
+    }
+ else {
+      event.error(Errors.INVALID_CLIENT_CREDENTIALS);
+      return ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client",e.getError().toString() + ": " + e.getMessage());
+    }
+  }
+ else {
+    logger.error("Unexpected error when authenticating client",failure);
+    event.error(Errors.INVALID_CLIENT_CREDENTIALS);
+    return ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client","Unexpected error when authenticating client: " + failure.getMessage());
+  }
+}

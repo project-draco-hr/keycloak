@@ -1,30 +1,8 @@
 {
   auth.requireManage();
-  String subject=client.getClientId();
-  KeyPair keyPair=null;
-  try {
-    KeyPairGenerator generator=KeyPairGenerator.getInstance("RSA");
-    generator.initialize(2048);
-    keyPair=generator.generateKeyPair();
-  }
- catch (  NoSuchAlgorithmException e) {
-    throw new RuntimeException(e);
-  }
-  X509Certificate certificate=null;
-  try {
-    certificate=CertificateUtils.generateV1SelfSignedCertificate(keyPair,subject);
-  }
- catch (  Exception e) {
-    throw new RuntimeException(e);
-  }
-  String privateKeyPem=KeycloakModelUtils.getPemFromKey(keyPair.getPrivate());
-  String certPem=KeycloakModelUtils.getPemFromCertificate(certificate);
-  client.setAttribute(privateAttribute,privateKeyPem);
-  client.setAttribute(certificateAttribute,certPem);
-  KeycloakModelUtils.generateClientKeyPairCertificate(client);
-  ClientKeyPairInfo info=new ClientKeyPairInfo();
-  info.setCertificate(client.getAttribute(certificateAttribute));
-  info.setPrivateKey(client.getAttribute(privateAttribute));
+  CertificateRepresentation info=KeycloakModelUtils.generateKeyPairCertificate(client.getClientId());
+  client.setAttribute(privateAttribute,info.getPrivateKey());
+  client.setAttribute(certificateAttribute,info.getCertificate());
   adminEvent.operation(OperationType.ACTION).resourcePath(session.getContext().getUri()).representation(info).success();
   return info;
 }

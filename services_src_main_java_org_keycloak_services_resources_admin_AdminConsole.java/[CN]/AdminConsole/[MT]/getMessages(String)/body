@@ -1,0 +1,18 @@
+{
+  if (lang == null) {
+    logger.warn("Locale not specified for messages.json");
+    lang="en";
+  }
+  try {
+    Properties msgs=AdminMessagesLoader.getMessages(lang);
+    if (msgs.isEmpty()) {
+      logger.warn("Message bundle not found for language code '" + lang + "'");
+      msgs=AdminMessagesLoader.getMessages("en");
+    }
+    if (msgs.isEmpty())     logger.fatal("Message bundle not found for language code 'en'");
+    return msgs;
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+}

@@ -4,9 +4,9 @@
     loginPage.resetPassword();
     resetPasswordPage.assertCurrent();
     resetPasswordPage.changePassword("login-test");
-    validateResetPage.assertCurrent();
+    loginPage.assertCurrent();
+    assertEquals("You should receive an email shortly with further instructions.",loginPage.getSuccessMessage());
     events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).session((String)null).user(userId).detail(Details.USERNAME,"login-test").detail(Details.EMAIL,"login@test.com").assertEvent();
-    assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
     assertEquals(1,greenMail.getReceivedMessages().length);
     MimeMessage message=greenMail.getReceivedMessages()[0];
     String changePasswordUrl=getPasswordResetEmailLink(message);

@@ -1,17 +1,6 @@
 {
   String secret=context.getClientSession().getNote(RESET_CREDENTIAL_SECRET);
-  String key=null;
-  if (context.getHttpRequest().getHttpMethod().equalsIgnoreCase("GET")) {
-    key=context.getUriInfo().getQueryParameters().getFirst(KEY);
-  }
- else   if (context.getHttpRequest().getHttpMethod().equalsIgnoreCase("POST")) {
-    MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
-    if (formData.containsKey("cancel")) {
-      context.resetBrowserLogin();
-      return;
-    }
-    key=formData.getFirst(KEY);
-  }
+  String key=context.getUriInfo().getQueryParameters().getFirst(KEY);
   context.getClientSession().removeNote(RESET_CREDENTIAL_SECRET);
   if (secret == null || key == null || !secret.equals(key)) {
     context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);

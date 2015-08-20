@@ -1,34 +1,41 @@
 {
   if (failure instanceof AuthenticationFlowException) {
     AuthenticationFlowException e=(AuthenticationFlowException)failure;
-    logger.error("failed authentication: " + e.getError().toString(),e);
     if (e.getError() == AuthenticationFlowError.INVALID_USER) {
+      logger.error("failed authentication: " + e.getError().toString(),e);
       event.error(Errors.USER_NOT_FOUND);
       return ErrorPage.error(session,Messages.INVALID_USER);
     }
  else     if (e.getError() == AuthenticationFlowError.USER_DISABLED) {
+      logger.error("failed authentication: " + e.getError().toString(),e);
       event.error(Errors.USER_DISABLED);
       return ErrorPage.error(session,Messages.ACCOUNT_DISABLED);
     }
  else     if (e.getError() == AuthenticationFlowError.USER_TEMPORARILY_DISABLED) {
+      logger.error("failed authentication: " + e.getError().toString(),e);
       event.error(Errors.USER_TEMPORARILY_DISABLED);
       return ErrorPage.error(session,Messages.ACCOUNT_TEMPORARILY_DISABLED);
     }
  else     if (e.getError() == AuthenticationFlowError.INVALID_CLIENT_SESSION) {
+      logger.error("failed authentication: " + e.getError().toString(),e);
       event.error(Errors.INVALID_CODE);
       return ErrorPage.error(session,Messages.INVALID_CODE);
     }
  else     if (e.getError() == AuthenticationFlowError.EXPIRED_CODE) {
+      logger.error("failed authentication: " + e.getError().toString(),e);
       event.error(Errors.EXPIRED_CODE);
       return ErrorPage.error(session,Messages.EXPIRED_CODE);
     }
- else     if (e.getError() == AuthenticationFlowError.RESET_TO_BROWSER_LOGIN) {
-      resetFlow(getClientSession());
+ else     if (e.getError() == AuthenticationFlowError.FORK_FLOW) {
+      ForkFlowException reset=(ForkFlowException)e;
+      ClientSessionModel clone=clone(session,clientSession);
+      clone.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
       AuthenticationProcessor processor=new AuthenticationProcessor();
-      processor.setClientSession(clientSession).setFlowPath(LoginActionsService.AUTHENTICATE_PATH).setFlowId(realm.getBrowserFlow().getId()).setConnection(connection).setEventBuilder(event).setProtector(protector).setRealm(realm).setSession(session).setUriInfo(uriInfo).setRequest(request);
+      processor.setClientSession(clone).setFlowPath(LoginActionsService.AUTHENTICATE_PATH).setFlowId(realm.getBrowserFlow().getId()).setForwardedErrorMessage(reset.getErrorMessage()).setForwardedSuccessMessage(reset.getSuccessMessage()).setConnection(connection).setEventBuilder(event).setProtector(protector).setRealm(realm).setSession(session).setUriInfo(uriInfo).setRequest(request);
       return processor.authenticate();
     }
  else {
+      logger.error("failed authentication: " + e.getError().toString(),e);
       event.error(Errors.INVALID_USER_CREDENTIALS);
       return ErrorPage.error(session,Messages.INVALID_USER);
     }

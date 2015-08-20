@@ -1,0 +1,11 @@
+{
+  ClientSessionModel clone=session.sessions().createClientSession(clientSession.getRealm(),clientSession.getClient());
+  for (  Map.Entry<String,String> entry : clientSession.getNotes().entrySet()) {
+    clone.setNote(entry.getKey(),entry.getValue());
+  }
+  clone.setRedirectUri(clientSession.getRedirectUri());
+  clone.setAuthMethod(clientSession.getAuthMethod());
+  clone.setTimestamp(Time.currentTime());
+  clone.removeNote(AuthenticationProcessor.CURRENT_AUTHENTICATION_EXECUTION);
+  return clone;
+}

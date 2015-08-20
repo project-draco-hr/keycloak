@@ -3,9 +3,9 @@
   loginPage.resetPassword();
   resetPasswordPage.assertCurrent();
   resetPasswordPage.changePassword(username);
-  validateResetPage.assertCurrent();
+  loginPage.assertCurrent();
+  assertEquals("You should receive an email shortly with further instructions.",loginPage.getSuccessMessage());
   events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).user(userId).session((String)null).detail(Details.USERNAME,username).detail(Details.EMAIL,"login@test.com").assertEvent();
-  assertEquals("You should receive an email shortly with further instructions.",resetPasswordPage.getSuccessMessage());
   MimeMessage message=greenMail.getReceivedMessages()[greenMail.getReceivedMessages().length - 1];
   String changePasswordUrl=getPasswordResetEmailLink(message);
   driver.navigate().to(changePasswordUrl.trim());

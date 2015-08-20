@@ -1,0 +1,14 @@
+{
+  JsonNode jsonNode=jsonParser.readValueAsTree();
+  if (jsonNode.isArray()) {
+    ArrayList<String> a=new ArrayList<>(1);
+    Iterator<JsonNode> itr=jsonNode.iterator();
+    while (itr.hasNext()) {
+      a.add(itr.next().getTextValue());
+    }
+    return a.toArray(new String[a.size()]);
+  }
+ else {
+    return new String[]{jsonNode.getTextValue()};
+  }
+}

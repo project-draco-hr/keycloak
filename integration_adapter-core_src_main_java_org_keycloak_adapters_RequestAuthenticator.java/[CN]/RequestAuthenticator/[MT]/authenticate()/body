@@ -18,11 +18,6 @@
     log.debug("Bearer AUTHENTICATED");
     return AuthOutcome.AUTHENTICATED;
   }
- else   if (deployment.isBearerOnly()) {
-    challenge=bearer.getChallenge();
-    log.debug("NOT_ATTEMPTED: bearer only");
-    return AuthOutcome.NOT_ATTEMPTED;
-  }
   if (deployment.isEnableBasicAuth()) {
     BasicAuthRequestAuthenticator basicAuth=createBasicAuthAuthenticator();
     if (log.isTraceEnabled()) {
@@ -39,6 +34,11 @@
       completeAuthentication(basicAuth,"BASIC");
       return AuthOutcome.AUTHENTICATED;
     }
+  }
+  if (deployment.isBearerOnly()) {
+    challenge=bearer.getChallenge();
+    log.debug("NOT_ATTEMPTED: bearer only");
+    return AuthOutcome.NOT_ATTEMPTED;
   }
   if (log.isTraceEnabled()) {
     log.trace("try oauth");

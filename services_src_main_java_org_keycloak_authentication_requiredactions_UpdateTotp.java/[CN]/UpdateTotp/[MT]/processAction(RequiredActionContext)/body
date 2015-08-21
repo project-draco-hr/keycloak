@@ -1,3 +1,27 @@
 {
-  context.failure();
+  EventBuilder event=context.getEvent();
+  event.event(EventType.UPDATE_TOTP);
+  MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
+  String totp=formData.getFirst("totp");
+  String totpSecret=formData.getFirst("totpSecret");
+  if (Validation.isBlank(totp)) {
+    Response challenge=context.form().setError(Messages.MISSING_TOTP).createResponse(UserModel.RequiredAction.CONFIGURE_TOTP);
+    context.challenge(challenge);
+    return;
+  }
+ else   if (!CredentialValidation.validOTP(context.getRealm(),totp,totpSecret)) {
+    Response challenge=context.form().setError(Messages.INVALID_TOTP).createResponse(UserModel.RequiredAction.CONFIGURE_TOTP);
+    context.challenge(challenge);
+    return;
+  }
+  UserCredentialModel credentials=new UserCredentialModel();
+  credentials.setType(context.getRealm().getOTPPolicy().getType());
+  credentials.setValue(totpSecret);
+  context.getSession().users().updateCredential(context.getRealm(),context.getUser(),credentials);
+  UserCredentialModel cred=new UserCredentialModel();
+  cred.setType(context.getRealm().getOTPPolicy().getType());
+  cred.setValue(totp);
+  context.getSession().users().validCredentials(context.getRealm(),context.getUser(),cred);
+  context.getUser().setOtpEnabled(true);
+  context.success();
 }

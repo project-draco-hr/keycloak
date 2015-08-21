@@ -25,6 +25,7 @@
     throw new WebApplicationException(ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE));
   }
   initEvent(clientSession);
+  event.event(EventType.CUSTOM_REQUIRED_ACTION);
   RequiredActionContextResult context=new RequiredActionContextResult(clientSession.getUserSession(),clientSession,realm,event,session,request,clientSession.getUserSession().getUser(),factory){
     @Override public String generateAccessCode(    String action){
       String clientSessionAction=clientSession.getAction();
@@ -43,8 +44,9 @@
 ;
   provider.processAction(context);
   if (context.getStatus() == RequiredActionContext.Status.SUCCESS) {
-    event.clone().event(EventType.CUSTOM_REQUIRED_ACTION).detail(Details.CUSTOM_REQUIRED_ACTION,action).success();
+    event.clone().success();
     clientSession.getUserSession().getUser().removeRequiredAction(factory.getId());
+    event.event(EventType.LOGIN);
     return AuthenticationManager.nextActionAfterAuthentication(session,clientSession.getUserSession(),clientSession,clientConnection,request,uriInfo,event);
   }
   if (context.getStatus() == RequiredActionContext.Status.CHALLENGE) {

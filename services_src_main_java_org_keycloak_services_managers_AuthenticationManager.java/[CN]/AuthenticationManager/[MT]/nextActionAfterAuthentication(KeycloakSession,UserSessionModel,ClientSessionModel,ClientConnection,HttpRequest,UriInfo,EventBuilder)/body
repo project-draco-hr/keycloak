@@ -1,6 +1,11 @@
 {
   Response requiredAction=actionRequired(session,userSession,clientSession,clientConnection,request,uriInfo,event);
   if (requiredAction != null)   return requiredAction;
+  if (clientSession.getNote(END_AFTER_REQUIRED_ACTIONS) != null) {
+    Response response=session.getProvider(LoginFormsProvider.class).setAttribute("skipLink",true).setSuccess(Messages.ACCOUNT_UPDATED).createInfoPage();
+    session.sessions().removeUserSession(session.getContext().getRealm(),userSession);
+    return response;
+  }
   event.success();
   RealmModel realm=clientSession.getRealm();
   return redirectAfterSuccessfulFlow(session,realm,userSession,clientSession,request,uriInfo,clientConnection);

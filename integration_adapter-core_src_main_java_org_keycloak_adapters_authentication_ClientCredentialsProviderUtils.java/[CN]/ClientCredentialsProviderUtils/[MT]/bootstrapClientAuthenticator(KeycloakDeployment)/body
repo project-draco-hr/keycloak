@@ -1,0 +1,30 @@
+{
+  String clientId=deployment.getResourceName();
+  Map<String,Object> clientCredentials=deployment.getResourceCredentials();
+  String authenticatorId;
+  if (clientCredentials == null || clientCredentials.isEmpty()) {
+    authenticatorId=ClientIdAndSecretCredentialsProvider.PROVIDER_ID;
+  }
+ else {
+    authenticatorId=(String)clientCredentials.get("provider");
+    if (authenticatorId == null) {
+      if (clientCredentials.size() == 1) {
+        authenticatorId=clientCredentials.keySet().iterator().next();
+      }
+ else {
+        throw new RuntimeException("Can't identify clientAuthenticator from the configuration of client '" + clientId + "' . Check your adapter configurations");
+      }
+    }
+  }
+  logger.debugf("Using provider '%s' for authentication of client '%s'",authenticatorId,clientId);
+  Map<String,ClientCredentialsProvider> authenticators=new HashMap<>();
+  loadAuthenticators(authenticators,ClientCredentialsProviderUtils.class.getClassLoader());
+  loadAuthenticators(authenticators,Thread.currentThread().getContextClassLoader());
+  ClientCredentialsProvider authenticator=authenticators.get(authenticatorId);
+  if (authenticator == null) {
+    throw new RuntimeException("Couldn't find ClientCredentialsProvider implementation class with id: " + authenticatorId + ". Loaded authentication providers: "+ authenticators.keySet());
+  }
+  Object config=(clientCredentials == null) ? null : clientCredentials.get(authenticatorId);
+  authenticator.init(deployment,config);
+  return authenticator;
+}

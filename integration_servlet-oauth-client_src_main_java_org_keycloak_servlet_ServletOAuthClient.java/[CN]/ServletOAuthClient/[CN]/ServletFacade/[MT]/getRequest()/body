@@ -1,0 +1,37 @@
+{
+  return new Request(){
+    @Override public String getMethod(){
+      return servletRequest.getMethod();
+    }
+    @Override public String getURI(){
+      return servletRequest.getRequestURL().toString();
+    }
+    @Override public boolean isSecure(){
+      return servletRequest.isSecure();
+    }
+    @Override public String getQueryParamValue(    String param){
+      return servletRequest.getParameter(param);
+    }
+    @Override public Cookie getCookie(    String cookieName){
+      return null;
+    }
+    @Override public String getHeader(    String name){
+      return servletRequest.getHeader(name);
+    }
+    @Override public List<String> getHeaders(    String name){
+      return null;
+    }
+    @Override public InputStream getInputStream(){
+      try {
+        return servletRequest.getInputStream();
+      }
+ catch (      IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+    }
+    @Override public String getRemoteAddr(){
+      return servletRequest.getRemoteAddr();
+    }
+  }
+;
+}

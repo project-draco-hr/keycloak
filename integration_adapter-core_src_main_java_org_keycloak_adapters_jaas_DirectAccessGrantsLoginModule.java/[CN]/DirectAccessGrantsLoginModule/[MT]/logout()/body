@@ -4,15 +4,7 @@
       URI logoutUri=deployment.getLogoutUrl().clone().build();
       HttpPost post=new HttpPost(logoutUri);
       List<NameValuePair> formparams=new ArrayList<NameValuePair>();
-      if (deployment.isPublicClient()) {
-        formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,deployment.getResourceName()));
-      }
- else {
-        String clientId=deployment.getResourceName();
-        String clientSecret=deployment.getResourceCredentials().get("secret");
-        String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
-        post.setHeader("Authorization",authorization);
-      }
+      ClientCredentialsProviderUtils.setClientCredentials(deployment,post,formparams);
       formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN,refreshToken));
       UrlEncodedFormEntity form=new UrlEncodedFormEntity(formparams,"UTF-8");
       post.setEntity(form);

@@ -3,11 +3,11 @@
   if (key != null) {
     Checks checks=new Checks();
     if (!checks.verifyCode(key,ClientSessionModel.Action.RECOVER_PASSWORD.name())) {
-      event.error(Errors.RESET_CREDENTIAL_DISABLED);
-      return ErrorPage.error(session,Messages.INVALID_CODE);
+      return checks.response;
     }
-    ClientSessionCode accessCode=checks.clientCode;
-    return session.getProvider(LoginFormsProvider.class).setClientSessionCode(accessCode.getCode()).createResponse(RequiredAction.UPDATE_PASSWORD);
+    ClientSessionModel clientSession=checks.clientCode.getClientSession();
+    clientSession.setNote("END_AFTER_REQUIRED_ACTIONS","true");
+    return AuthenticationManager.nextActionAfterAuthentication(session,clientSession.getUserSession(),clientSession,clientConnection,request,uriInfo,event);
   }
  else {
     event.error(Errors.RESET_CREDENTIAL_DISABLED);

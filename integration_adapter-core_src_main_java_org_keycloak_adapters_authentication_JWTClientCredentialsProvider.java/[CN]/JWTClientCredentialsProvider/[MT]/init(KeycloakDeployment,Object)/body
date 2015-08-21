@@ -1,0 +1,27 @@
+{
+  if (config == null || !(config instanceof Map)) {
+    throw new RuntimeException("Configuration of jwt credentials is missing or incorrect for client '" + deployment.getResourceName() + "'. Check your adapter configuration");
+  }
+  Map<String,Object> cfg=(Map<String,Object>)config;
+  String clientKeystoreFile=(String)cfg.get("client-keystore-file");
+  if (clientKeystoreFile == null) {
+    throw new RuntimeException("Missing parameter client-keystore-file in configuration of jwt for client " + deployment.getResourceName());
+  }
+  String clientKeystoreType=(String)cfg.get("client-keystore-type");
+  KeystoreUtil.KeystoreFormat clientKeystoreFormat=clientKeystoreType == null ? KeystoreUtil.KeystoreFormat.JKS : Enum.valueOf(KeystoreUtil.KeystoreFormat.class,clientKeystoreType);
+  String clientKeystorePassword=(String)cfg.get("client-keystore-password");
+  if (clientKeystorePassword == null) {
+    throw new RuntimeException("Missing parameter client-keystore-password in configuration of jwt for client " + deployment.getResourceName());
+  }
+  String clientKeyPassword=(String)cfg.get("client-key-password");
+  if (clientKeyPassword == null) {
+    clientKeyPassword=clientKeystorePassword;
+  }
+  String clientKeyAlias=(String)cfg.get("client-key-alias");
+  if (clientKeyAlias == null) {
+    clientKeyAlias=deployment.getResourceName();
+  }
+  this.privateKey=KeystoreUtil.loadPrivateKeyFromKeystore(clientKeystoreFile,clientKeystorePassword,clientKeyPassword,clientKeyAlias,clientKeystoreFormat);
+  Integer tokenExp=(Integer)cfg.get("token-timeout");
+  this.tokenTimeout=(tokenExp == null) ? 10 : tokenExp;
+}

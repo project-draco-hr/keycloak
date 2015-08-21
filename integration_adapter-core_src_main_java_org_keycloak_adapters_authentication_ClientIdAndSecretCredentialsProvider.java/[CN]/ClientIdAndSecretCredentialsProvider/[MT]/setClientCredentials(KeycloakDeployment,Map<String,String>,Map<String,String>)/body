@@ -1,0 +1,15 @@
+{
+  String clientId=deployment.getResourceName();
+  if (!deployment.isPublicClient()) {
+    if (clientSecret != null) {
+      String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
+      requestHeaders.put("Authorization",authorization);
+    }
+ else {
+      logger.warnf("Client '%s' doesn't have secret available",clientId);
+    }
+  }
+ else {
+    formParams.put(OAuth2Constants.CLIENT_ID,clientId);
+  }
+}

@@ -8,6 +8,7 @@
     res=tokenManager.refreshAccessToken(session,uriInfo,clientConnection,realm,client,refreshToken,event,headers);
     UserSessionModel userSession=session.sessions().getUserSession(realm,res.getSessionState());
     updateClientSessions(userSession.getClientSessions());
+    updateUserSessionFromClientAuth(userSession);
   }
  catch (  OAuthErrorException e) {
     event.error(Errors.INVALID_TOKEN);

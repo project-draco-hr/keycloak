@@ -6,15 +6,7 @@
   formparams.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD));
   formparams.add(new BasicNameValuePair("username",username));
   formparams.add(new BasicNameValuePair("password",password));
-  if (deployment.isPublicClient()) {
-    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,deployment.getResourceName()));
-  }
- else {
-    String clientId=deployment.getResourceName();
-    String clientSecret=deployment.getResourceCredentials().get("secret");
-    String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
-    post.setHeader("Authorization",authorization);
-  }
+  ClientCredentialsProviderUtils.setClientCredentials(deployment,post,formparams);
   UrlEncodedFormEntity form=new UrlEncodedFormEntity(formparams,"UTF-8");
   post.setEntity(form);
   HttpClient client=deployment.getClient();

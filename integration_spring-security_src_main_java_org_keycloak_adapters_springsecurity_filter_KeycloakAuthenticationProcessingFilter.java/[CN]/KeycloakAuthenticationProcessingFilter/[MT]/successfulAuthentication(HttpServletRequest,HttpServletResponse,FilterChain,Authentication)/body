@@ -1,10 +1,10 @@
 {
-  if (!this.isBearerTokenRequest(request)) {
+  if (!(this.isBearerTokenRequest(request) || this.isBasicAuthRequest(request))) {
     super.successfulAuthentication(request,response,chain,authResult);
     return;
   }
   if (log.isDebugEnabled()) {
-    log.debug("Authentication success using bearer token. Updating SecurityContextHolder to contain: {}",authResult);
+    log.debug("Authentication success using bearer token/basic authentication. Updating SecurityContextHolder to contain: {}",authResult);
   }
   SecurityContextHolder.getContext().setAuthentication(authResult);
   if (this.eventPublisher != null) {

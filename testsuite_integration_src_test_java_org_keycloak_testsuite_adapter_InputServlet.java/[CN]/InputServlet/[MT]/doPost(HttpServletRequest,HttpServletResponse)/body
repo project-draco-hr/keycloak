@@ -1,4 +1,12 @@
 {
+  if (!FORM_URLENCODED.equals(req.getContentType())) {
+    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    PrintWriter pw=resp.getWriter();
+    resp.setContentType("text/plain");
+    pw.printf("Expecting content type " + FORM_URLENCODED + ", received "+ req.getContentType()+ " instead");
+    pw.flush();
+    return;
+  }
   resp.setContentType("text/plain");
   PrintWriter pw=resp.getWriter();
   pw.printf("parameter=" + req.getParameter("parameter"));

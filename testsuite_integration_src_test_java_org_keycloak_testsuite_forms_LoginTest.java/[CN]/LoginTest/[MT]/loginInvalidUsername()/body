@@ -2,6 +2,8 @@
   loginPage.open();
   loginPage.login("invalid","password");
   loginPage.assertCurrent();
+  Assert.assertEquals("invalid",loginPage.getUsername());
+  Assert.assertEquals("",loginPage.getPassword());
   Assert.assertEquals("Invalid username or password.",loginPage.getError());
   events.expectLogin().user((String)null).session((String)null).error("user_not_found").detail(Details.USERNAME,"invalid").removeDetail(Details.CONSENT).assertEvent();
 }

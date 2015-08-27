@@ -2,6 +2,8 @@
   loginPage.open();
   loginPage.missingPassword("login-test");
   loginPage.assertCurrent();
+  Assert.assertEquals("login-test",loginPage.getUsername());
+  Assert.assertEquals("",loginPage.getPassword());
   Assert.assertEquals("Invalid username or password.",loginPage.getError());
   events.expectLogin().user(userId).session((String)null).error("invalid_user_credentials").detail(Details.USERNAME,"login-test").removeDetail(Details.CONSENT).assertEvent();
 }

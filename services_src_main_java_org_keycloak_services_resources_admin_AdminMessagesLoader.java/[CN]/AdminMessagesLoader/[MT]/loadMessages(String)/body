@@ -1,9 +1,13 @@
 {
-  Properties msgs=new Properties();
-  try (InputStream msgStream=getBundleStream(locale)){
-    if (msgStream == null)     return msgs;
-    msgs.load(msgStream);
-  }
-   allMessages.put(locale,msgs);
-  return msgs;
+  Properties masterMsgs=new Properties();
+  for (  File file : getBundlesForLocale(locale)) {
+    try (FileInputStream msgStream=new FileInputStream(file)){
+      Properties propsFromFile=new Properties();
+      propsFromFile.load(msgStream);
+      checkForDups(masterMsgs,propsFromFile,file,locale);
+      masterMsgs.putAll(propsFromFile);
+    }
+   }
+  allMessages.put(locale,masterMsgs);
+  return masterMsgs;
 }

@@ -28,22 +28,27 @@
       }
  else {
         ImportProvider importProvider=session.getProvider(ImportProvider.class,exportImportProviderId);
-        Strategy strategy=ExportImportConfig.getStrategy();
-        if (realmName == null) {
-          logger.infof("Full model import requested. Strategy: %s",strategy.toString());
-          if (!importProvider.isMasterRealmExported()) {
-            new ApplianceBootstrap().bootstrap(sessionFactory,contextPath);
-          }
-          importProvider.importModel(sessionFactory,strategy);
+        if (importProvider == null) {
+          logger.errorf("Invalid Import Provider %s",exportImportProviderId);
         }
  else {
-          logger.infof("Import of realm '%s' requested. Strategy: %s",realmName,strategy.toString());
-          if (!realmName.equals(Config.getAdminRealm())) {
-            new ApplianceBootstrap().bootstrap(sessionFactory,contextPath);
+          Strategy strategy=ExportImportConfig.getStrategy();
+          if (realmName == null) {
+            logger.infof("Full model import requested. Strategy: %s",strategy.toString());
+            if (!importProvider.isMasterRealmExported()) {
+              new ApplianceBootstrap().bootstrap(sessionFactory,contextPath);
+            }
+            importProvider.importModel(sessionFactory,strategy);
           }
-          importProvider.importRealm(sessionFactory,realmName,strategy);
+ else {
+            logger.infof("Import of realm '%s' requested. Strategy: %s",realmName,strategy.toString());
+            if (!realmName.equals(Config.getAdminRealm())) {
+              new ApplianceBootstrap().bootstrap(sessionFactory,contextPath);
+            }
+            importProvider.importRealm(sessionFactory,realmName,strategy);
+          }
+          logger.info("Import finished successfully");
         }
-        logger.info("Import finished successfully");
       }
     }
  catch (    Throwable ioe) {

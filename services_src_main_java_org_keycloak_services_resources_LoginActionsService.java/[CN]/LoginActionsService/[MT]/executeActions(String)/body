@@ -1,16 +1,17 @@
 {
-  event.event(EventType.RESET_PASSWORD);
+  event.event(EventType.EXECUTE_ACTIONS);
   if (key != null) {
     Checks checks=new Checks();
-    if (!checks.verifyCode(key,ClientSessionModel.Action.RECOVER_PASSWORD.name())) {
+    if (!checks.verifyCode(key,ClientSessionModel.Action.EXECUTE_ACTIONS.name())) {
       return checks.response;
     }
     ClientSessionModel clientSession=checks.clientCode.getClientSession();
     clientSession.setNote("END_AFTER_REQUIRED_ACTIONS","true");
+    clientSession.setNote(ClientSessionModel.Action.EXECUTE_ACTIONS.name(),"true");
     return AuthenticationManager.nextActionAfterAuthentication(session,clientSession.getUserSession(),clientSession,clientConnection,request,uriInfo,event);
   }
  else {
-    event.error(Errors.RESET_CREDENTIAL_DISABLED);
+    event.error(Errors.INVALID_CODE);
     return ErrorPage.error(session,Messages.INVALID_CODE);
   }
 }

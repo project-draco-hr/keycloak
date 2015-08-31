@@ -1,15 +1,11 @@
 {
   event.event(EventType.LOGIN);
   Checks checks=new Checks();
-  if (!checks.verifyCode(code,ClientSessionModel.Action.AUTHENTICATE.name(),ClientSessionModel.Action.RECOVER_PASSWORD.name())) {
+  if (!checks.verifyCode(code,ClientSessionModel.Action.AUTHENTICATE.name())) {
     return checks.response;
   }
   event.detail(Details.CODE_ID,code);
   ClientSessionCode clientSessionCode=checks.clientCode;
   ClientSessionModel clientSession=clientSessionCode.getClientSession();
-  if (clientSession.getAction().equals(ClientSessionModel.Action.RECOVER_PASSWORD.name())) {
-    TokenManager.dettachClientSession(session.sessions(),realm,clientSession);
-    clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
-  }
   return processAuthentication(execution,clientSession,null);
 }

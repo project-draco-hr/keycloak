@@ -1,4 +1,9 @@
 {
+  if (context.getClientSession().getNote(ClientSessionModel.Action.EXECUTE_ACTIONS.name()) != null) {
+    context.getUser().setEmailVerified(true);
+    context.success();
+    return;
+  }
   if (Validation.isBlank(context.getUser().getEmail())) {
     context.ignore();
     return;

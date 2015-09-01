@@ -2,6 +2,11 @@
   if (File.separatorChar != '/') {
     path=path.replace('/',File.separatorChar);
   }
-  File file=new File(themeDir,"/resources/" + path);
-  return file.isFile() ? file.toURI().toURL() : null;
+  File file=new File(resourcesDir,path);
+  if (!file.isFile() || !file.getCanonicalPath().startsWith(resourcesDir.getCanonicalPath())) {
+    return null;
+  }
+ else {
+    return file.toURI().toURL();
+  }
 }

@@ -1,0 +1,12 @@
+{
+  this.auth.requireView();
+  ConfigurableAuthenticatorFactory factory=CredentialHelper.getConfigurableAuthenticatorFactory(session,providerId);
+  ClientAuthenticatorFactory clientAuthFactory=(ClientAuthenticatorFactory)factory;
+  List<ProviderConfigProperty> perClientConfigProps=clientAuthFactory.getConfigPropertiesPerClient();
+  List<ConfigPropertyRepresentation> result=new LinkedList<>();
+  for (  ProviderConfigProperty prop : perClientConfigProps) {
+    ConfigPropertyRepresentation propRep=getConfigPropertyRep(prop);
+    result.add(propRep);
+  }
+  return result;
+}

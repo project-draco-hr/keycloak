@@ -17,9 +17,8 @@
       model.removeRealm(realm.getId());
     }
   }
-  realm=rep.getId() != null ? model.createRealm(rep.getId(),realmName) : model.createRealm(realmName);
-  RepresentationToModel.importRealm(session,rep,realm);
-  refreshMasterAdminApps(model,realm);
+  RealmImporter realmManager=session.getContext().getRealmManager();
+  realm=realmManager.importRealm(rep);
   if (System.getProperty(ExportImportConfig.ACTION) != null) {
     logger.infof("Realm '%s' imported",realmName);
   }

@@ -1,3 +1,11 @@
 {
-  ImportUtils.setupMasterAdminManagement(model,realm);
+  String adminRealmId=Config.getAdminRealm();
+  RealmModel adminRealm=model.getRealm(adminRealmId);
+  ClientModel masterApp=adminRealm.getClientByClientId(KeycloakModelUtils.getMasterRealmAdminApplicationClientId(realm.getName()));
+  if (masterApp != null) {
+    realm.setMasterAdminClient(masterApp);
+  }
+ else {
+    createMasterAdminManagement(model,realm);
+  }
 }

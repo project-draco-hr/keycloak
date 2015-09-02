@@ -7,7 +7,8 @@
     RealmProvider realmProvider=session.realms();
     UserProvider userProvider=session.users();
     new RealmManager(session).removeRealm(realmProvider.getRealmByName("test"));
-    Assert.assertEquals(2,realmProvider.getRealms().size());
+    new RealmManager(session).removeRealm(realmProvider.getRealmByName("test-realm"));
+    Assert.assertEquals(1,realmProvider.getRealms().size());
     assertNotAuthenticated(userProvider,realmProvider,"test","test-user@localhost","password");
     assertNotAuthenticated(userProvider,realmProvider,"test","user1","password");
     assertNotAuthenticated(userProvider,realmProvider,"test","user2","password");
@@ -27,7 +28,7 @@
     assertAuthenticated(userProvider,model,"test","user1","password");
     assertAuthenticated(userProvider,model,"test","user2","password");
     assertAuthenticated(userProvider,model,"test","user3","password");
-    RealmModel testRealmRealm=model.getRealm("test-realm");
+    RealmModel testRealmRealm=model.getRealmByName("test-realm");
     ImportTest.assertDataImportedInRealm(session,testRealmRealm);
   }
   finally {

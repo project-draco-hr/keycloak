@@ -2,7 +2,9 @@
   List<UserFederationProviderModel> federationProviders=realm.getUserFederationProviders();
   boolean removed=model.removeRealm(realm.getId());
   if (removed) {
-    new ClientManager(this).removeClient(getKeycloakAdminstrationRealm(),realm.getMasterAdminClient());
+    if (realm.getMasterAdminClient() != null) {
+      new ClientManager(this).removeClient(getKeycloakAdminstrationRealm(),realm.getMasterAdminClient());
+    }
     UserSessionProvider sessions=session.sessions();
     if (sessions != null) {
       sessions.onRealmRemoved(realm);

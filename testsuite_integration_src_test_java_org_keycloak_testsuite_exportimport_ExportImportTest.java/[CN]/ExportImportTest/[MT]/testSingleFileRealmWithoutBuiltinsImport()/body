@@ -1,0 +1,23 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    new RealmManager(session).removeRealm(session.realms().getRealmByName("test-realm"));
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  ExportImportConfig.setProvider(SingleFileExportProviderFactory.PROVIDER_ID);
+  URL url=ExportImportTest.class.getResource("/model/testrealm.json");
+  String targetFilePath=new File(url.getFile()).getAbsolutePath();
+  ExportImportConfig.setFile(targetFilePath);
+  ExportImportConfig.setAction(ExportImportConfig.ACTION_IMPORT);
+  keycloakRule.restartServer();
+  session=keycloakRule.startSession();
+  try {
+    RealmModel testRealmRealm=session.realms().getRealmByName("test-realm");
+    ImportTest.assertDataImportedInRealm(session,testRealmRealm);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

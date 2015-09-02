@@ -1,0 +1,18 @@
+{
+  List<UserSessionEntity> userSessionEntities=new LinkedList<UserSessionEntity>();
+  for (  ClientSessionEntity s : clientSessions.values()) {
+    String realmId=realm.getId();
+    String clientId=client.getId();
+    if (s.getSession() != null && s.getSession().getRealm().equals(realmId) && s.getClientId().equals(clientId)) {
+      if (!userSessionEntities.contains(s.getSession())) {
+        userSessionEntities.add(s.getSession());
+      }
+    }
+  }
+  List<UserSessionModel> userSessions=new LinkedList<UserSessionModel>();
+  for (  UserSessionEntity e : userSessionEntities) {
+    userSessions.add(new UserSessionAdapter(session,this,realm,e));
+  }
+  Collections.sort(userSessions,new UserSessionSort());
+  return userSessions;
+}

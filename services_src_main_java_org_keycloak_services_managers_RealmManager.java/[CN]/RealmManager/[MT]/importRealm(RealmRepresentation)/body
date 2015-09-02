@@ -6,7 +6,10 @@
   RealmModel realm=model.createRealm(id,rep.getRealm());
   realm.setName(rep.getRealm());
   setupRealmDefaults(realm);
-  setupMasterAdminManagement(realm);
+  boolean postponeMasterClientSetup=postponeMasterClientSetup(rep);
+  if (!postponeMasterClientSetup) {
+    setupMasterAdminManagement(realm);
+  }
   if (!hasRealmAdminManagementClient(rep))   setupRealmAdminManagement(realm);
   if (!hasAccountManagementClient(rep))   setupAccountManagement(realm);
   boolean postponeImpersonationSetup=false;
@@ -21,6 +24,9 @@
   if (!hasBrokerClient(rep))   setupBrokerService(realm);
   if (!hasAdminConsoleClient(rep))   setupAdminConsole(realm);
   RepresentationToModel.importRealm(session,rep,realm);
+  if (postponeMasterClientSetup) {
+    setupMasterAdminManagement(realm);
+  }
   if (postponeImpersonationSetup) {
     setupImpersonationService(realm);
   }

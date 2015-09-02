@@ -5,8 +5,9 @@
   String id=ApiUtil.getCreatedId(response);
   response.close();
   UserResource user=realm.users().get(id);
+  List<String> actions=new LinkedList<>();
   try {
-    user.executeActionsEmail();
+    user.executeActionsEmail(actions);
     fail("Expected failure");
   }
  catch (  ClientErrorException e) {
@@ -19,7 +20,7 @@
     userRep.setEmail("user1@localhost");
     userRep.setEnabled(false);
     user.update(userRep);
-    user.executeActionsEmail();
+    user.executeActionsEmail(actions);
     fail("Expected failure");
   }
  catch (  ClientErrorException e) {
@@ -30,7 +31,7 @@
   try {
     userRep.setEnabled(true);
     user.update(userRep);
-    user.executeActionsEmail("invalidClientId");
+    user.executeActionsEmail("invalidClientId",actions);
     fail("Expected failure");
   }
  catch (  ClientErrorException e) {

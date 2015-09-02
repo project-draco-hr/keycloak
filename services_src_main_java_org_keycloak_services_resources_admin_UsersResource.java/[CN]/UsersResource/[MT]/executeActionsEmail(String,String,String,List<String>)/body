@@ -8,6 +8,9 @@
     return ErrorResponse.error("User email missing",Response.Status.BAD_REQUEST);
   }
   ClientSessionModel clientSession=createClientSession(user,redirectUri,clientId);
+  for (  String action : actions) {
+    clientSession.addRequiredAction(action);
+  }
   ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
   accessCode.setAction(ClientSessionModel.Action.EXECUTE_ACTIONS.name());
   try {

@@ -12,7 +12,7 @@
   }
   KeycloakAdapterConfigService service=KeycloakAdapterConfigService.getInstance();
   LoginConfigMetaData loginConfig=webMetaData.getLoginConfig();
-  if (!service.isSecureDeployment(deploymentName) && (loginConfig == null || !loginConfig.getAuthMethod().equalsIgnoreCase("KEYCLOAK"))) {
+  if (!service.isSecureDeployment(deploymentName) || loginConfig == null || !loginConfig.getAuthMethod().equalsIgnoreCase("KEYCLOAK")) {
     return;
   }
   log.debug("Setting up KEYCLOAK auth method for WAR: " + deploymentName);

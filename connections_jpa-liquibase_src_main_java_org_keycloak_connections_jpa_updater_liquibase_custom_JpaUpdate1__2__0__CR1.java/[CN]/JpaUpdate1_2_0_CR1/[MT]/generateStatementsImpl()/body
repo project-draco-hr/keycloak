@@ -2,7 +2,7 @@
   String realmClientTableName=database.correctObjectName("REALM_CLIENT",Table.class);
   try {
     String trueValue=DataTypeFactory.getInstance().getTrueBooleanValue(database);
-    PreparedStatement statement=jdbcConnection.prepareStatement("select CLIENT.REALM_ID, CLIENT.ID CLIENT_ID from CLIENT where CLIENT.CONSENT_REQUIRED = " + trueValue);
+    PreparedStatement statement=jdbcConnection.prepareStatement("select CLIENT.REALM_ID, CLIENT.ID CLIENT_ID from " + getTableName("CLIENT") + " CLIENT where CLIENT.CONSENT_REQUIRED = "+ trueValue);
     try {
       ResultSet resultSet=statement.executeQuery();
       try {

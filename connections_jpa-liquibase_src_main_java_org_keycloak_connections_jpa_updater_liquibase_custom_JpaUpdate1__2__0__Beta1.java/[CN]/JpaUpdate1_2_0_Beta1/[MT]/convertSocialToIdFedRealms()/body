@@ -1,7 +1,9 @@
 {
   String identityProviderTableName=database.correctObjectName("IDENTITY_PROVIDER",Table.class);
   String idpConfigTableName=database.correctObjectName("IDENTITY_PROVIDER_CONFIG",Table.class);
-  PreparedStatement statement=jdbcConnection.prepareStatement("select RSC.NAME, VALUE, REALM_ID, UPDATE_PROFILE_ON_SOC_LOGIN from REALM_SOCIAL_CONFIG RSC,REALM where RSC.REALM_ID = REALM.ID ORDER BY RSC.REALM_ID, RSC.NAME");
+  String realmSocialConfigTable=getTableName("REALM_SOCIAL_CONFIG");
+  String realmTableName=getTableName("REALM");
+  PreparedStatement statement=jdbcConnection.prepareStatement("select RSC.NAME, VALUE, REALM_ID, UPDATE_PROFILE_ON_SOC_LOGIN from " + realmSocialConfigTable + " RSC,"+ realmTableName+ " REALM where RSC.REALM_ID = REALM.ID ORDER BY RSC.REALM_ID, RSC.NAME");
   try {
     ResultSet resultSet=statement.executeQuery();
     try {

@@ -2,7 +2,7 @@
   try {
     String correctedTableName=database.correctObjectName("REALM",Table.class);
     if (SnapshotGeneratorFactory.getInstance().has(new Table().setName(correctedTableName),database)) {
-      ResultSet resultSet=connection.createStatement().executeQuery("SELECT ID FROM REALM");
+      ResultSet resultSet=connection.createStatement().executeQuery("SELECT ID FROM " + getTableName(correctedTableName));
       try {
         return (resultSet.next());
       }

@@ -1,0 +1,12 @@
+{
+  TypedQuery<UserAttributeEntity> query=em.createNamedQuery("getAttributesByNameAndValue",UserAttributeEntity.class);
+  query.setParameter("name",attrName);
+  query.setParameter("value",attrValue);
+  List<UserAttributeEntity> results=query.getResultList();
+  List<UserModel> users=new ArrayList<UserModel>();
+  for (  UserAttributeEntity attr : results) {
+    UserEntity user=attr.getUser();
+    users.add(new UserAdapter(realm,em,user));
+  }
+  return users;
+}

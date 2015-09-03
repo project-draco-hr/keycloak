@@ -1,8 +1,6 @@
 {
   QueryBuilder queryBuilder=new QueryBuilder().and("realmId").is(realm.getId());
-  for (  Map.Entry<String,String> entry : attributes.entrySet()) {
-    queryBuilder.and("attributes." + entry.getKey()).is(entry.getValue());
-  }
+  queryBuilder.and("attributes." + attrName).is(attrValue);
   List<MongoUserEntity> users=getMongoStore().loadEntities(MongoUserEntity.class,queryBuilder.get(),invocationContext);
   return convertUserEntities(realm,users);
 }

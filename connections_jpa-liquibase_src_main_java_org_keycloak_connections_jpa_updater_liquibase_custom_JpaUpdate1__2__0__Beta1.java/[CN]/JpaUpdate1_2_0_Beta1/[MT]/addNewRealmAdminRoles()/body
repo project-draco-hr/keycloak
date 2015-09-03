@@ -1,5 +1,5 @@
 {
-  PreparedStatement statement=jdbcConnection.prepareStatement("select CLIENT.ID REALM_ADMIN_APP_ID, CLIENT.REALM_ID REALM_ID, KEYCLOAK_ROLE.ID ADMIN_ROLE_ID from CLIENT,KEYCLOAK_ROLE where KEYCLOAK_ROLE.APPLICATION = CLIENT.ID AND CLIENT.NAME = 'realm-management' AND KEYCLOAK_ROLE.NAME = ?");
+  PreparedStatement statement=jdbcConnection.prepareStatement("select CLIENT.ID REALM_ADMIN_APP_ID, CLIENT.REALM_ID REALM_ID, KEYCLOAK_ROLE.ID ADMIN_ROLE_ID from " + getTableName("CLIENT") + " CLIENT,"+ getTableName("KEYCLOAK_ROLE")+ " KEYCLOAK_ROLE where KEYCLOAK_ROLE.APPLICATION = CLIENT.ID AND CLIENT.NAME = 'realm-management' AND KEYCLOAK_ROLE.NAME = ?");
   statement.setString(1,AdminRoles.REALM_ADMIN);
   try {
     ResultSet resultSet=statement.executeQuery();

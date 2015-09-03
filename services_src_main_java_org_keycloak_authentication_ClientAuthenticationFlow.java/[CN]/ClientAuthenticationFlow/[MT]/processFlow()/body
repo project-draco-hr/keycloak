@@ -1,71 +1,36 @@
 {
-  while (executionIterator.hasNext()) {
-    AuthenticationExecutionModel model=executionIterator.next();
-    if (model.isDisabled()) {
-      continue;
-    }
-    if (model.isAlternative() && alternativeSuccessful) {
-      continue;
-    }
-    if (model.isAuthenticatorFlow()) {
-      AuthenticationFlow authenticationFlow;
-      authenticationFlow=processor.createFlowExecution(model.getFlowId(),model);
-      Response flowChallenge=authenticationFlow.processFlow();
-      if (flowChallenge == null) {
-        if (model.isAlternative())         alternativeSuccessful=true;
-        continue;
-      }
- else {
-        if (model.isAlternative()) {
-          alternativeChallenge=flowChallenge;
-        }
- else         if (model.isRequired()) {
-          return flowChallenge;
-        }
- else {
-          continue;
-        }
-        return flowChallenge;
-      }
-    }
+  List<AuthenticationExecutionModel> executions=findExecutionsToRun();
+  for (  AuthenticationExecutionModel model : executions) {
     ClientAuthenticatorFactory factory=(ClientAuthenticatorFactory)processor.getSession().getKeycloakSessionFactory().getProviderFactory(ClientAuthenticator.class,model.getAuthenticator());
     if (factory == null) {
       throw new AuthenticationFlowException("Could not find ClientAuthenticatorFactory for: " + model.getAuthenticator(),AuthenticationFlowError.INTERNAL_ERROR);
     }
     ClientAuthenticator authenticator=factory.create();
     AuthenticationProcessor.logger.debugv("client authenticator: {0}",factory.getId());
-    ClientModel authClient=processor.getClient();
-    if (authenticator.requiresClient() && authClient == null) {
-      if (model.isAlternative() || model.isOptional()) {
-        AuthenticationProcessor.logger.debugv("client authenticator: {0} requires client, but client not available. Skipping",factory.getId());
-        continue;
-      }
-      if (alternativeChallenge != null) {
-        return alternativeChallenge;
-      }
-      throw new AuthenticationFlowException("client authenticator: " + factory.getId(),AuthenticationFlowError.CLIENT_NOT_FOUND);
-    }
-    if (authenticator.requiresClient() && authClient != null) {
-      boolean configuredFor=authenticator.configuredFor(processor.getSession(),processor.getRealm(),authClient);
-      if (!configuredFor) {
-        if (model.isRequired()) {
-          throw new AuthenticationFlowException("Client setup required for authenticator " + factory.getId() + " for client "+ authClient.getClientId(),AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED);
-        }
- else         if (model.isOptional()) {
-          continue;
-        }
-      }
-    }
     AuthenticationProcessor.Result context=processor.createClientAuthenticatorContext(model,authenticator,executions);
     authenticator.authenticateClient(context);
     Response response=processResult(context);
     if (response != null)     return response;
-    authClient=processor.getClient();
-    if (authClient != null && authClient.isPublicClient()) {
-      AuthenticationProcessor.logger.debugv("Public client {0} identified by {1} . Skip next client authenticators",authClient.getClientId(),factory.getId());
-      logSuccessEvent();
-      return null;
+    ClientModel client=processor.getClient();
+    if (client != null) {
+      String expectedClientAuthType=client.getClientAuthenticatorType();
+      if (expectedClientAuthType == null) {
+        expectedClientAuthType=KeycloakModelUtils.getDefaultClientAuthenticatorType();
+        AuthenticationProcessor.logger.warnv("Client {0} doesn't have have authentication method configured. Fallback to {1}",client.getClientId(),expectedClientAuthType);
+      }
+      if (factory.getId().equals(expectedClientAuthType)) {
+        AuthenticationProcessor.logger.debugv("Client {0} authenticated by {1}",client.getClientId(),factory.getId());
+        processor.getEvent().detail(Details.CLIENT_AUTH_METHOD,factory.getId());
+        return null;
+      }
+ else {
+        throw new AuthenticationFlowException("Client " + client.getClientId() + " was authenticated by incorrect method "+ factory.getId(),AuthenticationFlowError.INVALID_CLIENT_CREDENTIALS);
+      }
     }
   }
-  return finishClientAuthentication();
+  if (alternativeChallenge != null) {
+    processor.getEvent().error(Errors.INVALID_CLIENT);
+    return alternativeChallenge;
+  }
+  throw new AuthenticationFlowException("Client was not identified by any client authenticator",AuthenticationFlowError.UNKNOWN_CLIENT);
 }

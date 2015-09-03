@@ -1,0 +1,21 @@
+{
+  List<AuthenticationExecutionModel> executions=processor.getRealm().getAuthenticationExecutions(flow.getId());
+  List<AuthenticationExecutionModel> executionsToRun=new ArrayList<>();
+  for (  AuthenticationExecutionModel execution : executions) {
+    if (execution.isRequired()) {
+      executionsToRun=Arrays.asList(execution);
+      break;
+    }
+    if (execution.isAlternative()) {
+      executionsToRun.add(execution);
+    }
+  }
+  if (AuthenticationProcessor.logger.isTraceEnabled()) {
+    List<String> exIds=new ArrayList<>();
+    for (    AuthenticationExecutionModel execution : executionsToRun) {
+      exIds.add(execution.getId());
+    }
+    AuthenticationProcessor.logger.tracef("Using executions for client authentication: %s",exIds.toString());
+  }
+  return executionsToRun;
+}

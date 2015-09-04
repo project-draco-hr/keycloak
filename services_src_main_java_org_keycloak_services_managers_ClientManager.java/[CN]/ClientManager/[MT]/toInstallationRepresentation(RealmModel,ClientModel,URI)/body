@@ -9,10 +9,10 @@
   if (clientModel.getRoles().size() > 0)   rep.setUseResourceRoleMappings(true);
   rep.setResource(clientModel.getClientId());
   if (!clientModel.isBearerOnly() && !clientModel.isPublicClient()) {
-    Map<String,String> creds=new HashMap<String,String>();
-    String cred=clientModel.getSecret();
-    creds.put(CredentialRepresentation.SECRET,cred);
-    rep.setCredentials(creds);
+    String clientAuthenticator=clientModel.getClientAuthenticatorType();
+    ClientAuthenticatorFactory authenticator=(ClientAuthenticatorFactory)realmManager.getSession().getKeycloakSessionFactory().getProviderFactory(ClientAuthenticator.class,clientAuthenticator);
+    Map<String,Object> adapterConfig=authenticator.getAdapterConfiguration(clientModel);
+    rep.setCredentials(adapterConfig);
   }
   return rep;
 }

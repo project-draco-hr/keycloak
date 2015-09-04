@@ -10,22 +10,23 @@
   builder.logoutRequestID(userSession.getNote(SAML_LOGOUT_REQUEST_ID));
   builder.destination(logoutBindingUri);
   builder.issuer(getResponseIssuer(realm));
-  builder.relayState(logoutRelayState);
+  JaxrsSAML2BindingBuilder binding=new JaxrsSAML2BindingBuilder();
+  binding.relayState(logoutRelayState);
   String signingAlgorithm=userSession.getNote(SAML_LOGOUT_SIGNATURE_ALGORITHM);
   if (signingAlgorithm != null) {
     SignatureAlgorithm algorithm=SignatureAlgorithm.valueOf(signingAlgorithm);
     String canonicalization=userSession.getNote(SAML_LOGOUT_CANONICALIZATION);
     if (canonicalization != null) {
-      builder.canonicalizationMethod(canonicalization);
+      binding.canonicalizationMethod(canonicalization);
     }
-    builder.signatureAlgorithm(algorithm).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
+    binding.signatureAlgorithm(algorithm).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
   }
   try {
     if (isLogoutPostBindingForInitiator(userSession)) {
-      return builder.postBinding().response(logoutBindingUri);
+      return binding.postBinding(builder.buildDocument()).response(logoutBindingUri);
     }
  else {
-      return builder.redirectBinding().response(logoutBindingUri);
+      return binding.redirectBinding(builder.buildDocument()).response(logoutBindingUri);
     }
   }
  catch (  ConfigurationException e) {

@@ -1,11 +1,13 @@
 {
-  SAML2ErrorResponseBuilder builder=new SAML2ErrorResponseBuilder().relayState(clientSession.getNote(GeneralConstants.RELAY_STATE)).destination(clientSession.getRedirectUri()).issuer(getResponseIssuer(realm)).status(status);
+  SAML2ErrorResponseBuilder builder=new SAML2ErrorResponseBuilder().destination(clientSession.getRedirectUri()).issuer(getResponseIssuer(realm)).status(status);
   try {
+    JaxrsSAML2BindingBuilder binding=new JaxrsSAML2BindingBuilder().relayState(clientSession.getNote(GeneralConstants.RELAY_STATE));
+    Document document=builder.buildDocument();
     if (isPostBinding(clientSession)) {
-      return builder.postBinding().response();
+      return binding.postBinding(document).response(clientSession.getRedirectUri());
     }
  else {
-      return builder.redirectBinding().response();
+      return binding.redirectBinding(document).response(clientSession.getRedirectUri());
     }
   }
  catch (  Exception e) {

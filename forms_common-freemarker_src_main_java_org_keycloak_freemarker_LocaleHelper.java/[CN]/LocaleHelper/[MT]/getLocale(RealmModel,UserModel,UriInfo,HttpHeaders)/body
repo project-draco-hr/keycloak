@@ -11,9 +11,6 @@
       }
       return locale;
     }
- else {
-      LOGGER.infof("Locale %s is not supported.",localeString);
-    }
   }
   if (httpHeaders != null && httpHeaders.getCookies().containsKey(LOCALE_COOKIE)) {
     String localeString=httpHeaders.getCookies().get(LOCALE_COOKIE).getValue();
@@ -24,18 +21,12 @@
       }
       return locale;
     }
- else {
-      LOGGER.infof("Locale %s is not supported.",localeString);
-    }
   }
   if (user != null && user.getAttributes().containsKey(UserModel.LOCALE)) {
     String localeString=user.getFirstAttribute(UserModel.LOCALE);
     Locale locale=findLocale(realm.getSupportedLocales(),localeString);
     if (locale != null) {
       return locale;
-    }
- else {
-      LOGGER.infof("Locale %s is not supported.",localeString);
     }
   }
   if (uriInfo != null && uriInfo.getQueryParameters().containsKey(UI_LOCALES_PARAM)) {
@@ -44,9 +35,6 @@
     if (locale != null) {
       return locale;
     }
- else {
-      LOGGER.infof("Locale %s is not supported.",localeString);
-    }
   }
   if (httpHeaders != null && httpHeaders.getAcceptableLanguages() != null && !httpHeaders.getAcceptableLanguages().isEmpty()) {
     for (    Locale l : httpHeaders.getAcceptableLanguages()) {
@@ -54,9 +42,6 @@
       Locale locale=findLocale(realm.getSupportedLocales(),localeString);
       if (locale != null) {
         return locale;
-      }
- else {
-        LOGGER.infof("Locale %s is not supported.",localeString);
       }
     }
   }

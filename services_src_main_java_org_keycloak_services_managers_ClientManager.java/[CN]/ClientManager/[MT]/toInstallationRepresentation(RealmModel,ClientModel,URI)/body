@@ -8,10 +8,8 @@
   if (clientModel.isBearerOnly())   rep.setBearerOnly(true);
   if (clientModel.getRoles().size() > 0)   rep.setUseResourceRoleMappings(true);
   rep.setResource(clientModel.getClientId());
-  if (!clientModel.isBearerOnly() && !clientModel.isPublicClient()) {
-    String clientAuthenticator=clientModel.getClientAuthenticatorType();
-    ClientAuthenticatorFactory authenticator=(ClientAuthenticatorFactory)realmManager.getSession().getKeycloakSessionFactory().getProviderFactory(ClientAuthenticator.class,clientAuthenticator);
-    Map<String,Object> adapterConfig=authenticator.getAdapterConfiguration(clientModel);
+  if (showClientCredentialsAdapterConfig(clientModel)) {
+    Map<String,Object> adapterConfig=getClientCredentialsAdapterConfig(clientModel);
     rep.setCredentials(adapterConfig);
   }
   return rep;

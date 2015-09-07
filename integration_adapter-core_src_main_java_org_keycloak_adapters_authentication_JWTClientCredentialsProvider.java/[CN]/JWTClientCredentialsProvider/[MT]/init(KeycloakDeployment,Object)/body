@@ -8,7 +8,7 @@
     throw new RuntimeException("Missing parameter client-keystore-file in configuration of jwt for client " + deployment.getResourceName());
   }
   String clientKeystoreType=(String)cfg.get("client-keystore-type");
-  KeystoreUtil.KeystoreFormat clientKeystoreFormat=clientKeystoreType == null ? KeystoreUtil.KeystoreFormat.JKS : Enum.valueOf(KeystoreUtil.KeystoreFormat.class,clientKeystoreType);
+  KeystoreUtil.KeystoreFormat clientKeystoreFormat=clientKeystoreType == null ? KeystoreUtil.KeystoreFormat.JKS : Enum.valueOf(KeystoreUtil.KeystoreFormat.class,clientKeystoreType.toUpperCase());
   String clientKeystorePassword=(String)cfg.get("client-keystore-password");
   if (clientKeystorePassword == null) {
     throw new RuntimeException("Missing parameter client-keystore-password in configuration of jwt for client " + deployment.getResourceName());
@@ -22,6 +22,5 @@
     clientKeyAlias=deployment.getResourceName();
   }
   this.privateKey=KeystoreUtil.loadPrivateKeyFromKeystore(clientKeystoreFile,clientKeystorePassword,clientKeyPassword,clientKeyAlias,clientKeystoreFormat);
-  Integer tokenExp=(Integer)cfg.get("token-timeout");
-  this.tokenTimeout=(tokenExp == null) ? 10 : tokenExp;
+  this.tokenTimeout=asInt(cfg,"token-timeout",10);
 }

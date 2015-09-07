@@ -13,8 +13,23 @@
   buffer.append("    <ssl-required>").append(realmModel.getSslRequired().name()).append("</ssl-required>\n");
   buffer.append("    <resource>").append(clientModel.getClientId()).append("</resource>\n");
   String cred=clientModel.getSecret();
-  if (!clientModel.isBearerOnly() && !clientModel.isPublicClient()) {
-    buffer.append("    <credential name=\"secret\">").append(cred).append("</credential>\n");
+  if (showClientCredentialsAdapterConfig(clientModel)) {
+    Map<String,Object> adapterConfig=getClientCredentialsAdapterConfig(clientModel);
+    for (    Map.Entry<String,Object> entry : adapterConfig.entrySet()) {
+      buffer.append("    <credential name=\"" + entry.getKey() + "\">");
+      Object value=entry.getValue();
+      if (value instanceof Map) {
+        buffer.append("\n");
+        Map<String,Object> asMap=(Map<String,Object>)value;
+        for (        Map.Entry<String,Object> credEntry : asMap.entrySet()) {
+          buffer.append("        <" + credEntry.getKey() + ">"+ credEntry.getValue().toString()+ "</"+ credEntry.getKey()+ ">\n");
+        }
+        buffer.append("    </credential>\n");
+      }
+ else {
+        buffer.append(value.toString()).append("</credential>\n");
+      }
+    }
   }
   if (clientModel.getRoles().size() > 0) {
     buffer.append("    <use-resource-role-mappings>true</use-resource-role-mappings>\n");

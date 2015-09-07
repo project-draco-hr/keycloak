@@ -23,6 +23,8 @@
   Assert.assertTrue(resourceAccess.get("test-app").isUserInRole("customer-user"));
   events.expectCodeToToken(codeId,loginEvent.getSessionId()).client("third-party").assertEvent();
   accountAppsPage.open();
+  assertEquals(1,driver.findElements(By.id("revoke-third-party")).size());
   accountAppsPage.revokeGrant("third-party");
   events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,"third-party").assertEvent();
+  assertEquals(0,driver.findElements(By.id("revoke-third-party")).size());
 }

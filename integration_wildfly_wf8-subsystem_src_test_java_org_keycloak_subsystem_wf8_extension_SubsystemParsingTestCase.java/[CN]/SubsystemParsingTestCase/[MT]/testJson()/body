@@ -7,8 +7,11 @@
   node.get("code-url").set("http://localhost:8080/auth-server/rest/realms/demo/protocol/openid-connect/access/codes");
   node.get("ssl-required").set("external");
   node.get("expose-token").set(true);
+  ModelNode jwtCredential=new ModelNode();
+  jwtCredential.get("client-keystore-file").set("/tmp/keystore.jks");
+  jwtCredential.get("client-keystore-password").set("changeit");
   ModelNode credential=new ModelNode();
-  credential.get("password").set("password");
+  credential.get("jwt").set(jwtCredential);
   node.get("credentials").set(credential);
   System.out.println("json=" + node.toJSONString(false));
 }

@@ -1,0 +1,15 @@
+{
+  Object cfgObj=cfg.get(cfgKey);
+  if (cfgObj == null) {
+    return defaultValue;
+  }
+  if (cfgObj instanceof String) {
+    return Integer.parseInt(cfgObj.toString());
+  }
+ else   if (cfgObj instanceof Number) {
+    return ((Number)cfgObj).intValue();
+  }
+ else {
+    throw new IllegalArgumentException("Can't parse " + cfgKey + " from the config. Value is "+ cfgObj);
+  }
+}

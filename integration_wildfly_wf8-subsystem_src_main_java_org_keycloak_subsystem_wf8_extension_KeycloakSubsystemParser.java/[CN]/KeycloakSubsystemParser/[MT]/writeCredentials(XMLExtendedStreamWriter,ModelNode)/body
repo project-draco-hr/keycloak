@@ -1,9 +1,38 @@
 {
+  Map<String,Object> parsed=new LinkedHashMap<>();
   for (  Property credential : credentials.asPropertyList()) {
+    String credName=credential.getName();
+    String credValue=credential.getValue().get(CredentialDefinition.VALUE.getName()).asString();
+    if (credName.contains(".")) {
+      String[] parts=credName.split("\\.");
+      String provider=parts[0];
+      String propKey=parts[1];
+      Map<String,String> currentProviderMap=(Map<String,String>)parsed.get(provider);
+      if (currentProviderMap == null) {
+        currentProviderMap=new LinkedHashMap<>();
+        parsed.put(provider,currentProviderMap);
+      }
+      currentProviderMap.put(propKey,credValue);
+    }
+ else {
+      parsed.put(credName,credValue);
+    }
+  }
+  for (  Map.Entry<String,Object> entry : parsed.entrySet()) {
     writer.writeStartElement(CredentialDefinition.TAG_NAME);
-    writer.writeAttribute("name",credential.getName());
-    String credentialValue=credential.getValue().get(CredentialDefinition.VALUE.getName()).asString();
-    writeCharacters(writer,credentialValue);
+    writer.writeAttribute("name",entry.getKey());
+    Object value=entry.getValue();
+    if (value instanceof String) {
+      writeCharacters(writer,(String)value);
+    }
+ else {
+      Map<String,String> credentialProps=(Map<String,String>)value;
+      for (      Map.Entry<String,String> prop : credentialProps.entrySet()) {
+        writer.writeStartElement(prop.getKey());
+        writeCharacters(writer,prop.getValue());
+        writer.writeEndElement();
+      }
+    }
     writer.writeEndElement();
   }
 }

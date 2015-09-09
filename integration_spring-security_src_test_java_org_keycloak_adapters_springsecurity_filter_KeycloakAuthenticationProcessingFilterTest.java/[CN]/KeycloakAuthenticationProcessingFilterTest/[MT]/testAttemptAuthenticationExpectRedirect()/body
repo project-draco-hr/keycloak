@@ -1,0 +1,9 @@
+{
+  when(keycloakDeployment.getAuthUrl()).thenReturn(KeycloakUriBuilder.fromUri("http://localhost:8080/auth"));
+  when(keycloakDeployment.getResourceName()).thenReturn("resource-name");
+  when(keycloakDeployment.getStateCookieName()).thenReturn("kc-cookie");
+  when(keycloakDeployment.getSslRequired()).thenReturn(SslRequired.NONE);
+  filter.attemptAuthentication(request,response);
+  verify(response).setStatus(302);
+  verify(response).setHeader(eq("Location"),startsWith("http://localhost:8080/auth"));
+}

@@ -6,16 +6,28 @@
   if (!user.isEnabled()) {
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"User disabled","User disabled");
   }
-  UserSessionModel userSession=session.sessions().getUserSession(realm,oldToken.getSessionState());
-  if (!AuthenticationManager.isSessionValid(realm,userSession)) {
-    AuthenticationManager.backchannelLogout(session,realm,userSession,uriInfo,connection,headers,true);
-    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Session not active","Session not active");
-  }
+  UserSessionModel userSession=null;
   ClientSessionModel clientSession=null;
-  for (  ClientSessionModel clientSessionModel : userSession.getClientSessions()) {
-    if (clientSessionModel.getId().equals(oldToken.getClientSession())) {
-      clientSession=clientSessionModel;
-      break;
+  if (RefreshTokenUtil.TOKEN_TYPE_OFFLINE.equals(oldToken.getType())) {
+    clientSession=new OfflineUserSessionManager().findOfflineClientSession(realm,user,oldToken.getClientSession(),oldToken.getSessionState());
+    if (clientSession != null) {
+      if (!clientSession.getClient().isOfflineTokensEnabled()) {
+        throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Offline tokens not allowed for client","Offline tokens not allowed for client");
+      }
+      userSession=clientSession.getUserSession();
+    }
+  }
+ else {
+    userSession=session.sessions().getUserSession(realm,oldToken.getSessionState());
+    if (!AuthenticationManager.isSessionValid(realm,userSession)) {
+      AuthenticationManager.backchannelLogout(session,realm,userSession,uriInfo,connection,headers,true);
+      throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Session not active","Session not active");
+    }
+    for (    ClientSessionModel clientSessionModel : userSession.getClientSessions()) {
+      if (clientSessionModel.getId().equals(oldToken.getClientSession())) {
+        clientSession=clientSessionModel;
+        break;
+      }
     }
   }
   if (clientSession == null) {

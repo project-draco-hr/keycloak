@@ -1,0 +1,14 @@
+{
+  loginPage.open();
+  loginPage.login("john-doh@localhost","password");
+  updateProfilePage.assertCurrent();
+  updateProfilePage.update("New first","New last","john-doh@localhost","new");
+  String sessionId=events.expectRequiredActionEnabledUsername(EventType.UPDATE_PROFILE,"new").assertEvent().getSessionId();
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  events.expectLogin("new").session(sessionId).assertEvent();
+  UserRepresentation user=keycloakRule.getUser("test","new");
+  Assert.assertEquals("New first",user.getFirstName());
+  Assert.assertEquals("New last",user.getLastName());
+  Assert.assertEquals("john-doh@localhost",user.getEmail());
+  Assert.assertEquals("new",user.getUsername());
+}

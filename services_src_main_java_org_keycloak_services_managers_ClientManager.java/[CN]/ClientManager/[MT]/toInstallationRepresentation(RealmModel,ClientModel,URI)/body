@@ -8,11 +8,9 @@
   if (clientModel.isBearerOnly())   rep.setBearerOnly(true);
   if (clientModel.getRoles().size() > 0)   rep.setUseResourceRoleMappings(true);
   rep.setResource(clientModel.getClientId());
-  if (!clientModel.isBearerOnly() && !clientModel.isPublicClient()) {
-    Map<String,String> creds=new HashMap<String,String>();
-    String cred=clientModel.getSecret();
-    creds.put(CredentialRepresentation.SECRET,cred);
-    rep.setCredentials(creds);
+  if (showClientCredentialsAdapterConfig(clientModel)) {
+    Map<String,Object> adapterConfig=getClientCredentialsAdapterConfig(clientModel);
+    rep.setCredentials(adapterConfig);
   }
   return rep;
 }

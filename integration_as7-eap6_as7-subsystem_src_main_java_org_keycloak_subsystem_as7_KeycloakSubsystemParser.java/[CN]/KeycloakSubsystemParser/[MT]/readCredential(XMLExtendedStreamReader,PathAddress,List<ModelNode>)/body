@@ -1,9 +1,35 @@
 {
   String name=readNameAttribute(reader);
-  ModelNode addCredential=new ModelNode();
-  addCredential.get(ModelDescriptionConstants.OP).set(ModelDescriptionConstants.ADD);
-  PathAddress addr=PathAddress.pathAddress(parent,PathElement.pathElement(CredentialDefinition.TAG_NAME,name));
-  addCredential.get(ModelDescriptionConstants.OP_ADDR).set(addr.toModelNode());
-  addCredential.get(CredentialDefinition.VALUE.getName()).set(reader.getElementText());
-  credentialsToAdd.add(addCredential);
+  Map<String,String> values=new HashMap<>();
+  String textValue=null;
+  while (reader.hasNext()) {
+    int next=reader.next();
+    if (next == CHARACTERS) {
+      String text=reader.getText();
+      if (text == null || text.trim().isEmpty()) {
+        continue;
+      }
+      textValue=text;
+    }
+ else     if (next == START_ELEMENT) {
+      String key=reader.getLocalName();
+      reader.next();
+      String value=reader.getText();
+      reader.next();
+      values.put(key,value);
+    }
+ else     if (next == END_ELEMENT) {
+      break;
+    }
+  }
+  if (textValue != null) {
+    ModelNode addCredential=getCredentialToAdd(parent,name,textValue);
+    credentialsToAdd.add(addCredential);
+  }
+ else {
+    for (    Map.Entry<String,String> entry : values.entrySet()) {
+      ModelNode addCredential=getCredentialToAdd(parent,name + "." + entry.getKey(),entry.getValue());
+      credentialsToAdd.add(addCredential);
+    }
+  }
 }

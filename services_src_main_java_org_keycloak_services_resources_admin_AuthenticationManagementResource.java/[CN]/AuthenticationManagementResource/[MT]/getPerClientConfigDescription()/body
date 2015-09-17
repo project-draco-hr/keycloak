@@ -1,0 +1,18 @@
+{
+  this.auth.requireView();
+  List<ProviderFactory> factories=session.getKeycloakSessionFactory().getProviderFactories(ClientAuthenticator.class);
+  Map<String,List<ConfigPropertyRepresentation>> toReturn=new HashMap<>();
+  for (  ProviderFactory clientAuthenticatorFactory : factories) {
+    String providerId=clientAuthenticatorFactory.getId();
+    ConfigurableAuthenticatorFactory factory=CredentialHelper.getConfigurableAuthenticatorFactory(session,providerId);
+    ClientAuthenticatorFactory clientAuthFactory=(ClientAuthenticatorFactory)factory;
+    List<ProviderConfigProperty> perClientConfigProps=clientAuthFactory.getConfigPropertiesPerClient();
+    List<ConfigPropertyRepresentation> result=new LinkedList<>();
+    for (    ProviderConfigProperty prop : perClientConfigProps) {
+      ConfigPropertyRepresentation propRep=getConfigPropertyRep(prop);
+      result.add(propRep);
+    }
+    toReturn.put(providerId,result);
+  }
+  return toReturn;
+}

@@ -4,50 +4,45 @@
   for (  String policy : policies) {
     policy=policy.trim();
     String name;
-    String[] args=null;
+    String arg=null;
     int i=policy.indexOf('(');
     if (i == -1) {
       name=policy.trim();
     }
  else {
       name=policy.substring(0,i).trim();
-      args=policy.substring(i + 1,policy.length() - 1).split(",");
-      for (int j=0; j < args.length; j++) {
-        args[j]=args[j].trim();
-      }
+      arg=policy.substring(i + 1,policy.length() - 1);
     }
     if (name.equals(Length.NAME)) {
-      list.add(new Length(args));
+      list.add(new Length(arg));
     }
  else     if (name.equals(Digits.NAME)) {
-      list.add(new Digits(args));
+      list.add(new Digits(arg));
     }
  else     if (name.equals(LowerCase.NAME)) {
-      list.add(new LowerCase(args));
+      list.add(new LowerCase(arg));
     }
  else     if (name.equals(UpperCase.NAME)) {
-      list.add(new UpperCase(args));
+      list.add(new UpperCase(arg));
     }
  else     if (name.equals(SpecialChars.NAME)) {
-      list.add(new SpecialChars(args));
+      list.add(new SpecialChars(arg));
     }
  else     if (name.equals(NotUsername.NAME)) {
-      list.add(new NotUsername(args));
+      list.add(new NotUsername(arg));
     }
  else     if (name.equals(HashIterations.NAME)) {
-      list.add(new HashIterations(args));
+      list.add(new HashIterations(arg));
     }
  else     if (name.equals(RegexPatterns.NAME)) {
-      for (      String regexPattern : args) {
-        Pattern.compile(regexPattern);
-      }
-      list.add(new RegexPatterns(args));
+      Pattern.compile(arg);
+      list.add(new RegexPatterns(arg));
     }
  else     if (name.equals(PasswordHistory.NAME)) {
-      list.add(new PasswordHistory(args));
+      list.add(new PasswordHistory(arg));
     }
  else     if (name.equals(ForceExpiredPasswordChange.NAME)) {
-      list.add(new ForceExpiredPasswordChange(args));
+      list.add(new ForceExpiredPasswordChange(arg));
     }
   }
   return list;

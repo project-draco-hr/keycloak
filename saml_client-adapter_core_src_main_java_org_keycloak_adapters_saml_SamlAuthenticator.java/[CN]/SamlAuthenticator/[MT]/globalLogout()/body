@@ -1,0 +1,25 @@
+{
+  SamlSession account=sessionStore.getAccount();
+  SAML2LogoutRequestBuilder logoutBuilder=new SAML2LogoutRequestBuilder().assertionExpiration(30).issuer(deployment.getIssuer()).sessionIndex(account.getSessionIndex()).userPrincipal(account.getPrincipal().getSamlSubject(),account.getPrincipal().getNameIDFormat()).destination(deployment.getSingleLogoutServiceUrl());
+  BaseSAML2BindingBuilder binding=new BaseSAML2BindingBuilder();
+  if (deployment.isRequestsSigned()) {
+    binding.signWith(deployment.getSigningKeyPair()).signDocument();
+  }
+  binding.relayState("logout");
+  try {
+    SamlUtil.sendSaml(facade,deployment.getSingleLogoutServiceUrl(),binding,logoutBuilder.buildDocument(),deployment.getRequestBinding());
+  }
+ catch (  ProcessingException e) {
+    throw new RuntimeException(e);
+  }
+catch (  ConfigurationException e) {
+    throw new RuntimeException(e);
+  }
+catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+catch (  ParsingException e) {
+    throw new RuntimeException(e);
+  }
+  return AuthOutcome.NOT_ATTEMPTED;
+}

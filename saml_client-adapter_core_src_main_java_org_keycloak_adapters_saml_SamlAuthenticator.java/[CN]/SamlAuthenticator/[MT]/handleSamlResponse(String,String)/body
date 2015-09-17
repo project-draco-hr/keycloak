@@ -1,0 +1,22 @@
+{
+  SAMLDocumentHolder holder=null;
+  boolean postBinding=false;
+  if (facade.getRequest().getMethod().equalsIgnoreCase("GET")) {
+    holder=extractRedirectBindingResponse(samlResponse);
+  }
+ else {
+    postBinding=true;
+    holder=extractPostBindingResponse(samlResponse);
+  }
+  StatusResponseType statusResponse=(StatusResponseType)holder.getSamlObject();
+  if (!facade.getRequest().getURI().toString().equals(statusResponse.getDestination())) {
+    throw new RuntimeException("destination not equal to request");
+  }
+  validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
+  if (statusResponse instanceof ResponseType) {
+    return handleLoginResponse((ResponseType)statusResponse);
+  }
+ else {
+    return handleLogoutResponse(holder,statusResponse,relayState);
+  }
+}

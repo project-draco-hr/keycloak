@@ -1,3 +1,21 @@
 {
-  return null;
+  String samlRequest=facade.getRequest().getFirstParam(GeneralConstants.SAML_REQUEST_KEY);
+  String samlResponse=facade.getRequest().getFirstParam(GeneralConstants.SAML_RESPONSE_KEY);
+  String relayState=facade.getRequest().getFirstParam(GeneralConstants.RELAY_STATE);
+  boolean globalLogout="true".equals(facade.getRequest().getQueryParamValue("GLO"));
+  if (samlRequest != null) {
+    return handleSamlRequest(samlRequest,relayState);
+  }
+ else   if (samlResponse != null) {
+    return handleSamlResponse(samlResponse,relayState);
+  }
+ else   if (sessionStore.isLoggedIn()) {
+    if (globalLogout) {
+      return globalLogout();
+    }
+    if (verifySSL())     return AuthOutcome.FAILED;
+    log.debug("AUTHENTICATED: was cached");
+    return AuthOutcome.AUTHENTICATED;
+  }
+  return initiateLogin();
 }

@@ -1,0 +1,32 @@
+{
+  ContainerRegistry reg=new Registry(injector.get());
+  ServiceLoader serviceLoader=loader.get();
+  @SuppressWarnings("rawtypes") Collection<DeployableContainer> containers=serviceLoader.all(DeployableContainer.class);
+  if (containers.isEmpty()) {
+    throw new IllegalStateException("There are not any container adapters on the classpath");
+  }
+  for (  ContainerDef container : event.getContainers()) {
+    if (isCreatingContainer(container,containers)) {
+      if (isEnabled(container)) {
+        checkMultipleEnabledContainers(container);
+        reg.create(container,serviceLoader);
+      }
+ else {
+        log.info("Container is disabled: " + container.getContainerName());
+      }
+    }
+  }
+  for (  GroupDef group : event.getGroups()) {
+    for (    ContainerDef container : group.getGroupContainers()) {
+      if (isCreatingContainer(container,containers)) {
+        if (isEnabled(container)) {
+          reg.create(container,serviceLoader);
+        }
+ else {
+          log.info("Container is disabled: " + container.getContainerName());
+        }
+      }
+    }
+  }
+  registry.set(reg);
+}

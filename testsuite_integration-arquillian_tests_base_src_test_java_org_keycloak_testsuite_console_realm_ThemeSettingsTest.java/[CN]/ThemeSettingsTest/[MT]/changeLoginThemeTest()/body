@@ -1,0 +1,15 @@
+{
+  themeSettingsPage.changeLoginTheme(Theme.BASE.getName());
+  themeSettingsPage.saveTheme();
+  testRealmAdminConsolePage.navigateTo();
+  testRealmLoginPage.waitForKeycloakThemeNotPresent();
+  testRealmLoginPage.form().login(testUser);
+  testRealmAdminConsolePage.logOut();
+  themeSettingsPage.navigateTo();
+  themeSettingsPage.changeLoginTheme(Theme.KEYCLOAK.getName());
+  themeSettingsPage.saveTheme();
+  testRealmAdminConsolePage.navigateTo();
+  testRealmLoginPage.waitForKeycloakThemePresent();
+  testRealmLoginPage.form().login(testUser);
+  testRealmAdminConsolePage.logOut();
+}

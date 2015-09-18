@@ -1,0 +1,10 @@
+{
+  loginAndCheckSession(driver,testRealmLoginPage);
+  findClientResourceByClientId(testRealmResource(),"session-portal").logoutUser("mposolda");
+  sessionPortalPage.navigateTo();
+  assertEquals(driver.getCurrentUrl(),sessionPortalPage.toString());
+  String pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("Counter=3"));
+  String logoutUri=OIDCLoginProtocolService.logoutUrl(authServerPage.createUriBuilder()).queryParam(OAuth2Constants.REDIRECT_URI,sessionPortalPage.toString()).build("demo").toString();
+  driver.navigate().to(logoutUri);
+}

@@ -1,0 +1,15 @@
+{
+  testRealmAccountManagementPage.account();
+  assertEquals(testRealmAccountPage.getUsername(),testUser.getUsername());
+  testRealmAccountPage.setEmail(UPDATED_EMAIL);
+  testRealmAccountPage.setFirstName(NEW_FIRST_NAME);
+  testRealmAccountPage.setLastName(NEW_LAST_NAME);
+  testRealmAccountPage.save();
+  assertFlashMessageSuccess();
+  testRealmAccountManagementPage.signOut();
+  testRealmLoginPage.form().login(testUser);
+  testRealmAccountManagementPage.account();
+  assertEquals(testRealmAccountPage.getEmail(),UPDATED_EMAIL);
+  assertEquals(testRealmAccountPage.getFirstName(),NEW_FIRST_NAME);
+  assertEquals(testRealmAccountPage.getLastName(),NEW_LAST_NAME);
+}

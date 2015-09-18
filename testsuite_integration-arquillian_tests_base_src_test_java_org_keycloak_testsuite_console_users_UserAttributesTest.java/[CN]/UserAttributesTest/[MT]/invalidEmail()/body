@@ -1,0 +1,11 @@
+{
+  String testUsername="testUserInvEmail";
+  String invalidEmail="user.redhat.com";
+  newTestRealmUser.setUsername(testUsername);
+  setPasswordFor(newTestRealmUser,"pass");
+  newTestRealmUser.setEmail(invalidEmail);
+  createUser(newTestRealmUser);
+  assertFlashMessageDanger();
+  userAttributesPage.backToUsersViaBreadcrumb();
+  assertNull(usersPage.table().findUser(testUsername));
+}

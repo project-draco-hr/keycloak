@@ -1,0 +1,13 @@
+{
+  requiredActionsPage.navigateTo();
+  requiredActionsPage.clickTermsAndConditionEnabled();
+  manage().users();
+  usersPage.table().viewAllUsers();
+  usersPage.table().clickUser(testUser.getUsername());
+  userAttributesPage.form().addRequiredAction(TERMS_AND_CONDITIONS.getActionName());
+  userAttributesPage.form().save();
+  assertFlashMessageSuccess();
+  testRealmAccountPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  driver.findElement(By.xpath("//div[@id='kc-header-wrapper' and text()[contains(.,'Terms and Conditions')]]"));
+}

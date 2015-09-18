@@ -1,0 +1,17 @@
+{
+  customerPortal.navigateTo();
+  testRealmLoginPage.form().waitForUsernameInputPresent();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlEquals(customerPortal);
+  String pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  RealmRepresentation demoRealmRep=testRealmResource().toRepresentation();
+  int originalIdle=demoRealmRep.getSsoSessionIdleTimeout();
+  demoRealmRep.setSsoSessionIdleTimeout(1);
+  testRealmResource().update(demoRealmRep);
+  productPortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  demoRealmRep.setSsoSessionIdleTimeout(originalIdle);
+  testRealmResource().update(demoRealmRep);
+}

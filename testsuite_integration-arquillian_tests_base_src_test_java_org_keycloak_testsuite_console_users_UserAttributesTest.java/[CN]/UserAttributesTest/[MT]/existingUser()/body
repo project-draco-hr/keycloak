@@ -1,0 +1,12 @@
+{
+  String testUsername="test_duplicated_user";
+  newTestRealmUser.setUsername(testUsername);
+  createUser(newTestRealmUser);
+  assertFlashMessageSuccess();
+  userAttributesPage.backToUsersViaBreadcrumb();
+  assertNotNull(usersPage.table().findUser(testUsername));
+  UserRepresentation testUser2=new UserRepresentation();
+  testUser2.setUsername(testUsername);
+  createUser(testUser2);
+  assertFlashMessageDanger();
+}

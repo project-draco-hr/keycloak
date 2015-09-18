@@ -1,0 +1,35 @@
+{
+  customerPortal.navigateTo();
+  testRealmLoginPage.form().waitForUsernameInputPresent();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlEquals(customerPortal);
+  String pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  productPortal.navigateTo();
+  assertCurrentUrlEquals(productPortal);
+  pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("iPhone") && pageSource.contains("iPad"));
+  List<Map<String,String>> stats=testRealmResource().getClientSessionStats();
+  Map<String,String> customerPortalStats=null;
+  Map<String,String> productPortalStats=null;
+  for (  Map<String,String> s : stats) {
+switch (s.get("clientId")) {
+case "customer-portal":
+      customerPortalStats=s;
+    break;
+case "product-portal":
+  productPortalStats=s;
+break;
+}
+}
+assertEquals(1,Integer.parseInt(customerPortalStats.get("active")));
+assertEquals(1,Integer.parseInt(productPortalStats.get("active")));
+String logoutUri=OIDCLoginProtocolService.logoutUrl(authServerPage.createUriBuilder()).queryParam(OAuth2Constants.REDIRECT_URI,customerPortal.toString()).build("demo").toString();
+driver.navigate().to(logoutUri);
+assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+productPortal.navigateTo();
+assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+customerPortal.navigateTo();
+assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+}

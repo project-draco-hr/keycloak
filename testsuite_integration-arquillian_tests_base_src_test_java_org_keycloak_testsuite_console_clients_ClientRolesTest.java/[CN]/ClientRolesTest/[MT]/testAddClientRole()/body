@@ -1,0 +1,17 @@
+{
+  ClientRepresentation newClient=createClientRepresentation("test-client1","http://example.com/*");
+  RoleRepresentation newRole=new RoleRepresentation("client-role","");
+  createClient(newClient);
+  assertFlashMessageSuccess();
+  clientPage.tabs().roles();
+  addClientRole(newRole);
+  assertFlashMessageSuccess();
+  clientRolePage.backToClientRolesViaBreadcrumb();
+  assertFalse(clientRolesPage.roles().getRolesFromTableRows().isEmpty());
+  configure().clients();
+  clientsPage.table().search(newClient.getClientId());
+  clientsPage.table().deleteClient(newClient.getClientId());
+  modalDialog.confirmDeletion();
+  assertFlashMessageSuccess();
+  assertNull(clientsPage.table().findClient(newClient.getClientId()));
+}

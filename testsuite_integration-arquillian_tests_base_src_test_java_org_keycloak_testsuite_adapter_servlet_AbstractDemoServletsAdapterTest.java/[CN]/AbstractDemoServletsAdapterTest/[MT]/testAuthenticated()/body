@@ -1,0 +1,13 @@
+{
+  securePortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlEquals(securePortal);
+  String pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  String logoutUri=OIDCLoginProtocolService.logoutUrl(authServerPage.createUriBuilder()).queryParam(OAuth2Constants.REDIRECT_URI,securePortal.toString()).build("demo").toString();
+  driver.navigate().to(logoutUri);
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  securePortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+}

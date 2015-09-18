@@ -1,0 +1,12 @@
+{
+  jsConsoleExample.navigateTo();
+  assertCurrentUrlStartsWith(jsConsoleExample);
+  jsConsoleExample.refreshToken();
+  assertTrue(driver.getPageSource().contains("Failed to refresh token"));
+  jsConsoleExample.logIn();
+  testRealmLoginPage.form().login("user","password");
+  assertCurrentUrlStartsWith(jsConsoleExample);
+  assertTrue(driver.getPageSource().contains("Auth Success"));
+  jsConsoleExample.refreshToken();
+  assertTrue(driver.getPageSource().contains("Auth Refresh Success"));
+}

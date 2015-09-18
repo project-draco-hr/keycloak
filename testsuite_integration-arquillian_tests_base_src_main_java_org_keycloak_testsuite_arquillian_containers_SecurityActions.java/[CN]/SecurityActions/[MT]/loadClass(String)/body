@@ -1,0 +1,13 @@
+{
+  try {
+    return Class.forName(className,true,getThreadContextClassLoader());
+  }
+ catch (  ClassNotFoundException e) {
+    try {
+      return Class.forName(className,true,SecurityActions.class.getClassLoader());
+    }
+ catch (    ClassNotFoundException e2) {
+      throw new RuntimeException("Could not load class " + className,e2);
+    }
+  }
+}

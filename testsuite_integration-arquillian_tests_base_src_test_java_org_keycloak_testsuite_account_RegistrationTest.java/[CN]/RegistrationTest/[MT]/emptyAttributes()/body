@@ -1,0 +1,20 @@
+{
+  UserRepresentation newUserEmpty=new UserRepresentation();
+  testRealmRegistrationPage.register(newUserEmpty);
+  assertMessageAttributeMissing("username");
+  newUserEmpty.setUsername(newUser.getUsername());
+  testRealmRegistrationPage.register(newUserEmpty);
+  assertMessageAttributeMissing("first name");
+  newUserEmpty.setFirstName(newUser.getFirstName());
+  testRealmRegistrationPage.register(newUserEmpty);
+  assertMessageAttributeMissing("last name");
+  newUserEmpty.setLastName(newUser.getLastName());
+  testRealmRegistrationPage.register(newUserEmpty);
+  assertMessageAttributeMissing("email");
+  newUserEmpty.setEmail(newUser.getEmail());
+  testRealmRegistrationPage.register(newUserEmpty);
+  assertMessageAttributeMissing("password");
+  setPasswordFor(newUserEmpty,getPasswordOf(newUser));
+  testRealmRegistrationPage.register(newUser);
+  assertUserExistsWithAdminClient(newUserEmpty);
+}

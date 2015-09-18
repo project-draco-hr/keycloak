@@ -1,0 +1,29 @@
+{
+  angularCorsProductExample.navigateTo();
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlStartsWith(angularCorsProductExample);
+  angularCorsProductExample.reloadData();
+  Assert.assertTrue(driver.getPageSource().contains("Product Listing"));
+  Assert.assertTrue(driver.getPageSource().contains("iphone"));
+  Assert.assertTrue(driver.getPageSource().contains("ipad"));
+  Assert.assertTrue(driver.getPageSource().contains("ipod"));
+  angularCorsProductExample.loadRoles();
+  Assert.assertTrue(driver.getPageSource().contains("Role Listing"));
+  Assert.assertTrue(driver.getPageSource().contains("user"));
+  angularCorsProductExample.addRole();
+  Assert.assertTrue(driver.getPageSource().contains("stuff"));
+  angularCorsProductExample.deleteRole();
+  Assert.assertFalse(driver.getPageSource().contains("stuff"));
+  angularCorsProductExample.loadAvailableSocialProviders();
+  Assert.assertTrue(driver.getPageSource().contains("Available social providers"));
+  Assert.assertTrue(driver.getPageSource().contains("twitter"));
+  Assert.assertTrue(driver.getPageSource().contains("google"));
+  Assert.assertTrue(driver.getPageSource().contains("linkedin"));
+  Assert.assertTrue(driver.getPageSource().contains("facebook"));
+  Assert.assertTrue(driver.getPageSource().contains("stackoverflow"));
+  Assert.assertTrue(driver.getPageSource().contains("github"));
+  angularCorsProductExample.loadPublicRealmInfo();
+  Assert.assertTrue(driver.getPageSource().contains("Realm name: cors"));
+  angularCorsProductExample.loadVersion();
+  Assert.assertTrue(driver.getPageSource().contains("Keycloak version: "));
+}

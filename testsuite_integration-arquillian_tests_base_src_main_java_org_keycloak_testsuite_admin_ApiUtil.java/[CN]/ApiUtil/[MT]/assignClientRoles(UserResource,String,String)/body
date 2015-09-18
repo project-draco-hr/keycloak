@@ -1,0 +1,11 @@
+{
+  RoleScopeResource rsr=userResource.roles().clientLevel(clientId);
+  List<String> rolesList=Arrays.asList(roles);
+  List<RoleRepresentation> realmMgmtRoles=new ArrayList<>();
+  for (  RoleRepresentation rr : rsr.listAvailable()) {
+    if (rolesList.contains(rr.getName())) {
+      realmMgmtRoles.add(rr);
+    }
+  }
+  rsr.add(realmMgmtRoles);
+}

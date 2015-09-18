@@ -1,0 +1,31 @@
+{
+  int secondsToWait=5;
+  bruteForceDetectionPage.form().setProtectionEnabled(true);
+  bruteForceDetectionPage.form().setMaxLoginFailures("1");
+  bruteForceDetectionPage.form().setMaxWaitSelect(SecurityDefenses.TimeSelectValues.SECONDS);
+  bruteForceDetectionPage.form().setMaxWaitInput(String.valueOf(secondsToWait));
+  bruteForceDetectionPage.form().save();
+  testRealmAccountPage.navigateTo();
+  setPasswordFor(testUser,PASSWORD + "-mismatch");
+  testRealmLoginPage.form().login(testUser);
+  Date endTime=new Date(new Date().getTime() + secondsToWait * 1000);
+  waitForFeedbackText("Invalid username or password.");
+  testRealmLoginPage.form().login(testUser);
+  endTime=new Date(endTime.getTime() + secondsToWait * 1000);
+  waitGui().until().element(By.className("instruction")).text().contains("Account is temporarily disabled, contact admin or try again later.");
+  testRealmAccountPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  endTime=new Date(endTime.getTime() + secondsToWait * 1000);
+  waitForFeedbackText("Account is temporarily disabled, contact admin or try again later.");
+  while (new Date().compareTo(endTime) < 0) {
+    try {
+      Thread.sleep(50);
+    }
+ catch (    InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+  setPasswordFor(testUser,PASSWORD);
+  testRealmLoginPage.form().login(testUser);
+  assertCurrentUrlStartsWith(testRealmAccountPage);
+}

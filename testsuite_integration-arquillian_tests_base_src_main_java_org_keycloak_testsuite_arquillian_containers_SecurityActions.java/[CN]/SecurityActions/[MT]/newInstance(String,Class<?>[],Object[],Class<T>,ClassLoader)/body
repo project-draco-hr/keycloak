@@ -1,0 +1,16 @@
+{
+  Class<?> clazz=null;
+  try {
+    clazz=Class.forName(className,false,classLoader);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Could not load class " + className,e);
+  }
+  Object obj=newInstance(clazz,argumentTypes,arguments);
+  try {
+    return expectedType.cast(obj);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Loaded class " + className + " is not of expected type "+ expectedType,e);
+  }
+}

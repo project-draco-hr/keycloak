@@ -1,0 +1,23 @@
+{
+  Validate.notNull(definition,"Definition must be specified");
+  try {
+    logger.log(Level.INFO,"Registering container: {0}",definition.getContainerName());
+    @SuppressWarnings("rawtypes") Collection<DeployableContainer> containerAdapters=loader.all(DeployableContainer.class);
+    DeployableContainer<?> dcService=null;
+    if (containerAdapters.size() == 1) {
+      dcService=containerAdapters.iterator().next();
+    }
+ else {
+      if (dcService == null) {
+        dcService=getContainerAdapter(getAdapterImplClassValue(definition),containerAdapters);
+      }
+      if (dcService == null) {
+        throw new ConfigurationException("Unable to get container adapter from Arquillian configuration.");
+      }
+    }
+    return addContainer(injector.inject(new ContainerImpl(definition.getContainerName(),dcService,definition)));
+  }
+ catch (  Exception e) {
+    throw new ContainerCreationException("Could not create Container " + definition.getContainerName(),e);
+  }
+}

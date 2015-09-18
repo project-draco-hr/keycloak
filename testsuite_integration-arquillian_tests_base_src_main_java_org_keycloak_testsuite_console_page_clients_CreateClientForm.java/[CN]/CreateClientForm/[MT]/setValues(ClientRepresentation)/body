@@ -1,0 +1,18 @@
+{
+  waitAjaxForElement(clientIdInput);
+  setClientId(client.getClientId());
+  setName(client.getName());
+  setEnabled(client.isEnabled());
+  setConsentRequired(client.isConsentRequired());
+  setDirectGrantsOnly(client.isDirectGrantsOnly());
+  setProtocol(client.getProtocol());
+  if (OIDC.equals(client.getProtocol())) {
+    setAccessType(client);
+    if (!client.isBearerOnly()) {
+      if (!client.isPublicClient()) {
+        setServiceAccountsEnabled(client.isServiceAccountsEnabled());
+      }
+      setRedirectUris(client.getRedirectUris());
+    }
+  }
+}

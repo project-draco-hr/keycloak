@@ -1,0 +1,12 @@
+{
+  if (isTomcatAppServer(testClass.getJavaClass())) {
+    try {
+      String webXmlContent=IOUtils.toString(archive.get(WEBXML_PATH).getAsset().openStream());
+      webXmlContent=webXmlContent.replace("<auth-method>KEYCLOAK</auth-method>","<auth-method>BASIC</auth-method>");
+      archive.add(new StringAsset((webXmlContent)),WEBXML_PATH);
+    }
+ catch (    IOException ex) {
+      throw new RuntimeException("Cannot load web.xml from archive.");
+    }
+  }
+}

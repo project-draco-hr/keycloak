@@ -1,0 +1,10 @@
+{
+  log.info("Starting auth server on embedded Undertow.");
+  long start=System.currentTimeMillis();
+  if (undertow == null) {
+    undertow=new UndertowJaxrsServer();
+  }
+  undertow.start(Undertow.builder().addHttpListener(configuration.getBindHttpPort(),configuration.getBindAddress()).setWorkerThreads(configuration.getWorkerThreads()).setIoThreads(configuration.getWorkerThreads() / 8));
+  undertow.deploy(createAuthServerDeploymentInfo());
+  log.info("Auth server started in " + (System.currentTimeMillis() - start) + " ms\n");
+}

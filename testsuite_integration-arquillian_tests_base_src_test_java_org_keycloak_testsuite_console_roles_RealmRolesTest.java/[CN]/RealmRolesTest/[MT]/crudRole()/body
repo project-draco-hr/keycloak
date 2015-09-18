@@ -1,0 +1,27 @@
+{
+  addRole(testRole);
+  configure().roles();
+  RoleRepresentation foundRole=realmRolesPage.table().findRole(testRole.getName());
+  assertBasicRoleAttributesEqual(testRole,foundRole);
+  realmRolesPage.table().editRole(testRole.getName());
+  foundRole=rolePage.form().getBasicAttributes();
+  assertBasicRoleAttributesEqual(testRole,foundRole);
+  testRole.setDescription("updated role description");
+  rolePage.form().setDescription(testRole.getDescription());
+  rolePage.form().save();
+  assertFlashMessageSuccess();
+  configure().roles();
+  foundRole=realmRolesPage.table().findRole(testRole.getName());
+  assertBasicRoleAttributesEqual(testRole,foundRole);
+  realmRolesPage.table().deleteRole(testRole.getName());
+  modalDialog.cancel();
+  assertTrue(realmRolesPage.table().containsRole(testRole.getName()));
+  realmRolesPage.table().deleteRole(testRole.getName());
+  modalDialog.confirmDeletion();
+  pause(250);
+  assertFalse(realmRolesPage.table().containsRole(testRole.getName()));
+  addRole(testRole);
+  rolePage.form().delete();
+  modalDialog.confirmDeletion();
+  assertCurrentUrlEquals(realmRolesPage);
+}

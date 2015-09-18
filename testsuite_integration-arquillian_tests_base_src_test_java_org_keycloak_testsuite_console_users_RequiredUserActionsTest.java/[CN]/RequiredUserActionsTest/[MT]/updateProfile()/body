@@ -1,0 +1,22 @@
+{
+  userAttributesPage.form().addRequiredAction(UPDATE_PROFILE.getActionName());
+  userAttributesPage.form().save();
+  assertFlashMessageSuccess();
+  testRealmAccountPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  waitForFeedbackText("You need to update your user profile to activate your account.");
+  testUser.setEmail(null);
+  testUser.setFirstName(null);
+  testUser.setLastName(null);
+  testRealmUpdateAccountPage.updateAccount(testUser);
+  waitForFeedbackText("Please specify email.");
+  testUser.setEmail("test@email.test");
+  testRealmUpdateAccountPage.updateAccount(testUser);
+  waitForFeedbackText("Please specify first name.");
+  testUser.setFirstName("test");
+  testRealmUpdateAccountPage.updateAccount(testUser);
+  waitForFeedbackText("Please specify last name.");
+  testUser.setLastName("user");
+  testRealmUpdateAccountPage.updateAccount(testUser);
+  assertCurrentUrlStartsWith(testRealmAccountPage);
+}

@@ -1,0 +1,19 @@
+{
+  String containerName=containerDef.getContainerName();
+  if (containerName.startsWith("keycloak")) {
+    if (migrationContainer == null) {
+      migrationContainer=containerName;
+    }
+ else {
+      throw new RuntimeException("There is more than one migration container " + "enabled in arquillian.xml. It has to be enabled at most one. " + "Do not activate more than one migration profile.");
+    }
+  }
+ else   if (containerName.startsWith("auth-server")) {
+    if (authContainer == null) {
+      authContainer=containerName;
+    }
+ else {
+      throw new RuntimeException("There is more than one auth containec enabled " + "in arquillian.xml. It has to be enabled exactly one. Do not " + "activate more than one auth profile.");
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  ResteasyDeployment deployment=new ResteasyDeployment();
+  deployment.setApplicationClass(KeycloakApplication.class.getName());
+  DeploymentInfo di=undertow.undertowDeployment(deployment);
+  di.setClassLoader(getClass().getClassLoader());
+  di.setContextPath("/auth");
+  di.setDeploymentName("Keycloak");
+  di.setDefaultServletConfig(new DefaultServletConfig(true));
+  di.addWelcomePage("theme/keycloak/welcome/resources/index.html");
+  FilterInfo filter=Servlets.filter("SessionFilter",KeycloakSessionServletFilter.class);
+  di.addFilter(filter);
+  di.addFilterUrlMapping("SessionFilter","/*",DispatcherType.REQUEST);
+  FilterInfo connectionFilter=Servlets.filter("ClientConnectionFilter",ClientConnectionFilter.class);
+  di.addFilter(connectionFilter);
+  di.addFilterUrlMapping("ClientConnectionFilter","/*",DispatcherType.REQUEST);
+  return di;
+}

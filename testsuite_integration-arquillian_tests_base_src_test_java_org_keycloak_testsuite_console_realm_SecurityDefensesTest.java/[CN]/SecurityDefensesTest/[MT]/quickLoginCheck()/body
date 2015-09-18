@@ -1,0 +1,32 @@
+{
+  int secondsToWait=3;
+  bruteForceDetectionPage.form().setProtectionEnabled(true);
+  bruteForceDetectionPage.form().setMaxLoginFailures("100");
+  bruteForceDetectionPage.form().setQuickLoginCheckInput("1500");
+  bruteForceDetectionPage.form().setMinQuickLoginWaitSelect(SecurityDefenses.TimeSelectValues.SECONDS);
+  bruteForceDetectionPage.form().setMinQuickLoginWaitInput(String.valueOf(secondsToWait));
+  bruteForceDetectionPage.form().save();
+  assertFlashMessageSuccess();
+  testRealmAccountPage.navigateTo();
+  setPasswordFor(testUser,PASSWORD + "-mismatch");
+  testRealmLoginPage.form().login(testUser);
+  testRealmLoginPage.form().login(testUser);
+  Date endTime=new Date(new Date().getTime() + secondsToWait * 1000);
+  testRealmLoginPage.form().login(testUser);
+  waitGui().until().element(By.className("instruction")).text().contains("Account is temporarily disabled, contact admin or try again later.");
+  endTime=new Date(endTime.getTime() + secondsToWait * 1000);
+  testRealmAccountPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  endTime=new Date(endTime.getTime() + secondsToWait * 1000);
+  while (new Date().compareTo(endTime) < 0) {
+    try {
+      Thread.sleep(50);
+    }
+ catch (    InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+  setPasswordFor(testUser,PASSWORD);
+  testRealmLoginPage.form().login(testUser);
+  assertCurrentUrlStartsWith(testRealmAccountPage);
+}

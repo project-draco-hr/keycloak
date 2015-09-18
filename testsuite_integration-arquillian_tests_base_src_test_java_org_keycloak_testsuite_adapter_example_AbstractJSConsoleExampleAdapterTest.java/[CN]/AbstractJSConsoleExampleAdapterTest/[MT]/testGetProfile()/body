@@ -1,0 +1,13 @@
+{
+  jsConsoleExample.navigateTo();
+  assertCurrentUrlStartsWith(jsConsoleExample);
+  jsConsoleExample.getProfile();
+  assertTrue(driver.getPageSource().contains("Failed to load profile"));
+  jsConsoleExample.logIn();
+  testRealmLoginPage.form().login("user","password");
+  assertCurrentUrlStartsWith(jsConsoleExample);
+  assertTrue(driver.getPageSource().contains("Auth Success"));
+  jsConsoleExample.getProfile();
+  assertTrue(driver.getPageSource().contains("Failed to load profile"));
+  assertTrue(driver.getPageSource().contains("\"username\": \"user\""));
+}

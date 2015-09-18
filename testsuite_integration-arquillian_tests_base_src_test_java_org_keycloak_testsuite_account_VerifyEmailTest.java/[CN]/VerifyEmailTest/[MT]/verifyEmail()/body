@@ -1,0 +1,12 @@
+{
+  testRealmAccountManagementPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  assertEquals("You need to verify your email address to activate your account.",testRealmVerifyEmailPage.getFeedbackText());
+  String url=assertEmailAndGetUrl(MailServerConfiguration.FROM,testUser.getEmail(),"Someone has created a Test account with this email address.");
+  log.info("navigating to " + url);
+  driver.navigate().to(url);
+  assertCurrentUrlStartsWith(testRealmAccountManagementPage);
+  testRealmAccountManagementPage.signOut();
+  testRealmLoginPage.form().login(testUser);
+  assertCurrentUrlStartsWith(testRealmAccountManagementPage);
+}

@@ -1,0 +1,20 @@
+{
+  if (archive.contains(adapterConfigPath)) {
+    log.info("Modifying adapter config " + adapterConfigPath + " in "+ archive.getName());
+    try {
+      BaseAdapterConfig adapterConfig=loadJson(archive.get(adapterConfigPath).getAsset().openStream(),BaseAdapterConfig.class);
+      log.info(" setting " + (relative ? "" : "non-") + "relative auth-server-url");
+      if (relative) {
+        adapterConfig.setAuthServerUrl("/auth");
+      }
+ else {
+        adapterConfig.setAuthServerUrl(getAuthServerContextRootFromSystemProperty() + "/auth");
+        adapterConfig.setRealmKey(REALM_KEY);
+      }
+      archive.add(new StringAsset(JsonSerialization.writeValueAsPrettyString(adapterConfig)),adapterConfigPath);
+    }
+ catch (    IOException ex) {
+      log.log(Level.FATAL,"Cannot serialize adapter config to JSON.",ex);
+    }
+  }
+}

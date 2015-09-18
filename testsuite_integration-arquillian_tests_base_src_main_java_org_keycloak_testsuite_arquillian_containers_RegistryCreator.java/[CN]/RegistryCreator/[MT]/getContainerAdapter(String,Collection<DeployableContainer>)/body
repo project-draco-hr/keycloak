@@ -1,0 +1,16 @@
+{
+  Validate.notNullOrEmpty(adapterImplClass,"The value of " + ADAPTER_IMPL_CONFIG_STRING + " can not be a null object "+ "nor an empty string!");
+  Class<?> foundAdapter=null;
+  if (isClassPresent(adapterImplClass)) {
+    foundAdapter=loadClass(adapterImplClass);
+  }
+ else {
+    return null;
+  }
+  for (  DeployableContainer<?> container : containers) {
+    if (foundAdapter.isInstance(container)) {
+      return container;
+    }
+  }
+  return null;
+}

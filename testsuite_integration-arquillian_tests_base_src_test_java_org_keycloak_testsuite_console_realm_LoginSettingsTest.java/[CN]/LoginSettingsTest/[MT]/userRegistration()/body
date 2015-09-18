@@ -1,0 +1,30 @@
+{
+  log.info("enabling registration");
+  loginSettingsPage.form().setRegistrationAllowed(true);
+  loginSettingsPage.form().save();
+  log.debug("enabled");
+  testRealmAdminConsolePage.navigateTo();
+  testRealmLoginPage.form().register();
+  assertCurrentUrlStartsWith(testRealmRegistrationPage);
+  testRealmRegistrationPage.waitForUsernameInputPresent();
+  log.info("verified registration is enabled");
+  log.info("enabling email as username");
+  loginSettingsPage.navigateTo();
+  loginSettingsPage.form().setEmailAsUsername(true);
+  loginSettingsPage.form().save();
+  log.debug("enabled");
+  testRealmAdminConsolePage.navigateTo();
+  testRealmLoginPage.form().register();
+  assertCurrentUrlStartsWith(testRealmRegistrationPage);
+  testRealmRegistrationPage.waitForUsernameInputNotPresent();
+  log.info("verified email as username");
+  log.info("disabling registration");
+  loginSettingsPage.navigateTo();
+  loginSettingsPage.form().setRegistrationAllowed(false);
+  loginSettingsPage.form().save();
+  assertFalse(loginSettingsPage.form().isRegistrationAllowed());
+  log.debug("disabled");
+  testRealmAdminConsolePage.navigateTo();
+  testRealmLoginPage.form().waitForRegisterLinkNotPresent();
+  log.info("verified regisration is disabled");
+}

@@ -1,0 +1,9 @@
+{
+  String realm=request.getQueryParamValue("realm");
+  InputStream is=getClass().getResourceAsStream("/" + realm + "-keycloak.json");
+  if (is == null) {
+    throw new IllegalStateException("Not able to find the file /" + realm + "-keycloak.json");
+  }
+  KeycloakDeployment deployment=KeycloakDeploymentBuilder.build(is);
+  return deployment;
+}

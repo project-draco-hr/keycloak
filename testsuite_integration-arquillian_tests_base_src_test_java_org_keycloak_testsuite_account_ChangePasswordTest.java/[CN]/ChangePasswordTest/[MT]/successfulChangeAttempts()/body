@@ -1,0 +1,10 @@
+{
+  testRealmChangePasswordPage.changePasswords(correctPassword,NEW_PASSWORD,NEW_PASSWORD);
+  assertFlashMessageSuccess();
+  testRealmAccountManagementPage.signOut();
+  testRealmLoginPage.form().login(testUser.getUsername(),NEW_PASSWORD);
+  assertCurrentUrlStartsWith(testRealmAccountManagementPage);
+  testRealmAccountManagementPage.password();
+  testRealmChangePasswordPage.changePasswords(NEW_PASSWORD,correctPassword,correctPassword);
+  assertFlashMessageSuccess();
+}

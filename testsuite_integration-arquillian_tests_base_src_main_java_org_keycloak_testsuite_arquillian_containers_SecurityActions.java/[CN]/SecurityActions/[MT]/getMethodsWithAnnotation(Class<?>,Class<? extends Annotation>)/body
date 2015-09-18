@@ -1,0 +1,22 @@
+{
+  List<Method> declaredAccessableMethods=AccessController.doPrivileged(new PrivilegedAction<List<Method>>(){
+    @Override public List<Method> run(){
+      List<Method> foundMethods=new ArrayList<Method>();
+      Class<?> nextSource=source;
+      while (nextSource != Object.class) {
+        for (        Method method : nextSource.getDeclaredMethods()) {
+          if (method.isAnnotationPresent(annotationClass)) {
+            if (!method.isAccessible()) {
+              method.setAccessible(true);
+            }
+            foundMethods.add(method);
+          }
+        }
+        nextSource=nextSource.getSuperclass();
+      }
+      return foundMethods;
+    }
+  }
+);
+  return declaredAccessableMethods;
+}

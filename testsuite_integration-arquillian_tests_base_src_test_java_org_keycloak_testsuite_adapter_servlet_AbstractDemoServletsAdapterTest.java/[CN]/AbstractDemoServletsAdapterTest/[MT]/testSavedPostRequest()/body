@@ -1,0 +1,23 @@
+{
+  inputPortal.navigateTo();
+  assertCurrentUrlEquals(inputPortal);
+  inputPortal.execute("hello");
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertEquals(driver.getCurrentUrl(),inputPortal + "/secured/post");
+  String pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("parameter=hello"));
+  String logoutUri=OIDCLoginProtocolService.logoutUrl(authServerPage.createUriBuilder()).queryParam(OAuth2Constants.REDIRECT_URI,customerPortal.toString()).build("demo").toString();
+  driver.navigate().to(logoutUri);
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  productPortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  customerPortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  Client client=ClientBuilder.newClient();
+  Form form=new Form();
+  form.param("parameter","hello");
+  String text=client.target(inputPortal + "/unsecured").request().post(Entity.form(form),String.class);
+  assertTrue(text.contains("parameter=hello"));
+  client.close();
+}

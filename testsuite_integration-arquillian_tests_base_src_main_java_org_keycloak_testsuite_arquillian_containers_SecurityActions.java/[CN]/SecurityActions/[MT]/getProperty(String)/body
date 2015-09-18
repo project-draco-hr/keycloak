@@ -1,0 +1,31 @@
+{
+  try {
+    String value=AccessController.doPrivileged(new PrivilegedExceptionAction<String>(){
+      @Override public String run(){
+        return System.getProperty(key);
+      }
+    }
+);
+    return value;
+  }
+ catch (  final PrivilegedActionException pae) {
+    final Throwable t=pae.getCause();
+    if (t instanceof SecurityException) {
+      throw (SecurityException)t;
+    }
+    if (t instanceof NullPointerException) {
+      throw (NullPointerException)t;
+    }
+ else     if (t instanceof IllegalArgumentException) {
+      throw (IllegalArgumentException)t;
+    }
+ else {
+      try {
+        throw (RuntimeException)t;
+      }
+ catch (      final ClassCastException cce) {
+        throw new RuntimeException("Obtained unchecked Exception; this code should never be reached",t);
+      }
+    }
+  }
+}

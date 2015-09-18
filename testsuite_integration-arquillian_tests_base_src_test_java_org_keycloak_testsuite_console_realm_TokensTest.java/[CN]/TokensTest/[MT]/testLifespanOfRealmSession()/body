@@ -1,0 +1,12 @@
+{
+  tokenSettingsPage.form().setSessionTimeoutLifespan(TIMEOUT,TIME_UNIT);
+  tokenSettingsPage.form().save();
+  loginToTestRealmConsoleAs(testUser);
+  TIME_UNIT.sleep(TIMEOUT / 2);
+  driver.navigate().refresh();
+  assertCurrentUrlStartsWith(testRealmAdminConsolePage);
+  TIME_UNIT.sleep(TIMEOUT / 2 + 2);
+  driver.navigate().refresh();
+  log.debug(driver.getCurrentUrl());
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+}

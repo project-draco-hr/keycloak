@@ -1,0 +1,25 @@
+{
+  loginAndCheckSession(driver,testRealmLoginPage);
+  driver2.navigate().to(sessionPortalPage.toString());
+  assertCurrentUrlStartsWithLoginUrlOf(driver2,testRealmPage);
+  driver2.findElement(By.id("username")).sendKeys("bburke@redhat.com");
+  driver2.findElement(By.id("password")).sendKeys("password");
+  driver2.findElement(By.id("password")).submit();
+  assertCurrentUrlEquals(driver2,sessionPortalPage);
+  String pageSource=driver2.getPageSource();
+  assertTrue(pageSource.contains("Counter=1"));
+  driver2.navigate().to(sessionPortalPage.toString());
+  pageSource=driver2.getPageSource();
+  assertTrue(pageSource.contains("Counter=2"));
+  String logoutUri=OIDCLoginProtocolService.logoutUrl(authServerPage.createUriBuilder()).queryParam(OAuth2Constants.REDIRECT_URI,sessionPortalPage.toString()).build("demo").toString();
+  driver.navigate().to(logoutUri);
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  sessionPortalPage.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  driver2.navigate().to(sessionPortalPage.toString());
+  assertCurrentUrlEquals(driver2,sessionPortalPage);
+  pageSource=driver2.getPageSource();
+  assertTrue(pageSource.contains("Counter=3"));
+  driver2.navigate().to(logoutUri);
+  assertCurrentUrlStartsWithLoginUrlOf(driver2,testRealmPage);
+}

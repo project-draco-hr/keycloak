@@ -1,0 +1,18 @@
+{
+  customerPortal.navigateTo();
+  assertCurrentUrlStartsWith(customerPortal);
+  customerPortal.clickAdminInterfaceLink();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("admin","password");
+  assertCurrentUrlStartsWith(adminInterface);
+  assertTrue(driver.getPageSource().contains("Hello admin!"));
+  customerListing.navigateTo();
+  customerListing.clickLogOut();
+  pause(500);
+  assertCurrentUrlStartsWith(customerPortal);
+  customerPortal.clickAdminInterfaceLink();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlStartsWith(adminInterface);
+  assertTrue(driver.getPageSource().contains("Status code is 403"));
+}

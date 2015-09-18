@@ -1,0 +1,16 @@
+{
+  userAttributesPage.form().addRequiredAction(UPDATE_PASSWORD.getActionName());
+  userAttributesPage.form().save();
+  assertFlashMessageSuccess();
+  testRealmAccountPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  waitForFeedbackText("You need to change your password to activate your account.");
+  testRealmUpdatePasswordPage.updatePasswords(null,null);
+  waitForFeedbackText("Please specify password.");
+  testRealmUpdatePasswordPage.updatePasswords(PASSWORD,null);
+  waitForFeedbackText("Passwords don't match.");
+  testRealmUpdatePasswordPage.updatePasswords(PASSWORD,PASSWORD + "-mismatch");
+  waitForFeedbackText("Passwords don't match.");
+  testRealmUpdatePasswordPage.updatePasswords(PASSWORD,PASSWORD);
+  assertCurrentUrlStartsWith(testRealmAccountPage);
+}

@@ -1,0 +1,11 @@
+{
+  productPortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlStartsWith(productPortal);
+  assertTrue(productPortal.getProduct1UnsecuredText().contains("401: Unauthorized"));
+  assertTrue(productPortal.getProduct1SecuredText().contains("Product received: id=1"));
+  assertTrue(productPortal.getProduct2SecuredText().contains("Product received: id=2"));
+  productPortal.clickLogOutLink();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+}

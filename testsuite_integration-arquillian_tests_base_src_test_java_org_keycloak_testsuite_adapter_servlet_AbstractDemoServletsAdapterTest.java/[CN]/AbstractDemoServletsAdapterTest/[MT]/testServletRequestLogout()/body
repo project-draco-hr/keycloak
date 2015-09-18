@@ -1,0 +1,22 @@
+{
+  customerPortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlEquals(customerPortal);
+  String pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  productPortal.navigateTo();
+  assertCurrentUrlEquals(productPortal);
+  pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("iPhone") && pageSource.contains("iPad"));
+  customerPortal.navigateTo();
+  assertCurrentUrlEquals(customerPortal);
+  pageSource=driver.getPageSource();
+  Assert.assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  driver.navigate().to(customerPortal + "/logout");
+  assertTrue(driver.getPageSource().contains("servlet logout ok"));
+  customerPortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  productPortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+}

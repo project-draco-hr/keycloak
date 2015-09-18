@@ -1,0 +1,8 @@
+{
+  String webInfPath="/adapter-test/" + name + "/WEB-INF/";
+  URL keycloakJSON=AbstractServletsAdapterTest.class.getResource(webInfPath + adapterConfig);
+  URL webXML=AbstractServletsAdapterTest.class.getResource(webInfPath + "web.xml");
+  WebArchive deployment=ShrinkWrap.create(WebArchive.class,name + ".war").addClasses(servletClasses).addAsWebInfResource(webXML,"web.xml").addAsWebInfResource(keycloakJSON,"keycloak.json").addAsWebInfResource(jbossDeploymentStructure,JBOSS_DEPLOYMENT_STRUCTURE_XML);
+  addContextXml(deployment,name);
+  return deployment;
+}

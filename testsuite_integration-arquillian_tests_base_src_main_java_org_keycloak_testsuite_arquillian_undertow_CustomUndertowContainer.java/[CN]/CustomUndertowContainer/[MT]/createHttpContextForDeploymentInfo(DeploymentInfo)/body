@@ -1,0 +1,9 @@
+{
+  HTTPContext httpContext=new HTTPContext(configuration.getBindAddress(),configuration.getBindHttpPort());
+  final Map<String,ServletInfo> servlets=deploymentInfo.getServlets();
+  final Collection<ServletInfo> servletsInfo=servlets.values();
+  for (  ServletInfo servletInfo : servletsInfo) {
+    httpContext.add(new Servlet(servletInfo.getName(),deploymentInfo.getContextPath()));
+  }
+  return httpContext;
+}

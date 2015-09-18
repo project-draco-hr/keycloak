@@ -1,0 +1,12 @@
+{
+  log.debug("importing realm: " + realm.getRealm());
+  try {
+    RealmResource realmResource=adminClient.realms().realm(realm.getRealm());
+    RealmRepresentation rRep=realmResource.toRepresentation();
+    log.debug("realm already exists on server, re-importing");
+    realmResource.remove();
+  }
+ catch (  NotFoundException nfe) {
+  }
+  adminClient.realms().create(realm);
+}

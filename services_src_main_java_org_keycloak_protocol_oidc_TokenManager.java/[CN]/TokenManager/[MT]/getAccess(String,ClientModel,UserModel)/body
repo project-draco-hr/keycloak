@@ -3,9 +3,7 @@
   Set<RoleModel> roleMappings=user.getRoleMappings();
   if (client.isFullScopeAllowed())   return roleMappings;
   Set<RoleModel> scopeMappings=client.getScopeMappings();
-  if (client instanceof ClientModel) {
-    scopeMappings.addAll(((ClientModel)client).getRoles());
-  }
+  scopeMappings.addAll(client.getRoles());
   for (  RoleModel role : roleMappings) {
     for (    RoleModel desiredRole : scopeMappings) {
       Set<RoleModel> visited=new HashSet<RoleModel>();

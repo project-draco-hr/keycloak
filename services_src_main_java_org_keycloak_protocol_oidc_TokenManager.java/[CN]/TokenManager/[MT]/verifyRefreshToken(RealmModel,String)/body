@@ -10,7 +10,7 @@
  catch (  Exception e) {
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid refresh token",e);
   }
-  if (refreshToken.isExpired()) {
+  if (refreshToken.getExpiration() != 0 && refreshToken.isExpired()) {
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Refresh token expired");
   }
   if (refreshToken.getIssuedAt() < realm.getNotBefore()) {

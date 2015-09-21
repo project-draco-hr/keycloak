@@ -1,0 +1,21 @@
+{
+  if (req.getRequestURI().endsWith("logout")) {
+    UriBuilder redirectUriBuilder=UriBuilder.fromUri(offlineClientAppUri);
+    if (req.getParameter(OAuth2Constants.SCOPE) != null) {
+      redirectUriBuilder.queryParam(OAuth2Constants.SCOPE,req.getParameter(OAuth2Constants.SCOPE));
+    }
+    String redirectUri=redirectUriBuilder.build().toString();
+    String origin=UriUtils.getOrigin(req.getRequestURL().toString());
+    String serverLogoutRedirect=UriBuilder.fromUri(origin + "/auth/realms/test/protocol/openid-connect/logout").queryParam("redirect_uri",redirectUri).build().toString();
+    resp.sendRedirect(serverLogoutRedirect);
+    return;
+  }
+  StringBuilder response=new StringBuilder("<html><head><title>Offline token servlet</title></head><body><pre>");
+  RefreshableKeycloakSecurityContext ctx=(RefreshableKeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
+  String accessTokenPretty=JsonSerialization.writeValueAsPrettyString(ctx.getToken());
+  RefreshToken refreshToken=new JWSInput(ctx.getRefreshToken()).readJsonContent(RefreshToken.class);
+  String refreshTokenPretty=JsonSerialization.writeValueAsPrettyString(refreshToken);
+  response=response.append(accessTokenPretty).append(refreshTokenPretty).append("</pre></body></html>");
+  resp.getWriter().println(response.toString());
+  tokenInfo=new TokenInfo(ctx.getToken(),refreshToken);
+}

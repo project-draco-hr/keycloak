@@ -1,4 +1,5 @@
 {
+  Set<ClientModel> offlineClients=new OfflineUserSessionManager().findClientsWithOfflineToken(realm,user);
   List<ClientModel> realmClients=realm.getClients();
   for (  ClientModel client : realmClients) {
     if (client.isBearerOnly()) {
@@ -23,7 +24,11 @@
         }
       }
     }
-    ApplicationEntry appEntry=new ApplicationEntry(realmRolesAvailable,resourceRolesAvailable,realmRolesGranted,resourceRolesGranted,client,claimsGranted);
+    List<String> additionalGrants=new ArrayList<>();
+    if (offlineClients.contains(client)) {
+      additionalGrants.add("${offlineAccess}");
+    }
+    ApplicationEntry appEntry=new ApplicationEntry(realmRolesAvailable,resourceRolesAvailable,realmRolesGranted,resourceRolesGranted,client,claimsGranted,additionalGrants);
     applications.add(appEntry);
   }
 }

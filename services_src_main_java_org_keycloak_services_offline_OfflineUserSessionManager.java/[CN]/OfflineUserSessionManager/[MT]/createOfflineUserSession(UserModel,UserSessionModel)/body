@@ -1,0 +1,23 @@
+{
+  if (logger.isTraceEnabled()) {
+    logger.tracef("Creating new offline user session. UserSessionID: '%s' , Username: '%s'",userSession.getId(),user.getUsername());
+  }
+  OfflineUserSessionAdapter.OfflineUserSessionData rep=new OfflineUserSessionAdapter.OfflineUserSessionData();
+  rep.setBrokerUserId(userSession.getBrokerUserId());
+  rep.setBrokerSessionId(userSession.getBrokerSessionId());
+  rep.setIpAddress(userSession.getIpAddress());
+  rep.setAuthMethod(userSession.getAuthMethod());
+  rep.setRememberMe(userSession.isRememberMe());
+  rep.setStarted(userSession.getStarted());
+  rep.setNotes(userSession.getNotes());
+  try {
+    String stringRep=JsonSerialization.writeValueAsString(rep);
+    OfflineUserSessionModel sessionModel=new OfflineUserSessionModel();
+    sessionModel.setUserSessionId(userSession.getId());
+    sessionModel.setData(stringRep);
+    user.addOfflineUserSession(sessionModel);
+  }
+ catch (  IOException ioe) {
+    throw new ModelException(ioe);
+  }
+}

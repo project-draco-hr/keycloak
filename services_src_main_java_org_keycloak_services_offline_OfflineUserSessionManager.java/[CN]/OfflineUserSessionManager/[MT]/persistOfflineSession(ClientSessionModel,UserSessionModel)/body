@@ -1,0 +1,21 @@
+{
+  UserModel user=userSession.getUser();
+  ClientModel client=clientSession.getClient();
+  Collection<OfflineClientSessionModel> clientSessions=user.getOfflineClientSessions();
+  for (  OfflineClientSessionModel existing : clientSessions) {
+    if (existing.getClientId().equals(client.getId())) {
+      if (logger.isTraceEnabled()) {
+        logger.tracef("Removing existing offline token for user '%s' and client '%s' . ClientSessionID was '%s' . Offline token will be replaced with new one",user.getUsername(),client.getClientId(),existing.getClientSessionId());
+      }
+      user.removeOfflineClientSession(existing.getClientSessionId());
+      if (!existing.getUserSessionId().equals(userSession.getId())) {
+        checkUserSessionHasClientSessions(user,existing.getUserSessionId());
+      }
+    }
+  }
+  OfflineUserSessionModel userSessionRep=user.getOfflineUserSession(userSession.getId());
+  if (userSessionRep == null) {
+    createOfflineUserSession(user,userSession);
+  }
+  createOfflineClientSession(user,clientSession,userSession);
+}

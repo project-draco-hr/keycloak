@@ -1,0 +1,22 @@
+{
+  OfflineTokenServlet.tokenInfo=null;
+  String servletUri=UriBuilder.fromUri(offlineClientAppUri).queryParam(OAuth2Constants.SCOPE,OAuth2Constants.OFFLINE_ACCESS).build().toString();
+  driver.navigate().to(servletUri);
+  loginPage.login("test-user@localhost","password");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(offlineClientAppUri));
+  Assert.assertEquals(OfflineTokenServlet.tokenInfo.refreshToken.getType(),RefreshTokenUtil.TOKEN_TYPE_OFFLINE);
+  Assert.assertEquals(OfflineTokenServlet.tokenInfo.refreshToken.getExpiration(),0);
+  String accessTokenId=OfflineTokenServlet.tokenInfo.accessToken.getId();
+  String refreshTokenId=OfflineTokenServlet.tokenInfo.refreshToken.getId();
+  Time.setOffset(9999);
+  driver.navigate().to(offlineClientAppUri);
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(offlineClientAppUri));
+  Assert.assertEquals(OfflineTokenServlet.tokenInfo.refreshToken.getId(),refreshTokenId);
+  Assert.assertNotEquals(OfflineTokenServlet.tokenInfo.accessToken.getId(),accessTokenId);
+  driver.navigate().to(offlineClientAppUri + "/logout");
+  loginPage.assertCurrent();
+  driver.navigate().to(offlineClientAppUri);
+  loginPage.assertCurrent();
+  Time.setOffset(0);
+  events.clear();
+}

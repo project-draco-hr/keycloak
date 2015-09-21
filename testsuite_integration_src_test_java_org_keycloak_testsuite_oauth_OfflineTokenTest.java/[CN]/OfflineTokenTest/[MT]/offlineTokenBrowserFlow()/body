@@ -1,0 +1,18 @@
+{
+  oauth.scope(OAuth2Constants.OFFLINE_ACCESS);
+  oauth.clientId("offline-client");
+  oauth.redirectUri(offlineClientAppUri);
+  oauth.doLogin("test-user@localhost","password");
+  Event loginEvent=events.expectLogin().client("offline-client").detail(Details.REDIRECT_URI,offlineClientAppUri).assertEvent();
+  final String sessionId=loginEvent.getSessionId();
+  String codeId=loginEvent.getDetails().get(Details.CODE_ID);
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"secret1");
+  AccessToken token=oauth.verifyToken(tokenResponse.getAccessToken());
+  String offlineTokenString=tokenResponse.getRefreshToken();
+  RefreshToken offlineToken=oauth.verifyRefreshToken(offlineTokenString);
+  events.expectCodeToToken(codeId,sessionId).client("offline-client").detail(Details.REFRESH_TOKEN_TYPE,RefreshTokenUtil.TOKEN_TYPE_OFFLINE).assertEvent();
+  Assert.assertEquals(RefreshTokenUtil.TOKEN_TYPE_OFFLINE,offlineToken.getType());
+  Assert.assertEquals(0,offlineToken.getExpiration());
+  testRefreshWithOfflineToken(token,offlineToken,offlineTokenString,sessionId,userId);
+}

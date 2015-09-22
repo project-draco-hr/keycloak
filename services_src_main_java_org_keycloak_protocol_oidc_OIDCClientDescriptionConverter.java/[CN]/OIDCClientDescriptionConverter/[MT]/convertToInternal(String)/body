@@ -1,0 +1,14 @@
+{
+  try {
+    OIDCClientRepresentation oidcRep=JsonSerialization.readValue(description,OIDCClientRepresentation.class);
+    ClientRepresentation client=new ClientRepresentation();
+    client.setClientId(KeycloakModelUtils.generateId());
+    client.setName(oidcRep.getClientName());
+    client.setRedirectUris(oidcRep.getRedirectUris());
+    client.setBaseUrl(oidcRep.getClientUri());
+    return client;
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+}

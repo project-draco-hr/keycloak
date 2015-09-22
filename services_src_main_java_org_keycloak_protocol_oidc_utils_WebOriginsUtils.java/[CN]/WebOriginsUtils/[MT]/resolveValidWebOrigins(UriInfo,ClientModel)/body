@@ -1,0 +1,13 @@
+{
+  Set<String> webOrigins=client.getWebOrigins();
+  if (webOrigins != null && webOrigins.contains("+")) {
+    webOrigins.remove(INCLUDE_REDIRECTS);
+    client.getRedirectUris();
+    for (    String redirectUri : RedirectUtils.resolveValidRedirects(uriInfo,client.getRootUrl(),client.getRedirectUris())) {
+      if (redirectUri.startsWith("http://") || redirectUri.startsWith("https://")) {
+        webOrigins.add(UriUtils.getOrigin(redirectUri));
+      }
+    }
+  }
+  return webOrigins;
+}

@@ -1,0 +1,26 @@
+{
+  log.info("enabling verify email");
+  loginSettingsPage.form().setVerifyEmailAllowed(true);
+  loginSettingsPage.form().save();
+  log.debug("enabled");
+  testAccountPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  Assert.assertEquals("Failed to send email, please try again later.",testRealmVerifyEmailPage.getErrorMessage());
+  log.info("verified verify email is enabled");
+  log.info("disabling verify email");
+  loginSettingsPage.navigateTo();
+  loginSettingsPage.form().setVerifyEmailAllowed(false);
+  loginSettingsPage.form().save();
+  assertFalse(loginSettingsPage.form().isVerifyEmailAllowed());
+  log.debug("disabled");
+  log.debug("create new test user");
+  UserRepresentation newUser=createUserRepresentation("new_user","new_user@email.test","new","user",true);
+  setPasswordFor(newUser,PASSWORD);
+  String id=createUserAndResetPasswordWithAdminClient(testRealmResource(),newUser,PASSWORD);
+  newUser.setId(id);
+  log.info("log in as new user");
+  testAccountPage.navigateTo();
+  testRealmLoginPage.form().login(newUser);
+  testAccountPage.waitForAccountLinkPresent();
+  log.info("verified verify email is disabled");
+}

@@ -1,0 +1,17 @@
+{
+  testRealmAccountManagementPage.navigateTo();
+  log.info("login with remember me unchecked");
+  testRealmLoginPage.form().login(testUser);
+  testRealmAccountManagementPage.waitForAccountLinkPresent();
+  log.debug("logged in");
+  testRealmAccountManagementPage.navigateTo();
+  log.debug("user shouldn't be logged in");
+  testRealmLoginPage.form().waitForRememberMePresent();
+  log.info("login with remember me checked");
+  testRealmLoginPage.form().rememberMe(true);
+  testRealmLoginPage.form().login(testUser);
+  testRealmAccountManagementPage.waitForAccountLinkPresent();
+  testRealmAccountManagementPage.navigateTo();
+  log.debug("user should be logged in");
+  testRealmAccountManagementPage.waitForAccountLinkPresent();
+}

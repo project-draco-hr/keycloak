@@ -1,6 +1,15 @@
 {
   if (greenMail != null) {
-    log.info("--Stopping mail server (localhost:3025)--");
+    log.info("Stopping mail server (localhost:3025)");
+    Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(){
+      @Override public void uncaughtException(      Thread t,      Throwable e){
+        if (!(e.getCause() instanceof SocketException && e.getStackTrace()[0].getClassName().equals("com.icegreen.greenmail.smtp.SmtpHandler"))) {
+          log.error("Exception in thread \"" + t.getName() + "\" ");
+          log.error(e.getMessage(),e);
+        }
+      }
+    }
+);
     greenMail.stop();
   }
 }

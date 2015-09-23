@@ -1,0 +1,15 @@
+{
+  String userId=keycloakRule.getUser("test","keycloak-user@localhost").getId();
+  oauth.scope(OAuth2Constants.OFFLINE_ACCESS);
+  oauth.clientId("offline-client");
+  oauth.redirectUri(offlineClientAppUri);
+  oauth.doLogin("keycloak-user@localhost","password");
+  Event loginEvent=events.expectLogin().client("offline-client").user(userId).detail(Details.REDIRECT_URI,offlineClientAppUri).assertEvent();
+  String sessionId=loginEvent.getSessionId();
+  String codeId=loginEvent.getDetails().get(Details.CODE_ID);
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"secret1");
+  assertEquals(400,tokenResponse.getStatusCode());
+  assertEquals("not_allowed",tokenResponse.getError());
+  events.expectCodeToToken(codeId,sessionId).client("offline-client").user(userId).error("not_allowed").clearDetails().assertEvent();
+}

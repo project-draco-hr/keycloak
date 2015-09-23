@@ -7,12 +7,14 @@
     RoleModel createRealmRole=realm.addRole(AdminRoles.CREATE_REALM);
     adminRole.addCompositeRole(createRealmRole);
     createRealmRole.setDescription("${role_" + AdminRoles.CREATE_REALM + "}");
+    createRealmRole.setScopeParamRequired(false);
   }
  else {
     adminRealm=model.getRealmByName(Config.getAdminRealm());
     adminRole=adminRealm.getRole(AdminRoles.ADMIN);
   }
   adminRole.setDescription("${role_" + AdminRoles.ADMIN + "}");
+  adminRole.setScopeParamRequired(false);
   ClientModel realmAdminApp=KeycloakModelUtils.createClient(adminRealm,KeycloakModelUtils.getMasterRealmAdminApplicationClientId(realm.getName()));
   realmAdminApp.setName(realm.getName() + " Realm");
   realmAdminApp.setBearerOnly(true);
@@ -20,6 +22,7 @@
   for (  String r : AdminRoles.ALL_REALM_ROLES) {
     RoleModel role=realmAdminApp.addRole(r);
     role.setDescription("${role_" + r + "}");
+    role.setScopeParamRequired(false);
     adminRole.addCompositeRole(role);
   }
 }

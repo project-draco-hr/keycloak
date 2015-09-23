@@ -5,13 +5,13 @@
   String scopeParam=clientSession.getNote(OIDCLoginProtocol.SCOPE_PARAM);
   boolean offlineTokenRequested=RefreshTokenUtil.isOfflineTokenRequested(scopeParam);
   if (offlineTokenRequested) {
-    if (!clientSession.getClient().isOfflineTokensEnabled()) {
-      event.error(Errors.INVALID_CLIENT);
-      throw new ErrorResponseException("invalid_client","Offline tokens not allowed for the client",Response.Status.BAD_REQUEST);
+    if (!OfflineTokenUtils.isOfflineTokenAllowed(realm,clientSession)) {
+      event.error(Errors.NOT_ALLOWED);
+      throw new ErrorResponseException("not_allowed","Offline tokens not allowed for the user or client",Response.Status.BAD_REQUEST);
     }
     refreshToken=new RefreshToken(accessToken);
     refreshToken.type(RefreshTokenUtil.TOKEN_TYPE_OFFLINE);
-    new OfflineUserSessionManager().persistOfflineSession(clientSession,userSession);
+    OfflineTokenUtils.persistOfflineSession(clientSession,userSession);
   }
  else {
     refreshToken=new RefreshToken(accessToken);

@@ -12,7 +12,7 @@
   accountAppPage.open();
   List<String> additionalGrants=accountAppPage.getApplications().get("offline-client").getAdditionalGrants();
   Assert.assertEquals(additionalGrants.size(),1);
-  Assert.assertEquals(additionalGrants.get(0),"Offline Access");
+  Assert.assertEquals(additionalGrants.get(0),"Offline Token");
   accountAppPage.revokeGrant("offline-client");
   Assert.assertEquals(accountAppPage.getApplications().get("offline-client").getAdditionalGrants().size(),0);
   events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,"offline-client").assertEvent();

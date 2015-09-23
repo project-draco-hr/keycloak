@@ -1,0 +1,41 @@
+{
+  Set<RoleModel> requestedRoles=new HashSet<RoleModel>();
+  Set<RoleModel> roleMappings=user.getRoleMappings();
+  if (client.isFullScopeAllowed()) {
+    requestedRoles=roleMappings;
+  }
+ else {
+    Set<RoleModel> scopeMappings=client.getScopeMappings();
+    scopeMappings.addAll(client.getRoles());
+    for (    RoleModel role : roleMappings) {
+      for (      RoleModel desiredRole : scopeMappings) {
+        Set<RoleModel> visited=new HashSet<RoleModel>();
+        applyScope(role,desiredRole,visited,requestedRoles);
+      }
+    }
+  }
+  if (applyScopeParam) {
+    Collection<String> scopeParamRoles;
+    if (scopeParam != null) {
+      String[] scopes=scopeParam.split(" ");
+      scopeParamRoles=Arrays.asList(scopes);
+    }
+ else {
+      scopeParamRoles=Collections.emptyList();
+    }
+    Set<RoleModel> roles=new HashSet<>();
+    for (    RoleModel role : requestedRoles) {
+      String roleName=getRoleNameForScopeParam(role);
+      if (!role.isScopeParamRequired() || scopeParamRoles.contains(roleName)) {
+        roles.add(role);
+      }
+ else {
+        if (logger.isTraceEnabled()) {
+          logger.tracef("Role '%s' excluded by scope param. Client is '%s', User is '%s', Scope param is '%s' ",role.getName(),client.getClientId(),user.getUsername(),scopeParam);
+        }
+      }
+    }
+    requestedRoles=roles;
+  }
+  return requestedRoles;
+}

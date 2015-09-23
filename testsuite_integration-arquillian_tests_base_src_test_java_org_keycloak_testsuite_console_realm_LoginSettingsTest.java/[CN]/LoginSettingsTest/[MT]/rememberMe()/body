@@ -1,0 +1,23 @@
+{
+  log.info("enabling remember me");
+  loginSettingsPage.form().setRememberMeAllowed(true);
+  loginSettingsPage.form().save();
+  log.debug("enabled");
+  log.info("login with remember me checked");
+  testAccountPage.navigateTo();
+  testRealmLoginPage.form().rememberMe(true);
+  testRealmLoginPage.form().login(testUser);
+  assertTrue("Cookie KEYCLOAK_REMEMBER_ME should be present.",getCookieNames().contains("KEYCLOAK_REMEMBER_ME"));
+  log.info("verified remember me is enabled");
+  log.info("disabling remember me");
+  loginSettingsPage.navigateTo();
+  loginSettingsPage.form().setRememberMeAllowed(false);
+  loginSettingsPage.form().save();
+  assertFalse(loginSettingsPage.form().isRememberMeAllowed());
+  log.debug("disabled");
+  testAccountPage.navigateTo();
+  testAccountPage.signOut();
+  testRealmLoginPage.form().waitForLoginButtonPresent();
+  testRealmLoginPage.form().waitForRememberMeNotPresent();
+  log.info("verified remember me is disabled");
+}

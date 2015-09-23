@@ -1,0 +1,23 @@
+{
+  log.info("enabling edit username");
+  loginSettingsPage.form().setEditUsernameAllowed(true);
+  loginSettingsPage.form().save();
+  log.debug("enabled");
+  log.info("edit username");
+  testAccountPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  testAccountPage.waitForAccountLinkPresent();
+  testAccountPage.setUsername(NEW_USERNAME);
+  testAccountPage.save();
+  testAccountPage.signOut();
+  log.debug("edited");
+  log.info("log in with edited username");
+  testRealmLoginPage.form().login(NEW_USERNAME,PASSWORD);
+  testAccountPage.waitForAccountLinkPresent();
+  log.debug("user is logged in with edited username");
+  log.info("disabling edit username");
+  loginSettingsPage.navigateTo();
+  loginSettingsPage.form().setEditUsernameAllowed(false);
+  loginSettingsPage.form().save();
+  log.debug("disabled");
+}

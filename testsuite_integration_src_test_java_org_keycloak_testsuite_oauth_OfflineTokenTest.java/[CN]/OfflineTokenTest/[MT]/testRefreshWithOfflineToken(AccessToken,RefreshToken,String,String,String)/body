@@ -21,8 +21,9 @@
   Assert.assertNull(response.getRefreshToken());
   Assert.assertNotEquals(oldToken.getId(),refreshedToken.getId());
   Assert.assertEquals(userId,refreshedToken.getSubject());
-  Assert.assertEquals(1,refreshedToken.getRealmAccess().getRoles().size());
+  Assert.assertEquals(2,refreshedToken.getRealmAccess().getRoles().size());
   Assert.assertTrue(refreshedToken.getRealmAccess().isUserInRole("user"));
+  Assert.assertTrue(refreshedToken.getRealmAccess().isUserInRole(Constants.OFFLINE_ACCESS_ROLE));
   Assert.assertEquals(1,refreshedToken.getResourceAccess("test-app").getRoles().size());
   Assert.assertTrue(refreshedToken.getResourceAccess("test-app").isUserInRole("customer-user"));
   Event refreshEvent=events.expectRefresh(offlineToken.getId(),sessionId).client("offline-client").user(userId).removeDetail(Details.UPDATED_REFRESH_TOKEN_ID).detail(Details.REFRESH_TOKEN_TYPE,RefreshTokenUtil.TOKEN_TYPE_OFFLINE).assertEvent();

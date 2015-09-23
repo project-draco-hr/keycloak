@@ -5,7 +5,8 @@
   UserModel user=session.getUser();
   clientSession.setUserSession(session);
   Set<String> requestedRoles=new HashSet<String>();
-  for (  RoleModel r : TokenManager.getAccess(null,clientSession.getClient(),user)) {
+  String scopeParam=clientSession.getNote(OAuth2Constants.SCOPE);
+  for (  RoleModel r : TokenManager.getAccess(scopeParam,true,clientSession.getClient(),user)) {
     requestedRoles.add(r.getId());
   }
   clientSession.setRoles(requestedRoles);

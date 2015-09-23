@@ -9,11 +9,8 @@
   UserSessionModel userSession=null;
   ClientSessionModel clientSession=null;
   if (RefreshTokenUtil.TOKEN_TYPE_OFFLINE.equals(oldToken.getType())) {
-    clientSession=new OfflineUserSessionManager().findOfflineClientSession(realm,user,oldToken.getClientSession(),oldToken.getSessionState());
+    clientSession=OfflineTokenUtils.findOfflineClientSession(realm,user,oldToken.getClientSession(),oldToken.getSessionState());
     if (clientSession != null) {
-      if (!clientSession.getClient().isOfflineTokensEnabled()) {
-        throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Offline tokens not allowed for client","Offline tokens not allowed for client");
-      }
       userSession=clientSession.getUserSession();
     }
   }
@@ -43,7 +40,8 @@
   if (oldToken.getIssuedAt() < realm.getNotBefore()) {
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale token");
   }
-  Set<RoleModel> requestedRoles=TokenManager.getAccess(null,clientSession.getClient(),user);
+  String scopeParam=clientSession.getNote(OAuth2Constants.SCOPE);
+  Set<RoleModel> requestedRoles=TokenManager.getAccess(scopeParam,true,clientSession.getClient(),user);
   AccessToken newToken=createClientAccessToken(session,requestedRoles,realm,client,user,userSession,clientSession);
   verifyAccess(oldToken,newToken);
   return new TokenValidation(user,userSession,clientSession,newToken);

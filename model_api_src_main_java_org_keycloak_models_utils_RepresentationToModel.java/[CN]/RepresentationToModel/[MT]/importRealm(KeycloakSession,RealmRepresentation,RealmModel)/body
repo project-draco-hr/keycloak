@@ -89,6 +89,8 @@
         for (        RoleRepresentation roleRep : entry.getValue()) {
           RoleModel role=roleRep.getId() != null ? client.addRole(roleRep.getId(),roleRep.getName()) : client.addRole(roleRep.getName());
           role.setDescription(roleRep.getDescription());
+          boolean scopeParamRequired=roleRep.isScopeParamRequired() == null ? false : roleRep.isScopeParamRequired();
+          role.setScopeParamRequired(scopeParamRequired);
         }
       }
     }

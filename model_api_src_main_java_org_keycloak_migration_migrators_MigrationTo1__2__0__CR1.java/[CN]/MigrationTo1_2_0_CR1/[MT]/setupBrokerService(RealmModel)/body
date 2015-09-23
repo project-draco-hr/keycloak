@@ -6,7 +6,9 @@
     client.setName("${client_" + Constants.BROKER_SERVICE_CLIENT_ID + "}");
     client.setFullScopeAllowed(false);
     for (    String role : Constants.BROKER_SERVICE_ROLES) {
-      client.addRole(role).setDescription("${role_" + role.toLowerCase().replaceAll("_","-") + "}");
+      RoleModel roleModel=client.addRole(role);
+      roleModel.setDescription("${role_" + role.toLowerCase().replaceAll("_","-") + "}");
+      roleModel.setScopeParamRequired(false);
     }
   }
 }

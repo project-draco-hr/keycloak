@@ -1,0 +1,24 @@
+{
+  System.out.println("visit 1st app ");
+  driver.navigate().to("http://localhost:8081/employee-sig/");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/demo/protocol/saml"));
+  System.out.println("login to form");
+  loginPage.login("bburke","password");
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/employee-sig/");
+  Assert.assertTrue(driver.getPageSource().contains("bburke"));
+  System.out.println("visit 2nd app ");
+  driver.navigate().to("http://localhost:8081/employee-sig-front/");
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/employee-sig-front/");
+  Assert.assertTrue(driver.getPageSource().contains("bburke"));
+  System.out.println("visit 3rd app ");
+  driver.navigate().to("http://localhost:8081/sales-post-sig/");
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/sales-post-sig/");
+  Assert.assertTrue(driver.getPageSource().contains("bburke"));
+  System.out.println("GLO");
+  driver.navigate().to("http://localhost:8081/employee-sig?GLO=true");
+  checkLoggedOut("http://localhost:8081/employee-sig/");
+  driver.navigate().to("http://localhost:8081/employee-sig-front/");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/demo/protocol/saml"));
+  driver.navigate().to("http://localhost:8081/sales-post-sig/");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/demo/protocol/saml"));
+}

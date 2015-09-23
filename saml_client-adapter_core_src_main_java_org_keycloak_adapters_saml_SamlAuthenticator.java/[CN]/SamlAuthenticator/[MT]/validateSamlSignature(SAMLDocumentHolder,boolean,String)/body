@@ -1,16 +1,14 @@
 {
-  if (deployment.isValidateSignatures()) {
-    try {
-      if (postBinding) {
-        verifyPostBindingSignature(holder.getSamlDocument(),deployment.getSignatureValidationKey());
-      }
+  try {
+    if (postBinding) {
+      verifyPostBindingSignature(holder.getSamlDocument(),deployment.getIDP().getSignatureValidationKey());
+    }
  else {
-        verifyRedirectBindingSignature(deployment.getSignatureValidationKey(),paramKey);
-      }
+      verifyRedirectBindingSignature(deployment.getIDP().getSignatureValidationKey(),paramKey);
     }
- catch (    VerificationException e) {
-      log.error("validation failed",e);
-      throw new RuntimeException("invalid document signature");
-    }
+  }
+ catch (  VerificationException e) {
+    log.error("validation failed",e);
+    throw new RuntimeException("invalid document signature");
   }
 }

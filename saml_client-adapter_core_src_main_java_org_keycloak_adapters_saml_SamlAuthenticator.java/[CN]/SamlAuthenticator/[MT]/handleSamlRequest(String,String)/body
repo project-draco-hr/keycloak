@@ -12,8 +12,10 @@
   if (!facade.getRequest().getURI().toString().equals(requestAbstractType.getDestination())) {
     throw new RuntimeException("destination not equal to request");
   }
-  validateSamlSignature(holder,postBinding,GeneralConstants.SAML_REQUEST_KEY);
   if (requestAbstractType instanceof LogoutRequestType) {
+    if (deployment.getIDP().getSingleLogoutService().validateRequestSignature()) {
+      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_REQUEST_KEY);
+    }
     LogoutRequestType logout=(LogoutRequestType)requestAbstractType;
     return logoutRequest(logout,relayState);
   }

@@ -5,17 +5,18 @@
  else {
     sessionStore.logoutBySsoId(request.getSessionIndex());
   }
-  String issuerURL=deployment.getIssuer();
+  String issuerURL=deployment.getEntityID();
   SAML2LogoutResponseBuilder builder=new SAML2LogoutResponseBuilder();
   builder.logoutRequestID(request.getID());
-  builder.destination(deployment.getSingleLogoutServiceUrl());
+  builder.destination(deployment.getIDP().getSingleLogoutService().getResponseBindingUrl());
   builder.issuer(issuerURL);
   BaseSAML2BindingBuilder binding=new BaseSAML2BindingBuilder().relayState(relayState);
-  if (deployment.isRequestsSigned()) {
+  if (deployment.getIDP().getSingleLogoutService().signResponse()) {
     binding.signWith(deployment.getSigningKeyPair()).signDocument();
+    binding.canonicalizationMethod(deployment.getIDP().getSingleLogoutService().getSignatureCanonicalizationMethod());
   }
   try {
-    SamlUtil.sendSaml(facade,deployment.getSingleLogoutServiceUrl(),binding,builder.buildDocument(),deployment.getResponseBinding());
+    SamlUtil.sendSaml(facade,deployment.getIDP().getSingleLogoutService().getResponseBindingUrl(),binding,builder.buildDocument(),deployment.getIDP().getSingleLogoutService().getResponseBinding());
   }
  catch (  ConfigurationException e) {
     throw new RuntimeException(e);

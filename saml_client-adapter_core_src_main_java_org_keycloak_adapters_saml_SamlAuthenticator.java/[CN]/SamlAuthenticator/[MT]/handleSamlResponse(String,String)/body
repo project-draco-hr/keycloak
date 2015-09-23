@@ -12,11 +12,16 @@
   if (!facade.getRequest().getURI().toString().equals(statusResponse.getDestination())) {
     throw new RuntimeException("destination not equal to request");
   }
-  validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
   if (statusResponse instanceof ResponseType) {
+    if (deployment.getIDP().getSingleSignOnService().validateResponseSignature()) {
+      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_REQUEST_KEY);
+    }
     return handleLoginResponse((ResponseType)statusResponse);
   }
  else {
+    if (deployment.getIDP().getSingleLogoutService().validateResponseSignature()) {
+      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_REQUEST_KEY);
+    }
     return handleLogoutResponse(holder,statusResponse,relayState);
   }
 }

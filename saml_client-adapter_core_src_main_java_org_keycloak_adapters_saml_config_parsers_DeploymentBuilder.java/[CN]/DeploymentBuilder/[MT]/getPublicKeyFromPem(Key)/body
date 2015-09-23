@@ -1,0 +1,11 @@
+{
+  PublicKey publicKey;
+  if (key.getPublicKeyPem() != null) {
+    publicKey=PemUtils.decodePublicKey(key.getPublicKeyPem().trim());
+  }
+ else {
+    Certificate cert=PemUtils.decodeCertificate(key.getCertificatePem().trim());
+    publicKey=cert.getPublicKey();
+  }
+  return publicKey;
+}

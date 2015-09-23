@@ -1,0 +1,18 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmManager manager=new RealmManager(session);
+    RealmModel adminRealm=manager.getRealm(Config.getAdminRealm());
+    ClientModel adminConsole=adminRealm.getClientByClientId(Constants.ADMIN_CONSOLE_CLIENT_ID);
+    TokenManager tm=new TokenManager();
+    UserModel admin=session.users().getUserByUsername("admin",adminRealm);
+    ClientSessionModel clientSession=session.sessions().createClientSession(adminRealm,adminConsole);
+    clientSession.setNote(OIDCLoginProtocol.ISSUER,"http://localhost:8081/auth/realms/master");
+    UserSessionModel userSession=session.sessions().createUserSession(adminRealm,admin,"admin",null,"form",false,null,null);
+    AccessToken token=tm.createClientAccessToken(session,tm.getAccess(null,adminConsole,admin),adminRealm,adminConsole,admin,userSession,clientSession);
+    return tm.encodeToken(adminRealm,token);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

@@ -1,5 +1,5 @@
 {
-  UndertowHttpFacade facade=new UndertowHttpFacade(exchange);
+  UndertowHttpFacade facade=createFacade(exchange);
   SamlDeployment deployment=deploymentContext.resolveDeployment(facade);
   if (!deployment.isConfigured()) {
     return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
@@ -13,10 +13,8 @@
   }
   if (outcome == AuthOutcome.LOGGED_OUT) {
     securityContext.logout();
-    if (logoutPage != null) {
-      sendRedirect(exchange,logoutPage);
-      exchange.setResponseCode(302);
-      exchange.endExchange();
+    if (deployment.getLogoutPage() != null) {
+      redirectLogout(deployment,exchange);
     }
     return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
   }

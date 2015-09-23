@@ -1,13 +1,13 @@
 {
   SamlSession account=sessionStore.getAccount();
-  SAML2LogoutRequestBuilder logoutBuilder=new SAML2LogoutRequestBuilder().assertionExpiration(30).issuer(deployment.getIssuer()).sessionIndex(account.getSessionIndex()).userPrincipal(account.getPrincipal().getSamlSubject(),account.getPrincipal().getNameIDFormat()).destination(deployment.getSingleLogoutServiceUrl());
+  SAML2LogoutRequestBuilder logoutBuilder=new SAML2LogoutRequestBuilder().assertionExpiration(30).issuer(deployment.getEntityID()).sessionIndex(account.getSessionIndex()).userPrincipal(account.getPrincipal().getSamlSubject(),account.getPrincipal().getNameIDFormat()).destination(deployment.getIDP().getSingleLogoutService().getRequestBindingUrl());
   BaseSAML2BindingBuilder binding=new BaseSAML2BindingBuilder();
-  if (deployment.isRequestsSigned()) {
+  if (deployment.getIDP().getSingleLogoutService().signRequest()) {
     binding.signWith(deployment.getSigningKeyPair()).signDocument();
   }
   binding.relayState("logout");
   try {
-    SamlUtil.sendSaml(facade,deployment.getSingleLogoutServiceUrl(),binding,logoutBuilder.buildDocument(),deployment.getRequestBinding());
+    SamlUtil.sendSaml(facade,deployment.getIDP().getSingleLogoutService().getRequestBindingUrl(),binding,logoutBuilder.buildDocument(),deployment.getIDP().getSingleLogoutService().getRequestBinding());
   }
  catch (  ProcessingException e) {
     throw new RuntimeException(e);

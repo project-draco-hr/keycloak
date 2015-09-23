@@ -1,0 +1,13 @@
+{
+  loginPage.open();
+  loginPage.login("john-doh@localhost","password");
+  updateProfilePage.assertCurrent();
+  updateProfilePage.update("New first","New last","new@email.com","");
+  updateProfilePage.assertCurrent();
+  Assert.assertEquals("New first",updateProfilePage.getFirstName());
+  Assert.assertEquals("New last",updateProfilePage.getLastName());
+  Assert.assertEquals("new@email.com",updateProfilePage.getEmail());
+  Assert.assertEquals("",updateProfilePage.getUsername());
+  Assert.assertEquals("Please specify username.",updateProfilePage.getError());
+  events.assertEmpty();
+}

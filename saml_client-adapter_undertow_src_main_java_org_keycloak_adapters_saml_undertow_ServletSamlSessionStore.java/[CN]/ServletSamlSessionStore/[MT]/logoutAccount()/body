@@ -1,7 +1,13 @@
 {
   HttpSession session=getSession(false);
   if (session != null) {
-    session.removeAttribute(SamlSession.class.getName());
+    SamlSession samlSession=(SamlSession)session.getAttribute(SamlSession.class.getName());
+    if (samlSession != null) {
+      if (samlSession.getSessionIndex() != null) {
+        idMapper.removeSession(session.getId());
+      }
+      session.removeAttribute(SamlSession.class.getName());
+    }
     session.removeAttribute(SAML_REDIRECT_URI);
   }
 }

@@ -91,8 +91,14 @@ catch (  ConfigurationException e) {
 ;
   sessionStore.saveAccount(account);
   completeAuthentication(account);
-  facade.getResponse().setHeader("Location",sessionStore.getRedirectUri());
-  facade.getResponse().setStatus(302);
-  facade.getResponse().end();
+  String redirectUri=sessionStore.getRedirectUri();
+  if (redirectUri != null) {
+    facade.getResponse().setHeader("Location",redirectUri);
+    facade.getResponse().setStatus(302);
+    facade.getResponse().end();
+  }
+ else {
+    log.debug("IDP initiated invocation");
+  }
   return AuthOutcome.AUTHENTICATED;
 }

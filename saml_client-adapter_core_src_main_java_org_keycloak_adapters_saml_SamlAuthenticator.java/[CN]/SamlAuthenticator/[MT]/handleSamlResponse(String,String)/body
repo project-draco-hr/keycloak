@@ -1,7 +1,12 @@
 {
   SAMLDocumentHolder holder=null;
   boolean postBinding=false;
+  String requestUri=facade.getRequest().getURI();
   if (facade.getRequest().getMethod().equalsIgnoreCase("GET")) {
+    int index=requestUri.indexOf('?');
+    if (index > -1) {
+      requestUri=requestUri.substring(0,index);
+    }
     holder=extractRedirectBindingResponse(samlResponse);
   }
  else {
@@ -9,18 +14,18 @@
     holder=extractPostBindingResponse(samlResponse);
   }
   StatusResponseType statusResponse=(StatusResponseType)holder.getSamlObject();
-  if (!facade.getRequest().getURI().toString().equals(statusResponse.getDestination())) {
+  if (!requestUri.equals(statusResponse.getDestination())) {
     throw new RuntimeException("destination not equal to request");
   }
   if (statusResponse instanceof ResponseType) {
     if (deployment.getIDP().getSingleSignOnService().validateResponseSignature()) {
-      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_REQUEST_KEY);
+      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
     }
     return handleLoginResponse((ResponseType)statusResponse);
   }
  else {
     if (deployment.getIDP().getSingleLogoutService().validateResponseSignature()) {
-      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_REQUEST_KEY);
+      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
     }
     return handleLogoutResponse(holder,statusResponse,relayState);
   }

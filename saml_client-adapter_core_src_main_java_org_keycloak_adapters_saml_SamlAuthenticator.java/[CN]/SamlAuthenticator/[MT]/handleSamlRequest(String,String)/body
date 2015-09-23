@@ -1,7 +1,12 @@
 {
   SAMLDocumentHolder holder=null;
   boolean postBinding=false;
+  String requestUri=facade.getRequest().getURI();
   if (facade.getRequest().getMethod().equalsIgnoreCase("GET")) {
+    int index=requestUri.indexOf('?');
+    if (index > -1) {
+      requestUri=requestUri.substring(0,index);
+    }
     holder=SAMLRequestParser.parseRequestRedirectBinding(samlRequest);
   }
  else {
@@ -9,8 +14,9 @@
     holder=SAMLRequestParser.parseRequestPostBinding(samlRequest);
   }
   RequestAbstractType requestAbstractType=(RequestAbstractType)holder.getSamlObject();
-  if (!facade.getRequest().getURI().toString().equals(requestAbstractType.getDestination())) {
-    throw new RuntimeException("destination not equal to request");
+  if (!requestUri.equals(requestAbstractType.getDestination().toString())) {
+    log.error("expected destination '" + requestUri + "' got '"+ requestAbstractType.getDestination()+ "'");
+    throw new RuntimeException("destination not equal to request.");
   }
   if (requestAbstractType instanceof LogoutRequestType) {
     if (deployment.getIDP().getSingleLogoutService().validateRequestSignature()) {

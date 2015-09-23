@@ -12,11 +12,11 @@
   builder.issuer(issuerURL);
   BaseSAML2BindingBuilder binding=new BaseSAML2BindingBuilder().relayState(relayState);
   if (deployment.getIDP().getSingleLogoutService().signResponse()) {
-    binding.signWith(deployment.getSigningKeyPair()).signDocument();
-    binding.canonicalizationMethod(deployment.getIDP().getSingleLogoutService().getSignatureCanonicalizationMethod());
+    binding.signatureAlgorithm(deployment.getSignatureAlgorithm()).signWith(deployment.getSigningKeyPair()).signDocument();
+    if (deployment.getSignatureCanonicalizationMethod() != null)     binding.canonicalizationMethod(deployment.getSignatureCanonicalizationMethod());
   }
   try {
-    SamlUtil.sendSaml(facade,deployment.getIDP().getSingleLogoutService().getResponseBindingUrl(),binding,builder.buildDocument(),deployment.getIDP().getSingleLogoutService().getResponseBinding());
+    SamlUtil.sendSaml(false,facade,deployment.getIDP().getSingleLogoutService().getResponseBindingUrl(),binding,builder.buildDocument(),deployment.getIDP().getSingleLogoutService().getResponseBinding());
   }
  catch (  ConfigurationException e) {
     throw new RuntimeException(e);

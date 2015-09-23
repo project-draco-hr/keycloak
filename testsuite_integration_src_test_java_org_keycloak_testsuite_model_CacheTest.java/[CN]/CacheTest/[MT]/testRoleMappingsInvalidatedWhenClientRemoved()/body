@@ -1,0 +1,41 @@
+{
+  KeycloakSession session=kc.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    UserModel user=session.users().addUser(realm,"joel");
+    ClientModel client=realm.addClient("foo");
+    RoleModel fooRole=client.addRole("foo-role");
+    user.grantRole(fooRole);
+  }
+  finally {
+    session.getTransaction().commit();
+    session.close();
+  }
+  session=kc.startSession();
+  int grantedRolesCount;
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    UserModel user=session.users().getUserByUsername("joel",realm);
+    grantedRolesCount=user.getRoleMappings().size();
+    ClientModel client=realm.getClientByClientId("foo");
+    realm.removeClient(client.getId());
+  }
+  finally {
+    session.getTransaction().commit();
+    session.close();
+  }
+  session=kc.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    UserModel user=session.users().getUserByUsername("joel",realm);
+    Set<RoleModel> roles=user.getRoleMappings();
+    for (    RoleModel role : roles) {
+      Assert.assertNotNull(role.getContainer());
+    }
+    Assert.assertEquals(roles.size(),grantedRolesCount - 1);
+  }
+  finally {
+    session.getTransaction().commit();
+    session.close();
+  }
+}

@@ -1,6 +1,6 @@
 {
   UsersSyncManager usersSyncManager=new UsersSyncManager();
-  sleep(1000);
+  sleep(ldapRule.getSleepTime());
   KeycloakSession session=keycloakRule.startSession();
   try {
     KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
@@ -28,7 +28,7 @@
         Assert.assertEquals(0,persistentFedModel.getLastSync());
       }
     }
-    sleep(1000);
+    sleep(ldapRule.getSleepTime());
     LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
     FederationTestUtils.addLDAPUser(ldapFedProvider,testRealm,"user6","User6FN","User6LN","user6@email.org",null,"126");
     LDAPObject ldapUser5=ldapFedProvider.loadLDAPUserByUsername(testRealm,"user5");

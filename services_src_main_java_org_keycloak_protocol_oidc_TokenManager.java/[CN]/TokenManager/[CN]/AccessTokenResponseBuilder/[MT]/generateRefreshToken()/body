@@ -2,9 +2,22 @@
   if (accessToken == null) {
     throw new IllegalStateException("accessToken not set");
   }
-  refreshToken=new RefreshToken(accessToken);
+  String scopeParam=clientSession.getNote(OIDCLoginProtocol.SCOPE_PARAM);
+  boolean offlineTokenRequested=RefreshTokenUtil.isOfflineTokenRequested(scopeParam);
+  if (offlineTokenRequested) {
+    if (!clientSession.getClient().isOfflineTokensEnabled()) {
+      event.error(Errors.INVALID_CLIENT);
+      throw new ErrorResponseException("invalid_client","Offline tokens not allowed for the client",Response.Status.BAD_REQUEST);
+    }
+    refreshToken=new RefreshToken(accessToken);
+    refreshToken.type(RefreshTokenUtil.TOKEN_TYPE_OFFLINE);
+    new OfflineUserSessionManager().persistOfflineSession(clientSession,userSession);
+  }
+ else {
+    refreshToken=new RefreshToken(accessToken);
+    refreshToken.expiration(Time.currentTime() + realm.getSsoSessionIdleTimeout());
+  }
   refreshToken.id(KeycloakModelUtils.generateId());
   refreshToken.issuedNow();
-  refreshToken.expiration(Time.currentTime() + realm.getSsoSessionIdleTimeout());
   return this;
 }

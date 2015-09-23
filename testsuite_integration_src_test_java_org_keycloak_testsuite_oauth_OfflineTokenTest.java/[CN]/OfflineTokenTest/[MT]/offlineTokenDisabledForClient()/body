@@ -1,0 +1,12 @@
+{
+  oauth.scope(OAuth2Constants.OFFLINE_ACCESS);
+  oauth.doLogin("test-user@localhost","password");
+  Event loginEvent=events.expectLogin().assertEvent();
+  String sessionId=loginEvent.getSessionId();
+  String codeId=loginEvent.getDetails().get(Details.CODE_ID);
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
+  assertEquals(400,tokenResponse.getStatusCode());
+  assertEquals("invalid_client",tokenResponse.getError());
+  events.expectCodeToToken(codeId,sessionId).error("invalid_client").clearDetails().assertEvent();
+}

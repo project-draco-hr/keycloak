@@ -1,0 +1,8 @@
+{
+  HttpFacade facade=getFacade(servletRequest);
+  AdapterDeploymentContext deploymentContext=(AdapterDeploymentContext)getServletContext().getAttribute(AdapterDeploymentContext.class.getName());
+  if (deploymentContext == null) {
+    throw new ServletException("AdapterDeploymentContext not set");
+  }
+  return deploymentContext.resolveDeployment(facade);
+}

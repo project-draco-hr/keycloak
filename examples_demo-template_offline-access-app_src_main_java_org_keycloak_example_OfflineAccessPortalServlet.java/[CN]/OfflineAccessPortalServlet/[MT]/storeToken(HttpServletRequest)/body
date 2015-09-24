@@ -1,0 +1,8 @@
+{
+  RefreshableKeycloakSecurityContext ctx=(RefreshableKeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
+  String refreshToken=ctx.getRefreshToken();
+  RefreshTokenDAO.saveToken(refreshToken);
+  RefreshToken refreshTokenDecoded=RefreshTokenUtil.getRefreshToken(refreshToken);
+  Boolean isOfflineToken=refreshTokenDecoded.getType().equals(RefreshTokenUtil.TOKEN_TYPE_OFFLINE);
+  req.setAttribute("isOfflineToken",isOfflineToken);
+}

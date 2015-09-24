@@ -1,4 +1,10 @@
 {
+  if (checkRoles != null) {
+    for (    String role : checkRoles) {
+      System.out.println("check role: " + role);
+      Assert.assertTrue(req.isUserInRole(role));
+    }
+  }
   resp.setContentType("text/plain");
   OutputStream stream=resp.getOutputStream();
   Principal principal=req.getUserPrincipal();
@@ -12,4 +18,5 @@
   }
   String name=principal.getName();
   stream.write(name.getBytes());
+  sentPrincipal=principal;
 }

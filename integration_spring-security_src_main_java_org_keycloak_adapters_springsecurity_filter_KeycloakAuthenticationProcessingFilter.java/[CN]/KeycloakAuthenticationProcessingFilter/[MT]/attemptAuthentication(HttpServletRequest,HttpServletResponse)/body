@@ -5,15 +5,20 @@
   AdapterTokenStore tokenStore=adapterTokenStoreFactory.createAdapterTokenStore(deployment,request);
   RequestAuthenticator authenticator=new SpringSecurityRequestAuthenticator(facade,request,deployment,tokenStore,-1);
   AuthOutcome result=authenticator.authenticate();
-  AuthChallenge challenge=authenticator.getChallenge();
   log.debug("Auth outcome: {}",result);
-  if (challenge != null) {
-    challenge.challenge(facade);
+  if (AuthOutcome.FAILED.equals(result)) {
+    throw new KeycloakAuthenticationException("Auth outcome: " + result);
   }
-  if (AuthOutcome.AUTHENTICATED.equals(result)) {
+ else   if (AuthOutcome.AUTHENTICATED.equals(result)) {
     Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
     Assert.notNull(authentication,"Authentication SecurityContextHolder was null");
     return authenticationManager.authenticate(authentication);
   }
-  return null;
+ else {
+    AuthChallenge challenge=authenticator.getChallenge();
+    if (challenge != null) {
+      challenge.challenge(facade);
+    }
+    return null;
+  }
 }

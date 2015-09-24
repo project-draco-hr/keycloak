@@ -1,0 +1,24 @@
+{
+  HttpSession session=getSession(false);
+  if (session == null) {
+    log.debug("session was null, returning null");
+    return false;
+  }
+  final SamlSession samlSession=(SamlSession)session.getAttribute(SamlSession.class.getName());
+  if (samlSession == null) {
+    log.debug("SamlSession was not in session, returning null");
+    return false;
+  }
+  Account undertowAccount=new Account(){
+    @Override public Principal getPrincipal(){
+      return samlSession.getPrincipal();
+    }
+    @Override public Set<String> getRoles(){
+      return samlSession.getRoles();
+    }
+  }
+;
+  securityContext.authenticationComplete(undertowAccount,"KEYCLOAK-SAML",false);
+  restoreRequest();
+  return true;
+}

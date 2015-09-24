@@ -1,0 +1,9 @@
+{
+  SavedRequest.trySaveRequest(exchange);
+  final ServletRequestContext sc=exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+  HttpSessionImpl session=sc.getCurrentServletContext().getSession(exchange,true);
+  KeycloakUriBuilder uriBuilder=KeycloakUriBuilder.fromUri(exchange.getRequestURI()).replaceQuery(exchange.getQueryString());
+  if (!exchange.isHostIncludedInRequestURI())   uriBuilder.scheme(exchange.getRequestScheme()).host(exchange.getHostAndPort());
+  String uri=uriBuilder.build().toString();
+  session.setAttribute(SAML_REDIRECT_URI,uri);
+}

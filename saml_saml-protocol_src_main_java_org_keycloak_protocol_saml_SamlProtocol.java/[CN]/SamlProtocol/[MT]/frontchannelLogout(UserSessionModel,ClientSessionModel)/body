@@ -5,13 +5,15 @@
     if (isLogoutPostBindingForClient(clientSession)) {
       String bindingUri=getLogoutServiceUrl(uriInfo,client,SAML_POST_BINDING);
       SAML2LogoutRequestBuilder logoutBuilder=createLogoutRequest(bindingUri,clientSession,client);
-      return logoutBuilder.postBinding().request(bindingUri);
+      JaxrsSAML2BindingBuilder binding=createBindingBuilder(client);
+      return binding.postBinding(logoutBuilder.buildDocument()).request(bindingUri);
     }
  else {
       logger.debug("frontchannel redirect binding");
       String bindingUri=getLogoutServiceUrl(uriInfo,client,SAML_REDIRECT_BINDING);
       SAML2LogoutRequestBuilder logoutBuilder=createLogoutRequest(bindingUri,clientSession,client);
-      return logoutBuilder.redirectBinding().request(bindingUri);
+      JaxrsSAML2BindingBuilder binding=createBindingBuilder(client);
+      return binding.redirectBinding(logoutBuilder.buildDocument()).request(bindingUri);
     }
   }
  catch (  ConfigurationException e) {

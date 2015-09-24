@@ -1,0 +1,17 @@
+{
+  Document samlResponse=null;
+  ResponseType responseType=null;
+  SAML2Response saml2Response=new SAML2Response();
+  String id=IDGenerator.create("ID_");
+  IssuerInfoHolder issuerHolder=new IssuerInfoHolder(issuer);
+  issuerHolder.setStatusCode(status);
+  IDPInfoHolder idp=new IDPInfoHolder();
+  idp.setNameIDFormatValue(null);
+  idp.setNameIDFormat(JBossSAMLURIConstants.NAMEID_FORMAT_PERSISTENT.get());
+  SPInfoHolder sp=new SPInfoHolder();
+  sp.setResponseDestinationURI(destination);
+  responseType=saml2Response.createResponseType(id);
+  responseType.setStatus(JBossSAMLAuthnResponseFactory.createStatusTypeForResponder(status));
+  responseType.setDestination(destination);
+  return samlResponse;
+}

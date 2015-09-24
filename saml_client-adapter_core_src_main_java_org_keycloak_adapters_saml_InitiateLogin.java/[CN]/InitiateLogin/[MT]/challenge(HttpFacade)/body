@@ -1,0 +1,42 @@
+{
+  try {
+    String issuerURL=deployment.getEntityID();
+    String actionUrl=deployment.getIDP().getSingleSignOnService().getRequestBindingUrl();
+    String destinationUrl=actionUrl;
+    String nameIDPolicyFormat=deployment.getNameIDPolicyFormat();
+    if (nameIDPolicyFormat == null) {
+      nameIDPolicyFormat=JBossSAMLURIConstants.NAMEID_FORMAT_PERSISTENT.get();
+    }
+    SAML2AuthnRequestBuilder authnRequestBuilder=new SAML2AuthnRequestBuilder().destination(destinationUrl).issuer(issuerURL).forceAuthn(deployment.isForceAuthentication()).nameIdPolicy(SAML2NameIDPolicyBuilder.format(nameIDPolicyFormat));
+    if (deployment.getIDP().getSingleSignOnService().getResponseBinding() != null) {
+      String protocolBinding=JBossSAMLURIConstants.SAML_HTTP_REDIRECT_BINDING.get();
+      if (deployment.getIDP().getSingleSignOnService().getResponseBinding() == SamlDeployment.Binding.POST) {
+        protocolBinding=JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get();
+      }
+      authnRequestBuilder.protocolBinding(protocolBinding);
+    }
+    if (deployment.getAssertionConsumerServiceUrl() != null) {
+      authnRequestBuilder.assertionConsumerUrl(deployment.getAssertionConsumerServiceUrl());
+    }
+    BaseSAML2BindingBuilder binding=new BaseSAML2BindingBuilder();
+    if (deployment.getIDP().getSingleSignOnService().signRequest()) {
+      KeyPair keypair=deployment.getSigningKeyPair();
+      if (keypair == null) {
+        throw new RuntimeException("Signing keys not configured");
+      }
+      if (deployment.getSignatureCanonicalizationMethod() != null) {
+        binding.canonicalizationMethod(deployment.getSignatureCanonicalizationMethod());
+      }
+      binding.signWith(keypair);
+      binding.signDocument();
+    }
+    sessionStore.saveRequest();
+    Document document=authnRequestBuilder.toDocument();
+    SamlDeployment.Binding samlBinding=deployment.getIDP().getSingleSignOnService().getRequestBinding();
+    SamlUtil.sendSaml(true,httpFacade,actionUrl,binding,document,samlBinding);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Could not create authentication request.",e);
+  }
+  return true;
+}

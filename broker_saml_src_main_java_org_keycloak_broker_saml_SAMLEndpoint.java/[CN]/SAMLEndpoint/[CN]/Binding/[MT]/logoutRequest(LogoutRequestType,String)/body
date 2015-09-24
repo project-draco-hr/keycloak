@@ -36,16 +36,16 @@
   builder.logoutRequestID(request.getID());
   builder.destination(config.getSingleLogoutServiceUrl());
   builder.issuer(issuerURL);
-  builder.relayState(relayState);
+  JaxrsSAML2BindingBuilder binding=new JaxrsSAML2BindingBuilder().relayState(relayState);
   if (config.isWantAuthnRequestsSigned()) {
-    builder.signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signatureAlgorithm(provider.getSignatureAlgorithm()).signDocument();
+    binding.signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signatureAlgorithm(provider.getSignatureAlgorithm()).signDocument();
   }
   try {
     if (config.isPostBindingResponse()) {
-      return builder.postBinding().response();
+      return binding.postBinding(builder.buildDocument()).response(config.getSingleLogoutServiceUrl());
     }
  else {
-      return builder.redirectBinding().response();
+      return binding.redirectBinding(builder.buildDocument()).response(config.getSingleLogoutServiceUrl());
     }
   }
  catch (  ConfigurationException e) {

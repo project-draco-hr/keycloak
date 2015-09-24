@@ -1,0 +1,19 @@
+{
+  InputStream is=null;
+  if (is == null) {
+    String path=context.getInitParameter("keycloak.config.file");
+    if (path == null) {
+      log.debug("using /WEB-INF/keycloak-saml.xml");
+      is=context.getResourceAsStream("/WEB-INF/keycloak-saml.xml");
+    }
+ else {
+      try {
+        is=new FileInputStream(path);
+      }
+ catch (      FileNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  return is;
+}

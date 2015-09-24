@@ -1,0 +1,16 @@
+{
+  String value;
+  if (attrValue instanceof String) {
+    value=(String)attrValue;
+  }
+ else   if (attrValue instanceof Node) {
+    Node roleNode=(Node)attrValue;
+    value=roleNode.getFirstChild().getNodeValue();
+  }
+ else   if (attrValue instanceof NameIDType) {
+    NameIDType nameIdType=(NameIDType)attrValue;
+    value=nameIdType.getValue();
+  }
+ else   throw new RuntimeException("Unknown attribute value type: " + attrValue.getClass().getName());
+  return value;
+}

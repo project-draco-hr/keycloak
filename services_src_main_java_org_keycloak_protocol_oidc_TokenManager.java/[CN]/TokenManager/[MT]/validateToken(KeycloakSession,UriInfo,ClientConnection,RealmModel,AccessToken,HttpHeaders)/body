@@ -6,16 +6,25 @@
   if (!user.isEnabled()) {
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"User disabled","User disabled");
   }
-  UserSessionModel userSession=session.sessions().getUserSession(realm,oldToken.getSessionState());
-  if (!AuthenticationManager.isSessionValid(realm,userSession)) {
-    AuthenticationManager.backchannelLogout(session,realm,userSession,uriInfo,connection,headers,true);
-    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Session not active","Session not active");
-  }
+  UserSessionModel userSession=null;
   ClientSessionModel clientSession=null;
-  for (  ClientSessionModel clientSessionModel : userSession.getClientSessions()) {
-    if (clientSessionModel.getId().equals(oldToken.getClientSession())) {
-      clientSession=clientSessionModel;
-      break;
+  if (RefreshTokenUtil.TOKEN_TYPE_OFFLINE.equals(oldToken.getType())) {
+    clientSession=OfflineTokenUtils.findOfflineClientSession(realm,user,oldToken.getClientSession(),oldToken.getSessionState());
+    if (clientSession != null) {
+      userSession=clientSession.getUserSession();
+    }
+  }
+ else {
+    userSession=session.sessions().getUserSession(realm,oldToken.getSessionState());
+    if (!AuthenticationManager.isSessionValid(realm,userSession)) {
+      AuthenticationManager.backchannelLogout(session,realm,userSession,uriInfo,connection,headers,true);
+      throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Session not active","Session not active");
+    }
+    for (    ClientSessionModel clientSessionModel : userSession.getClientSessions()) {
+      if (clientSessionModel.getId().equals(oldToken.getClientSession())) {
+        clientSession=clientSessionModel;
+        break;
+      }
     }
   }
   if (clientSession == null) {
@@ -31,7 +40,8 @@
   if (oldToken.getIssuedAt() < realm.getNotBefore()) {
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale token");
   }
-  Set<RoleModel> requestedRoles=TokenManager.getAccess(null,clientSession.getClient(),user);
+  String scopeParam=clientSession.getNote(OAuth2Constants.SCOPE);
+  Set<RoleModel> requestedRoles=TokenManager.getAccess(scopeParam,true,clientSession.getClient(),user);
   AccessToken newToken=createClientAccessToken(session,requestedRoles,realm,client,user,userSession,clientSession);
   verifyAccess(oldToken,newToken);
   return new TokenValidation(user,userSession,clientSession,newToken);

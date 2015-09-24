@@ -1,0 +1,31 @@
+{
+  newClient=AbstractClientTest.createClientRepresentation("test_client","http://example.test/test_client/*");
+  Response response=clientsPage.clientsResource().create(newClient);
+  String id=ApiUtil.getCreatedId(response);
+  response.close();
+  newClient.setClientId("test_client2");
+  clientsPage.clientsResource().get(id).update(newClient);
+  clientsPage.clientsResource().get(id).remove();
+  adminEventsPage.navigateTo();
+  adminEventsPage.table().filter();
+  adminEventsPage.table().filterForm().addOperationType("CREATE");
+  adminEventsPage.table().update();
+  List<WebElement> resultList=adminEventsPage.table().rows();
+  assertEquals(1,resultList.size());
+  resultList.get(0).findElement(By.xpath("//td[text()='CREATE']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='clients/" + id + "']"));
+  adminEventsPage.table().reset();
+  adminEventsPage.table().filterForm().addOperationType("UPDATE");
+  adminEventsPage.table().update();
+  resultList=adminEventsPage.table().rows();
+  assertEquals(1,resultList.size());
+  resultList.get(0).findElement(By.xpath("//td[text()='UPDATE']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='clients/" + id + "']"));
+  adminEventsPage.table().reset();
+  adminEventsPage.table().filterForm().addOperationType("DELETE");
+  adminEventsPage.table().update();
+  resultList=adminEventsPage.table().rows();
+  assertEquals(1,resultList.size());
+  resultList.get(0).findElement(By.xpath("//td[text()='DELETE']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='clients/" + id + "']"));
+}

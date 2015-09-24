@@ -1,0 +1,13 @@
+{
+  RealmRepresentation testRealmRep=testRealmResource().toRepresentation();
+  testRealmRep.setSmtpServer(suiteContext.getSmtpServer());
+  testRealmRep.setResetPasswordAllowed(true);
+  testRealmResource().update(testRealmRep);
+  if (!init) {
+    init=true;
+    MailServer.start();
+    MailServer.createEmailAccount(testUser.getEmail(),"password");
+  }
+  testRealmAccountManagementPage.navigateTo();
+  testRealmLoginPage.form().forgotPassword();
+}

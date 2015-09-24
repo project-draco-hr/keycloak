@@ -1,0 +1,24 @@
+{
+  Properties p=new Properties();
+  try {
+    log.info("Reading LDAP configuration from: " + connectionPropertiesLocation);
+    InputStream is=Thread.currentThread().getContextClassLoader().getResourceAsStream(connectionPropertiesLocation);
+    p.load(is);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  config=new HashMap<String,String>();
+  for (  Map.Entry<String,String> property : PROP_MAPPINGS.entrySet()) {
+    String propertyName=property.getKey();
+    String configName=property.getValue();
+    String value=(String)p.get(configName);
+    if (value == null) {
+      value=DEFAULT_VALUES.get(propertyName);
+    }
+    config.put(propertyName,value);
+  }
+  startEmbeddedLdapLerver=Boolean.parseBoolean(p.getProperty("idm.test.ldap.start.embedded.ldap.server","true"));
+  log.info("Start embedded server: " + startEmbeddedLdapLerver);
+  log.info("Read config: " + config);
+}

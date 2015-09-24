@@ -1,0 +1,25 @@
+{
+  URL url=(URL)super.doLookup(resource,qualifiers);
+  if (url != null) {
+    try {
+      url=fixLocalhost(url);
+      url=removeTrailingSlash(url);
+    }
+ catch (    MalformedURLException ex) {
+      log.log(Level.FATAL,null,ex);
+    }
+    if (!fixedUrls.contains(url.toString())) {
+      fixedUrls.add(url.toString());
+      log.debug("Fixed injected @ArquillianResource URL to: " + url);
+    }
+  }
+  for (  Annotation a : qualifiers) {
+    if (AuthServerContext.class.isAssignableFrom(a.annotationType())) {
+      return testContext.get().getAuthServerContextRoot();
+    }
+    if (AppServerContext.class.isAssignableFrom(a.annotationType())) {
+      return testContext.get().getAppServerContextRoot();
+    }
+  }
+  return url;
+}

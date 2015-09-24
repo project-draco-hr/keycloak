@@ -1,0 +1,17 @@
+{
+  addAdapterTestRealms(testRealms);
+  for (  RealmRepresentation tr : testRealms) {
+    log.info("Setting redirect-uris in test realm '" + tr.getRealm() + "' as "+ (isRelative() ? "" : "non-")+ "relative");
+    modifyClientRedirectUris(tr,"http://localhost:8080","");
+    modifyClientUrls(tr,"http://localhost:8080","");
+    if (isRelative()) {
+      modifyClientRedirectUris(tr,appServerContextRootPage.toString(),"");
+      modifyClientUrls(tr,appServerContextRootPage.toString(),"");
+      modifyClientWebOrigins(tr,"8080",System.getProperty("auth.server.http.port",null));
+    }
+ else {
+      modifyClientRedirectUris(tr,"^(/.*/\\*)",appServerContextRootPage.toString() + "$1");
+      modifyClientUrls(tr,"^(/.*)",appServerContextRootPage.toString() + "$1");
+    }
+  }
+}

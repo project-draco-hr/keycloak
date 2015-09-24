@@ -1,0 +1,27 @@
+{
+  int secondsToWait=3;
+  bruteForceDetectionPage.form().setProtectionEnabled(true);
+  bruteForceDetectionPage.form().setMaxLoginFailures("2");
+  bruteForceDetectionPage.form().setFailureResetTimeSelect(SecurityDefenses.TimeSelectValues.SECONDS);
+  bruteForceDetectionPage.form().setFailureResetTimeInput(String.valueOf(secondsToWait));
+  bruteForceDetectionPage.form().save();
+  assertFlashMessageSuccess();
+  testRealmAccountPage.navigateTo();
+  setPasswordFor(testUser,PASSWORD + "-mismatch");
+  testRealmLoginPage.form().login(testUser);
+  waitForFeedbackText("Invalid username or password.");
+  Date endTime=new Date(new Date().getTime() + secondsToWait * 1000);
+  while (new Date().compareTo(endTime) < 0) {
+    try {
+      Thread.sleep(50);
+    }
+ catch (    InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+  testRealmLoginPage.form().login(testUser);
+  waitForFeedbackText("Invalid username or password.");
+  setPasswordFor(testUser,PASSWORD);
+  testRealmLoginPage.form().login(testUser);
+  assertCurrentUrlStartsWith(testRealmAccountPage);
+}

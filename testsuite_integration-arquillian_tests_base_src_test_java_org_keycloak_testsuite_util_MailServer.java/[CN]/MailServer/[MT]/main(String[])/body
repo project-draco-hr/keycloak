@@ -1,0 +1,29 @@
+{
+  MailServer.start();
+  MailServer.createEmailAccount("test@email.test","password");
+  try {
+    while (true) {
+      int c=greenMail.getReceivedMessages().length;
+      if (greenMail.waitForIncomingEmail(Long.MAX_VALUE,c + 1)) {
+        MimeMessage m=greenMail.getReceivedMessages()[c++];
+        log.info("-------------------------------------------------------");
+        log.info("Received mail to " + m.getRecipients(RecipientType.TO)[0]);
+        if (m.getContent() instanceof MimeMultipart) {
+          MimeMultipart mimeMultipart=(MimeMultipart)m.getContent();
+          for (int i=0; i < mimeMultipart.getCount(); i++) {
+            log.info("----");
+            log.info(mimeMultipart.getBodyPart(i).getContentType() + ":\n");
+            log.info(mimeMultipart.getBodyPart(i).getContent());
+          }
+        }
+ else {
+          log.info("\n" + m.getContent());
+        }
+        log.info("-------------------------------------------------------");
+      }
+    }
+  }
+ catch (  IOException|InterruptedException|MessagingException ex) {
+    throw new RuntimeException(ex);
+  }
+}

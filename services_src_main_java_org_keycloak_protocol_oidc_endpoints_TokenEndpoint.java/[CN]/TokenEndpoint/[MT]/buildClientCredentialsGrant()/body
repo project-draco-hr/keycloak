@@ -30,6 +30,7 @@
   ClientSessionModel clientSession=sessions.createClientSession(realm,client);
   clientSession.setAuthMethod(OIDCLoginProtocol.LOGIN_PROTOCOL);
   clientSession.setNote(OIDCLoginProtocol.ISSUER,Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName()));
+  clientSession.setNote(OIDCLoginProtocol.SCOPE_PARAM,scope);
   UserSessionModel userSession=sessions.createUserSession(realm,clientUser,clientUsername,clientConnection.getRemoteAddr(),ServiceAccountConstants.CLIENT_AUTH,false,null,null);
   event.session(userSession);
   TokenManager.attachClientSession(userSession,clientSession);
@@ -37,7 +38,7 @@
   userSession.setNote(ServiceAccountConstants.CLIENT_HOST,clientConnection.getRemoteHost());
   userSession.setNote(ServiceAccountConstants.CLIENT_ADDRESS,clientConnection.getRemoteAddr());
   updateUserSessionFromClientAuth(userSession);
-  AccessTokenResponse res=tokenManager.responseBuilder(realm,client,event,session,userSession,clientSession).generateAccessToken(session,scope,client,clientUser,userSession,clientSession).generateRefreshToken().generateIDToken().build();
+  AccessTokenResponse res=tokenManager.responseBuilder(realm,client,event,session,userSession,clientSession).generateAccessToken().generateRefreshToken().generateIDToken().build();
   event.success();
   return Cors.add(request,Response.ok(res,MediaType.APPLICATION_JSON_TYPE)).auth().allowedOrigins(client).allowedMethods("POST").exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build();
 }

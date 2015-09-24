@@ -1,0 +1,20 @@
+{
+  ClientRepresentation values=new ClientRepresentation();
+  values.setClientId(getClientId());
+  values.setName(getName());
+  values.setEnabled(isEnabled());
+  values.setConsentRequired(isConsentRequired());
+  values.setDirectGrantsOnly(isDirectGrantsOnly());
+  values.setProtocol(getProtocol());
+  if (OIDC.equals(values.getProtocol())) {
+    values.setBearerOnly(isBearerOnly());
+    if (!values.isBearerOnly()) {
+      values.setPublicClient(isPublicClient());
+      if (!values.isPublicClient()) {
+        values.setServiceAccountsEnabled(isServiceAccountsEnabled());
+      }
+      values.setRedirectUris(getRedirectUris());
+    }
+  }
+  return values;
+}

@@ -1,0 +1,17 @@
+{
+  OfflineClientSessionModel clientSession=user.getOfflineClientSession(clientSessionId);
+  if (clientSession == null) {
+    return null;
+  }
+  if (!userSessionId.equals(clientSession.getUserSessionId())) {
+    throw new ModelException("User session don't match. Offline client session " + clientSession.getClientSessionId() + ", It's user session "+ clientSession.getUserSessionId()+ "  Wanted user session: "+ userSessionId);
+  }
+  OfflineUserSessionModel userSession=user.getOfflineUserSession(userSessionId);
+  if (userSession == null) {
+    throw new ModelException("Found clientSession " + clientSessionId + " but not userSession "+ userSessionId);
+  }
+  OfflineUserSessionAdapter userSessionAdapter=new OfflineUserSessionAdapter(userSession,user);
+  ClientModel client=realm.getClientById(clientSession.getClientId());
+  OfflineClientSessionAdapter clientSessionAdapter=new OfflineClientSessionAdapter(clientSession,realm,client,userSessionAdapter);
+  return clientSessionAdapter;
+}

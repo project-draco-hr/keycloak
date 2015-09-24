@@ -1,0 +1,13 @@
+{
+  String defaultRoleName=defaultRoleRep.getName();
+  defaultRolesPage.form().addAvailableRole(defaultRoleName);
+  assertFlashMessageSuccess();
+  UserRepresentation newUser=new UserRepresentation();
+  newUser.setUsername("new_user");
+  createUserWithAdminClient(testRealmResource(),newUser);
+  users.navigateTo();
+  users.table().search(newUser.getUsername());
+  users.table().clickUser(newUser.getUsername());
+  userPage.tabs().roleMappings();
+  assertTrue(userRolesPage.form().isAssignedRole(defaultRoleName));
+}

@@ -1,0 +1,29 @@
+{
+  try {
+    AccessController.doPrivileged(new PrivilegedExceptionAction<Void>(){
+      @Override public Void run() throws Exception {
+        Field field=source.getDeclaredField(fieldName);
+        if (!field.isAccessible()) {
+          field.setAccessible(true);
+        }
+        field.set(target,value);
+        return null;
+      }
+    }
+);
+  }
+ catch (  final PrivilegedActionException pae) {
+    final Throwable t=pae.getCause();
+    if (t instanceof NoSuchFieldException) {
+      throw (NoSuchFieldException)t;
+    }
+ else {
+      try {
+        throw (RuntimeException)t;
+      }
+ catch (      final ClassCastException cce) {
+        throw new RuntimeException("Obtained unchecked Exception; this code should never be reached",t);
+      }
+    }
+  }
+}

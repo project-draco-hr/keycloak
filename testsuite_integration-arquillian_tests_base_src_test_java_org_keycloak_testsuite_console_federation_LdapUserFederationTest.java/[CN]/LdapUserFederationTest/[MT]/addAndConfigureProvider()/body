@@ -1,0 +1,15 @@
+{
+  adminConsolePage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  String name="ldapname";
+  String LDAP_CONNECTION_PROPERTIES_LOCATION="ldap/ldap-connection.properties";
+  LDAPTestConfiguration ldapTestConfiguration=LDAPTestConfiguration.readConfiguration(LDAP_CONNECTION_PROPERTIES_LOCATION);
+  UserRepresentation newUser=new UserRepresentation();
+  String testUsername="defaultrole tester";
+  newUser.setUsername(testUsername);
+  setPasswordFor(newUser,PASSWORD);
+  Map<String,String> ldapConfig=ldapTestConfiguration.getLDAPConfig();
+  configure().userFederation();
+  userFederationPage.addProvider("ldap");
+  ldapUserProviderForm.configureLdap(ldapConfig.get(LDAPConstants.LDAP_PROVIDER),ldapConfig.get(LDAPConstants.EDIT_MODE),ldapConfig.get(LDAPConstants.VENDOR),ldapConfig.get(LDAPConstants.CONNECTION_URL),ldapConfig.get(LDAPConstants.USERS_DN),ldapConfig.get(LDAPConstants.BIND_DN),ldapConfig.get(LDAPConstants.BIND_CREDENTIAL));
+}

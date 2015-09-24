@@ -1,0 +1,23 @@
+{
+  if (implClass == null) {
+    throw new IllegalArgumentException("ImplClass must be specified");
+  }
+  if (argumentTypes == null) {
+    throw new IllegalArgumentException("ArgumentTypes must be specified. Use empty array if no arguments");
+  }
+  if (arguments == null) {
+    throw new IllegalArgumentException("Arguments must be specified. Use empty array if no arguments");
+  }
+  final T obj;
+  try {
+    Constructor<T> constructor=getConstructor(implClass,argumentTypes);
+    if (!constructor.isAccessible()) {
+      constructor.setAccessible(true);
+    }
+    obj=constructor.newInstance(arguments);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Could not create new instance of " + implClass,e);
+  }
+  return obj;
+}

@@ -1,0 +1,24 @@
+{
+  String servletUri=UriBuilder.fromUri(offlineClientAppUri).queryParam(OAuth2Constants.SCOPE,OAuth2Constants.OFFLINE_ACCESS).build().toString();
+  driver.navigate().to(servletUri);
+  loginPage.login("test-user@localhost","password");
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(offlineClientAppUri));
+  Assert.assertEquals(OfflineTokenServlet.tokenInfo.refreshToken.getType(),RefreshTokenUtil.TOKEN_TYPE_OFFLINE);
+  Time.setOffset(9999);
+  driver.navigate().to(offlineClientAppUri);
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(offlineClientAppUri));
+  Time.setOffset(0);
+  events.clear();
+  accountAppPage.open();
+  List<String> additionalGrants=accountAppPage.getApplications().get("offline-client").getAdditionalGrants();
+  Assert.assertEquals(additionalGrants.size(),1);
+  Assert.assertEquals(additionalGrants.get(0),"Offline Token");
+  accountAppPage.revokeGrant("offline-client");
+  Assert.assertEquals(accountAppPage.getApplications().get("offline-client").getAdditionalGrants().size(),0);
+  events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,"offline-client").assertEvent();
+  Time.setOffset(9999);
+  driver.navigate().to(offlineClientAppUri);
+  Assert.assertFalse(driver.getCurrentUrl().startsWith(offlineClientAppUri));
+  loginPage.assertCurrent();
+  Time.setOffset(0);
+}

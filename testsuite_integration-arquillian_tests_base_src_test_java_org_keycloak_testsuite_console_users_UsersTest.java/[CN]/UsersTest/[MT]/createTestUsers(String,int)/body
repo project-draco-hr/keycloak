@@ -1,0 +1,11 @@
+{
+  for (int i=0; i < count; i++) {
+    String username=String.format("%s%03d",usernamePrefix,i);
+    UserRepresentation u=createUserRepresentation(username,username + "@email.test","First","Last",true);
+    Timer.time();
+    Response r=testRealmResource().users().create(u);
+    String id=getCreatedId(r);
+    r.close();
+    Timer.time("create user");
+  }
+}

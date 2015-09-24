@@ -1,0 +1,11 @@
+{
+  RealmRepresentation testRealmRep=testRealmResource().toRepresentation();
+  testRealmRep.setSmtpServer(suiteContext.getSmtpServer());
+  testRealmRep.setVerifyEmail(true);
+  testRealmResource().update(testRealmRep);
+  if (!init) {
+    init=true;
+    MailServer.start();
+    MailServer.createEmailAccount(testUser.getEmail(),"password");
+  }
+}

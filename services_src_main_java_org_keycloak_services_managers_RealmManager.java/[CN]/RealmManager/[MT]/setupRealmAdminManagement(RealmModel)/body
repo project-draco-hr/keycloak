@@ -11,11 +11,13 @@
   }
   RoleModel adminRole=realmAdminClient.addRole(AdminRoles.REALM_ADMIN);
   adminRole.setDescription("${role_" + AdminRoles.REALM_ADMIN + "}");
+  adminRole.setScopeParamRequired(false);
   realmAdminClient.setBearerOnly(true);
   realmAdminClient.setFullScopeAllowed(false);
   for (  String r : AdminRoles.ALL_REALM_ROLES) {
     RoleModel role=realmAdminClient.addRole(r);
     role.setDescription("${role_" + r + "}");
+    role.setScopeParamRequired(false);
     adminRole.addCompositeRole(role);
   }
 }

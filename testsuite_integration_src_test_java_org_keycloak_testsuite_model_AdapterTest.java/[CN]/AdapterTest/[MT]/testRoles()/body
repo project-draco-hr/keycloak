@@ -3,7 +3,7 @@
   realmModel.addRole("admin");
   realmModel.addRole("user");
   Set<RoleModel> roles=realmModel.getRoles();
-  Assert.assertEquals(3,roles.size());
+  Assert.assertEquals(4,roles.size());
   UserModel user=realmManager.getSession().users().addUser(realmModel,"bburke");
   RoleModel realmUserRole=realmModel.getRole("user");
   user.grantRole(realmUserRole);
@@ -24,7 +24,7 @@
   user.grantRole(appBarRole);
   user.grantRole(application.getRole("user"));
   roles=user.getRealmRoleMappings();
-  Assert.assertEquals(roles.size(),2);
+  Assert.assertEquals(roles.size(),3);
   assertRolesContains(realmUserRole,roles);
   Assert.assertTrue(user.hasRole(realmUserRole));
   Assert.assertTrue(user.hasRole(realmModel.getRole("foo")));
@@ -34,11 +34,11 @@
   assertRolesContains(appBarRole,roles);
   Assert.assertTrue(user.hasRole(appBarRole));
   Assert.assertNotEquals(realmModel.getRole("user").getId(),application.getRole("user").getId());
-  Assert.assertEquals(6,user.getRoleMappings().size());
+  Assert.assertEquals(7,user.getRoleMappings().size());
   user.deleteRoleMapping(realmModel.getRole("foo"));
   user.deleteRoleMapping(appBarRole);
   roles=user.getRoleMappings();
-  Assert.assertEquals(4,roles.size());
+  Assert.assertEquals(5,roles.size());
   assertRolesContains(realmUserRole,roles);
   assertRolesContains(application.getRole("user"),roles);
   Assert.assertFalse(user.hasRole(appBarRole));

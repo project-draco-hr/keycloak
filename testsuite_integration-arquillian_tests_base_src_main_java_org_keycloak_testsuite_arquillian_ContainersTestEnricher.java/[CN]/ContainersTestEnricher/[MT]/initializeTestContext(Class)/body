@@ -1,0 +1,12 @@
+{
+  String authServerContextRootStr=getAuthServerContextRootFromSystemProperty();
+  String appServerContextRootStr=isRelative(testClass) ? authServerContextRootStr : getAppServerContextRootFromSystemProperty();
+  try {
+    URL authServerContextRoot=new URL(authServerContextRootStr);
+    URL appServerContextRoot=new URL(appServerContextRootStr);
+    testContext.set(new TestContext(authServerContextRoot,appServerContextRoot));
+  }
+ catch (  MalformedURLException ex) {
+    throw new IllegalStateException("Malformed url.",ex);
+  }
+}

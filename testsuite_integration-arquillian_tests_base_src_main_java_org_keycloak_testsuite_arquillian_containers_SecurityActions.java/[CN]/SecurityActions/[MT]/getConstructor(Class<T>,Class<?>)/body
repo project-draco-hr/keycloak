@@ -1,0 +1,24 @@
+{
+  try {
+    return AccessController.doPrivileged(new PrivilegedExceptionAction<Constructor<T>>(){
+      @Override public Constructor<T> run() throws NoSuchMethodException {
+        return clazz.getDeclaredConstructor(argumentTypes);
+      }
+    }
+);
+  }
+ catch (  final PrivilegedActionException pae) {
+    final Throwable t=pae.getCause();
+    if (t instanceof NoSuchMethodException) {
+      throw (NoSuchMethodException)t;
+    }
+ else {
+      try {
+        throw (RuntimeException)t;
+      }
+ catch (      final ClassCastException cce) {
+        throw new RuntimeException("Obtained unchecked Exception; this code should never be reached",t);
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  newClient=createClientRepresentation("oidc-bearer-only","http://example.test/app/*");
+  newClient.setBearerOnly(true);
+  createClient(newClient);
+  assertFlashMessageSuccess();
+  clientPage.backToClientsViaBreadcrumb();
+  assertCurrentUrlEquals(clientsPage);
+  assertEquals(1,clientsPage.table().searchClients(newClient.getClientId()).size());
+}

@@ -1,0 +1,28 @@
+{
+  try {
+    MimeMessage message=MailServer.getLastReceivedMessage();
+    assertNotNull("There is no received email.",message);
+    assertEquals(recipient,message.getRecipients(RecipientType.TO)[0].toString());
+    assertEquals(from,message.getFrom()[0].toString());
+    String messageContent;
+    if (message.getContent() instanceof MimeMultipart) {
+      MimeMultipart mimeMultipart=(MimeMultipart)message.getContent();
+      messageContent=String.valueOf(mimeMultipart.getBodyPart(0).getContent());
+    }
+ else {
+      messageContent=String.valueOf(message.getContent());
+    }
+    logMessageContent(messageContent);
+    String errorMessage="Email content should contains \"" + content + "\", but it doesn't.\nEmail content:\n"+ messageContent+ "\n";
+    assertTrue(errorMessage,messageContent.contains(content));
+    for (    String string : messageContent.split("\n")) {
+      if (string.contains("http://")) {
+        return string;
+      }
+    }
+    return null;
+  }
+ catch (  IOException|MessagingException|InterruptedException ex) {
+    throw new RuntimeException(ex);
+  }
+}

@@ -1,0 +1,36 @@
+{
+  testRealmAdminConsolePage.navigateTo();
+  Users.setPasswordFor(testUser,"Wrong_password");
+  testRealmLoginPage.form().login(testUser);
+  Users.setPasswordFor(testUser,PASSWORD);
+  testRealmLoginPage.form().login(testUser);
+  testRealmAdminConsolePage.logOut();
+  loginEventsPage.navigateTo();
+  loginEventsPage.table().filter();
+  loginEventsPage.table().filterForm().addEventType("LOGIN");
+  loginEventsPage.table().update();
+  List<WebElement> resultList=loginEventsPage.table().rows();
+  assertEquals(7,resultList.size());
+  resultList.get(0).findElement(By.xpath("//td[text()='LOGIN']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='User']/../td[text()='" + testUser.getId() + "']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='Client']/../td[text()='security-admin-console']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='IP Address']/../td[text()='127.0.0.1']"));
+  loginEventsPage.table().reset();
+  loginEventsPage.table().filterForm().addEventType("LOGOUT");
+  loginEventsPage.table().update();
+  resultList=loginEventsPage.table().rows();
+  assertEquals(2,resultList.size());
+  resultList.get(0).findElement(By.xpath("//td[text()='LOGOUT']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='User']/../td[text()='" + testUser.getId() + "']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='IP Address']/../td[text()='127.0.0.1']"));
+  loginEventsPage.table().reset();
+  loginEventsPage.table().filterForm().addEventType("LOGIN_ERROR");
+  loginEventsPage.table().update();
+  resultList=loginEventsPage.table().rows();
+  assertEquals(6,resultList.size());
+  resultList.get(0).findElement(By.xpath("//td[text()='LOGIN_ERROR']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='User']/../td[text()='" + testUser.getId() + "']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='Client']/../td[text()='security-admin-console']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='Error']/../td[text()='invalid_user_credentials']"));
+  resultList.get(0).findElement(By.xpath("//td[text()='IP Address']/../td[text()='127.0.0.1']"));
+}

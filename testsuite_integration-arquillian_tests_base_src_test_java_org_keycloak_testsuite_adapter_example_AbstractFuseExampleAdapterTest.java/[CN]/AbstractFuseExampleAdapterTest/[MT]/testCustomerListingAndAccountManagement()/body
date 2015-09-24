@@ -1,0 +1,17 @@
+{
+  customerPortal.navigateTo();
+  assertCurrentUrlStartsWith(customerPortal);
+  customerPortal.clickCustomerListingLink();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlStartsWith(customerListing);
+  String src=driver.getPageSource();
+  assertTrue(src.contains("Username: bburke@redhat.com") && src.contains("Bill Burke") && src.contains("Stian Thorgersen"));
+  customerListing.clickAccountManagement();
+  assertCurrentUrlStartsWith(testRealmAccount);
+  assertEquals(testRealmAccount.getUsername(),"bburke@redhat.com");
+  driver.navigate().back();
+  customerListing.clickLogOut();
+  customerPortal.clickCustomerListingLink();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+}

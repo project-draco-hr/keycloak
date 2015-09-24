@@ -1,0 +1,12 @@
+{
+  Client client=ClientBuilder.newClient();
+  URI uri=OIDCLoginProtocolService.tokenUrl(authServerPage.createUriBuilder()).build("demo");
+  WebTarget target=client.target(uri);
+  String header=BasicAuthHelper.createHeader("customer-portal","password");
+  Form form=new Form();
+  form.param(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD).param("username","monkey@redhat.com").param("password","password");
+  Response response=target.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
+  assertEquals(401,response.getStatus());
+  response.close();
+  client.close();
+}

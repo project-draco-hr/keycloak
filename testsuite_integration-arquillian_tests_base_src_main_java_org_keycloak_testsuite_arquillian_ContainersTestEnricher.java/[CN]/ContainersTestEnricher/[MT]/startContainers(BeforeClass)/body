@@ -1,0 +1,12 @@
+{
+  controller=containerController.get();
+  Class testClass=event.getTestClass().getJavaClass();
+  appServerQualifier=getAppServerQualifier(testClass);
+  if (!controller.isStarted(appServerQualifier)) {
+    log.info("\nSTARTING APP SERVER: " + appServerQualifier + "\n");
+    controller.start(appServerQualifier);
+    log.info("");
+  }
+  initializeTestContext(testClass);
+  initializeAdminClient();
+}

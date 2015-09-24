@@ -1,0 +1,26 @@
+{
+  RealmRepresentation testRealmRep=testRealmResource().toRepresentation();
+  ClientResource sessionPortalRes=null;
+  for (  ClientRepresentation clientRep : testRealmResource().clients().findAll()) {
+    if ("session-portal".equals(clientRep.getClientId())) {
+      sessionPortalRes=testRealmResource().clients().get(clientRep.getId());
+    }
+  }
+  assertNotNull(sessionPortalRes);
+  sessionPortalRes.toRepresentation().setAdminUrl("");
+  int origTokenLifespan=testRealmRep.getAccessCodeLifespan();
+  testRealmRep.setAccessCodeLifespan(1);
+  testRealmResource().update(testRealmRep);
+  loginAndCheckSession(driver,testRealmLoginPage);
+  String logoutUri=OIDCLoginProtocolService.logoutUrl(authServerPage.createUriBuilder()).queryParam(OAuth2Constants.REDIRECT_URI,sessionPortalPage.toString()).build("demo").toString();
+  driver.navigate().to(logoutUri);
+  sessionPortalPage.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertEquals(driver.getCurrentUrl(),sessionPortalPage.toString());
+  String pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("Counter=1"));
+  sessionPortalRes.toRepresentation().setAdminUrl(sessionPortalPage.toString());
+  testRealmRep.setAccessCodeLifespan(origTokenLifespan);
+  testRealmResource().update(testRealmRep);
+}

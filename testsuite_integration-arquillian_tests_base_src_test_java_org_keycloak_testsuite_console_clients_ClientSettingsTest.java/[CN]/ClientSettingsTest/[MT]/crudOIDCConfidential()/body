@@ -1,0 +1,12 @@
+{
+  newClient=createClientRepresentation("oidc-confidential","http://example.test/app/*");
+  createClient(newClient);
+  assertFlashMessageSuccess();
+  clientPage.backToClientsViaBreadcrumb();
+  assertCurrentUrlEquals(clientsPage);
+  assertEquals(1,clientsPage.table().searchClients(newClient.getClientId()).size());
+  clientsPage.table().clickClient(newClient);
+  ClientRepresentation found=clientSettingsPage.form().getValues();
+  assertClientSettingsEqual(newClient,found);
+  clientPage.backToClientsViaBreadcrumb();
+}

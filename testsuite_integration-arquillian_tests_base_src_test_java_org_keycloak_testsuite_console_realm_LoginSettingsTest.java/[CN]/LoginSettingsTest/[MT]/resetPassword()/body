@@ -1,0 +1,19 @@
+{
+  log.info("enabling reset password");
+  loginSettingsPage.form().setResetPasswordAllowed(true);
+  loginSettingsPage.form().save();
+  log.debug("enabled");
+  testRealmAdminConsolePage.navigateTo();
+  testRealmLoginPage.form().forgotPassword();
+  Assert.assertEquals("Enter your username or email address and we will send you instructions on how to create a new password.",testRealmForgottenPasswordPage.getInfoMessage());
+  log.info("verified reset password is enabled");
+  log.info("disabling reset password");
+  loginSettingsPage.navigateTo();
+  loginSettingsPage.form().setResetPasswordAllowed(false);
+  loginSettingsPage.form().save();
+  assertFalse(loginSettingsPage.form().isResetPasswordAllowed());
+  log.debug("disabled");
+  testRealmAdminConsolePage.navigateTo();
+  testRealmLoginPage.form().waitForResetPasswordLinkNotPresent();
+  log.info("verified reset password is disabled");
+}

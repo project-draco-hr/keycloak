@@ -1,0 +1,22 @@
+{
+  int menuOrder=0;
+switch (menuType) {
+case REALM:
+    menuOrder=1;
+  break;
+case USER:
+menuOrder=0;
+break;
+}
+waitGuiForElement(By.cssSelector(MENU_LOCATOR));
+if (!menuList.get(menuOrder).isDisplayed()) {
+toggle.get(menuOrder).click();
+}
+for (WebElement item : menuList.get(menuOrder).findElements(By.cssSelector(MENU_LOCATOR + " a"))) {
+if (item.getText().contains(linkText)) {
+item.click();
+return;
+}
+}
+throw new RuntimeException("Could not find menu item containing \"" + linkText + "\"");
+}

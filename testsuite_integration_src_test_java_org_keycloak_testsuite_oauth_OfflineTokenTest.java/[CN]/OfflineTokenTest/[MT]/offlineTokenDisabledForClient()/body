@@ -1,0 +1,26 @@
+{
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.getClientByClientId("offline-client").setFullScopeAllowed(false);
+    }
+  }
+);
+  oauth.scope(OAuth2Constants.OFFLINE_ACCESS);
+  oauth.clientId("offline-client");
+  oauth.redirectUri(offlineClientAppUri);
+  oauth.doLogin("test-user@localhost","password");
+  Event loginEvent=events.expectLogin().client("offline-client").detail(Details.REDIRECT_URI,offlineClientAppUri).assertEvent();
+  String sessionId=loginEvent.getSessionId();
+  String codeId=loginEvent.getDetails().get(Details.CODE_ID);
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"secret1");
+  assertEquals(400,tokenResponse.getStatusCode());
+  assertEquals("not_allowed",tokenResponse.getError());
+  events.expectCodeToToken(codeId,sessionId).client("offline-client").error("not_allowed").clearDetails().assertEvent();
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.getClientByClientId("offline-client").setFullScopeAllowed(true);
+    }
+  }
+);
+}

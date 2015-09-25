@@ -1,0 +1,24 @@
+{
+  tomcat=new Tomcat();
+  String baseDir=getBaseDirectory();
+  tomcat.setBaseDir(baseDir);
+  tomcat.setPort(8082);
+  System.setProperty("app.server.base.url","http://localhost:8082");
+  System.setProperty("my.host.name","localhost");
+  URL dir=TomcatSamlTest.class.getResource("/keycloak-saml/testsaml.json");
+  File base=new File(dir.getFile()).getParentFile();
+  tomcat.addWebapp("/sales-post",new File(base,"simple-post").toString());
+  tomcat.addWebapp("/sales-post-sig",new File(base,"signed-post").toString());
+  tomcat.addWebapp("/sales-post-sig-email",new File(base,"signed-post-email").toString());
+  tomcat.addWebapp("/sales-post-sig-transient",new File(base,"signed-post-transient").toString());
+  tomcat.addWebapp("/sales-post-sig-persistent",new File(base,"signed-post-persistent").toString());
+  tomcat.addWebapp("/sales-metadata",new File(base,"signed-metadata").toString());
+  tomcat.addWebapp("/employee-sig",new File(base,"signed-get").toString());
+  tomcat.addWebapp("/employee2",new File(base,"mappers").toString());
+  tomcat.addWebapp("/employee-sig-front",new File(base,"signed-front-get").toString());
+  tomcat.addWebapp("/bad-client-sales-post-sig",new File(base,"bad-client-signed-post").toString());
+  tomcat.addWebapp("/bad-realm-sales-post-sig",new File(base,"bad-realm-signed-post").toString());
+  tomcat.addWebapp("/sales-post-enc",new File(base,"encrypted-post").toString());
+  SamlAdapterTestStrategy.uploadSP("http://localhost:8081/auth",keycloakRule);
+  tomcat.start();
+}

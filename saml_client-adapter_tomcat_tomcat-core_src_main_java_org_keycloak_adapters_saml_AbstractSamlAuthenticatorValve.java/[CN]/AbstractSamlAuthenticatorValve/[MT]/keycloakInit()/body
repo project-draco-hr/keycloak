@@ -1,0 +1,36 @@
+{
+  String configResolverClass=context.getServletContext().getInitParameter("keycloak.config.resolver");
+  if (configResolverClass != null) {
+    try {
+      throw new RuntimeException("Not implemented yet");
+    }
+ catch (    Exception ex) {
+      log.log(Level.FINE,"The specified resolver {0} could NOT be loaded. Keycloak is unconfigured and will deny all requests. Reason: {1}",new Object[]{configResolverClass,ex.getMessage()});
+    }
+  }
+ else {
+    InputStream is=getConfigInputStream(context);
+    final SamlDeployment deployment;
+    if (is == null) {
+      log.info("No adapter configuration. Keycloak is unconfigured and will deny all requests.");
+      deployment=new DefaultSamlDeployment();
+    }
+ else {
+      try {
+        ResourceLoader loader=new ResourceLoader(){
+          @Override public InputStream getResourceAsStream(          String resource){
+            return context.getServletContext().getResourceAsStream(resource);
+          }
+        }
+;
+        deployment=new DeploymentBuilder().build(is,loader);
+      }
+ catch (      ParsingException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    deploymentContext=new SamlDeploymentContext(deployment);
+    log.fine("Keycloak is using a per-deployment configuration.");
+  }
+  context.getServletContext().setAttribute(SamlDeploymentContext.class.getName(),deploymentContext);
+}

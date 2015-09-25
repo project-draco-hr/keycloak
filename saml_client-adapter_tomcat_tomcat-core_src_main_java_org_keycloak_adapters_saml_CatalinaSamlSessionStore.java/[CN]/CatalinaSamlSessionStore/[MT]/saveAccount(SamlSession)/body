@@ -1,0 +1,13 @@
+{
+  Session session=request.getSessionInternal(true);
+  session.getSession().setAttribute(SamlSession.class.getName(),account);
+  GenericPrincipal principal=(GenericPrincipal)session.getPrincipal();
+  if (principal == null) {
+    principal=principalFactory.createPrincipal(request.getContext().getRealm(),account.getPrincipal(),account.getRoles());
+    session.setPrincipal(principal);
+    session.setAuthType("KEYCLOAK-SAML");
+  }
+  request.setUserPrincipal(principal);
+  request.setAuthType("KEYCLOAK-SAML");
+  idMapper.map(account.getSessionIndex(),account.getPrincipal().getSamlSubject(),session.getId());
+}

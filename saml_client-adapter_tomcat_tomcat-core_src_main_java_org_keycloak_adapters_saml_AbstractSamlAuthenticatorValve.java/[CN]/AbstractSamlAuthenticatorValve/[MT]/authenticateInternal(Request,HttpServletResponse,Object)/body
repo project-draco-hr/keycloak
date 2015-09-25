@@ -1,0 +1,42 @@
+{
+  log.info("authenticateInternal");
+  CatalinaHttpFacade facade=new CatalinaHttpFacade(response,request);
+  SamlDeployment deployment=deploymentContext.resolveDeployment(facade);
+  if (deployment == null || !deployment.isConfigured()) {
+    log.fine("deployment not configured");
+    return false;
+  }
+  SamlSessionStore tokenStore=getTokenStore(request,facade,deployment);
+  CatalinaSamlAuthenticator authenticator=new CatalinaSamlAuthenticator(facade,deployment,tokenStore);
+  AuthOutcome outcome=authenticator.authenticate();
+  if (outcome == AuthOutcome.AUTHENTICATED) {
+    log.fine("AUTHENTICATED");
+    if (facade.isEnded()) {
+      return false;
+    }
+    return true;
+  }
+  if (outcome == AuthOutcome.LOGGED_OUT) {
+    logoutInternal(request);
+    if (deployment.getLogoutPage() != null) {
+      forwardToLogoutPage(request,response,deployment);
+    }
+    log.fine("Logging OUT");
+    return false;
+  }
+  AuthChallenge challenge=authenticator.getChallenge();
+  if (challenge != null) {
+    log.fine("challenge");
+    if (loginConfig == null) {
+      loginConfig=request.getContext().getLoginConfig();
+    }
+    if (challenge.errorPage()) {
+      log.fine("error page");
+      if (forwardToErrorPageInternal(request,response,loginConfig))       return false;
+    }
+    log.fine("sending challenge");
+    challenge.challenge(facade);
+  }
+  log.fine("No challenge, but failed authentication");
+  return false;
+}

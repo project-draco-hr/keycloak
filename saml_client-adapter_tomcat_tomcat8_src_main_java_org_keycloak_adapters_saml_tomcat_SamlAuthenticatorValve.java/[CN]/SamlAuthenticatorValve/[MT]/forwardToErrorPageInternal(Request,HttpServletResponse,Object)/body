@@ -1,0 +1,15 @@
+{
+  if (loginConfig == null)   return false;
+  LoginConfig config=(LoginConfig)loginConfig;
+  if (config.getErrorPage() == null)   return false;
+  try {
+    Method method=null;
+    method=FormAuthenticator.class.getDeclaredMethod("forwardToErrorPage",Request.class,HttpServletResponse.class,LoginConfig.class);
+    method.setAccessible(true);
+    method.invoke(this,request,response,config);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  return true;
+}

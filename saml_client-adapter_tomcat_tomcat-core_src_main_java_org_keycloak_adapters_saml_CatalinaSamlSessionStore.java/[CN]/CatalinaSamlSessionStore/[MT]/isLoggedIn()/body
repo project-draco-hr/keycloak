@@ -1,0 +1,34 @@
+{
+  Session session=request.getSessionInternal(false);
+  if (session == null)   return false;
+  if (session == null) {
+    log.debug("session was null, returning null");
+    return false;
+  }
+  final SamlSession samlSession=(SamlSession)session.getSession().getAttribute(SamlSession.class.getName());
+  if (samlSession == null) {
+    log.debug("SamlSession was not in session, returning null");
+    return false;
+  }
+  GenericPrincipal principal=(GenericPrincipal)session.getPrincipal();
+  if (samlSession.getPrincipal().getName().equals(principal.getName()))   if (principal == null) {
+    principal=principalFactory.createPrincipal(request.getContext().getRealm(),samlSession.getPrincipal(),samlSession.getRoles());
+    session.setPrincipal(principal);
+    session.setAuthType("KEYCLOAK-SAML");
+  }
+ else {
+    if (!principal.getUserPrincipal().getName().equals(samlSession.getPrincipal().getName())) {
+      throw new RuntimeException("Unknown State");
+    }
+    log.debug("************principal already in");
+    if (log.isDebugEnabled()) {
+      for (      String role : principal.getRoles()) {
+        log.debug("principal role: " + role);
+      }
+    }
+  }
+  request.setUserPrincipal(principal);
+  request.setAuthType("KEYCLOAK-SAML");
+  restoreRequest();
+  return true;
+}

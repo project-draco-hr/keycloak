@@ -15,17 +15,30 @@
   }
   StatusResponseType statusResponse=(StatusResponseType)holder.getSamlObject();
   if (!requestUri.equals(statusResponse.getDestination())) {
-    throw new RuntimeException("destination not equal to request");
+    log.error("Request URI does not match SAML request destination");
+    return AuthOutcome.FAILED;
   }
   if (statusResponse instanceof ResponseType) {
     if (deployment.getIDP().getSingleSignOnService().validateResponseSignature()) {
-      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
+      try {
+        validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
+      }
+ catch (      VerificationException e) {
+        log.error("Failed to verify saml response signature",e);
+        return AuthOutcome.FAILED;
+      }
     }
     return handleLoginResponse((ResponseType)statusResponse);
   }
  else {
     if (deployment.getIDP().getSingleLogoutService().validateResponseSignature()) {
-      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
+      try {
+        validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
+      }
+ catch (      VerificationException e) {
+        log.error("Failed to verify saml response signature",e);
+        return AuthOutcome.FAILED;
+      }
     }
     return handleLogoutResponse(holder,statusResponse,relayState);
   }

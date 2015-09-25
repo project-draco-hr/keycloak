@@ -6,14 +6,9 @@
       return initiateLogin();
     }
   }
- catch (  ParsingException e) {
-    throw new RuntimeException(e);
-  }
-catch (  ProcessingException e) {
-    throw new RuntimeException(e);
-  }
-catch (  ConfigurationException e) {
-    throw new RuntimeException(e);
+ catch (  Exception e) {
+    log.error("Error extracting SAML assertion, e");
+    return AuthOutcome.FAILED;
   }
   SubjectType subject=assertion.getSubject();
   SubjectType.STSubType subType=subject.getSubType();
@@ -34,6 +29,7 @@ catch (  ConfigurationException e) {
           if (attributeValues != null) {
             for (            Object attrValue : attributeValues) {
               String role=getAttributeValue(attrValue);
+              log.info("Add role: " + role);
               roles.add(role);
             }
           }
@@ -77,18 +73,7 @@ catch (  ConfigurationException e) {
   final SamlPrincipal principal=new SamlPrincipal(principalName,principalName,subjectNameID.getFormat().toString(),attributes,friendlyAttributes);
   String index=authn == null ? null : authn.getSessionIndex();
   final String sessionIndex=index;
-  SamlSession account=new SamlSession(){
-    @Override public SamlPrincipal getPrincipal(){
-      return principal;
-    }
-    @Override public Set<String> getRoles(){
-      return roles;
-    }
-    @Override public String getSessionIndex(){
-      return sessionIndex;
-    }
-  }
-;
+  SamlSession account=new SamlSession(principal,roles,sessionIndex);
   sessionStore.saveAccount(account);
   completeAuthentication(account);
   String redirectUri=sessionStore.getRedirectUri();
@@ -100,5 +85,6 @@ catch (  ConfigurationException e) {
  else {
     log.debug("IDP initiated invocation");
   }
+  log.debug("AUTHENTICATED authn");
   return AuthOutcome.AUTHENTICATED;
 }

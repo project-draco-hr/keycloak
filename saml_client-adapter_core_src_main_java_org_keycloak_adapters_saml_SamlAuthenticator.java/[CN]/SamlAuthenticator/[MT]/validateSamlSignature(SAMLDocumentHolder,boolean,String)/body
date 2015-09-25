@@ -1,14 +1,8 @@
 {
-  try {
-    if (postBinding) {
-      verifyPostBindingSignature(holder.getSamlDocument(),deployment.getIDP().getSignatureValidationKey());
-    }
- else {
-      verifyRedirectBindingSignature(deployment.getIDP().getSignatureValidationKey(),paramKey);
-    }
+  if (postBinding) {
+    verifyPostBindingSignature(holder.getSamlDocument(),deployment.getIDP().getSignatureValidationKey());
   }
- catch (  VerificationException e) {
-    log.error("validation failed",e);
-    throw new RuntimeException("invalid document signature");
+ else {
+    verifyRedirectBindingSignature(deployment.getIDP().getSignatureValidationKey(),paramKey);
   }
 }

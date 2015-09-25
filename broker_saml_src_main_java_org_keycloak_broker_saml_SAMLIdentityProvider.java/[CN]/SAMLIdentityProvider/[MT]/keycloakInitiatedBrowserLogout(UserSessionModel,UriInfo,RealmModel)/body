@@ -8,7 +8,8 @@
  else {
     try {
       SAML2LogoutRequestBuilder logoutBuilder=buildLogoutRequest(userSession,uriInfo,realm,singleLogoutServiceUrl);
-      return logoutBuilder.postBinding().request();
+      JaxrsSAML2BindingBuilder binding=buildLogoutBinding(userSession,realm);
+      return binding.postBinding(logoutBuilder.buildDocument()).request(singleLogoutServiceUrl);
     }
  catch (    Exception e) {
       throw new RuntimeException(e);

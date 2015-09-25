@@ -1,0 +1,31 @@
+{
+  SAMLDocumentHolder holder=null;
+  boolean postBinding=false;
+  String requestUri=facade.getRequest().getURI();
+  if (facade.getRequest().getMethod().equalsIgnoreCase("GET")) {
+    int index=requestUri.indexOf('?');
+    if (index > -1) {
+      requestUri=requestUri.substring(0,index);
+    }
+    holder=SAMLRequestParser.parseRequestRedirectBinding(samlRequest);
+  }
+ else {
+    postBinding=true;
+    holder=SAMLRequestParser.parseRequestPostBinding(samlRequest);
+  }
+  RequestAbstractType requestAbstractType=(RequestAbstractType)holder.getSamlObject();
+  if (!requestUri.equals(requestAbstractType.getDestination().toString())) {
+    log.error("expected destination '" + requestUri + "' got '"+ requestAbstractType.getDestination()+ "'");
+    throw new RuntimeException("destination not equal to request.");
+  }
+  if (requestAbstractType instanceof LogoutRequestType) {
+    if (deployment.getIDP().getSingleLogoutService().validateRequestSignature()) {
+      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_REQUEST_KEY);
+    }
+    LogoutRequestType logout=(LogoutRequestType)requestAbstractType;
+    return logoutRequest(logout,relayState);
+  }
+ else {
+    throw new RuntimeException("unknown SAML request type");
+  }
+}

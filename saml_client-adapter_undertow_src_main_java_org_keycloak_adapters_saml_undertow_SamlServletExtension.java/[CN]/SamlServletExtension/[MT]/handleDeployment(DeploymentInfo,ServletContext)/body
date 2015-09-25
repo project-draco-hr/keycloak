@@ -1,0 +1,67 @@
+{
+  if (!isAuthenticationMechanismPresent(deploymentInfo,"KEYCLOAK-SAML")) {
+    log.debug("auth-method is not keycloak saml!");
+    return;
+  }
+  log.debug("SamlServletException initialization");
+  SamlConfigResolver configResolver;
+  String configResolverClass=servletContext.getInitParameter("keycloak.config.resolver");
+  SamlDeploymentContext deploymentContext=null;
+  if (configResolverClass != null) {
+    try {
+      throw new RuntimeException("Not implemented yet");
+    }
+ catch (    Exception ex) {
+      log.warn("The specified resolver " + configResolverClass + " could NOT be loaded. Keycloak is unconfigured and will deny all requests. Reason: "+ ex.getMessage());
+    }
+  }
+ else {
+    InputStream is=getConfigInputStream(servletContext);
+    final SamlDeployment deployment;
+    if (is == null) {
+      log.warn("No adapter configuration.  Keycloak is unconfigured and will deny all requests.");
+      deployment=new DefaultSamlDeployment();
+    }
+ else {
+      try {
+        ResourceLoader loader=new ResourceLoader(){
+          @Override public InputStream getResourceAsStream(          String resource){
+            return servletContext.getResourceAsStream(resource);
+          }
+        }
+;
+        deployment=new DeploymentBuilder().build(is,loader);
+      }
+ catch (      ParsingException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    deploymentContext=new SamlDeploymentContext(deployment);
+    log.debug("Keycloak is using a per-deployment configuration.");
+  }
+  servletContext.setAttribute(SamlDeploymentContext.class.getName(),deploymentContext);
+  UndertowUserSessionManagement userSessionManagement=new UndertowUserSessionManagement();
+  final ServletSamlAuthMech mech=new ServletSamlAuthMech(deploymentContext,userSessionManagement,getErrorPage(deploymentInfo));
+  deploymentInfo.addAuthenticationMechanism("KEYCLOAK-SAML",new AuthenticationMechanismFactory(){
+    @Override public AuthenticationMechanism create(    String s,    FormParserFactory formParserFactory,    Map<String,String> stringStringMap){
+      return mech;
+    }
+  }
+);
+  deploymentInfo.setIdentityManager(new IdentityManager(){
+    @Override public Account verify(    Account account){
+      return account;
+    }
+    @Override public Account verify(    String id,    Credential credential){
+      throw new IllegalStateException("Should never be called in Keycloak flow");
+    }
+    @Override public Account verify(    Credential credential){
+      throw new IllegalStateException("Should never be called in Keycloak flow");
+    }
+  }
+);
+  log.debug("Setting jsession cookie path to: " + deploymentInfo.getContextPath());
+  ServletSessionConfig cookieConfig=new ServletSessionConfig();
+  cookieConfig.setPath(deploymentInfo.getContextPath());
+  deploymentInfo.setServletSessionConfig(cookieConfig);
+}

@@ -1,0 +1,14 @@
+{
+  String sso=sessionToSso.remove(session);
+  if (sso != null) {
+    ssoToSession.remove(sso);
+  }
+  String principal=sessionToPrincipal.remove(session);
+  if (principal != null) {
+    Set<String> sessions=principalToSession.get(principal);
+    sessions.remove(session);
+    if (sessions.isEmpty()) {
+      principalToSession.remove(principal,sessions);
+    }
+  }
+}

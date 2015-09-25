@@ -1,0 +1,29 @@
+{
+  UndertowHttpFacade facade=createFacade(exchange);
+  SamlDeployment deployment=deploymentContext.resolveDeployment(facade);
+  if (!deployment.isConfigured()) {
+    return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  }
+  SamlSessionStore sessionStore=getTokenStore(exchange,facade,deployment,securityContext);
+  UndertowSamlAuthenticator authenticator=new UndertowSamlAuthenticator(securityContext,facade,deploymentContext.resolveDeployment(facade),sessionStore);
+  AuthOutcome outcome=authenticator.authenticate();
+  if (outcome == AuthOutcome.AUTHENTICATED) {
+    registerNotifications(securityContext);
+    return AuthenticationMechanismOutcome.AUTHENTICATED;
+  }
+  if (outcome == AuthOutcome.LOGGED_OUT) {
+    securityContext.logout();
+    if (deployment.getLogoutPage() != null) {
+      redirectLogout(deployment,exchange);
+    }
+    return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  }
+  AuthChallenge challenge=authenticator.getChallenge();
+  if (challenge != null) {
+    exchange.putAttachment(KEYCLOAK_CHALLENGE_ATTACHMENT_KEY,challenge);
+  }
+  if (outcome == AuthOutcome.FAILED) {
+    return AuthenticationMechanismOutcome.NOT_AUTHENTICATED;
+  }
+  return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+}

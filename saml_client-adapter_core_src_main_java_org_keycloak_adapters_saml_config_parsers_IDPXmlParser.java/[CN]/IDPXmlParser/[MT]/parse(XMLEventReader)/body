@@ -1,0 +1,40 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,ConfigXmlConstants.IDP_ELEMENT);
+  IDP idp=new IDP();
+  String entityID=StaxParserUtil.getAttributeValue(startElement,ConfigXmlConstants.ENTITY_ID_ATTR);
+  if (entityID == null) {
+    throw new ParsingException("entityID must be set on IDP");
+  }
+  idp.setEntityID(entityID);
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent == null)     break;
+    if (xmlEvent instanceof EndElement) {
+      EndElement endElement=(EndElement)StaxParserUtil.getNextEvent(xmlEventReader);
+      String endElementName=StaxParserUtil.getEndElementName(endElement);
+      if (endElementName.equals(ConfigXmlConstants.IDP_ELEMENT))       break;
+ else       continue;
+    }
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    String tag=StaxParserUtil.getStartElementName(startElement);
+    if (tag.equals(ConfigXmlConstants.SINGLE_SIGN_ON_SERVICE_ELEMENT)) {
+      IDP.SingleSignOnService sso=parseSingleSignOnService(xmlEventReader);
+      idp.setSingleSignOnService(sso);
+    }
+ else     if (tag.equals(ConfigXmlConstants.SINGLE_LOGOUT_SERVICE_ELEMENT)) {
+      IDP.SingleLogoutService slo=parseSingleLogoutService(xmlEventReader);
+      idp.setSingleLogoutService(slo);
+    }
+ else     if (tag.equals(ConfigXmlConstants.KEYS_ELEMENT)) {
+      KeysXmlParser parser=new KeysXmlParser();
+      List<Key> keys=(List<Key>)parser.parse(xmlEventReader);
+      idp.setKeys(keys);
+    }
+ else {
+      StaxParserUtil.bypassElementBlock(xmlEventReader,tag);
+    }
+  }
+  return idp;
+}

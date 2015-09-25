@@ -1,0 +1,104 @@
+{
+  AssertionType assertion=null;
+  try {
+    assertion=AssertionUtil.getAssertion(responseType,deployment.getDecryptionKey());
+    if (AssertionUtil.hasExpired(assertion)) {
+      return initiateLogin();
+    }
+  }
+ catch (  ParsingException e) {
+    throw new RuntimeException(e);
+  }
+catch (  ProcessingException e) {
+    throw new RuntimeException(e);
+  }
+catch (  ConfigurationException e) {
+    throw new RuntimeException(e);
+  }
+  SubjectType subject=assertion.getSubject();
+  SubjectType.STSubType subType=subject.getSubType();
+  NameIDType subjectNameID=(NameIDType)subType.getBaseID();
+  String principalName=subjectNameID.getValue();
+  final Set<String> roles=new HashSet<>();
+  MultivaluedHashMap<String,String> attributes=new MultivaluedHashMap<>();
+  MultivaluedHashMap<String,String> friendlyAttributes=new MultivaluedHashMap<>();
+  Set<StatementAbstractType> statements=assertion.getStatements();
+  for (  StatementAbstractType statement : statements) {
+    if (statement instanceof AttributeStatementType) {
+      AttributeStatementType attributeStatement=(AttributeStatementType)statement;
+      List<AttributeStatementType.ASTChoiceType> attList=attributeStatement.getAttributes();
+      for (      AttributeStatementType.ASTChoiceType obj : attList) {
+        AttributeType attr=obj.getAttribute();
+        if (isRole(attr)) {
+          List<Object> attributeValues=attr.getAttributeValue();
+          if (attributeValues != null) {
+            for (            Object attrValue : attributeValues) {
+              String role=getAttributeValue(attrValue);
+              roles.add(role);
+            }
+          }
+        }
+ else {
+          List<Object> attributeValues=attr.getAttributeValue();
+          if (attributeValues != null) {
+            for (            Object attrValue : attributeValues) {
+              String value=getAttributeValue(attrValue);
+              if (attr.getName() != null) {
+                attributes.add(attr.getName(),value);
+              }
+              if (attr.getFriendlyName() != null) {
+                friendlyAttributes.add(attr.getFriendlyName(),value);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (deployment.getPrincipalNamePolicy() == SamlDeployment.PrincipalNamePolicy.FROM_ATTRIBUTE_NAME) {
+    if (deployment.getPrincipalAttributeName() != null) {
+      String attribute=attributes.getFirst(deployment.getPrincipalAttributeName());
+      if (attribute != null)       principalName=attribute;
+    }
+  }
+ else   if (deployment.getPrincipalNamePolicy() == SamlDeployment.PrincipalNamePolicy.FROM_FRIENDLY_ATTRIBUTE_NAME) {
+    if (deployment.getPrincipalAttributeName() != null) {
+      String attribute=friendlyAttributes.getFirst(deployment.getPrincipalAttributeName());
+      if (attribute != null)       principalName=attribute;
+    }
+  }
+  AuthnStatementType authn=null;
+  for (  Object statement : assertion.getStatements()) {
+    if (statement instanceof AuthnStatementType) {
+      authn=(AuthnStatementType)statement;
+      break;
+    }
+  }
+  final SamlPrincipal principal=new SamlPrincipal(principalName,principalName,subjectNameID.getFormat().toString(),attributes,friendlyAttributes);
+  String index=authn == null ? null : authn.getSessionIndex();
+  final String sessionIndex=index;
+  SamlSession account=new SamlSession(){
+    @Override public SamlPrincipal getPrincipal(){
+      return principal;
+    }
+    @Override public Set<String> getRoles(){
+      return roles;
+    }
+    @Override public String getSessionIndex(){
+      return sessionIndex;
+    }
+  }
+;
+  sessionStore.saveAccount(account);
+  completeAuthentication(account);
+  String redirectUri=sessionStore.getRedirectUri();
+  if (redirectUri != null) {
+    facade.getResponse().setHeader("Location",redirectUri);
+    facade.getResponse().setStatus(302);
+    facade.getResponse().end();
+  }
+ else {
+    log.debug("IDP initiated invocation");
+  }
+  return AuthOutcome.AUTHENTICATED;
+}

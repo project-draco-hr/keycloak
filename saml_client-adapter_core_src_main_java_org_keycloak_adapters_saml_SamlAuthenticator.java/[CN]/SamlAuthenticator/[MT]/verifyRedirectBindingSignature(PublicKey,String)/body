@@ -1,0 +1,31 @@
+{
+  String request=facade.getRequest().getQueryParamValue(paramKey);
+  String algorithm=facade.getRequest().getQueryParamValue(GeneralConstants.SAML_SIG_ALG_REQUEST_KEY);
+  String signature=facade.getRequest().getQueryParamValue(GeneralConstants.SAML_SIGNATURE_REQUEST_KEY);
+  String decodedAlgorithm=facade.getRequest().getQueryParamValue(GeneralConstants.SAML_SIG_ALG_REQUEST_KEY);
+  if (request == null) {
+    throw new VerificationException("SAML Request was null");
+  }
+  if (algorithm == null)   throw new VerificationException("SigAlg was null");
+  if (signature == null)   throw new VerificationException("Signature was null");
+  String relayState=facade.getRequest().getQueryParamValue(GeneralConstants.RELAY_STATE);
+  KeycloakUriBuilder builder=KeycloakUriBuilder.fromPath("/").queryParam(paramKey,request);
+  if (relayState != null) {
+    builder.queryParam(GeneralConstants.RELAY_STATE,relayState);
+  }
+  builder.queryParam(GeneralConstants.SAML_SIG_ALG_REQUEST_KEY,algorithm);
+  String rawQuery=builder.build().getRawQuery();
+  try {
+    byte[] decodedSignature=Base64.decode(signature);
+    SignatureAlgorithm signatureAlgorithm=SignatureAlgorithm.getFromXmlMethod(decodedAlgorithm);
+    Signature validator=signatureAlgorithm.createSignature();
+    validator.initVerify(publicKey);
+    validator.update(rawQuery.getBytes("UTF-8"));
+    if (!validator.verify(decodedSignature)) {
+      throw new VerificationException("Invalid query param signature");
+    }
+  }
+ catch (  Exception e) {
+    throw new VerificationException(e);
+  }
+}

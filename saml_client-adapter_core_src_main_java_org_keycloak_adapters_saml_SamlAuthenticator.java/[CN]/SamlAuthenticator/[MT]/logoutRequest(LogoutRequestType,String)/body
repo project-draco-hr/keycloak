@@ -1,0 +1,31 @@
+{
+  if (request.getSessionIndex() == null || request.getSessionIndex().isEmpty()) {
+    sessionStore.logoutByPrincipal(request.getNameID().getValue());
+  }
+ else {
+    sessionStore.logoutBySsoId(request.getSessionIndex());
+  }
+  String issuerURL=deployment.getEntityID();
+  SAML2LogoutResponseBuilder builder=new SAML2LogoutResponseBuilder();
+  builder.logoutRequestID(request.getID());
+  builder.destination(deployment.getIDP().getSingleLogoutService().getResponseBindingUrl());
+  builder.issuer(issuerURL);
+  BaseSAML2BindingBuilder binding=new BaseSAML2BindingBuilder().relayState(relayState);
+  if (deployment.getIDP().getSingleLogoutService().signResponse()) {
+    binding.signatureAlgorithm(deployment.getSignatureAlgorithm()).signWith(deployment.getSigningKeyPair()).signDocument();
+    if (deployment.getSignatureCanonicalizationMethod() != null)     binding.canonicalizationMethod(deployment.getSignatureCanonicalizationMethod());
+  }
+  try {
+    SamlUtil.sendSaml(false,facade,deployment.getIDP().getSingleLogoutService().getResponseBindingUrl(),binding,builder.buildDocument(),deployment.getIDP().getSingleLogoutService().getResponseBinding());
+  }
+ catch (  ConfigurationException e) {
+    throw new RuntimeException(e);
+  }
+catch (  ProcessingException e) {
+    throw new RuntimeException(e);
+  }
+catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  return AuthOutcome.NOT_ATTEMPTED;
+}

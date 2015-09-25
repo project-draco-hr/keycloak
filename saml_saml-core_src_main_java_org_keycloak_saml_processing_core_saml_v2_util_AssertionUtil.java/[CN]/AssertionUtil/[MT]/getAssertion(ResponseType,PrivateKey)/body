@@ -1,0 +1,15 @@
+{
+  List<ResponseType.RTChoiceType> assertions=responseType.getAssertions();
+  if (assertions.isEmpty()) {
+    throw new ProcessingException("No assertion from response.");
+  }
+  ResponseType.RTChoiceType rtChoiceType=assertions.get(0);
+  EncryptedAssertionType encryptedAssertion=rtChoiceType.getEncryptedAssertion();
+  if (encryptedAssertion != null) {
+    if (privateKey == null) {
+      throw new ProcessingException("Encryptd assertion and decrypt private key is null");
+    }
+    decryptAssertion(responseType,privateKey);
+  }
+  return responseType.getAssertions().get(0).getAssertion();
+}

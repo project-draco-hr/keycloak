@@ -1,7 +1,7 @@
 {
   KeycloakSecurityContext ksc=(KeycloakSecurityContext)request.getAttribute(KeycloakSecurityContext.class.getName());
   if (ksc != null) {
-    CatalinaHttpFacade facade=new CatalinaHttpFacade(request,null);
+    CatalinaHttpFacade facade=new OIDCCatalinaHttpFacade(request,null);
     KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
     if (ksc instanceof RefreshableKeycloakSecurityContext) {
       ((RefreshableKeycloakSecurityContext)ksc).logout(deployment);

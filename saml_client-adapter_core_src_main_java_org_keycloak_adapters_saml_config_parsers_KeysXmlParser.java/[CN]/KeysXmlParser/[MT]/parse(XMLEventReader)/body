@@ -1,0 +1,27 @@
+{
+  StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
+  StaxParserUtil.validate(startElement,ConfigXmlConstants.KEYS_ELEMENT);
+  List<Key> keys=new LinkedList<>();
+  while (xmlEventReader.hasNext()) {
+    XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
+    if (xmlEvent == null)     break;
+    if (xmlEvent instanceof EndElement) {
+      EndElement endElement=(EndElement)StaxParserUtil.getNextEvent(xmlEventReader);
+      String endElementName=StaxParserUtil.getEndElementName(endElement);
+      if (endElementName.equals(ConfigXmlConstants.KEYS_ELEMENT))       break;
+ else       throw logger.parserUnknownEndElement(endElementName);
+    }
+    startElement=StaxParserUtil.peekNextStartElement(xmlEventReader);
+    if (startElement == null)     break;
+    String tag=StaxParserUtil.getStartElementName(startElement);
+    if (tag.equals(ConfigXmlConstants.KEY_ELEMENT)) {
+      KeyXmlParser parser=new KeyXmlParser();
+      Key key=(Key)parser.parse(xmlEventReader);
+      keys.add(key);
+    }
+ else {
+      StaxParserUtil.bypassElementBlock(xmlEventReader,tag);
+    }
+  }
+  return keys;
+}

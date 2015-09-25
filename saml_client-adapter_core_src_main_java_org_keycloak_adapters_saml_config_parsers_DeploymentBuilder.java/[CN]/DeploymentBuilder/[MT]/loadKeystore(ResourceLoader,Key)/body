@@ -1,0 +1,36 @@
+{
+  String type=key.getKeystore().getType();
+  if (type == null)   type="JKS";
+  KeyStore keyStore=null;
+  try {
+    keyStore=KeyStore.getInstance(type);
+  }
+ catch (  KeyStoreException e) {
+    throw new RuntimeException(e);
+  }
+  InputStream is=null;
+  if (key.getKeystore().getFile() != null) {
+    File fp=new File(key.getKeystore().getFile());
+    if (!fp.exists()) {
+    }
+    try {
+      is=new FileInputStream(fp);
+    }
+ catch (    FileNotFoundException e) {
+      throw new RuntimeException("KeyStore " + key.getKeystore().getFile() + " does not exist");
+    }
+  }
+ else {
+    is=resourceLoader.getResourceAsStream(key.getKeystore().getResource());
+    if (is == null) {
+      throw new RuntimeException("KeyStore " + key.getKeystore().getResource() + " does not exist");
+    }
+  }
+  try {
+    keyStore.load(is,key.getKeystore().getPassword().toCharArray());
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  return keyStore;
+}

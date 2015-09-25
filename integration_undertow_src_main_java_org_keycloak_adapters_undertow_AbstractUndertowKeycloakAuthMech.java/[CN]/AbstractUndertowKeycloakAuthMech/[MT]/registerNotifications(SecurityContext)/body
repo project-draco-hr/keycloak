@@ -3,9 +3,9 @@
     @Override public void handleNotification(    SecurityNotification notification){
       if (notification.getEventType() != SecurityNotification.EventType.LOGGED_OUT)       return;
       HttpServerExchange exchange=notification.getExchange();
-      UndertowHttpFacade facade=new UndertowHttpFacade(exchange);
+      UndertowHttpFacade facade=new OIDCUndertowHttpFacade(exchange);
       KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
-      KeycloakSecurityContext ksc=exchange.getAttachment(UndertowHttpFacade.KEYCLOAK_SECURITY_CONTEXT_KEY);
+      KeycloakSecurityContext ksc=exchange.getAttachment(OIDCUndertowHttpFacade.KEYCLOAK_SECURITY_CONTEXT_KEY);
       if (ksc != null && ksc instanceof RefreshableKeycloakSecurityContext) {
         ((RefreshableKeycloakSecurityContext)ksc).logout(deployment);
       }

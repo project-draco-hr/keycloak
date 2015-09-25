@@ -1,0 +1,17 @@
+{
+  if (samlBinding == SamlDeployment.Binding.POST) {
+    String html=asRequest ? binding.postBinding(document).getHtmlRequest(actionUrl) : binding.postBinding(document).getHtmlResponse(actionUrl);
+    httpFacade.getResponse().setStatus(200);
+    httpFacade.getResponse().setHeader("Content-Type","text/html");
+    httpFacade.getResponse().setHeader("Pragma","no-cache");
+    httpFacade.getResponse().setHeader("Cache-Control","no-cache, no-store");
+    httpFacade.getResponse().getOutputStream().write(html.getBytes());
+    httpFacade.getResponse().end();
+  }
+ else {
+    String uri=asRequest ? binding.redirectBinding(document).requestURI(actionUrl).toString() : binding.redirectBinding(document).responseURI(actionUrl).toString();
+    httpFacade.getResponse().setStatus(302);
+    httpFacade.getResponse().setHeader("Location",uri);
+    httpFacade.getResponse().end();
+  }
+}

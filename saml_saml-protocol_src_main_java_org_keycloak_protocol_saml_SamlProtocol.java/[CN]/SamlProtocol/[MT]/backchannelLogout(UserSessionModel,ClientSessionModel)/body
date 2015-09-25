@@ -8,7 +8,8 @@
   SAML2LogoutRequestBuilder logoutBuilder=createLogoutRequest(logoutUrl,clientSession,client);
   String logoutRequestString=null;
   try {
-    logoutRequestString=logoutBuilder.postBinding().encoded();
+    JaxrsSAML2BindingBuilder binding=createBindingBuilder(client);
+    logoutRequestString=binding.postBinding(logoutBuilder.buildDocument()).encoded();
   }
  catch (  Exception e) {
     logger.warn("failed to send saml logout",e);

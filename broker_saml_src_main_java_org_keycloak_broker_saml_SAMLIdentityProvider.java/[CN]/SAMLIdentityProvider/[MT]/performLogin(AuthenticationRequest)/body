@@ -13,7 +13,8 @@
     if (getConfig().isPostBindingResponse()) {
       protocolBinding=JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get();
     }
-    SAML2AuthnRequestBuilder authnRequestBuilder=new SAML2AuthnRequestBuilder().assertionConsumerUrl(assertionConsumerServiceUrl).destination(destinationUrl).issuer(issuerURL).forceAuthn(getConfig().isForceAuthn()).protocolBinding(protocolBinding).nameIdPolicy(SAML2NameIDPolicyBuilder.format(nameIDPolicyFormat)).relayState(request.getState());
+    SAML2AuthnRequestBuilder authnRequestBuilder=new SAML2AuthnRequestBuilder().assertionConsumerUrl(assertionConsumerServiceUrl).destination(destinationUrl).issuer(issuerURL).forceAuthn(getConfig().isForceAuthn()).protocolBinding(protocolBinding).nameIdPolicy(SAML2NameIDPolicyBuilder.format(nameIDPolicyFormat));
+    JaxrsSAML2BindingBuilder binding=new JaxrsSAML2BindingBuilder().relayState(request.getState());
     if (getConfig().isWantAuthnRequestsSigned()) {
       PrivateKey privateKey=realm.getPrivateKey();
       PublicKey publicKey=realm.getPublicKey();
@@ -24,15 +25,15 @@
         throw new IdentityBrokerException("Identity Provider [" + getConfig().getAlias() + "] wants a signed authentication request. But the Realm ["+ realm.getName()+ "] does not have a public key.");
       }
       KeyPair keypair=new KeyPair(publicKey,privateKey);
-      authnRequestBuilder.signWith(keypair);
-      authnRequestBuilder.signatureAlgorithm(getSignatureAlgorithm());
-      authnRequestBuilder.signDocument();
+      binding.signWith(keypair);
+      binding.signatureAlgorithm(getSignatureAlgorithm());
+      binding.signDocument();
     }
     if (getConfig().isPostBindingAuthnRequest()) {
-      return authnRequestBuilder.postBinding().request();
+      return binding.postBinding(authnRequestBuilder.toDocument()).request(destinationUrl);
     }
  else {
-      return authnRequestBuilder.redirectBinding().request();
+      return binding.redirectBinding(authnRequestBuilder.toDocument()).request(destinationUrl);
     }
   }
  catch (  Exception e) {

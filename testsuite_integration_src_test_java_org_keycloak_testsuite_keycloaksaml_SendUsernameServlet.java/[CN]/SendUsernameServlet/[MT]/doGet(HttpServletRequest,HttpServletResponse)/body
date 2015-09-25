@@ -1,0 +1,23 @@
+{
+  System.out.println("In SendUsername Servlet doGet()");
+  if (checkRoles != null) {
+    for (    String role : checkRoles) {
+      System.out.println("check role: " + role);
+      Assert.assertTrue(req.isUserInRole(role));
+    }
+  }
+  resp.setContentType("text/plain");
+  OutputStream stream=resp.getOutputStream();
+  Principal principal=req.getUserPrincipal();
+  stream.write("request-path: ".getBytes());
+  stream.write(req.getPathInfo().getBytes());
+  stream.write("\n".getBytes());
+  stream.write("principal=".getBytes());
+  if (principal == null) {
+    stream.write("null".getBytes());
+    return;
+  }
+  String name=principal.getName();
+  stream.write(name.getBytes());
+  sentPrincipal=principal;
+}

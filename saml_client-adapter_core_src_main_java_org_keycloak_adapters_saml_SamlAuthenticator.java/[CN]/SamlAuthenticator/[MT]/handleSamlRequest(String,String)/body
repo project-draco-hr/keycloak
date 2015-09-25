@@ -16,16 +16,23 @@
   RequestAbstractType requestAbstractType=(RequestAbstractType)holder.getSamlObject();
   if (!requestUri.equals(requestAbstractType.getDestination().toString())) {
     log.error("expected destination '" + requestUri + "' got '"+ requestAbstractType.getDestination()+ "'");
-    throw new RuntimeException("destination not equal to request.");
+    return AuthOutcome.FAILED;
   }
   if (requestAbstractType instanceof LogoutRequestType) {
     if (deployment.getIDP().getSingleLogoutService().validateRequestSignature()) {
-      validateSamlSignature(holder,postBinding,GeneralConstants.SAML_REQUEST_KEY);
+      try {
+        validateSamlSignature(holder,postBinding,GeneralConstants.SAML_REQUEST_KEY);
+      }
+ catch (      VerificationException e) {
+        log.error("Failed to verify saml request signature",e);
+        return AuthOutcome.FAILED;
+      }
     }
     LogoutRequestType logout=(LogoutRequestType)requestAbstractType;
     return logoutRequest(logout,relayState);
   }
  else {
-    throw new RuntimeException("unknown SAML request type");
+    log.error("unknown SAML request type");
+    return AuthOutcome.FAILED;
   }
 }

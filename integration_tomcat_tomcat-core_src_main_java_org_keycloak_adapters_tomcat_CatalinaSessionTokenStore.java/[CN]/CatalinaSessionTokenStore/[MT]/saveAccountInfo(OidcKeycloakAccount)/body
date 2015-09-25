@@ -1,0 +1,13 @@
+{
+  RefreshableKeycloakSecurityContext securityContext=(RefreshableKeycloakSecurityContext)account.getKeycloakSecurityContext();
+  Set<String> roles=account.getRoles();
+  GenericPrincipal principal=principalFactory.createPrincipal(request.getContext().getRealm(),account.getPrincipal(),roles);
+  SerializableKeycloakAccount sAccount=new SerializableKeycloakAccount(roles,account.getPrincipal(),securityContext);
+  Session session=request.getSessionInternal(true);
+  session.setPrincipal(principal);
+  session.setAuthType("KEYCLOAK");
+  session.getSession().setAttribute(SerializableKeycloakAccount.class.getName(),sAccount);
+  String username=securityContext.getToken().getSubject();
+  log.fine("userSessionManagement.login: " + username);
+  this.sessionManagement.login(session);
+}

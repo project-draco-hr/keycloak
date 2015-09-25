@@ -1,0 +1,22 @@
+{
+  URL dir=TomcatSamlTest.class.getResource("/keycloak-saml/testsaml.json");
+  String baseDir=new File(dir.getFile()).getParentFile().toString();
+  System.out.println("Tomcat basedir: " + baseDir);
+  tomcat=new TomcatServer(8082,baseDir);
+  System.setProperty("app.server.base.url","http://localhost:8082");
+  System.setProperty("my.host.name","localhost");
+  tomcat.deploySaml("/sales-post","simple-post");
+  tomcat.deploySaml("/sales-post-sig","signed-post");
+  tomcat.deploySaml("/sales-post-sig-email","signed-post-email");
+  tomcat.deploySaml("/sales-post-sig-transient","signed-post-transient");
+  tomcat.deploySaml("/sales-post-sig-persistent","signed-post-persistent");
+  tomcat.deploySaml("/sales-metadata","signed-metadata");
+  tomcat.deploySaml("/employee-sig","signed-get");
+  tomcat.deploySaml("/employee2","mappers");
+  tomcat.deploySaml("/employee-sig-front","signed-front-get");
+  tomcat.deploySaml("/bad-client-sales-post-sig","bad-client-signed-post");
+  tomcat.deploySaml("/bad-realm-sales-post-sig","bad-realm-signed-post");
+  tomcat.deploySaml("/sales-post-enc","encrypted-post");
+  SamlAdapterTestStrategy.uploadSP("http://localhost:8081/auth",keycloakRule);
+  tomcat.start();
+}

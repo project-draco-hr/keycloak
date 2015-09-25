@@ -1,0 +1,13 @@
+{
+  if (contextPath == null) {
+    throw new IllegalArgumentException("Context path or appbase should not be null");
+  }
+  if (!contextPath.startsWith("/")) {
+    contextPath="/" + contextPath;
+  }
+  StandardContext rootContext=(StandardContext)server.createContext(contextPath,appDir);
+  SamlAuthenticatorValve valve=new SamlAuthenticatorValve();
+  rootContext.addValve(valve);
+  rootContext.setDefaultWebXml("web.xml");
+  host.addChild(rootContext);
+}

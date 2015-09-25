@@ -9,17 +9,9 @@
   try {
     SamlUtil.sendSaml(true,facade,deployment.getIDP().getSingleLogoutService().getRequestBindingUrl(),binding,logoutBuilder.buildDocument(),deployment.getIDP().getSingleLogoutService().getRequestBinding());
   }
- catch (  ProcessingException e) {
-    throw new RuntimeException(e);
-  }
-catch (  ConfigurationException e) {
-    throw new RuntimeException(e);
-  }
-catch (  IOException e) {
-    throw new RuntimeException(e);
-  }
-catch (  ParsingException e) {
-    throw new RuntimeException(e);
+ catch (  Exception e) {
+    log.error("Could not send global logout SAML request",e);
+    return AuthOutcome.FAILED;
   }
   return AuthOutcome.NOT_ATTEMPTED;
 }

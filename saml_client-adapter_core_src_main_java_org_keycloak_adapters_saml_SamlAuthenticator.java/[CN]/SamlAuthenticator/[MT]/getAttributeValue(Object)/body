@@ -1,5 +1,5 @@
 {
-  String value;
+  String value=null;
   if (attrValue instanceof String) {
     value=(String)attrValue;
   }
@@ -11,6 +11,8 @@
     NameIDType nameIdType=(NameIDType)attrValue;
     value=nameIdType.getValue();
   }
- else   throw new RuntimeException("Unknown attribute value type: " + attrValue.getClass().getName());
+ else {
+    log.warn("Unable to extract unknown SAML assertion attribute value type: " + attrValue.getClass().getName());
+  }
   return value;
 }

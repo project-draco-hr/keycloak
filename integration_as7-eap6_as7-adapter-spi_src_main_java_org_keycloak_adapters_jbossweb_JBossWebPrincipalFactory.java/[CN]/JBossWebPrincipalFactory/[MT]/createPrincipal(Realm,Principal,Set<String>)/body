@@ -1,0 +1,44 @@
+{
+  KeycloakAccount account=new KeycloakAccount(){
+    @Override public Principal getPrincipal(){
+      return identity;
+    }
+    @Override public Set<String> getRoles(){
+      return roleSet;
+    }
+  }
+;
+  Subject subject=new Subject();
+  Set<Principal> principals=subject.getPrincipals();
+  principals.add(identity);
+  Group[] roleSets=getRoleSets(roleSet);
+  for (int g=0; g < roleSets.length; g++) {
+    Group group=roleSets[g];
+    String name=group.getName();
+    Group subjectGroup=createGroup(name,principals);
+    if (subjectGroup instanceof NestableGroup) {
+      SimpleGroup tmp=new SimpleGroup("Roles");
+      subjectGroup.addMember(tmp);
+      subjectGroup=tmp;
+    }
+    Enumeration<? extends Principal> members=group.members();
+    while (members.hasMoreElements()) {
+      Principal role=(Principal)members.nextElement();
+      subjectGroup.addMember(role);
+    }
+  }
+  Group callerGroup=new SimpleGroup(SecurityConstants.CALLER_PRINCIPAL_GROUP);
+  callerGroup.addMember(identity);
+  principals.add(callerGroup);
+  SecurityContext sc=SecurityContextAssociation.getSecurityContext();
+  Principal userPrincipal=getPrincipal(subject);
+  sc.getUtil().createSubjectInfo(userPrincipal,account,subject);
+  List<String> rolesAsStringList=new ArrayList<String>();
+  rolesAsStringList.addAll(roleSet);
+  try {
+    return (GenericPrincipal)jbossWebPrincipalConstructor.newInstance(realm,userPrincipal.getName(),null,rolesAsStringList,userPrincipal,null,account,null,subject);
+  }
+ catch (  Throwable t) {
+    throw new RuntimeException("Failed to create JBossGenericPrincipal",t);
+  }
+}

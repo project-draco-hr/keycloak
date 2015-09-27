@@ -1,0 +1,7 @@
+{
+  Cookie localeCookie=request.getHttpHeaders().getCookies().get(LocaleHelper.LOCALE_COOKIE);
+  if (localeCookie == null)   return;
+  UserModel user=userSession.getUser();
+  Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,request.getHttpHeaders());
+  user.setSingleAttribute(UserModel.LOCALE,locale.toLanguageTag());
+}

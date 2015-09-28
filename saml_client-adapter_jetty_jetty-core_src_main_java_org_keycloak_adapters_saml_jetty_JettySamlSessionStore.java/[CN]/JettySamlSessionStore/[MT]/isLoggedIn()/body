@@ -1,0 +1,15 @@
+{
+  HttpSession session=request.getSession(false);
+  if (session == null)   return false;
+  if (session == null) {
+    log.debug("session was null, returning null");
+    return false;
+  }
+  SamlSession samlSession=(SamlSession)session.getAttribute(SamlSession.class.getName());
+  if (samlSession == null) {
+    log.debug("SamlSession was not in session, returning null");
+    return false;
+  }
+  restoreRequest();
+  return true;
+}

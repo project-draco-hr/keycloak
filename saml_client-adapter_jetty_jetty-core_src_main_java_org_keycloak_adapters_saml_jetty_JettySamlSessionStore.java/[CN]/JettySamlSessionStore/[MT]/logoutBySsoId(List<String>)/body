@@ -1,0 +1,12 @@
+{
+  if (ssoIds == null)   return;
+  List<String> sessionIds=new LinkedList<String>();
+  for (  String id : ssoIds) {
+    String sessionId=idMapper.getSessionFromSSO(id);
+    if (sessionId != null) {
+      sessionIds.add(sessionId);
+      idMapper.removeSession(sessionId);
+    }
+  }
+  logoutSessionIds(sessionIds);
+}

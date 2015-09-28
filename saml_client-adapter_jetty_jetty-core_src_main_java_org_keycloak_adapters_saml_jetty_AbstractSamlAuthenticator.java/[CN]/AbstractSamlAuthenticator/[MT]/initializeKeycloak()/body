@@ -1,0 +1,47 @@
+{
+  ServletContext theServletContext=null;
+  ContextHandler.Context currentContext=ContextHandler.getCurrentContext();
+  if (currentContext != null) {
+    String contextPath=currentContext.getContextPath();
+    if ("".equals(contextPath)) {
+      theServletContext=currentContext;
+    }
+ else {
+      theServletContext=currentContext.getContext(contextPath);
+    }
+  }
+  if (configResolver == null && theServletContext != null) {
+    String configResolverClass=theServletContext.getInitParameter("keycloak.config.resolver");
+    if (configResolverClass != null) {
+      try {
+        configResolver=(SamlConfigResolver)ContextHandler.getCurrentContext().getClassLoader().loadClass(configResolverClass).newInstance();
+        log.infov("Using {0} to resolve Keycloak configuration on a per-request basis.",configResolverClass);
+      }
+ catch (      Exception ex) {
+        log.infov("The specified resolver {0} could NOT be loaded. Keycloak is unconfigured and will deny all requests. Reason: {1}",new Object[]{configResolverClass,ex.getMessage()});
+      }
+    }
+  }
+  if (configResolver != null) {
+  }
+ else   if (theServletContext != null) {
+    InputStream configInputStream=getConfigInputStream(theServletContext);
+    if (configInputStream != null) {
+      final ServletContext servletContext=theServletContext;
+      SamlDeployment deployment=null;
+      try {
+        deployment=new DeploymentBuilder().build(configInputStream,new ResourceLoader(){
+          @Override public InputStream getResourceAsStream(          String resource){
+            return servletContext.getResourceAsStream(resource);
+          }
+        }
+);
+      }
+ catch (      ParsingException e) {
+        throw new RuntimeException(e);
+      }
+      deploymentContext=new SamlDeploymentContext(deployment);
+    }
+  }
+  if (theServletContext != null)   theServletContext.setAttribute(SamlDeploymentContext.class.getName(),deploymentContext);
+}

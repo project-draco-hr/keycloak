@@ -1,0 +1,73 @@
+{
+  Object metadata;
+  try {
+    metadata=new SAMLParser().parse(is);
+  }
+ catch (  ParsingException e) {
+    throw new RuntimeException(e);
+  }
+  EntitiesDescriptorType entities;
+  if (EntitiesDescriptorType.class.isInstance(metadata)) {
+    entities=(EntitiesDescriptorType)metadata;
+  }
+ else {
+    entities=new EntitiesDescriptorType();
+    entities.addEntityDescriptor(metadata);
+  }
+  if (entities.getEntityDescriptor().size() != 1) {
+    throw new RuntimeException("Expected one entity descriptor");
+  }
+  EntityDescriptorType entity=(EntityDescriptorType)entities.getEntityDescriptor().get(0);
+  String entityId=entity.getEntityID();
+  ClientRepresentation app=new ClientRepresentation();
+  app.setClientId(entityId);
+  Map<String,String> attributes=new HashMap<>();
+  app.setAttributes(attributes);
+  List<String> redirectUris=new LinkedList<>();
+  app.setRedirectUris(redirectUris);
+  app.setFullScopeAllowed(true);
+  app.setProtocol(SamlProtocol.LOGIN_PROTOCOL);
+  attributes.put(SamlProtocol.SAML_SERVER_SIGNATURE,SamlProtocol.ATTRIBUTE_TRUE_VALUE);
+  attributes.put(SamlProtocol.SAML_SIGNATURE_ALGORITHM,SignatureAlgorithm.RSA_SHA256.toString());
+  attributes.put(SamlProtocol.SAML_AUTHNSTATEMENT,SamlProtocol.ATTRIBUTE_TRUE_VALUE);
+  SPSSODescriptorType spDescriptorType=CoreConfigUtil.getSPDescriptor(entity);
+  if (spDescriptorType.isWantAssertionsSigned()) {
+    attributes.put(SamlProtocol.SAML_ASSERTION_SIGNATURE,SamlProtocol.ATTRIBUTE_TRUE_VALUE);
+  }
+  String logoutPost=getLogoutLocation(spDescriptorType,JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get());
+  if (logoutPost != null)   attributes.put(SamlProtocol.SAML_SINGLE_LOGOUT_SERVICE_URL_POST_ATTRIBUTE,logoutPost);
+  String logoutRedirect=getLogoutLocation(spDescriptorType,JBossSAMLURIConstants.SAML_HTTP_REDIRECT_BINDING.get());
+  if (logoutPost != null)   attributes.put(SamlProtocol.SAML_SINGLE_LOGOUT_SERVICE_URL_REDIRECT_ATTRIBUTE,logoutRedirect);
+  String assertionConsumerServicePostBinding=CoreConfigUtil.getServiceURL(spDescriptorType,JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get());
+  if (assertionConsumerServicePostBinding != null) {
+    attributes.put(SamlProtocol.SAML_ASSERTION_CONSUMER_URL_POST_ATTRIBUTE,assertionConsumerServicePostBinding);
+    redirectUris.add(assertionConsumerServicePostBinding);
+  }
+  String assertionConsumerServiceRedirectBinding=CoreConfigUtil.getServiceURL(spDescriptorType,JBossSAMLURIConstants.SAML_HTTP_REDIRECT_BINDING.get());
+  if (assertionConsumerServiceRedirectBinding != null) {
+    attributes.put(SamlProtocol.SAML_ASSERTION_CONSUMER_URL_REDIRECT_ATTRIBUTE,assertionConsumerServiceRedirectBinding);
+    redirectUris.add(assertionConsumerServiceRedirectBinding);
+  }
+  for (  KeyDescriptorType keyDescriptor : spDescriptorType.getKeyDescriptor()) {
+    X509Certificate cert=null;
+    try {
+      cert=SAMLMetadataUtil.getCertificate(keyDescriptor);
+    }
+ catch (    ConfigurationException e) {
+      throw new RuntimeException(e);
+    }
+catch (    ProcessingException e) {
+      throw new RuntimeException(e);
+    }
+    String certPem=KeycloakModelUtils.getPemFromCertificate(cert);
+    if (keyDescriptor.getUse() == KeyTypes.SIGNING) {
+      attributes.put(SamlProtocol.SAML_CLIENT_SIGNATURE_ATTRIBUTE,SamlProtocol.ATTRIBUTE_TRUE_VALUE);
+      attributes.put(SamlProtocol.SAML_SIGNING_CERTIFICATE_ATTRIBUTE,certPem);
+    }
+ else     if (keyDescriptor.getUse() == KeyTypes.ENCRYPTION) {
+      attributes.put(SamlProtocol.SAML_ENCRYPT,SamlProtocol.ATTRIBUTE_TRUE_VALUE);
+      attributes.put(SamlProtocol.SAML_ENCRYPTION_CERTIFICATE_ATTRIBUTE,certPem);
+    }
+  }
+  return app;
+}

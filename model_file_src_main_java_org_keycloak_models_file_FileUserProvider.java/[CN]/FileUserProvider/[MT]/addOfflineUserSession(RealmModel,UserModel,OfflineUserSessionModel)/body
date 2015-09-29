@@ -1,0 +1,15 @@
+{
+  userModel=getUserById(userModel.getId(),realm);
+  UserEntity userEntity=((UserAdapter)userModel).getUserEntity();
+  if (userEntity.getOfflineUserSessions() == null) {
+    userEntity.setOfflineUserSessions(new ArrayList<OfflineUserSessionEntity>());
+  }
+  if (getUserSessionEntityById(userEntity,userSession.getUserSessionId()) != null) {
+    throw new ModelDuplicateException("User session already exists with id " + userSession.getUserSessionId() + " for user "+ userEntity.getUsername());
+  }
+  OfflineUserSessionEntity entity=new OfflineUserSessionEntity();
+  entity.setUserSessionId(userSession.getUserSessionId());
+  entity.setData(userSession.getData());
+  entity.setOfflineClientSessions(new ArrayList<OfflineClientSessionEntity>());
+  userEntity.getOfflineUserSessions().add(entity);
+}

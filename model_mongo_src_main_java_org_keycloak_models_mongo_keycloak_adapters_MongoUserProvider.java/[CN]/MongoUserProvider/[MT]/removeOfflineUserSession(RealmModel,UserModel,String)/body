@@ -1,0 +1,12 @@
+{
+  MongoUserEntity user=getUserById(userModel.getId(),realm).getUser();
+  OfflineUserSessionEntity entity=getUserSessionEntityById(user,userSessionId);
+  if (entity != null) {
+    user.getOfflineUserSessions().remove(entity);
+    getMongoStore().updateEntity(user,invocationContext);
+    return true;
+  }
+ else {
+    return false;
+  }
+}

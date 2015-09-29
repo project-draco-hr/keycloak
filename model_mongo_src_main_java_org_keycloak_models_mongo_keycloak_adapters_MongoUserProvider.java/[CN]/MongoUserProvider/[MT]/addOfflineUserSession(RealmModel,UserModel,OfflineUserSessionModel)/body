@@ -1,0 +1,15 @@
+{
+  MongoUserEntity user=getUserById(userModel.getId(),realm).getUser();
+  if (user.getOfflineUserSessions() == null) {
+    user.setOfflineUserSessions(new ArrayList<OfflineUserSessionEntity>());
+  }
+  if (getUserSessionEntityById(user,userSession.getUserSessionId()) != null) {
+    throw new ModelDuplicateException("User session already exists with id " + userSession.getUserSessionId() + " for user "+ user.getUsername());
+  }
+  OfflineUserSessionEntity entity=new OfflineUserSessionEntity();
+  entity.setUserSessionId(userSession.getUserSessionId());
+  entity.setData(userSession.getData());
+  entity.setOfflineClientSessions(new ArrayList<OfflineClientSessionEntity>());
+  user.getOfflineUserSessions().add(entity);
+  getMongoStore().updateEntity(user,invocationContext);
+}

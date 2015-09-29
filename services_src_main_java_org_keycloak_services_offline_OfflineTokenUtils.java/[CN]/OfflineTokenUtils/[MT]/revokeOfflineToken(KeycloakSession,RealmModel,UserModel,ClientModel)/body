@@ -1,0 +1,15 @@
+{
+  Collection<OfflineClientSessionModel> clientSessions=kcSession.users().getOfflineClientSessions(realm,user);
+  boolean anyRemoved=false;
+  for (  OfflineClientSessionModel clientSession : clientSessions) {
+    if (clientSession.getClientId().equals(client.getId())) {
+      if (logger.isTraceEnabled()) {
+        logger.tracef("Removing existing offline token for user '%s' and client '%s' . ClientSessionID was '%s' .",user.getUsername(),client.getClientId(),clientSession.getClientSessionId());
+      }
+      kcSession.users().removeOfflineClientSession(realm,user,clientSession.getClientSessionId());
+      checkUserSessionHasClientSessions(kcSession,realm,user,clientSession.getUserSessionId());
+      anyRemoved=true;
+    }
+  }
+  return anyRemoved;
+}

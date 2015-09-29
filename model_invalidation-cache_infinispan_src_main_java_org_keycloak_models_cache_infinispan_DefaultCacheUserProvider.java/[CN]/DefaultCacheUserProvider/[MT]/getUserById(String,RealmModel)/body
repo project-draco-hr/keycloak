@@ -1,9 +1,6 @@
 {
   if (!cache.isEnabled())   return getDelegate().getUserById(id,realm);
-  if (realmInvalidations.contains(realm.getId())) {
-    return getDelegate().getUserById(id,realm);
-  }
-  if (userInvalidations.containsKey(id)) {
+  if (isRegisteredForInvalidation(realm,id)) {
     return getDelegate().getUserById(id,realm);
   }
   CachedUser cached=cache.getCachedUser(realm.getId(),id);
@@ -12,7 +9,7 @@
     if (model == null)     return null;
     if (managedUsers.containsKey(id))     return managedUsers.get(id);
     if (userInvalidations.containsKey(id))     return model;
-    cached=new CachedUser(realm,model);
+    cached=new CachedUser(this,realm,model);
     cache.addCachedUser(realm.getId(),cached);
   }
  else   if (managedUsers.containsKey(id)) {

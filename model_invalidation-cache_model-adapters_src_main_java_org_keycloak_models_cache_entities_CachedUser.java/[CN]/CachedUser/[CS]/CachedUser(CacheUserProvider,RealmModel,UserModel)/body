@@ -1,0 +1,26 @@
+{
+  this.id=user.getId();
+  this.realm=realm.getId();
+  this.username=user.getUsername();
+  this.createdTimestamp=user.getCreatedTimestamp();
+  this.firstName=user.getFirstName();
+  this.lastName=user.getLastName();
+  this.attributes.putAll(user.getAttributes());
+  this.email=user.getEmail();
+  this.emailVerified=user.isEmailVerified();
+  this.credentials.addAll(user.getCredentialsDirectly());
+  this.enabled=user.isEnabled();
+  this.totp=user.isOtpEnabled();
+  this.federationLink=user.getFederationLink();
+  this.serviceAccountClientLink=user.getServiceAccountClientLink();
+  this.requiredActions.addAll(user.getRequiredActions());
+  for (  RoleModel role : user.getRoleMappings()) {
+    roleMappings.add(role.getId());
+  }
+  for (  OfflineUserSessionModel offlineSession : cacheUserProvider.getDelegate().getOfflineUserSessions(realm,user)) {
+    offlineUserSessions.put(offlineSession.getUserSessionId(),offlineSession);
+  }
+  for (  OfflineClientSessionModel offlineSession : cacheUserProvider.getDelegate().getOfflineClientSessions(realm,user)) {
+    offlineClientSessions.put(offlineSession.getClientSessionId(),offlineSession);
+  }
+}

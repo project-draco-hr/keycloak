@@ -4,11 +4,23 @@
   if (user == null) {
     throw new NotFoundException("User not found");
   }
-  List<UserConsentModel> consents=user.getConsents();
-  List<UserConsentRepresentation> result=new ArrayList<UserConsentRepresentation>();
-  for (  UserConsentModel consent : consents) {
-    UserConsentRepresentation rep=ModelToRepresentation.toRepresentation(consent);
-    result.add(rep);
+  List<Map<String,Object>> result=new LinkedList<>();
+  Set<ClientModel> offlineClients=OfflineTokenUtils.findClientsWithOfflineToken(session,realm,user);
+  for (  ClientModel client : realm.getClients()) {
+    UserConsentModel consent=user.getConsentByClient(client.getId());
+    boolean hasOfflineToken=offlineClients.contains(client);
+    if (consent == null && !hasOfflineToken) {
+      continue;
+    }
+    UserConsentRepresentation rep=(consent == null) ? null : ModelToRepresentation.toRepresentation(consent);
+    Map<String,Object> currentRep=new HashMap<>();
+    currentRep.put("clientId",client.getClientId());
+    currentRep.put("grantedProtocolMappers",(rep == null ? Collections.emptyMap() : rep.getGrantedProtocolMappers()));
+    currentRep.put("grantedRealmRoles",(rep == null ? Collections.emptyList() : rep.getGrantedRealmRoles()));
+    currentRep.put("grantedClientRoles",(rep == null ? Collections.emptyMap() : rep.getGrantedClientRoles()));
+    List<String> additionalGrants=hasOfflineToken ? Arrays.asList("Offline Token") : Collections.<String>emptyList();
+    currentRep.put("additionalGrants",additionalGrants);
+    result.add(currentRep);
   }
   return result;
 }

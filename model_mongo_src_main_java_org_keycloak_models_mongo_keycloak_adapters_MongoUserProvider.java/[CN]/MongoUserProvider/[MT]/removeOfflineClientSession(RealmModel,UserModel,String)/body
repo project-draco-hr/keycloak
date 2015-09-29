@@ -1,0 +1,23 @@
+{
+  MongoUserEntity user=getUserById(userModel.getId(),realm).getUser();
+  boolean updated=false;
+  if (user.getOfflineUserSessions() != null) {
+    for (    OfflineUserSessionEntity userSession : user.getOfflineUserSessions()) {
+      for (      OfflineClientSessionEntity clSession : userSession.getOfflineClientSessions()) {
+        if (clSession.getClientSessionId().equals(clientSessionId)) {
+          userSession.getOfflineClientSessions().remove(clSession);
+          updated=true;
+          break;
+        }
+      }
+      if (updated && userSession.getOfflineClientSessions().isEmpty()) {
+        user.getOfflineUserSessions().remove(userSession);
+      }
+      if (updated) {
+        getMongoStore().updateEntity(user,invocationContext);
+        return true;
+      }
+    }
+  }
+  return false;
+}

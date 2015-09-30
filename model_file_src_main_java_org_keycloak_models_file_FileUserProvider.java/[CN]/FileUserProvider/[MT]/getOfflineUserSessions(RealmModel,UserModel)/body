@@ -1,0 +1,14 @@
+{
+  userModel=getUserById(userModel.getId(),realm);
+  UserEntity user=((UserAdapter)userModel).getUserEntity();
+  if (user.getOfflineUserSessions() == null) {
+    return Collections.emptyList();
+  }
+ else {
+    List<OfflineUserSessionModel> result=new ArrayList<>();
+    for (    OfflineUserSessionEntity entity : user.getOfflineUserSessions()) {
+      result.add(toModel(entity));
+    }
+    return result;
+  }
+}

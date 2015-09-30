@@ -1,0 +1,16 @@
+{
+  TypedQuery<OfflineClientSessionEntity> query=em.createNamedQuery("findOfflineClientSessionsByClient",OfflineClientSessionEntity.class);
+  query.setParameter("clientId",client.getId());
+  if (firstResult != -1) {
+    query.setFirstResult(firstResult);
+  }
+  if (maxResults != -1) {
+    query.setMaxResults(maxResults);
+  }
+  List<OfflineClientSessionEntity> results=query.getResultList();
+  Set<OfflineClientSessionModel> set=new HashSet<>();
+  for (  OfflineClientSessionEntity entity : results) {
+    set.add(toModel(entity));
+  }
+  return set;
+}

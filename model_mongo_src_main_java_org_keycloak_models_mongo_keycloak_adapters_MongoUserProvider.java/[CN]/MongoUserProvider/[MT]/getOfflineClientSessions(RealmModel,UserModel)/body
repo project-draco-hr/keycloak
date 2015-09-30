@@ -1,0 +1,12 @@
+{
+  MongoUserEntity user=getUserById(userModel.getId(),realm).getUser();
+  List<OfflineClientSessionModel> result=new ArrayList<>();
+  if (user.getOfflineUserSessions() != null) {
+    for (    OfflineUserSessionEntity userSession : user.getOfflineUserSessions()) {
+      for (      OfflineClientSessionEntity clSession : userSession.getOfflineClientSessions()) {
+        result.add(toModel(clSession,user.getId(),userSession.getUserSessionId()));
+      }
+    }
+  }
+  return result;
+}

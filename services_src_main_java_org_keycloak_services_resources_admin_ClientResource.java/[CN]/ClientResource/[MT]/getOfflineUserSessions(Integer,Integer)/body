@@ -1,0 +1,20 @@
+{
+  auth.requireView();
+  firstResult=firstResult != null ? firstResult : -1;
+  maxResults=maxResults != null ? maxResults : -1;
+  List<UserSessionRepresentation> sessions=new ArrayList<UserSessionRepresentation>();
+  for (  OfflineClientSessionModel offlineClientSession : session.users().getOfflineClientSessions(client.getRealm(),client,firstResult,maxResults)) {
+    UserModel user=session.users().getUserById(offlineClientSession.getUserId(),client.getRealm());
+    OfflineUserSessionModel offlineUserSession=session.users().getOfflineUserSession(client.getRealm(),user,offlineClientSession.getUserSessionId());
+    OfflineUserSessionAdapter sessionAdapter=new OfflineUserSessionAdapter(offlineUserSession,user);
+    OfflineClientSessionAdapter clientSessionAdapter=new OfflineClientSessionAdapter(offlineClientSession,client.getRealm(),client,sessionAdapter);
+    UserSessionRepresentation rep=new UserSessionRepresentation();
+    rep.setId(sessionAdapter.getId());
+    rep.setStart(Time.toMillis(clientSessionAdapter.getTimestamp()));
+    rep.setUsername(user.getUsername());
+    rep.setUserId(user.getId());
+    rep.setIpAddress(sessionAdapter.getIpAddress());
+    sessions.add(rep);
+  }
+  return sessions;
+}

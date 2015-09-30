@@ -5,12 +5,13 @@
     throw new NotFoundException("User not found");
   }
   ClientModel client=realm.getClientByClientId(clientId);
-  boolean revoked=user.revokeConsentForClient(client.getId());
-  if (revoked) {
+  boolean revokedConsent=user.revokeConsentForClient(client.getId());
+  boolean revokedOfflineToken=OfflineTokenUtils.revokeOfflineToken(session,realm,user,client);
+  if (revokedConsent) {
     AuthenticationManager.backchannelUserFromClient(session,realm,user,client,uriInfo,headers);
   }
- else {
-    throw new NotFoundException("Consent not found");
+  if (!revokedConsent && !revokedOfflineToken) {
+    throw new NotFoundException("Consent nor offline token not found");
   }
   adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).success();
 }

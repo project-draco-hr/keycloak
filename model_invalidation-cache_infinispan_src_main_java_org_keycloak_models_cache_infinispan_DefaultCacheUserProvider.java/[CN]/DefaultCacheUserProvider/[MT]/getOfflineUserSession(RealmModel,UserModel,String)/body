@@ -1,0 +1,12 @@
+{
+  if (isRegisteredForInvalidation(realm,user.getId())) {
+    return getDelegate().getOfflineUserSession(realm,user,userSessionId);
+  }
+  CachedUser cachedUser=cache.getCachedUser(realm.getId(),user.getId());
+  if (cachedUser == null) {
+    return getDelegate().getOfflineUserSession(realm,user,userSessionId);
+  }
+ else {
+    return cachedUser.getOfflineUserSessions().get(userSessionId);
+  }
+}

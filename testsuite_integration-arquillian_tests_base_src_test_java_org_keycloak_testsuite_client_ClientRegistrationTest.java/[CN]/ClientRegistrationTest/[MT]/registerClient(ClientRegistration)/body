@@ -1,0 +1,11 @@
+{
+  ClientRepresentation client=new ClientRepresentation();
+  client.setClientId(CLIENT_ID);
+  client.setSecret(CLIENT_SECRET);
+  ClientRepresentation createdClient=clientRegistration.create(client);
+  assertEquals(CLIENT_ID,createdClient.getClientId());
+  client=adminClient.realm(REALM_NAME).clients().get(createdClient.getId()).toRepresentation();
+  assertEquals(CLIENT_ID,client.getClientId());
+  AccessTokenResponse token2=oauthClient.getToken(REALM_NAME,CLIENT_ID,CLIENT_SECRET,"manage-clients","password");
+  assertNotNull(token2.getToken());
+}

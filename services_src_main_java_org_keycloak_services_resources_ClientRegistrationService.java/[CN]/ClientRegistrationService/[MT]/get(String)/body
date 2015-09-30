@@ -1,8 +1,8 @@
 {
-  AuthorizeClientUtil.ClientAuthResult clientAuth=AuthorizeClientUtil.authorizeClient(session,event,realm);
-  ClientModel client=clientAuth.getClient();
+  event.event(EventType.CLIENT_INFO);
+  ClientModel client=authenticate(false,clientId);
   if (client == null) {
-    throw new NotFoundException("Client not found");
+    return Response.status(Response.Status.NOT_FOUND).build();
   }
-  return ModelToRepresentation.toRepresentation(client);
+  return Response.ok(ModelToRepresentation.toRepresentation(client)).build();
 }

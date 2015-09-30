@@ -1,0 +1,31 @@
+{
+  String accessToken=null;
+  try {
+    KeycloakDeployment deployment=getDeployment(req);
+    AccessTokenResponse response=ServerRequest.invokeRefresh(deployment,refreshToken);
+    accessToken=response.getToken();
+  }
+ catch (  ServerRequest.HttpFailure failure) {
+    return "Failed to refresh token. Status from auth-server request: " + failure.getStatus() + ", Error: "+ failure.getError();
+  }
+  HttpGet get=new HttpGet(UriUtils.getOrigin(req.getRequestURL().toString()) + "/database/customers");
+  get.addHeader("Authorization","Bearer " + accessToken);
+  HttpResponse response=getHttpClient().execute(get);
+  InputStream is=response.getEntity().getContent();
+  try {
+    if (response.getStatusLine().getStatusCode() != 200) {
+      return "Error when loading customer. Status: " + response.getStatusLine().getStatusCode() + ", error: "+ StreamUtil.readString(is);
+    }
+ else {
+      List<String> list=JsonSerialization.readValue(is,TypedList.class);
+      StringBuilder result=new StringBuilder();
+      for (      String customer : list) {
+        result.append(customer + "<br />");
+      }
+      return result.toString();
+    }
+  }
+  finally {
+    is.close();
+  }
+}

@@ -1,0 +1,12 @@
+{
+  UserEntity userEntity=em.getReference(UserEntity.class,offlineClientSession.getUserId());
+  OfflineClientSessionEntity entity=new OfflineClientSessionEntity();
+  entity.setUser(userEntity);
+  entity.setClientSessionId(offlineClientSession.getClientSessionId());
+  entity.setUserSessionId(offlineClientSession.getUserSessionId());
+  entity.setClientId(offlineClientSession.getClientId());
+  entity.setData(offlineClientSession.getData());
+  em.persist(entity);
+  userEntity.getOfflineClientSessions().add(entity);
+  em.flush();
+}

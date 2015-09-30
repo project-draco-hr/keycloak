@@ -1,0 +1,19 @@
+{
+  UserEntity userEntity=em.getReference(UserEntity.class,user.getId());
+  OfflineClientSessionEntity found=null;
+  for (  OfflineClientSessionEntity session : userEntity.getOfflineClientSessions()) {
+    if (session.getClientSessionId().equals(clientSessionId)) {
+      found=session;
+      break;
+    }
+  }
+  if (found == null) {
+    return false;
+  }
+ else {
+    userEntity.getOfflineClientSessions().remove(found);
+    em.remove(found);
+    em.flush();
+    return true;
+  }
+}

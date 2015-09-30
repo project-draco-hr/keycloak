@@ -1,0 +1,20 @@
+{
+  OfflineUserSessionModel model=new OfflineUserSessionModel();
+  model.setUserSessionId(sessionRep.getUserSessionId());
+  model.setData(sessionRep.getData());
+  session.users().addOfflineUserSession(newRealm,user,model);
+  for (  OfflineClientSessionRepresentation csRep : sessionRep.getOfflineClientSessions()) {
+    OfflineClientSessionModel csModel=new OfflineClientSessionModel();
+    String clientId=csRep.getClient();
+    ClientModel client=newRealm.getClientByClientId(clientId);
+    if (client == null) {
+      throw new RuntimeException("Unable to find client " + clientId + " referenced from offlineClientSession of user "+ user.getUsername());
+    }
+    csModel.setClientId(client.getId());
+    csModel.setUserId(user.getId());
+    csModel.setClientSessionId(csRep.getClientSessionId());
+    csModel.setUserSessionId(sessionRep.getUserSessionId());
+    csModel.setData(csRep.getData());
+    session.users().addOfflineClientSession(newRealm,csModel);
+  }
+}

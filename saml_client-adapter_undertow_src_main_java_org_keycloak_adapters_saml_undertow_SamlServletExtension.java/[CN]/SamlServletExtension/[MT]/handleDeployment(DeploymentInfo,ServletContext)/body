@@ -41,7 +41,7 @@
   }
   servletContext.setAttribute(SamlDeploymentContext.class.getName(),deploymentContext);
   UndertowUserSessionManagement userSessionManagement=new UndertowUserSessionManagement();
-  final ServletSamlAuthMech mech=new ServletSamlAuthMech(deploymentContext,userSessionManagement,getErrorPage(deploymentInfo));
+  final ServletSamlAuthMech mech=createAuthMech(deploymentInfo,deploymentContext,userSessionManagement);
   deploymentInfo.addAuthenticationMechanism("KEYCLOAK-SAML",new AuthenticationMechanismFactory(){
     @Override public AuthenticationMechanism create(    String s,    FormParserFactory formParserFactory,    Map<String,String> stringStringMap){
       return mech;

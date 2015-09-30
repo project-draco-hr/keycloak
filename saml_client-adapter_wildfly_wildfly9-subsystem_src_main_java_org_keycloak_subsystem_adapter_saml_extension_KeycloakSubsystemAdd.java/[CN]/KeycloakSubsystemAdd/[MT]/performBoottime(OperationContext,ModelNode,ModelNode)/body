@@ -1,0 +1,9 @@
+{
+  context.addStep(new AbstractDeploymentChainStep(){
+    @Override protected void execute(    DeploymentProcessorTarget processorTarget){
+      processorTarget.addDeploymentProcessor(KeycloakSamlExtension.SUBSYSTEM_NAME,Phase.DEPENDENCIES,0,chooseDependencyProcessor());
+      processorTarget.addDeploymentProcessor(KeycloakSamlExtension.SUBSYSTEM_NAME,Phase.POST_MODULE,Phase.POST_MODULE_VALIDATOR_FACTORY - 1,chooseConfigDeploymentProcessor());
+    }
+  }
+,OperationContext.Stage.RUNTIME);
+}

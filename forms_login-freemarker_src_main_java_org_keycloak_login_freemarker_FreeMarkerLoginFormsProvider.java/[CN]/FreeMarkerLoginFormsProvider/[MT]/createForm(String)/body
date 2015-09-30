@@ -30,7 +30,7 @@
     logger.warn("Failed to load properties",e);
   }
   if (client != null) {
-    attributes.put("client",new ClientBean(client));
+    attributes.put("client",new ClientBean(client,baseUri));
   }
   Properties messagesBundle;
   Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,session.getContext().getRequestHeaders());
@@ -78,7 +78,8 @@
     for (    Map.Entry<String,String> entry : httpResponseHeaders.entrySet()) {
       builder.header(entry.getKey(),entry.getValue());
     }
-    LocaleHelper.updateLocaleCookie(builder,locale,realm,uriInfo,Urls.localeCookiePath(baseUri,realm.getName()));
+    String cookiePath=Urls.localeCookiePath(baseUri,realm.getName());
+    LocaleHelper.updateLocaleCookie(builder,locale,realm,uriInfo,cookiePath);
     return builder.build();
   }
  catch (  FreeMarkerException e) {

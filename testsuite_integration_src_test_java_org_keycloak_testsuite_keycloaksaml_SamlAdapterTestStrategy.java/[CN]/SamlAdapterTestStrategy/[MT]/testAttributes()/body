@@ -10,13 +10,13 @@
     requiredRoles.add("user");
     SendUsernameServlet.checkRoles=requiredRoles;
     loginPage.login("bburke","password");
-    Assert.assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/employee2/");
+    assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/employee2/");
     SendUsernameServlet.checkRoles=null;
     SamlPrincipal principal=(SamlPrincipal)SendUsernameServlet.sentPrincipal;
     Assert.assertNotNull(principal);
-    Assert.assertEquals("bburke@redhat.com",principal.getAttribute(X500SAMLProfileConstants.EMAIL.get()));
-    Assert.assertEquals("bburke@redhat.com",principal.getFriendlyAttribute("email"));
-    Assert.assertEquals("617",principal.getAttribute("phone"));
+    assertEquals("bburke@redhat.com",principal.getAttribute(X500SAMLProfileConstants.EMAIL.get()));
+    assertEquals("bburke@redhat.com",principal.getFriendlyAttribute("email"));
+    assertEquals("617",principal.getAttribute("phone"));
     Assert.assertNull(principal.getFriendlyAttribute("phone"));
     driver.navigate().to(APP_SERVER_BASE_URL + "/employee2/?GLO=true");
     checkLoggedOut(APP_SERVER_BASE_URL + "/employee2/");
@@ -53,10 +53,10 @@
     requiredRoles.add("pee-on");
     SendUsernameServlet.checkRoles=requiredRoles;
     loginPage.login("bburke","password");
-    Assert.assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/employee2/");
+    assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/employee2/");
     SendUsernameServlet.checkRoles=null;
     SamlPrincipal principal=(SamlPrincipal)SendUsernameServlet.sentPrincipal;
     Assert.assertNotNull(principal);
-    Assert.assertEquals("hard",principal.getAttribute("hardcoded-attribute"));
+    assertEquals("hard",principal.getAttribute("hardcoded-attribute"));
   }
 }

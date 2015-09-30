@@ -1,0 +1,12 @@
+{
+  Set<String> resolveValidRedirects=new HashSet<String>();
+  for (  String validRedirect : validRedirects) {
+    resolveValidRedirects.add(validRedirect);
+    if (validRedirect.startsWith("/")) {
+      validRedirect=relativeToAbsoluteURI(uriInfo,rootUrl,validRedirect);
+      logger.debugv("replacing relative valid redirect with: {0}",validRedirect);
+      resolveValidRedirects.add(validRedirect);
+    }
+  }
+  return resolveValidRedirects;
+}

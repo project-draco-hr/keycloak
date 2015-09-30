@@ -1,0 +1,8 @@
+{
+  for (  ProviderFactory<ClientDescriptionConverter> factory : session.getKeycloakSessionFactory().getProviderFactories(ClientDescriptionConverter.class)) {
+    if (((ClientDescriptionConverterFactory)factory).isSupported(description)) {
+      return factory.create(session).convertToInternal(description);
+    }
+  }
+  throw new BadRequestException("Unsupported format");
+}

@@ -1,0 +1,49 @@
+{
+  if (log.isTraceEnabled()) {
+    log.trace("*** authenticate");
+  }
+  Request request=resolveRequest(req);
+  JettyHttpFacade facade=new JettyHttpFacade(request,(HttpServletResponse)res);
+  SamlDeployment deployment=deploymentContext.resolveDeployment(facade);
+  if (deployment == null || !deployment.isConfigured()) {
+    log.debug("*** deployment isn't configured return false");
+    return Authentication.UNAUTHENTICATED;
+  }
+  if (!mandatory)   return new DeferredAuthentication(this);
+  JettySamlSessionStore tokenStore=getTokenStore(request,facade,deployment);
+  SamlAuthenticator authenticator=new SamlAuthenticator(facade,deployment,tokenStore){
+    @Override protected void completeAuthentication(    SamlSession account){
+    }
+  }
+;
+  AuthOutcome outcome=authenticator.authenticate();
+  if (outcome == AuthOutcome.AUTHENTICATED) {
+    if (facade.isEnded()) {
+      return Authentication.SEND_SUCCESS;
+    }
+    SamlSession samlSession=tokenStore.getAccount();
+    Authentication authentication=register(request,samlSession);
+    return authentication;
+  }
+  if (outcome == AuthOutcome.LOGGED_OUT) {
+    logoutCurrent(request);
+    if (deployment.getLogoutPage() != null) {
+      forwardToLogoutPage(request,(HttpServletResponse)res,deployment);
+    }
+    return Authentication.SEND_CONTINUE;
+  }
+  AuthChallenge challenge=authenticator.getChallenge();
+  if (challenge != null) {
+    if (challenge.errorPage() && errorPage != null) {
+      Response response=(Response)res;
+      try {
+        response.sendRedirect(response.encodeRedirectURL(URIUtil.addPaths(request.getContextPath(),errorPage)));
+      }
+ catch (      IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    challenge.challenge(facade);
+  }
+  return Authentication.SEND_CONTINUE;
+}

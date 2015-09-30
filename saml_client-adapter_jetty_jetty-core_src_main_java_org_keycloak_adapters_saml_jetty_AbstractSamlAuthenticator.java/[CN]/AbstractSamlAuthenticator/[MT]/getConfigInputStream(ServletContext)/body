@@ -1,0 +1,18 @@
+{
+  InputStream is=getJSONFromServletContext(servletContext);
+  if (is == null) {
+    String path=servletContext.getInitParameter("keycloak.config.file");
+    if (path == null) {
+      is=servletContext.getResourceAsStream("/WEB-INF/keycloak-saml.xml");
+    }
+ else {
+      try {
+        is=new FileInputStream(path);
+      }
+ catch (      FileNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  return is;
+}

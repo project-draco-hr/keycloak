@@ -1,0 +1,9 @@
+{
+  Authentication authentication=request.getAuthentication();
+  if (!(authentication instanceof KeycloakAuthentication)) {
+    UserIdentity userIdentity=createIdentity(samlSession);
+    authentication=createAuthentication(userIdentity);
+    request.setAuthentication(authentication);
+  }
+  return authentication;
+}

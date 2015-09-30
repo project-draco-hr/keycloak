@@ -1,0 +1,25 @@
+{
+  server=new Server(8082);
+  List<Handler> list=new ArrayList<Handler>();
+  System.setProperty("app.server.base.url","http://localhost:8082");
+  System.setProperty("my.host.name","localhost");
+  URL dir=JettySamlTest.class.getResource("/keycloak-saml/testsaml.json");
+  File base=new File(dir.getFile()).getParentFile();
+  list.add(new WebAppContext(new File(base,"simple-post").toString(),"/sales-post"));
+  list.add(new WebAppContext(new File(base,"signed-post").toString(),"/sales-post-sig"));
+  list.add(new WebAppContext(new File(base,"signed-post-email").toString(),"/sales-post-sig-email"));
+  list.add(new WebAppContext(new File(base,"signed-post-transient").toString(),"/sales-post-sig-transient"));
+  list.add(new WebAppContext(new File(base,"signed-post-persistent").toString(),"/sales-post-sig-persistent"));
+  list.add(new WebAppContext(new File(base,"signed-metadata").toString(),"/sales-metadata"));
+  list.add(new WebAppContext(new File(base,"signed-get").toString(),"/employee-sig"));
+  list.add(new WebAppContext(new File(base,"mappers").toString(),"/employee2"));
+  list.add(new WebAppContext(new File(base,"signed-front-get").toString(),"/employee-sig-front"));
+  list.add(new WebAppContext(new File(base,"bad-client-signed-post").toString(),"/bad-client-sales-post-sig"));
+  list.add(new WebAppContext(new File(base,"bad-realm-signed-post").toString(),"/bad-realm-sales-post-sig"));
+  list.add(new WebAppContext(new File(base,"encrypted-post").toString(),"/sales-post-enc"));
+  SamlAdapterTestStrategy.uploadSP("http://localhost:8081/auth",keycloakRule);
+  HandlerCollection handlers=new HandlerCollection();
+  handlers.setHandlers(list.toArray(new Handler[list.size()]));
+  server.setHandler(handlers);
+  server.start();
+}

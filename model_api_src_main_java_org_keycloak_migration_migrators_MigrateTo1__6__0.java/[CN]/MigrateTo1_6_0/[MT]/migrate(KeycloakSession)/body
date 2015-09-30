@@ -1,14 +1,20 @@
 {
   List<RealmModel> realms=session.realms().getRealms();
   for (  RealmModel realm : realms) {
-    for (    RoleModel realmRole : realm.getRoles()) {
-      realmRole.setScopeParamRequired(false);
-    }
-    for (    ClientModel client : realm.getClients()) {
-      for (      RoleModel clientRole : client.getRoles()) {
-        clientRole.setScopeParamRequired(false);
+    if (realm.getRole(Constants.OFFLINE_ACCESS_ROLE) == null) {
+      for (      RoleModel realmRole : realm.getRoles()) {
+        realmRole.setScopeParamRequired(false);
+      }
+      for (      ClientModel client : realm.getClients()) {
+        for (        RoleModel clientRole : client.getRoles()) {
+          clientRole.setScopeParamRequired(false);
+        }
+      }
+      KeycloakModelUtils.setupOfflineTokens(realm);
+      RoleModel role=realm.getRole(Constants.OFFLINE_ACCESS_ROLE);
+      for (      UserModel user : session.userStorage().getUsers(realm,true)) {
+        user.grantRole(role);
       }
     }
-    KeycloakModelUtils.setupOfflineTokens(realm);
   }
 }

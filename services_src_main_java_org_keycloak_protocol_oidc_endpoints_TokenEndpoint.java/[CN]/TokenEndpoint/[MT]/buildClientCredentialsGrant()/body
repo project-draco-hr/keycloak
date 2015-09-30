@@ -14,7 +14,7 @@
   event.detail(Details.RESPONSE_TYPE,ServiceAccountConstants.CLIENT_AUTH);
   UserModel clientUser=session.users().getUserByServiceAccountClient(client);
   if (clientUser == null || client.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,ServiceAccountConstants.CLIENT_ID_PROTOCOL_MAPPER) == null) {
-    logger.infof("Service account user for client '%s' not found or default protocol mapper for service account not found. Creating now",client.getClientId());
+    logger.debugf("Service account user for client '%s' not found or default protocol mapper for service account not found. Creating now",client.getClientId());
     new ClientManager(new RealmManager(session)).enableServiceAccount(client);
     clientUser=session.users().getUserByServiceAccountClient(client);
   }

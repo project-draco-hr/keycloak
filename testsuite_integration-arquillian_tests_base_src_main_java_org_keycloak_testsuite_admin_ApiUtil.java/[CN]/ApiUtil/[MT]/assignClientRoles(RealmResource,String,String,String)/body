@@ -1,0 +1,23 @@
+{
+  String realmName=realm.toRepresentation().getRealm();
+  String clientId="";
+  for (  ClientRepresentation clientRepresentation : realm.clients().findAll()) {
+    if (clientRepresentation.getClientId().equals(clientName)) {
+      clientId=clientRepresentation.getId();
+    }
+  }
+  if (!clientId.isEmpty()) {
+    ClientResource clientResource=realm.clients().get(clientId);
+    List<RoleRepresentation> roleRepresentations=new ArrayList<>();
+    for (    String roleName : roles) {
+      RoleRepresentation role=clientResource.roles().get(roleName).toRepresentation();
+      roleRepresentations.add(role);
+    }
+    UserResource userResource=realm.users().get(userId);
+    log.debug("assigning roles: " + Arrays.toString(roles) + " to user: \""+ userResource.toRepresentation().getUsername()+ "\" of client: \""+ clientName+ "\" in realm: \""+ realmName+ "\"");
+    userResource.roles().clientLevel(clientId).add(roleRepresentations);
+  }
+ else {
+    log.warn("client with name " + clientName + "doesn't exist in realm "+ realmName);
+  }
+}

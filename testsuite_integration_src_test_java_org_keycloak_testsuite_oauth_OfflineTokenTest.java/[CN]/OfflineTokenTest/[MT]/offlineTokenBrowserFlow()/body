@@ -11,8 +11,8 @@
   AccessToken token=oauth.verifyToken(tokenResponse.getAccessToken());
   String offlineTokenString=tokenResponse.getRefreshToken();
   RefreshToken offlineToken=oauth.verifyRefreshToken(offlineTokenString);
-  events.expectCodeToToken(codeId,sessionId).client("offline-client").detail(Details.REFRESH_TOKEN_TYPE,RefreshTokenUtil.TOKEN_TYPE_OFFLINE).assertEvent();
-  Assert.assertEquals(RefreshTokenUtil.TOKEN_TYPE_OFFLINE,offlineToken.getType());
+  events.expectCodeToToken(codeId,sessionId).client("offline-client").detail(Details.REFRESH_TOKEN_TYPE,TokenUtil.TOKEN_TYPE_OFFLINE).assertEvent();
+  Assert.assertEquals(TokenUtil.TOKEN_TYPE_OFFLINE,offlineToken.getType());
   Assert.assertEquals(0,offlineToken.getExpiration());
   testRefreshWithOfflineToken(token,offlineToken,offlineTokenString,sessionId,userId);
 }

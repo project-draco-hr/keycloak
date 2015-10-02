@@ -8,6 +8,8 @@
   adminConsole.setPublicClient(true);
   adminConsole.addRedirectUri(baseUrl + "/*");
   adminConsole.setFullScopeAllowed(false);
+  ProtocolMapperModel localeMapper=ProtocolMapperUtils.findLocaleMapper(session);
+  if (localeMapper != null)   adminConsole.addProtocolMapper(localeMapper);
   RoleModel adminRole;
   if (realm.getName().equals(Config.getAdminRealm())) {
     adminRole=realm.getRole(AdminRoles.ADMIN);

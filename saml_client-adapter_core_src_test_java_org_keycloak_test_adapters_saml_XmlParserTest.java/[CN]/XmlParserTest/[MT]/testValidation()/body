@@ -1,0 +1,26 @@
+{
+{
+    InputStream schema=KeycloakSamlAdapterXMLParser.class.getResourceAsStream("/schema/keycloak_saml_adapter_1_6.xsd");
+    InputStream is=getClass().getResourceAsStream("/keycloak-saml.xml");
+    Assert.assertNotNull(is);
+    Assert.assertNotNull(schema);
+    StaxParserUtil.validate(is,schema);
+  }
+{
+    InputStream sch=KeycloakSamlAdapterXMLParser.class.getResourceAsStream("/schema/keycloak_saml_adapter_1_6.xsd");
+    InputStream doc=getClass().getResourceAsStream("/keycloak-saml2.xml");
+    Assert.assertNotNull(doc);
+    Assert.assertNotNull(sch);
+    try {
+      SchemaFactory factory=SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+      Schema schema=factory.newSchema(new StreamSource(sch));
+      Validator validator=schema.newValidator();
+      StreamSource source=new StreamSource(doc);
+      source.setSystemId("/keycloak-saml2.xml");
+      validator.validate(source);
+    }
+ catch (    Exception e) {
+      e.printStackTrace();
+    }
+  }
+}

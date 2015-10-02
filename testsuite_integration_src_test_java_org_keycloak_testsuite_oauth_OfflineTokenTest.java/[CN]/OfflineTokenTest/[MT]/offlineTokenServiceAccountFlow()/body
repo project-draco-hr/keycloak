@@ -6,18 +6,18 @@
   String offlineTokenString=tokenResponse.getRefreshToken();
   RefreshToken offlineToken=oauth.verifyRefreshToken(offlineTokenString);
   String serviceAccountUserId=keycloakRule.getUser("test",ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX + "offline-client").getId();
-  events.expectClientLogin().client("offline-client").user(serviceAccountUserId).session(token.getSessionState()).detail(Details.TOKEN_ID,token.getId()).detail(Details.REFRESH_TOKEN_ID,offlineToken.getId()).detail(Details.REFRESH_TOKEN_TYPE,RefreshTokenUtil.TOKEN_TYPE_OFFLINE).detail(Details.USERNAME,ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX + "offline-client").assertEvent();
-  Assert.assertEquals(RefreshTokenUtil.TOKEN_TYPE_OFFLINE,offlineToken.getType());
+  events.expectClientLogin().client("offline-client").user(serviceAccountUserId).session(token.getSessionState()).detail(Details.TOKEN_ID,token.getId()).detail(Details.REFRESH_TOKEN_ID,offlineToken.getId()).detail(Details.REFRESH_TOKEN_TYPE,TokenUtil.TOKEN_TYPE_OFFLINE).detail(Details.USERNAME,ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX + "offline-client").assertEvent();
+  Assert.assertEquals(TokenUtil.TOKEN_TYPE_OFFLINE,offlineToken.getType());
   Assert.assertEquals(0,offlineToken.getExpiration());
   testRefreshWithOfflineToken(token,offlineToken,offlineTokenString,token.getSessionState(),serviceAccountUserId);
   tokenResponse=oauth.doClientCredentialsGrantAccessTokenRequest("secret1");
   AccessToken token2=oauth.verifyToken(tokenResponse.getAccessToken());
   String offlineTokenString2=tokenResponse.getRefreshToken();
   RefreshToken offlineToken2=oauth.verifyRefreshToken(offlineTokenString2);
-  events.expectClientLogin().client("offline-client").user(serviceAccountUserId).session(token2.getSessionState()).detail(Details.TOKEN_ID,token2.getId()).detail(Details.REFRESH_TOKEN_ID,offlineToken2.getId()).detail(Details.REFRESH_TOKEN_TYPE,RefreshTokenUtil.TOKEN_TYPE_OFFLINE).detail(Details.USERNAME,ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX + "offline-client").assertEvent();
+  events.expectClientLogin().client("offline-client").user(serviceAccountUserId).session(token2.getSessionState()).detail(Details.TOKEN_ID,token2.getId()).detail(Details.REFRESH_TOKEN_ID,offlineToken2.getId()).detail(Details.REFRESH_TOKEN_TYPE,TokenUtil.TOKEN_TYPE_OFFLINE).detail(Details.USERNAME,ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX + "offline-client").assertEvent();
   OAuthClient.AccessTokenResponse response=oauth.doRefreshTokenRequest(offlineTokenString,"secret1");
   Assert.assertEquals(400,response.getStatusCode());
   Assert.assertEquals("invalid_grant",response.getError());
-  events.expectRefresh(offlineToken.getId(),offlineToken.getSessionState()).error(Errors.INVALID_TOKEN).client("offline-client").user(serviceAccountUserId).removeDetail(Details.UPDATED_REFRESH_TOKEN_ID).removeDetail(Details.TOKEN_ID).detail(Details.REFRESH_TOKEN_TYPE,RefreshTokenUtil.TOKEN_TYPE_OFFLINE).assertEvent();
+  events.expectRefresh(offlineToken.getId(),offlineToken.getSessionState()).error(Errors.INVALID_TOKEN).client("offline-client").user(serviceAccountUserId).removeDetail(Details.UPDATED_REFRESH_TOKEN_ID).removeDetail(Details.TOKEN_ID).detail(Details.REFRESH_TOKEN_TYPE,TokenUtil.TOKEN_TYPE_OFFLINE).assertEvent();
   testRefreshWithOfflineToken(token2,offlineToken2,offlineTokenString2,token2.getSessionState(),serviceAccountUserId);
 }

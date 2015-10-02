@@ -24,6 +24,12 @@
   if (!realmUrl.equals(token.getIssuer())) {
     throw new VerificationException("Token audience doesn't match domain. Token issuer is " + token.getIssuer() + ", but URL from configuration is "+ realmUrl);
   }
+  if (checkTokenType) {
+    String type=token.getType();
+    if (type == null || !type.equalsIgnoreCase(TokenUtil.TOKEN_TYPE_BEARER)) {
+      throw new VerificationException("Token type is incorrect. Expected '" + TokenUtil.TOKEN_TYPE_BEARER + "' but was '"+ type+ "'");
+    }
+  }
   if (checkActive && !token.isActive()) {
     throw new VerificationException("Token is not active.");
   }

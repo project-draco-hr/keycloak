@@ -7,6 +7,9 @@
     throw new ParsingException("entityID must be set on IDP");
   }
   idp.setEntityID(entityID);
+  boolean signaturesRequired=StaxParserUtil.getBooleanAttributeValue(startElement,ConfigXmlConstants.SIGNATURES_REQUIRED_ATTR);
+  idp.setSignatureCanonicalizationMethod(StaxParserUtil.getAttributeValue(startElement,ConfigXmlConstants.SIGNATURE_CANONICALIZATION_METHOD_ATTR));
+  idp.setSignatureAlgorithm(StaxParserUtil.getAttributeValue(startElement,ConfigXmlConstants.SIGNATURE_ALGORITHM_ATTR));
   while (xmlEventReader.hasNext()) {
     XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
     if (xmlEvent == null)     break;
@@ -20,11 +23,11 @@
     if (startElement == null)     break;
     String tag=StaxParserUtil.getStartElementName(startElement);
     if (tag.equals(ConfigXmlConstants.SINGLE_SIGN_ON_SERVICE_ELEMENT)) {
-      IDP.SingleSignOnService sso=parseSingleSignOnService(xmlEventReader);
+      IDP.SingleSignOnService sso=parseSingleSignOnService(xmlEventReader,signaturesRequired);
       idp.setSingleSignOnService(sso);
     }
  else     if (tag.equals(ConfigXmlConstants.SINGLE_LOGOUT_SERVICE_ELEMENT)) {
-      IDP.SingleLogoutService slo=parseSingleLogoutService(xmlEventReader);
+      IDP.SingleLogoutService slo=parseSingleLogoutService(xmlEventReader,signaturesRequired);
       idp.setSingleLogoutService(slo);
     }
  else     if (tag.equals(ConfigXmlConstants.KEYS_ELEMENT)) {

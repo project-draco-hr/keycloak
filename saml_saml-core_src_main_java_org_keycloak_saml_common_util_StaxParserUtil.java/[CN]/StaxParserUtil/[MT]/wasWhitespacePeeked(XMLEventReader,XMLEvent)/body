@@ -1,0 +1,16 @@
+{
+  if (xmlEvent.isCharacters()) {
+    Characters chars=xmlEvent.asCharacters();
+    String data=chars.getData();
+    if (data == null || data.trim().equals("")) {
+      try {
+        xmlEventReader.nextEvent();
+        return true;
+      }
+ catch (      XMLStreamException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+  return false;
+}

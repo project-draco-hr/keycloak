@@ -1,0 +1,13 @@
+{
+  PersistentUserSessionAdapter adapter=new PersistentUserSessionAdapter(userSession);
+  PersistentUserSessionModel model=adapter.getUpdatedModel();
+  PersistentUserSessionEntity entity=new PersistentUserSessionEntity();
+  entity.setUserSessionId(model.getUserSessionId());
+  entity.setRealmId(adapter.getRealm().getId());
+  entity.setUserId(adapter.getUser().getId());
+  entity.setOffline(offline);
+  entity.setLastSessionRefresh(model.getLastSessionRefresh());
+  entity.setData(model.getData());
+  em.persist(entity);
+  em.flush();
+}

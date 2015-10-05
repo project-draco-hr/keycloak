@@ -1,0 +1,18 @@
+{
+  if (isFinished()) {
+    return;
+  }
+  while (!isFinished()) {
+    if (!isCoordinator()) {
+      try {
+        latch.await(500,TimeUnit.MILLISECONDS);
+      }
+ catch (      InterruptedException ie) {
+        log.error("Interrupted",ie);
+      }
+    }
+ else {
+      startLoading();
+    }
+  }
+}

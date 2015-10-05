@@ -1,0 +1,37 @@
+{
+  int started=Time.currentTime();
+  UserSessionModel[] origSessions=createSessions();
+  resetSession();
+  UserSessionModel userSession=session.sessions().getUserSession(realm,origSessions[1].getId());
+  persistUserSession(userSession,true);
+  resetSession();
+  List<UserSessionModel> loadedSessions=loadPersistedSessionsPaginated(true,10,1,1);
+  UserSessionModel persistedSession=loadedSessions.get(0);
+  UserSessionProviderTest.assertSession(persistedSession,session.users().getUserByUsername("user1",realm),"127.0.0.2",started,started,"test-app");
+  Time.setOffset(10);
+  try {
+    persistedSession.setLastSessionRefresh(Time.currentTime());
+    persistedSession.setNote("foo","bar");
+    persistedSession.setState(UserSessionModel.State.LOGGING_IN);
+    persister.updateUserSession(persistedSession,true);
+    ClientSessionModel clientSession=createClientSession(realm.getClientByClientId("third-party"),session.sessions().getUserSession(realm,persistedSession.getId()),"http://redirect","state",new HashSet<String>(),new HashSet<String>());
+    persister.createClientSession(clientSession,true);
+    resetSession();
+    loadedSessions=loadPersistedSessionsPaginated(true,10,1,1);
+    persistedSession=loadedSessions.get(0);
+    UserSessionProviderTest.assertSession(persistedSession,session.users().getUserByUsername("user1",realm),"127.0.0.2",started,started + 10,"test-app","third-party");
+    Assert.assertEquals("bar",persistedSession.getNote("foo"));
+    Assert.assertEquals(UserSessionModel.State.LOGGING_IN,persistedSession.getState());
+    persister.removeClientSession(clientSession.getId(),true);
+    resetSession();
+    loadedSessions=loadPersistedSessionsPaginated(true,10,1,1);
+    persistedSession=loadedSessions.get(0);
+    UserSessionProviderTest.assertSession(persistedSession,session.users().getUserByUsername("user1",realm),"127.0.0.2",started,started + 10,"test-app");
+    persister.removeUserSession(persistedSession.getId(),true);
+    resetSession();
+    loadPersistedSessionsPaginated(true,10,0,0);
+  }
+  finally {
+    Time.setOffset(0);
+  }
+}

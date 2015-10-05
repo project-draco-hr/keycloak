@@ -1,8 +1,11 @@
 {
   ClientSessionEntity entity=(ClientSessionEntity)sessionCache.get(id);
+  if (entity == null) {
+    entity=(ClientSessionEntity)tx.get(sessionCache,id);
+  }
   if (entity != null) {
     RealmModel realm=session.realms().getRealm(entity.getRealm());
-    return wrap(realm,entity);
+    return wrap(realm,entity,false);
   }
   return null;
 }

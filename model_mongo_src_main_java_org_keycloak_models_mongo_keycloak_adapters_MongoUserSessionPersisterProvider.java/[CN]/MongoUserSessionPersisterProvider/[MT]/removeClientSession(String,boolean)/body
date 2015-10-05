@@ -1,0 +1,23 @@
+{
+  DBObject query=new QueryBuilder().and("clientSessions.clientSessionId").is(clientSessionId).get();
+  Class<? extends MongoUserSessionEntity> clazz=offline ? MongoOfflineUserSessionEntity.class : MongoOnlineUserSessionEntity.class;
+  MongoUserSessionEntity userSession=getMongoStore().loadSingleEntity(clazz,query,invocationContext);
+  if (userSession != null) {
+    PersistentClientSessionEntity found=null;
+    for (    PersistentClientSessionEntity clientSession : userSession.getClientSessions()) {
+      if (clientSession.getClientSessionId().equals(clientSessionId)) {
+        found=clientSession;
+        break;
+      }
+    }
+    if (found != null) {
+      userSession.getClientSessions().remove(found);
+      if (userSession.getClientSessions().size() == 0) {
+        getMongoStore().removeEntity(userSession,invocationContext);
+      }
+ else {
+        getMongoStore().updateEntity(userSession,invocationContext);
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  RealmModel realm=session.realms().getRealm(entity.getRealmId());
+  UserModel user=session.users().getUserById(entity.getUserId(),realm);
+  PersistentUserSessionModel model=new PersistentUserSessionModel();
+  model.setUserSessionId(entity.getUserSessionId());
+  model.setLastSessionRefresh(entity.getLastSessionRefresh());
+  model.setData(entity.getData());
+  List<ClientSessionModel> clientSessions=new LinkedList<>();
+  return new PersistentUserSessionAdapter(model,realm,user,clientSessions);
+}

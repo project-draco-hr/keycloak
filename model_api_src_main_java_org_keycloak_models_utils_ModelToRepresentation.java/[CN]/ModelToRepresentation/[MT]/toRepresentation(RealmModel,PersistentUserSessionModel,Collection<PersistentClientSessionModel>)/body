@@ -1,0 +1,12 @@
+{
+  OfflineUserSessionRepresentation rep=new OfflineUserSessionRepresentation();
+  rep.setData(model.getData());
+  rep.setUserSessionId(model.getUserSessionId());
+  List<OfflineClientSessionRepresentation> clientSessionReps=new LinkedList<>();
+  for (  PersistentClientSessionModel clsm : clientSessions) {
+    OfflineClientSessionRepresentation clrep=toRepresentation(realm,clsm);
+    clientSessionReps.add(clrep);
+  }
+  rep.setOfflineClientSessions(clientSessionReps);
+  return rep;
+}

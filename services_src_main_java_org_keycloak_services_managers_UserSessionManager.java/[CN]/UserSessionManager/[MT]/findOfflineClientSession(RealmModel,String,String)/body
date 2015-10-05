@@ -1,0 +1,10 @@
+{
+  ClientSessionModel clientSession=kcSession.sessions().getOfflineClientSession(realm,clientSessionId);
+  if (clientSession == null) {
+    return null;
+  }
+  if (!userSessionId.equals(clientSession.getUserSession().getId())) {
+    throw new ModelException("User session don't match. Offline client session " + clientSession.getId() + ", It's user session "+ clientSession.getUserSession().getId()+ "  Wanted user session: "+ userSessionId);
+  }
+  return clientSession;
+}

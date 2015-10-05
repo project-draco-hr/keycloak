@@ -1,0 +1,14 @@
+{
+  PersistentClientSessionEntity sessionEntity=em.find(PersistentClientSessionEntity.class,new PersistentClientSessionEntity.Key(clientSessionId,offline));
+  if (sessionEntity != null) {
+    em.remove(sessionEntity);
+    List<PersistentClientSessionEntity> clientSessions=getClientSessionsByUserSession(sessionEntity.getUserSessionId(),offline);
+    if (clientSessions.size() == 0) {
+      PersistentUserSessionEntity userSessionEntity=em.find(PersistentUserSessionEntity.class,new PersistentUserSessionEntity.Key(sessionEntity.getUserSessionId(),offline));
+      if (userSessionEntity != null) {
+        em.remove(userSessionEntity);
+      }
+    }
+    em.flush();
+  }
+}

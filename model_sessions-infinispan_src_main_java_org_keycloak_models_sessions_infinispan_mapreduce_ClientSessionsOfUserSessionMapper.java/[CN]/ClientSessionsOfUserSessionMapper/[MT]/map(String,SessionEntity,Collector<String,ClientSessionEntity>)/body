@@ -1,0 +1,14 @@
+{
+  if (!realm.equals(e.getRealm())) {
+    return;
+  }
+  if (!(e instanceof ClientSessionEntity)) {
+    return;
+  }
+  ClientSessionEntity entity=(ClientSessionEntity)e;
+  for (  String userSessionId : userSessions) {
+    if (userSessionId.equals(((ClientSessionEntity)e).getUserSession())) {
+      collector.emit(entity.getId(),entity);
+    }
+  }
+}

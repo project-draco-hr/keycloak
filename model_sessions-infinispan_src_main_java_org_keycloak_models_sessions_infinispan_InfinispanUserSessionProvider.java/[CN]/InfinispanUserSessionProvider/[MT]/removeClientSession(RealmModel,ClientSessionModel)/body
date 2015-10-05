@@ -1,11 +1,3 @@
 {
-  UserSessionModel userSession=clientSession.getUserSession();
-  if (userSession != null) {
-    UserSessionEntity entity=((UserSessionAdapter)userSession).getEntity();
-    if (entity.getClientSessions() != null) {
-      entity.getClientSessions().remove(clientSession.getId());
-    }
-    tx.replace(sessionCache,entity.getId(),entity);
-  }
-  tx.remove(sessionCache,clientSession.getId());
+  removeClientSession(realm,clientSession,false);
 }

@@ -1,0 +1,18 @@
+{
+  PersistentClientSessionEntity found=null;
+  for (  PersistentClientSessionEntity clientSession : userSession.getClientSessions()) {
+    if (clientSession.getClientId().equals(clientId)) {
+      found=clientSession;
+      break;
+    }
+  }
+  if (found != null) {
+    userSession.getClientSessions().remove(found);
+    if (userSession.getClientSessions().size() == 0) {
+      getMongoStore().removeEntity(userSession,invocationContext);
+    }
+ else {
+      getMongoStore().updateEntity(userSession,invocationContext);
+    }
+  }
+}

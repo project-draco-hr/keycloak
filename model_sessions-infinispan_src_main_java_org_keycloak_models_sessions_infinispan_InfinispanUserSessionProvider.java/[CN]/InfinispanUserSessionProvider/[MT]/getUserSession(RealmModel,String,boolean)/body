@@ -1,0 +1,8 @@
+{
+  Cache<String,SessionEntity> cache=getCache(offline);
+  UserSessionEntity entity=(UserSessionEntity)cache.get(id);
+  if (entity == null) {
+    entity=(UserSessionEntity)tx.get(cache,id);
+  }
+  return wrap(realm,entity,offline);
+}

@@ -1,0 +1,14 @@
+{
+  ProtocolMapperModel found=null;
+  for (  ProviderFactory p : session.getKeycloakSessionFactory().getProviderFactories(LoginProtocol.class)) {
+    LoginProtocolFactory factory=(LoginProtocolFactory)p;
+    for (    ProtocolMapperModel mapper : factory.getBuiltinMappers()) {
+      if (mapper.getName().equals(OIDCLoginProtocolFactory.LOCALE) && mapper.getProtocol().equals(OIDCLoginProtocol.LOGIN_PROTOCOL)) {
+        found=mapper;
+        break;
+      }
+    }
+    if (found != null)     break;
+  }
+  return found;
+}

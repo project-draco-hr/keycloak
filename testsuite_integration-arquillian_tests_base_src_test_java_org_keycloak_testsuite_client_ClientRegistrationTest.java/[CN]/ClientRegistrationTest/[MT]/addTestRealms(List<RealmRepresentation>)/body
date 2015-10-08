@@ -1,0 +1,29 @@
+{
+  RealmRepresentation rep=new RealmRepresentation();
+  rep.setEnabled(true);
+  rep.setRealm(REALM_NAME);
+  rep.setUsers(new LinkedList<UserRepresentation>());
+  LinkedList<CredentialRepresentation> credentials=new LinkedList<>();
+  CredentialRepresentation password=new CredentialRepresentation();
+  password.setType(CredentialRepresentation.PASSWORD);
+  password.setValue("password");
+  credentials.add(password);
+  UserRepresentation user=new UserRepresentation();
+  user.setEnabled(true);
+  user.setUsername("manage-clients");
+  user.setCredentials(credentials);
+  user.setClientRoles(Collections.singletonMap(Constants.REALM_MANAGEMENT_CLIENT_ID,Collections.singletonList(AdminRoles.MANAGE_CLIENTS)));
+  rep.getUsers().add(user);
+  UserRepresentation user2=new UserRepresentation();
+  user2.setEnabled(true);
+  user2.setUsername("create-clients");
+  user2.setCredentials(credentials);
+  user2.setClientRoles(Collections.singletonMap(Constants.REALM_MANAGEMENT_CLIENT_ID,Collections.singletonList(AdminRoles.CREATE_CLIENT)));
+  rep.getUsers().add(user2);
+  UserRepresentation user3=new UserRepresentation();
+  user3.setEnabled(true);
+  user3.setUsername("no-access");
+  user3.setCredentials(credentials);
+  rep.getUsers().add(user3);
+  testRealms.add(rep);
+}

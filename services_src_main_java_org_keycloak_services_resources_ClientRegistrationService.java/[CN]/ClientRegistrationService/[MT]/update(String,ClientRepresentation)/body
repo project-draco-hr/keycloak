@@ -1,7 +1,8 @@
 {
-  ClientModel client=realm.getClientByClientId(clientId);
-  if (client == null) {
-    throw new NotFoundException("Client not found");
-  }
+  event.event(EventType.CLIENT_UPDATE).client(clientId);
+  ClientModel client=authenticate(false,clientId);
   RepresentationToModel.updateClient(rep,client);
+  logger.infov("Updated client {0}",rep.getClientId());
+  event.success();
+  return Response.status(Response.Status.OK).build();
 }

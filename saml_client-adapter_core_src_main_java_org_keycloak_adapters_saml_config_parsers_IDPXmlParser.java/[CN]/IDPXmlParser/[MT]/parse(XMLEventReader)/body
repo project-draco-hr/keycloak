@@ -2,14 +2,14 @@
   StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
   StaxParserUtil.validate(startElement,ConfigXmlConstants.IDP_ELEMENT);
   IDP idp=new IDP();
-  String entityID=StaxParserUtil.getAttributeValue(startElement,ConfigXmlConstants.ENTITY_ID_ATTR);
+  String entityID=SPXmlParser.getAttributeValue(startElement,ConfigXmlConstants.ENTITY_ID_ATTR);
   if (entityID == null) {
     throw new ParsingException("entityID must be set on IDP");
   }
   idp.setEntityID(entityID);
-  boolean signaturesRequired=StaxParserUtil.getBooleanAttributeValue(startElement,ConfigXmlConstants.SIGNATURES_REQUIRED_ATTR);
-  idp.setSignatureCanonicalizationMethod(StaxParserUtil.getAttributeValue(startElement,ConfigXmlConstants.SIGNATURE_CANONICALIZATION_METHOD_ATTR));
-  idp.setSignatureAlgorithm(StaxParserUtil.getAttributeValue(startElement,ConfigXmlConstants.SIGNATURE_ALGORITHM_ATTR));
+  boolean signaturesRequired=SPXmlParser.getBooleanAttributeValue(startElement,ConfigXmlConstants.SIGNATURES_REQUIRED_ATTR);
+  idp.setSignatureCanonicalizationMethod(SPXmlParser.getAttributeValue(startElement,ConfigXmlConstants.SIGNATURE_CANONICALIZATION_METHOD_ATTR));
+  idp.setSignatureAlgorithm(SPXmlParser.getAttributeValue(startElement,ConfigXmlConstants.SIGNATURE_ALGORITHM_ATTR));
   while (xmlEventReader.hasNext()) {
     XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
     if (xmlEvent == null)     break;

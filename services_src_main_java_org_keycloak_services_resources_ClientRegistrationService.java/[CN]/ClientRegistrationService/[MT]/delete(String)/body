@@ -1,7 +1,11 @@
 {
-  ClientModel client=realm.getClientByClientId(clientId);
-  if (client == null) {
-    throw new NotFoundException("Client not found");
+  event.event(EventType.CLIENT_DELETE).client(clientId);
+  ClientModel client=authenticate(false,clientId);
+  if (realm.removeClient(client.getId())) {
+    event.success();
+    return Response.ok().build();
   }
-  realm.removeClient(client.getId());
+ else {
+    return Response.status(Response.Status.NOT_FOUND).build();
+  }
 }

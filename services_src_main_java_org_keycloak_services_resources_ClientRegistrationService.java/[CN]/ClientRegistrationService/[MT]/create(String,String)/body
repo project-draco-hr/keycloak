@@ -1,4 +1,6 @@
 {
+  event.event(EventType.CLIENT_REGISTER);
+  authenticate(true,null);
   if (format == null) {
     format=KeycloakClientDescriptionConverter.ID;
   }
@@ -11,6 +13,8 @@
     ClientModel clientModel=RepresentationToModel.createClient(session,realm,rep,true);
     rep=ModelToRepresentation.toRepresentation(clientModel);
     URI uri=session.getContext().getUri().getAbsolutePathBuilder().path(clientModel.getId()).build();
+    logger.infov("Created client {0}",rep.getClientId());
+    event.client(rep.getClientId()).success();
     return Response.created(uri).entity(rep).build();
   }
  catch (  ModelDuplicateException e) {

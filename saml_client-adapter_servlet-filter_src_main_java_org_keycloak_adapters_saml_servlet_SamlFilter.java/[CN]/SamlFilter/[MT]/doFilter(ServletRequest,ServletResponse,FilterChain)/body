@@ -1,0 +1,54 @@
+{
+  HttpServletRequest request=(HttpServletRequest)req;
+  HttpServletResponse response=(HttpServletResponse)res;
+  ServletHttpFacade facade=new ServletHttpFacade(request,response);
+  SamlDeployment deployment=deploymentContext.resolveDeployment(facade);
+  if (deployment == null || !deployment.isConfigured()) {
+    response.sendError(403);
+    log.fine("deployment not configured");
+    return;
+  }
+  FilterSamlSessionStore tokenStore=new FilterSamlSessionStore(request,facade,100000,idMapper);
+  SamlAuthenticator authenticator=new SamlAuthenticator(facade,deployment,tokenStore){
+    @Override protected void completeAuthentication(    SamlSession account){
+    }
+  }
+;
+  AuthOutcome outcome=authenticator.authenticate();
+  if (outcome == AuthOutcome.AUTHENTICATED) {
+    log.fine("AUTHENTICATED");
+    if (facade.isEnded()) {
+      return;
+    }
+    HttpServletRequestWrapper wrapper=tokenStore.getWrap();
+    chain.doFilter(wrapper,res);
+    return;
+  }
+  if (outcome == AuthOutcome.LOGGED_OUT) {
+    tokenStore.logoutAccount();
+    if (deployment.getLogoutPage() != null) {
+      RequestDispatcher disp=req.getRequestDispatcher(deployment.getLogoutPage());
+      disp.forward(req,res);
+      return;
+    }
+    chain.doFilter(req,res);
+    return;
+  }
+  AuthChallenge challenge=authenticator.getChallenge();
+  if (challenge != null) {
+    log.fine("challenge");
+    if (challenge.errorPage()) {
+      response.sendError(403);
+      return;
+    }
+    log.fine("sending challenge");
+    challenge.challenge(facade);
+  }
+  if (outcome == AuthOutcome.FAILED) {
+    response.sendError(403);
+  }
+ else   if (!facade.isEnded()) {
+    chain.doFilter(req,res);
+    return;
+  }
+}

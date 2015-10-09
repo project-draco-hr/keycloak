@@ -1,0 +1,16 @@
+{
+  HttpSession httpSession=request.getSession(false);
+  if (httpSession == null)   return;
+  SerializableKeycloakAccount account=(SerializableKeycloakAccount)httpSession.getAttribute(KeycloakAccount.class.getName());
+  if (account == null) {
+    return;
+  }
+  RefreshableKeycloakSecurityContext session=account.getKeycloakSecurityContext();
+  if (session == null)   return;
+  if (session.getDeployment() == null)   session.setCurrentRequestInfo(deployment,this);
+  if (session.isActive() && !session.getDeployment().isAlwaysRefreshToken())   return;
+  boolean success=session.refreshExpiredToken(false);
+  if (success && session.isActive())   return;
+  cleanSession(httpSession);
+  httpSession.invalidate();
+}

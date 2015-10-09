@@ -37,18 +37,15 @@
   AuthChallenge challenge=authenticator.getChallenge();
   if (challenge != null) {
     log.fine("challenge");
+    challenge.challenge(facade);
     if (challenge.errorPage()) {
-      response.sendError(403);
+      response.sendError(challenge.getResponseCode());
       return;
     }
     log.fine("sending challenge");
-    challenge.challenge(facade);
-  }
-  if (outcome == AuthOutcome.FAILED) {
-    response.sendError(403);
-  }
- else   if (!facade.isEnded()) {
-    chain.doFilter(req,res);
     return;
+  }
+  if (!facade.isEnded()) {
+    response.sendError(403);
   }
 }

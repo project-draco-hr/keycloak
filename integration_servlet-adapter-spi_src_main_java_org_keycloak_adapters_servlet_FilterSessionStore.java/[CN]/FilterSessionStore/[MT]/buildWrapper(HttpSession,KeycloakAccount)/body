@@ -1,0 +1,173 @@
+{
+  if (needRequestRestore) {
+    final String method=(String)session.getAttribute(SAVED_METHOD);
+    final byte[] body=(byte[])session.getAttribute(SAVED_BODY);
+    final MultivaluedHashMap<String,String> headers=(MultivaluedHashMap<String,String>)session.getAttribute(SAVED_HEADERS);
+    clearSavedRequest(session);
+    HttpServletRequestWrapper wrapper=new HttpServletRequestWrapper(request){
+      protected MultivaluedHashMap<String,String> parameters;
+      MultivaluedHashMap<String,String> getParams(){
+        if (parameters != null)         return parameters;
+        String contentType=getContentType();
+        contentType=contentType.toLowerCase();
+        if (contentType.startsWith("application/x-www-form-urlencoded")) {
+          ByteArrayInputStream is=new ByteArrayInputStream(body);
+          try {
+            parameters=parseForm(is);
+          }
+ catch (          IOException e) {
+            throw new RuntimeException(e);
+          }
+        }
+        return parameters;
+      }
+      @Override public boolean isUserInRole(      String role){
+        return account.getRoles().contains(role);
+      }
+      @Override public Principal getUserPrincipal(){
+        return account.getPrincipal();
+      }
+      @Override public String getMethod(){
+        if (needRequestRestore) {
+          return method;
+        }
+ else {
+          return super.getMethod();
+        }
+      }
+      @Override public String getHeader(      String name){
+        if (needRequestRestore && headers != null) {
+          return headers.getFirst(name.toLowerCase());
+        }
+        return super.getHeader(name);
+      }
+      @Override public Enumeration<String> getHeaders(      String name){
+        if (needRequestRestore && headers != null) {
+          List<String> values=headers.getList(name.toLowerCase());
+          if (values == null)           return Collections.emptyEnumeration();
+ else           return Collections.enumeration(values);
+        }
+        return super.getHeaders(name);
+      }
+      @Override public Enumeration<String> getHeaderNames(){
+        if (needRequestRestore && headers != null) {
+          return Collections.enumeration(headers.keySet());
+        }
+        return super.getHeaderNames();
+      }
+      @Override public ServletInputStream getInputStream() throws IOException {
+        if (needRequestRestore && body != null) {
+          final ByteArrayInputStream is=new ByteArrayInputStream(body);
+          return new ServletInputStream(){
+            @Override public int read() throws IOException {
+              return is.read();
+            }
+          }
+;
+        }
+        return super.getInputStream();
+      }
+      @Override public void logout() throws ServletException {
+        servletRequestLogout();
+      }
+      @Override public long getDateHeader(      String name){
+        if (!needRequestRestore)         return super.getDateHeader(name);
+        throw new RuntimeException("This method is not supported in a restored authenticated request");
+      }
+      @Override public int getIntHeader(      String name){
+        if (!needRequestRestore)         return super.getIntHeader(name);
+        String value=getHeader(name);
+        if (value == null)         return -1;
+        return Integer.valueOf(value);
+      }
+      @Override public String[] getParameterValues(      String name){
+        if (!needRequestRestore)         return super.getParameterValues(name);
+        MultivaluedHashMap<String,String> formParams=getParams();
+        if (formParams == null) {
+          return super.getParameterValues(name);
+        }
+        String[] values=request.getParameterValues(name);
+        List<String> list=new LinkedList<>();
+        if (values != null) {
+          for (          String val : values)           list.add(val);
+        }
+        List<String> vals=formParams.get(name);
+        if (vals != null)         list.addAll(vals);
+        return list.toArray(new String[list.size()]);
+      }
+      @Override public Enumeration<String> getParameterNames(){
+        if (!needRequestRestore)         return super.getParameterNames();
+        MultivaluedHashMap<String,String> formParams=getParams();
+        if (formParams == null) {
+          return super.getParameterNames();
+        }
+        Set<String> names=new HashSet<>();
+        Enumeration<String> qnames=super.getParameterNames();
+        while (qnames.hasMoreElements())         names.add(qnames.nextElement());
+        names.addAll(formParams.keySet());
+        return Collections.enumeration(names);
+      }
+      @Override public Map<String,String[]> getParameterMap(){
+        if (!needRequestRestore)         return super.getParameterMap();
+        MultivaluedHashMap<String,String> formParams=getParams();
+        if (formParams == null) {
+          return super.getParameterMap();
+        }
+        Map<String,String[]> map=new HashMap<>();
+        Enumeration<String> names=getParameterNames();
+        while (names.hasMoreElements()) {
+          String name=names.nextElement();
+          String[] values=getParameterValues(name);
+          if (values != null) {
+            map.put(name,values);
+          }
+        }
+        return map;
+      }
+      @Override public String getParameter(      String name){
+        if (!needRequestRestore)         return super.getParameter(name);
+        String param=super.getParameter(name);
+        if (param != null)         return param;
+        MultivaluedHashMap<String,String> formParams=getParams();
+        if (formParams == null) {
+          return null;
+        }
+        return formParams.getFirst(name);
+      }
+      @Override public BufferedReader getReader() throws IOException {
+        if (!needRequestRestore)         return super.getReader();
+        return new BufferedReader(new InputStreamReader(getInputStream()));
+      }
+      @Override public int getContentLength(){
+        if (!needRequestRestore)         return super.getContentLength();
+        String header=getHeader("content-length");
+        if (header == null)         return -1;
+        return Integer.valueOf(header);
+      }
+      @Override public String getContentType(){
+        if (!needRequestRestore)         return super.getContentType();
+        return getHeader("content-type");
+      }
+      @Override public String getCharacterEncoding(){
+        if (!needRequestRestore)         return super.getCharacterEncoding();
+        return getCharsetFromContentType(getContentType());
+      }
+    }
+;
+    return wrapper;
+  }
+ else {
+    return new HttpServletRequestWrapper(request){
+      @Override public boolean isUserInRole(      String role){
+        return account.getRoles().contains(role);
+      }
+      @Override public Principal getUserPrincipal(){
+        return account.getPrincipal();
+      }
+      @Override public void logout() throws ServletException {
+        servletRequestLogout();
+      }
+    }
+;
+  }
+}

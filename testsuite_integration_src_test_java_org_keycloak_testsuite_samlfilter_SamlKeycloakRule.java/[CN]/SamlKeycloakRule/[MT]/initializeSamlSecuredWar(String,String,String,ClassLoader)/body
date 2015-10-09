@@ -1,0 +1,7 @@
+{
+  ServletInfo regularServletInfo=new ServletInfo("servlet",SendUsernameServlet.class).addMapping("/*");
+  FilterInfo samlFilter=new FilterInfo("saml-filter",SamlFilter.class);
+  ResourceManager resourceManager=new TestResourceManager(warResourcePath);
+  DeploymentInfo deploymentInfo=new DeploymentInfo().setClassLoader(classLoader).setIdentityManager(new TestIdentityManager()).setContextPath(contextPath).setDeploymentName(warDeploymentName).setResourceManager(resourceManager).addServlets(regularServletInfo).addFilter(samlFilter).addFilterUrlMapping("saml-filter","/*",DispatcherType.REQUEST).addServletExtension(new SamlServletExtension());
+  server.getServer().deploy(deploymentInfo);
+}

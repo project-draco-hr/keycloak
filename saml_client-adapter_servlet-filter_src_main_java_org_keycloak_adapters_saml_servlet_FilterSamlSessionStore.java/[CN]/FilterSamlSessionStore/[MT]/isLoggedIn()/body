@@ -1,0 +1,19 @@
+{
+  HttpSession session=request.getSession(false);
+  if (session == null)   return false;
+  if (session == null) {
+    log.debug("session was null, returning null");
+    return false;
+  }
+  final SamlSession samlSession=(SamlSession)session.getAttribute(SamlSession.class.getName());
+  if (samlSession == null) {
+    log.debug("SamlSession was not in session, returning null");
+    return false;
+  }
+  if (idMapper != null && !idMapper.hasSession(session.getId())) {
+    logoutAccount();
+    return false;
+  }
+  needRequestRestore=restoreRequest();
+  return true;
+}

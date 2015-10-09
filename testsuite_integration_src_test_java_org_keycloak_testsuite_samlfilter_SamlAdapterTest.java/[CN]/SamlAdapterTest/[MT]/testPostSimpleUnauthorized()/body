@@ -1,0 +1,18 @@
+{
+  List<String> requiredRoles=new LinkedList<>();
+  requiredRoles.add("manager");
+  requiredRoles.add("employee");
+  requiredRoles.add("user");
+  SendUsernameServlet.checkRoles=requiredRoles;
+  try {
+    testStrategy.testPostSimpleUnauthorized(new SamlAdapterTestStrategy.CheckAuthError(){
+      @Override public void check(      WebDriver driver){
+        Assert.assertTrue(driver.getPageSource().contains("Forbidden"));
+      }
+    }
+);
+  }
+  finally {
+    SendUsernameServlet.checkRoles=null;
+  }
+}

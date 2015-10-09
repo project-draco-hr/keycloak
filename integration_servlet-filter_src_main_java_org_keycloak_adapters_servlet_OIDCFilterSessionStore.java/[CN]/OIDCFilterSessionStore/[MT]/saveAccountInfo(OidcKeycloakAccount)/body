@@ -1,0 +1,8 @@
+{
+  RefreshableKeycloakSecurityContext securityContext=(RefreshableKeycloakSecurityContext)account.getKeycloakSecurityContext();
+  Set<String> roles=account.getRoles();
+  SerializableKeycloakAccount sAccount=new SerializableKeycloakAccount(roles,account.getPrincipal(),securityContext);
+  HttpSession httpSession=request.getSession();
+  httpSession.setAttribute(KeycloakAccount.class.getName(),sAccount);
+  if (idMapper != null)   idMapper.map(account.getKeycloakSecurityContext().getToken().getClientSession(),account.getPrincipal().getName(),httpSession.getId());
+}

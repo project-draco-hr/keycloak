@@ -1,0 +1,13 @@
+{
+  DeploymentInfo di=createDeploymentInfo(name,contextPath,servletClass);
+  FilterInfo filter=new FilterInfo("keycloak-filter",KeycloakOIDCFilter.class);
+  if (null == keycloakConfigResolver) {
+    filter.addInitParam("keycloak.config.file",adapterConfigPath);
+  }
+ else {
+    filter.addInitParam("keycloak.config.resolver",keycloakConfigResolver.getCanonicalName());
+  }
+  di.addFilter(filter);
+  di.addFilterUrlMapping("keycloak-filter",constraintUrl,DispatcherType.REQUEST);
+  server.getServer().deploy(di);
+}

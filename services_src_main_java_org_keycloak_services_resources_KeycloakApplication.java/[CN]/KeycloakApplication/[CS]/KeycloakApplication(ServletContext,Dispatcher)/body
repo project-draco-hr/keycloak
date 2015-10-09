@@ -14,11 +14,11 @@
   singletons.add(new RealmsResource());
   singletons.add(new AdminRoot());
   singletons.add(new ModelExceptionMapper());
-  classes.add(SkeletonKeyContextResolver.class);
   classes.add(QRCodeResource.class);
   classes.add(ThemeResource.class);
   classes.add(JsResource.class);
   classes.add(WelcomeResource.class);
+  singletons.add(new ObjectMapperResolver(Boolean.parseBoolean(System.getProperty("keycloak.jsonPrettyPrint","false"))));
   setupDefaultRealm(context.getContextPath());
   migrateModel();
   new ExportImportManager().checkExportImport(this.sessionFactory,context.getContextPath());

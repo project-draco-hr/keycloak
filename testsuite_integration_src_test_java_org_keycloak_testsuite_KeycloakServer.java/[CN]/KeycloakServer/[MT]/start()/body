@@ -3,25 +3,32 @@
   ResteasyDeployment deployment=new ResteasyDeployment();
   deployment.setApplicationClass(KeycloakApplication.class.getName());
   Builder builder=Undertow.builder().addHttpListener(config.getPort(),config.getHost()).setWorkerThreads(config.getWorkerThreads()).setIoThreads(config.getWorkerThreads() / 8);
-  server=new UndertowJaxrsServer().start(builder);
-  DeploymentInfo di=server.undertowDeployment(deployment,"");
-  di.setClassLoader(getClass().getClassLoader());
-  di.setContextPath("/auth");
-  di.setDeploymentName("Keycloak");
-  di.setDefaultEncoding("UTF-8");
-  di.setDefaultServletConfig(new DefaultServletConfig(true));
-  di.addWelcomePage("theme/keycloak/welcome/resources/index.html");
-  FilterInfo filter=Servlets.filter("SessionFilter",KeycloakSessionServletFilter.class);
-  di.addFilter(filter);
-  di.addFilterUrlMapping("SessionFilter","/*",DispatcherType.REQUEST);
-  FilterInfo connectionFilter=Servlets.filter("ClientConnectionFilter",ClientConnectionFilter.class);
-  di.addFilter(connectionFilter);
-  di.addFilterUrlMapping("ClientConnectionFilter","/*",DispatcherType.REQUEST);
-  server.deploy(di);
-  sessionFactory=((KeycloakApplication)deployment.getApplication()).getSessionFactory();
-  setupDevConfig();
-  if (config.getResourcesHome() != null) {
-    info("Loading resources from " + config.getResourcesHome());
+  server=new UndertowJaxrsServer();
+  try {
+    server.start(builder);
+    DeploymentInfo di=server.undertowDeployment(deployment,"");
+    di.setClassLoader(getClass().getClassLoader());
+    di.setContextPath("/auth");
+    di.setDeploymentName("Keycloak");
+    di.setDefaultEncoding("UTF-8");
+    di.setDefaultServletConfig(new DefaultServletConfig(true));
+    di.addWelcomePage("theme/keycloak/welcome/resources/index.html");
+    FilterInfo filter=Servlets.filter("SessionFilter",KeycloakSessionServletFilter.class);
+    di.addFilter(filter);
+    di.addFilterUrlMapping("SessionFilter","/*",DispatcherType.REQUEST);
+    FilterInfo connectionFilter=Servlets.filter("ClientConnectionFilter",ClientConnectionFilter.class);
+    di.addFilter(connectionFilter);
+    di.addFilterUrlMapping("ClientConnectionFilter","/*",DispatcherType.REQUEST);
+    server.deploy(di);
+    sessionFactory=((KeycloakApplication)deployment.getApplication()).getSessionFactory();
+    setupDevConfig();
+    if (config.getResourcesHome() != null) {
+      info("Loading resources from " + config.getResourcesHome());
+    }
+    info("Started Keycloak (http://" + config.getHost() + ":"+ config.getPort()+ "/auth) in "+ (System.currentTimeMillis() - start)+ " ms\n");
   }
-  info("Started Keycloak (http://" + config.getHost() + ":"+ config.getPort()+ "/auth) in "+ (System.currentTimeMillis() - start)+ " ms\n");
+ catch (  RuntimeException e) {
+    server.stop();
+    throw e;
+  }
 }

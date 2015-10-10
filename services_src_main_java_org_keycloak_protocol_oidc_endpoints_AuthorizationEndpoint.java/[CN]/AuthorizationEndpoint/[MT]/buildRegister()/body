@@ -1,4 +1,7 @@
 {
   authManager.expireIdentityCookie(realm,uriInfo,clientConnection);
-  return session.getProvider(LoginFormsProvider.class).setClientSessionCode(new ClientSessionCode(realm,clientSession).getCode()).createRegistration();
+  AuthenticationFlowModel flow=realm.getRegistrationFlow();
+  String flowId=flow.getId();
+  AuthenticationProcessor processor=createProcessor(flowId,LoginActionsService.REGISTRATION_PATH);
+  return processor.authenticate();
 }

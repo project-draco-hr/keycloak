@@ -1,0 +1,7 @@
+{
+  oauth.clientId("resource-owner");
+  OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest(null,"test-user@localhost","password");
+  assertEquals(400,response.getStatusCode());
+  assertEquals("unauthorized_client",response.getError());
+  events.expectLogin().client("resource-owner").session((String)null).clearDetails().error(Errors.INVALID_CLIENT_CREDENTIALS).user((String)null).assertEvent();
+}

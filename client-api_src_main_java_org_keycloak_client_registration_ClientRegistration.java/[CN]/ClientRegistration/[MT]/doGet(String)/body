@@ -1,0 +1,26 @@
+{
+  try {
+    HttpGet request=new HttpGet(clientRegistrationUrl + "/" + endpoint);
+    request.setHeader(HttpHeaders.ACCEPT,"application/json");
+    auth.addAuth(request);
+    HttpResponse response=httpClient.execute(request);
+    InputStream responseStream=null;
+    if (response.getEntity() != null) {
+      responseStream=response.getEntity().getContent();
+    }
+    if (response.getStatusLine().getStatusCode() == 200) {
+      return responseStream;
+    }
+ else     if (response.getStatusLine().getStatusCode() == 404) {
+      responseStream.close();
+      return null;
+    }
+ else {
+      responseStream.close();
+      throw new HttpErrorException(response.getStatusLine());
+    }
+  }
+ catch (  IOException e) {
+    throw new ClientRegistrationException("Failed to send request",e);
+  }
+}

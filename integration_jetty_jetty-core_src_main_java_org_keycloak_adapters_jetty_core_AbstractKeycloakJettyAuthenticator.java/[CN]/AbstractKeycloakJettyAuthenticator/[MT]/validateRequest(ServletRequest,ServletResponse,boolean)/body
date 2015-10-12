@@ -32,6 +32,7 @@
   }
   AuthChallenge challenge=authenticator.getChallenge();
   if (challenge != null) {
+    challenge.challenge(facade);
     if (challenge.errorPage() && errorPage != null) {
       Response response=(Response)res;
       try {
@@ -41,7 +42,6 @@
         throw new RuntimeException(e);
       }
     }
-    challenge.challenge(facade);
   }
   return Authentication.SEND_CONTINUE;
 }

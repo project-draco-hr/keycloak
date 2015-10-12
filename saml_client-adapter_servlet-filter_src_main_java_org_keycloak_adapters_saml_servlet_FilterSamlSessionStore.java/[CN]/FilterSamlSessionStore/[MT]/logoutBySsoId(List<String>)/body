@@ -1,0 +1,12 @@
+{
+  SamlSession account=getAccount();
+  for (  String ssoId : ssoIds) {
+    if (account != null && account.getSessionIndex().equals(ssoId)) {
+      logoutAccount();
+    }
+ else     if (idMapper != null) {
+      String sessionId=idMapper.getSessionFromSSO(ssoId);
+      idMapper.removeSession(sessionId);
+    }
+  }
+}

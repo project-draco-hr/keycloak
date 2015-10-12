@@ -2,15 +2,15 @@
   StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
   StaxParserUtil.validate(startElement,ConfigXmlConstants.SP_ELEMENT);
   SP sp=new SP();
-  String entityID=StaxParserUtil.getAttributeValue(startElement,ConfigXmlConstants.ENTITY_ID_ATTR);
+  String entityID=getAttributeValue(startElement,ConfigXmlConstants.ENTITY_ID_ATTR);
   if (entityID == null) {
     throw new ParsingException("entityID must be set on SP");
   }
   sp.setEntityID(entityID);
-  sp.setSslPolicy(StaxParserUtil.getAttributeValue(startElement,ConfigXmlConstants.SSL_POLICY_ATTR));
-  sp.setLogoutPage(StaxParserUtil.getAttributeValue(startElement,ConfigXmlConstants.LOGOUT_PAGE_ATTR));
-  sp.setNameIDPolicyFormat(StaxParserUtil.getAttributeValue(startElement,ConfigXmlConstants.NAME_ID_POLICY_FORMAT_ATTR));
-  sp.setForceAuthentication(StaxParserUtil.getBooleanAttributeValue(startElement,ConfigXmlConstants.FORCE_AUTHENTICATION_ATTR));
+  sp.setSslPolicy(getAttributeValue(startElement,ConfigXmlConstants.SSL_POLICY_ATTR));
+  sp.setLogoutPage(getAttributeValue(startElement,ConfigXmlConstants.LOGOUT_PAGE_ATTR));
+  sp.setNameIDPolicyFormat(getAttributeValue(startElement,ConfigXmlConstants.NAME_ID_POLICY_FORMAT_ATTR));
+  sp.setForceAuthentication(getBooleanAttributeValue(startElement,ConfigXmlConstants.FORCE_AUTHENTICATION_ATTR));
   while (xmlEventReader.hasNext()) {
     XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
     if (xmlEvent == null)     break;
@@ -30,17 +30,17 @@
     }
  else     if (tag.equals(ConfigXmlConstants.PRINCIPAL_NAME_MAPPING_ELEMENT)) {
       StartElement element=StaxParserUtil.getNextStartElement(xmlEventReader);
-      String policy=StaxParserUtil.getAttributeValue(element,ConfigXmlConstants.POLICY_ATTR);
+      String policy=getAttributeValue(element,ConfigXmlConstants.POLICY_ATTR);
       if (policy == null) {
         throw new ParsingException("PrincipalNameMapping element must have the policy attribute set");
       }
-      String attribute=StaxParserUtil.getAttributeValue(element,ConfigXmlConstants.ATTRIBUTE_ATTR);
+      String attribute=getAttributeValue(element,ConfigXmlConstants.ATTRIBUTE_ATTR);
       SP.PrincipalNameMapping mapping=new SP.PrincipalNameMapping();
       mapping.setPolicy(policy);
       mapping.setAttributeName(attribute);
       sp.setPrincipalNameMapping(mapping);
     }
- else     if (tag.equals(ConfigXmlConstants.ROLE_MAPPING_ELEMENT)) {
+ else     if (tag.equals(ConfigXmlConstants.ROLE_IDENTIFIERS_ELEMENT)) {
       parseRoleMapping(xmlEventReader,sp);
     }
  else     if (tag.equals(ConfigXmlConstants.IDP_ELEMENT)) {

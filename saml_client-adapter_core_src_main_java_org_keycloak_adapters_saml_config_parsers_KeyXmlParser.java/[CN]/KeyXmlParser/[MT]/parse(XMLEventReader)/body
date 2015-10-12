@@ -2,8 +2,8 @@
   StartElement startElement=StaxParserUtil.getNextStartElement(xmlEventReader);
   StaxParserUtil.validate(startElement,ConfigXmlConstants.KEY_ELEMENT);
   Key key=new Key();
-  key.setSigning(StaxParserUtil.getBooleanAttributeValue(startElement,ConfigXmlConstants.SIGNING_ATTR));
-  key.setEncryption(StaxParserUtil.getBooleanAttributeValue(startElement,ConfigXmlConstants.ENCRYPTION_ATTR));
+  key.setSigning(SPXmlParser.getBooleanAttributeValue(startElement,ConfigXmlConstants.SIGNING_ATTR));
+  key.setEncryption(SPXmlParser.getBooleanAttributeValue(startElement,ConfigXmlConstants.ENCRYPTION_ATTR));
   while (xmlEventReader.hasNext()) {
     XMLEvent xmlEvent=StaxParserUtil.peek(xmlEventReader);
     if (xmlEvent == null)     break;
@@ -21,15 +21,15 @@
     }
  else     if (tag.equals(ConfigXmlConstants.CERTIFICATE_PEM_ELEMENT)) {
       StartElement element=StaxParserUtil.getNextStartElement(xmlEventReader);
-      key.setCertificatePem(StaxParserUtil.getElementText(xmlEventReader));
+      key.setCertificatePem(SPXmlParser.getElementText(xmlEventReader));
     }
  else     if (tag.equals(ConfigXmlConstants.PUBLIC_KEY_PEM_ELEMENT)) {
       StartElement element=StaxParserUtil.getNextStartElement(xmlEventReader);
-      key.setPublicKeyPem(StaxParserUtil.getElementText(xmlEventReader));
+      key.setPublicKeyPem(SPXmlParser.getElementText(xmlEventReader));
     }
  else     if (tag.equals(ConfigXmlConstants.PRIVATE_KEY_PEM_ELEMENT)) {
       StartElement element=StaxParserUtil.getNextStartElement(xmlEventReader);
-      key.setPrivateKeyPem(StaxParserUtil.getElementText(xmlEventReader));
+      key.setPrivateKeyPem(SPXmlParser.getElementText(xmlEventReader));
     }
  else {
       StaxParserUtil.bypassElementBlock(xmlEventReader,tag);

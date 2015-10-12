@@ -1,0 +1,12 @@
+{
+  HttpSession session=request.getSession(false);
+  if (session == null)   return;
+  if (session != null) {
+    if (idMapper != null)     idMapper.removeSession(session.getId());
+    SamlSession samlSession=(SamlSession)session.getAttribute(SamlSession.class.getName());
+    if (samlSession != null) {
+      session.removeAttribute(SamlSession.class.getName());
+    }
+    clearSavedRequest(session);
+  }
+}

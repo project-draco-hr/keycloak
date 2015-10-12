@@ -1,0 +1,10 @@
+{
+  HttpSession httpSession=request.getSession(false);
+  if (httpSession != null) {
+    SerializableKeycloakAccount account=(SerializableKeycloakAccount)httpSession.getAttribute(KeycloakAccount.class.getName());
+    if (account != null) {
+      account.getKeycloakSecurityContext().logout(deployment);
+    }
+    cleanSession(httpSession);
+  }
+}

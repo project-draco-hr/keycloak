@@ -1,0 +1,59 @@
+{
+  HttpServletRequest request=(HttpServletRequest)req;
+  HttpServletResponse response=(HttpServletResponse)res;
+  OIDCServletHttpFacade facade=new OIDCServletHttpFacade(request,response);
+  KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
+  if (deployment == null || !deployment.isConfigured()) {
+    response.sendError(403);
+    log.fine("deployment not configured");
+    return;
+  }
+  PreAuthActionsHandler preActions=new PreAuthActionsHandler(new UserSessionManagement(){
+    @Override public void logoutAll(){
+      if (idMapper != null) {
+        idMapper.clear();
+      }
+    }
+    @Override public void logoutHttpSessions(    List<String> ids){
+      for (      String id : ids) {
+        idMapper.removeSession(id);
+      }
+    }
+  }
+,deploymentContext,facade);
+  if (preActions.handleRequest()) {
+    return;
+  }
+  nodesRegistrationManagement.tryRegister(deployment);
+  OIDCFilterSessionStore tokenStore=new OIDCFilterSessionStore(request,facade,100000,deployment,idMapper);
+  tokenStore.checkCurrentToken();
+  FilterRequestAuthenticator authenticator=new FilterRequestAuthenticator(deployment,tokenStore,facade,request,8443);
+  AuthOutcome outcome=authenticator.authenticate();
+  if (outcome == AuthOutcome.AUTHENTICATED) {
+    log.fine("AUTHENTICATED");
+    if (facade.isEnded()) {
+      return;
+    }
+    AuthenticatedActionsHandler actions=new AuthenticatedActionsHandler(deployment,facade);
+    if (actions.handledRequest()) {
+      return;
+    }
+ else {
+      HttpServletRequestWrapper wrapper=tokenStore.buildWrapper();
+      chain.doFilter(wrapper,res);
+      return;
+    }
+  }
+  AuthChallenge challenge=authenticator.getChallenge();
+  if (challenge != null) {
+    log.fine("challenge");
+    challenge.challenge(facade);
+    if (challenge.errorPage()) {
+      response.sendError(challenge.getResponseCode());
+      return;
+    }
+    log.fine("sending challenge");
+    return;
+  }
+  response.sendError(403);
+}

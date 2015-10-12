@@ -1,0 +1,23 @@
+{
+  HttpSession httpSession=request.getSession(false);
+  if (httpSession == null)   return false;
+  SerializableKeycloakAccount account=(SerializableKeycloakAccount)httpSession.getAttribute(KeycloakAccount.class.getName());
+  if (account == null) {
+    return false;
+  }
+  log.fine("remote logged in already. Establish state from session");
+  RefreshableKeycloakSecurityContext securityContext=account.getKeycloakSecurityContext();
+  if (!deployment.getRealm().equals(securityContext.getRealm())) {
+    log.fine("Account from cookie is from a different realm than for the request.");
+    cleanSession(httpSession);
+    return false;
+  }
+  if (idMapper != null && !idMapper.hasSession(httpSession.getId())) {
+    cleanSession(httpSession);
+    return false;
+  }
+  securityContext.setCurrentRequestInfo(deployment,this);
+  request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);
+  needRequestRestore=restoreRequest();
+  return true;
+}

@@ -1,0 +1,9 @@
+{
+  loginPage.open();
+  loginPage.clickRegister();
+  registerPage.assertCurrent();
+  registerPage.register("firstName","lastName",null,"registerUserMissingEmail","password","password");
+  registerPage.assertCurrent();
+  assertEquals("Please specify email.",registerPage.getError());
+  events.expectRegister("registerUserMissingEmail",null).removeDetail("email").error("invalid_registration").assertEvent();
+}

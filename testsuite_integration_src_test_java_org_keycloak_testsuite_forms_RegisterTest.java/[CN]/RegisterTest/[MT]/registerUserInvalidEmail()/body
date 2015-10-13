@@ -1,0 +1,10 @@
+{
+  loginPage.open();
+  loginPage.clickRegister();
+  registerPage.assertCurrent();
+  registerPage.register("firstName","lastName","registerUserInvalidEmailemail","registerUserInvalidEmail","password","password");
+  registerPage.assertCurrent();
+  assertEquals("registerUserInvalidEmailemail",registerPage.getEmail());
+  assertEquals("Invalid email address.",registerPage.getError());
+  events.expectRegister("registerUserInvalidEmail","registerUserInvalidEmailemail").error("invalid_registration").assertEvent();
+}

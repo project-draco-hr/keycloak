@@ -1,10 +1,9 @@
 {
-  String allMessagesKey=theme.getName() + "_" + strLocale;
-  Properties messages=allMessages.get(allMessagesKey);
-  if (messages != null)   return messages;
-  Locale locale=Locale.forLanguageTag(strLocale);
-  messages=theme.getMessages("admin-messages",locale);
-  validateMessages(messages,strLocale);
-  allMessages.put(allMessagesKey,messages);
-  return messages;
+  String themeName=theme.getName();
+  Map bundlesForTheme=allMessages.get(themeName);
+  if (bundlesForTheme == null) {
+    bundlesForTheme=new HashMap<String,Properties>();
+    allMessages.put(themeName,bundlesForTheme);
+  }
+  return findMessagesForTheme(theme,strLocale,bundlesForTheme);
 }

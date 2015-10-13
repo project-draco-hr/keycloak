@@ -2,8 +2,8 @@
   loginPage.open();
   loginPage.clickRegister();
   registerPage.assertCurrent();
-  registerPage.register("firstName","lastName","registerUserMissingUsername@email",null,"password","password");
+  registerPage.register(null,null,null,null,null,null);
   registerPage.assertCurrent();
-  assertEquals("Please specify username.",registerPage.getError());
+  assertEquals("Please specify username.\n" + "Please specify first name.\n" + "Please specify last name.\n"+ "Please specify email.\n"+ "Please specify password.",registerPage.getError());
   events.expectRegister(null,"registerUserMissingUsername@email").removeDetail(Details.USERNAME).removeDetail(Details.EMAIL).error("invalid_registration").assertEvent();
 }

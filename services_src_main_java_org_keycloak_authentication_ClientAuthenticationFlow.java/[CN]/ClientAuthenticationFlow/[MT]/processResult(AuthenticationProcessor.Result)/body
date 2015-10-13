@@ -5,7 +5,7 @@
   if (status == FlowStatus.SUCCESS) {
     return null;
   }
- else   if (status == FlowStatus.FAILED) {
+  if (status == FlowStatus.FAILED) {
     if (result.getChallenge() != null) {
       return sendChallenge(result,execution);
     }
@@ -20,13 +20,10 @@
     if (alternativeChallenge == null) {
       alternativeChallenge=result.getChallenge();
     }
-    return null;
+    return sendChallenge(result,execution);
   }
  else   if (status == FlowStatus.FAILURE_CHALLENGE) {
     return sendChallenge(result,execution);
-  }
- else   if (status == FlowStatus.ATTEMPTED) {
-    return null;
   }
  else {
     AuthenticationProcessor.logger.error("Unknown result status");

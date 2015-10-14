@@ -1,3 +1,23 @@
 {
+  if (code == null) {
+    if (!realm.isResetPasswordAllowed()) {
+      event.event(EventType.RESET_PASSWORD);
+      event.error(Errors.NOT_ALLOWED);
+      return ErrorPage.error(session,Messages.RESET_CREDENTIAL_NOT_ALLOWED);
+    }
+    ClientModel client=realm.getClientByClientId(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID);
+    ClientSessionModel clientSession=session.sessions().createClientSession(realm,client);
+    clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
+    clientSession.setNote(ClientSessionCode.ACTION_KEY,KeycloakModelUtils.generateCodeSecret());
+    clientSession.setAuthMethod(OIDCLoginProtocol.LOGIN_PROTOCOL);
+    String redirectUri=Urls.accountBase(uriInfo.getBaseUri()).path("/").build(realm.getName()).toString();
+    clientSession.setRedirectUri(redirectUri);
+    clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
+    clientSession.setNote(ClientSessionCode.ACTION_KEY,KeycloakModelUtils.generateCodeSecret());
+    clientSession.setNote(OIDCLoginProtocol.RESPONSE_TYPE_PARAM,OAuth2Constants.CODE);
+    clientSession.setNote(OIDCLoginProtocol.REDIRECT_URI_PARAM,redirectUri);
+    clientSession.setNote(OIDCLoginProtocol.ISSUER,Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName()));
+    return processResetCredentials(null,clientSession,null);
+  }
   return resetCredentials(code,execution);
 }

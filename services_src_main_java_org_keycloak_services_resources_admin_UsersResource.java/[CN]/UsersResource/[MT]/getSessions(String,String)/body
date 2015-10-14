@@ -1,0 +1,18 @@
+{
+  auth.requireView();
+  UserModel user=session.users().getUserById(id,realm);
+  if (user == null) {
+    throw new NotFoundException("User not found");
+  }
+  ClientModel client=realm.getClientById(clientId);
+  if (client == null) {
+    throw new NotFoundException("Client not found");
+  }
+  List<UserSessionModel> sessions=new UserSessionManager(session).findOfflineSessions(realm,client,user);
+  List<UserSessionRepresentation> reps=new ArrayList<UserSessionRepresentation>();
+  for (  UserSessionModel session : sessions) {
+    UserSessionRepresentation rep=ModelToRepresentation.toRepresentation(session);
+    reps.add(rep);
+  }
+  return reps;
+}

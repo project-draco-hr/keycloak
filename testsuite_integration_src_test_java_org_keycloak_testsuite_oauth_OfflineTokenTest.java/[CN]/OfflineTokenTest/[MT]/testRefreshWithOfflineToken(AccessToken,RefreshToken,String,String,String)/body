@@ -18,7 +18,8 @@
   AccessToken refreshedToken=oauth.verifyToken(response.getAccessToken());
   Assert.assertEquals(200,response.getStatusCode());
   Assert.assertEquals(sessionId,refreshedToken.getSessionState());
-  Assert.assertNull(response.getRefreshToken());
+  String newRefreshToken=response.getRefreshToken();
+  Assert.assertNotNull(newRefreshToken);
   Assert.assertNotEquals(oldToken.getId(),refreshedToken.getId());
   Assert.assertEquals(userId,refreshedToken.getSubject());
   Assert.assertEquals(2,refreshedToken.getRealmAccess().getRoles().size());
@@ -29,4 +30,5 @@
   Event refreshEvent=events.expectRefresh(offlineToken.getId(),sessionId).client("offline-client").user(userId).removeDetail(Details.UPDATED_REFRESH_TOKEN_ID).detail(Details.REFRESH_TOKEN_TYPE,TokenUtil.TOKEN_TYPE_OFFLINE).assertEvent();
   Assert.assertNotEquals(oldToken.getId(),refreshEvent.getDetails().get(Details.TOKEN_ID));
   Time.setOffset(0);
+  return newRefreshToken;
 }

@@ -6,13 +6,14 @@
   entity.setBrokerSessionId(userSession.getBrokerSessionId());
   entity.setBrokerUserId(userSession.getBrokerUserId());
   entity.setIpAddress(userSession.getIpAddress());
-  entity.setLastSessionRefresh(userSession.getLastSessionRefresh());
   entity.setLoginUsername(userSession.getLoginUsername());
   entity.setNotes(userSession.getNotes());
   entity.setRememberMe(userSession.isRememberMe());
-  entity.setStarted(userSession.getStarted());
   entity.setState(userSession.getState());
   entity.setUser(userSession.getUser().getId());
+  int currentTime=Time.currentTime();
+  entity.setStarted(currentTime);
+  entity.setLastSessionRefresh(currentTime);
   tx.put(offlineSessionCache,userSession.getId(),entity);
   return wrap(userSession.getRealm(),entity,true);
 }

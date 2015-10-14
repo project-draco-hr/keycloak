@@ -6,15 +6,16 @@
   entity.setBrokerSessionId(userSession.getBrokerSessionId());
   entity.setBrokerUserId(userSession.getBrokerUserId());
   entity.setIpAddress(userSession.getIpAddress());
-  entity.setLastSessionRefresh(userSession.getLastSessionRefresh());
   entity.setLoginUsername(userSession.getLoginUsername());
   if (userSession.getNotes() != null) {
     entity.getNotes().putAll(userSession.getNotes());
   }
   entity.setRememberMe(userSession.isRememberMe());
-  entity.setStarted(userSession.getStarted());
   entity.setState(userSession.getState());
   entity.setUser(userSession.getUser().getId());
+  int currentTime=Time.currentTime();
+  entity.setStarted(currentTime);
+  entity.setLastSessionRefresh(currentTime);
   offlineUserSessions.put(userSession.getId(),entity);
   return new UserSessionAdapter(session,this,userSession.getRealm(),entity);
 }

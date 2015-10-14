@@ -14,5 +14,11 @@
   events.expectCodeToToken(codeId,sessionId).client("offline-client").detail(Details.REFRESH_TOKEN_TYPE,TokenUtil.TOKEN_TYPE_OFFLINE).assertEvent();
   Assert.assertEquals(TokenUtil.TOKEN_TYPE_OFFLINE,offlineToken.getType());
   Assert.assertEquals(0,offlineToken.getExpiration());
-  testRefreshWithOfflineToken(token,offlineToken,offlineTokenString,sessionId,userId);
+  String newRefreshTokenString=testRefreshWithOfflineToken(token,offlineToken,offlineTokenString,sessionId,userId);
+  Time.setOffset(3000000);
+  OAuthClient.AccessTokenResponse response=oauth.doRefreshTokenRequest(newRefreshTokenString,"secret1");
+  Assert.assertEquals(400,response.getStatusCode());
+  assertEquals("invalid_grant",response.getError());
+  events.expectRefresh(offlineToken.getId(),sessionId).client("offline-client").error(Errors.INVALID_TOKEN).user(userId).clearDetails().assertEvent();
+  Time.setOffset(0);
 }

@@ -13,10 +13,6 @@
     validation.clientSession.setTimestamp(currentTime);
   }
   validation.userSession.setLastSessionRefresh(currentTime);
-  AccessTokenResponseBuilder responseBuilder=responseBuilder(realm,authorizedClient,event,session,validation.userSession,validation.clientSession).accessToken(validation.newToken).generateIDToken();
-  if (!refreshToken.getType().equals(TokenUtil.TOKEN_TYPE_OFFLINE)) {
-    responseBuilder.generateRefreshToken();
-  }
-  AccessTokenResponse res=responseBuilder.build();
+  AccessTokenResponse res=responseBuilder(realm,authorizedClient,event,session,validation.userSession,validation.clientSession).accessToken(validation.newToken).generateIDToken().generateRefreshToken().build();
   return new RefreshResult(res,TokenUtil.TOKEN_TYPE_OFFLINE.equals(refreshToken.getType()));
 }

@@ -1,0 +1,22 @@
+{
+  UserRepresentation userRep=new UserRepresentation();
+  userRep.setEnabled(true);
+  userRep.setUsername("user1");
+  userRep.setEmail("user1@test.com");
+  Response response=realm.users().create(userRep);
+  String id=ApiUtil.getCreatedId(response);
+  response.close();
+  UserResource user=realm.users().get(id);
+  List<String> actions=new LinkedList<>();
+  actions.add(UserModel.RequiredAction.UPDATE_PASSWORD.name());
+  user.executeActionsEmail("account",actions);
+  Assert.assertEquals(1,greenMail.getReceivedMessages().length);
+  MimeMessage message=greenMail.getReceivedMessages()[0];
+  String link=ResetPasswordTest.getPasswordResetEmailLink(message);
+  driver.navigate().to(link);
+  assertTrue(passwordUpdatePage.isCurrent());
+  passwordUpdatePage.changePassword("new-pass","new-pass");
+  assertEquals("Your account has been updated.",driver.getTitle());
+  driver.navigate().to(link);
+  assertEquals("We're sorry...",driver.getTitle());
+}

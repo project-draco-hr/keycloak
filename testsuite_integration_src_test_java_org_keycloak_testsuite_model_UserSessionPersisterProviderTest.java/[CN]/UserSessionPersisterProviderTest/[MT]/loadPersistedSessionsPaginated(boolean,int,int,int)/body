@@ -1,0 +1,22 @@
+{
+  int count=persister.getUserSessionsCount(offline);
+  int start=0;
+  int pageCount=0;
+  boolean next=true;
+  List<UserSessionModel> result=new ArrayList<>();
+  while (next && start < count) {
+    List<UserSessionModel> sess=persister.loadUserSessions(start,sessionsPerPage,offline);
+    if (sess.size() == 0) {
+      next=false;
+    }
+ else {
+      pageCount++;
+      start+=sess.size();
+      result.addAll(sess);
+    }
+  }
+  Assert.assertEquals(pageCount,expectedPageCount);
+  Assert.assertEquals(count,expectedSessionsCount);
+  Assert.assertEquals(count,result.size());
+  return result;
+}

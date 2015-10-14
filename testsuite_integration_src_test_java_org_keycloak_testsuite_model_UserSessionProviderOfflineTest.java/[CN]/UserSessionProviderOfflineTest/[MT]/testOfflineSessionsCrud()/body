@@ -1,0 +1,59 @@
+{
+  int started=Time.currentTime();
+  UserSessionModel[] origSessions=createSessions();
+  resetSession();
+  Map<String,String> offlineSessions=new HashMap<>();
+  ClientModel testApp=realm.getClientByClientId("test-app");
+  List<UserSessionModel> userSessions=session.sessions().getUserSessions(realm,testApp);
+  for (  UserSessionModel userSession : userSessions) {
+    offlineSessions.putAll(createOfflineSessionIncludeClientSessions(userSession));
+  }
+  resetSession();
+  for (  Map.Entry<String,String> entry : offlineSessions.entrySet()) {
+    Assert.assertTrue(sessionManager.findOfflineClientSession(realm,entry.getKey(),entry.getValue()) != null);
+    UserSessionModel offlineSession=session.sessions().getUserSession(realm,entry.getValue());
+    boolean found=false;
+    for (    ClientSessionModel clientSession : offlineSession.getClientSessions()) {
+      if (clientSession.getId().equals(entry.getKey())) {
+        found=true;
+      }
+    }
+    Assert.assertTrue(found);
+  }
+  UserModel user1=session.users().getUserByUsername("user1",realm);
+  Set<ClientModel> clients=sessionManager.findClientsWithOfflineToken(realm,user1);
+  Assert.assertEquals(clients.size(),2);
+  for (  ClientModel client : clients) {
+    Assert.assertTrue(client.getClientId().equals("test-app") || client.getClientId().equals("third-party"));
+  }
+  UserModel user2=session.users().getUserByUsername("user2",realm);
+  clients=sessionManager.findClientsWithOfflineToken(realm,user2);
+  Assert.assertEquals(clients.size(),1);
+  Assert.assertTrue(clients.iterator().next().getClientId().equals("test-app"));
+  testApp=realm.getClientByClientId("test-app");
+  ClientModel thirdparty=realm.getClientByClientId("third-party");
+  Assert.assertEquals(3,session.sessions().getOfflineSessionsCount(realm,testApp));
+  Assert.assertEquals(1,session.sessions().getOfflineSessionsCount(realm,thirdparty));
+  sessionManager.revokeOfflineToken(user1,testApp);
+  resetSession();
+  testApp=realm.getClientByClientId("test-app");
+  thirdparty=realm.getClientByClientId("third-party");
+  Assert.assertEquals(1,session.sessions().getOfflineSessionsCount(realm,testApp));
+  Assert.assertEquals(1,session.sessions().getOfflineSessionsCount(realm,thirdparty));
+  List<UserSessionModel> testAppSessions=session.sessions().getOfflineUserSessions(realm,testApp,0,10);
+  List<UserSessionModel> thirdpartySessions=session.sessions().getOfflineUserSessions(realm,thirdparty,0,10);
+  Assert.assertEquals(1,testAppSessions.size());
+  Assert.assertEquals("127.0.0.3",testAppSessions.get(0).getIpAddress());
+  Assert.assertEquals("user2",testAppSessions.get(0).getUser().getUsername());
+  Assert.assertEquals(1,thirdpartySessions.size());
+  Assert.assertEquals("127.0.0.1",thirdpartySessions.get(0).getIpAddress());
+  Assert.assertEquals("user1",thirdpartySessions.get(0).getUser().getUsername());
+  user1=session.users().getUserByUsername("user1",realm);
+  user2=session.users().getUserByUsername("user2",realm);
+  clients=sessionManager.findClientsWithOfflineToken(realm,user1);
+  Assert.assertEquals(1,clients.size());
+  Assert.assertEquals("third-party",clients.iterator().next().getClientId());
+  clients=sessionManager.findClientsWithOfflineToken(realm,user2);
+  Assert.assertEquals(1,clients.size());
+  Assert.assertEquals("test-app",clients.iterator().next().getClientId());
+}

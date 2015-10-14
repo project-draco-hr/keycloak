@@ -1,0 +1,9 @@
+{
+  UserSessionModel userSession=session.sessions().createUserSession(realm,session.users().getUserByUsername("user1",realm),"user1","127.0.0.2","form",true,null,null);
+  ClientSessionModel clientSession=createClientSession(realm.getClientByClientId("test-app"),userSession,"http://redirect","state",new HashSet<String>(),new HashSet<String>());
+  Assert.assertNotNull(session.sessions().getUserSession(realm,userSession.getId()));
+  Assert.assertNotNull(session.sessions().getClientSession(realm,clientSession.getId()));
+  Assert.assertEquals(userSession.getId(),clientSession.getUserSession().getId());
+  Assert.assertEquals(1,userSession.getClientSessions().size());
+  Assert.assertEquals(clientSession.getId(),userSession.getClientSessions().get(0).getId());
+}

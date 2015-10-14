@@ -1,0 +1,11 @@
+{
+  UserSessionEntity entity=userSession.getEntity();
+  String clientSessionId=clientSession.getId();
+  if (entity.getClientSessions() != null && entity.getClientSessions().contains(clientSessionId)) {
+    entity.getClientSessions().remove(clientSessionId);
+    if (entity.getClientSessions().isEmpty()) {
+      entity.setClientSessions(null);
+    }
+    userSession.update();
+  }
+}

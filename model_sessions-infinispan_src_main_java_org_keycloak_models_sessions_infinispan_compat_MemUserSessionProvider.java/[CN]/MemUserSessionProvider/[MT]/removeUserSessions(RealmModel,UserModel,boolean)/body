@@ -1,0 +1,10 @@
+{
+  Iterator<UserSessionEntity> itr=offline ? offlineUserSessions.values().iterator() : userSessions.values().iterator();
+  while (itr.hasNext()) {
+    UserSessionEntity s=itr.next();
+    if (s.getRealm().equals(realm.getId()) && s.getUser().equals(user.getId())) {
+      itr.remove();
+      remove(s,offline);
+    }
+  }
+}

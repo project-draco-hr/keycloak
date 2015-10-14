@@ -4,7 +4,7 @@
     UserSessionEntity s=itr.next();
     if (s.getRealm().equals(realm.getId()) && (s.getLastSessionRefresh() < Time.currentTime() - realm.getSsoSessionIdleTimeout() || s.getStarted() < Time.currentTime() - realm.getSsoSessionMaxLifespan())) {
       itr.remove();
-      remove(s);
+      remove(s,false);
     }
   }
   int expired=Time.currentTime() - RealmInfoUtil.getDettachedClientSessionLifespan(realm);

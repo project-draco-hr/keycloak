@@ -1,0 +1,24 @@
+{
+  int started=Time.currentTime();
+  RealmModel fooRealm=session.realms().createRealm("foo","foo");
+  fooRealm.addClient("foo-app");
+  session.users().addUser(fooRealm,"user3");
+  UserSessionModel userSession=session.sessions().createUserSession(fooRealm,session.users().getUserByUsername("user3",fooRealm),"user3","127.0.0.1","form",true,null,null);
+  ClientSessionModel clientSession=createClientSession(fooRealm.getClientByClientId("foo-app"),userSession,"http://redirect","state",new HashSet<String>(),new HashSet<String>());
+  resetSession();
+  fooRealm=session.realms().getRealm("foo");
+  userSession=session.sessions().getUserSession(fooRealm,userSession.getId());
+  createOfflineSessionIncludeClientSessions(userSession);
+  resetSession();
+  RealmManager realmMgr=new RealmManager(session);
+  fooRealm=realmMgr.getRealm("foo");
+  UserModel user3=session.users().getUserByUsername("user3",fooRealm);
+  UserSessionModel offlineSession=session.sessions().getOfflineUserSession(fooRealm,userSession.getId());
+  UserSessionProviderTest.assertSession(offlineSession,user3,"127.0.0.1",started,started,"foo-app");
+  new UserManager(session).removeUser(fooRealm,user3);
+  resetSession();
+  Assert.assertNull(session.sessions().getOfflineUserSession(fooRealm,userSession.getId()));
+  Assert.assertNull(session.sessions().getOfflineClientSession(fooRealm,clientSession.getId()));
+  realmMgr=new RealmManager(session);
+  realmMgr.removeRealm(realmMgr.getRealm("foo"));
+}

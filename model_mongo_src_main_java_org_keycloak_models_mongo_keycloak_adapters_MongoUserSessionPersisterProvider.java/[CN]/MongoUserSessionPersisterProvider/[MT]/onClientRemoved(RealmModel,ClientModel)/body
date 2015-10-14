@@ -1,0 +1,11 @@
+{
+  DBObject query=new QueryBuilder().and("clientSessions.clientId").is(client.getId()).get();
+  List<MongoOnlineUserSessionEntity> userSessions=getMongoStore().loadEntities(MongoOnlineUserSessionEntity.class,query,invocationContext);
+  for (  MongoOnlineUserSessionEntity userSession : userSessions) {
+    removeClientSessionOfClient(userSession,client.getId());
+  }
+  List<MongoOfflineUserSessionEntity> userSessions2=getMongoStore().loadEntities(MongoOfflineUserSessionEntity.class,query,invocationContext);
+  for (  MongoOfflineUserSessionEntity userSession : userSessions2) {
+    removeClientSessionOfClient(userSession,client.getId());
+  }
+}

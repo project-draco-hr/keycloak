@@ -15,7 +15,7 @@
  catch (  IOException e) {
     logger.warn("Failed to load properties",e);
   }
-  Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,headers);
+  Locale locale=session.getContext().resolveLocale(user);
   Properties messagesBundle;
   try {
     messagesBundle=theme.getMessages(locale);
@@ -89,8 +89,6 @@ try {
 String result=freeMarker.processTemplate(attributes,Templates.getTemplate(page),theme);
 Response.ResponseBuilder builder=Response.status(status).type(MediaType.TEXT_HTML).entity(result);
 BrowserSecurityHeaderSetup.headers(builder,realm);
-String keycloakLocaleCookiePath=Urls.localeCookiePath(baseUri,realm.getName());
-LocaleHelper.updateLocaleCookie(builder,locale,realm,uriInfo,keycloakLocaleCookiePath);
 return builder.build();
 }
  catch (FreeMarkerException e) {

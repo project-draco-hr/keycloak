@@ -1,0 +1,24 @@
+{
+  ClientSessionEntity entity=new ClientSessionEntity();
+  entity.setId(clientSession.getId());
+  entity.setRealmId(clientSession.getRealm().getId());
+  entity.setAction(clientSession.getAction());
+  entity.setAuthenticatorStatus(clientSession.getExecutionStatus());
+  entity.setAuthMethod(clientSession.getAuthMethod());
+  if (clientSession.getAuthenticatedUser() != null) {
+    entity.setAuthUserId(clientSession.getAuthenticatedUser().getId());
+  }
+  entity.setClientId(clientSession.getClient().getId());
+  if (clientSession.getNotes() != null) {
+    entity.getNotes().putAll(clientSession.getNotes());
+  }
+  entity.setProtocolMappers(clientSession.getProtocolMappers());
+  entity.setRedirectUri(clientSession.getRedirectUri());
+  entity.setRoles(clientSession.getRoles());
+  entity.setTimestamp(clientSession.getTimestamp());
+  if (clientSession.getUserSessionNotes() != null) {
+    entity.getUserSessionNotes().putAll(clientSession.getUserSessionNotes());
+  }
+  offlineClientSessions.put(clientSession.getId(),entity);
+  return new ClientSessionAdapter(session,this,clientSession.getRealm(),entity);
+}

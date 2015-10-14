@@ -9,7 +9,7 @@
   UserSessionModel userSession=null;
   ClientSessionModel clientSession=null;
   if (TokenUtil.TOKEN_TYPE_OFFLINE.equals(oldToken.getType())) {
-    clientSession=OfflineTokenUtils.findOfflineClientSession(session,realm,user,oldToken.getClientSession(),oldToken.getSessionState());
+    clientSession=new UserSessionManager(session).findOfflineClientSession(realm,oldToken.getClientSession(),oldToken.getSessionState());
     if (clientSession != null) {
       userSession=clientSession.getUserSession();
     }

@@ -1,0 +1,17 @@
+{
+  PersistentUserSessionAdapter adapter;
+  if (userSession instanceof PersistentUserSessionAdapter) {
+    adapter=(PersistentUserSessionAdapter)userSession;
+  }
+ else {
+    adapter=new PersistentUserSessionAdapter(userSession);
+  }
+  PersistentUserSessionModel model=adapter.getUpdatedModel();
+  MongoUserSessionEntity entity=loadUserSession(model.getUserSessionId(),offline);
+  if (entity == null) {
+    throw new ModelException("UserSession with ID " + userSession.getId() + ", offline: "+ offline+ " not found");
+  }
+  entity.setLastSessionRefresh(model.getLastSessionRefresh());
+  entity.setData(model.getData());
+  getMongoStore().updateEntity(entity,invocationContext);
+}

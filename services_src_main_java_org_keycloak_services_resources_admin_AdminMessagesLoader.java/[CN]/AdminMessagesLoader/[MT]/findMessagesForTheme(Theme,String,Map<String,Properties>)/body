@@ -1,0 +1,15 @@
+{
+  Properties messages=bundlesForTheme.get(strLocale);
+  if (messages != null)   return messages;
+  Locale locale=Locale.forLanguageTag(strLocale);
+  messages=theme.getMessages("admin-messages",locale);
+  String themeName=theme.getName();
+  if (messages == null)   throw new NullPointerException(themeName + ": Unable to find admin-messages bundle for locale=" + strLocale);
+  if (!bundlesForTheme.isEmpty()) {
+    String standardLocale=bundlesForTheme.keySet().iterator().next();
+    Properties standardBundle=bundlesForTheme.get(standardLocale);
+    validateMessages(themeName,standardBundle,standardLocale,messages,strLocale);
+  }
+  bundlesForTheme.put(strLocale,messages);
+  return messages;
+}

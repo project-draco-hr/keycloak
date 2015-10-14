@@ -1,0 +1,22 @@
+{
+  try {
+    oauth.doLogin("test-user@localhost","password");
+    Event loginEvent=events.expectLogin().assertEvent();
+    String sessionId=loginEvent.getSessionId();
+    String codeId=loginEvent.getDetails().get(Details.CODE_ID);
+    String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+    AccessTokenResponse response1=oauth.doAccessTokenRequest(code,"password");
+    RefreshToken refreshToken1=oauth.verifyRefreshToken(response1.getRefreshToken());
+    events.expectCodeToToken(codeId,sessionId).assertEvent();
+    Time.setOffset(2);
+    AccessTokenResponse response2=oauth.doRefreshTokenRequest(response1.getRefreshToken(),"password");
+    Assert.assertEquals(200,response2.getStatusCode());
+    events.expectRefresh(refreshToken1.getId(),sessionId).assertEvent();
+    AccessTokenResponse response3=oauth.doRefreshTokenRequest(response1.getRefreshToken(),"password");
+    Assert.assertEquals(200,response3.getStatusCode());
+    events.expectRefresh(refreshToken1.getId(),sessionId).assertEvent();
+  }
+  finally {
+    Time.setOffset(0);
+  }
+}

@@ -1,8 +1,13 @@
 {
+  if (this.config.getBoolean("enforceCompat",false)) {
+    log.info("Enforced compatibility mode for infinispan. Falling back to deprecated mem user session provider.");
+    return true;
+  }
   if (Version.getVersionShort() < Version.getVersionShort("5.3.0.Final")) {
     InfinispanConnectionProvider connections=session.getProvider(InfinispanConnectionProvider.class);
     Cache<String,SessionEntity> cache=connections.getCache(InfinispanConnectionProvider.SESSION_CACHE_NAME);
     if (cache.getAdvancedCache().getRpcManager() == null) {
+      log.info("Infinispan version doesn't support map reduce for local cache. Falling back to deprecated mem user session provider.");
       return true;
     }
   }

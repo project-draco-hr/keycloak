@@ -1,0 +1,12 @@
+{
+  PersistentClientSessionAdapter adapter=new PersistentClientSessionAdapter(clientSession);
+  PersistentClientSessionModel model=adapter.getUpdatedModel();
+  PersistentClientSessionEntity entity=new PersistentClientSessionEntity();
+  entity.setClientSessionId(clientSession.getId());
+  entity.setClientId(clientSession.getClient().getId());
+  entity.setOffline(offline);
+  entity.setUserSessionId(clientSession.getUserSession().getId());
+  entity.setData(model.getData());
+  em.persist(entity);
+  em.flush();
+}

@@ -1,0 +1,8 @@
+{
+  if (logger.isTraceEnabled()) {
+    logger.tracef("Creating new offline token client session. ClientSessionId: '%s', UserSessionID: '%s' , Username: '%s', Client: '%s'",clientSession.getId(),userSession.getId(),user.getUsername(),clientSession.getClient().getClientId());
+  }
+  ClientSessionModel offlineClientSession=kcSession.sessions().createOfflineClientSession(clientSession);
+  offlineClientSession.setUserSession(userSession);
+  persister.createClientSession(clientSession,true);
+}

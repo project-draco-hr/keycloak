@@ -1,6 +1,7 @@
 {
   log.tracev("Adding cache operation: {0} on {1}",CacheOperation.REPLACE,key);
-  CacheTask current=tasks.get(key);
+  Object taskKey=getTaskKey(cache,key);
+  CacheTask current=tasks.get(taskKey);
   if (current != null) {
 switch (current.operation) {
 case ADD:
@@ -12,6 +13,6 @@ case REMOVE:
 }
 }
  else {
-tasks.put(key,new CacheTask(cache,CacheOperation.REPLACE,key,value));
+tasks.put(taskKey,new CacheTask(cache,CacheOperation.REPLACE,key,value));
 }
 }

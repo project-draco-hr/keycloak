@@ -1,0 +1,16 @@
+{
+  InitializerState state=(InitializerState)cache.get(stateKey);
+  if (state == null) {
+    final int[] count=new int[1];
+    KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+      @Override public void run(      KeycloakSession session){
+        count[0]=sessionLoader.getSessionsCount(session);
+      }
+    }
+);
+    state=new InitializerState();
+    state.init(count[0],sessionsPerSegment);
+    saveStateToCache(state);
+  }
+  return state;
+}

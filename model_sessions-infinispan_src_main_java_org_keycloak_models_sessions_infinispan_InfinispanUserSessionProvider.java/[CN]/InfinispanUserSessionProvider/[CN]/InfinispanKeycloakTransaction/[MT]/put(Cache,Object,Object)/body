@@ -1,9 +1,10 @@
 {
   log.tracev("Adding cache operation: {0} on {1}",CacheOperation.ADD,key);
-  if (tasks.containsKey(key)) {
+  Object taskKey=getTaskKey(cache,key);
+  if (tasks.containsKey(taskKey)) {
     throw new IllegalStateException("Can't add session: task in progress for session");
   }
  else {
-    tasks.put(key,new CacheTask(cache,CacheOperation.ADD,key,value));
+    tasks.put(taskKey,new CacheTask(cache,CacheOperation.ADD,key,value));
   }
 }

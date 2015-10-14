@@ -1,0 +1,16 @@
+{
+  PersistentClientSessionAdapter adapter=new PersistentClientSessionAdapter(clientSession);
+  PersistentClientSessionModel model=adapter.getUpdatedModel();
+  MongoUserSessionEntity userSession=loadUserSession(model.getUserSessionId(),offline);
+  if (userSession == null) {
+    throw new ModelException("Not userSession found with ID " + clientSession.getUserSession().getId() + ". Requested by clientSession: "+ clientSession.getId());
+  }
+ else {
+    PersistentClientSessionEntity entity=new PersistentClientSessionEntity();
+    entity.setClientSessionId(clientSession.getId());
+    entity.setClientId(clientSession.getClient().getId());
+    entity.setData(model.getData());
+    userSession.getClientSessions().add(entity);
+    getMongoStore().updateEntity(userSession,invocationContext);
+  }
+}

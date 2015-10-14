@@ -9,6 +9,10 @@
     if (sessions != null) {
       sessions.onRealmRemoved(realm);
     }
+    UserSessionPersisterProvider sessionsPersister=session.getProvider(UserSessionPersisterProvider.class);
+    if (sessionsPersister != null) {
+      sessionsPersister.onRealmRemoved(realm);
+    }
     UsersSyncManager usersSyncManager=new UsersSyncManager();
     for (    final UserFederationProviderModel fedProvider : federationProviders) {
       usersSyncManager.removePeriodicSyncForProvider(session.getProvider(TimerProvider.class),fedProvider);

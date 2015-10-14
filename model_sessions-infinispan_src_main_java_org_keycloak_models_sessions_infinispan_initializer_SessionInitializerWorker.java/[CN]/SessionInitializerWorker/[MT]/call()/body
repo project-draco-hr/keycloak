@@ -1,0 +1,17 @@
+{
+  log.infof("Running computation for segment: %d",segment);
+  KeycloakSessionFactory sessionFactory=cache.getAdvancedCache().getComponentRegistry().getComponent(KeycloakSessionFactory.class);
+  if (sessionFactory == null) {
+    log.warnf("KeycloakSessionFactory not yet set in cache. Worker skipped");
+    return InfinispanUserSessionInitializer.WorkerResult.create(segment,false);
+  }
+  final int first=segment * sessionsPerSegment;
+  final int max=sessionsPerSegment;
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      sessionLoader.loadSessions(session,first,max);
+    }
+  }
+);
+  return InfinispanUserSessionInitializer.WorkerResult.create(segment,true);
+}

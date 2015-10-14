@@ -1,0 +1,103 @@
+{
+  try {
+    String[] splits=line.split(" ");
+    if (splits[0].equals("put")) {
+      UserSessionEntity userSession=new UserSessionEntity();
+      String id=splits[1];
+      userSession.setId(id);
+      userSession.setRealm(splits[2]);
+      userSession.setLastSessionRefresh(Time.currentTime());
+      cache.put(id,userSession);
+    }
+ else     if (splits[0].equals("get")) {
+      String id=splits[1];
+      UserSessionEntity userSession=(UserSessionEntity)cache.get(id);
+      printSession(id,userSession);
+    }
+ else     if (splits[0].equals("remove")) {
+      String id=splits[1];
+      cache.remove(id);
+    }
+ else     if (splits[0].equals("clear")) {
+      cache.clear();
+      log.info("Cache cleared");
+    }
+ else     if (splits[0].equals("size")) {
+      log.info("Size: " + cache.size());
+    }
+ else     if (splits[0].equals("list")) {
+      for (      String id : cache.keySet()) {
+        SessionEntity entity=cache.get(id);
+        if (!(entity instanceof UserSessionEntity)) {
+          continue;
+        }
+        UserSessionEntity userSession=(UserSessionEntity)cache.get(id);
+        log.info("list: key=" + id + ", value="+ toString(userSession));
+      }
+    }
+ else     if (splits[0].equals("getLocal")) {
+      String id=splits[1];
+      cache=((AdvancedCache)cache).withFlags(Flag.CACHE_MODE_LOCAL);
+      UserSessionEntity userSession=(UserSessionEntity)cache.get(id);
+      printSession(id,userSession);
+    }
+ else     if (splits[0].equals("persistSessions")) {
+      final int count=Integer.parseInt(splits[1]);
+      final List<String> userSessionIds=new LinkedList<>();
+      final List<String> clientSessionIds=new LinkedList<>();
+      KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+        @Override public void run(        KeycloakSession session){
+          RealmModel realm=session.realms().getRealmByName("master");
+          UserModel john=session.users().getUserByUsername("admin",realm);
+          ClientModel testApp=realm.getClientByClientId("security-admin-console");
+          UserSessionPersisterProvider persister=session.getProvider(UserSessionPersisterProvider.class);
+          for (int i=0; i < count; i++) {
+            UserSessionModel userSession=session.sessions().createUserSession(realm,john,"john-doh@localhost","127.0.0.2","form",true,null,null);
+            ClientSessionModel clientSession=session.sessions().createClientSession(realm,testApp);
+            clientSession.setUserSession(userSession);
+            clientSession.setRedirectUri("http://redirect");
+            clientSession.setNote("foo","bar-" + i);
+            userSessionIds.add(userSession.getId());
+            clientSessionIds.add(clientSession.getId());
+          }
+        }
+      }
+);
+      log.info("Sessions created in infinispan storage");
+      KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+        @Override public void run(        KeycloakSession session){
+          RealmModel realm=session.realms().getRealmByName("master");
+          UserSessionPersisterProvider persister=session.getProvider(UserSessionPersisterProvider.class);
+          for (          String userSessionId : userSessionIds) {
+            UserSessionModel userSession=session.sessions().getUserSession(realm,userSessionId);
+            persister.createUserSession(userSession,true);
+          }
+          log.info("userSessions persisted");
+          for (          String clientSessionId : clientSessionIds) {
+            ClientSessionModel clientSession=session.sessions().getClientSession(realm,clientSessionId);
+            persister.createClientSession(clientSession,true);
+          }
+          log.info("clientSessions persisted");
+        }
+      }
+);
+      KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+        @Override public void run(        KeycloakSession session){
+          RealmModel realm=session.realms().getRealmByName("master");
+          UserSessionPersisterProvider persister=session.getProvider(UserSessionPersisterProvider.class);
+          log.info(count + " sessions persisted. Total number of sessions: " + persister.getUserSessionsCount(true));
+        }
+      }
+);
+    }
+ else     if (splits[0].equals("loadPersistentSessions")) {
+      int sessionsPerSegment=Integer.parseInt(splits[1]);
+      UserSessionProviderFactory sessionProviderFactory=(UserSessionProviderFactory)sessionFactory.getProviderFactory(UserSessionProvider.class);
+      sessionProviderFactory.loadPersistentSessions(sessionFactory,10,sessionsPerSegment);
+      log.info("All persistent sessions loaded successfully");
+    }
+  }
+ catch (  RuntimeException e) {
+    log.error("Error occured during command. ",e);
+  }
+}

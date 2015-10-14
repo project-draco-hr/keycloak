@@ -1,0 +1,39 @@
+{
+  TypedQuery<PersistentUserSessionEntity> query=em.createNamedQuery("findUserSessions",PersistentUserSessionEntity.class);
+  query.setParameter("offline",offline);
+  if (firstResult != -1) {
+    query.setFirstResult(firstResult);
+  }
+  if (maxResults != -1) {
+    query.setMaxResults(maxResults);
+  }
+  List<PersistentUserSessionEntity> results=query.getResultList();
+  List<UserSessionModel> result=new ArrayList<>();
+  List<String> userSessionIds=new ArrayList<>();
+  for (  PersistentUserSessionEntity entity : results) {
+    result.add(toAdapter(entity));
+    userSessionIds.add(entity.getUserSessionId());
+  }
+  TypedQuery<PersistentClientSessionEntity> query2=em.createNamedQuery("findClientSessionsByUserSessions",PersistentClientSessionEntity.class);
+  query2.setParameter("userSessionIds",userSessionIds);
+  query2.setParameter("offline",offline);
+  List<PersistentClientSessionEntity> clientSessions=query2.getResultList();
+  int j=0;
+  for (  UserSessionModel ss : result) {
+    PersistentUserSessionAdapter userSession=(PersistentUserSessionAdapter)ss;
+    List<ClientSessionModel> currentClientSessions=userSession.getClientSessions();
+    boolean next=true;
+    while (next && j < clientSessions.size()) {
+      PersistentClientSessionEntity clientSession=clientSessions.get(j);
+      if (clientSession.getUserSessionId().equals(userSession.getId())) {
+        PersistentClientSessionAdapter clientSessAdapter=toAdapter(userSession.getRealm(),userSession,clientSession);
+        currentClientSessions.add(clientSessAdapter);
+        j++;
+      }
+ else {
+        next=false;
+      }
+    }
+  }
+  return result;
+}

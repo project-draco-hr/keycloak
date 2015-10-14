@@ -6,16 +6,17 @@
     entity.setUserSession(null);
   }
  else {
+    UserSessionAdapter userSessionAdapter=(UserSessionAdapter)userSession;
     if (entity.getUserSession() != null) {
       if (entity.getUserSession().equals(userSession.getId())) {
         return;
       }
  else {
-        provider.dettachSession(userSession,this);
+        provider.dettachSession(userSessionAdapter,this);
       }
     }
  else {
-      provider.attachSession(userSession,this);
+      provider.attachSession(userSessionAdapter,this);
     }
     entity.setUserSession(userSession.getId());
   }

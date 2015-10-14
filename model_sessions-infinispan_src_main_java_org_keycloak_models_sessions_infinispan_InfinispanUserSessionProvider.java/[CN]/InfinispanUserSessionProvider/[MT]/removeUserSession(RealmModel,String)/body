@@ -1,7 +1,3 @@
 {
-  tx.remove(sessionCache,userSessionId);
-  Map<String,String> map=new MapReduceTask(sessionCache).mappedWith(ClientSessionMapper.create(realm.getId()).userSession(userSessionId).emitKey()).reducedWith(new FirstResultReducer()).execute();
-  for (  String id : map.keySet()) {
-    tx.remove(sessionCache,id);
-  }
+  removeUserSession(realm,userSessionId,false);
 }

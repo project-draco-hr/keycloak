@@ -1,13 +1,13 @@
 {
   if (entity.getClientSessions() != null) {
-    List<ClientSessionEntity> clientSessions=new LinkedList<ClientSessionEntity>();
+    List<ClientSessionModel> clientSessions=new LinkedList<>();
     for (    String c : entity.getClientSessions()) {
-      ClientSessionEntity clientSession=(ClientSessionEntity)cache.get(c);
+      ClientSessionModel clientSession=provider.getClientSession(realm,c,offline);
       if (clientSession != null) {
         clientSessions.add(clientSession);
       }
     }
-    return provider.wrapClientSessions(realm,clientSessions);
+    return clientSessions;
   }
  else {
     return Collections.emptyList();

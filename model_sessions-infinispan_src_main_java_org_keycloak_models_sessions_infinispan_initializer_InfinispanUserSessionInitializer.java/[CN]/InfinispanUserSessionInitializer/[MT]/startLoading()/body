@@ -1,0 +1,55 @@
+{
+  InitializerState state=getOrCreateInitializerState();
+  int processors=Runtime.getRuntime().availableProcessors();
+  ExecutorService localExecutor=Executors.newCachedThreadPool();
+  DistributedExecutorService distributedExecutorService=new DefaultExecutorService(cache,localExecutor);
+  int errors=0;
+  try {
+    while (!state.isFinished()) {
+      Transport transport=cache.getCacheManager().getTransport();
+      int nodesCount=transport == null ? 1 : transport.getMembers().size();
+      int distributedWorkersCount=processors * nodesCount;
+      log.infof("Starting next iteration with %d workers",distributedWorkersCount);
+      List<Integer> segments=state.getUnfinishedSegments(distributedWorkersCount);
+      log.info("unfinished segments for this iteration: " + segments);
+      List<Future<WorkerResult>> futures=new LinkedList<>();
+      for (      Integer segment : segments) {
+        SessionInitializerWorker worker=new SessionInitializerWorker();
+        worker.setWorkerEnvironment(segment,sessionsPerSegment,sessionLoader);
+        Future<WorkerResult> future=distributedExecutorService.submit(worker);
+        futures.add(future);
+      }
+      for (      Future<WorkerResult> future : futures) {
+        try {
+          WorkerResult result=future.get();
+          if (result.getSuccess()) {
+            int computedSegment=result.getSegment();
+            state.markSegmentFinished(computedSegment);
+          }
+ else {
+            if (log.isTraceEnabled()) {
+              log.tracef("Segment %d failed to compute",result.getSegment());
+            }
+          }
+        }
+ catch (        InterruptedException ie) {
+          errors++;
+          log.error("Interruped exception when computed future. Errors: " + errors,ie);
+        }
+catch (        ExecutionException ee) {
+          errors++;
+          log.error("ExecutionException when computed future. Errors: " + errors,ee);
+        }
+      }
+      if (errors >= maxErrors) {
+        throw new RuntimeException("Maximum count of worker errors occured. Limit was " + maxErrors + ". See server.log for details");
+      }
+      saveStateToCache(state);
+      log.info("New initializer state pushed. The state is: " + state.printState(false));
+    }
+  }
+  finally {
+    distributedExecutorService.shutdown();
+    localExecutor.shutdown();
+  }
+}

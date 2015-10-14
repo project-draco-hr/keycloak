@@ -14,7 +14,7 @@
   }
   UserModel user=auth.getUser();
   user.revokeConsentForClient(client.getId());
-  OfflineTokenUtils.revokeOfflineToken(session,realm,user,client);
+  new UserSessionManager(session).revokeOfflineToken(user,client);
   AuthenticationManager.backchannelUserFromClient(session,realm,user,client,uriInfo,headers);
   event.event(EventType.REVOKE_GRANT).client(auth.getClient()).user(auth.getUser()).detail(Details.REVOKED_CLIENT,client.getClientId()).success();
   setReferrerOnPage();

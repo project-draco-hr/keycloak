@@ -1,0 +1,37 @@
+{
+  UserSessionModel[] origSessions=createSessions();
+  resetSession();
+  for (  UserSessionModel origSession : origSessions) {
+    UserSessionModel userSession=session.sessions().getUserSession(realm,origSession.getId());
+    for (    ClientSessionModel clientSession : userSession.getClientSessions()) {
+      sessionManager.persistOfflineSession(clientSession,userSession);
+    }
+  }
+  resetSession();
+  session.sessions().onRealmRemoved(realm);
+  InfinispanConnectionProvider infinispan=session.getProvider(InfinispanConnectionProvider.class);
+  infinispan.getCache(InfinispanConnectionProvider.OFFLINE_SESSION_CACHE_NAME).clear();
+  resetSession();
+  ClientModel testApp=realm.getClientByClientId("test-app");
+  ClientModel thirdparty=realm.getClientByClientId("third-party");
+  Assert.assertEquals(0,session.sessions().getOfflineSessionsCount(realm,testApp));
+  Assert.assertEquals(0,session.sessions().getOfflineSessionsCount(realm,thirdparty));
+  int started=Time.currentTime();
+  try {
+    Time.setOffset(10);
+    UserSessionProviderFactory userSessionFactory=(UserSessionProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(UserSessionProvider.class);
+    userSessionFactory.loadPersistentSessions(session.getKeycloakSessionFactory(),10,2);
+    resetSession();
+    testApp=realm.getClientByClientId("test-app");
+    Assert.assertEquals(3,session.sessions().getOfflineSessionsCount(realm,testApp));
+    Assert.assertEquals(1,session.sessions().getOfflineSessionsCount(realm,thirdparty));
+    List<UserSessionModel> loadedSessions=session.sessions().getOfflineUserSessions(realm,testApp,0,10);
+    UserSessionProviderTest.assertSessions(loadedSessions,origSessions);
+    UserSessionPersisterProviderTest.assertSessionLoaded(loadedSessions,origSessions[0].getId(),session.users().getUserByUsername("user1",realm),"127.0.0.1",started,started + 10,"test-app","third-party");
+    UserSessionPersisterProviderTest.assertSessionLoaded(loadedSessions,origSessions[1].getId(),session.users().getUserByUsername("user1",realm),"127.0.0.2",started,started + 10,"test-app");
+    UserSessionPersisterProviderTest.assertSessionLoaded(loadedSessions,origSessions[2].getId(),session.users().getUserByUsername("user2",realm),"127.0.0.3",started,started + 10,"test-app");
+  }
+  finally {
+    Time.setOffset(0);
+  }
+}

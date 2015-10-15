@@ -3,6 +3,10 @@
   if (sessions != null) {
     sessions.onUserRemoved(realm,user);
   }
+  UserSessionPersisterProvider sessionsPersister=session.getProvider(UserSessionPersisterProvider.class);
+  if (sessionsPersister != null) {
+    sessionsPersister.onUserRemoved(realm,user);
+  }
   if (session.users().removeUser(realm,user)) {
     return true;
   }

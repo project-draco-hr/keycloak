@@ -6,5 +6,10 @@
   }
   final ClientSessionCode clientCode=checks.clientCode;
   final ClientSessionModel clientSession=clientCode.getClientSession();
+  if (!realm.isResetPasswordAllowed()) {
+    event.client(clientCode.getClientSession().getClient());
+    event.error(Errors.NOT_ALLOWED);
+    return ErrorPage.error(session,Messages.RESET_CREDENTIAL_NOT_ALLOWED);
+  }
   return processResetCredentials(execution,clientSession,null);
 }

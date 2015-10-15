@@ -6,11 +6,11 @@
     registerPage.assertCurrent();
     registerPage.registerWithEmailAsUsername("firstName","lastName",null,"password","password");
     registerPage.assertCurrent();
-    Assert.assertEquals("Please specify email.",registerPage.getError());
+    assertEquals("Please specify email.",registerPage.getError());
     events.expectRegister(null,null).removeDetail("username").removeDetail("email").error("invalid_registration").assertEvent();
     registerPage.registerWithEmailAsUsername("firstName","lastName","registerUserInvalidEmailemail","password","password");
     registerPage.assertCurrent();
-    Assert.assertEquals("Invalid email address.",registerPage.getError());
+    assertEquals("Invalid email address.",registerPage.getError());
     events.expectRegister("registerUserInvalidEmailemail","registerUserInvalidEmailemail").error("invalid_registration").assertEvent();
   }
   finally {

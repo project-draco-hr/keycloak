@@ -1,0 +1,12 @@
+{
+  PersistentUserSessionAdapter adapter=new PersistentUserSessionAdapter(userSession);
+  PersistentUserSessionModel model=adapter.getUpdatedModel();
+  MongoUserSessionEntity entity=offline ? new MongoOfflineUserSessionEntity() : new MongoOnlineUserSessionEntity();
+  entity.setId(model.getUserSessionId());
+  entity.setRealmId(adapter.getRealm().getId());
+  entity.setUserId(adapter.getUser().getId());
+  entity.setLastSessionRefresh(model.getLastSessionRefresh());
+  entity.setData(model.getData());
+  entity.setClientSessions(new ArrayList<PersistentClientSessionEntity>());
+  getMongoStore().insertEntity(entity,invocationContext);
+}

@@ -1,0 +1,50 @@
+{
+  UriInfo uriInfo=session.getContext().getUri();
+  HttpHeaders httpHeaders=session.getContext().getRequestHeaders();
+  if (uriInfo != null && uriInfo.getQueryParameters().containsKey(KC_LOCALE_PARAM)) {
+    String localeString=uriInfo.getQueryParameters().getFirst(KC_LOCALE_PARAM);
+    Locale locale=findLocale(realm.getSupportedLocales(),localeString);
+    if (locale != null) {
+      updateLocaleCookie(session,realm,localeString);
+      if (user != null) {
+        updateUsersLocale(user,localeString);
+      }
+      return locale;
+    }
+  }
+  if (user != null && user.getAttributes().containsKey(UserModel.LOCALE)) {
+    String localeString=user.getFirstAttribute(UserModel.LOCALE);
+    Locale locale=findLocale(realm.getSupportedLocales(),localeString);
+    if (locale != null) {
+      updateLocaleCookie(session,realm,localeString);
+      return locale;
+    }
+  }
+  if (httpHeaders != null && httpHeaders.getCookies().containsKey(LOCALE_COOKIE)) {
+    String localeString=httpHeaders.getCookies().get(LOCALE_COOKIE).getValue();
+    Locale locale=findLocale(realm.getSupportedLocales(),localeString);
+    if (locale != null) {
+      if (user != null) {
+        updateUsersLocale(user,localeString);
+      }
+      return locale;
+    }
+  }
+  if (uriInfo != null && uriInfo.getQueryParameters().containsKey(UI_LOCALES_PARAM)) {
+    String localeString=uriInfo.getQueryParameters().getFirst(UI_LOCALES_PARAM);
+    Locale locale=findLocale(realm.getSupportedLocales(),localeString.split(" "));
+    if (locale != null) {
+      return locale;
+    }
+  }
+  if (httpHeaders != null && httpHeaders.getAcceptableLanguages() != null && !httpHeaders.getAcceptableLanguages().isEmpty()) {
+    for (    Locale l : httpHeaders.getAcceptableLanguages()) {
+      String localeString=l.toLanguageTag();
+      Locale locale=findLocale(realm.getSupportedLocales(),localeString);
+      if (locale != null) {
+        return locale;
+      }
+    }
+  }
+  return null;
+}

@@ -1,0 +1,12 @@
+{
+  Cache<String,SessionEntity> cache=getCache(offline);
+  UserSessionModel userSession=clientSession.getUserSession();
+  if (userSession != null) {
+    UserSessionEntity entity=((UserSessionAdapter)userSession).getEntity();
+    if (entity.getClientSessions() != null) {
+      entity.getClientSessions().remove(clientSession.getId());
+    }
+    tx.replace(cache,entity.getId(),entity);
+  }
+  tx.remove(cache,clientSession.getId());
+}

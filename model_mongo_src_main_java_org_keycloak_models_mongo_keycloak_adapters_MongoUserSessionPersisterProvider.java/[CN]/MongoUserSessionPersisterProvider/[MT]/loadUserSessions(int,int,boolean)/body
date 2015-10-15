@@ -1,0 +1,12 @@
+{
+  DBObject query=new QueryBuilder().get();
+  DBObject sort=new BasicDBObject("id",1);
+  Class<? extends MongoUserSessionEntity> clazz=offline ? MongoOfflineUserSessionEntity.class : MongoOnlineUserSessionEntity.class;
+  List<? extends MongoUserSessionEntity> entities=getMongoStore().loadEntities(clazz,query,sort,firstResult,maxResults,invocationContext);
+  List<UserSessionModel> results=new LinkedList<>();
+  for (  MongoUserSessionEntity entity : entities) {
+    PersistentUserSessionAdapter userSession=toAdapter(entity,offline);
+    results.add(userSession);
+  }
+  return results;
+}

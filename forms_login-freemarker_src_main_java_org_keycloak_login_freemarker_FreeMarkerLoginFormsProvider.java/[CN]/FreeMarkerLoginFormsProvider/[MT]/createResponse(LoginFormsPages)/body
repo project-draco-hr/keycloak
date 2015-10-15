@@ -29,7 +29,7 @@
     logger.warn("Failed to load properties",e);
   }
   Properties messagesBundle;
-  Locale locale=LocaleHelper.getLocale(realm,user,uriInfo,session.getContext().getRequestHeaders());
+  Locale locale=session.getContext().resolveLocale(user);
   try {
     messagesBundle=theme.getMessages(locale);
     attributes.put("msg",new MessageFormatterMethod(locale,messagesBundle));
@@ -111,8 +111,6 @@ BrowserSecurityHeaderSetup.headers(builder,realm);
 for (Map.Entry<String,String> entry : httpResponseHeaders.entrySet()) {
 builder.header(entry.getKey(),entry.getValue());
 }
-String cookiePath=Urls.localeCookiePath(baseUri,realm.getName());
-LocaleHelper.updateLocaleCookie(builder,locale,realm,uriInfo,cookiePath);
 return builder.build();
 }
  catch (FreeMarkerException e) {

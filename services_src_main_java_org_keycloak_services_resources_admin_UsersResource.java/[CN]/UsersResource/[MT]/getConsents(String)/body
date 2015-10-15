@@ -5,7 +5,7 @@
     throw new NotFoundException("User not found");
   }
   List<Map<String,Object>> result=new LinkedList<>();
-  Set<ClientModel> offlineClients=OfflineTokenUtils.findClientsWithOfflineToken(session,realm,user);
+  Set<ClientModel> offlineClients=new UserSessionManager(session).findClientsWithOfflineToken(realm,user);
   for (  ClientModel client : realm.getClients()) {
     UserConsentModel consent=user.getConsentByClient(client.getId());
     boolean hasOfflineToken=offlineClients.contains(client);

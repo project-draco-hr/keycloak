@@ -6,7 +6,7 @@
   }
   ClientModel client=realm.getClientByClientId(clientId);
   boolean revokedConsent=user.revokeConsentForClient(client.getId());
-  boolean revokedOfflineToken=OfflineTokenUtils.revokeOfflineToken(session,realm,user,client);
+  boolean revokedOfflineToken=new UserSessionManager(session).revokeOfflineToken(user,client);
   if (revokedConsent) {
     AuthenticationManager.backchannelUserFromClient(session,realm,user,client,uriInfo,headers);
   }

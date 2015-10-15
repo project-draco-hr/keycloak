@@ -5,6 +5,7 @@
   Map<String,ClientSessionModel.ExecutionStatus> executionStatus=new HashMap<>();
   List<FormAction> requiredActions=new LinkedList<>();
   List<ValidationContextImpl> successes=new LinkedList<>();
+  List<ValidationContextImpl> errors=new LinkedList<>();
   for (  AuthenticationExecutionModel formActionExecution : formActionExecutions) {
     if (!formActionExecution.isEnabled()) {
       executionStatus.put(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.SKIPPED);
@@ -44,10 +45,25 @@
       successes.add(result);
     }
  else {
-      processor.logFailure();
       executionStatus.put(formActionExecution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
-      return renderForm(result.formData,result.errors);
+      errors.add(result);
     }
+  }
+  if (!errors.isEmpty()) {
+    processor.logFailure();
+    List<FormMessage> messages=new LinkedList<>();
+    Set<String> fields=new HashSet<>();
+    for (    ValidationContextImpl v : errors) {
+      for (      FormMessage m : v.errors) {
+        if (!fields.contains(m.getField())) {
+          fields.add(m.getField());
+          messages.add(m);
+        }
+      }
+    }
+    ValidationContextImpl first=errors.get(0);
+    first.getEvent().error(first.error);
+    return renderForm(first.formData,messages);
   }
   for (  ValidationContextImpl context : successes) {
     context.action.success(context);

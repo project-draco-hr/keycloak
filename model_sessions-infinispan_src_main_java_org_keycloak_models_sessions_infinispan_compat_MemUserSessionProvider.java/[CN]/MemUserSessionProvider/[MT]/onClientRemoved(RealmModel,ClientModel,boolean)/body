@@ -1,0 +1,9 @@
+{
+  ConcurrentHashMap<String,ClientSessionEntity> clientSessionsMap=offline ? offlineClientSessions : clientSessions;
+  for (  ClientSessionEntity e : clientSessionsMap.values()) {
+    if (e.getRealmId().equals(realm.getId()) && e.getClientId().equals(client.getId())) {
+      clientSessionsMap.remove(e.getId());
+      e.getSession().removeClientSession(e);
+    }
+  }
+}

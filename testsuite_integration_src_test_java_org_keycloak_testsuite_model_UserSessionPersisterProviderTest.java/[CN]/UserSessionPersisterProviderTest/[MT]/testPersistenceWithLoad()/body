@@ -1,0 +1,20 @@
+{
+  int started=Time.currentTime();
+  UserSessionModel[] origSessions=createSessions();
+  resetSession();
+  ClientModel testApp=realm.getClientByClientId("test-app");
+  List<UserSessionModel> userSessions=session.sessions().getUserSessions(realm,testApp);
+  for (  UserSessionModel userSession : userSessions) {
+    persistUserSession(userSession,true);
+  }
+  UserSessionModel userSession=session.sessions().getUserSession(realm,origSessions[0].getId());
+  persistUserSession(userSession,false);
+  resetSession();
+  List<UserSessionModel> loadedSessions=loadPersistedSessionsPaginated(false,1,1,1);
+  UserSessionProviderTest.assertSession(loadedSessions.get(0),session.users().getUserByUsername("user1",realm),"127.0.0.1",started,started,"test-app","third-party");
+  loadedSessions=loadPersistedSessionsPaginated(true,2,2,3);
+  UserSessionProviderTest.assertSessions(loadedSessions,origSessions);
+  assertSessionLoaded(loadedSessions,origSessions[0].getId(),session.users().getUserByUsername("user1",realm),"127.0.0.1",started,started,"test-app","third-party");
+  assertSessionLoaded(loadedSessions,origSessions[1].getId(),session.users().getUserByUsername("user1",realm),"127.0.0.2",started,started,"test-app");
+  assertSessionLoaded(loadedSessions,origSessions[2].getId(),session.users().getUserByUsername("user2",realm),"127.0.0.3",started,started,"test-app");
+}

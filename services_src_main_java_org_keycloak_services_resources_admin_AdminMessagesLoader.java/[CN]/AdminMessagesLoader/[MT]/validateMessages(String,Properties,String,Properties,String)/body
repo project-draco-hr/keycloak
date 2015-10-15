@@ -1,0 +1,20 @@
+{
+  if (standardBundle.keySet().containsAll(messages.keySet()) && (messages.keySet().containsAll(standardBundle.keySet()))) {
+    return;
+  }
+  int warnCount=0;
+  for (  Object key : standardBundle.keySet()) {
+    if (!messages.containsKey(key)) {
+      logger.error(themeName + " theme: Key '" + key+ "' not found in admin-messages bundle for locale="+ strLocale+ ". However, this key exists in previously loaded bundle for locale="+ standardLocale);
+      warnCount++;
+    }
+    if (warnCount > 4)     return;
+  }
+  for (  Object key : messages.keySet()) {
+    if (!standardBundle.containsKey(key)) {
+      logger.error(themeName + " theme: Key '" + key+ "' was found in admin-messages bundle for locale="+ strLocale+ ". However, this key does not exist in previously loaded bundle for locale="+ standardLocale);
+      warnCount++;
+    }
+    if (warnCount > 4)     return;
+  }
+}

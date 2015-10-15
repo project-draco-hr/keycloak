@@ -35,6 +35,18 @@
         }
       }
     }
+    List<RoleModel> scopeRoles=new LinkedList<>();
+    for (    String scopeParamPart : scopeParamRoles) {
+      RoleModel scopeParamRole=getRoleFromScopeParam(client.getRealm(),scopeParamPart);
+      if (scopeParamRole != null) {
+        for (        RoleModel role : roles) {
+          if (role.hasRole(scopeParamRole)) {
+            scopeRoles.add(scopeParamRole);
+          }
+        }
+      }
+    }
+    roles.addAll(scopeRoles);
     requestedRoles=roles;
   }
   return requestedRoles;

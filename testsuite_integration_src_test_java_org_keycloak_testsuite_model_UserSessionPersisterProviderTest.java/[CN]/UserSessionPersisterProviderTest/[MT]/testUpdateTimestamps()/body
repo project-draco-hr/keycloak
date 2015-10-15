@@ -1,0 +1,19 @@
+{
+  int started=Time.currentTime();
+  UserSessionModel[] origSessions=createSessions();
+  resetSession();
+  ClientModel testApp=realm.getClientByClientId("test-app");
+  List<UserSessionModel> userSessions=session.sessions().getUserSessions(realm,testApp);
+  for (  UserSessionModel userSession : userSessions) {
+    persistUserSession(userSession,true);
+  }
+  UserSessionModel userSession=session.sessions().getUserSession(realm,origSessions[0].getId());
+  persistUserSession(userSession,false);
+  resetSession();
+  int newTime=started + 50;
+  persister.updateAllTimestamps(newTime);
+  List<UserSessionModel> loadedSessions=loadPersistedSessionsPaginated(false,1,1,1);
+  Assert.assertEquals(2,assertTimestampsUpdated(loadedSessions,newTime));
+  loadedSessions=loadPersistedSessionsPaginated(true,2,2,3);
+  Assert.assertEquals(4,assertTimestampsUpdated(loadedSessions,newTime));
+}

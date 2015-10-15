@@ -1,9 +1,7 @@
 {
   Map<String,String> offlineSessions=new HashMap<>();
-  UserSessionModel offlineUserSession=session.sessions().createOfflineUserSession(userSession);
   for (  ClientSessionModel clientSession : userSession.getClientSessions()) {
-    ClientSessionModel offlineClientSession=session.sessions().createOfflineClientSession(clientSession);
-    offlineClientSession.setUserSession(offlineUserSession);
+    sessionManager.createOrUpdateOfflineSession(clientSession,userSession);
     offlineSessions.put(clientSession.getId(),userSession.getId());
   }
   return offlineSessions;

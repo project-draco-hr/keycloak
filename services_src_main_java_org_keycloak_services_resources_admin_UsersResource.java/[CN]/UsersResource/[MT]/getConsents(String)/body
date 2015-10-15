@@ -18,7 +18,13 @@
     currentRep.put("grantedProtocolMappers",(rep == null ? Collections.emptyMap() : rep.getGrantedProtocolMappers()));
     currentRep.put("grantedRealmRoles",(rep == null ? Collections.emptyList() : rep.getGrantedRealmRoles()));
     currentRep.put("grantedClientRoles",(rep == null ? Collections.emptyMap() : rep.getGrantedClientRoles()));
-    List<String> additionalGrants=hasOfflineToken ? Arrays.asList("Offline Token") : Collections.<String>emptyList();
+    List<Map<String,String>> additionalGrants=new LinkedList<>();
+    if (hasOfflineToken) {
+      Map<String,String> offlineTokens=new HashMap<>();
+      offlineTokens.put("client",client.getId());
+      offlineTokens.put("key","Offline Token");
+      additionalGrants.add(offlineTokens);
+    }
     currentRep.put("additionalGrants",additionalGrants);
     result.add(currentRep);
   }

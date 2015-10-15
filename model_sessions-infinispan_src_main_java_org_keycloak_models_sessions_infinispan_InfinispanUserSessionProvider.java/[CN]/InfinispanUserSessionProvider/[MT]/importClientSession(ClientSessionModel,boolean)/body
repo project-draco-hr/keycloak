@@ -1,0 +1,21 @@
+{
+  ClientSessionEntity entity=new ClientSessionEntity();
+  entity.setId(clientSession.getId());
+  entity.setRealm(clientSession.getRealm().getId());
+  entity.setAction(clientSession.getAction());
+  entity.setAuthenticatorStatus(clientSession.getExecutionStatus());
+  entity.setAuthMethod(clientSession.getAuthMethod());
+  if (clientSession.getAuthenticatedUser() != null) {
+    entity.setAuthUserId(clientSession.getAuthenticatedUser().getId());
+  }
+  entity.setClient(clientSession.getClient().getId());
+  entity.setNotes(clientSession.getNotes());
+  entity.setProtocolMappers(clientSession.getProtocolMappers());
+  entity.setRedirectUri(clientSession.getRedirectUri());
+  entity.setRoles(clientSession.getRoles());
+  entity.setTimestamp(clientSession.getTimestamp());
+  entity.setUserSessionNotes(clientSession.getUserSessionNotes());
+  Cache<String,SessionEntity> cache=getCache(offline);
+  tx.put(cache,clientSession.getId(),entity);
+  return wrap(clientSession.getRealm(),entity,offline);
+}

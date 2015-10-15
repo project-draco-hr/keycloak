@@ -8,7 +8,7 @@
   fooRealm=session.realms().getRealm("foo");
   userSession=session.sessions().getUserSession(fooRealm,userSession.getId());
   clientSession=session.sessions().getClientSession(fooRealm,clientSession.getId());
-  sessionManager.persistOfflineSession(userSession.getClientSessions().get(0),userSession);
+  sessionManager.createOrUpdateOfflineSession(userSession.getClientSessions().get(0),userSession);
   resetSession();
   ClientSessionModel offlineClientSession=sessionManager.findOfflineClientSession(fooRealm,clientSession.getId(),userSession.getId());
   Assert.assertEquals("foo-app",offlineClientSession.getClient().getClientId());

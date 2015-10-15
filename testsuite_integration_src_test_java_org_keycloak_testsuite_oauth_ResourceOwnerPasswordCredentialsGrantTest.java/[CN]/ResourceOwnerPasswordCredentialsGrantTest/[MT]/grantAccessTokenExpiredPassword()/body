@@ -1,0 +1,28 @@
+{
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.setPasswordPolicy(new PasswordPolicy("forceExpiredPasswordChange(1)"));
+    }
+  }
+);
+  try {
+    Time.setOffset(60 * 60 * 48);
+    oauth.clientId("resource-owner");
+    OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("secret","test-user@localhost","password");
+    assertEquals(400,response.getStatusCode());
+    assertEquals("invalid_grant",response.getError());
+    assertEquals("Account is not fully set up",response.getErrorDescription());
+    events.expectLogin().client("resource-owner").session((String)null).clearDetails().error(Errors.RESOLVE_REQUIRED_ACTIONS).user((String)null).assertEvent();
+  }
+  finally {
+    Time.setOffset(0);
+    keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+      @Override public void config(      RealmManager manager,      RealmModel adminstrationRealm,      RealmModel appRealm){
+        appRealm.setPasswordPolicy(new PasswordPolicy(""));
+        UserModel user=manager.getSession().users().getUserByEmail("test-user@localhost",appRealm);
+        user.removeRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+      }
+    }
+);
+  }
+}

@@ -1,13 +1,11 @@
 {
+  log.infof("Loading sessions - first: %d, max: %d",first,max);
   UserSessionPersisterProvider persister=session.getProvider(UserSessionPersisterProvider.class);
   List<UserSessionModel> sessions=persister.loadUserSessions(first,max,true);
-  int currentTime=Time.currentTime();
   for (  UserSessionModel persistentSession : sessions) {
-    persistentSession.setLastSessionRefresh(currentTime);
-    persister.updateUserSession(persistentSession,true);
-    UserSessionModel offlineUserSession=session.sessions().createOfflineUserSession(persistentSession);
+    UserSessionModel offlineUserSession=session.sessions().importUserSession(persistentSession,true);
     for (    ClientSessionModel persistentClientSession : persistentSession.getClientSessions()) {
-      ClientSessionModel offlineClientSession=session.sessions().createOfflineClientSession(persistentClientSession);
+      ClientSessionModel offlineClientSession=session.sessions().importClientSession(persistentClientSession,true);
       offlineClientSession.setUserSession(offlineUserSession);
     }
   }

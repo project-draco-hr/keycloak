@@ -12,13 +12,19 @@
   for (  String id : map.keySet()) {
     tx.remove(sessionCache,id);
   }
-  map=new MapReduceTask(offlineSessionCache).mappedWith(UserSessionMapper.create(realm.getId()).expired(null,expiredOffline).emitKey()).reducedWith(new FirstResultReducer()).execute();
-  for (  String id : map.keySet()) {
-    tx.remove(offlineSessionCache,id);
-    persister.removeUserSession(id,true);
+  Map<String,SessionEntity> map2=new MapReduceTask(offlineSessionCache).mappedWith(UserSessionMapper.create(realm.getId()).expired(null,expiredOffline)).reducedWith(new FirstResultReducer()).execute();
+  for (  Map.Entry<String,SessionEntity> entry : map2.entrySet()) {
+    String userSessionId=entry.getKey();
+    tx.remove(offlineSessionCache,userSessionId);
+    persister.removeUserSession(userSessionId,true);
+    UserSessionEntity entity=(UserSessionEntity)entry.getValue();
+    for (    String clientSessionId : entity.getClientSessions()) {
+      tx.remove(offlineSessionCache,clientSessionId);
+    }
   }
-  map=new MapReduceTask(offlineSessionCache).mappedWith(new ClientSessionsOfUserSessionMapper(realm.getId(),new HashSet<>(map.keySet())).emitKey()).reducedWith(new FirstResultReducer()).execute();
-  for (  String id : map.keySet()) {
-    tx.remove(offlineSessionCache,id);
+  map=new MapReduceTask(offlineSessionCache).mappedWith(ClientSessionMapper.create(realm.getId()).expiredRefresh(expiredOffline).emitKey()).reducedWith(new FirstResultReducer()).execute();
+  for (  String clientSessionId : map.keySet()) {
+    tx.remove(offlineSessionCache,clientSessionId);
+    persister.removeClientSession(clientSessionId,true);
   }
 }

@@ -1,0 +1,17 @@
+{
+  DBObject timestampSubquery=new QueryBuilder().and("timestamp").notEquals(time).get();
+  DBObject query=new QueryBuilder().and("clientSessions").elemMatch(timestampSubquery).get();
+  DBObject update=new QueryBuilder().and("$set").is(new BasicDBObject("clientSessions.$.timestamp",time)).get();
+  int countModified=1;
+  while (countModified > 0) {
+    countModified=getMongoStore().updateEntities(MongoOfflineUserSessionEntity.class,query,update,invocationContext);
+  }
+  countModified=1;
+  while (countModified > 0) {
+    countModified=getMongoStore().updateEntities(MongoOnlineUserSessionEntity.class,query,update,invocationContext);
+  }
+  query=new QueryBuilder().get();
+  update=new QueryBuilder().and("$set").is(new BasicDBObject("lastSessionRefresh",time)).get();
+  getMongoStore().updateEntities(MongoOfflineUserSessionEntity.class,query,update,invocationContext);
+  getMongoStore().updateEntities(MongoOnlineUserSessionEntity.class,query,update,invocationContext);
+}

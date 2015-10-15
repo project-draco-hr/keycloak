@@ -1,21 +1,7 @@
 {
-  UserSessionEntity entity=new UserSessionEntity();
-  entity.setId(userSession.getId());
-  entity.setRealm(userSession.getRealm().getId());
-  entity.setAuthMethod(userSession.getAuthMethod());
-  entity.setBrokerSessionId(userSession.getBrokerSessionId());
-  entity.setBrokerUserId(userSession.getBrokerUserId());
-  entity.setIpAddress(userSession.getIpAddress());
-  entity.setLoginUsername(userSession.getLoginUsername());
-  if (userSession.getNotes() != null) {
-    entity.getNotes().putAll(userSession.getNotes());
-  }
-  entity.setRememberMe(userSession.isRememberMe());
-  entity.setState(userSession.getState());
-  entity.setUser(userSession.getUser().getId());
+  UserSessionAdapter importedUserSession=importUserSession(userSession,true);
   int currentTime=Time.currentTime();
-  entity.setStarted(currentTime);
-  entity.setLastSessionRefresh(currentTime);
-  offlineUserSessions.put(userSession.getId(),entity);
-  return new UserSessionAdapter(session,this,userSession.getRealm(),entity);
+  importedUserSession.getEntity().setStarted(currentTime);
+  importedUserSession.setLastSessionRefresh(currentTime);
+  return importedUserSession;
 }

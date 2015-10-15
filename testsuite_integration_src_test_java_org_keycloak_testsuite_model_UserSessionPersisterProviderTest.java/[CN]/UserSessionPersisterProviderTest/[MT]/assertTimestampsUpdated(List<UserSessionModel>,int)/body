@@ -1,0 +1,11 @@
+{
+  int clientSessionsCount=0;
+  for (  UserSessionModel loadedSession : loadedSessions) {
+    Assert.assertEquals(expectedTime,loadedSession.getLastSessionRefresh());
+    for (    ClientSessionModel clientSession : loadedSession.getClientSessions()) {
+      Assert.assertEquals(expectedTime,clientSession.getTimestamp());
+      clientSessionsCount++;
+    }
+  }
+  return clientSessionsCount;
+}

@@ -12,6 +12,12 @@
   List<UserSessionRepresentation> reps=new ArrayList<UserSessionRepresentation>();
   for (  UserSessionModel session : sessions) {
     UserSessionRepresentation rep=ModelToRepresentation.toRepresentation(session);
+    for (    ClientSessionModel clientSession : session.getClientSessions()) {
+      if (clientId.equals(clientSession.getClient().getId())) {
+        rep.setLastAccess(Time.toMillis(clientSession.getTimestamp()));
+        break;
+      }
+    }
     reps.add(rep);
   }
   return reps;

@@ -25,4 +25,12 @@
       persister.removeUserSession(s.getId(),true);
     }
   }
+  citr=offlineClientSessions.values().iterator();
+  while (citr.hasNext()) {
+    ClientSessionEntity s=citr.next();
+    if (s.getRealmId().equals(realm.getId()) && (s.getTimestamp() < Time.currentTime() - realm.getOfflineSessionIdleTimeout())) {
+      citr.remove();
+      persister.removeClientSession(s.getId(),true);
+    }
+  }
 }

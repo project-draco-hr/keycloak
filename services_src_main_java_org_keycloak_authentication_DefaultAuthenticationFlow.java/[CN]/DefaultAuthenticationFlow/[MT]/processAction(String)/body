@@ -19,7 +19,14 @@
       AuthenticationProcessor.Result result=processor.createAuthenticatorContext(model,authenticator,executions);
       authenticator.action(result);
       Response response=processResult(result);
-      if (response == null)       return processFlow();
+      if (response == null) {
+        if (result.status == SUCCESS && processor.isBrowserFlow()) {
+          return processor.createSuccessRedirect();
+        }
+ else {
+          return processFlow();
+        }
+      }
  else       return response;
     }
   }

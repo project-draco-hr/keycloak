@@ -6,5 +6,12 @@
   spnegoSchemeFactory.setCredentials(username,password);
   Response response=client.target(kcLoginPageLocation).request().get();
   SpnegoAuthenticator.bypassChallengeJavascript=false;
+  if (response.getStatus() == 302) {
+    if (response.getLocation() == null)     return response;
+    String uri=response.getLocation().toString();
+    if (uri.contains("login-actions/required-action")) {
+      response=client.target(uri).request().get();
+    }
+  }
   return response;
 }

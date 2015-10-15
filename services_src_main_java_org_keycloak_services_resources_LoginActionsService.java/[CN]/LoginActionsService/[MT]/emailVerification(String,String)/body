@@ -2,11 +2,16 @@
   event.event(EventType.VERIFY_EMAIL);
   if (key != null) {
     Checks checks=new Checks();
-    if (!checks.verifyCode(key,ClientSessionModel.Action.VERIFY_EMAIL.name())) {
+    if (!checks.verifyCode(key,ClientSessionModel.Action.REQUIRED_ACTIONS.name())) {
       return checks.response;
     }
     ClientSessionCode accessCode=checks.clientCode;
     ClientSessionModel clientSession=accessCode.getClientSession();
+    if (!ClientSessionModel.Action.VERIFY_EMAIL.name().equals(clientSession.getNote(AuthenticationManager.CURRENT_REQUIRED_ACTION))) {
+      logger.error("required action doesn't match current required action");
+      event.error(Errors.INVALID_CODE);
+      throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
+    }
     UserSessionModel userSession=clientSession.getUserSession();
     UserModel user=userSession.getUser();
     initEvent(clientSession);
@@ -19,11 +24,11 @@
       return session.getProvider(LoginFormsProvider.class).setSuccess(Messages.EMAIL_VERIFIED).createInfoPage();
     }
     event=event.clone().removeDetail(Details.EMAIL).event(EventType.LOGIN);
-    return AuthenticationManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
+    return AuthenticationProcessor.createRequiredActionRedirect(realm,clientSession,uriInfo);
   }
  else {
     Checks checks=new Checks();
-    if (!checks.verifyCode(code,ClientSessionModel.Action.VERIFY_EMAIL.name())) {
+    if (!checks.verifyCode(code,ClientSessionModel.Action.REQUIRED_ACTIONS.name())) {
       return checks.response;
     }
     ClientSessionCode accessCode=checks.clientCode;

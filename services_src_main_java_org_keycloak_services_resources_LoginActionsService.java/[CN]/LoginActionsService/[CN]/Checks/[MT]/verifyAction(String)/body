@@ -1,29 +1,20 @@
 {
-  if (!verifyCode(code)) {
-    return false;
-  }
- else   if (!(clientCode.isValidAction(requiredAction) || clientCode.isValidAction(alternativeRequiredAction))) {
+  if (!clientCode.isValidAction(requiredAction)) {
     event.client(clientCode.getClientSession().getClient());
     event.error(Errors.INVALID_CODE);
     response=ErrorPage.error(session,Messages.INVALID_CODE);
     return false;
   }
- else   if (!(clientCode.isActionActive(requiredAction) || clientCode.isActionActive(alternativeRequiredAction))) {
+  if (!clientCode.isActionActive(requiredAction)) {
     event.client(clientCode.getClientSession().getClient());
     event.clone().error(Errors.EXPIRED_CODE);
     if (clientCode.getClientSession().getAction().equals(ClientSessionModel.Action.AUTHENTICATE.name())) {
       AuthenticationProcessor.resetFlow(clientCode.getClientSession());
       response=processAuthentication(null,clientCode.getClientSession(),Messages.LOGIN_TIMEOUT);
+      return false;
     }
- else {
-      if (clientCode.getClientSession().getUserSession() == null) {
-        session.sessions().removeClientSession(realm,clientCode.getClientSession());
-      }
-      response=ErrorPage.error(session,Messages.EXPIRED_CODE);
-    }
+    response=ErrorPage.error(session,Messages.EXPIRED_CODE);
     return false;
   }
- else {
-    return true;
-  }
+  return true;
 }

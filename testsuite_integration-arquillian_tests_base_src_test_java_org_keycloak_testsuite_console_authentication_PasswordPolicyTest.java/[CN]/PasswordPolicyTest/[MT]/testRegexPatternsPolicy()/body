@@ -1,5 +1,8 @@
 {
-  passwordPolicyPage.addPolicy(REGEX_PATTERN,"^[A-Z]+#[a-z]{8}$");
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  realm.setPasswordPolicy("regexPattern(^[A-Z]+#[a-z]{8}$) and ");
+  System.out.println(realm.getPasswordPolicy());
+  testRealmResource().update(realm);
   testUserCredentialsPage.navigateTo();
   testUserCredentialsPage.resetPassword("invalidPassword");
   assertFlashMessageDanger();

@@ -1,5 +1,7 @@
 {
-  passwordPolicyPage.addPolicy(SPECIAL_CHARS,2);
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  realm.setPasswordPolicy("specialChars(2) and ");
+  testRealmResource().update(realm);
   testUserCredentialsPage.navigateTo();
   testUserCredentialsPage.resetPassword("invalidPassword*");
   assertFlashMessageDanger();

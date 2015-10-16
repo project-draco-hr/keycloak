@@ -1,0 +1,13 @@
+{
+  configPage.form().setSaveEvents(true);
+  configPage.form().removeSaveType("LOGIN");
+  configPage.form().addSaveType("REGISTER_NODE");
+  configPage.form().setExpiration("50","Days");
+  configPage.form().save();
+  assertFlashMessageSuccess();
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  assertTrue(realm.isEventsEnabled());
+  assertFalse(realm.getEnabledEventTypes().contains("LOGIN"));
+  assertTrue(realm.getEnabledEventTypes().contains("REGISTER_NODE"));
+  assertEquals(4320000L,realm.getEventsExpiration().longValue());
+}

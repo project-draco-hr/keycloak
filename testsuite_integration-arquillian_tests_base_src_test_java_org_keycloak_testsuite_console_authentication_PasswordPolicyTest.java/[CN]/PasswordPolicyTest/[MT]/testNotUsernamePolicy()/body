@@ -1,5 +1,7 @@
 {
-  passwordPolicyPage.addPolicy(NOT_USERNAME);
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  realm.setPasswordPolicy("notUsername(1) and ");
+  testRealmResource().update(realm);
   testUserCredentialsPage.navigateTo();
   testUserCredentialsPage.resetPassword(testUser.getUsername());
   assertFlashMessageDanger();

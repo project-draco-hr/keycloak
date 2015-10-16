@@ -1,5 +1,7 @@
 {
-  passwordPolicyPage.addPolicy(UPPER_CASE,2);
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  realm.setPasswordPolicy("upperCase(2) and ");
+  testRealmResource().update(realm);
   testUserCredentialsPage.navigateTo();
   testUserCredentialsPage.resetPassword("Invalidpassword");
   assertFlashMessageDanger();

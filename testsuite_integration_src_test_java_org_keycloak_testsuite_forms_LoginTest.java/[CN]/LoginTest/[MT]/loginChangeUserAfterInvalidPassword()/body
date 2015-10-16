@@ -1,11 +1,11 @@
 {
   loginPage.open();
-  loginPage.login("invalid","password");
+  loginPage.login("login-test2","invalid");
   loginPage.assertCurrent();
-  Assert.assertEquals("invalid",loginPage.getUsername());
+  Assert.assertEquals("login-test2",loginPage.getUsername());
   Assert.assertEquals("",loginPage.getPassword());
   Assert.assertEquals("Invalid username or password.",loginPage.getError());
-  events.expectLogin().user((String)null).session((String)null).error("user_not_found").detail(Details.USERNAME,"invalid").removeDetail(Details.CONSENT).assertEvent();
+  events.expectLogin().user(user2Id).session((String)null).error("invalid_user_credentials").detail(Details.USERNAME,"login-test2").removeDetail(Details.CONSENT).assertEvent();
   loginPage.login("login-test","password");
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   Assert.assertNotNull(oauth.getCurrentQuery().get(OAuth2Constants.CODE));

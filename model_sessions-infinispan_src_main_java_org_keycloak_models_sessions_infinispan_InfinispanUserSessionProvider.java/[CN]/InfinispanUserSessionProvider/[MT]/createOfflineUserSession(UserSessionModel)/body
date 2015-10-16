@@ -1,18 +1,7 @@
 {
-  UserSessionEntity entity=new UserSessionEntity();
-  entity.setId(userSession.getId());
-  entity.setRealm(userSession.getRealm().getId());
-  entity.setAuthMethod(userSession.getAuthMethod());
-  entity.setBrokerSessionId(userSession.getBrokerSessionId());
-  entity.setBrokerUserId(userSession.getBrokerUserId());
-  entity.setIpAddress(userSession.getIpAddress());
-  entity.setLastSessionRefresh(userSession.getLastSessionRefresh());
-  entity.setLoginUsername(userSession.getLoginUsername());
-  entity.setNotes(userSession.getNotes());
-  entity.setRememberMe(userSession.isRememberMe());
-  entity.setStarted(userSession.getStarted());
-  entity.setState(userSession.getState());
-  entity.setUser(userSession.getUser().getId());
-  tx.put(offlineSessionCache,userSession.getId(),entity);
-  return wrap(userSession.getRealm(),entity,true);
+  UserSessionAdapter offlineUserSession=importUserSession(userSession,true);
+  int currentTime=Time.currentTime();
+  offlineUserSession.getEntity().setStarted(currentTime);
+  offlineUserSession.setLastSessionRefresh(currentTime);
+  return offlineUserSession;
 }

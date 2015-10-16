@@ -1,5 +1,7 @@
 {
-  passwordPolicyPage.addPolicy(LENGTH,8);
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  realm.setPasswordPolicy("length(8) and ");
+  testRealmResource().update(realm);
   testUserCredentialsPage.navigateTo();
   testUserCredentialsPage.resetPassword("1234567");
   assertFlashMessageDanger();

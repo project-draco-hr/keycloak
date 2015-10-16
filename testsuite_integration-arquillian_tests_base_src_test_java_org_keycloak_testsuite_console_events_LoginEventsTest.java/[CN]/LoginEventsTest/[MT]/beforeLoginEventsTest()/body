@@ -1,9 +1,6 @@
 {
-  configPage.navigateTo();
-  configPage.form().setSaveEvents(true);
-  configPage.form().waitForClearEventsButtonPresent();
-  configPage.form().addSaveType("LOGIN");
-  configPage.form().addSaveType("LOGIN_ERROR");
-  configPage.form().addSaveType("LOGOUT");
-  configPage.form().save();
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  realm.setEventsEnabled(true);
+  realm.setEnabledEventTypes(Arrays.asList("LOGIN","LOGIN_ERROR","LOGOUT"));
+  testRealmResource().update(realm);
 }

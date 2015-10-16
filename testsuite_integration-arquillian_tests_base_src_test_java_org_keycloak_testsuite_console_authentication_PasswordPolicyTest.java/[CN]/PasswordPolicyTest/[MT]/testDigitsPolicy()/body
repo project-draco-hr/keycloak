@@ -1,5 +1,7 @@
 {
-  passwordPolicyPage.addPolicy(DIGITS,2);
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  realm.setPasswordPolicy("digits(2) and ");
+  testRealmResource().update(realm);
   testUserCredentialsPage.navigateTo();
   testUserCredentialsPage.resetPassword("invalidPassword1");
   assertFlashMessageDanger();

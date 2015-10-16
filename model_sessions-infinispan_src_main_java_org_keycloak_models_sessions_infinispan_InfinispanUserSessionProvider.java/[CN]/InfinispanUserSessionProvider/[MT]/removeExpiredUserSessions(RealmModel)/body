@@ -1,6 +1,8 @@
 {
+  UserSessionPersisterProvider persister=session.getProvider(UserSessionPersisterProvider.class);
   int expired=Time.currentTime() - realm.getSsoSessionMaxLifespan();
   int expiredRefresh=Time.currentTime() - realm.getSsoSessionIdleTimeout();
+  int expiredOffline=Time.currentTime() - realm.getOfflineSessionIdleTimeout();
   int expiredDettachedClientSession=Time.currentTime() - RealmInfoUtil.getDettachedClientSessionLifespan(realm);
   Map<String,String> map=new MapReduceTask(sessionCache).mappedWith(UserSessionMapper.create(realm.getId()).expired(expired,expiredRefresh).emitKey()).reducedWith(new FirstResultReducer()).execute();
   for (  String id : map.keySet()) {
@@ -9,5 +11,20 @@
   map=new MapReduceTask(sessionCache).mappedWith(ClientSessionMapper.create(realm.getId()).expiredRefresh(expiredDettachedClientSession).requireNullUserSession(true).emitKey()).reducedWith(new FirstResultReducer()).execute();
   for (  String id : map.keySet()) {
     tx.remove(sessionCache,id);
+  }
+  Map<String,SessionEntity> map2=new MapReduceTask(offlineSessionCache).mappedWith(UserSessionMapper.create(realm.getId()).expired(null,expiredOffline)).reducedWith(new FirstResultReducer()).execute();
+  for (  Map.Entry<String,SessionEntity> entry : map2.entrySet()) {
+    String userSessionId=entry.getKey();
+    tx.remove(offlineSessionCache,userSessionId);
+    persister.removeUserSession(userSessionId,true);
+    UserSessionEntity entity=(UserSessionEntity)entry.getValue();
+    for (    String clientSessionId : entity.getClientSessions()) {
+      tx.remove(offlineSessionCache,clientSessionId);
+    }
+  }
+  map=new MapReduceTask(offlineSessionCache).mappedWith(ClientSessionMapper.create(realm.getId()).expiredRefresh(expiredOffline).emitKey()).reducedWith(new FirstResultReducer()).execute();
+  for (  String clientSessionId : map.keySet()) {
+    tx.remove(offlineSessionCache,clientSessionId);
+    persister.removeClientSession(clientSessionId,true);
   }
 }

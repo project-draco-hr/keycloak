@@ -1,0 +1,15 @@
+{
+  RealmRepresentation rep=new RealmRepresentation();
+  rep.setEditUsernameAllowed(true);
+  rep.setSupportedLocales(new HashSet<>(Arrays.asList("en","de")));
+  realm.update(rep);
+  rep=realm.toRepresentation();
+  assertEquals(Boolean.TRUE,rep.isEditUsernameAllowed());
+  assertEquals(2,rep.getSupportedLocales().size());
+  rep=new RealmRepresentation();
+  rep.setEditUsernameAllowed(false);
+  realm.update(rep);
+  rep=realm.toRepresentation();
+  assertEquals(Boolean.FALSE,rep.isEditUsernameAllowed());
+  assertEquals(2,rep.getSupportedLocales().size());
+}

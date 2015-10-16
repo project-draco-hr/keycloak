@@ -6,17 +6,14 @@
     throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid refresh token. Token client and authorized client don't match");
   }
   int currentTime=Time.currentTime();
-  if (realm.isRevokeRefreshToken() && !refreshToken.getType().equals(TokenUtil.TOKEN_TYPE_OFFLINE)) {
-    if (refreshToken.getIssuedAt() < validation.clientSession.getTimestamp()) {
+  if (realm.isRevokeRefreshToken()) {
+    int serverStartupTime=(int)(session.getKeycloakSessionFactory().getServerStartupTimestamp() / 1000);
+    if (refreshToken.getIssuedAt() < validation.clientSession.getTimestamp() && (serverStartupTime != validation.clientSession.getTimestamp())) {
       throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale token");
     }
-    validation.clientSession.setTimestamp(currentTime);
   }
+  validation.clientSession.setTimestamp(currentTime);
   validation.userSession.setLastSessionRefresh(currentTime);
-  AccessTokenResponseBuilder responseBuilder=responseBuilder(realm,authorizedClient,event,session,validation.userSession,validation.clientSession).accessToken(validation.newToken).generateIDToken();
-  if (!refreshToken.getType().equals(TokenUtil.TOKEN_TYPE_OFFLINE)) {
-    responseBuilder.generateRefreshToken();
-  }
-  AccessTokenResponse res=responseBuilder.build();
+  AccessTokenResponse res=responseBuilder(realm,authorizedClient,event,session,validation.userSession,validation.clientSession).accessToken(validation.newToken).generateIDToken().generateRefreshToken().build();
   return new RefreshResult(res,TokenUtil.TOKEN_TYPE_OFFLINE.equals(refreshToken.getType()));
 }

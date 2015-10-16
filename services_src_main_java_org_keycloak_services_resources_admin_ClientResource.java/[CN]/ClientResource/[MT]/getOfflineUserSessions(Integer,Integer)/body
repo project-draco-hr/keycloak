@@ -6,6 +6,12 @@
   List<UserSessionModel> userSessions=session.sessions().getOfflineUserSessions(client.getRealm(),client,firstResult,maxResults);
   for (  UserSessionModel userSession : userSessions) {
     UserSessionRepresentation rep=ModelToRepresentation.toRepresentation(userSession);
+    for (    ClientSessionModel clientSession : userSession.getClientSessions()) {
+      if (client.getId().equals(clientSession.getClient().getId())) {
+        rep.setLastAccess(Time.toMillis(clientSession.getTimestamp()));
+        break;
+      }
+    }
     sessions.add(rep);
   }
   return sessions;

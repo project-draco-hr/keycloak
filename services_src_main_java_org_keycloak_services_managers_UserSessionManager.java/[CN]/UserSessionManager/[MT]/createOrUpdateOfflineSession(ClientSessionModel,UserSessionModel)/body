@@ -1,0 +1,14 @@
+{
+  UserModel user=userSession.getUser();
+  UserSessionModel offlineUserSession=kcSession.sessions().getOfflineUserSession(clientSession.getRealm(),userSession.getId());
+  if (offlineUserSession == null) {
+    offlineUserSession=createOfflineUserSession(user,userSession);
+  }
+ else {
+    offlineUserSession.setLastSessionRefresh(Time.currentTime());
+  }
+  ClientSessionModel offlineClientSession=kcSession.sessions().getOfflineClientSession(clientSession.getRealm(),clientSession.getId());
+  if (offlineClientSession == null) {
+    createOfflineClientSession(user,clientSession,offlineUserSession);
+  }
+}

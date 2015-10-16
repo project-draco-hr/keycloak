@@ -1,0 +1,20 @@
+{
+  if (!clientCode.isValidAction(requiredAction)) {
+    event.client(clientCode.getClientSession().getClient());
+    event.error(Errors.INVALID_CODE);
+    response=ErrorPage.error(session,Messages.INVALID_CODE);
+    return false;
+  }
+  if (!clientCode.isActionActive(requiredAction)) {
+    event.client(clientCode.getClientSession().getClient());
+    event.clone().error(Errors.EXPIRED_CODE);
+    if (clientCode.getClientSession().getAction().equals(ClientSessionModel.Action.AUTHENTICATE.name())) {
+      AuthenticationProcessor.resetFlow(clientCode.getClientSession());
+      response=processAuthentication(null,clientCode.getClientSession(),Messages.LOGIN_TIMEOUT);
+      return false;
+    }
+    response=ErrorPage.error(session,Messages.EXPIRED_CODE);
+    return false;
+  }
+  return true;
+}

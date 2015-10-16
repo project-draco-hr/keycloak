@@ -1,8 +1,24 @@
 {
   event.event(EventType.CUSTOM_REQUIRED_ACTION);
   event.detail(Details.CUSTOM_REQUIRED_ACTION,action);
-  if (action == null) {
-    logger.error("required action query param was null");
+  Checks checks=new Checks();
+  if (!checks.verifyCode(code,ClientSessionModel.Action.REQUIRED_ACTIONS.name())) {
+    return checks.response;
+  }
+  final ClientSessionCode clientCode=checks.clientCode;
+  final ClientSessionModel clientSession=clientCode.getClientSession();
+  if (clientSession.getUserSession() == null) {
+    logger.error("user session was null");
+    event.error(Errors.USER_SESSION_NOT_FOUND);
+    throw new WebApplicationException(ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE));
+  }
+  if (action == null && clientSession.getUserSession() != null) {
+    initEvent(clientSession);
+    event.event(EventType.LOGIN);
+    return AuthenticationManager.nextActionAfterAuthentication(session,clientSession.getUserSession(),clientSession,clientConnection,request,uriInfo,event);
+  }
+  if (!action.equals(clientSession.getNote(AuthenticationManager.CURRENT_REQUIRED_ACTION))) {
+    logger.error("required action doesn't match current required action");
     event.error(Errors.INVALID_CODE);
     throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
   }
@@ -13,30 +29,9 @@
     throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
   }
   RequiredActionProvider provider=factory.create(session);
-  Checks checks=new Checks();
-  if (!checks.verifyCode(code,action)) {
-    return checks.response;
-  }
-  final ClientSessionCode clientCode=checks.clientCode;
-  final ClientSessionModel clientSession=clientCode.getClientSession();
-  if (clientSession.getUserSession() == null) {
-    logger.error("user session was null");
-    event.error(Errors.USER_SESSION_NOT_FOUND);
-    throw new WebApplicationException(ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE));
-  }
   initEvent(clientSession);
   event.event(EventType.CUSTOM_REQUIRED_ACTION);
   RequiredActionContextResult context=new RequiredActionContextResult(clientSession.getUserSession(),clientSession,realm,event,session,request,clientSession.getUserSession().getUser(),factory){
-    @Override public String generateAccessCode(    String action){
-      String clientSessionAction=clientSession.getAction();
-      if (action.equals(clientSessionAction)) {
-        clientSession.setTimestamp(Time.currentTime());
-        return code;
-      }
-      ClientSessionCode code=new ClientSessionCode(getRealm(),getClientSession());
-      code.setAction(action);
-      return code.getCode();
-    }
     @Override public void ignore(){
       throw new RuntimeException("Cannot call ignore within processAction()");
     }
@@ -44,11 +39,11 @@
 ;
   provider.processAction(context);
   if (context.getStatus() == RequiredActionContext.Status.SUCCESS) {
-    event.clone().success();
+    event.success();
     clientSession.removeRequiredAction(factory.getId());
     clientSession.getUserSession().getUser().removeRequiredAction(factory.getId());
-    event.event(EventType.LOGIN);
-    return AuthenticationManager.nextActionAfterAuthentication(session,clientSession.getUserSession(),clientSession,clientConnection,request,uriInfo,event);
+    URI redirect=LoginActionsService.loginActionsBaseUrl(uriInfo).path(LoginActionsService.REQUIRED_ACTION).queryParam(OAuth2Constants.CODE,code).build(realm.getName());
+    return Response.status(302).location(redirect).build();
   }
   if (context.getStatus() == RequiredActionContext.Status.CHALLENGE) {
     return context.getChallenge();

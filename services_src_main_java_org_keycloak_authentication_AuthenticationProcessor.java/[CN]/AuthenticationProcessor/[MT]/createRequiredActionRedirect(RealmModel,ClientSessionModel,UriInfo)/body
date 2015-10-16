@@ -1,0 +1,7 @@
+{
+  ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
+  accessCode.setAction(ClientSessionModel.Action.REQUIRED_ACTIONS.name());
+  clientSession.setTimestamp(Time.currentTime());
+  URI redirect=LoginActionsService.loginActionsBaseUrl(uriInfo).path(LoginActionsService.REQUIRED_ACTION).queryParam(OAuth2Constants.CODE,accessCode.getCode()).build(realm.getName());
+  return Response.status(302).location(redirect).build();
+}

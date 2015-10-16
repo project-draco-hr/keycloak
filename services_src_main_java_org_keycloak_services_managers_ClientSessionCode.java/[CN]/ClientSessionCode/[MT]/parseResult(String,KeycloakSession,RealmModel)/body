@@ -1,6 +1,10 @@
 {
+  ParseResult result=new ParseResult();
+  if (code == null) {
+    result.illegalHash=true;
+    return result;
+  }
   try {
-    ParseResult result=new ParseResult();
     String[] parts=code.split("\\.");
     String id=parts[1];
     ClientSessionModel clientSession=session.sessions().getClientSession(realm,id);
@@ -17,6 +21,7 @@
     return result;
   }
  catch (  RuntimeException e) {
-    return null;
+    result.illegalHash=true;
+    return result;
   }
 }

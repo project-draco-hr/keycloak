@@ -1,0 +1,19 @@
+{
+  UserSessionEntity entity=new UserSessionEntity();
+  entity.setId(userSession.getId());
+  entity.setRealm(userSession.getRealm().getId());
+  entity.setAuthMethod(userSession.getAuthMethod());
+  entity.setBrokerSessionId(userSession.getBrokerSessionId());
+  entity.setBrokerUserId(userSession.getBrokerUserId());
+  entity.setIpAddress(userSession.getIpAddress());
+  entity.setLoginUsername(userSession.getLoginUsername());
+  entity.setNotes(userSession.getNotes());
+  entity.setRememberMe(userSession.isRememberMe());
+  entity.setState(userSession.getState());
+  entity.setUser(userSession.getUser().getId());
+  entity.setStarted(userSession.getStarted());
+  entity.setLastSessionRefresh(userSession.getLastSessionRefresh());
+  Cache<String,SessionEntity> cache=getCache(offline);
+  tx.put(cache,userSession.getId(),entity);
+  return wrap(userSession.getRealm(),entity,offline);
+}

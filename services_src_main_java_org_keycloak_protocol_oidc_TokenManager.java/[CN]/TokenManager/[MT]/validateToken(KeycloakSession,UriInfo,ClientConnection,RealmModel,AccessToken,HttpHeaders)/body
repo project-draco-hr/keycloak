@@ -9,9 +9,15 @@
   UserSessionModel userSession=null;
   ClientSessionModel clientSession=null;
   if (TokenUtil.TOKEN_TYPE_OFFLINE.equals(oldToken.getType())) {
-    clientSession=new UserSessionManager(session).findOfflineClientSession(realm,oldToken.getClientSession(),oldToken.getSessionState());
+    UserSessionManager sessionManager=new UserSessionManager(session);
+    clientSession=sessionManager.findOfflineClientSession(realm,oldToken.getClientSession(),oldToken.getSessionState());
     if (clientSession != null) {
       userSession=clientSession.getUserSession();
+      if (userSession.getLastSessionRefresh() < Time.currentTime() - realm.getOfflineSessionIdleTimeout()) {
+        sessionManager.revokeOfflineUserSession(userSession);
+        userSession=null;
+        clientSession=null;
+      }
     }
   }
  else {

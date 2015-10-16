@@ -1,0 +1,19 @@
+{
+  if (!realm.equals(e.getRealm())) {
+    return;
+  }
+  if (!(e instanceof ClientSessionEntity)) {
+    return;
+  }
+  ClientSessionEntity entity=(ClientSessionEntity)e;
+  if (userSessions.contains(entity.getUserSession())) {
+switch (emit) {
+case KEY:
+      collector.emit(entity.getId(),entity.getId());
+    break;
+case ENTITY:
+  collector.emit(entity.getId(),entity);
+break;
+}
+}
+}

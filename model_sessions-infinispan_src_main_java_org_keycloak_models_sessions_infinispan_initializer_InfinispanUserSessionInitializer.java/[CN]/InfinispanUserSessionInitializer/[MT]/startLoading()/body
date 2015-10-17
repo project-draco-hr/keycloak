@@ -9,9 +9,11 @@
       Transport transport=cache.getCacheManager().getTransport();
       int nodesCount=transport == null ? 1 : transport.getMembers().size();
       int distributedWorkersCount=processors * nodesCount;
-      log.infof("Starting next iteration with %d workers",distributedWorkersCount);
+      log.debugf("Starting next iteration with %d workers",distributedWorkersCount);
       List<Integer> segments=state.getUnfinishedSegments(distributedWorkersCount);
-      log.info("unfinished segments for this iteration: " + segments);
+      if (log.isTraceEnabled()) {
+        log.trace("unfinished segments for this iteration: " + segments);
+      }
       List<Future<WorkerResult>> futures=new LinkedList<>();
       for (      Integer segment : segments) {
         SessionInitializerWorker worker=new SessionInitializerWorker();
@@ -45,7 +47,9 @@ catch (        ExecutionException ee) {
         throw new RuntimeException("Maximum count of worker errors occured. Limit was " + maxErrors + ". See server.log for details");
       }
       saveStateToCache(state);
-      log.info("New initializer state pushed. The state is: " + state.printState());
+      if (log.isDebugEnabled()) {
+        log.debug("New initializer state pushed. The state is: " + state.printState());
+      }
     }
   }
   finally {

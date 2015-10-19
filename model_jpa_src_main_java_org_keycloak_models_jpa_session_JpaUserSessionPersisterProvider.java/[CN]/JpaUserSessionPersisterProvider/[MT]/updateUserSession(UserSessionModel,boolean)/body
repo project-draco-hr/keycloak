@@ -7,7 +7,8 @@
     adapter=new PersistentUserSessionAdapter(userSession);
   }
   PersistentUserSessionModel model=adapter.getUpdatedModel();
-  PersistentUserSessionEntity entity=em.find(PersistentUserSessionEntity.class,new PersistentUserSessionEntity.Key(userSession.getId(),offline));
+  String offlineStr=offlineToString(offline);
+  PersistentUserSessionEntity entity=em.find(PersistentUserSessionEntity.class,new PersistentUserSessionEntity.Key(userSession.getId(),offlineStr));
   if (entity == null) {
     throw new ModelException("UserSession with ID " + userSession.getId() + ", offline: "+ offline+ " not found");
   }

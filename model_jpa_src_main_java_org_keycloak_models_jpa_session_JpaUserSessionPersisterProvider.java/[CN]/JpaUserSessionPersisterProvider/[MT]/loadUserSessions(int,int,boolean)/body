@@ -1,6 +1,7 @@
 {
+  String offlineStr=offlineToString(offline);
   TypedQuery<PersistentUserSessionEntity> query=em.createNamedQuery("findUserSessions",PersistentUserSessionEntity.class);
-  query.setParameter("offline",offline);
+  query.setParameter("offline",offlineStr);
   if (firstResult != -1) {
     query.setFirstResult(firstResult);
   }
@@ -16,7 +17,7 @@
   }
   TypedQuery<PersistentClientSessionEntity> query2=em.createNamedQuery("findClientSessionsByUserSessions",PersistentClientSessionEntity.class);
   query2.setParameter("userSessionIds",userSessionIds);
-  query2.setParameter("offline",offline);
+  query2.setParameter("offline",offlineStr);
   List<PersistentClientSessionEntity> clientSessions=query2.getResultList();
   int j=0;
   for (  UserSessionModel ss : result) {

@@ -1,10 +1,12 @@
 {
-  PersistentClientSessionEntity sessionEntity=em.find(PersistentClientSessionEntity.class,new PersistentClientSessionEntity.Key(clientSessionId,offline));
+  String offlineStr=offlineToString(offline);
+  PersistentClientSessionEntity sessionEntity=em.find(PersistentClientSessionEntity.class,new PersistentClientSessionEntity.Key(clientSessionId,offlineStr));
   if (sessionEntity != null) {
     em.remove(sessionEntity);
     List<PersistentClientSessionEntity> clientSessions=getClientSessionsByUserSession(sessionEntity.getUserSessionId(),offline);
     if (clientSessions.size() == 0) {
-      PersistentUserSessionEntity userSessionEntity=em.find(PersistentUserSessionEntity.class,new PersistentUserSessionEntity.Key(sessionEntity.getUserSessionId(),offline));
+      offlineStr=offlineToString(offline);
+      PersistentUserSessionEntity userSessionEntity=em.find(PersistentUserSessionEntity.class,new PersistentUserSessionEntity.Key(sessionEntity.getUserSessionId(),offlineStr));
       if (userSessionEntity != null) {
         em.remove(userSessionEntity);
       }

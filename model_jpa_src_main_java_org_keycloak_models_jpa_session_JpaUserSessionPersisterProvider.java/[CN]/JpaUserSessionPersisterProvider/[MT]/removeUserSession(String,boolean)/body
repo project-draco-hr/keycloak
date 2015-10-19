@@ -1,6 +1,7 @@
 {
-  em.createNamedQuery("deleteClientSessionsByUserSession").setParameter("userSessionId",userSessionId).setParameter("offline",offline).executeUpdate();
-  PersistentUserSessionEntity sessionEntity=em.find(PersistentUserSessionEntity.class,new PersistentUserSessionEntity.Key(userSessionId,offline));
+  String offlineStr=offlineToString(offline);
+  em.createNamedQuery("deleteClientSessionsByUserSession").setParameter("userSessionId",userSessionId).setParameter("offline",offlineStr).executeUpdate();
+  PersistentUserSessionEntity sessionEntity=em.find(PersistentUserSessionEntity.class,new PersistentUserSessionEntity.Key(userSessionId,offlineStr));
   if (sessionEntity != null) {
     em.remove(sessionEntity);
     em.flush();

@@ -1,0 +1,17 @@
+{
+  String uri=null;
+  uri="otpauth://" + type + "/"+ realm.getName()+ ":"+ user.getUsername()+ "?secret="+ Base32.encode(secret.getBytes())+ "&digits="+ digits+ "&algorithm="+ algToKeyUriAlg.get(algorithm);
+  try {
+    uri+="&issuer=" + URLEncoder.encode(realm.getName(),"UTF-8");
+  }
+ catch (  UnsupportedEncodingException e) {
+    logger.debug("Failed to add issuer parameter to OTP URI becasue UTF-8 is not supported.");
+  }
+  if (type.equals(UserCredentialModel.HOTP)) {
+    uri+="&counter=" + initialCounter;
+  }
+  if (type.equals(UserCredentialModel.TOTP)) {
+    uri+="&period=" + period;
+  }
+  return uri;
+}

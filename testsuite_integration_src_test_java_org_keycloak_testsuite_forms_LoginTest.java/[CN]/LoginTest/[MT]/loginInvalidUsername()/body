@@ -6,4 +6,8 @@
   Assert.assertEquals("",loginPage.getPassword());
   Assert.assertEquals("Invalid username or password.",loginPage.getError());
   events.expectLogin().user((String)null).session((String)null).error("user_not_found").detail(Details.USERNAME,"invalid").removeDetail(Details.CONSENT).assertEvent();
+  loginPage.login("login-test","password");
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  Assert.assertNotNull(oauth.getCurrentQuery().get(OAuth2Constants.CODE));
+  events.expectLogin().user(userId).detail(Details.USERNAME,"login-test").assertEvent();
 }

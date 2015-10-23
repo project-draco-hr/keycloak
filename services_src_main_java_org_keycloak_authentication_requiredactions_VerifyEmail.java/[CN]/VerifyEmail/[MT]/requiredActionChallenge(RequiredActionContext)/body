@@ -9,7 +9,8 @@
   }
   context.getEvent().clone().event(EventType.SEND_VERIFY_EMAIL).detail(Details.EMAIL,context.getUser().getEmail()).success();
   LoginActionsService.createActionCookie(context.getRealm(),context.getUriInfo(),context.getConnection(),context.getUserSession().getId());
-  LoginFormsProvider loginFormsProvider=context.getSession().getProvider(LoginFormsProvider.class).setClientSessionCode(context.generateCode()).setUser(context.getUser());
+  setupKey(context.getClientSession());
+  LoginFormsProvider loginFormsProvider=context.getSession().getProvider(LoginFormsProvider.class).setClientSessionCode(context.generateCode()).setClientSession(context.getClientSession()).setUser(context.getUser());
   Response challenge=loginFormsProvider.createResponse(UserModel.RequiredAction.VERIFY_EMAIL);
   context.challenge(challenge);
 }

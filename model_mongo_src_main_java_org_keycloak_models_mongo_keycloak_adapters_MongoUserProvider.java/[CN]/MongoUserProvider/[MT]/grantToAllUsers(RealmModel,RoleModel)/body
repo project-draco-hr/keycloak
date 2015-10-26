@@ -1,0 +1,5 @@
+{
+  DBObject query=new QueryBuilder().and("realmId").is(realm.getId()).get();
+  DBObject update=new QueryBuilder().and("$push").is(new BasicDBObject("roleIds",role.getId())).get();
+  int count=getMongoStore().updateEntities(MongoUserEntity.class,query,update,invocationContext);
+}

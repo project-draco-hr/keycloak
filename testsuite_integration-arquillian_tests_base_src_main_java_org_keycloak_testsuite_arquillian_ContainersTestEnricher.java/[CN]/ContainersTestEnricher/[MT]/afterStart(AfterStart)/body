@@ -1,0 +1,11 @@
+{
+  if (System.getProperty("check.server.log","true").equals("true")) {
+    checkServerLog();
+  }
+  if (migrationTests && !alreadyStopped) {
+    log.info("\n\n### Stopping keycloak with previous version ###\n");
+    stopSuiteContainers.fire(new StopSuiteContainers());
+    log.info("\n\n### Starting keycloak with current version ###\n");
+  }
+  alreadyStopped=true;
+}

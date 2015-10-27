@@ -8,7 +8,14 @@
     }
   }
 );
-  int maxErrors=config.getInt("maxErrors",20);
-  int sessionsPerSegment=config.getInt("sessionsPerSegment",100);
-  loadPersistentSessions(factory,maxErrors,sessionsPerSegment);
+  final int maxErrors=config.getInt("maxErrors",20);
+  final int sessionsPerSegment=config.getInt("sessionsPerSegment",100);
+  factory.register(new ProviderEventListener(){
+    @Override public void onEvent(    ProviderEvent event){
+      if (event instanceof PostMigrationEvent) {
+        loadPersistentSessions(factory,maxErrors,sessionsPerSegment);
+      }
+    }
+  }
+);
 }

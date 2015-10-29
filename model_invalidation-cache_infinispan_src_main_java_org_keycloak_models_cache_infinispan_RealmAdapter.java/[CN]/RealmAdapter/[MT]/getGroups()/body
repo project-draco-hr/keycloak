@@ -1,0 +1,11 @@
+{
+  if (updated != null)   return updated.getGroups();
+  if (cached.getGroups().isEmpty())   return null;
+  List<GroupModel> list=new LinkedList<>();
+  for (  String id : cached.getGroups()) {
+    GroupModel group=cacheSession.getGroupById(id,this);
+    if (group == null)     continue;
+    list.add(group);
+  }
+  return list;
+}

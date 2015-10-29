@@ -1,0 +1,13 @@
+{
+  if (updated != null)   return updated.getGroups();
+  Set<GroupModel> groups=new HashSet<GroupModel>();
+  for (  String id : cached.getRoleMappings()) {
+    GroupModel groupModel=keycloakSession.realms().getGroupById(id,realm);
+    if (groupModel == null) {
+      getDelegateForUpdate();
+      return updated.getGroups();
+    }
+    groups.add(groupModel);
+  }
+  return groups;
+}

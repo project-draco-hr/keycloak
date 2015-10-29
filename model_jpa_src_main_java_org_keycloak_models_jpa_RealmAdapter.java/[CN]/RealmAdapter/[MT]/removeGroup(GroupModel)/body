@@ -1,0 +1,18 @@
+{
+  if (group == null) {
+    return false;
+  }
+  GroupEntity groupEntity=GroupAdapter.toEntity(group,em);
+  if (!groupEntity.getRealm().getId().equals(getId())) {
+    return false;
+  }
+  for (  GroupModel subGroup : group.getSubGroups()) {
+    removeGroup(subGroup);
+  }
+  session.users().preRemove(this,group);
+  realm.getGroups().remove(groupEntity);
+  em.createNamedQuery("deleteGroupAttributesByGroup").setParameter("group",group).executeUpdate();
+  em.createNamedQuery("deleteGroupRoleMappingsByGroup").setParameter("group",group).executeUpdate();
+  em.remove(groupEntity);
+  return true;
+}

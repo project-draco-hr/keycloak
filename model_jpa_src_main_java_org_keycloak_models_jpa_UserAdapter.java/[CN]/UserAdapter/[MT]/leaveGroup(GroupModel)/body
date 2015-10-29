@@ -1,0 +1,10 @@
+{
+  if (user == null || group == null)   return;
+  TypedQuery<UserGroupMembershipEntity> query=getUserGroupMappingQuery(group);
+  List<UserGroupMembershipEntity> results=query.getResultList();
+  if (results.size() == 0)   return;
+  for (  UserGroupMembershipEntity entity : results) {
+    em.remove(entity);
+  }
+  em.flush();
+}

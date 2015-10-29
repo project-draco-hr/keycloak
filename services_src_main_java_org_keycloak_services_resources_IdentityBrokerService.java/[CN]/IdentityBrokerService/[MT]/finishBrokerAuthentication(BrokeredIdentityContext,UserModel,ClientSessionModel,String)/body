@@ -1,0 +1,12 @@
+{
+  UserSessionModel userSession=this.session.sessions().createUserSession(this.realmModel,federatedUser,federatedUser.getUsername(),this.clientConnection.getRemoteAddr(),"broker",false,context.getBrokerSessionId(),context.getBrokerUserId());
+  this.event.user(federatedUser);
+  this.event.session(userSession);
+  TokenManager.attachClientSession(userSession,clientSession);
+  context.getIdp().attachUserSession(userSession,clientSession,context);
+  userSession.setNote(BROKER_PROVIDER_ID,providerId);
+  if (isDebugEnabled()) {
+    LOGGER.debugf("Performing local authentication for user [%s].",federatedUser);
+  }
+  return AuthenticationProcessor.createRequiredActionRedirect(realmModel,clientSession,uriInfo);
+}

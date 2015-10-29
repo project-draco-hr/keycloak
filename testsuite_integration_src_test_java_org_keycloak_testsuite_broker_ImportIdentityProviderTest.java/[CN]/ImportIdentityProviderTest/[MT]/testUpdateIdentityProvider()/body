@@ -10,6 +10,7 @@
   identityProviderModel.setTrustEmail(true);
   identityProviderModel.setStoreToken(true);
   identityProviderModel.setAuthenticateByDefault(true);
+  identityProviderModel.setFirstBrokerLoginFlowId(realm.getBrowserFlow().getId());
   realm.updateIdentityProvider(identityProviderModel);
   commit();
   realm=this.realmManager.getRealm(realm.getId());
@@ -20,6 +21,7 @@
   assertTrue(identityProviderModel.isTrustEmail());
   assertTrue(identityProviderModel.isStoreToken());
   assertTrue(identityProviderModel.isAuthenticateByDefault());
+  assertEquals(identityProviderModel.getFirstBrokerLoginFlowId(),realm.getBrowserFlow().getId());
   identityProviderModel.getConfig().remove("config-added");
   identityProviderModel.setEnabled(true);
   identityProviderModel.setUpdateProfileFirstLoginMode(IdentityProviderRepresentation.UPFLM_MISSING);

@@ -1,0 +1,56 @@
+{
+  ClientSessionCode clientCode=parseClientSessionCode(code);
+  ClientSessionModel clientSession=clientCode.getClientSession();
+  try {
+    SerializedBrokeredIdentityContext serializedCtx=SerializedBrokeredIdentityContext.readFromClientSession(clientSession);
+    if (serializedCtx == null) {
+      throw new IdentityBrokerException("Not found serialized context in clientSession");
+    }
+    BrokeredIdentityContext context=serializedCtx.deserialize(session,clientSession);
+    String providerId=context.getIdpConfig().getAlias();
+    clientSession.removeNote(AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE);
+    UserModel federatedUser=clientSession.getAuthenticatedUser();
+    if (federatedUser == null) {
+      throw new IdentityBrokerException("Couldn't found authenticated federatedUser in clientSession");
+    }
+    if (context.getIdpConfig().isAddReadTokenRoleOnCreate()) {
+      RoleModel readTokenRole=realmModel.getClientByClientId(Constants.BROKER_SERVICE_CLIENT_ID).getRole(Constants.READ_TOKEN_ROLE);
+      federatedUser.grantRole(readTokenRole);
+    }
+    FederatedIdentityModel federatedIdentityModel=new FederatedIdentityModel(context.getIdpConfig().getAlias(),context.getId(),context.getUsername(),context.getToken());
+    session.users().addFederatedIdentity(realmModel,federatedUser,federatedIdentityModel);
+    String isRegisteredNewUser=clientSession.getNote(AbstractIdpAuthenticator.BROKER_REGISTERED_NEW_USER);
+    if (Boolean.parseBoolean(isRegisteredNewUser)) {
+      LOGGER.debugf("Registered new user '%s' after first login with identity provider '%s'. Identity provider username is '%s' . ",federatedUser.getUsername(),providerId,context.getUsername());
+      context.getIdp().importNewUser(session,realmModel,federatedUser,context);
+      Set<IdentityProviderMapperModel> mappers=realmModel.getIdentityProviderMappersByAlias(providerId);
+      if (mappers != null) {
+        KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+        for (        IdentityProviderMapperModel mapper : mappers) {
+          IdentityProviderMapper target=(IdentityProviderMapper)sessionFactory.getProviderFactory(IdentityProviderMapper.class,mapper.getIdentityProviderMapper());
+          target.importNewUser(session,realmModel,federatedUser,mapper,context);
+        }
+      }
+      if (context.getIdpConfig().isTrustEmail() && !Validation.isBlank(federatedUser.getEmail()) && !Boolean.parseBoolean(clientSession.getNote(AbstractIdpAuthenticator.UPDATE_PROFILE_EMAIL_CHANGED))) {
+        LOGGER.debugf("Email verified automatically after registration of user '%s' through Identity provider '%s' ",federatedUser.getUsername(),context.getIdpConfig().getAlias());
+        federatedUser.setEmailVerified(true);
+      }
+      this.event.clone().user(federatedUser).event(EventType.REGISTER).detail(Details.IDENTITY_PROVIDER,providerId).detail(Details.IDENTITY_PROVIDER_USERNAME,context.getUsername()).removeDetail("auth_method").success();
+    }
+ else {
+      LOGGER.debugf("Linked existing keycloak user '%s' with identity provider '%s' . Identity provider username is '%s' .",federatedUser.getUsername(),providerId,context.getUsername());
+      updateFederatedIdentity(context,federatedUser);
+    }
+    String isDifferentBrowser=clientSession.getNote(AbstractIdpAuthenticator.IS_DIFFERENT_BROWSER);
+    if (Boolean.parseBoolean(isDifferentBrowser)) {
+      session.sessions().removeClientSession(realmModel,clientSession);
+      return session.getProvider(LoginFormsProvider.class).setSuccess(Messages.IDENTITY_PROVIDER_LINK_SUCCESS,context.getIdpConfig().getAlias(),context.getUsername()).createInfoPage();
+    }
+ else {
+      return finishBrokerAuthentication(context,federatedUser,clientSession,providerId);
+    }
+  }
+ catch (  Exception e) {
+    return redirectToErrorPage(Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR,e);
+  }
+}

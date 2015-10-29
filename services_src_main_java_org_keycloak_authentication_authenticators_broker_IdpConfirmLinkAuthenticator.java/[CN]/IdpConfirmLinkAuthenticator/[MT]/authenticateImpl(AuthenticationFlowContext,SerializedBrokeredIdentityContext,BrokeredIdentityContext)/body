@@ -1,0 +1,12 @@
+{
+  ClientSessionModel clientSession=context.getClientSession();
+  String existingUserInfo=clientSession.getNote(EXISTING_USER_INFO);
+  if (existingUserInfo == null) {
+    logger.warnf("No duplication detected.");
+    context.attempted();
+    return;
+  }
+  ExistingUserInfo duplicationInfo=ExistingUserInfo.deserialize(existingUserInfo);
+  Response challenge=context.form().setStatus(Response.Status.OK).setAttribute(LoginFormsProvider.IDENTITY_PROVIDER_BROKER_CONTEXT,brokerContext).setError(Messages.FEDERATED_IDENTITY_CONFIRM_LINK_MESSAGE,duplicationInfo.getDuplicateAttributeName(),duplicationInfo.getDuplicateAttributeValue()).createIdpLinkConfirmLinkPage();
+  context.challenge(challenge);
+}

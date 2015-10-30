@@ -1,6 +1,10 @@
 {
-  for (  RealmRepresentation realm : adminClient.realms().findAll()) {
-    System.out.println(realm.getRealm());
-  }
-  Assert.fail("TODO");
+  RealmResource realmResource=adminClient.realms().realm("Migration");
+  RealmRepresentation realmRep=realmResource.toRepresentation();
+  assertEquals("Migration",realmRep.getRealm());
+  List<RoleRepresentation> realmRoles=realmResource.roles().list();
+  assertEquals(1,realmRoles.size());
+  assertEquals("offline_access",realmRoles.get(0).getName());
+  List<RoleRepresentation> clientRoles=realmResource.clients().get("realm-management").roles().list();
+  assertEquals(13,clientRoles.size());
 }

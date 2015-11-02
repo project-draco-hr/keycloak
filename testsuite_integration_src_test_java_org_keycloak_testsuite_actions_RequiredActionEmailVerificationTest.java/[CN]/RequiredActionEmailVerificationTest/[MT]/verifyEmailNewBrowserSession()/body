@@ -9,7 +9,7 @@
   Event sendEvent=emailEvent.assertEvent();
   String sessionId=sendEvent.getSessionId();
   String mailCodeId=sendEvent.getDetails().get(Details.CODE_ID);
-  Assert.assertEquals(mailCodeId,verificationUrl.split("key=")[1].split("\\.")[1]);
+  Assert.assertEquals(mailCodeId,verificationUrl.split("code=")[1].split("\\&")[0].split("\\.")[1]);
   driver.manage().deleteAllCookies();
   driver.navigate().to(verificationUrl.trim());
   events.expectRequiredAction(EventType.VERIFY_EMAIL).session(sessionId).detail("email","test-user@localhost").detail(Details.CODE_ID,mailCodeId).assertEvent();

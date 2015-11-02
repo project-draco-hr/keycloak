@@ -1,0 +1,12 @@
+{
+  Container container=containers.removeFirst();
+  if (!container.getName().equals("auth-server-undertow")) {
+    String jbossHomePath=container.getContainerConfiguration().getContainerProperties().get("jbossHome");
+    log.debug("jbossHome: " + jbossHomePath + "\n");
+    String serverLogContent=FileUtils.readFileToString(new File(jbossHomePath + "/standalone/log/server.log"));
+    boolean containsError=serverLogContent.contains("ERROR") || serverLogContent.contains("SEVERE") || serverLogContent.contains("Exception ");
+    if (containsError) {
+      throw new RuntimeException(container.getName() + ": Server log contains ERROR.");
+    }
+  }
+}

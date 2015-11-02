@@ -1,0 +1,16 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  Assert.assertTrue(verifyEmailPage.isCurrent());
+  String resendEmailLink=verifyEmailPage.getResendEmailLink();
+  String keyInsteadCodeURL=resendEmailLink.replace("code=","key=");
+  AssertEvents.ExpectedEvent emailEvent=events.expectRequiredAction(EventType.SEND_VERIFY_EMAIL).detail("email","test-user@localhost");
+  Event sendEvent=emailEvent.assertEvent();
+  String sessionId=sendEvent.getSessionId();
+  String mailCodeId=sendEvent.getDetails().get(Details.CODE_ID);
+  driver.navigate().to(keyInsteadCodeURL);
+  events.expectRequiredAction(EventType.VERIFY_EMAIL_ERROR).error(Errors.INVALID_CODE).client((String)null).user((String)null).session((String)null).clearDetails().assertEvent();
+  String badKeyURL=KeycloakUriBuilder.fromUri(resendEmailLink).queryParam("key","foo").build().toString();
+  driver.navigate().to(badKeyURL);
+  events.expectRequiredAction(EventType.VERIFY_EMAIL_ERROR).error(Errors.INVALID_USER_CREDENTIALS).session(sessionId).detail("email","test-user@localhost").detail(Details.CODE_ID,mailCodeId).assertEvent();
+}

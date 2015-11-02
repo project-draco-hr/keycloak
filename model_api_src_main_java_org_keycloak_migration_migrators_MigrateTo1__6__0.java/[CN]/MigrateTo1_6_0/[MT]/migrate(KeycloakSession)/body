@@ -24,9 +24,7 @@
       }
       KeycloakModelUtils.setupOfflineTokens(realm);
       RoleModel role=realm.getRole(Constants.OFFLINE_ACCESS_ROLE);
-      for (      UserModel user : session.userStorage().getUsers(realm,true)) {
-        user.grantRole(role);
-      }
+      session.users().grantToAllUsers(realm,role);
     }
     ClientModel adminConsoleClient=realm.getClientByClientId(Constants.ADMIN_CONSOLE_CLIENT_ID);
     if ((adminConsoleClient != null) && !localeMapperAdded(adminConsoleClient)) {

@@ -1,14 +1,19 @@
 {
-  productPortalExample.navigateTo();
-  productPortalExample.productListing();
+  productPortalExamplePage.navigateTo();
+  productPortalExamplePage.productListing();
   testRealmLoginPage.form().login("bburke@redhat.com","password");
-  assertCurrentUrlStartsWith(productPortalExample);
-  productPortalExample.waitForProductListingHeader();
-  productPortalExample.logOut();
-  assertCurrentUrlStartsWith(productPortalExample);
-  productPortalExample.productListing();
-  customerPortalExample.navigateTo();
-  customerPortalExample.customerListing();
+  assertCurrentUrlStartsWith(productPortalExamplePage);
+  productPortalExamplePage.waitForProductListingHeader();
+  if (isRelative()) {
+    productPortalExamplePage.logOut();
+  }
+ else {
+    driver.navigate().to(testRealmPage.getOIDCLogoutUrl() + "?redirect_uri=" + productPortalExamplePage);
+  }
+  assertCurrentUrlStartsWith(productPortalExamplePage);
+  productPortalExamplePage.productListing();
+  customerPortalExamplePage.navigateTo();
+  customerPortalExamplePage.customerListing();
   testRealmLoginPage.form().login("bburke@redhat.com","password");
-  customerPortalExample.logOut();
+  customerPortalExamplePage.logOut();
 }

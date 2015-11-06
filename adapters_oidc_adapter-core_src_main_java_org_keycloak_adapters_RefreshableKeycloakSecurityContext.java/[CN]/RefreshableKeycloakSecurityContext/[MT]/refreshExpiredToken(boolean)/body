@@ -3,7 +3,7 @@
     if (log.isTraceEnabled()) {
       log.trace("checking whether to refresh.");
     }
-    if (isActive())     return true;
+    if (isActive() && isTokenTimeToLiveSufficient(this.token))     return true;
   }
   if (this.deployment == null || refreshToken == null)   return false;
   if (!this.getRealm().equals(this.deployment.getRealm())) {
@@ -35,6 +35,10 @@ catch (  ServerRequest.HttpFailure httpFailure) {
   }
  catch (  VerificationException e) {
     log.error("failed verification of token");
+    return false;
+  }
+  if (!isTokenTimeToLiveSufficient(token)) {
+    log.error("failed to refresh the token with a longer time-to-live than the minimum");
     return false;
   }
   if (response.getNotBeforePolicy() > deployment.getNotBefore()) {

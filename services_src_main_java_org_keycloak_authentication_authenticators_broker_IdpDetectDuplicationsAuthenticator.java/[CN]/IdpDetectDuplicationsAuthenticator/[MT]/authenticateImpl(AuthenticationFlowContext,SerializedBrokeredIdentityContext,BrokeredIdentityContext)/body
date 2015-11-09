@@ -1,0 +1,29 @@
+{
+  KeycloakSession session=context.getSession();
+  RealmModel realm=context.getRealm();
+  if (context.getClientSession().getNote(EXISTING_USER_INFO) != null) {
+    context.attempted();
+    return;
+  }
+  ExistingUserInfo duplication=checkExistingUser(context,serializedCtx,brokerContext);
+  if (duplication == null) {
+    logger.debugf("No duplication detected. Creating account for user '%s' and linking with identity provider '%s' .",brokerContext.getModelUsername(),brokerContext.getIdpConfig().getAlias());
+    UserModel federatedUser=session.users().addUser(realm,brokerContext.getModelUsername());
+    federatedUser.setEnabled(true);
+    federatedUser.setEmail(brokerContext.getEmail());
+    federatedUser.setFirstName(brokerContext.getFirstName());
+    federatedUser.setLastName(brokerContext.getLastName());
+    for (    Map.Entry<String,List<String>> attr : serializedCtx.getAttributes().entrySet()) {
+      federatedUser.setAttribute(attr.getKey(),attr.getValue());
+    }
+    context.setUser(federatedUser);
+    context.getClientSession().setNote(BROKER_REGISTERED_NEW_USER,"true");
+    context.success();
+  }
+ else {
+    logger.debugf("Duplication detected. There is already existing user with %s '%s' .",duplication.getDuplicateAttributeName(),duplication.getDuplicateAttributeValue());
+    context.getClientSession().setNote(EXISTING_USER_INFO,duplication.serialize());
+    Response challengeResponse=context.form().setError(Messages.FEDERATED_IDENTITY_EXISTS,duplication.getDuplicateAttributeName(),duplication.getDuplicateAttributeValue()).createErrorPage();
+    context.challenge(challengeResponse);
+  }
+}

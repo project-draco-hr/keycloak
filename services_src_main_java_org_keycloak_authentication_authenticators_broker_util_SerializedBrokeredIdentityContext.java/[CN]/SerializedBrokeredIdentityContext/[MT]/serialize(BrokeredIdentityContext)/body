@@ -1,0 +1,22 @@
+{
+  SerializedBrokeredIdentityContext ctx=new SerializedBrokeredIdentityContext();
+  ctx.setId(context.getId());
+  ctx.setBrokerUsername(context.getUsername());
+  ctx.setModelUsername(context.getModelUsername());
+  ctx.setEmail(context.getEmail());
+  ctx.setFirstName(context.getFirstName());
+  ctx.setLastName(context.getLastName());
+  ctx.setBrokerSessionId(context.getBrokerSessionId());
+  ctx.setBrokerUserId(context.getBrokerUserId());
+  ctx.setCode(context.getCode());
+  ctx.setToken(context.getToken());
+  ctx.setIdentityProviderId(context.getIdpConfig().getAlias());
+  IdentityProviderDataMarshaller serializer=context.getIdp().getMarshaller();
+  for (  Map.Entry<String,Object> entry : context.getContextData().entrySet()) {
+    Object value=entry.getValue();
+    String serializedValue=serializer.serialize(value);
+    ContextDataEntry ctxEntry=ContextDataEntry.create(value.getClass().getName(),serializedValue);
+    ctx.getContextData().put(entry.getKey(),ctxEntry);
+  }
+  return ctx;
+}

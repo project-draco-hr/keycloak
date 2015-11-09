@@ -1,0 +1,17 @@
+{
+  FacebookIdentityProvider facebookIdentityProvider=new FacebookIdentityProviderFactory().create(identityProvider);
+  OAuth2IdentityProviderConfig config=facebookIdentityProvider.getConfig();
+  assertEquals("model-facebook",config.getAlias());
+  assertEquals(FacebookIdentityProviderFactory.PROVIDER_ID,config.getProviderId());
+  assertEquals(true,config.isEnabled());
+  assertEquals(IdentityProviderRepresentation.UPFLM_OFF,config.getUpdateProfileFirstLoginMode());
+  assertEquals(false,config.isTrustEmail());
+  assertEquals(false,config.isAuthenticateByDefault());
+  assertEquals(false,config.isStoreToken());
+  assertEquals("clientId",config.getClientId());
+  assertEquals("clientSecret",config.getClientSecret());
+  assertEquals(realm.getBrowserFlow().getId(),identityProvider.getFirstBrokerLoginFlowId());
+  assertEquals(FacebookIdentityProvider.AUTH_URL,config.getAuthorizationUrl());
+  assertEquals(FacebookIdentityProvider.TOKEN_URL,config.getTokenUrl());
+  assertEquals(FacebookIdentityProvider.PROFILE_URL,config.getUserInfoUrl());
+}

@@ -1,0 +1,26 @@
+{
+  KeycloakSession session=context.getSession();
+  RealmModel realm=context.getRealm();
+  ClientSessionModel clientSession=context.getClientSession();
+  if (realm.getSmtpConfig().size() == 0) {
+    logger.warnf("Smtp is not configured for the realm. Ignoring email verification authenticator");
+    context.attempted();
+    return;
+  }
+  LoginActionsService.createActionCookie(context.getRealm(),context.getUriInfo(),context.getConnection(),context.getClientSession().getId());
+  VerifyEmail.setupKey(clientSession);
+  UserModel existingUser=getExistingUser(session,realm,clientSession);
+  String link=UriBuilder.fromUri(context.getActionUrl()).queryParam(Constants.KEY,clientSession.getNote(Constants.VERIFY_EMAIL_KEY)).build().toString();
+  long expiration=TimeUnit.SECONDS.toMinutes(context.getRealm().getAccessCodeLifespanUserAction());
+  try {
+    context.getSession().getProvider(EmailProvider.class).setRealm(realm).setUser(existingUser).setAttribute(EmailProvider.IDENTITY_PROVIDER_BROKER_CONTEXT,brokerContext).sendConfirmIdentityBrokerLink(link,expiration);
+  }
+ catch (  EmailException e) {
+    logger.error("Failed to send email to confirm identity broker linking",e);
+    Response challenge=context.form().setError(Messages.EMAIL_SENT_ERROR).createErrorPage();
+    context.failure(AuthenticationFlowError.INTERNAL_ERROR,challenge);
+    return;
+  }
+  Response challenge=context.form().setStatus(Response.Status.OK).setAttribute(LoginFormsProvider.IDENTITY_PROVIDER_BROKER_CONTEXT,brokerContext).createIdpLinkEmailPage();
+  context.forceChallenge(challenge);
+}

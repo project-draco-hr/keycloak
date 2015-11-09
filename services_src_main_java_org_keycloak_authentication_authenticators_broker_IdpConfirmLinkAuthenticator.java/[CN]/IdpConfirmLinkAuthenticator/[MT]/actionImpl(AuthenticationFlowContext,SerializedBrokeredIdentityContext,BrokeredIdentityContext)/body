@@ -1,0 +1,15 @@
+{
+  MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
+  String action=formData.getFirst("submitAction");
+  if (action != null && action.equals("updateProfile")) {
+    context.getClientSession().setNote(ENFORCE_UPDATE_PROFILE,"true");
+    context.getClientSession().removeNote(EXISTING_USER_INFO);
+    context.resetFlow();
+  }
+ else   if (action != null && action.equals("linkAccount")) {
+    context.success();
+  }
+ else {
+    throw new AuthenticationFlowException("Unknown action: " + action,AuthenticationFlowError.INTERNAL_ERROR);
+  }
+}

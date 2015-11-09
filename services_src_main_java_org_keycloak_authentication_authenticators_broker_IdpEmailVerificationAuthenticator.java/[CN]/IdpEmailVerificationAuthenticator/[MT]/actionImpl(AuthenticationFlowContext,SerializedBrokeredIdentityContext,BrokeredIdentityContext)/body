@@ -1,0 +1,30 @@
+{
+  MultivaluedMap<String,String> queryParams=context.getSession().getContext().getUri().getQueryParameters();
+  String key=queryParams.getFirst(Constants.KEY);
+  ClientSessionModel clientSession=context.getClientSession();
+  RealmModel realm=context.getRealm();
+  KeycloakSession session=context.getSession();
+  if (key != null) {
+    String keyFromSession=clientSession.getNote(Constants.VERIFY_EMAIL_KEY);
+    clientSession.removeNote(Constants.VERIFY_EMAIL_KEY);
+    if (key.equals(keyFromSession)) {
+      UserModel existingUser=getExistingUser(session,realm,clientSession);
+      logger.debugf("User '%s' confirmed that wants to link with identity provider '%s' . Identity provider username is '%s' ",existingUser.getUsername(),brokerContext.getIdpConfig().getAlias(),brokerContext.getUsername());
+      String actionCookieValue=LoginActionsService.getActionCookie(session.getContext().getRequestHeaders(),realm,session.getContext().getUri(),context.getConnection());
+      if (actionCookieValue == null || !actionCookieValue.equals(clientSession.getId())) {
+        clientSession.setNote(IS_DIFFERENT_BROWSER,"true");
+      }
+      context.setUser(existingUser);
+      context.success();
+    }
+ else {
+      logger.error("Key parameter don't match with the expected value from client session");
+      Response challengeResponse=context.form().setError(Messages.INVALID_ACCESS_CODE).createErrorPage();
+      context.failureChallenge(AuthenticationFlowError.IDENTITY_PROVIDER_ERROR,challengeResponse);
+    }
+  }
+ else {
+    Response challengeResponse=context.form().setError(Messages.MISSING_PARAMETER,Constants.KEY).createErrorPage();
+    context.failureChallenge(AuthenticationFlowError.IDENTITY_PROVIDER_ERROR,challengeResponse);
+  }
+}

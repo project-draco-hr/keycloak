@@ -1,0 +1,14 @@
+{
+  otpPolicyPage.form().setValues(OTPType.COUNTER_BASED,OTPHashAlg.SHA256,Digits.EIGHT,"10","50");
+  assertEquals("Success! Your changes have been saved to the realm.",otpPolicyPage.getSuccessMessage());
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  assertEquals("hotp",realm.getOtpPolicyType());
+  assertEquals("HmacSHA256",realm.getOtpPolicyAlgorithm());
+  assertEquals(Integer.valueOf(8),realm.getOtpPolicyDigits());
+  assertEquals(Integer.valueOf(10),realm.getOtpPolicyLookAheadWindow());
+  assertEquals(Integer.valueOf(50),realm.getOtpPolicyInitialCounter());
+  otpPolicyPage.form().setValues(OTPType.TIME_BASED,OTPHashAlg.SHA512,Digits.EIGHT,"10","40");
+  assertEquals("Success! Your changes have been saved to the realm.",otpPolicyPage.getSuccessMessage());
+  realm=testRealmResource().toRepresentation();
+  assertEquals(Integer.valueOf(40),realm.getOtpPolicyPeriod());
+}

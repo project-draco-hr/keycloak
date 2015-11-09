@@ -1,0 +1,12 @@
+{
+  if (!model.isDefined()) {
+    return;
+  }
+  writer.writeStartElement(Constants.XML.KEY_STORE);
+  for (  SimpleAttributeDefinition attr : KeyStoreDefinition.ATTRIBUTES) {
+    attr.getAttributeMarshaller().marshallAsAttribute(attr,model,false,writer);
+  }
+  writePrivateKey(writer,model);
+  writeCertificate(writer,model);
+  writer.writeEndElement();
+}

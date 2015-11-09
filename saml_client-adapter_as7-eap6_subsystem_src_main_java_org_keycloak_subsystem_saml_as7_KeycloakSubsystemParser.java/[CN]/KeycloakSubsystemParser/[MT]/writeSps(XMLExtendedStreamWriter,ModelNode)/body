@@ -1,0 +1,18 @@
+{
+  if (!model.isDefined()) {
+    return;
+  }
+  for (  Property sp : model.get(Constants.Model.SERVICE_PROVIDER).asPropertyList()) {
+    writer.writeStartElement(Constants.XML.SERVICE_PROVIDER);
+    writer.writeAttribute(Constants.XML.ENTITY_ID,sp.getName());
+    ModelNode spAttributes=sp.getValue();
+    for (    SimpleAttributeDefinition attr : ServiceProviderDefinition.ATTRIBUTES) {
+      attr.getAttributeMarshaller().marshallAsAttribute(attr,spAttributes,false,writer);
+    }
+    writeKeys(writer,spAttributes.get(Constants.Model.KEY));
+    writePrincipalNameMapping(writer,spAttributes);
+    writeRoleIdentifiers(writer,spAttributes);
+    writeIdentityProvider(writer,spAttributes.get(Constants.Model.IDENTITY_PROVIDER));
+    writer.writeEndElement();
+  }
+}

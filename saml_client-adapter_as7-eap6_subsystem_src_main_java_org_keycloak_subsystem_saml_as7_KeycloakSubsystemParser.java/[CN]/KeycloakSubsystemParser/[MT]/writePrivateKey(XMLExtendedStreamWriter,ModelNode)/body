@@ -1,0 +1,12 @@
+{
+  ModelNode pk_alias=model.get(Constants.Model.PRIVATE_KEY_ALIAS);
+  ModelNode pk_password=model.get(Constants.Model.PRIVATE_KEY_PASSWORD);
+  if (!pk_alias.isDefined() && !pk_password.isDefined()) {
+    return;
+  }
+  writer.writeStartElement(Constants.XML.PRIVATE_KEY);
+  for (  SimpleAttributeDefinition attr : KeyStorePrivateKeyDefinition.ATTRIBUTES) {
+    attr.getAttributeMarshaller().marshallAsAttribute(attr,model,false,writer);
+  }
+  writer.writeEndElement();
+}

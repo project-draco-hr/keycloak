@@ -1,0 +1,13 @@
+{
+  ModelNode slo=addIdentityProvider.get(Constants.Model.SINGLE_LOGOUT);
+  for (int i=0; i < reader.getAttributeCount(); i++) {
+    String name=reader.getAttributeLocalName(i);
+    String value=reader.getAttributeValue(i);
+    SimpleAttributeDefinition attr=SingleLogoutDefinition.lookup(name);
+    if (attr == null) {
+      throw ParseUtils.unexpectedAttribute(reader,i);
+    }
+    attr.parseAndSetParameter(value,slo,reader);
+  }
+  ParseUtils.requireNoContent(reader);
+}

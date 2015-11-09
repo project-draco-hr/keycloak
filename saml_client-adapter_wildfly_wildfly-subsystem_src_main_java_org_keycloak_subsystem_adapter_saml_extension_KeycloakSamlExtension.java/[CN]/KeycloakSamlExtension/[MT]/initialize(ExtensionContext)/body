@@ -1,0 +1,10 @@
+{
+  final SubsystemRegistration subsystem=context.registerSubsystem(SUBSYSTEM_NAME,MGMT_API_VERSION);
+  ManagementResourceRegistration registration=subsystem.registerSubsystemModel(KeycloakSubsystemDefinition.INSTANCE);
+  ManagementResourceRegistration secureDeploymentRegistration=registration.registerSubModel(SecureDeploymentDefinition.INSTANCE);
+  ManagementResourceRegistration serviceProviderRegistration=secureDeploymentRegistration.registerSubModel(ServiceProviderDefinition.INSTANCE);
+  serviceProviderRegistration.registerSubModel(KeyDefinition.INSTANCE);
+  ManagementResourceRegistration idpRegistration=serviceProviderRegistration.registerSubModel(IdentityProviderDefinition.INSTANCE);
+  idpRegistration.registerSubModel(KeyDefinition.INSTANCE);
+  subsystem.registerXMLElementWriter(PARSER);
+}

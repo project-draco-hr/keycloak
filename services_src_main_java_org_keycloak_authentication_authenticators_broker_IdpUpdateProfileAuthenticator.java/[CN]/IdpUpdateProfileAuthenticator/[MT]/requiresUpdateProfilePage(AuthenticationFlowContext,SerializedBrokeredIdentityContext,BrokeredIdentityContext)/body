@@ -1,9 +1,0 @@
-{
-  String enforceUpdateProfile=context.getClientSession().getNote(ENFORCE_UPDATE_PROFILE);
-  if (Boolean.parseBoolean(enforceUpdateProfile)) {
-    return true;
-  }
-  IdentityProviderModel idpConfig=brokerContext.getIdpConfig();
-  RealmModel realm=context.getRealm();
-  return IdentityProviderRepresentation.UPFLM_ON.equals(idpConfig.getUpdateProfileFirstLoginMode()) || (IdentityProviderRepresentation.UPFLM_MISSING.equals(idpConfig.getUpdateProfileFirstLoginMode()) && !Validation.validateUserMandatoryFields(realm,userCtx));
-}

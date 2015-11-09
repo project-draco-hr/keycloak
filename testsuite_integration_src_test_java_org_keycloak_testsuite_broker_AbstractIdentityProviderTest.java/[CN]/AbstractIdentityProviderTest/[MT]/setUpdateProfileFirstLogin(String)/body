@@ -1,0 +1,11 @@
+{
+  KeycloakModelUtils.runJobInTransaction(this.session.getKeycloakSessionFactory(),new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      RealmModel realm=session.realms().getRealm("realm-with-broker");
+      AuthenticatorConfigModel reviewProfileConfig=realm.getAuthenticatorConfigByAlias(DefaultAuthenticationFlows.IDP_REVIEW_PROFILE_CONFIG_ALIAS);
+      reviewProfileConfig.getConfig().put(IdpReviewProfileAuthenticatorFactory.UPDATE_PROFILE_ON_FIRST_LOGIN,updateProfileFirstLogin);
+      realm.updateAuthenticatorConfig(reviewProfileConfig);
+    }
+  }
+);
+}

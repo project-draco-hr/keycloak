@@ -1,10 +1,10 @@
 {
   getRealm().setVerifyEmail(true);
+  setUpdateProfileFirstLogin(IdentityProviderRepresentation.UPFLM_OFF);
   brokerServerRule.stopSession(this.session,true);
   this.session=brokerServerRule.startSession();
   IdentityProviderModel identityProviderModel=getIdentityProviderModel();
   try {
-    identityProviderModel.setUpdateProfileFirstLoginMode(IdentityProviderRepresentation.UPFLM_OFF);
     identityProviderModel.setTrustEmail(true);
     UserModel federatedUser=assertSuccessfulAuthentication(identityProviderModel,"test-user","test-user@localhost",false);
     assertFalse(federatedUser.getRequiredActions().contains(RequiredAction.VERIFY_EMAIL.name()));

@@ -1,0 +1,15 @@
+{
+  List<UserCredentialModel> credentials=new LinkedList<>();
+  String password=inputData.getFirst(CredentialRepresentation.PASSWORD);
+  if (password == null || password.isEmpty()) {
+    invalidPassword(context,user);
+    return false;
+  }
+  credentials.add(UserCredentialModel.password(password));
+  boolean valid=context.getSession().users().validCredentials(context.getRealm(),user,credentials);
+  if (!valid) {
+    invalidPassword(context,user);
+    return false;
+  }
+  return true;
+}

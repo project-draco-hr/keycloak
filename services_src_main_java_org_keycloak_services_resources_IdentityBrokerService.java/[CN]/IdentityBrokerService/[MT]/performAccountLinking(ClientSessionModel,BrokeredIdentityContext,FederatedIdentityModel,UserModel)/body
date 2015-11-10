@@ -1,5 +1,5 @@
 {
-  this.event.event(EventType.IDENTITY_PROVIDER_ACCCOUNT_LINKING);
+  this.event.event(EventType.FEDERATED_IDENTITY_LINK);
   if (federatedUser != null) {
     return redirectToErrorPage(Messages.IDENTITY_PROVIDER_ALREADY_LINKED,context.getIdpConfig().getAlias());
   }
@@ -17,6 +17,6 @@
   }
   this.session.users().addFederatedIdentity(this.realmModel,authenticatedUser,federatedIdentityModel);
   context.getIdp().attachUserSession(clientSession.getUserSession(),clientSession,context);
-  this.event.success();
+  this.event.user(authenticatedUser).detail(Details.USERNAME,authenticatedUser.getUsername()).detail(Details.IDENTITY_PROVIDER,federatedIdentityModel.getIdentityProvider()).detail(Details.IDENTITY_PROVIDER_USERNAME,federatedIdentityModel.getUserName()).success();
   return Response.status(302).location(UriBuilder.fromUri(clientSession.getRedirectUri()).build()).build();
 }

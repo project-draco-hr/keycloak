@@ -1,0 +1,15 @@
+{
+  setUpdateProfileFirstLogin(IdentityProviderRepresentation.UPFLM_OFF);
+  loginIDP("pedroigor");
+  this.idpConfirmLinkPage.assertCurrent();
+  Assert.assertEquals("User with email psilva@redhat.com already exists. How do you want to continue?",this.idpConfirmLinkPage.getMessage());
+  this.idpConfirmLinkPage.clickReviewProfile();
+  this.updateProfileWithUsernamePage.assertCurrent();
+  this.updateProfileWithUsernamePage.update("Test","User","testing-user@redhat.com","pedroigor");
+  this.idpConfirmLinkPage.assertCurrent();
+  Assert.assertEquals("User with username pedroigor already exists. How do you want to continue?",this.idpConfirmLinkPage.getMessage());
+  this.idpConfirmLinkPage.clickReviewProfile();
+  this.updateProfileWithUsernamePage.assertCurrent();
+  this.updateProfileWithUsernamePage.update("Test","User","testing-user@redhat.com","testing-user");
+  assertFederatedUser("testing-user","testing-user@redhat.com","pedroigor");
+}

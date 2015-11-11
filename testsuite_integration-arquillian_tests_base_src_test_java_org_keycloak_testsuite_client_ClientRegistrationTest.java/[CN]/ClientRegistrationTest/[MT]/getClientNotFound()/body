@@ -1,0 +1,10 @@
+{
+  authManageClients();
+  try {
+    reg.get(CLIENT_ID);
+    fail("Expected 403");
+  }
+ catch (  ClientRegistrationException e) {
+    assertEquals(403,((HttpErrorException)e.getCause()).getStatusLine().getStatusCode());
+  }
+}

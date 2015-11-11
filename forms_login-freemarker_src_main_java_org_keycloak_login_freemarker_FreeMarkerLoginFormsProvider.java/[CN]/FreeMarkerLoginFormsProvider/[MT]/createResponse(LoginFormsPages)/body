@@ -50,6 +50,9 @@
     }
     attributes.put("message",wholeMessage);
   }
+ else {
+    attributes.put("message",null);
+  }
   attributes.put("messagesPerField",messagesPerField);
   if (page == LoginFormsPages.OAUTH_GRANT) {
     uriBuilder.replaceQuery(null);
@@ -61,7 +64,9 @@
   }
   if (realm != null) {
     attributes.put("realm",new RealmBean(realm));
-    attributes.put("social",new IdentityProviderBean(realm,baseUri,uriInfo));
+    List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
+    identityProviders=LoginFormsUtil.filterIdentityProviders(identityProviders,session,realm,attributes,formData);
+    attributes.put("social",new IdentityProviderBean(realm,identityProviders,baseUri,uriInfo));
     attributes.put("url",new UrlBean(realm,theme,baseUri,this.actionUri));
     if (realm.isInternationalizationEnabled()) {
       UriBuilder b;
@@ -88,7 +93,16 @@ case LOGIN_CONFIG_TOTP:
 attributes.put("totp",new TotpBean(realm,user,baseUri));
 break;
 case LOGIN_UPDATE_PROFILE:
-attributes.put("user",new ProfileBean(user,formData));
+UpdateProfileContext userCtx=(UpdateProfileContext)attributes.get(LoginFormsProvider.UPDATE_PROFILE_CONTEXT_ATTR);
+attributes.put("user",new ProfileBean(userCtx,formData));
+break;
+case LOGIN_IDP_LINK_CONFIRM:
+case LOGIN_IDP_LINK_EMAIL:
+BrokeredIdentityContext brokerContext=(BrokeredIdentityContext)this.attributes.get(IDENTITY_PROVIDER_BROKER_CONTEXT);
+String idpAlias=brokerContext.getIdpConfig().getAlias();
+idpAlias=idpAlias.substring(0,1).toUpperCase() + idpAlias.substring(1);
+attributes.put("brokerContext",brokerContext);
+attributes.put("idpAlias",idpAlias);
 break;
 case REGISTER:
 attributes.put("register",new RegisterBean(formData));

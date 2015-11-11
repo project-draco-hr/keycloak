@@ -1,6 +1,6 @@
 {
   FederatedIdentityModel federatedIdentityModel=this.session.users().getFederatedIdentity(federatedUser,context.getIdpConfig().getAlias(),this.realmModel);
-  if (context.getIdpConfig().isStoreToken() && !ObjectUtil.isEqualOrNull(context.getToken(),federatedIdentityModel.getToken())) {
+  if (context.getIdpConfig().isStoreToken() && !ObjectUtil.isEqualOrBothNull(context.getToken(),federatedIdentityModel.getToken())) {
     federatedIdentityModel.setToken(context.getToken());
     this.session.users().updateFederatedIdentity(this.realmModel,federatedUser,federatedIdentityModel);
     if (isDebugEnabled()) {

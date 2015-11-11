@@ -73,6 +73,16 @@
   if (rep.getPasswordPolicy() != null)   newRealm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
   if (rep.getOtpPolicyType() != null)   newRealm.setOTPPolicy(toPolicy(rep));
  else   newRealm.setOTPPolicy(OTPPolicy.DEFAULT_POLICY);
+  importAuthenticationFlows(newRealm,rep);
+  if (rep.getRequiredActions() != null) {
+    for (    RequiredActionProviderRepresentation action : rep.getRequiredActions()) {
+      RequiredActionProviderModel model=toModel(action);
+      newRealm.addRequiredActionProvider(model);
+    }
+  }
+ else {
+    DefaultRequiredActions.addActions(newRealm);
+  }
   importIdentityProviders(rep,newRealm);
   importIdentityProviderMappers(rep,newRealm);
   if (rep.getClients() != null) {
@@ -203,15 +213,5 @@
   }
   if (rep.getDefaultLocale() != null) {
     newRealm.setDefaultLocale(rep.getDefaultLocale());
-  }
-  importAuthenticationFlows(newRealm,rep);
-  if (rep.getRequiredActions() != null) {
-    for (    RequiredActionProviderRepresentation action : rep.getRequiredActions()) {
-      RequiredActionProviderModel model=toModel(action);
-      newRealm.addRequiredActionProvider(model);
-    }
-  }
- else {
-    DefaultRequiredActions.addActions(newRealm);
   }
 }

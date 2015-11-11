@@ -1,0 +1,23 @@
+{
+  event.event(EventType.IDENTITY_PROVIDER_FIRST_LOGIN);
+  Checks checks=new Checks();
+  if (!checks.verifyCode(code,ClientSessionModel.Action.AUTHENTICATE.name())) {
+    return checks.response;
+  }
+  event.detail(Details.CODE_ID,code);
+  ClientSessionCode clientSessionCode=checks.clientCode;
+  ClientSessionModel clientSession=clientSessionCode.getClientSession();
+  SerializedBrokeredIdentityContext serializedCtx=SerializedBrokeredIdentityContext.readFromClientSession(clientSession);
+  if (serializedCtx == null) {
+    throw new WebApplicationException(ErrorPage.error(session,"Not found serialized context in clientSession"));
+  }
+  BrokeredIdentityContext brokerContext=serializedCtx.deserialize(session,clientSession);
+  AuthenticationFlowModel firstBrokerLoginFlow=realm.getAuthenticationFlowById(brokerContext.getIdpConfig().getFirstBrokerLoginFlowId());
+  AuthenticationProcessor processor=new AuthenticationProcessor(){
+    @Override protected Response authenticationComplete(){
+      return redirectToAfterFirstBrokerLoginEndpoint(clientSession);
+    }
+  }
+;
+  return processFlow(execution,clientSession,FIRST_BROKER_LOGIN_PATH,firstBrokerLoginFlow,null,processor);
+}

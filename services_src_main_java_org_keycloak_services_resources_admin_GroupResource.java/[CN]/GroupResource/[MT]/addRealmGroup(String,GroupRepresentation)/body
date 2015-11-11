@@ -1,0 +1,23 @@
+{
+  GroupModel parentModel=realm.getGroupById(parentId);
+  Response.ResponseBuilder builder=Response.status(204);
+  if (parentModel == null) {
+    throw new NotFoundException("Could not find parent by id");
+  }
+  GroupModel child=null;
+  if (rep.getId() != null) {
+    child=realm.getGroupById(rep.getId());
+    if (child == null) {
+      throw new NotFoundException("Could not find child by id");
+    }
+  }
+ else {
+    child=realm.createGroup(rep.getName());
+    updateGroup(rep,child);
+    URI uri=uriInfo.getBaseUriBuilder().path(uriInfo.getMatchedURIs().get(1)).path(child.getId()).build();
+    builder.status(201).location(uri);
+  }
+  child.setParent(parentModel);
+  GroupRepresentation childRep=ModelToRepresentation.toRepresentation(child,true);
+  return builder.type(MediaType.APPLICATION_JSON_TYPE).entity(childRep).build();
+}

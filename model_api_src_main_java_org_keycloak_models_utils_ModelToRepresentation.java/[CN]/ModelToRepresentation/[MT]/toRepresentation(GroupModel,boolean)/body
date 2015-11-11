@@ -1,0 +1,29 @@
+{
+  GroupRepresentation rep=new GroupRepresentation();
+  rep.setId(group.getId());
+  rep.setName(group.getName());
+  if (!full)   return rep;
+  Set<RoleModel> roles=group.getRoleMappings();
+  List<String> realmRoleNames=new ArrayList<>();
+  Map<String,List<String>> clientRoleNames=new HashMap<>();
+  for (  RoleModel role : roles) {
+    if (role.getContainer() instanceof RealmModel) {
+      realmRoleNames.add(role.getName());
+    }
+ else {
+      ClientModel client=(ClientModel)role.getContainer();
+      String clientId=client.getClientId();
+      List<String> currentClientRoles=clientRoleNames.get(clientId);
+      if (currentClientRoles == null) {
+        currentClientRoles=new ArrayList<>();
+        clientRoleNames.put(clientId,currentClientRoles);
+      }
+      currentClientRoles.add(role.getName());
+    }
+  }
+  rep.setRealmRoles(realmRoleNames);
+  rep.setClientRoles(clientRoleNames);
+  Map<String,List<String>> attributes=group.getAttributes();
+  rep.setAttributes(attributes);
+  return rep;
+}

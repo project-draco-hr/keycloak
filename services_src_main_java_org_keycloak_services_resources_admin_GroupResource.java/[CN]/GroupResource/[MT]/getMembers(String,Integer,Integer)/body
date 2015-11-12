@@ -1,0 +1,15 @@
+{
+  auth.requireView();
+  GroupModel group=session.realms().getGroupById(id,realm);
+  if (group == null) {
+    throw new NotFoundException("Group not found");
+  }
+  firstResult=firstResult != null ? firstResult : -1;
+  maxResults=maxResults != null ? maxResults : -1;
+  List<UserRepresentation> results=new ArrayList<UserRepresentation>();
+  List<UserModel> userModels=session.users().getGroupMembers(realm,group,firstResult,maxResults);
+  for (  UserModel user : userModels) {
+    results.add(ModelToRepresentation.toRepresentation(user));
+  }
+  return results;
+}

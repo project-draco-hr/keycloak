@@ -1,0 +1,26 @@
+{
+  createLdapUserProvider.navigateTo();
+  createLdapUserProvider.form().selectVendor(ACTIVE_DIRECTORY);
+  createLdapUserProvider.form().setConsoleDisplayNameInput("ldap");
+  createLdapUserProvider.form().selectEditMode(UNSYNCED);
+  createLdapUserProvider.form().setLdapBindDnInput("uid=admin,ou=system");
+  createLdapUserProvider.form().setLdapUserDnInput("ou=People,dc=keycloak,dc=org");
+  createLdapUserProvider.form().setLdapBindCredentialInput("secret");
+  createLdapUserProvider.form().save();
+  assertFlashMessageDanger();
+  createLdapUserProvider.form().setLdapUserDnInput("");
+  createLdapUserProvider.form().setLdapConnectionUrlInput("ldap://localhost:389");
+  createLdapUserProvider.form().save();
+  assertFlashMessageDanger();
+  createLdapUserProvider.form().setLdapUserDnInput("ou=People,dc=keycloak,dc=org");
+  createLdapUserProvider.form().setLdapBindDnInput("");
+  createLdapUserProvider.form().save();
+  assertFlashMessageDanger();
+  createLdapUserProvider.form().setLdapBindDnInput("uid=admin,ou=system");
+  createLdapUserProvider.form().setLdapBindCredentialInput("");
+  createLdapUserProvider.form().save();
+  assertFlashMessageDanger();
+  createLdapUserProvider.form().setLdapBindCredentialInput("secret");
+  createLdapUserProvider.form().save();
+  assertFlashMessageSuccess();
+}

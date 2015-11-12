@@ -1,0 +1,12 @@
+{
+  TypedQuery<String> query=em.createNamedQuery("groupRoleMappingIds",String.class);
+  query.setParameter("group",getGroup());
+  List<String> ids=query.getResultList();
+  Set<RoleModel> roles=new HashSet<RoleModel>();
+  for (  String roleId : ids) {
+    RoleModel roleById=realm.getRoleById(roleId);
+    if (roleById == null)     continue;
+    roles.add(roleById);
+  }
+  return roles;
+}

@@ -1,0 +1,10 @@
+{
+  GroupModel group=session.realms().getGroupById(id,realm);
+  if (group == null) {
+    throw new NotFoundException("Group not found");
+  }
+  auth.init(RealmAuth.Resource.USER);
+  RoleMapperResource resource=new RoleMapperResource(realm,auth,group,adminEvent);
+  ResteasyProviderFactory.getInstance().injectProperties(resource);
+  return resource;
+}

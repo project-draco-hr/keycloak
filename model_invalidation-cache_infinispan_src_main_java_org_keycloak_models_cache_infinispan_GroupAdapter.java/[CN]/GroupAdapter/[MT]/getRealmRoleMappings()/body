@@ -1,0 +1,14 @@
+{
+  if (updated != null)   return updated.getRealmRoleMappings();
+  Set<RoleModel> roleMappings=getRoleMappings();
+  Set<RoleModel> realmMappings=new HashSet<RoleModel>();
+  for (  RoleModel role : roleMappings) {
+    RoleContainerModel container=role.getContainer();
+    if (container instanceof RealmModel) {
+      if (((RealmModel)container).getId().equals(realm.getId())) {
+        realmMappings.add(role);
+      }
+    }
+  }
+  return realmMappings;
+}

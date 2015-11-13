@@ -1,0 +1,12 @@
+{
+  fireErrorEvent(message);
+  FormMessage errorMessage=new FormMessage(message,parameters);
+  try {
+    String serializedError=JsonSerialization.writeValueAsString(errorMessage);
+    clientSession.setNote(AccountService.ACCOUNT_MGMT_FORWARDED_ERROR_NOTE,serializedError);
+  }
+ catch (  IOException ioe) {
+    throw new RuntimeException(ioe);
+  }
+  return Response.status(302).location(UriBuilder.fromUri(clientSession.getRedirectUri()).build()).build();
+}

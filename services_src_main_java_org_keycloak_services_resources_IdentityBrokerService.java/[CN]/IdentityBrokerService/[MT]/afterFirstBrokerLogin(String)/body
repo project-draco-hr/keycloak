@@ -19,6 +19,7 @@
     }
     FederatedIdentityModel federatedIdentityModel=new FederatedIdentityModel(context.getIdpConfig().getAlias(),context.getId(),context.getUsername(),context.getToken());
     session.users().addFederatedIdentity(realmModel,federatedUser,federatedIdentityModel);
+    EventBuilder event=this.event.clone().user(federatedUser).detail(Details.CODE_ID,clientSession.getId()).detail(Details.USERNAME,federatedUser.getUsername()).detail(Details.IDENTITY_PROVIDER,providerId).detail(Details.IDENTITY_PROVIDER_USERNAME,context.getUsername()).removeDetail("auth_method");
     String isRegisteredNewUser=clientSession.getNote(AbstractIdpAuthenticator.BROKER_REGISTERED_NEW_USER);
     if (Boolean.parseBoolean(isRegisteredNewUser)) {
       LOGGER.debugf("Registered new user '%s' after first login with identity provider '%s'. Identity provider username is '%s' . ",federatedUser.getUsername(),providerId,context.getUsername());
@@ -35,10 +36,11 @@
         LOGGER.debugf("Email verified automatically after registration of user '%s' through Identity provider '%s' ",federatedUser.getUsername(),context.getIdpConfig().getAlias());
         federatedUser.setEmailVerified(true);
       }
-      this.event.clone().user(federatedUser).event(EventType.REGISTER).detail(Details.IDENTITY_PROVIDER,providerId).detail(Details.IDENTITY_PROVIDER_USERNAME,context.getUsername()).removeDetail("auth_method").success();
+      event.event(EventType.REGISTER).detail(Details.REGISTER_METHOD,"broker").detail(Details.EMAIL,federatedUser.getEmail()).success();
     }
  else {
       LOGGER.debugf("Linked existing keycloak user '%s' with identity provider '%s' . Identity provider username is '%s' .",federatedUser.getUsername(),providerId,context.getUsername());
+      event.event(EventType.FEDERATED_IDENTITY_LINK).success();
       updateFederatedIdentity(context,federatedUser);
     }
     String isDifferentBrowser=clientSession.getNote(AbstractIdpAuthenticator.IS_DIFFERENT_BROWSER);

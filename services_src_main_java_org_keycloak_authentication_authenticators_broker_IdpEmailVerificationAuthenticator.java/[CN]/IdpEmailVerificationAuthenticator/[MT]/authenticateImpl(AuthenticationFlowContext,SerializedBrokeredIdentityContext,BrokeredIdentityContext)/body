@@ -11,11 +11,14 @@
   VerifyEmail.setupKey(clientSession);
   UserModel existingUser=getExistingUser(session,realm,clientSession);
   String link=UriBuilder.fromUri(context.getActionUrl()).queryParam(Constants.KEY,clientSession.getNote(Constants.VERIFY_EMAIL_KEY)).build().toString();
+  EventBuilder event=context.getEvent().clone().event(EventType.SEND_IDENTITY_PROVIDER_LINK).user(existingUser).detail(Details.USERNAME,existingUser.getUsername()).detail(Details.EMAIL,existingUser.getEmail()).detail(Details.CODE_ID,clientSession.getId()).removeDetail(Details.AUTH_METHOD).removeDetail(Details.AUTH_TYPE);
   long expiration=TimeUnit.SECONDS.toMinutes(context.getRealm().getAccessCodeLifespanUserAction());
   try {
     context.getSession().getProvider(EmailProvider.class).setRealm(realm).setUser(existingUser).setAttribute(EmailProvider.IDENTITY_PROVIDER_BROKER_CONTEXT,brokerContext).sendConfirmIdentityBrokerLink(link,expiration);
+    event.success();
   }
  catch (  EmailException e) {
+    event.error(Errors.EMAIL_SEND_FAILED);
     logger.error("Failed to send email to confirm identity broker linking",e);
     Response challenge=context.form().setError(Messages.EMAIL_SENT_ERROR).createErrorPage();
     context.failure(AuthenticationFlowError.INTERNAL_ERROR,challenge);

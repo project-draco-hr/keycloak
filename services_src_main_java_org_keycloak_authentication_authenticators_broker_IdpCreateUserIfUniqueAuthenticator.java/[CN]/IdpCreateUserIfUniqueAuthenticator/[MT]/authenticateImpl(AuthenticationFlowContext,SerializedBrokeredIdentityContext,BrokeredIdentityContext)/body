@@ -30,5 +30,8 @@
     context.getClientSession().setNote(EXISTING_USER_INFO,duplication.serialize());
     Response challengeResponse=context.form().setError(Messages.FEDERATED_IDENTITY_EXISTS,duplication.getDuplicateAttributeName(),duplication.getDuplicateAttributeValue()).createErrorPage();
     context.challenge(challengeResponse);
+    if (context.getExecution().isRequired()) {
+      context.getEvent().user(duplication.getExistingUserId()).detail("existing_" + duplication.getDuplicateAttributeName(),duplication.getDuplicateAttributeValue()).removeDetail(Details.AUTH_METHOD).removeDetail(Details.AUTH_TYPE).error(Errors.FEDERATED_IDENTITY_EXISTS);
+    }
   }
 }

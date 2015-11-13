@@ -22,7 +22,15 @@
     }
     return false;
   }
-  if (invalidUser(context,user))   return false;
+  if (invalidUser(context,user)) {
+    return false;
+  }
+  if (!validatePassword(context,user,inputData)) {
+    return false;
+  }
+  if (!enabledUser(context,user)) {
+    return false;
+  }
   String rememberMe=inputData.getFirst("rememberMe");
   boolean remember=rememberMe != null && rememberMe.equalsIgnoreCase("on");
   if (remember) {

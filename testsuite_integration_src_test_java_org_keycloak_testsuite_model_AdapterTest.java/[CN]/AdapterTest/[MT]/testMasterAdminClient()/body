@@ -1,0 +1,10 @@
+{
+  realmModel=realmManager.createRealm("foo-realm");
+  ClientModel masterAdminClient=realmModel.getMasterAdminClient();
+  Assert.assertEquals(Config.getAdminRealm(),masterAdminClient.getRealm().getId());
+  commit();
+  realmModel=realmManager.getRealmByName("foo-realm");
+  masterAdminClient=realmModel.getMasterAdminClient();
+  Assert.assertEquals(Config.getAdminRealm(),masterAdminClient.getRealm().getId());
+  realmManager.removeRealm(realmModel);
+}

@@ -1,0 +1,12 @@
+{
+  List<AuthenticationExecutionModel> executions=realm.getAuthenticationExecutions(flow.getId());
+  for (  AuthenticationExecutionModel execution : executions) {
+    if (execution.isAuthenticatorFlow()) {
+      AuthenticationFlowModel subFlow=realm.getAuthenticationFlowById(execution.getFlowId());
+      deepFindAuthenticationExecutions(realm,subFlow,result);
+    }
+ else {
+      result.add(execution);
+    }
+  }
+}

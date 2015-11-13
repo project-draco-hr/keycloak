@@ -86,6 +86,16 @@
   execution=new AuthenticationExecutionModel();
   execution.setParentFlow(verifyByReauthenticationAccountFlow.getId());
   execution.setRequirement(AuthenticationExecutionModel.Requirement.OPTIONAL);
+  if (migrate) {
+    AuthenticationFlowModel browserFlow=realm.getBrowserFlow();
+    List<AuthenticationExecutionModel> browserExecutions=new LinkedList<>();
+    KeycloakModelUtils.deepFindAuthenticationExecutions(realm,browserFlow,browserExecutions);
+    for (    AuthenticationExecutionModel browserExecution : browserExecutions) {
+      if (browserExecution.getAuthenticator().equals("auth-otp-form")) {
+        execution.setRequirement(browserExecution.getRequirement());
+      }
+    }
+  }
   execution.setAuthenticator("auth-otp-form");
   execution.setPriority(20);
   execution.setAuthenticatorFlow(false);

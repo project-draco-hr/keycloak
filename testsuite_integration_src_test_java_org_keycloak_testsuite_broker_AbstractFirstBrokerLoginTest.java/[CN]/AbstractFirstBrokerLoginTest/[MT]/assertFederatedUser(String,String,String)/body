@@ -1,0 +1,13 @@
+{
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
+  UserModel federatedUser=getFederatedUser();
+  assertNotNull(federatedUser);
+  assertEquals(expectedUsername,federatedUser.getUsername());
+  assertEquals(expectedEmail,federatedUser.getEmail());
+  RealmModel realmWithBroker=getRealm();
+  Set<FederatedIdentityModel> federatedIdentities=this.session.users().getFederatedIdentities(federatedUser,realmWithBroker);
+  assertEquals(1,federatedIdentities.size());
+  FederatedIdentityModel federatedIdentityModel=federatedIdentities.iterator().next();
+  assertEquals(getProviderId(),federatedIdentityModel.getIdentityProvider());
+  assertEquals(expectedFederatedUsername,federatedIdentityModel.getUserName());
+}

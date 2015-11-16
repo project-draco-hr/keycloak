@@ -1,0 +1,10 @@
+{
+  String redirect=clientSession.getRedirectUri();
+  String state=clientSession.getNote(OIDCLoginProtocol.STATE_PARAM);
+  UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam(OAuth2Constants.ERROR,translateError(error));
+  if (state != null)   redirectUri.queryParam(OAuth2Constants.STATE,state);
+  session.sessions().removeClientSession(realm,clientSession);
+  RestartLoginCookie.expireRestartCookie(realm,session.getContext().getConnection(),uriInfo);
+  Response.ResponseBuilder location=Response.status(302).location(redirectUri.build());
+  return location.build();
+}

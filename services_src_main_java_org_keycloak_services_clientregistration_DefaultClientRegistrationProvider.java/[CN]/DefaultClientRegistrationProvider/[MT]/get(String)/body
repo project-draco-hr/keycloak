@@ -1,8 +1,7 @@
 {
   event.event(EventType.CLIENT_INFO);
-  ClientModel client=authenticate(false,clientId);
-  if (client == null) {
-    return Response.status(Response.Status.NOT_FOUND).build();
-  }
+  ClientModel client=session.getContext().getRealm().getClientByClientId(clientId);
+  auth.requireView(client);
+  event.client(client.getClientId()).success();
   return Response.ok(ModelToRepresentation.toRepresentation(client)).build();
 }

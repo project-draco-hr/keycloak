@@ -1,0 +1,20 @@
+{
+  if (client.isPublicClient()) {
+    return;
+  }
+  AuthenticationProcessor processor=AuthorizeClientUtil.getAuthenticationProcessor(session,event);
+  Response response=processor.authenticateClient();
+  if (response != null) {
+    event.client(client.getClientId()).error(Errors.NOT_ALLOWED);
+    throw new ForbiddenException();
+  }
+  ClientModel authClient=processor.getClient();
+  if (client == null) {
+    event.client(client.getClientId()).error(Errors.NOT_ALLOWED);
+    throw new ForbiddenException();
+  }
+  if (!authClient.getClientId().equals(client.getClientId())) {
+    event.client(client.getClientId()).error(Errors.NOT_ALLOWED);
+    throw new ForbiddenException();
+  }
+}

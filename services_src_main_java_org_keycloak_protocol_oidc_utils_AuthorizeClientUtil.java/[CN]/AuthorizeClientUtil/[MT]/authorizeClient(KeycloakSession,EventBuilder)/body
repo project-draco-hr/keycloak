@@ -1,0 +1,12 @@
+{
+  AuthenticationProcessor processor=getAuthenticationProcessor(session,event);
+  Response response=processor.authenticateClient();
+  if (response != null) {
+    throw new WebApplicationException(response);
+  }
+  ClientModel client=processor.getClient();
+  if (client == null) {
+    throw new ErrorResponseException("invalid_client","Client authentication ended, but client is null",Response.Status.BAD_REQUEST);
+  }
+  return new ClientAuthResult(client,processor.getClientAuthAttributes());
+}

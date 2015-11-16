@@ -1,8 +1,8 @@
 {
   event.event(EventType.CLIENT_UPDATE).client(clientId);
-  ClientModel client=authenticate(false,clientId);
+  ClientModel client=session.getContext().getRealm().getClientByClientId(clientId);
+  auth.requireUpdate(client);
   RepresentationToModel.updateClient(rep,client);
-  logger.infov("Updated client {0}",rep.getClientId());
-  event.success();
+  event.client(client.getClientId()).success();
   return Response.status(Response.Status.OK).build();
 }

@@ -1,0 +1,12 @@
+{
+  client.setRootUrl("http://newroot");
+  reg.auth(Auth.token("invalid"));
+  try {
+    reg.update(client);
+    fail("Expected 403");
+  }
+ catch (  ClientRegistrationException e) {
+    assertEquals(403,((HttpErrorException)e.getCause()).getStatusLine().getStatusCode());
+  }
+  assertEquals("http://root",getClient(client.getId()).getRootUrl());
+}

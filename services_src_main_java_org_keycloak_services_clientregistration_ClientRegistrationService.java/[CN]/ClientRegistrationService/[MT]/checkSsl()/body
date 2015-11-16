@@ -1,0 +1,7 @@
+{
+  if (!session.getContext().getUri().getBaseUri().getScheme().equals("https")) {
+    if (session.getContext().getRealm().getSslRequired().isRequired(session.getContext().getConnection())) {
+      throw new ErrorResponseException("invalid_request","HTTPS required",Response.Status.FORBIDDEN);
+    }
+  }
+}

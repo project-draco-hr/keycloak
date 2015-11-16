@@ -1,0 +1,20 @@
+{
+  RealmModel realm=session.getContext().getRealm();
+  String authorizationHeader=session.getContext().getRequestHeaders().getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+  if (authorizationHeader == null) {
+    return;
+  }
+  String[] split=authorizationHeader.split(" ");
+  if (!split[0].equalsIgnoreCase("bearer")) {
+    return;
+  }
+  if (split[1].indexOf('.') == -1) {
+    token=split[1];
+    authenticated=true;
+  }
+ else {
+    AuthenticationManager.AuthResult authResult=new AppAuthManager().authenticateBearerToken(session,realm);
+    bearerRealmAccess=authResult.getToken().getResourceAccess(Constants.REALM_MANAGEMENT_CLIENT_ID);
+    authenticated=true;
+  }
+}

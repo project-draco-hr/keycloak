@@ -1,0 +1,19 @@
+{
+  try {
+    HttpPut request=new HttpPut(getUrl(baseUri,path));
+    request.setHeader(HttpHeaders.CONTENT_TYPE,"application/json");
+    request.setHeader(HttpHeaders.ACCEPT,"application/json");
+    request.setEntity(new StringEntity(content));
+    addAuth(request);
+    HttpResponse response=httpClient.execute(request);
+    if (response.getEntity() != null) {
+      response.getEntity().getContent().close();
+    }
+    if (response.getStatusLine().getStatusCode() != 200) {
+      throw new HttpErrorException(response.getStatusLine());
+    }
+  }
+ catch (  IOException e) {
+    throw new ClientRegistrationException("Failed to send request",e);
+  }
+}

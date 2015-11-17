@@ -2,4 +2,11 @@
   reg.auth(Auth.client(client.getClientId(),client.getSecret()));
   AdapterConfig config=reg.getAdapterConfig(client.getClientId());
   assertNotNull(config);
+  assertEquals(testContext.getAuthServerContextRoot() + "/auth",config.getAuthServerUrl());
+  assertEquals("test",config.getRealm());
+  assertEquals(1,config.getCredentials().size());
+  assertEquals(client.getSecret(),config.getCredentials().get("secret"));
+  assertEquals(publicKey,config.getRealmKey());
+  assertEquals(client.getClientId(),config.getResource());
+  assertEquals(SslRequired.EXTERNAL.name().toLowerCase(),config.getSslRequired());
 }

@@ -1,0 +1,14 @@
+{
+  setUpdateProfileFirstLogin(IdentityProviderRepresentation.UPFLM_OFF);
+  loginIDP("pedroigor");
+  this.idpConfirmLinkPage.assertCurrent();
+  Assert.assertEquals("User with email psilva@redhat.com already exists. How do you want to continue?",this.idpConfirmLinkPage.getMessage());
+  this.idpConfirmLinkPage.clickLinkAccount();
+  this.idpLinkEmailPage.assertCurrent();
+  Assert.assertEquals("An email with instructions to link " + ObjectUtil.capitalize(getProviderId()) + " account pedroigor with your "+ APP_REALM_ID+ " account has been sent to you.",this.idpLinkEmailPage.getMessage());
+  Assert.assertEquals(1,greenMail.getReceivedMessages().length);
+  MimeMessage message=greenMail.getReceivedMessages()[0];
+  String linkFromMail=getVerificationEmailLink(message);
+  driver.navigate().to(linkFromMail.trim());
+  assertFederatedUser("pedroigor","psilva@redhat.com","pedroigor");
+}

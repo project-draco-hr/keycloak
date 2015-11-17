@@ -1,0 +1,30 @@
+{
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      setExecutionRequirement(realmWithBroker,DefaultAuthenticationFlows.FIRST_BROKER_LOGIN_HANDLE_EXISTING_SUBFLOW,IdpEmailVerificationAuthenticatorFactory.PROVIDER_ID,AuthenticationExecutionModel.Requirement.DISABLED);
+      setUpdateProfileFirstLogin(realmWithBroker,IdentityProviderRepresentation.UPFLM_OFF);
+    }
+  }
+,APP_REALM_ID);
+  loginIDP("pedroigor");
+  this.idpConfirmLinkPage.assertCurrent();
+  Assert.assertEquals("User with email psilva@redhat.com already exists. How do you want to continue?",this.idpConfirmLinkPage.getMessage());
+  this.idpConfirmLinkPage.clickLinkAccount();
+  Assert.assertEquals("Log in to " + APP_REALM_ID,this.driver.getTitle());
+  this.loginPage.resetPassword();
+  Assert.assertEquals("Log in to " + APP_REALM_ID,this.driver.getTitle());
+  Assert.assertEquals("You should receive an email shortly with further instructions.",this.loginPage.getSuccessMessage());
+  Assert.assertEquals(1,greenMail.getReceivedMessages().length);
+  MimeMessage message=greenMail.getReceivedMessages()[0];
+  String linkFromMail=getVerificationEmailLink(message);
+  driver.navigate().to(linkFromMail.trim());
+  this.passwordUpdatePage.assertCurrent();
+  this.passwordUpdatePage.changePassword("password","password");
+  assertFederatedUser("pedroigor","psilva@redhat.com","pedroigor");
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      setExecutionRequirement(realmWithBroker,DefaultAuthenticationFlows.FIRST_BROKER_LOGIN_HANDLE_EXISTING_SUBFLOW,IdpEmailVerificationAuthenticatorFactory.PROVIDER_ID,AuthenticationExecutionModel.Requirement.ALTERNATIVE);
+    }
+  }
+,APP_REALM_ID);
+}

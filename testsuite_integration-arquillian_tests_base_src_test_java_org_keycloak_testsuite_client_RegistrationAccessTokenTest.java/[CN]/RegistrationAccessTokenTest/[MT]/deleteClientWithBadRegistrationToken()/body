@@ -1,0 +1,11 @@
+{
+  reg.auth(Auth.token("invalid"));
+  try {
+    reg.delete(client);
+    fail("Expected 403");
+  }
+ catch (  ClientRegistrationException e) {
+    assertEquals(403,((HttpErrorException)e.getCause()).getStatusLine().getStatusCode());
+  }
+  assertNotNull(getClient(client.getId()));
+}

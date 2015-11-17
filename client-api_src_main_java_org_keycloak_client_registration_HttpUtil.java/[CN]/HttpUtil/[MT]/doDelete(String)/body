@@ -1,0 +1,16 @@
+{
+  try {
+    HttpDelete request=new HttpDelete(getUrl(baseUri,path));
+    addAuth(request);
+    HttpResponse response=httpClient.execute(request);
+    if (response.getEntity() != null) {
+      response.getEntity().getContent().close();
+    }
+    if (response.getStatusLine().getStatusCode() != 200) {
+      throw new HttpErrorException(response.getStatusLine());
+    }
+  }
+ catch (  IOException e) {
+    throw new ClientRegistrationException("Failed to send request",e);
+  }
+}

@@ -1,11 +1,11 @@
 {
   event.event(EventType.CLIENT_REGISTER);
-  authenticate(true,null);
+  auth.requireCreate();
   try {
-    ClientModel clientModel=RepresentationToModel.createClient(session,realm,client,true);
+    ClientModel clientModel=RepresentationToModel.createClient(session,session.getContext().getRealm(),client,true);
+    clientModel.setRegistrationSecret(TokenGenerator.createRegistrationAccessToken());
     client=ModelToRepresentation.toRepresentation(clientModel);
     URI uri=session.getContext().getUri().getAbsolutePathBuilder().path(clientModel.getId()).build();
-    logger.infov("Created client {0}",client.getClientId());
     event.client(client.getClientId()).success();
     return Response.created(uri).entity(client).build();
   }

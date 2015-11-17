@@ -1,0 +1,16 @@
+{
+  createKerberosUserProvider.navigateTo();
+  createKerberosUserProvider.form().setConsoleDisplayNameInput("kerberos");
+  createKerberosUserProvider.form().setKerberosRealmInput("KEYCLOAK.ORG");
+  createKerberosUserProvider.form().setServerPrincipalInput("HTTP/localhost@KEYCLOAK.ORG");
+  createKerberosUserProvider.form().setKeyTabInput("http.keytab");
+  createKerberosUserProvider.form().setDebugEnabled(true);
+  createKerberosUserProvider.form().setAllowPasswordAuthentication(true);
+  createKerberosUserProvider.form().selectEditMode(READ_ONLY);
+  createKerberosUserProvider.form().setUpdateProfileFirstLogin(true);
+  createKerberosUserProvider.form().save();
+  assertFlashMessageSuccess();
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  UserFederationProviderRepresentation ufpr=realm.getUserFederationProviders().get(0);
+  assertKerberosSetings(ufpr,"KEYCLOAK.ORG","HTTP/localhost@KEYCLOAK.ORG","http.keytab","true","true","true");
+}

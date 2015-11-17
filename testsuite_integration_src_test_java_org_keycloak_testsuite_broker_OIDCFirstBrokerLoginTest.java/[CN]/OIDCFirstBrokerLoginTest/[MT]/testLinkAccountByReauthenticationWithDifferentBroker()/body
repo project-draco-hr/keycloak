@@ -1,0 +1,53 @@
+{
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      setExecutionRequirement(realmWithBroker,DefaultAuthenticationFlows.FIRST_BROKER_LOGIN_HANDLE_EXISTING_SUBFLOW,IdpEmailVerificationAuthenticatorFactory.PROVIDER_ID,AuthenticationExecutionModel.Requirement.DISABLED);
+      setUpdateProfileFirstLogin(realmWithBroker,IdentityProviderRepresentation.UPFLM_OFF);
+    }
+  }
+,APP_REALM_ID);
+  driver.navigate().to("http://localhost:8081/test-app");
+  this.loginPage.clickSocial("kc-saml-idp-basic");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8082/auth/"));
+  Assert.assertEquals("Log in to realm-with-saml-idp-basic",this.driver.getTitle());
+  this.loginPage.login("pedroigor","password");
+  this.idpConfirmLinkPage.assertCurrent();
+  Assert.assertEquals("User with email psilva@redhat.com already exists. How do you want to continue?",this.idpConfirmLinkPage.getMessage());
+  this.idpConfirmLinkPage.clickLinkAccount();
+  this.loginPage.login("password");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
+  driver.navigate().to("http://localhost:8081/test-app/logout");
+  loginIDP("pedroigor");
+  this.idpConfirmLinkPage.assertCurrent();
+  Assert.assertEquals("User with email psilva@redhat.com already exists. How do you want to continue?",this.idpConfirmLinkPage.getMessage());
+  this.idpConfirmLinkPage.clickLinkAccount();
+  Assert.assertEquals("Log in to " + APP_REALM_ID,this.driver.getTitle());
+  Assert.assertEquals("Authenticate as pedroigor to link your account with " + getProviderId(),this.loginPage.getSuccessMessage());
+  try {
+    this.loginPage.findSocialButton(getProviderId());
+    Assert.fail("Not expected to see social button with " + getProviderId());
+  }
+ catch (  NoSuchElementException expected) {
+  }
+  this.loginPage.clickSocial("kc-saml-idp-basic");
+  Assert.assertEquals("Log in to realm-with-saml-idp-basic",this.driver.getTitle());
+  this.loginPage.login("pedroigor","password");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
+  UserModel federatedUser=getFederatedUser();
+  assertNotNull(federatedUser);
+  assertEquals("pedroigor",federatedUser.getUsername());
+  assertEquals("psilva@redhat.com",federatedUser.getEmail());
+  RealmModel realmWithBroker=getRealm();
+  Set<FederatedIdentityModel> federatedIdentities=this.session.users().getFederatedIdentities(federatedUser,realmWithBroker);
+  assertEquals(2,federatedIdentities.size());
+  for (  FederatedIdentityModel link : federatedIdentities) {
+    Assert.assertEquals("pedroigor",link.getUserName());
+    Assert.assertTrue(link.getIdentityProvider().equals(getProviderId()) || link.getIdentityProvider().equals("kc-saml-idp-basic"));
+  }
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      setExecutionRequirement(realmWithBroker,DefaultAuthenticationFlows.FIRST_BROKER_LOGIN_HANDLE_EXISTING_SUBFLOW,IdpEmailVerificationAuthenticatorFactory.PROVIDER_ID,AuthenticationExecutionModel.Requirement.ALTERNATIVE);
+    }
+  }
+,APP_REALM_ID);
+}

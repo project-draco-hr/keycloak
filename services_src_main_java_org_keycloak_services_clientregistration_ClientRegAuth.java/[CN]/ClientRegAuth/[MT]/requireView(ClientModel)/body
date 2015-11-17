@@ -1,0 +1,22 @@
+{
+  if (!authenticated) {
+    event.error(Errors.NOT_ALLOWED);
+    throw new UnauthorizedException();
+  }
+  if (client == null) {
+    event.error(Errors.NOT_ALLOWED);
+    throw new ForbiddenException();
+  }
+  if (bearerRealmAccess != null) {
+    if (bearerRealmAccess.isUserInRole(AdminRoles.MANAGE_CLIENTS) || bearerRealmAccess.isUserInRole(AdminRoles.VIEW_CLIENTS)) {
+      return;
+    }
+  }
+ else   if (token != null) {
+    if (client.getRegistrationSecret() != null && client.getRegistrationSecret().equals(token)) {
+      return;
+    }
+  }
+  event.error(Errors.NOT_ALLOWED);
+  throw new ForbiddenException();
+}

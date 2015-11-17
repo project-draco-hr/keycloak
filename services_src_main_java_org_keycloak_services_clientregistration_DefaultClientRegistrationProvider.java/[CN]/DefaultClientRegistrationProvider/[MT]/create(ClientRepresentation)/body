@@ -3,9 +3,14 @@
   auth.requireCreate();
   try {
     ClientModel clientModel=RepresentationToModel.createClient(session,session.getContext().getRealm(),client,true);
-    KeycloakModelUtils.generateRegistrationAccessToken(clientModel);
     client=ModelToRepresentation.toRepresentation(clientModel);
+    String registrationAccessToken=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,clientModel);
+    client.setRegistrationAccessToken(registrationAccessToken);
     URI uri=session.getContext().getUri().getAbsolutePathBuilder().path(clientModel.getId()).build();
+    if (auth.isInitialAccessToken()) {
+      ClientInitialAccessModel initialAccessModel=auth.getInitialAccessModel();
+      initialAccessModel.decreaseRemainingCount();
+    }
     event.client(client.getClientId()).success();
     return Response.created(uri).entity(client).build();
   }

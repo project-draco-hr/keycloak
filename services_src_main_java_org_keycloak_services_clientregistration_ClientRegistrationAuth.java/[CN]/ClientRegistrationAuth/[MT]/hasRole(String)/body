@@ -1,0 +1,28 @@
+{
+  try {
+    Map<String,Object> otherClaims=jwt.getOtherClaims();
+    if (otherClaims != null) {
+      Map<String,Map<String,List<String>>> resourceAccess=(Map<String,Map<String,List<String>>>)jwt.getOtherClaims().get("resource_access");
+      if (resourceAccess == null) {
+        return false;
+      }
+      Map<String,List<String>> realmManagement=resourceAccess.get(Constants.REALM_MANAGEMENT_CLIENT_ID);
+      if (realmManagement == null) {
+        return false;
+      }
+      List<String> resources=realmManagement.get("roles");
+      if (resources == null) {
+        return false;
+      }
+      for (      String r : role) {
+        if (resources.contains(r)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+ catch (  Throwable t) {
+    return false;
+  }
+}

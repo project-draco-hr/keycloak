@@ -1,0 +1,29 @@
+{
+  JWSInput input;
+  try {
+    input=new JWSInput(token);
+  }
+ catch (  Exception e) {
+    throw new ForbiddenException(e);
+  }
+  if (!RSAProvider.verify(input,realm.getPublicKey())) {
+    throw new ForbiddenException("Invalid signature");
+  }
+  JsonWebToken jwt;
+  try {
+    jwt=input.readJsonContent(JsonWebToken.class);
+  }
+ catch (  IOException e) {
+    throw new ForbiddenException(e);
+  }
+  if (!getIssuer(realm,uri).equals(jwt.getIssuer())) {
+    throw new ForbiddenException("Issuer doesn't match");
+  }
+  if (!jwt.isActive()) {
+    throw new ForbiddenException("Expired token");
+  }
+  if (!(TokenUtil.TOKEN_TYPE_BEARER.equals(jwt.getType()) || TYPE_INITIAL_ACCESS_TOKEN.equals(jwt.getType()) || TYPE_REGISTRATION_ACCESS_TOKEN.equals(jwt.getType()))) {
+    throw new ForbiddenException("Invalid token type");
+  }
+  return jwt;
+}

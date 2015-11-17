@@ -1,5 +1,8 @@
 {
   client.setRootUrl("http://newroot");
-  reg.update(client);
+  ClientRepresentation rep=reg.update(client);
   assertEquals("http://newroot",getClient(client.getId()).getRootUrl());
+  assertNotEquals(client.getRegistrationAccessToken(),rep.getRegistrationAccessToken());
+  assertRead(client.getClientId(),client.getRegistrationAccessToken(),false);
+  assertRead(client.getClientId(),rep.getRegistrationAccessToken(),true);
 }

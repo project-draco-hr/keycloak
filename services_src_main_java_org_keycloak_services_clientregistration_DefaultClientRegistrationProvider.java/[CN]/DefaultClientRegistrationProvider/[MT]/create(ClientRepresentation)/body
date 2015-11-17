@@ -3,7 +3,7 @@
   auth.requireCreate();
   try {
     ClientModel clientModel=RepresentationToModel.createClient(session,session.getContext().getRealm(),client,true);
-    clientModel.setRegistrationSecret(TokenGenerator.createRegistrationAccessToken());
+    KeycloakModelUtils.generateRegistrationAccessToken(clientModel);
     client=ModelToRepresentation.toRepresentation(clientModel);
     URI uri=session.getContext().getUri().getAbsolutePathBuilder().path(clientModel.getId()).build();
     event.client(client.getClientId()).success();

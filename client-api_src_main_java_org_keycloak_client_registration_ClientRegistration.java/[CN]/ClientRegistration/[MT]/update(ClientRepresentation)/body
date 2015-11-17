@@ -1,4 +1,5 @@
 {
   String content=serialize(client);
-  httpUtil.doPut(content,DEFAULT,client.getClientId());
+  InputStream resultStream=httpUtil.doPut(content,DEFAULT,client.getClientId());
+  return resultStream != null ? deserialize(resultStream,ClientRepresentation.class) : null;
 }

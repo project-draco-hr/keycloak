@@ -1,0 +1,12 @@
+{
+  ClientInitialAccessPresentation response=resource.create(new ClientInitialAccessCreatePresentation());
+  reg.auth(Auth.token(response));
+  resource.delete(response.getId());
+  ClientRepresentation rep=new ClientRepresentation();
+  try {
+    reg.create(rep);
+  }
+ catch (  ClientRegistrationException e) {
+    Assert.assertEquals(403,((HttpErrorException)e.getCause()).getStatusLine().getStatusCode());
+  }
+}

@@ -3,10 +3,11 @@
   ClientModel client=session.getContext().getRealm().getClientByClientId(clientId);
   auth.requireUpdate(client);
   RepresentationToModel.updateClient(rep,client);
-  if (auth.isRegistrationAccessToken()) {
-    KeycloakModelUtils.generateRegistrationAccessToken(client);
-  }
   rep=ModelToRepresentation.toRepresentation(client);
+  if (auth.isRegistrationAccessToken()) {
+    String registrationAccessToken=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,client);
+    rep.setRegistrationAccessToken(registrationAccessToken);
+  }
   event.client(client.getClientId()).success();
   return Response.ok(rep).build();
 }

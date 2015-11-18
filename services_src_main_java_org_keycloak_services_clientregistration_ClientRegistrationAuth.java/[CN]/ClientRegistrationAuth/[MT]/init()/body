@@ -1,0 +1,19 @@
+{
+  RealmModel realm=session.getContext().getRealm();
+  UriInfo uri=session.getContext().getUri();
+  String authorizationHeader=session.getContext().getRequestHeaders().getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+  if (authorizationHeader == null) {
+    return;
+  }
+  String[] split=authorizationHeader.split(" ");
+  if (!split[0].equalsIgnoreCase("bearer")) {
+    return;
+  }
+  jwt=ClientRegistrationTokenUtils.parseToken(realm,uri,split[1]);
+  if (isInitialAccessToken()) {
+    initialAccessModel=session.sessions().getClientInitialAccessModel(session.getContext().getRealm(),jwt.getId());
+    if (initialAccessModel == null) {
+      throw new ForbiddenException();
+    }
+  }
+}

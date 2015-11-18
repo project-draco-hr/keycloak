@@ -1,11 +1,25 @@
 {
   rep.setAuthenticationFlows(new LinkedList<AuthenticationFlowRepresentation>());
   rep.setAuthenticatorConfig(new LinkedList<AuthenticatorConfigRepresentation>());
-  for (  AuthenticationFlowModel model : realm.getAuthenticationFlows()) {
+  List<AuthenticationFlowModel> authenticationFlows=new ArrayList<>(realm.getAuthenticationFlows());
+  Collections.sort(authenticationFlows,new Comparator<AuthenticationFlowModel>(){
+    @Override public int compare(    AuthenticationFlowModel left,    AuthenticationFlowModel right){
+      return left.getAlias().compareTo(right.getAlias());
+    }
+  }
+);
+  for (  AuthenticationFlowModel model : authenticationFlows) {
     AuthenticationFlowRepresentation flowRep=toRepresentation(realm,model);
     rep.getAuthenticationFlows().add(flowRep);
   }
-  for (  AuthenticatorConfigModel model : realm.getAuthenticatorConfigs()) {
+  List<AuthenticatorConfigModel> authenticatorConfigs=new ArrayList<>(realm.getAuthenticatorConfigs());
+  Collections.sort(authenticatorConfigs,new Comparator<AuthenticatorConfigModel>(){
+    @Override public int compare(    AuthenticatorConfigModel left,    AuthenticatorConfigModel right){
+      return left.getAlias().compareTo(right.getAlias());
+    }
+  }
+);
+  for (  AuthenticatorConfigModel model : authenticatorConfigs) {
     rep.getAuthenticatorConfig().add(toRepresentation(model));
   }
 }

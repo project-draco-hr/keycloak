@@ -1,6 +1,13 @@
 {
   rep.setRequiredActions(new LinkedList<RequiredActionProviderRepresentation>());
-  for (  RequiredActionProviderModel model : realm.getRequiredActionProviders()) {
+  List<RequiredActionProviderModel> requiredActionProviders=realm.getRequiredActionProviders();
+  Collections.sort(requiredActionProviders,new Comparator<RequiredActionProviderModel>(){
+    @Override public int compare(    RequiredActionProviderModel left,    RequiredActionProviderModel right){
+      return left.getAlias().compareTo(right.getAlias());
+    }
+  }
+);
+  for (  RequiredActionProviderModel model : requiredActionProviders) {
     RequiredActionProviderRepresentation action=toRepresentation(model);
     rep.getRequiredActions().add(action);
   }

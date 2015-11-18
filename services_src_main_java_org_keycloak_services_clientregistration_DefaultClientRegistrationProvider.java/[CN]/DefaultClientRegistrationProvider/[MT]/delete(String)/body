@@ -1,8 +1,9 @@
 {
   event.event(EventType.CLIENT_DELETE).client(clientId);
-  ClientModel client=authenticate(false,clientId);
-  if (realm.removeClient(client.getId())) {
-    event.success();
+  ClientModel client=session.getContext().getRealm().getClientByClientId(clientId);
+  auth.requireUpdate(client);
+  if (session.getContext().getRealm().removeClient(client.getId())) {
+    event.client(client.getClientId()).success();
     return Response.ok().build();
   }
  else {

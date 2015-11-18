@@ -7,6 +7,17 @@
       return session.getProvider(LoginFormsProvider.class).setError(Messages.NO_ACCESS).createErrorPage();
     }
     setReferrerOnPage();
+    String forwardedError=auth.getClientSession().getNote(ACCOUNT_MGMT_FORWARDED_ERROR_NOTE);
+    if (forwardedError != null) {
+      try {
+        FormMessage errorMessage=JsonSerialization.readValue(forwardedError,FormMessage.class);
+        account.setError(errorMessage.getMessage(),errorMessage.getParameters());
+        auth.getClientSession().removeNote(ACCOUNT_MGMT_FORWARDED_ERROR_NOTE);
+      }
+ catch (      IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+    }
     return account.createResponse(page);
   }
  else {

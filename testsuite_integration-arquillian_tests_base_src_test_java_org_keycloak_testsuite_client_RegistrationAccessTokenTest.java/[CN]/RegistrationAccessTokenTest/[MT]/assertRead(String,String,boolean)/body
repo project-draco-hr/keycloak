@@ -1,0 +1,19 @@
+{
+  if (expectSuccess) {
+    reg.auth(Auth.token(registrationAccess));
+    ClientRepresentation rep=reg.get(client.getClientId());
+    assertNotNull(rep);
+    return rep;
+  }
+ else {
+    reg.auth(Auth.token(registrationAccess));
+    try {
+      reg.get(client.getClientId());
+      fail("Expected 403");
+    }
+ catch (    ClientRegistrationException e) {
+      assertEquals(403,((HttpErrorException)e.getCause()).getStatusLine().getStatusCode());
+    }
+  }
+  return null;
+}

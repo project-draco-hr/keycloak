@@ -1,0 +1,13 @@
+{
+  if (!authenticated) {
+    event.error(Errors.NOT_ALLOWED);
+    throw new UnauthorizedException();
+  }
+  if (bearerRealmAccess != null) {
+    if (bearerRealmAccess.isUserInRole(AdminRoles.MANAGE_CLIENTS) || bearerRealmAccess.isUserInRole(AdminRoles.CREATE_CLIENT)) {
+      return;
+    }
+  }
+  event.error(Errors.NOT_ALLOWED);
+  throw new ForbiddenException();
+}

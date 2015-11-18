@@ -1,0 +1,14 @@
+{
+  event.event(EventType.CLIENT_INFO);
+  ClientModel client=session.getContext().getRealm().getClientByClientId(clientId);
+  if (auth.isAuthenticated()) {
+    auth.requireView(client);
+  }
+ else {
+    authenticateClient(client);
+  }
+  ClientManager clientManager=new ClientManager(new RealmManager(session));
+  Object rep=clientManager.toInstallationRepresentation(session.getContext().getRealm(),client,session.getContext().getAuthServerUrl());
+  event.client(client.getClientId()).success();
+  return Response.ok(rep).build();
+}

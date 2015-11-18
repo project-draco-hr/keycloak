@@ -1,6 +1,10 @@
 {
+  checkSsl();
   ClientRegistrationProvider provider=session.getProvider(ClientRegistrationProvider.class,providerId);
-  provider.setRealm(realm);
+  if (provider == null) {
+    throw new NotFoundException("Client registration provider not found");
+  }
   provider.setEvent(event);
+  provider.setAuth(new ClientRegAuth(session,event));
   return provider;
 }

@@ -1,14 +1,11 @@
 {
-  registerClient(clientRegistrationAsAdmin);
-  ClientRegistration clientRegistration=clientBuilder().auth(getToken("no-access","password")).build();
+  registerClientAsAdmin();
+  authNoAccess();
   try {
-    clientRegistration.get(CLIENT_ID);
+    reg.get(CLIENT_ID);
     fail("Expected 403");
   }
  catch (  ClientRegistrationException e) {
     assertEquals(403,((HttpErrorException)e.getCause()).getStatusLine().getStatusCode());
-  }
- finally {
-    clientRegistration.close();
   }
 }

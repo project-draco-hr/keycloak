@@ -27,4 +27,8 @@
     tx.remove(offlineSessionCache,clientSessionId);
     persister.removeClientSession(clientSessionId,true);
   }
+  map=new MapReduceTask(sessionCache).mappedWith(ClientInitialAccessMapper.create(realm.getId()).time(Time.currentTime()).remainingCount(0).emitKey()).reducedWith(new FirstResultReducer()).execute();
+  for (  String id : map.keySet()) {
+    tx.remove(sessionCache,id);
+  }
 }

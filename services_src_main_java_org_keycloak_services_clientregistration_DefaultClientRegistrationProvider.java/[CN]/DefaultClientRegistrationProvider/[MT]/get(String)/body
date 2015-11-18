@@ -2,9 +2,11 @@
   event.event(EventType.CLIENT_INFO);
   ClientModel client=session.getContext().getRealm().getClientByClientId(clientId);
   auth.requireView(client);
+  ClientRepresentation rep=ModelToRepresentation.toRepresentation(client);
   if (auth.isRegistrationAccessToken()) {
-    KeycloakModelUtils.generateRegistrationAccessToken(client);
+    String registrationAccessToken=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,client);
+    rep.setRegistrationAccessToken(registrationAccessToken);
   }
   event.client(client.getClientId()).success();
-  return Response.ok(ModelToRepresentation.toRepresentation(client)).build();
+  return Response.ok(rep).build();
 }

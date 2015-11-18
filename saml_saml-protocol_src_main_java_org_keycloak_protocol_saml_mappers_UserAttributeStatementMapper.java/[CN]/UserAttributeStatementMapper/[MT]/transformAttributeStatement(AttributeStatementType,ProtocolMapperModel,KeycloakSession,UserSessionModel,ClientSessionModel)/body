@@ -1,7 +1,7 @@
 {
   UserModel user=userSession.getUser();
   String attributeName=mappingModel.getConfig().get(ProtocolMapperUtils.USER_ATTRIBUTE);
-  String attributeValue=user.getFirstAttribute(attributeName);
+  String attributeValue=KeycloakModelUtils.resolveFirstAttribute(user,attributeName);
   if (attributeValue == null)   return;
   AttributeStatementHelper.addAttribute(attributeStatement,mappingModel,attributeValue);
 }

@@ -71,5 +71,14 @@
     user.setServiceAccountClientLink(client.getId());
     ;
   }
+  if (userRep.getGroups() != null) {
+    for (    String path : userRep.getGroups()) {
+      GroupModel group=KeycloakModelUtils.findGroupByPath(newRealm,path);
+      if (group == null) {
+        throw new RuntimeException("Unable to find group specified by path: " + path);
+      }
+      user.joinGroup(group);
+    }
+  }
   return user;
 }

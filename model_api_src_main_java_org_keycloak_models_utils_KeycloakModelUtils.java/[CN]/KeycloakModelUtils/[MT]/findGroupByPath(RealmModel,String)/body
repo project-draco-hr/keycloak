@@ -1,0 +1,29 @@
+{
+  if (path == null) {
+    return null;
+  }
+  if (path.startsWith("/")) {
+    path=path.substring(1);
+  }
+  if (path.endsWith("/")) {
+    path=path.substring(0,path.length() - 1);
+  }
+  String[] split=path.split("/");
+  if (split.length == 0)   return null;
+  GroupModel found=null;
+  for (  GroupModel group : realm.getTopLevelGroups()) {
+    if (group.getName().equals(split[0])) {
+      if (split.length == 1) {
+        found=group;
+        break;
+      }
+ else {
+        if (split.length > 1) {
+          found=findSubGroup(split,1,group);
+          if (found != null)           break;
+        }
+      }
+    }
+  }
+  return found;
+}

@@ -1,0 +1,28 @@
+{
+  String single=mappingModel.getConfig().get(SINGLE_GROUP_ATTRIBUTE);
+  boolean singleAttribute=Boolean.parseBoolean(single);
+  boolean fullPath=useFullPath(mappingModel);
+  AttributeType singleAttributeType=null;
+  for (  GroupModel group : userSession.getUser().getGroups()) {
+    String groupName;
+    if (fullPath) {
+      groupName=ModelToRepresentation.buildGroupPath(group);
+    }
+ else {
+      groupName=group.getName();
+    }
+    AttributeType attributeType=null;
+    if (singleAttribute) {
+      if (singleAttributeType == null) {
+        singleAttributeType=AttributeStatementHelper.createAttributeType(mappingModel);
+        attributeStatement.addAttribute(new AttributeStatementType.ASTChoiceType(singleAttributeType));
+      }
+      attributeType=singleAttributeType;
+    }
+ else {
+      attributeType=AttributeStatementHelper.createAttributeType(mappingModel);
+      attributeStatement.addAttribute(new AttributeStatementType.ASTChoiceType(attributeType));
+    }
+    attributeType.addAttributeValue(groupName);
+  }
+}

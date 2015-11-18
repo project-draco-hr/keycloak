@@ -38,7 +38,7 @@
   credentials.setType(CredentialRepresentation.PASSWORD);
   credentials.setHashIterations(iterations);
   credentials.setSalt(Base64.encodeBytes(salt));
-  credentials.setHashedSaltedValue(new Pbkdf2PasswordEncoder(salt).encode(password,iterations));
+  credentials.setHashedSaltedValue(new DefaultPasswordHashProvider().encode(password,salt,iterations));
   user.getCredentials().add(credentials);
   String[] roles;
   if (rolesString != null) {

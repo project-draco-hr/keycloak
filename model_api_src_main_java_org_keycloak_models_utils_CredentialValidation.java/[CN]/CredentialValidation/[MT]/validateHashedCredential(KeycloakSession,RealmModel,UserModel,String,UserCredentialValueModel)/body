@@ -1,0 +1,29 @@
+{
+  if (unhashedCredValue == null) {
+    return false;
+  }
+  String algorithm;
+  if (credential.getAlgorithm() == null || credential.getAlgorithm().trim().equals("")) {
+    algorithm=Constants.DEFAULT_HASH_ALGORITHM;
+  }
+ else {
+    algorithm=credential.getAlgorithm();
+  }
+  byte[] salt=getSalt();
+  PasswordHashProvider provider=session.getProvider(PasswordHashProvider.class,algorithm);
+  byte[] credSalt=credential.getSalt();
+  boolean validated=provider.verify(unhashedCredValue,credential.getValue(),credSalt);
+  if (validated) {
+    int iterations=hashIterations(realm);
+    if (iterations > -1 && iterations != credential.getHashIterations()) {
+      UserCredentialValueModel newCred=new UserCredentialValueModel();
+      newCred.setType(credential.getType());
+      newCred.setDevice(credential.getDevice());
+      newCred.setSalt(credential.getSalt());
+      newCred.setHashIterations(iterations);
+      newCred.setValue(provider.encode(unhashedCredValue,salt,iterations));
+      user.updateCredentialDirectly(newCred);
+    }
+  }
+  return validated;
+}

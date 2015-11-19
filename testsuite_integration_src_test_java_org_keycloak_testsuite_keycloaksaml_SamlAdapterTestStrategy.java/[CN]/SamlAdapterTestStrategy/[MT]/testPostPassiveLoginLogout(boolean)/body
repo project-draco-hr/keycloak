@@ -1,0 +1,22 @@
+{
+  driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post-passive/");
+  assertEquals(APP_SERVER_BASE_URL + "/sales-post-passive/",driver.getCurrentUrl());
+  System.out.println(driver.getPageSource());
+  if (forbiddenIfNotauthenticated) {
+    Assert.assertTrue(driver.getPageSource().contains("Forbidden"));
+  }
+ else {
+    Assert.assertTrue(driver.getPageSource().contains("principal=null"));
+  }
+  driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post/");
+  loginPage.login("bburke","password");
+  driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post-passive/");
+  assertEquals(APP_SERVER_BASE_URL + "/sales-post-passive/",driver.getCurrentUrl());
+  System.out.println(driver.getPageSource());
+  Assert.assertTrue(driver.getPageSource().contains("bburke"));
+  driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post-passive?GLO=true");
+  driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post?GLO=true");
+  driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post-passive/");
+  assertEquals(APP_SERVER_BASE_URL + "/sales-post-passive/",driver.getCurrentUrl());
+  Assert.assertFalse(driver.getPageSource().contains("bburke"));
+}

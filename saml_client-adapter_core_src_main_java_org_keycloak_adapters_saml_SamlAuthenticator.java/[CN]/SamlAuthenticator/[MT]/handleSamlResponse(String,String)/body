@@ -19,6 +19,19 @@
     return AuthOutcome.FAILED;
   }
   if (statusResponse instanceof ResponseType) {
+    StatusType status=statusResponse.getStatus();
+    if (status == null) {
+      log.error("Missing Status in SAML response");
+      return AuthOutcome.FAILED;
+    }
+    if (!checkStatusCodeValue(status.getStatusCode(),JBossSAMLURIConstants.STATUS_SUCCESS.get())) {
+      if (checkStatusCodeValue(status.getStatusCode(),JBossSAMLURIConstants.STATUS_RESPONDER.get()) && checkStatusCodeValue(status.getStatusCode().getStatusCode(),JBossSAMLURIConstants.STATUS_NO_PASSIVE.get())) {
+        log.debug("Not authenticated due passive mode Status found in SAML response: " + status.toString());
+        return AuthOutcome.NOT_AUTHENTICATED;
+      }
+      log.error("Error Status found in SAML response: " + status.toString());
+      return AuthOutcome.FAILED;
+    }
     try {
       if (deployment.getIDP().getSingleSignOnService().validateResponseSignature()) {
         try {

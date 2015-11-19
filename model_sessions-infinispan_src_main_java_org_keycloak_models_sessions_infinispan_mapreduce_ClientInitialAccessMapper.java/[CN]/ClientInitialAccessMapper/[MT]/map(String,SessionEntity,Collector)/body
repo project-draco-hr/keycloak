@@ -6,18 +6,26 @@
     return;
   }
   ClientInitialAccessEntity entity=(ClientInitialAccessEntity)e;
-  if (time != null && entity.getExpiration() > 0 && (entity.getTimestamp() + entity.getExpiration()) < time) {
-    return;
+  boolean include=false;
+  if (expired != null) {
+    if (entity.getRemainingCount() <= 0) {
+      include=true;
+    }
+ else     if (entity.getExpiration() > 0 && (entity.getTimestamp() + entity.getExpiration()) < expired) {
+      include=true;
+    }
   }
-  if (remainingCount != null && entity.getRemainingCount() == remainingCount) {
-    return;
+ else {
+    include=true;
   }
+  if (include) {
 switch (emit) {
 case KEY:
-    collector.emit(key,key);
-  break;
+      collector.emit(key,key);
+    break;
 case ENTITY:
-collector.emit(key,entity);
+  collector.emit(key,entity);
 break;
+}
 }
 }

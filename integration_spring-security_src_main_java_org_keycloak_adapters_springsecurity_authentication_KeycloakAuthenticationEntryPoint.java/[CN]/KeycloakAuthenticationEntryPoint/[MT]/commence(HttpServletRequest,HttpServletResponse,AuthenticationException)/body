@@ -1,5 +1,8 @@
 {
-  String contextAwareLoginUri=request.getContextPath() + loginUri;
-  log.debug("Redirecting to login URI {}",contextAwareLoginUri);
-  response.sendRedirect(contextAwareLoginUri);
+  if (apiRequestMatcher.matches(request)) {
+    commenceUnauthorizedResponse(request,response);
+  }
+ else {
+    commenceLoginRedirect(request,response);
+  }
 }

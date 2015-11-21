@@ -11,6 +11,7 @@
   binding.relayState("logout");
   try {
     SamlUtil.sendSaml(true,facade,deployment.getIDP().getSingleLogoutService().getRequestBindingUrl(),binding,logoutBuilder.buildDocument(),deployment.getIDP().getSingleLogoutService().getRequestBinding());
+    sessionStore.setCurrentAction(SamlSessionStore.CurrentAction.LOGGING_OUT);
   }
  catch (  Exception e) {
     log.error("Could not send global logout SAML request",e);

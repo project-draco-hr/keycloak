@@ -17,6 +17,6 @@
 catch (  ModelReadOnlyException mre) {
     throw new BadRequestException("Can't reset password as account is read only");
   }
-  if (pass.isTemporary())   user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+  if (pass.isTemporary() != null && pass.isTemporary())   user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
   adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).success();
 }

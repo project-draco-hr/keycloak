@@ -1,0 +1,14 @@
+{
+  Method m=command.getClass().getMethod("get" + Character.toUpperCase(field.charAt(0)) + field.substring(1));
+  if (m.invoke(command) == null) {
+    Option option=command.getClass().getDeclaredField(field).getAnnotation(Option.class);
+    String optionName;
+    if (option != null && option.shortName() != '\u0000') {
+      optionName="-" + option.shortName() + ", --"+ field;
+    }
+ else {
+      optionName="--" + field;
+    }
+    throw new Exception("Option: " + optionName + " is required");
+  }
+}

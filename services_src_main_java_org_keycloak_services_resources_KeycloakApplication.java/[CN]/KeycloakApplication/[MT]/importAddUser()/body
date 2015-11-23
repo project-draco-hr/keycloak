@@ -1,0 +1,36 @@
+{
+  String configDir=System.getProperty("jboss.server.config.dir");
+  if (configDir != null) {
+    File addUserFile=new File(configDir + File.separator + "keycloak-add-user.json");
+    if (addUserFile.isFile()) {
+      log.info("Importing users from '" + addUserFile + "'");
+      KeycloakSession session=sessionFactory.create();
+      try {
+        session.getTransaction().begin();
+        List<RealmRepresentation> realms=JsonSerialization.readValue(new FileInputStream(addUserFile),new TypeReference<List<RealmRepresentation>>(){
+        }
+);
+        for (        RealmRepresentation r : realms) {
+          RealmModel realm=session.realms().getRealmByName(r.getRealm());
+          if (realm == null) {
+            throw new Exception("Realm '" + r.getRealm() + "' not found");
+          }
+          for (          UserRepresentation u : r.getUsers()) {
+            RepresentationToModel.createUser(session,realm,u,realm.getClientNameMap());
+          }
+        }
+        session.getTransaction().commit();
+        if (!addUserFile.delete()) {
+          log.error("Failed to delete '" + addUserFile + "'");
+        }
+      }
+ catch (      Throwable t) {
+        session.getTransaction().rollback();
+        log.error("Failed to import users from '" + addUserFile + "'",t);
+      }
+ finally {
+        session.close();
+      }
+    }
+  }
+}

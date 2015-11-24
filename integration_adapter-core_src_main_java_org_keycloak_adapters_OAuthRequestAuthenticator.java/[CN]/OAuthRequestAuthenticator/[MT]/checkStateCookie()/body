@@ -2,7 +2,7 @@
   OIDCHttpFacade.Cookie stateCookie=getCookie(deployment.getStateCookieName());
   if (stateCookie == null) {
     log.warn("No state cookie");
-    return challenge(400);
+    return challenge(400,OIDCAuthenticationError.Reason.INVALID_STATE_COOKIE,null);
   }
   log.debug("** reseting application state cookie");
   facade.getResponse().resetCookie(deployment.getStateCookieName(),stateCookie.getPath());
@@ -10,13 +10,13 @@
   String state=getQueryParamValue(OAuth2Constants.STATE);
   if (state == null) {
     log.warn("state parameter was null");
-    return challenge(400);
+    return challenge(400,OIDCAuthenticationError.Reason.INVALID_STATE_COOKIE,null);
   }
   if (!state.equals(stateCookieValue)) {
     log.warn("state parameter invalid");
     log.warn("cookie: " + stateCookieValue);
     log.warn("queryParam: " + state);
-    return challenge(400);
+    return challenge(400,OIDCAuthenticationError.Reason.INVALID_STATE_COOKIE,null);
   }
   return null;
 }

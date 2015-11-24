@@ -1,0 +1,14 @@
+{
+  return new AuthChallenge(){
+    @Override public int getResponseCode(){
+      return code;
+    }
+    @Override public boolean challenge(    HttpFacade exchange){
+      OIDCAuthenticationError error=new OIDCAuthenticationError(reason,description);
+      exchange.getRequest().setError(error);
+      exchange.getResponse().sendError(code);
+      return true;
+    }
+  }
+;
+}

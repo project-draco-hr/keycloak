@@ -1,4 +1,5 @@
 {
+  ErrorServlet.authError=null;
   Client client=ClientBuilder.newClient();
   Response response=client.target(APP_SERVER_BASE_URL + "/employee-sig/").request().get();
   response.close();
@@ -9,6 +10,11 @@
   response=client.target(uri).request().get();
   String errorPage=response.readEntity(String.class);
   response.close();
-  Assert.assertTrue(errorPage.contains(JBossSAMLURIConstants.STATUS_RESPONDER.get()));
+  Assert.assertTrue(errorPage.contains("Error Page"));
   client.close();
+  Assert.assertNotNull(ErrorServlet.authError);
+  SamlAuthenticationError error=(SamlAuthenticationError)ErrorServlet.authError;
+  Assert.assertEquals(SamlAuthenticationError.Reason.ERROR_STATUS,error.getReason());
+  Assert.assertNotNull(error.getStatus());
+  ErrorServlet.authError=null;
 }

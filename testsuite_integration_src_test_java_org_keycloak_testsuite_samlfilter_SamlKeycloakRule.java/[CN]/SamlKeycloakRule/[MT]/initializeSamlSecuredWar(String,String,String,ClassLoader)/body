@@ -3,5 +3,6 @@
   FilterInfo samlFilter=new FilterInfo("saml-filter",SamlFilter.class);
   ResourceManager resourceManager=new TestResourceManager(warResourcePath);
   DeploymentInfo deploymentInfo=new DeploymentInfo().setClassLoader(classLoader).setIdentityManager(new TestIdentityManager()).setContextPath(contextPath).setDeploymentName(warDeploymentName).setResourceManager(resourceManager).addServlets(regularServletInfo).addFilter(samlFilter).addFilterUrlMapping("saml-filter","/*",DispatcherType.REQUEST).addServletExtension(new SamlServletExtension());
+  addErrorPage("/error.html",deploymentInfo);
   server.getServer().deploy(deploymentInfo);
 }

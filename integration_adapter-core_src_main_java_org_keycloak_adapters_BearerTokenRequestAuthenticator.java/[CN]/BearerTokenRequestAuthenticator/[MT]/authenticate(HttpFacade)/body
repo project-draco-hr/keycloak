@@ -1,7 +1,7 @@
 {
   List<String> authHeaders=exchange.getRequest().getHeaders("Authorization");
   if (authHeaders == null || authHeaders.size() == 0) {
-    challenge=challengeResponse(exchange,null,null);
+    challenge=challengeResponse(exchange,OIDCAuthenticationError.Reason.NO_BEARER_TOKEN,null,null);
     return AuthOutcome.NOT_ATTEMPTED;
   }
   tokenString=null;
@@ -12,7 +12,7 @@
     tokenString=split[1];
   }
   if (tokenString == null) {
-    challenge=challengeResponse(exchange,null,null);
+    challenge=challengeResponse(exchange,OIDCAuthenticationError.Reason.NO_BEARER_TOKEN,null,null);
     return AuthOutcome.NOT_ATTEMPTED;
   }
   return (authenticateToken(exchange,tokenString));

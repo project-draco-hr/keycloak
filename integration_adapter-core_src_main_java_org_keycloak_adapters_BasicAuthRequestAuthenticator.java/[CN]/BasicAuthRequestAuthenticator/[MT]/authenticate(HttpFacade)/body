@@ -1,7 +1,7 @@
 {
   List<String> authHeaders=exchange.getRequest().getHeaders("Authorization");
   if (authHeaders == null || authHeaders.size() == 0) {
-    challenge=challengeResponse(exchange,null,null);
+    challenge=challengeResponse(exchange,OIDCAuthenticationError.Reason.NO_AUTHORIZATION_HEADER,null,null);
     return AuthOutcome.NOT_ATTEMPTED;
   }
   tokenString=null;
@@ -12,7 +12,7 @@
     tokenString=split[1];
   }
   if (tokenString == null) {
-    challenge=challengeResponse(exchange,null,null);
+    challenge=challengeResponse(exchange,OIDCAuthenticationError.Reason.INVALID_TOKEN,null,null);
     return AuthOutcome.NOT_ATTEMPTED;
   }
   AccessTokenResponse atr=null;
@@ -24,7 +24,7 @@
   }
  catch (  Exception e) {
     log.debug("Failed to obtain token",e);
-    challenge=challengeResponse(exchange,"no_token",e.getMessage());
+    challenge=challengeResponse(exchange,OIDCAuthenticationError.Reason.INVALID_TOKEN,"no_token",e.getMessage());
     return AuthOutcome.FAILED;
   }
   return authenticateToken(exchange,atr.getToken());

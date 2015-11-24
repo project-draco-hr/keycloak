@@ -1,0 +1,16 @@
+{
+  if (responseTypeParam == null) {
+    throw new IllegalStateException("response_type is null");
+  }
+  String[] responseTypes=responseTypeParam.trim().split(" ");
+  List<String> allowedTypes=new ArrayList<>();
+  for (  String current : responseTypes) {
+    if (ALLOWED_RESPONSE_TYPES.contains(current)) {
+      allowedTypes.add(current);
+    }
+ else {
+      throw new IllegalStateException("Unsupported response_type: " + responseTypeParam);
+    }
+  }
+  return new OIDCResponseType(allowedTypes);
+}

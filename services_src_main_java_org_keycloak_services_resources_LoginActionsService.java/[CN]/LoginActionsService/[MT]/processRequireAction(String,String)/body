@@ -50,9 +50,11 @@
   }
   if (context.getStatus() == RequiredActionContext.Status.FAILURE) {
     LoginProtocol protocol=context.getSession().getProvider(LoginProtocol.class,context.getClientSession().getAuthMethod());
-    protocol.setRealm(context.getRealm()).setHttpHeaders(context.getHttpRequest().getHttpHeaders()).setUriInfo(context.getUriInfo());
-    event.detail(Details.CUSTOM_REQUIRED_ACTION,action).error(Errors.REJECTED_BY_USER);
-    return protocol.sendError(context.getClientSession(),Error.CONSENT_DENIED);
+    protocol.setRealm(context.getRealm()).setHttpHeaders(context.getHttpRequest().getHttpHeaders()).setUriInfo(context.getUriInfo()).setEventBuilder(event);
+    event.detail(Details.CUSTOM_REQUIRED_ACTION,action);
+    Response response=protocol.sendError(context.getClientSession(),Error.CONSENT_DENIED);
+    event.error(Errors.REJECTED_BY_USER);
+    return response;
   }
   throw new RuntimeException("Unreachable");
 }

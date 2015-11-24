@@ -1,0 +1,11 @@
+{
+  if (clientOIDC.getClientId() != null) {
+    throw new ErrorResponseException(ErrorCodes.INVALID_CLIENT_METADATA,"Client Identifier included",Response.Status.BAD_REQUEST);
+  }
+  ClientRepresentation client=DescriptionConverter.toInternal(clientOIDC);
+  client=create(client);
+  URI uri=session.getContext().getUri().getAbsolutePathBuilder().path(client.getClientId()).build();
+  clientOIDC=DescriptionConverter.toExternalResponse(client,uri);
+  clientOIDC.setClientIdIssuedAt(Time.currentTime());
+  return Response.created(uri).entity(clientOIDC).build();
+}

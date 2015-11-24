@@ -1,0 +1,28 @@
+{
+  Boolean usernameEditDisabled=(Boolean)attributes.get(LoginFormsProvider.USERNAME_EDIT_DISABLED);
+  if (usernameEditDisabled != null && usernameEditDisabled) {
+    String username=formData.getFirst(UserModel.USERNAME);
+    if (username == null) {
+      throw new IllegalStateException("USERNAME_EDIT_DISABLED but username not known");
+    }
+    UserModel user=session.users().getUserByUsername(username,realm);
+    if (user == null || !user.isEnabled()) {
+      throw new IllegalStateException("User " + username + " not found or disabled");
+    }
+    Set<FederatedIdentityModel> fedLinks=session.users().getFederatedIdentities(user,realm);
+    Set<String> federatedIdentities=new HashSet<>();
+    for (    FederatedIdentityModel fedLink : fedLinks) {
+      federatedIdentities.add(fedLink.getIdentityProvider());
+    }
+    List<IdentityProviderModel> result=new LinkedList<>();
+    for (    IdentityProviderModel idp : providers) {
+      if (federatedIdentities.contains(idp.getAlias())) {
+        result.add(idp);
+      }
+    }
+    return result;
+  }
+ else {
+    return providers;
+  }
+}

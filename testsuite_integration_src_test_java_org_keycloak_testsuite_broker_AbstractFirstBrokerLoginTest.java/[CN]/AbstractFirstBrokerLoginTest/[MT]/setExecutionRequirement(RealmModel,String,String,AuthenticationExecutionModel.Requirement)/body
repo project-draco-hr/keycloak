@@ -1,0 +1,12 @@
+{
+  AuthenticationFlowModel flowModel=realmWithBroker.getFlowByAlias(flowAlias);
+  List<AuthenticationExecutionModel> authExecutions=realmWithBroker.getAuthenticationExecutions(flowModel.getId());
+  for (  AuthenticationExecutionModel execution : authExecutions) {
+    if (execution.getAuthenticator().equals(authenticatorProvider)) {
+      execution.setRequirement(requirement);
+      realmWithBroker.updateAuthenticatorExecution(execution);
+      return;
+    }
+  }
+  throw new IllegalStateException("Execution not found for flow " + flowAlias + " and authenticator "+ authenticatorProvider);
+}

@@ -1,0 +1,21 @@
+{
+  auth.requireManage();
+  logger.debug("deleteRealmRoleMappings");
+  if (roles == null) {
+    Set<RoleModel> roleModels=roleMapper.getRealmRoleMappings();
+    for (    RoleModel roleModel : roleModels) {
+      roleMapper.deleteRoleMapping(roleModel);
+    }
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo).representation(roles).success();
+  }
+ else {
+    for (    RoleRepresentation role : roles) {
+      RoleModel roleModel=realm.getRole(role.getName());
+      if (roleModel == null || !roleModel.getId().equals(role.getId())) {
+        throw new NotFoundException("Role not found");
+      }
+      roleMapper.deleteRoleMapping(roleModel);
+      adminEvent.operation(OperationType.DELETE).resourcePath(uriInfo,role.getId()).representation(roles).success();
+    }
+  }
+}

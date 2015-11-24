@@ -1,0 +1,31 @@
+{
+  createLdapUserProvider.navigateTo();
+  createLdapUserProvider.form().selectVendor("Other");
+  createLdapUserProvider.form().setConsoleDisplayNameInput("ldap");
+  createLdapUserProvider.form().selectEditMode(WRITABLE);
+  createLdapUserProvider.form().setLdapConnectionUrlInput("ldap://localhost:10389");
+  createLdapUserProvider.form().setLdapBindDnInput("uid=admin,ou=system");
+  createLdapUserProvider.form().setLdapUserDnInput("ou=People,dc=keycloak,dc=org");
+  createLdapUserProvider.form().setLdapBindCredentialInput("secret");
+  createLdapUserProvider.form().setAccountAfterPasswordUpdateEnabled(true);
+  createLdapUserProvider.form().save();
+  assertFlashMessageSuccess();
+  LDAPEmbeddedServer ldapServer=null;
+  try {
+    ldapServer=startEmbeddedLdapServer();
+    createLdapUserProvider.form().testConnection();
+    assertFlashMessageSuccess();
+    createLdapUserProvider.form().testAuthentication();
+    assertFlashMessageSuccess();
+    createLdapUserProvider.form().synchronizeAllUsers();
+    assertFlashMessageSuccess();
+    createLdapUserProvider.form().setLdapBindCredentialInput("secret1");
+    createLdapUserProvider.form().testAuthentication();
+    assertFlashMessageDanger();
+  }
+  finally {
+    if (ldapServer != null) {
+      ldapServer.stop();
+    }
+  }
+}

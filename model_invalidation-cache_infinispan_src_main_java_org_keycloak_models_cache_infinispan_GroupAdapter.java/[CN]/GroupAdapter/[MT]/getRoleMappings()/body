@@ -1,0 +1,13 @@
+{
+  if (updated != null)   return updated.getRoleMappings();
+  Set<RoleModel> roles=new HashSet<RoleModel>();
+  for (  String id : cached.getRoleMappings()) {
+    RoleModel roleById=keycloakSession.realms().getRoleById(id,realm);
+    if (roleById == null) {
+      getDelegateForUpdate();
+      return updated.getRoleMappings();
+    }
+    roles.add(roleById);
+  }
+  return roles;
+}

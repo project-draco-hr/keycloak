@@ -1,0 +1,41 @@
+{
+  final Map<String,String> smtpConfig=new HashMap<>();
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      setUpdateProfileFirstLogin(realmWithBroker,IdentityProviderRepresentation.UPFLM_OFF);
+      smtpConfig.putAll(realmWithBroker.getSmtpConfig());
+      realmWithBroker.setSmtpConfig(Collections.<String,String>emptyMap());
+    }
+  }
+,APP_REALM_ID);
+  loginIDP("pedroigor");
+  this.idpConfirmLinkPage.assertCurrent();
+  Assert.assertEquals("User with email psilva@redhat.com already exists. How do you want to continue?",this.idpConfirmLinkPage.getMessage());
+  this.idpConfirmLinkPage.clickLinkAccount();
+  Assert.assertEquals("Log in to " + APP_REALM_ID,this.driver.getTitle());
+  Assert.assertEquals("pedroigor",this.loginPage.getUsername());
+  Assert.assertFalse(this.loginPage.isUsernameInputEnabled());
+  Assert.assertEquals("Authenticate as pedroigor to link your account with " + getProviderId(),this.loginPage.getSuccessMessage());
+  try {
+    this.loginPage.findSocialButton(getProviderId());
+    Assert.fail("Not expected to see social button with " + getProviderId());
+  }
+ catch (  NoSuchElementException expected) {
+  }
+  try {
+    this.loginPage.clickRegister();
+    Assert.fail("Not expected to see register link");
+  }
+ catch (  NoSuchElementException expected) {
+  }
+  this.loginPage.login("password1");
+  Assert.assertEquals("Invalid username or password.",this.loginPage.getError());
+  this.loginPage.login("password");
+  assertFederatedUser("pedroigor","psilva@redhat.com","pedroigor");
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      realmWithBroker.setSmtpConfig(smtpConfig);
+    }
+  }
+,APP_REALM_ID);
+}

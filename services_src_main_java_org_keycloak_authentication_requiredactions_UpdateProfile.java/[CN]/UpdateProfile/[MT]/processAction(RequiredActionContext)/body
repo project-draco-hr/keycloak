@@ -5,7 +5,7 @@
   UserModel user=context.getUser();
   KeycloakSession session=context.getSession();
   RealmModel realm=context.getRealm();
-  List<FormMessage> errors=Validation.validateUpdateProfileForm(realm,formData);
+  List<FormMessage> errors=Validation.validateUpdateProfileForm(realm.isEditUsernameAllowed(),formData);
   if (errors != null && !errors.isEmpty()) {
     Response challenge=context.form().setErrors(errors).setFormData(formData).createResponse(UserModel.RequiredAction.UPDATE_PROFILE);
     context.challenge(challenge);

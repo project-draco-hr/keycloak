@@ -1,0 +1,34 @@
+{
+  BrokeredIdentityContext ctx=new BrokeredIdentityContext(getId());
+  ctx.setUsername(getBrokerUsername());
+  ctx.setModelUsername(getModelUsername());
+  ctx.setEmail(getEmail());
+  ctx.setFirstName(getFirstName());
+  ctx.setLastName(getLastName());
+  ctx.setBrokerSessionId(getBrokerSessionId());
+  ctx.setBrokerUserId(getBrokerUserId());
+  ctx.setCode(getCode());
+  ctx.setToken(getToken());
+  RealmModel realm=clientSession.getRealm();
+  IdentityProviderModel idpConfig=realm.getIdentityProviderByAlias(getIdentityProviderId());
+  if (idpConfig == null) {
+    throw new ModelException("Can't find identity provider with ID " + getIdentityProviderId() + " in realm "+ realm.getName());
+  }
+  IdentityProvider idp=IdentityBrokerService.getIdentityProvider(session,realm,idpConfig.getAlias());
+  ctx.setIdpConfig(idpConfig);
+  ctx.setIdp(idp);
+  IdentityProviderDataMarshaller serializer=idp.getMarshaller();
+  for (  Map.Entry<String,ContextDataEntry> entry : getContextData().entrySet()) {
+    try {
+      ContextDataEntry value=entry.getValue();
+      Class<?> clazz=Reflections.classForName(value.getClazz(),this.getClass().getClassLoader());
+      Object deserialized=serializer.deserialize(value.getData(),clazz);
+      ctx.getContextData().put(entry.getKey(),deserialized);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+  ctx.setClientSession(clientSession);
+  return ctx;
+}

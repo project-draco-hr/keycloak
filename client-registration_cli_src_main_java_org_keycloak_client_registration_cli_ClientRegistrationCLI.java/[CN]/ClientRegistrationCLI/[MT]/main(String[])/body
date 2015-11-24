@@ -1,0 +1,18 @@
+{
+  reg=ClientRegistration.create().url("http://localhost:8080/auth/realms/master").build();
+  reg.auth(Auth.token("..."));
+  Context context=new Context();
+  List<Command> commands=new LinkedList<>();
+  commands.add(new SetupCommand(context));
+  commands.add(new CreateCommand(context));
+  commands.add(new ExitCommand(context));
+  SettingsBuilder builder=new SettingsBuilder().logging(true);
+  builder.enableMan(true).readInputrc(false);
+  Settings settings=builder.create();
+  AeshCommandRegistryBuilder commandRegistryBuilder=new AeshCommandRegistryBuilder();
+  for (  Command c : commands) {
+    commandRegistryBuilder.command(c);
+  }
+  AeshConsole aeshConsole=new AeshConsoleBuilder().commandRegistry(commandRegistryBuilder.create()).settings(settings).prompt(new Prompt(new TerminalString("[clientreg]$ ",new TerminalColor(Color.GREEN,Color.DEFAULT,Color.Intensity.BRIGHT)))).create();
+  aeshConsole.start();
+}

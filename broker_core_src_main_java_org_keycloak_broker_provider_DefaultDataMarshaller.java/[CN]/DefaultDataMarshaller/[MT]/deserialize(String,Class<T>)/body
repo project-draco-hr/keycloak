@@ -1,0 +1,14 @@
+{
+  if (clazz.equals(String.class)) {
+    return clazz.cast(serialized);
+  }
+ else {
+    byte[] bytes=Base64Url.decode(serialized);
+    try {
+      return JsonSerialization.readValue(bytes,clazz);
+    }
+ catch (    IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
+}

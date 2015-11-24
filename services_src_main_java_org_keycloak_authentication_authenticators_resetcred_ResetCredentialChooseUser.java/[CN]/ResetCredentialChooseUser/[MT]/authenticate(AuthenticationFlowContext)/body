@@ -1,4 +1,12 @@
 {
+  String existingUserId=context.getClientSession().getNote(AbstractIdpAuthenticator.EXISTING_USER_INFO);
+  if (existingUserId != null) {
+    UserModel existingUser=AbstractIdpAuthenticator.getExistingUser(context.getSession(),context.getRealm(),context.getClientSession());
+    logger.debugf("Forget-password triggered when reauthenticating user after first broker login. Skipping reset-credential-choose-user screen and using user '%s' ",existingUser.getUsername());
+    context.setUser(existingUser);
+    context.success();
+    return;
+  }
   Response challenge=context.form().createPasswordReset();
   context.challenge(challenge);
 }

@@ -1,0 +1,23 @@
+{
+  if (!cache.isEnabled())   return getDelegate().getGroupById(id,realm);
+  CachedGroup cached=cache.getGroup(id);
+  if (cached != null && !cached.getRealm().equals(realm.getId())) {
+    cached=null;
+  }
+  if (cached == null) {
+    GroupModel model=getDelegate().getGroupById(id,realm);
+    if (model == null)     return null;
+    if (groupInvalidations.contains(id))     return model;
+    cached=new CachedGroup(realm,model);
+    cache.addCachedGroup(cached);
+  }
+ else   if (groupInvalidations.contains(id)) {
+    return getDelegate().getGroupById(id,realm);
+  }
+ else   if (managedGroups.containsKey(id)) {
+    return managedGroups.get(id);
+  }
+  GroupAdapter adapter=new GroupAdapter(cached,this,session,realm);
+  managedGroups.put(id,adapter);
+  return adapter;
+}

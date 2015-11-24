@@ -1,3 +1,20 @@
 {
-  return processFlow(execution,clientSession,RESET_CREDENTIALS_PATH,realm.getResetCredentialsFlow(),errorMessage);
+  AuthenticationProcessor authProcessor=new AuthenticationProcessor(){
+    @Override protected Response authenticationComplete(){
+      boolean firstBrokerLoginInProgress=(clientSession.getNote(AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE) != null);
+      if (firstBrokerLoginInProgress) {
+        UserModel linkingUser=AbstractIdpAuthenticator.getExistingUser(session,realm,clientSession);
+        if (!linkingUser.getId().equals(clientSession.getAuthenticatedUser().getId())) {
+          return ErrorPage.error(session,Messages.IDENTITY_PROVIDER_DIFFERENT_USER_MESSAGE,clientSession.getAuthenticatedUser().getUsername(),linkingUser.getUsername());
+        }
+        logger.debugf("Forget-password flow finished when authenticated user '%s' after first broker login.",linkingUser.getUsername());
+        return redirectToAfterFirstBrokerLoginEndpoint(clientSession);
+      }
+ else {
+        return super.authenticationComplete();
+      }
+    }
+  }
+;
+  return processFlow(execution,clientSession,RESET_CREDENTIALS_PATH,realm.getResetCredentialsFlow(),errorMessage,authProcessor);
 }

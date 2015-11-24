@@ -1,0 +1,10 @@
+{
+  if (group == null || role == null)   return;
+  TypedQuery<GroupRoleMappingEntity> query=getGroupRoleMappingEntityTypedQuery(role);
+  List<GroupRoleMappingEntity> results=query.getResultList();
+  if (results.size() == 0)   return;
+  for (  GroupRoleMappingEntity entity : results) {
+    em.remove(entity);
+  }
+  em.flush();
+}

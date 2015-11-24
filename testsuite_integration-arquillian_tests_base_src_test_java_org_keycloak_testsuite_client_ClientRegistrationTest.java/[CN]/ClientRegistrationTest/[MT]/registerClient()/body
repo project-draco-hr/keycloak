@@ -1,0 +1,10 @@
+{
+  ClientRepresentation client=new ClientRepresentation();
+  client.setClientId(CLIENT_ID);
+  client.setSecret(CLIENT_SECRET);
+  ClientRepresentation createdClient=reg.create(client);
+  assertEquals(CLIENT_ID,createdClient.getClientId());
+  client=adminClient.realm(REALM_NAME).clients().get(createdClient.getId()).toRepresentation();
+  assertEquals(CLIENT_ID,client.getClientId());
+  return client;
+}

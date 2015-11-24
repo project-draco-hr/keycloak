@@ -1,0 +1,23 @@
+{
+  boolean found=false;
+  List<GroupAttributeEntity> toRemove=new ArrayList<>();
+  for (  GroupAttributeEntity attr : group.getAttributes()) {
+    if (attr.getName().equals(name)) {
+      if (!found) {
+        attr.setValue(value);
+        found=true;
+      }
+ else {
+        toRemove.add(attr);
+      }
+    }
+  }
+  for (  GroupAttributeEntity attr : toRemove) {
+    em.remove(attr);
+    group.getAttributes().remove(attr);
+  }
+  if (found) {
+    return;
+  }
+  persistAttributeValue(name,value);
+}

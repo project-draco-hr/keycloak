@@ -49,7 +49,7 @@ if (link != null) {
 if (session.users().getFederatedIdentities(user,realm).size() > 1 || user.getFederationLink() != null || isPasswordSet(user)) {
   session.users().removeFederatedIdentity(realm,user,providerId);
   logger.debugv("Social provider {0} removed successfully from user {1}",providerId,user.getUsername());
-  event.event(EventType.REMOVE_FEDERATED_IDENTITY).client(auth.getClient()).user(auth.getUser()).detail(Details.USERNAME,link.getUserId() + "@" + link.getIdentityProvider()).success();
+  event.event(EventType.REMOVE_FEDERATED_IDENTITY).client(auth.getClient()).user(auth.getUser()).detail(Details.USERNAME,auth.getUser().getUsername()).detail(Details.IDENTITY_PROVIDER,link.getIdentityProvider()).detail(Details.IDENTITY_PROVIDER_USERNAME,link.getUserName()).success();
   setReferrerOnPage();
   return account.setSuccess(Messages.IDENTITY_PROVIDER_REMOVED).createResponse(AccountPages.FEDERATED_IDENTITY);
 }

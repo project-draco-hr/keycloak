@@ -1,9 +1,0 @@
-{
-  Client client=ClientBuilder.newClient();
-  WebTarget target=client.target(JBOSS_TRACKER_REST_URL);
-  String json=target.path(issueId).request().accept(MediaType.APPLICATION_JSON_TYPE).get(String.class);
-  JsonObject jsonObject=new Gson().fromJson(json,JsonElement.class).getAsJsonObject();
-  String status=jsonObject.getAsJsonObject("fields").getAsJsonObject("status").get("name").getAsString();
-  client.close();
-  return Status.getByStatus(status);
-}

@@ -1,0 +1,38 @@
+{
+  assertFalse(identityProviders.isEmpty());
+  Set<String> checkedProviders=new HashSet<String>(getExpectedProviders());
+  for (  IdentityProviderModel identityProvider : identityProviders) {
+    if (identityProvider.getAlias().startsWith("model-")) {
+      String providerId=identityProvider.getProviderId();
+      if (SAMLIdentityProviderFactory.PROVIDER_ID.equals(providerId)) {
+        assertSamlIdentityProviderConfig(identityProvider);
+      }
+ else       if (GoogleIdentityProviderFactory.PROVIDER_ID.equals(providerId)) {
+        assertGoogleIdentityProviderConfig(identityProvider);
+      }
+ else       if (OIDCIdentityProviderFactory.PROVIDER_ID.equals(providerId)) {
+        assertOidcIdentityProviderConfig(identityProvider);
+      }
+ else       if (FacebookIdentityProviderFactory.PROVIDER_ID.equals(providerId)) {
+        assertFacebookIdentityProviderConfig(realm,identityProvider);
+      }
+ else       if (GitHubIdentityProviderFactory.PROVIDER_ID.equals(providerId)) {
+        assertGitHubIdentityProviderConfig(realm,identityProvider);
+      }
+ else       if (TwitterIdentityProviderFactory.PROVIDER_ID.equals(providerId)) {
+        assertTwitterIdentityProviderConfig(identityProvider);
+      }
+ else       if (LinkedInIdentityProviderFactory.PROVIDER_ID.equals(providerId)) {
+        assertLinkedInIdentityProviderConfig(identityProvider);
+      }
+ else       if (StackoverflowIdentityProviderFactory.PROVIDER_ID.equals(providerId)) {
+        assertStackoverflowIdentityProviderConfig(identityProvider);
+      }
+ else {
+        continue;
+      }
+      checkedProviders.remove(providerId);
+    }
+  }
+  assertTrue(checkedProviders.isEmpty());
+}

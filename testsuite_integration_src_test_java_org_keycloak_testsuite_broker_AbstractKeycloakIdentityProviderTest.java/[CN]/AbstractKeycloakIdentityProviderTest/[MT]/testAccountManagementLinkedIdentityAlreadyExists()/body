@@ -1,0 +1,15 @@
+{
+  IdentityProviderModel identityProvider=getIdentityProviderModel();
+  assertSuccessfulAuthentication(identityProvider,"test-user","test-user@localhost",false);
+  accountFederatedIdentityPage.realm("realm-with-broker");
+  accountFederatedIdentityPage.open();
+  assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
+  loginPage.login("pedroigor","password");
+  assertTrue(accountFederatedIdentityPage.isCurrent());
+  accountFederatedIdentityPage.clickAddProvider(identityProvider.getAlias());
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8082/auth/"));
+  this.loginPage.login("test-user","password");
+  doAfterProviderAuthentication();
+  assertTrue(accountFederatedIdentityPage.isCurrent());
+  assertEquals("Federated identity returned by " + getProviderId() + " is already linked to another user.",accountFederatedIdentityPage.getError());
+}

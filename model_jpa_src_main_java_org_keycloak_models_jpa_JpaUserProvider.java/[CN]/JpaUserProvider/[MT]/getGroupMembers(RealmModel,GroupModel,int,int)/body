@@ -1,0 +1,16 @@
+{
+  TypedQuery<UserEntity> query=em.createNamedQuery("groupMembership",UserEntity.class);
+  query.setParameter("groupId",group.getId());
+  if (firstResult != -1) {
+    query.setFirstResult(firstResult);
+  }
+  if (maxResults != -1) {
+    query.setMaxResults(maxResults);
+  }
+  List<UserEntity> results=query.getResultList();
+  List<UserModel> users=new ArrayList<UserModel>();
+  for (  UserEntity user : results) {
+    users.add(new UserAdapter(realm,em,user));
+  }
+  return users;
+}

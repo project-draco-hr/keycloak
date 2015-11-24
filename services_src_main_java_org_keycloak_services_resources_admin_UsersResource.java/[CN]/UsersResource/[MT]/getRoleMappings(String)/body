@@ -1,37 +1,10 @@
 {
-  auth.requireView();
   UserModel user=session.users().getUserById(id,realm);
   if (user == null) {
     throw new NotFoundException("User not found");
   }
-  MappingsRepresentation all=new MappingsRepresentation();
-  Set<RoleModel> realmMappings=user.getRoleMappings();
-  RealmManager manager=new RealmManager(session);
-  if (realmMappings.size() > 0) {
-    List<RoleRepresentation> realmRep=new ArrayList<RoleRepresentation>();
-    for (    RoleModel roleModel : realmMappings) {
-      realmRep.add(ModelToRepresentation.toRepresentation(roleModel));
-    }
-    all.setRealmMappings(realmRep);
-  }
-  List<ClientModel> clients=realm.getClients();
-  if (clients.size() > 0) {
-    Map<String,ClientMappingsRepresentation> appMappings=new HashMap<String,ClientMappingsRepresentation>();
-    for (    ClientModel client : clients) {
-      Set<RoleModel> roleMappings=user.getClientRoleMappings(client);
-      if (roleMappings.size() > 0) {
-        ClientMappingsRepresentation mappings=new ClientMappingsRepresentation();
-        mappings.setId(client.getId());
-        mappings.setClient(client.getClientId());
-        List<RoleRepresentation> roles=new ArrayList<RoleRepresentation>();
-        mappings.setMappings(roles);
-        for (        RoleModel role : roleMappings) {
-          roles.add(ModelToRepresentation.toRepresentation(role));
-        }
-        appMappings.put(client.getClientId(),mappings);
-        all.setClientMappings(appMappings);
-      }
-    }
-  }
-  return all;
+  auth.init(RealmAuth.Resource.USER);
+  RoleMapperResource resource=new RoleMapperResource(realm,auth,user,adminEvent);
+  ResteasyProviderFactory.getInstance().injectProperties(resource);
+  return resource;
 }

@@ -1,0 +1,20 @@
+{
+  if (!isAuthenticated()) {
+    event.error(Errors.NOT_ALLOWED);
+    throw new UnauthorizedException();
+  }
+  if (isBearerToken()) {
+    if (hasRole(AdminRoles.MANAGE_CLIENTS,AdminRoles.CREATE_CLIENT)) {
+      return;
+    }
+  }
+ else   if (isInitialAccessToken()) {
+    if (initialAccessModel.getRemainingCount() > 0) {
+      if (initialAccessModel.getExpiration() == 0 || (initialAccessModel.getTimestamp() + initialAccessModel.getExpiration()) > Time.currentTime()) {
+        return;
+      }
+    }
+  }
+  event.error(Errors.NOT_ALLOWED);
+  throw new ForbiddenException();
+}

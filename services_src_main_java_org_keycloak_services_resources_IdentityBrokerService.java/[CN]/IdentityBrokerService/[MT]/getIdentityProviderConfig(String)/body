@@ -1,8 +1,7 @@
 {
-  for (  IdentityProviderModel model : this.realmModel.getIdentityProviders()) {
-    if (model.getAlias().equals(providerId)) {
-      return model;
-    }
+  IdentityProviderModel model=this.realmModel.getIdentityProviderByAlias(providerId);
+  if (model == null) {
+    throw new IdentityBrokerException("Configuration for identity provider [" + providerId + "] not found.");
   }
-  throw new IdentityBrokerException("Configuration for identity provider [" + providerId + "] not found.");
+  return model;
 }

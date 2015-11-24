@@ -1,0 +1,12 @@
+{
+  auth.requireView();
+  UserModel user=session.users().getUserById(id,realm);
+  if (user == null) {
+    throw new NotFoundException("User not found");
+  }
+  List<GroupRepresentation> memberships=new LinkedList<>();
+  for (  GroupModel group : user.getGroups()) {
+    memberships.add(ModelToRepresentation.toRepresentation(group,false));
+  }
+  return memberships;
+}

@@ -13,15 +13,15 @@
   for (  Spi spi : spis) {
     SpiInfoRepresentation spiRep=new SpiInfoRepresentation();
     spiRep.setInternal(spi.isInternal());
-    spiRep.setSystemInfo(ServerInfoAwareProviderFactory.class.isAssignableFrom(spi.getProviderFactoryClass()));
     List<String> providerIds=new LinkedList<>(session.listProviderIds(spi.getProviderClass()));
     Collections.sort(providerIds);
     Map<String,ProviderRepresentation> providers=new HashMap<>();
     if (providerIds != null) {
       for (      String name : providerIds) {
         ProviderRepresentation provider=new ProviderRepresentation();
-        if (spiRep.isSystemInfo()) {
-          provider.setOperationalInfo(((ServerInfoAwareProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(spi.getProviderClass(),name)).getOperationalInfo());
+        ProviderFactory<?> pi=session.getKeycloakSessionFactory().getProviderFactory(spi.getProviderClass(),name);
+        if (ServerInfoAwareProviderFactory.class.isAssignableFrom(pi.getClass())) {
+          provider.setOperationalInfo(((ServerInfoAwareProviderFactory)pi).getOperationalInfo());
         }
         providers.put(name,provider);
       }

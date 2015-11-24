@@ -1,0 +1,19 @@
+{
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      setExecutionRequirement(realmWithBroker,DefaultAuthenticationFlows.FIRST_BROKER_LOGIN_FLOW,IdpCreateUserIfUniqueAuthenticatorFactory.PROVIDER_ID,AuthenticationExecutionModel.Requirement.REQUIRED);
+      setUpdateProfileFirstLogin(realmWithBroker,IdentityProviderRepresentation.UPFLM_OFF);
+    }
+  }
+,APP_REALM_ID);
+  loginIDP("pedroigor");
+  WebElement element=this.driver.findElement(By.className("instruction"));
+  assertNotNull(element);
+  assertEquals("User with email psilva@redhat.com already exists. Please login to account management to link the account.",element.getText());
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      setExecutionRequirement(realmWithBroker,DefaultAuthenticationFlows.FIRST_BROKER_LOGIN_FLOW,IdpCreateUserIfUniqueAuthenticatorFactory.PROVIDER_ID,AuthenticationExecutionModel.Requirement.ALTERNATIVE);
+    }
+  }
+,APP_REALM_ID);
+}

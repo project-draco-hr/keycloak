@@ -13,7 +13,7 @@
   }
   String secret=HmacOTP.generateSecret(10);
   context.getClientSession().setNote(RESET_CREDENTIAL_SECRET,secret);
-  String link=UriBuilder.fromUri(context.getActionUrl()).queryParam(KEY,secret).build().toString();
+  String link=UriBuilder.fromUri(context.getActionUrl()).queryParam(Constants.KEY,secret).build().toString();
   long expiration=TimeUnit.SECONDS.toMinutes(context.getRealm().getAccessCodeLifespanUserAction());
   try {
     context.getSession().getProvider(EmailProvider.class).setRealm(context.getRealm()).setUser(user).sendPasswordReset(link,expiration);

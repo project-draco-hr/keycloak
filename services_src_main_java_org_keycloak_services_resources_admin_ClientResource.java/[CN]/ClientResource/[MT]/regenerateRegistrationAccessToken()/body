@@ -1,0 +1,8 @@
+{
+  auth.requireManage();
+  String token=ClientRegistrationTokenUtils.updateRegistrationAccessToken(realm,uriInfo,client);
+  ClientRepresentation rep=ModelToRepresentation.toRepresentation(client);
+  rep.setRegistrationAccessToken(token);
+  adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).representation(rep).success();
+  return rep;
+}

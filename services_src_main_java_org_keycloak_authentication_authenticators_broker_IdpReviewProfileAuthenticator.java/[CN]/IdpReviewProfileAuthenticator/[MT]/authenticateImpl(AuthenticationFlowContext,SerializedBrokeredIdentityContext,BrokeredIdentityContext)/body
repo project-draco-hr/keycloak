@@ -1,0 +1,11 @@
+{
+  IdentityProviderModel idpConfig=brokerContext.getIdpConfig();
+  if (requiresUpdateProfilePage(context,userCtx,brokerContext)) {
+    logger.debugf("Identity provider '%s' requires update profile action for broker user '%s'.",idpConfig.getAlias(),userCtx.getUsername());
+    Response challengeResponse=context.form().setAttribute(LoginFormsProvider.UPDATE_PROFILE_CONTEXT_ATTR,userCtx).setFormData(null).createUpdateProfilePage();
+    context.challenge(challengeResponse);
+  }
+ else {
+    context.success();
+  }
+}

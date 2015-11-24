@@ -1,6 +1,11 @@
 {
   Set<RoleModel> requestedRoles=new HashSet<RoleModel>();
-  Set<RoleModel> roleMappings=user.getRoleMappings();
+  Set<RoleModel> mappings=user.getRoleMappings();
+  Set<RoleModel> roleMappings=new HashSet<>();
+  roleMappings.addAll(mappings);
+  for (  GroupModel group : user.getGroups()) {
+    addGroupRoles(group,roleMappings);
+  }
   if (client.isFullScopeAllowed()) {
     requestedRoles=roleMappings;
   }

@@ -1,0 +1,14 @@
+{
+  if (value instanceof String) {
+    return (String)value;
+  }
+ else {
+    try {
+      byte[] bytes=JsonSerialization.writeValueAsBytes(value);
+      return Base64Url.encode(bytes);
+    }
+ catch (    IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
+}

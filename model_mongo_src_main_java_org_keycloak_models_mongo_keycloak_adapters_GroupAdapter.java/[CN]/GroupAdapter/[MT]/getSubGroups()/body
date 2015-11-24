@@ -1,0 +1,10 @@
+{
+  DBObject query=new QueryBuilder().and("realmId").is(realm.getId()).and("parentId").is(getId()).get();
+  List<MongoGroupEntity> groups=getMongoStore().loadEntities(MongoGroupEntity.class,query,invocationContext);
+  Set<GroupModel> subGroups=new HashSet<>();
+  if (groups == null)   return subGroups;
+  for (  MongoGroupEntity group : groups) {
+    subGroups.add(realm.getGroupById(group.getId()));
+  }
+  return subGroups;
+}

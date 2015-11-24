@@ -1,0 +1,10 @@
+{
+  SAMLDataMarshaller serializer=new SAMLDataMarshaller();
+  ResponseType responseType=serializer.deserialize(TEST_RESPONSE,ResponseType.class);
+  Assert.assertEquals(responseType.getID(),"ID_4804cf50-cd96-4b92-823e-89adaa0c78ba");
+  Assert.assertEquals(responseType.getDestination(),"http://localhost:8081/auth/realms/realm-with-broker/broker/kc-saml-idp-basic/endpoint");
+  Assert.assertEquals(responseType.getIssuer().getValue(),"http://localhost:8082/auth/realms/realm-with-saml-idp-basic");
+  Assert.assertEquals(responseType.getAssertions().get(0).getID(),"ID_29b196c2-d641-45c8-a423-8ed8e54d4cf9");
+  String serialized=serializer.serialize(responseType);
+  Assert.assertEquals(TEST_RESPONSE,serialized);
+}

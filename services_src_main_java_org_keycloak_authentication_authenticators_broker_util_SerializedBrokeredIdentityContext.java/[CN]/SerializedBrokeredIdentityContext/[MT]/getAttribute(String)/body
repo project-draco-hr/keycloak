@@ -1,0 +1,16 @@
+{
+  ContextDataEntry ctxEntry=this.contextData.get("user.attributes." + key);
+  if (ctxEntry != null) {
+    try {
+      String asString=ctxEntry.getData();
+      List<String> asList=JsonSerialization.readValue(asString,List.class);
+      return asList;
+    }
+ catch (    IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
+ else {
+    return null;
+  }
+}

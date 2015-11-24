@@ -1,0 +1,13 @@
+{
+  if (updated != null)   return updated.getSubGroups();
+  Set<GroupModel> subGroups=new HashSet<>();
+  for (  String id : cached.getSubGroups()) {
+    GroupModel subGroup=keycloakSession.realms().getGroupById(id,realm);
+    if (subGroup == null) {
+      getDelegateForUpdate();
+      return updated.getSubGroups();
+    }
+    subGroups.add(subGroup);
+  }
+  return subGroups;
+}

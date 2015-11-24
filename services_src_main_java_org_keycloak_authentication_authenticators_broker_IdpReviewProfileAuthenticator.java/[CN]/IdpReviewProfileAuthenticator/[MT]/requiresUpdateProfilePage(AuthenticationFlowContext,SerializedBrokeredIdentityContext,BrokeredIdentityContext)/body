@@ -1,0 +1,16 @@
+{
+  String enforceUpdateProfile=context.getClientSession().getNote(ENFORCE_UPDATE_PROFILE);
+  if (Boolean.parseBoolean(enforceUpdateProfile)) {
+    return true;
+  }
+  String updateProfileFirstLogin;
+  AuthenticatorConfigModel authenticatorConfig=context.getAuthenticatorConfig();
+  if (authenticatorConfig == null || !authenticatorConfig.getConfig().containsKey(IdpReviewProfileAuthenticatorFactory.UPDATE_PROFILE_ON_FIRST_LOGIN)) {
+    updateProfileFirstLogin=IdentityProviderRepresentation.UPFLM_MISSING;
+  }
+ else {
+    updateProfileFirstLogin=authenticatorConfig.getConfig().get(IdpReviewProfileAuthenticatorFactory.UPDATE_PROFILE_ON_FIRST_LOGIN);
+  }
+  RealmModel realm=context.getRealm();
+  return IdentityProviderRepresentation.UPFLM_ON.equals(updateProfileFirstLogin) || (IdentityProviderRepresentation.UPFLM_MISSING.equals(updateProfileFirstLogin) && !Validation.validateUserMandatoryFields(realm,userCtx));
+}

@@ -33,33 +33,39 @@
     return performAccountLinking(clientSession,context,federatedIdentityModel,federatedUser);
   }
   if (federatedUser == null) {
-    try {
-      federatedUser=createUser(context);
-      if (IdentityProviderRepresentation.UPFLM_ON.equals(identityProviderConfig.getUpdateProfileFirstLoginMode()) || (IdentityProviderRepresentation.UPFLM_MISSING.equals(identityProviderConfig.getUpdateProfileFirstLoginMode()) && !Validation.validateUserMandatoryFields(realmModel,federatedUser))) {
-        if (isDebugEnabled()) {
-          LOGGER.debugf("Identity provider requires update profile action.",federatedUser);
-        }
-        federatedUser.addRequiredAction(UPDATE_PROFILE);
+    LOGGER.debugf("Federated user not found for provider '%s' and broker username '%s' . Redirecting to flow for firstBrokerLogin",providerId,context.getUsername());
+    String username=context.getModelUsername();
+    if (username == null) {
+      if (this.realmModel.isRegistrationEmailAsUsername() && !Validation.isBlank(context.getEmail())) {
+        username=context.getEmail();
       }
-      if (identityProviderConfig.isTrustEmail() && !Validation.isBlank(federatedUser.getEmail())) {
-        federatedUser.setEmailVerified(true);
+ else       if (context.getUsername() == null) {
+        username=context.getIdpConfig().getAlias() + "." + context.getId();
+      }
+ else {
+        username=context.getIdpConfig().getAlias() + "." + context.getUsername();
       }
     }
- catch (    Exception e) {
-      return redirectToLoginPage(e,clientCode);
-    }
+    username=username.trim();
+    context.setModelUsername(username);
+    clientSession.setTimestamp(Time.currentTime());
+    SerializedBrokeredIdentityContext ctx=SerializedBrokeredIdentityContext.serialize(context);
+    ctx.saveToClientSession(clientSession);
+    URI redirect=LoginActionsService.firstBrokerLoginProcessor(uriInfo).queryParam(OAuth2Constants.CODE,context.getCode()).build(realmModel.getName());
+    return Response.status(302).location(redirect).build();
   }
  else {
     updateFederatedIdentity(context,federatedUser);
+    boolean firstBrokerLoginInProgress=(clientSession.getNote(AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE) != null);
+    if (firstBrokerLoginInProgress) {
+      LOGGER.debugf("Reauthenticated with broker '%s' when linking user '%s' with other broker",context.getIdpConfig().getAlias(),federatedUser.getUsername());
+      UserModel linkingUser=AbstractIdpAuthenticator.getExistingUser(session,realmModel,clientSession);
+      if (!linkingUser.getId().equals(federatedUser.getId())) {
+        return redirectToErrorPage(Messages.IDENTITY_PROVIDER_DIFFERENT_USER_MESSAGE,federatedUser.getUsername(),linkingUser.getUsername());
+      }
+      clientSession.setAuthenticatedUser(federatedUser);
+      return afterFirstBrokerLogin(context.getCode());
+    }
+    return finishBrokerAuthentication(context,federatedUser,clientSession,providerId);
   }
-  UserSessionModel userSession=this.session.sessions().createUserSession(this.realmModel,federatedUser,federatedUser.getUsername(),this.clientConnection.getRemoteAddr(),"broker",false,context.getBrokerSessionId(),context.getBrokerUserId());
-  this.event.user(federatedUser);
-  this.event.session(userSession);
-  TokenManager.attachClientSession(userSession,clientSession);
-  context.getIdp().attachUserSession(userSession,clientSession,context);
-  userSession.setNote(BROKER_PROVIDER_ID,providerId);
-  if (isDebugEnabled()) {
-    LOGGER.debugf("Performing local authentication for user [%s].",federatedUser);
-  }
-  return AuthenticationProcessor.createRequiredActionRedirect(realmModel,clientSession,uriInfo);
 }

@@ -1,0 +1,17 @@
+{
+  Map<String,List<String>> result=new HashMap<>();
+  for (  Map.Entry<String,ContextDataEntry> entry : this.contextData.entrySet()) {
+    if (entry.getKey().startsWith("user.attributes.")) {
+      ContextDataEntry ctxEntry=entry.getValue();
+      String asString=ctxEntry.getData();
+      try {
+        List<String> asList=JsonSerialization.readValue(asString,List.class);
+        result.put(entry.getKey().substring(16),asList);
+      }
+ catch (      IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+    }
+  }
+  return result;
+}

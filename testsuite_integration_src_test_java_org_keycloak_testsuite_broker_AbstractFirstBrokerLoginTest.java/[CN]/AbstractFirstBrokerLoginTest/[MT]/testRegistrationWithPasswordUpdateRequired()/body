@@ -1,0 +1,25 @@
+{
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      AuthenticatorConfigModel authenticatorConfig=realmWithBroker.getAuthenticatorConfigByAlias(DefaultAuthenticationFlows.IDP_CREATE_UNIQUE_USER_CONFIG_ALIAS);
+      authenticatorConfig.getConfig().put(IdpCreateUserIfUniqueAuthenticatorFactory.REQUIRE_PASSWORD_UPDATE_AFTER_REGISTRATION,"true");
+      realmWithBroker.updateAuthenticatorConfig(authenticatorConfig);
+      setUpdateProfileFirstLogin(realmWithBroker,IdentityProviderRepresentation.UPFLM_MISSING);
+    }
+  }
+,APP_REALM_ID);
+  loginIDP("pedroigor");
+  this.updateProfileWithUsernamePage.assertCurrent();
+  this.updateProfileWithUsernamePage.update("Test","User","some-user@redhat.com","some-user");
+  this.passwordUpdatePage.assertCurrent();
+  this.passwordUpdatePage.changePassword("password1","password1");
+  assertFederatedUser("some-user","some-user@redhat.com","pedroigor");
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      AuthenticatorConfigModel authenticatorConfig=realmWithBroker.getAuthenticatorConfigByAlias(DefaultAuthenticationFlows.IDP_CREATE_UNIQUE_USER_CONFIG_ALIAS);
+      authenticatorConfig.getConfig().put(IdpCreateUserIfUniqueAuthenticatorFactory.REQUIRE_PASSWORD_UPDATE_AFTER_REGISTRATION,"false");
+      realmWithBroker.updateAuthenticatorConfig(authenticatorConfig);
+    }
+  }
+,APP_REALM_ID);
+}

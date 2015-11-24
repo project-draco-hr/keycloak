@@ -1,0 +1,18 @@
+{
+  boolean migrationTest="true".equals(System.getProperty("migration","false"));
+  Migration migrationAnnotation=method.getAnnotation(Migration.class);
+  if (migrationTest && migrationAnnotation != null) {
+    String versionFrom=migrationAnnotation.versionFrom();
+    String version=System.getProperty("version");
+    if (version.equals(versionFrom)) {
+      return ExecutionDecision.execute();
+    }
+ else {
+      return ExecutionDecision.dontExecute(method.getName() + "doesn't fit with migration version.");
+    }
+  }
+  if ((migrationTest && migrationAnnotation == null) || (!migrationTest && migrationAnnotation != null)) {
+    return ExecutionDecision.dontExecute("Migration test and no migration annotation or no migration test and migration annotation");
+  }
+  return ExecutionDecision.execute();
+}

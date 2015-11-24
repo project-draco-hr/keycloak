@@ -75,6 +75,14 @@
     roleStrings.addAll(defaultRoles);
     rep.setDefaultRoles(roleStrings);
   }
+  List<GroupModel> defaultGroups=realm.getDefaultGroups();
+  if (!defaultGroups.isEmpty()) {
+    List<String> groupPaths=new LinkedList<>();
+    for (    GroupModel group : defaultGroups) {
+      groupPaths.add(ModelToRepresentation.buildGroupPath(group));
+    }
+    rep.setDefaultGroups(groupPaths);
+  }
   List<RequiredCredentialModel> requiredCredentialModels=realm.getRequiredCredentials();
   if (requiredCredentialModels.size() > 0) {
     rep.setRequiredCredentials(new HashSet<String>());
@@ -95,7 +103,7 @@
     rep.addUserFederationMapper(toRepresentation(realm,mapper));
   }
   for (  IdentityProviderModel provider : realm.getIdentityProviders()) {
-    rep.addIdentityProvider(toRepresentation(provider));
+    rep.addIdentityProvider(toRepresentation(realm,provider));
   }
   for (  IdentityProviderMapperModel mapper : realm.getIdentityProviderMappers()) {
     rep.addIdentityProviderMapper(toRepresentation(mapper));
@@ -109,6 +117,7 @@
   if (internal) {
     exportAuthenticationFlows(realm,rep);
     exportRequiredActions(realm,rep);
+    exportGroups(realm,rep);
   }
   return rep;
 }

@@ -1,0 +1,12 @@
+{
+  TypedQuery<String> query=em.createNamedQuery("userGroupIds",String.class);
+  query.setParameter("user",getUser());
+  List<String> ids=query.getResultList();
+  Set<GroupModel> groups=new HashSet<>();
+  for (  String groupId : ids) {
+    GroupModel group=realm.getGroupById(groupId);
+    if (group == null)     continue;
+    groups.add(group);
+  }
+  return groups;
+}

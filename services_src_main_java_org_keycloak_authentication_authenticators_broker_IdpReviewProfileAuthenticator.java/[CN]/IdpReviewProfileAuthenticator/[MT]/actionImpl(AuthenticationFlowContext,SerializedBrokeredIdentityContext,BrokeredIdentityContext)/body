@@ -1,0 +1,28 @@
+{
+  EventBuilder event=context.getEvent();
+  event.event(EventType.UPDATE_PROFILE);
+  MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
+  RealmModel realm=context.getRealm();
+  List<FormMessage> errors=Validation.validateUpdateProfileForm(true,formData);
+  if (errors != null && !errors.isEmpty()) {
+    Response challenge=context.form().setErrors(errors).setAttribute(LoginFormsProvider.UPDATE_PROFILE_CONTEXT_ATTR,userCtx).setFormData(formData).createUpdateProfilePage();
+    context.challenge(challenge);
+    return;
+  }
+  userCtx.setUsername(formData.getFirst(UserModel.USERNAME));
+  userCtx.setFirstName(formData.getFirst(UserModel.FIRST_NAME));
+  userCtx.setLastName(formData.getFirst(UserModel.LAST_NAME));
+  String email=formData.getFirst(UserModel.EMAIL);
+  if (!ObjectUtil.isEqualOrBothNull(email,userCtx.getEmail())) {
+    if (logger.isTraceEnabled()) {
+      logger.tracef("Email updated on updateProfile page to '%s' ",email);
+    }
+    userCtx.setEmail(email);
+    context.getClientSession().setNote(UPDATE_PROFILE_EMAIL_CHANGED,"true");
+  }
+  AttributeFormDataProcessor.process(formData,realm,userCtx);
+  userCtx.saveToClientSession(context.getClientSession());
+  logger.debugf("Profile updated successfully after first authentication with identity provider '%s' for broker user '%s'.",brokerContext.getIdpConfig().getAlias(),userCtx.getUsername());
+  event.detail(Details.UPDATED_EMAIL,email);
+  context.success();
+}

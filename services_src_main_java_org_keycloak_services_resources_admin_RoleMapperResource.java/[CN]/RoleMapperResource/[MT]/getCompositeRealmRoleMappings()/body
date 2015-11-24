@@ -1,0 +1,11 @@
+{
+  auth.requireView();
+  Set<RoleModel> roles=realm.getRoles();
+  List<RoleRepresentation> realmMappingsRep=new ArrayList<RoleRepresentation>();
+  for (  RoleModel roleModel : roles) {
+    if (roleMapper.hasRole(roleModel)) {
+      realmMappingsRep.add(ModelToRepresentation.toRepresentation(roleModel));
+    }
+  }
+  return realmMappingsRep;
+}

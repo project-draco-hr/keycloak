@@ -1,0 +1,8 @@
+{
+  SAMLDataMarshaller serializer=new SAMLDataMarshaller();
+  AssertionType assertion=serializer.deserialize(TEST_ASSERTION,AssertionType.class);
+  Assert.assertEquals(assertion.getID(),"ID_29b196c2-d641-45c8-a423-8ed8e54d4cf9");
+  Assert.assertEquals(((NameIDType)assertion.getSubject().getSubType().getBaseID()).getValue(),"test-user");
+  String serialized=serializer.serialize(assertion);
+  Assert.assertEquals(TEST_ASSERTION,serialized);
+}

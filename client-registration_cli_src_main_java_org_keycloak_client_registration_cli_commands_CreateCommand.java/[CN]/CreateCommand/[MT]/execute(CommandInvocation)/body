@@ -1,0 +1,21 @@
+{
+  System.out.println(help);
+  if (help) {
+    commandInvocation.getShell().out().println(commandInvocation.getHelpInfo("create"));
+  }
+ else {
+    if (arguments != null) {
+      for (      Resource f : arguments) {
+        System.out.println(f.getAbsolutePath());
+        ClientRepresentation rep=JsonSerialization.readValue(f.read(),ClientRepresentation.class);
+        try {
+          context.getReg().create(rep);
+        }
+ catch (        ClientRegistrationException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+  return CommandResult.SUCCESS;
+}

@@ -1,0 +1,17 @@
+{
+  createLdapUserProvider.navigateTo();
+  createLdapUserProvider.form().selectVendor(RED_HAT_DIRECTORY_SERVER);
+  createLdapUserProvider.form().setConsoleDisplayNameInput("ldap");
+  createLdapUserProvider.form().selectEditMode(READ_ONLY);
+  createLdapUserProvider.form().setLdapConnectionUrlInput("ldap://localhost:389");
+  createLdapUserProvider.form().setLdapBindDnInput("uid=admin,ou=system");
+  createLdapUserProvider.form().setLdapUserDnInput("ou=People,dc=keycloak,dc=org");
+  createLdapUserProvider.form().setLdapBindCredentialInput("secret");
+  createLdapUserProvider.form().save();
+  assertFlashMessageSuccess();
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  UserFederationProviderRepresentation ufpr=realm.getUserFederationProviders().get(0);
+  assertLdapProviderSetting(ufpr,"ldap",0,READ_ONLY,"false","rhds","1","true","true","true");
+  assertLdapBasicMapping(ufpr,"uid","uid","nsuniqueid","inetOrgPerson, organizationalPerson","ou=People,dc=keycloak,dc=org");
+  assertLdapSyncSetings(ufpr,"1000",0,0);
+}

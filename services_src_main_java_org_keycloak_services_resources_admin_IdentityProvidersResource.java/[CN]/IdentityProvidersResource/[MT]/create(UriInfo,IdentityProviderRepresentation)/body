@@ -1,7 +1,7 @@
 {
   this.auth.requireManage();
   try {
-    IdentityProviderModel identityProvider=RepresentationToModel.toModel(representation);
+    IdentityProviderModel identityProvider=RepresentationToModel.toModel(realm,representation);
     this.realm.addIdentityProvider(identityProvider);
     adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,identityProvider.getInternalId()).representation(representation).success();
     return Response.created(uriInfo.getAbsolutePathBuilder().path(representation.getProviderId()).build()).build();

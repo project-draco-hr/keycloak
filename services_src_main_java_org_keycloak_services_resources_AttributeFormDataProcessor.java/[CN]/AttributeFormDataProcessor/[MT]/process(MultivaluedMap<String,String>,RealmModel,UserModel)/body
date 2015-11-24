@@ -1,13 +1,4 @@
 {
-  for (  String key : formData.keySet()) {
-    if (!key.startsWith("user.attributes."))     continue;
-    String attribute=key.substring("user.attributes.".length());
-    List<String> modelValue=new ArrayList<>(user.getAttribute(attribute));
-    int index=0;
-    for (    String value : formData.get(key)) {
-      addOrSetValue(modelValue,index,value);
-      index++;
-    }
-    user.setAttribute(attribute,modelValue);
-  }
+  UpdateProfileContext userCtx=new UserUpdateProfileContext(realm,user);
+  process(formData,realm,userCtx);
 }

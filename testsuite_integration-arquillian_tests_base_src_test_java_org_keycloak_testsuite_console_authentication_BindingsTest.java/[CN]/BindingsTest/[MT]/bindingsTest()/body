@@ -1,0 +1,14 @@
+{
+  bindingsPage.form().select(BindingsSelect.BROWSER,BindingsOption.REGISTRATION);
+  bindingsPage.form().select(BindingsSelect.REGISTRATION,BindingsOption.RESET_CREDENTIALS);
+  bindingsPage.form().select(BindingsSelect.DIRECT_GRANT,BindingsOption.BROWSER);
+  bindingsPage.form().select(BindingsSelect.RESET_CREDENTIALS,BindingsOption.DIRECT_GRANT);
+  bindingsPage.form().save();
+  assertEquals("Success! Your changes have been saved to the realm.",bindingsPage.getSuccessMessage());
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  assertEquals("registration",realm.getBrowserFlow());
+  assertEquals("reset credentials",realm.getRegistrationFlow());
+  assertEquals("browser",realm.getDirectGrantFlow());
+  assertEquals("direct grant",realm.getResetCredentialsFlow());
+  assertEquals("clients",realm.getClientAuthenticationFlow());
+}

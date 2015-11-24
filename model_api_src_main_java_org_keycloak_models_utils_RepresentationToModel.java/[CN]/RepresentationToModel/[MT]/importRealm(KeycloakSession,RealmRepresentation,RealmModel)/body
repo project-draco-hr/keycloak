@@ -73,6 +73,16 @@
   if (rep.getPasswordPolicy() != null)   newRealm.setPasswordPolicy(new PasswordPolicy(rep.getPasswordPolicy()));
   if (rep.getOtpPolicyType() != null)   newRealm.setOTPPolicy(toPolicy(rep));
  else   newRealm.setOTPPolicy(OTPPolicy.DEFAULT_POLICY);
+  importAuthenticationFlows(newRealm,rep);
+  if (rep.getRequiredActions() != null) {
+    for (    RequiredActionProviderRepresentation action : rep.getRequiredActions()) {
+      RequiredActionProviderModel model=toModel(action);
+      newRealm.addRequiredActionProvider(model);
+    }
+  }
+ else {
+    DefaultRequiredActions.addActions(newRealm);
+  }
   importIdentityProviders(rep,newRealm);
   importIdentityProviderMappers(rep,newRealm);
   if (rep.getClients() != null) {
@@ -190,6 +200,16 @@
       newRealm.addUserFederationMapper(toModel(newRealm,representation));
     }
   }
+  if (rep.getGroups() != null) {
+    importGroups(newRealm,rep);
+    if (rep.getDefaultGroups() != null) {
+      for (      String path : rep.getDefaultGroups()) {
+        GroupModel found=KeycloakModelUtils.findGroupByPath(newRealm,path);
+        if (found == null)         throw new RuntimeException("default group in realm rep doesn't exist: " + path);
+        newRealm.addDefaultGroup(found);
+      }
+    }
+  }
   if (rep.getUsers() != null) {
     for (    UserRepresentation userRep : rep.getUsers()) {
       UserModel user=createUser(session,newRealm,userRep,appMap);
@@ -203,15 +223,5 @@
   }
   if (rep.getDefaultLocale() != null) {
     newRealm.setDefaultLocale(rep.getDefaultLocale());
-  }
-  importAuthenticationFlows(newRealm,rep);
-  if (rep.getRequiredActions() != null) {
-    for (    RequiredActionProviderRepresentation action : rep.getRequiredActions()) {
-      RequiredActionProviderModel model=toModel(action);
-      newRealm.addRequiredActionProvider(model);
-    }
-  }
- else {
-    DefaultRequiredActions.addActions(newRealm);
   }
 }

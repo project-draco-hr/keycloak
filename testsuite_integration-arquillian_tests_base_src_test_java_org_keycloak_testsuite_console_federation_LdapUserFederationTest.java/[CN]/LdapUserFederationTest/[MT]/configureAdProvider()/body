@@ -1,0 +1,24 @@
+{
+  createLdapUserProvider.navigateTo();
+  createLdapUserProvider.form().selectVendor(ACTIVE_DIRECTORY);
+  createLdapUserProvider.form().setConsoleDisplayNameInput("ldap");
+  createLdapUserProvider.form().selectEditMode(WRITABLE);
+  createLdapUserProvider.form().setLdapConnectionUrlInput("ldap://localhost:389");
+  createLdapUserProvider.form().setLdapBindDnInput("KEYCLOAK/Administrator");
+  createLdapUserProvider.form().setLdapUserDnInput("ou=People,dc=keycloak,dc=org");
+  createLdapUserProvider.form().setLdapBindCredentialInput("secret");
+  createLdapUserProvider.form().setAccountAfterPasswordUpdateEnabled(false);
+  createLdapUserProvider.form().setAllowKerberosAuthEnabled(true);
+  createLdapUserProvider.form().setKerberosRealmInput("KEYCLOAK.ORG");
+  createLdapUserProvider.form().setServerPrincipalInput("HTTP/localhost@KEYCLOAK.ORG");
+  createLdapUserProvider.form().setKeyTabInput("http.keytab");
+  createLdapUserProvider.form().setDebugEnabled(true);
+  createLdapUserProvider.form().save();
+  assertFlashMessageSuccess();
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  UserFederationProviderRepresentation ufpr=realm.getUserFederationProviders().get(0);
+  assertLdapProviderSetting(ufpr,"ldap",0,WRITABLE,"false","ad","1","true","true","false");
+  assertLdapBasicMapping(ufpr,"cn","cn","objectGUID","person, organizationalPerson, user","ou=People,dc=keycloak,dc=org");
+  assertLdapSyncSetings(ufpr,"1000",0,0);
+  assertLdapKerberosSetings(ufpr,"KEYCLOAK.ORG","HTTP/localhost@KEYCLOAK.ORG","http.keytab","true","false");
+}

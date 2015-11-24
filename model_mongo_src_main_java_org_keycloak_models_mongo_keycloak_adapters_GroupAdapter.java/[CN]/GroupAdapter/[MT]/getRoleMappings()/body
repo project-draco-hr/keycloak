@@ -1,0 +1,12 @@
+{
+  if (group.getRoleIds() == null || group.getRoleIds().isEmpty())   return Collections.EMPTY_SET;
+  Set<RoleModel> roles=new HashSet<>();
+  for (  String id : group.getRoleIds()) {
+    RoleModel roleById=realm.getRoleById(id);
+    if (roleById == null) {
+      throw new ModelException("role does not exist in group role mappings");
+    }
+    roles.add(roleById);
+  }
+  return roles;
+}

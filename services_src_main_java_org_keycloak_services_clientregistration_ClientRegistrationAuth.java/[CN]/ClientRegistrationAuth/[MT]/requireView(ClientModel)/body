@@ -1,0 +1,22 @@
+{
+  if (!isAuthenticated()) {
+    event.error(Errors.NOT_ALLOWED);
+    throw new UnauthorizedException();
+  }
+  if (client == null) {
+    event.error(Errors.NOT_ALLOWED);
+    throw new ForbiddenException();
+  }
+  if (isBearerToken()) {
+    if (hasRole(AdminRoles.MANAGE_CLIENTS,AdminRoles.VIEW_CLIENTS)) {
+      return;
+    }
+  }
+ else   if (isRegistrationAccessToken()) {
+    if (client.getRegistrationToken() != null && client.getRegistrationToken().equals(jwt.getId())) {
+      return;
+    }
+  }
+  event.error(Errors.NOT_ALLOWED);
+  throw new ForbiddenException();
+}

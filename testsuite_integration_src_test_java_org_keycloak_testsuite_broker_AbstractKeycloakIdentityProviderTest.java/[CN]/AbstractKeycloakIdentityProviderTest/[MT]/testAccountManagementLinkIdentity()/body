@@ -1,0 +1,33 @@
+{
+  accountFederatedIdentityPage.realm("realm-with-broker");
+  accountFederatedIdentityPage.open();
+  assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
+  loginPage.login("pedroigor","password");
+  assertTrue(accountFederatedIdentityPage.isCurrent());
+  IdentityProviderModel identityProviderModel=getIdentityProviderModel();
+  setUpdateProfileFirstLogin(IdentityProviderRepresentation.UPFLM_ON);
+  accountFederatedIdentityPage.clickAddProvider(identityProviderModel.getAlias());
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8082/auth/"));
+  this.loginPage.login("test-user","password");
+  doAfterProviderAuthentication();
+  assertTrue(accountFederatedIdentityPage.isCurrent());
+  assertTrue(driver.getPageSource().contains("id=\"remove-" + identityProviderModel.getAlias() + "\""));
+  revokeGrant();
+  accountFederatedIdentityPage.logout();
+  assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
+  loginPage.clickSocial(identityProviderModel.getAlias());
+  doAfterProviderAuthentication();
+  assertTrue(accountFederatedIdentityPage.isCurrent());
+  assertTrue(driver.getPageSource().contains("id=\"remove-" + identityProviderModel.getAlias() + "\""));
+  accountFederatedIdentityPage.clickRemoveProvider(identityProviderModel.getAlias());
+  assertTrue(driver.getPageSource().contains("id=\"add-" + identityProviderModel.getAlias() + "\""));
+  revokeGrant();
+  System.out.println("*** logout from account management");
+  accountFederatedIdentityPage.logout();
+  assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/auth"));
+  this.loginPage.clickSocial(identityProviderModel.getAlias());
+  this.loginPage.login("test-user","password");
+  doAfterProviderAuthentication();
+  this.updateProfilePage.assertCurrent();
+}

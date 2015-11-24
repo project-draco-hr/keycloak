@@ -1,0 +1,14 @@
+{
+  String asString=clientSession.getNote(AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE);
+  if (asString == null) {
+    return null;
+  }
+ else {
+    try {
+      return JsonSerialization.readValue(asString,SerializedBrokeredIdentityContext.class);
+    }
+ catch (    IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
+}

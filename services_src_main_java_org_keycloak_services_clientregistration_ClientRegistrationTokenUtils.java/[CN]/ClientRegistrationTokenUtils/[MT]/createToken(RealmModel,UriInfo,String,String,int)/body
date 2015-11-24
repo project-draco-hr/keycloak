@@ -1,0 +1,12 @@
+{
+  JsonWebToken jwt=new JsonWebToken();
+  String issuer=getIssuer(realm,uri);
+  jwt.type(type);
+  jwt.id(id);
+  jwt.issuedAt(Time.currentTime());
+  jwt.expiration(expiration);
+  jwt.issuer(issuer);
+  jwt.audience(issuer);
+  String token=new JWSBuilder().jsonContent(jwt).rsa256(realm.getPrivateKey());
+  return token;
+}

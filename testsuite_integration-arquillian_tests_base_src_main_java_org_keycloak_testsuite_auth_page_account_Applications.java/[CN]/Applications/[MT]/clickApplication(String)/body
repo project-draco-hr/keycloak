@@ -1,7 +1,8 @@
 {
-  for (  WebElement appLink : applicationLinks) {
-    if (appLink.getText().equals(application)) {
-      appLink.click();
-    }
+  WebElement row=getRowForLinkText(application);
+  if (row == null) {
+    log.error("Application: " + application + " doesn't exist");
+    throw new IllegalArgumentException("Application: " + application + " doesn't exist");
   }
+  row.findElement(By.xpath(".//a")).click();
 }

@@ -1,0 +1,13 @@
+{
+  if (rep.getName() != null)   model.setName(rep.getName());
+  if (rep.getAttributes() != null) {
+    Set<String> attrsToRemove=new HashSet<>(model.getAttributes().keySet());
+    attrsToRemove.removeAll(rep.getAttributes().keySet());
+    for (    Map.Entry<String,List<String>> attr : rep.getAttributes().entrySet()) {
+      model.setAttribute(attr.getKey(),attr.getValue());
+    }
+    for (    String attr : attrsToRemove) {
+      model.removeAttribute(attr);
+    }
+  }
+}

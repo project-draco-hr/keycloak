@@ -1,0 +1,13 @@
+{
+  if (brokerContext.getEmail() != null) {
+    UserModel existingUser=context.getSession().users().getUserByEmail(brokerContext.getEmail(),context.getRealm());
+    if (existingUser != null) {
+      return new ExistingUserInfo(existingUser.getId(),UserModel.EMAIL,existingUser.getEmail());
+    }
+  }
+  UserModel existingUser=context.getSession().users().getUserByUsername(brokerContext.getModelUsername(),context.getRealm());
+  if (existingUser != null) {
+    return new ExistingUserInfo(existingUser.getId(),UserModel.USERNAME,existingUser.getUsername());
+  }
+  return null;
+}

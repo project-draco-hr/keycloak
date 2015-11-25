@@ -1,8 +1,12 @@
 {
   authError=(AuthenticationError)req.getAttribute(AuthenticationError.class.getName());
+  Integer statusCode=(Integer)req.getAttribute("javax.servlet.error.status_code");
   resp.setContentType("text/html");
   PrintWriter pw=resp.getWriter();
   pw.printf("<html><head><title>%s</title></head><body>","Error Page");
-  pw.print("<h1>There was an error</h1></body></html>");
+  pw.print("<h1>There was an error</h1>");
+  if (statusCode != null)   pw.print("<br/>HTTP status code: " + statusCode);
+  if (authError != null)   pw.print("<br/>Error info: " + authError.toString());
+  pw.print("</body></html>");
   pw.flush();
 }

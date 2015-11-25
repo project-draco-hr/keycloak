@@ -31,7 +31,7 @@
     LoginProtocol protocol=session.getProvider(LoginProtocol.class,clientSession.getAuthMethod());
     protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo);
     event.error(Errors.REJECTED_BY_USER);
-    return protocol.consentDenied(clientSession);
+    return protocol.sendError(clientSession,Error.CONSENT_DENIED);
   }
   UserConsentModel grantedConsent=user.getConsentByClient(client.getId());
   if (grantedConsent == null) {

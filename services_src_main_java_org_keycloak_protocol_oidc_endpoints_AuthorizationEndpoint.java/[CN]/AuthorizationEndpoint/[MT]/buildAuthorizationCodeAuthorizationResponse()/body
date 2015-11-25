@@ -1,11 +1,12 @@
 {
-  String accessCode=new ClientSessionCode(realm,clientSession).getCode();
   if (idpHint != null && !"".equals(idpHint)) {
     IdentityProviderModel identityProviderModel=realm.getIdentityProviderByAlias(idpHint);
     if (identityProviderModel == null) {
       return session.getProvider(LoginFormsProvider.class).setError(Messages.IDENTITY_PROVIDER_NOT_FOUND,idpHint).createErrorPage();
     }
-    return buildRedirectToIdentityProvider(idpHint,accessCode);
+    return buildRedirectToIdentityProvider(idpHint,new ClientSessionCode(realm,clientSession).getCode());
   }
-  return browserAuthentication(accessCode);
+  this.event.event(EventType.LOGIN);
+  clientSession.setNote(Details.AUTH_TYPE,CODE_AUTH_TYPE);
+  return handleBrowserAuthenticationRequest(clientSession,new OIDCLoginProtocol(session,realm,uriInfo,headers,event),prompt != null && prompt.equals("none"));
 }

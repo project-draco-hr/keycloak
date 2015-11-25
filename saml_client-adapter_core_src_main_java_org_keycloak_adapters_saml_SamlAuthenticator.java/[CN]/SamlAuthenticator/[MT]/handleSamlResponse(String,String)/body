@@ -67,6 +67,11 @@
     }
  else     if (sessionStore.isLoggingIn()) {
       try {
+        StatusType status=statusResponse.getStatus();
+        if (checkStatusCodeValue(status.getStatusCode(),JBossSAMLURIConstants.STATUS_RESPONDER.get()) && checkStatusCodeValue(status.getStatusCode().getStatusCode(),JBossSAMLURIConstants.STATUS_NO_PASSIVE.get())) {
+          log.debug("Not authenticated due passive mode Status found in SAML response: " + status.toString());
+          return AuthOutcome.NOT_AUTHENTICATED;
+        }
         challenge=new AuthChallenge(){
           @Override public boolean challenge(          HttpFacade exchange){
             SamlAuthenticationError error=new SamlAuthenticationError(SamlAuthenticationError.Reason.ERROR_STATUS,statusResponse);

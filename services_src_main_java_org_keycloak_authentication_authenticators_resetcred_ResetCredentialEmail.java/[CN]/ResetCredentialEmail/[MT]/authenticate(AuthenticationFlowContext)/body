@@ -16,7 +16,7 @@
   String link=UriBuilder.fromUri(context.getActionUrl()).queryParam(Constants.KEY,secret).build().toString();
   long expiration=TimeUnit.SECONDS.toMinutes(context.getRealm().getAccessCodeLifespanUserAction());
   try {
-    context.getSession().getProvider(EmailProvider.class).setRealm(context.getRealm()).setUser(user).sendPasswordReset(link,expiration);
+    context.getSession().getProvider(EmailTemplateProvider.class).setRealm(context.getRealm()).setUser(user).sendPasswordReset(link,expiration);
     event.clone().event(EventType.SEND_RESET_PASSWORD).user(user).detail(Details.USERNAME,username).detail(Details.EMAIL,user.getEmail()).detail(Details.CODE_ID,context.getClientSession().getId()).success();
     context.forkWithSuccessMessage(new FormMessage(Messages.EMAIL_SENT));
   }

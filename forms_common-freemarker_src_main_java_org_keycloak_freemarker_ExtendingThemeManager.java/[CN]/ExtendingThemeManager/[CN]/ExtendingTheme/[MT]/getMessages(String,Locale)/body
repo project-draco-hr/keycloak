@@ -1,11 +1,18 @@
 {
-  Properties messages=new Properties();
-  ListIterator<Theme> itr=themes.listIterator(themes.size());
-  while (itr.hasPrevious()) {
-    Properties m=itr.previous().getMessages(baseBundlename,locale);
-    if (m != null) {
-      messages.putAll(m);
+  if (messages.get(baseBundlename) == null || messages.get(baseBundlename).get(locale) == null) {
+    Properties messages=new Properties();
+    ListIterator<Theme> itr=themes.listIterator(themes.size());
+    while (itr.hasPrevious()) {
+      Properties m=itr.previous().getMessages(baseBundlename,locale);
+      if (m != null) {
+        messages.putAll(m);
+      }
     }
+    this.messages.putIfAbsent(baseBundlename,new ConcurrentHashMap<Locale,Properties>());
+    this.messages.get(baseBundlename).putIfAbsent(locale,messages);
+    return messages;
   }
-  return messages;
+ else {
+    return messages.get(baseBundlename).get(locale);
+  }
 }

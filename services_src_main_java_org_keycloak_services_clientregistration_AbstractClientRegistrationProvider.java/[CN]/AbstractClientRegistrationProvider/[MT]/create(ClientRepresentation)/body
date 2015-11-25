@@ -1,0 +1,22 @@
+{
+  event.event(EventType.CLIENT_REGISTER);
+  auth.requireCreate();
+  try {
+    ClientModel clientModel=RepresentationToModel.createClient(session,session.getContext().getRealm(),client,true);
+    if (client.getClientId() == null) {
+      clientModel.setClientId(clientModel.getId());
+    }
+    client=ModelToRepresentation.toRepresentation(clientModel);
+    String registrationAccessToken=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,clientModel);
+    client.setRegistrationAccessToken(registrationAccessToken);
+    if (auth.isInitialAccessToken()) {
+      ClientInitialAccessModel initialAccessModel=auth.getInitialAccessModel();
+      initialAccessModel.decreaseRemainingCount();
+    }
+    event.client(client.getClientId()).success();
+    return client;
+  }
+ catch (  ModelDuplicateException e) {
+    throw new ErrorResponseException(ErrorCodes.INVALID_CLIENT_METADATA,"Client Identifier in use",Response.Status.BAD_REQUEST);
+  }
+}

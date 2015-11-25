@@ -13,33 +13,78 @@
     postBinding=true;
     holder=extractPostBindingResponse(samlResponse);
   }
-  StatusResponseType statusResponse=(StatusResponseType)holder.getSamlObject();
+  final StatusResponseType statusResponse=(StatusResponseType)holder.getSamlObject();
   if (!requestUri.equals(statusResponse.getDestination())) {
     log.error("Request URI does not match SAML request destination");
     return AuthOutcome.FAILED;
   }
   if (statusResponse instanceof ResponseType) {
-    if (deployment.getIDP().getSingleSignOnService().validateResponseSignature()) {
-      try {
-        validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
+    try {
+      if (deployment.getIDP().getSingleSignOnService().validateResponseSignature()) {
+        try {
+          validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
+        }
+ catch (        VerificationException e) {
+          log.error("Failed to verify saml response signature",e);
+          challenge=new AuthChallenge(){
+            @Override public boolean challenge(            HttpFacade exchange){
+              SamlAuthenticationError error=new SamlAuthenticationError(SamlAuthenticationError.Reason.INVALID_SIGNATURE);
+              exchange.getRequest().setError(error);
+              exchange.getResponse().sendError(403);
+              return true;
+            }
+            @Override public int getResponseCode(){
+              return 403;
+            }
+          }
+;
+          return AuthOutcome.FAILED;
+        }
       }
- catch (      VerificationException e) {
-        log.error("Failed to verify saml response signature",e);
-        return AuthOutcome.FAILED;
-      }
+      return handleLoginResponse((ResponseType)statusResponse);
     }
-    return handleLoginResponse((ResponseType)statusResponse);
+  finally {
+      sessionStore.setCurrentAction(SamlSessionStore.CurrentAction.NONE);
+    }
   }
  else {
-    if (deployment.getIDP().getSingleLogoutService().validateResponseSignature()) {
+    if (sessionStore.isLoggingOut()) {
       try {
-        validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
+        if (deployment.getIDP().getSingleLogoutService().validateResponseSignature()) {
+          try {
+            validateSamlSignature(holder,postBinding,GeneralConstants.SAML_RESPONSE_KEY);
+          }
+ catch (          VerificationException e) {
+            log.error("Failed to verify saml response signature",e);
+            return AuthOutcome.FAILED;
+          }
+        }
+        return handleLogoutResponse(holder,statusResponse,relayState);
       }
- catch (      VerificationException e) {
-        log.error("Failed to verify saml response signature",e);
-        return AuthOutcome.FAILED;
+  finally {
+        sessionStore.setCurrentAction(SamlSessionStore.CurrentAction.NONE);
       }
     }
-    return handleLogoutResponse(holder,statusResponse,relayState);
+ else     if (sessionStore.isLoggingIn()) {
+      try {
+        challenge=new AuthChallenge(){
+          @Override public boolean challenge(          HttpFacade exchange){
+            SamlAuthenticationError error=new SamlAuthenticationError(SamlAuthenticationError.Reason.ERROR_STATUS,statusResponse);
+            exchange.getRequest().setError(error);
+            exchange.getResponse().sendError(403);
+            return true;
+          }
+          @Override public int getResponseCode(){
+            return 403;
+          }
+        }
+;
+        return AuthOutcome.FAILED;
+      }
+  finally {
+        sessionStore.setCurrentAction(SamlSessionStore.CurrentAction.NONE);
+      }
+    }
+    return AuthOutcome.NOT_ATTEMPTED;
   }
 }

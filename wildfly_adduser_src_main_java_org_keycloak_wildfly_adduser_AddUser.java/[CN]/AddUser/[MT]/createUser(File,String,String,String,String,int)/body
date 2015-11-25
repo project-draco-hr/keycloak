@@ -1,0 +1,78 @@
+{
+  List<RealmRepresentation> realms;
+  if (addUserFile.isFile()) {
+    realms=JsonSerialization.readValue(new FileInputStream(addUserFile),new TypeReference<List<RealmRepresentation>>(){
+    }
+);
+  }
+ else {
+    realms=new LinkedList<>();
+  }
+  if (realmName == null) {
+    realmName="master";
+  }
+  RealmRepresentation realm=null;
+  for (  RealmRepresentation r : realms) {
+    if (r.getRealm().equals(realmName)) {
+      realm=r;
+    }
+  }
+  if (realm == null) {
+    realm=new RealmRepresentation();
+    realm.setRealm(realmName);
+    realms.add(realm);
+    realm.setUsers(new LinkedList<UserRepresentation>());
+  }
+  for (  UserRepresentation u : realm.getUsers()) {
+    if (u.getUsername().equals(userName)) {
+      throw new Exception("User with username '" + userName + "' already added to '"+ addUserFile+ "'");
+    }
+  }
+  UserRepresentation user=new UserRepresentation();
+  user.setEnabled(true);
+  user.setUsername(userName);
+  user.setCredentials(new LinkedList<CredentialRepresentation>());
+  byte[] salt=Pbkdf2PasswordEncoder.getSalt();
+  iterations=iterations > 0 ? iterations : DEFAULT_HASH_ITERATIONS;
+  CredentialRepresentation credentials=new CredentialRepresentation();
+  credentials.setType(CredentialRepresentation.PASSWORD);
+  credentials.setHashIterations(iterations);
+  credentials.setSalt(Base64.encodeBytes(salt));
+  credentials.setHashedSaltedValue(new Pbkdf2PasswordEncoder(salt).encode(password,iterations));
+  user.getCredentials().add(credentials);
+  String[] roles;
+  if (rolesString != null) {
+    roles=rolesString.split(",");
+  }
+ else {
+    if (realmName.equals("master")) {
+      roles=new String[]{"admin"};
+    }
+ else {
+      roles=new String[]{"realm-management/realm-admin"};
+    }
+  }
+  for (  String r : roles) {
+    if (r.indexOf('/') != -1) {
+      String[] cr=r.split("/");
+      String client=cr[0];
+      String clientRole=cr[1];
+      if (user.getClientRoles() == null) {
+        user.setClientRoles(new HashMap<String,List<String>>());
+      }
+      if (user.getClientRoles().get(client) == null) {
+        user.getClientRoles().put(client,new LinkedList<String>());
+      }
+      user.getClientRoles().get(client).add(clientRole);
+    }
+ else {
+      if (user.getRealmRoles() == null) {
+        user.setRealmRoles(new LinkedList<String>());
+      }
+      user.getRealmRoles().add(r);
+    }
+  }
+  realm.getUsers().add(user);
+  JsonSerialization.writeValuePrettyToStream(new FileOutputStream(addUserFile),realms);
+  System.out.println("Added '" + userName + "' to '"+ addUserFile+ "', restart server to load user");
+}

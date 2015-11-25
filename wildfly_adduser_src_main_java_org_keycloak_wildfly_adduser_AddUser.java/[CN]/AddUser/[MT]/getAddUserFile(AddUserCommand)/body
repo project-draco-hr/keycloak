@@ -1,0 +1,36 @@
+{
+  File configDir;
+  if (command.isDomain()) {
+    if (command.getDc() != null) {
+      configDir=new File(command.getDc());
+    }
+ else     if (System.getProperty("jboss.domain.config.user.dir") != null) {
+      configDir=new File(System.getProperty("jboss.domain.config.user.dir"));
+    }
+ else     if (System.getenv("JBOSS_HOME") != null) {
+      configDir=new File(System.getenv("JBOSS_HOME") + File.separator + "domain"+ File.separator+ "configuration");
+    }
+ else {
+      throw new Exception("Could not find domain configuration directory");
+    }
+  }
+ else {
+    if (command.getSc() != null) {
+      configDir=new File(command.getSc());
+    }
+ else     if (System.getProperty("jboss.server.config.user.dir") != null) {
+      configDir=new File(System.getProperty("jboss.server.config.user.dir"));
+    }
+ else     if (System.getenv("JBOSS_HOME") != null) {
+      configDir=new File(System.getenv("JBOSS_HOME") + File.separator + "standalone"+ File.separator+ "configuration");
+    }
+ else {
+      throw new Exception("Could not find standalone configuration directory");
+    }
+  }
+  if (!configDir.isDirectory()) {
+    throw new Exception("'" + configDir + "' does not exist or is not a directory");
+  }
+  File addUserFile=new File(configDir,"keycloak-add-user.json");
+  return addUserFile;
+}

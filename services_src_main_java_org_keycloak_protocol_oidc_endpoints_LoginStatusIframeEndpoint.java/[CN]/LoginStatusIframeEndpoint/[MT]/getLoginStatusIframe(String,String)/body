@@ -1,10 +1,13 @@
 {
+  if (client_id == null || origin == null) {
+    throw new WebApplicationException(Response.Status.BAD_REQUEST);
+  }
   if (!UriUtils.isOrigin(origin)) {
-    throw new BadRequestException("Invalid origin");
+    throw new WebApplicationException(Response.Status.BAD_REQUEST);
   }
   ClientModel client=realm.getClientByClientId(client_id);
   if (client == null) {
-    throw new NotFoundException("could not find client");
+    throw new WebApplicationException(Response.Status.BAD_REQUEST);
   }
   InputStream is=getClass().getClassLoader().getResourceAsStream("login-status-iframe.html");
   if (is == null)   throw new NotFoundException("Could not find login-status-iframe.html ");
@@ -26,7 +29,7 @@
     }
   }
   if (!valid) {
-    throw new BadRequestException("Invalid origin");
+    throw new WebApplicationException(Response.Status.BAD_REQUEST);
   }
   try {
     String file=StreamUtil.readString(is);
@@ -37,6 +40,6 @@
     return Response.ok(file).cacheControl(cacheControl).build();
   }
  catch (  IOException e) {
-    throw new RuntimeException(e);
+    throw new WebApplicationException(e,Response.Status.BAD_REQUEST);
   }
 }

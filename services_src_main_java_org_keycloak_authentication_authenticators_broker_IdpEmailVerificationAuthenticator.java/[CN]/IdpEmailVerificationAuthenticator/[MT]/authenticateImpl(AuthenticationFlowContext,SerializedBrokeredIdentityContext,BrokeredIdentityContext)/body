@@ -14,7 +14,7 @@
   EventBuilder event=context.getEvent().clone().event(EventType.SEND_IDENTITY_PROVIDER_LINK).user(existingUser).detail(Details.USERNAME,existingUser.getUsername()).detail(Details.EMAIL,existingUser.getEmail()).detail(Details.CODE_ID,clientSession.getId()).removeDetail(Details.AUTH_METHOD).removeDetail(Details.AUTH_TYPE);
   long expiration=TimeUnit.SECONDS.toMinutes(context.getRealm().getAccessCodeLifespanUserAction());
   try {
-    context.getSession().getProvider(EmailProvider.class).setRealm(realm).setUser(existingUser).setAttribute(EmailProvider.IDENTITY_PROVIDER_BROKER_CONTEXT,brokerContext).sendConfirmIdentityBrokerLink(link,expiration);
+    context.getSession().getProvider(EmailTemplateProvider.class).setRealm(realm).setUser(existingUser).setAttribute(EmailTemplateProvider.IDENTITY_PROVIDER_BROKER_CONTEXT,brokerContext).sendConfirmIdentityBrokerLink(link,expiration);
     event.success();
   }
  catch (  EmailException e) {

@@ -25,7 +25,7 @@ builder.queryParam(OAuth2Constants.CODE,accessCode);
 builder.queryParam(Constants.KEY,clientSession.getNote(Constants.VERIFY_EMAIL_KEY));
 String link=builder.build(realm.getName()).toString();
 long expiration=TimeUnit.SECONDS.toMinutes(realm.getAccessCodeLifespanUserAction());
-session.getProvider(EmailProvider.class).setRealm(realm).setUser(user).sendVerifyEmail(link,expiration);
+session.getProvider(EmailTemplateProvider.class).setRealm(realm).setUser(user).sendVerifyEmail(link,expiration);
 }
  catch (EmailException e) {
 logger.error("Failed to send verification email",e);

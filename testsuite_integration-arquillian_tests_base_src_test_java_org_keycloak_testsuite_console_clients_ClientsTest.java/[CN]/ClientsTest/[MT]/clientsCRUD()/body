@@ -1,0 +1,13 @@
+{
+  clientsPage.table().createClient();
+  assertCurrentUrlEquals(createClientPage);
+  clientsPage.navigateTo();
+  clientsPage.table().editClient(TEST_CLIENT_ID);
+  assertEquals(TEST_CLIENT_ID,clientSettingsPage.form().getClientId());
+  clientsPage.navigateTo();
+  clientsPage.table().deleteClient(TEST_CLIENT_ID);
+  modalDialog.confirmDeletion();
+  assertFlashMessageSuccess();
+  ClientRepresentation found=findClientRepByClientId(TEST_CLIENT_ID);
+  assertNull("Deleted client " + TEST_CLIENT_ID + " was found.",found);
+}

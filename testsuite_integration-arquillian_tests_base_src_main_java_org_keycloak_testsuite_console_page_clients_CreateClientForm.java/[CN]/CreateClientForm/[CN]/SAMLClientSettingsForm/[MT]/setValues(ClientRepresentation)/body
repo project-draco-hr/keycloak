@@ -1,0 +1,23 @@
+{
+  waitAjaxForElementVisible(fineGrainCollapsor);
+  Map<String,String> attributes=client.getAttributes();
+  samlAuthnStatement.setOn("true".equals(attributes.get(SAML_AUTHNSTATEMENT)));
+  samlServerSignature.setOn("true".equals(attributes.get(SAML_SERVER_SIGNATURE)));
+  samlAssertionSignature.setOn("true".equals(attributes.get(SAML_ASSERTION_SIGNATURE)));
+  if (samlServerSignature.isOn() || samlAssertionSignature.isOn()) {
+    signatureAlgorithm.selectByVisibleText(attributes.get(SAML_SIGNATURE_ALGORITHM));
+    canonicalization.selectByValue("string:" + attributes.get(SAML_SIGNATURE_CANONICALIZATION_METHOD));
+  }
+  samlEncrypt.setOn("true".equals(attributes.get(SAML_ENCRYPT)));
+  samlClientSignature.setOn("true".equals(attributes.get(SAML_CLIENT_SIGNATURE)));
+  samlForcePostBinding.setOn("true".equals(attributes.get(SAML_FORCE_POST_BINDING)));
+  frontchannelLogout.setOn(client.isFrontchannelLogout());
+  samlForceNameIdFormat.setOn("true".equals(attributes.get(SAML_FORCE_NAME_ID_FORMAT)));
+  samlNameIdFormat.selectByVisibleText(attributes.get(SAML_NAME_ID_FORMAT));
+  fineGrainCollapsor.click();
+  waitAjaxForElement(consumerServicePostInput);
+  setInputValue(consumerServicePostInput,attributes.get(SAML_ASSERTION_CONSUMER_URL_POST));
+  setInputValue(consumerServiceRedirectInput,attributes.get(SAML_ASSERTION_CONSUMER_URL_REDIRECT));
+  setInputValue(logoutPostBindingInput,attributes.get(SAML_SINGLE_LOGOUT_SERVICE_URL_POST));
+  setInputValue(logoutRedirectBindingInput,attributes.get(SAML_SINGLE_LOGOUT_SERVICE_URL_REDIRECT));
+}

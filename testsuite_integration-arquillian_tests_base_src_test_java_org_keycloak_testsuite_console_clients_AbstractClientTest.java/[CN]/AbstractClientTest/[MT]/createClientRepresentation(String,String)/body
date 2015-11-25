@@ -11,5 +11,10 @@
   List<String> redirectUrisList=new ArrayList();
   redirectUrisList.addAll(Arrays.asList(redirectUris));
   client.setRedirectUris(redirectUrisList);
+  List<String> webOrigins=new ArrayList<>();
+  for (  String redirectUri : redirectUris) {
+    webOrigins.add(redirectUri.substring(0,redirectUri.indexOf("/",7)));
+  }
+  client.setWebOrigins(webOrigins);
   return client;
 }

@@ -1,0 +1,14 @@
+{
+  newClient=createClientRepresentation("saml","http://example.test/app/*");
+  newClient.setProtocol(SAML);
+  newClient.setFrontchannelLogout(true);
+  newClient.setRedirectUris(null);
+  newClient.setWebOrigins(null);
+  newClient.setAttributes(getSAMLAttributes());
+  createClient(newClient);
+  assertFlashMessageSuccess();
+  ClientRepresentation found=findClientRepByClientId(newClient.getClientId());
+  assertNotNull("Client " + newClient.getClientId() + " was not found.",found);
+  assertClientSettingsEqual(newClient,found);
+  assertClientSamlAttributes(getSAMLAttributes(),found.getAttributes());
+}

@@ -1,0 +1,10 @@
+{
+  generatePrivateKeysPage.setId(clientCredentials.getId());
+  clientCredentials.form().selectSignedJwt();
+  clientCredentials.form().generateNewKeysAndCert();
+  assertCurrentUrlEquals(generatePrivateKeysPage);
+  generatePrivateKeysPage.generateForm().setKeyPassword("pass");
+  generatePrivateKeysPage.generateForm().setStorePassword("pass2");
+  generatePrivateKeysPage.generateForm().clickGenerateAndDownload();
+  assertFlashMessageSuccess();
+}

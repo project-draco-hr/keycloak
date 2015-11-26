@@ -1,7 +1,13 @@
 {
   auth.requireManage();
-  ProtocolMapperModel model=RepresentationToModel.toModel(rep);
-  model=client.addProtocolMapper(model);
-  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
+  ProtocolMapperModel model=null;
+  try {
+    model=RepresentationToModel.toModel(rep);
+    model=client.addProtocolMapper(model);
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
+  }
+ catch (  ModelDuplicateException e) {
+    return ErrorResponse.exists("Protocol mapper exists with same name");
+  }
   return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
 }

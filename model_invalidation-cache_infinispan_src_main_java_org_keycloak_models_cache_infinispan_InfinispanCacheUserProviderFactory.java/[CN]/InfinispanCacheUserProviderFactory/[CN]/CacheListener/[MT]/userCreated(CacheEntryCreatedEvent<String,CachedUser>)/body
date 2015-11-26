@@ -1,19 +1,20 @@
 {
   if (!event.isPre()) {
-    CachedUser cachedUser;
+    CachedUser user;
     if (isNewInfinispan) {
-      cachedUser=event.getValue();
+      user=event.getValue();
     }
  else {
       String userId=event.getKey();
-      cachedUser=event.getCache().get(userId);
+      user=event.getCache().get(userId);
     }
-    if (cachedUser != null) {
-      String realm=cachedUser.getRealm();
-      usernameLookup.put(realm,cachedUser.getUsername(),cachedUser.getId());
-      if (cachedUser.getEmail() != null) {
-        emailLookup.put(realm,cachedUser.getEmail(),cachedUser.getId());
+    if (user != null) {
+      String realm=user.getRealm();
+      usernameLookup.put(realm,user.getUsername(),user.getId());
+      if (user.getEmail() != null) {
+        emailLookup.put(realm,user.getEmail(),user.getId());
       }
+      log.tracev("User added realm={0}, id={1}, username={2}",realm,event.getValue().getId(),event.getValue().getUsername());
     }
   }
 }

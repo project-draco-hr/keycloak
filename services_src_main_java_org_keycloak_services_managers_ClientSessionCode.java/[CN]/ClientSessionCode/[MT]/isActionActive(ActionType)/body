@@ -1,0 +1,18 @@
+{
+  int timestamp=clientSession.getTimestamp();
+  int lifespan;
+switch (actionType) {
+case CLIENT:
+    lifespan=realm.getAccessCodeLifespan();
+  break;
+case LOGIN:
+lifespan=realm.getAccessCodeLifespanLogin() > 0 ? realm.getAccessCodeLifespanLogin() : realm.getAccessCodeLifespanUserAction();
+break;
+case USER:
+lifespan=realm.getAccessCodeLifespanUserAction();
+break;
+default :
+throw new IllegalArgumentException();
+}
+return timestamp + lifespan > Time.currentTime();
+}

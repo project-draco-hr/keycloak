@@ -3,7 +3,7 @@
   try {
     input=new JWSInput(token);
   }
- catch (  Exception e) {
+ catch (  JWSInputException e) {
     throw new ForbiddenException(e);
   }
   if (!RSAProvider.verify(input,realm.getPublicKey())) {
@@ -13,7 +13,7 @@
   try {
     jwt=input.readJsonContent(JsonWebToken.class);
   }
- catch (  IOException e) {
+ catch (  JWSInputException e) {
     throw new ForbiddenException(e);
   }
   if (!getIssuer(realm,uri).equals(jwt.getIssuer())) {

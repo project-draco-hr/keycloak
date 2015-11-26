@@ -30,11 +30,11 @@ catch (  IOException e) {
   try {
     token=RSATokenVerifier.verifyToken(tokenString,deployment.getRealmKey(),deployment.getRealmInfoUrl());
     if (idTokenString != null) {
-      JWSInput input=new JWSInput(idTokenString);
       try {
+        JWSInput input=new JWSInput(idTokenString);
         idToken=input.readJsonContent(IDToken.class);
       }
- catch (      IOException e) {
+ catch (      JWSInputException e) {
         throw new VerificationException();
       }
     }

@@ -1,12 +1,12 @@
 {
   String tokenString=authManager.extractAuthorizationHeaderToken(headers);
   if (tokenString == null)   throw new UnauthorizedException("Bearer");
-  JWSInput input=new JWSInput(tokenString);
   AccessToken token;
   try {
+    JWSInput input=new JWSInput(tokenString);
     token=input.readJsonContent(AccessToken.class);
   }
- catch (  IOException e) {
+ catch (  JWSInputException e) {
     throw new UnauthorizedException("Bearer token format error");
   }
   String realmName=token.getIssuer().substring(token.getIssuer().lastIndexOf('/') + 1);

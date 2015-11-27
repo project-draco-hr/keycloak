@@ -10,9 +10,9 @@
     accessCode.setAction(ClientSessionModel.Action.CODE_TO_TOKEN.name());
     redirectUri.addParam(OAuth2Constants.CODE,accessCode.getCode());
   }
-  if (responseType.hasResponseType(OIDCResponseType.TOKEN) || responseType.hasResponseType(OIDCResponseType.ID_TOKEN) || responseType.hasResponseType(OIDCResponseType.REFRESH_TOKEN)) {
+  if (responseType.isImplicitOrHybridFlow()) {
     TokenManager tokenManager=new TokenManager();
-    AccessTokenResponse res=tokenManager.responseBuilder(realm,clientSession.getClient(),event,session,userSession,clientSession).generateAccessToken().generateRefreshToken().generateIDToken().build();
+    AccessTokenResponse res=tokenManager.responseBuilder(realm,clientSession.getClient(),event,session,userSession,clientSession).generateAccessToken().generateIDToken().build();
     if (responseType.hasResponseType(OIDCResponseType.ID_TOKEN)) {
       redirectUri.addParam("id_token",res.getIdToken());
     }
@@ -21,10 +21,6 @@
       redirectUri.addParam("token_type",res.getTokenType());
       redirectUri.addParam("session-state",res.getSessionState());
       redirectUri.addParam("expires_in",String.valueOf(res.getExpiresIn()));
-    }
-    if (responseType.hasResponseType(OIDCResponseType.REFRESH_TOKEN)) {
-      redirectUri.addParam("refresh_token",res.getRefreshToken());
-      redirectUri.addParam("refresh_expires_in",String.valueOf(res.getRefreshExpiresIn()));
     }
     redirectUri.addParam("not-before-policy",String.valueOf(res.getNotBeforePolicy()));
   }

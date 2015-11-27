@@ -12,8 +12,9 @@
   if (session != null) {
     token.setSessionState(session.getId());
   }
-  if (realm.getAccessTokenLifespan() > 0) {
-    token.expiration(Time.currentTime() + realm.getAccessTokenLifespan());
+  int tokenLifespan=getTokenLifespan(realm,clientSession);
+  if (tokenLifespan > 0) {
+    token.expiration(Time.currentTime() + tokenLifespan);
   }
   Set<String> allowedOrigins=client.getWebOrigins();
   if (allowedOrigins != null) {

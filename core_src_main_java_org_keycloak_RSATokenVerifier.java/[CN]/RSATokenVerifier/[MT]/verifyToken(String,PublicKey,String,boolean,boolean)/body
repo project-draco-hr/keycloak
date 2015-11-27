@@ -3,7 +3,7 @@
   try {
     input=new JWSInput(tokenString);
   }
- catch (  Exception e) {
+ catch (  JWSInputException e) {
     throw new VerificationException("Couldn't parse token",e);
   }
   if (!isPublicKeyValid(input,realmKey))   throw new VerificationException("Invalid token signature.");
@@ -11,7 +11,7 @@
   try {
     token=input.readJsonContent(AccessToken.class);
   }
- catch (  IOException e) {
+ catch (  JWSInputException e) {
     throw new VerificationException("Couldn't parse token signature",e);
   }
   String user=token.getSubject();

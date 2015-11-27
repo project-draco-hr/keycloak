@@ -17,11 +17,11 @@
     AccessToken accessToken=RSATokenVerifier.verifyToken(accessTokenString,deployment.getRealmKey(),deployment.getRealmInfoUrl(),false,true);
     IDToken idToken;
     if (idTokenString != null && idTokenString.length() > 0) {
-      JWSInput input=new JWSInput(idTokenString);
       try {
+        JWSInput input=new JWSInput(idTokenString);
         idToken=input.readJsonContent(IDToken.class);
       }
- catch (      IOException e) {
+ catch (      JWSInputException e) {
         throw new VerificationException(e);
       }
     }

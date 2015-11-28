@@ -9,13 +9,28 @@
     }
   }
   event.detail(Details.RESPONSE_TYPE,responseType);
-  if (responseType.equals(OAuth2Constants.CODE)) {
+  try {
+    parsedResponseType=OIDCResponseType.parse(responseType);
     if (action == null) {
       action=Action.CODE;
     }
   }
- else {
+ catch (  IllegalArgumentException iae) {
+    logger.error(iae.getMessage());
     event.error(Errors.INVALID_REQUEST);
     throw new ErrorPageException(session,Messages.INVALID_PARAMETER,OIDCLoginProtocol.RESPONSE_TYPE_PARAM);
+  }
+  try {
+    OIDCResponseMode parsedResponseMode=OIDCResponseMode.parse(responseMode,parsedResponseType);
+    event.detail(Details.RESPONSE_MODE,parsedResponseMode.toString().toLowerCase());
+    if (parsedResponseType.isImplicitOrHybridFlow() && parsedResponseMode == OIDCResponseMode.QUERY) {
+      logger.error("Response_mode 'query' not allowed for implicit or hybrid flow");
+      event.error(Errors.INVALID_REQUEST);
+      throw new ErrorPageException(session,Messages.INVALID_PARAMETER,OIDCLoginProtocol.RESPONSE_MODE_PARAM);
+    }
+  }
+ catch (  IllegalArgumentException iae) {
+    event.error(Errors.INVALID_REQUEST);
+    throw new ErrorPageException(session,Messages.INVALID_PARAMETER,OIDCLoginProtocol.RESPONSE_MODE_PARAM);
   }
 }

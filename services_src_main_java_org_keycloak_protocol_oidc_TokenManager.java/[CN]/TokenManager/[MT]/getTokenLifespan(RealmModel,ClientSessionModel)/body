@@ -1,0 +1,8 @@
+{
+  boolean implicitFlow=false;
+  String responseType=clientSession.getNote(OIDCLoginProtocol.RESPONSE_TYPE_PARAM);
+  if (responseType != null) {
+    implicitFlow=OIDCResponseType.parse(responseType).isImplicitFlow();
+  }
+  return implicitFlow ? realm.getAccessTokenLifespanForImplicitFlow() : realm.getAccessTokenLifespan();
+}

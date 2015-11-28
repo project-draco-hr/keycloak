@@ -13,9 +13,13 @@
     event.error(Errors.NOT_ALLOWED);
     throw new ErrorPageException(session,Messages.BEARER_ONLY);
   }
-  if (client.isDirectGrantsOnly()) {
+  if ((parsedResponseType.hasResponseType(OIDCResponseType.CODE) || parsedResponseType.hasResponseType(OIDCResponseType.NONE)) && !client.isStandardFlowEnabled()) {
     event.error(Errors.NOT_ALLOWED);
-    throw new ErrorPageException(session,Messages.DIRECT_GRANTS_ONLY);
+    throw new ErrorPageException(session,Messages.STANDARD_FLOW_DISABLED);
+  }
+  if (parsedResponseType.isImplicitOrHybridFlow() && !client.isImplicitFlowEnabled()) {
+    event.error(Errors.NOT_ALLOWED);
+    throw new ErrorPageException(session,Messages.IMPLICIT_FLOW_DISABLED);
   }
   session.getContext().setClient(client);
 }

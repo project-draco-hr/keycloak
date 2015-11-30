@@ -1,0 +1,8 @@
+{
+  OIDCClientRepresentation response=create();
+  reg.auth(Auth.token(response));
+  response.setRedirectUris(Collections.singletonList("http://newredirect"));
+  OIDCClientRepresentation updated=reg.oidc().update(response);
+  assertEquals(1,updated.getRedirectUris().size());
+  assertEquals("http://newredirect",updated.getRedirectUris().get(0));
+}

@@ -1,0 +1,26 @@
+{
+  log.info("add new flow");
+  flowsPage.clickNew();
+  createFlowPage.form().setValues("testFlow","testDesc",CreateFlowForm.FlowType.GENERIC);
+  assertEquals("Success! Flow Created.",createFlowPage.getSuccessMessage());
+  log.debug("new flow created via UI");
+  log.info("check if test flow is created via rest");
+  log.debug("checked");
+  log.debug("check if testFlow is selected in UI");
+  assertEquals("TestFlow",flowsPage.getFlowSelectValue());
+  log.info("add new execution flow within testFlow");
+  flowsPage.clickAddFlow();
+  createFlowPage.form().setValues("testExecutionFlow","executionDesc",CreateFlowForm.FlowType.GENERIC);
+  assertEquals("Success! Flow Created.",createFlowPage.getSuccessMessage());
+  log.debug("new execution flow created via UI");
+  log.info("check if execution flow is created via rest");
+  log.debug("checked");
+  log.debug("check if testFlow is selected in UI");
+  assertEquals("TestFlow",flowsPage.getFlowSelectValue());
+  log.info("delete test flow");
+  flowsPage.clickDelete();
+  assertEquals("Success! Flow removed",createFlowPage.getSuccessMessage());
+  log.debug("test flow removed via UI");
+  log.info("check if both test flow and execution flow is removed via rest");
+  log.debug("checked");
+}

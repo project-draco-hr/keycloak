@@ -11,6 +11,9 @@
     registerNotifications(securityContext);
     return AuthenticationMechanismOutcome.AUTHENTICATED;
   }
+  if (outcome == AuthOutcome.NOT_AUTHENTICATED) {
+    return AuthenticationMechanismOutcome.NOT_ATTEMPTED;
+  }
   if (outcome == AuthOutcome.LOGGED_OUT) {
     securityContext.logout();
     if (deployment.getLogoutPage() != null) {

@@ -1,0 +1,12 @@
+{
+  event.event(EventType.CLIENT_INFO);
+  ClientModel client=session.getContext().getRealm().getClientByClientId(clientId);
+  auth.requireView(client);
+  ClientRepresentation rep=ModelToRepresentation.toRepresentation(client);
+  if (auth.isRegistrationAccessToken()) {
+    String registrationAccessToken=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,client);
+    rep.setRegistrationAccessToken(registrationAccessToken);
+  }
+  event.client(client.getClientId()).success();
+  return rep;
+}

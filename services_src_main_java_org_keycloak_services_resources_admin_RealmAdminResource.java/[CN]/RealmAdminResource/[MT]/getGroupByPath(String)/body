@@ -1,0 +1,8 @@
+{
+  this.auth.requireView();
+  GroupModel found=KeycloakModelUtils.findGroupByPath(realm,path);
+  if (found == null) {
+    throw new NotFoundException("Group path does not exist");
+  }
+  return ModelToRepresentation.toGroupHierarchy(found,true);
+}

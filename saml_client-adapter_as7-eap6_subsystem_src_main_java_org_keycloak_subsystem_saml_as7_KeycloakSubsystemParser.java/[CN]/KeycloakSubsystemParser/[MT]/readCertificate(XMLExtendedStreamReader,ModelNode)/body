@@ -1,0 +1,15 @@
+{
+  for (int i=0; i < reader.getAttributeCount(); i++) {
+    String name=reader.getAttributeLocalName(i);
+    String value=reader.getAttributeValue(i);
+    SimpleAttributeDefinition attr=KeyStoreCertificateDefinition.lookup(name);
+    if (attr == null) {
+      throw ParseUtils.unexpectedAttribute(reader,i);
+    }
+    attr.parseAndSetParameter(value,addKeyStore,reader);
+  }
+  if (!addKeyStore.hasDefined(Constants.Model.CERTIFICATE_ALIAS)) {
+    throw ParseUtils.missingRequired(reader,Constants.XML.CERTIFICATE_ALIAS);
+  }
+  ParseUtils.requireNoContent(reader);
+}

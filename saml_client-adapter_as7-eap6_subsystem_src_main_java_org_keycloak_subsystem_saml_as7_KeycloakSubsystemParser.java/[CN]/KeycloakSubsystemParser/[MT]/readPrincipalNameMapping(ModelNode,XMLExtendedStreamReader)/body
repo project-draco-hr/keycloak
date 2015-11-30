@@ -1,0 +1,21 @@
+{
+  boolean policySet=false;
+  for (int i=0; i < reader.getAttributeCount(); i++) {
+    String name=reader.getAttributeLocalName(i);
+    String value=reader.getAttributeValue(i);
+    if (Constants.XML.PRINCIPAL_NAME_MAPPING_POLICY.equals(name)) {
+      policySet=true;
+      ServiceProviderDefinition.PRINCIPAL_NAME_MAPPING_POLICY.parseAndSetParameter(value,addServiceProvider,reader);
+    }
+ else     if (Constants.XML.PRINCIPAL_NAME_MAPPING_ATTRIBUTE_NAME.equals(name)) {
+      ServiceProviderDefinition.PRINCIPAL_NAME_MAPPING_ATTRIBUTE_NAME.parseAndSetParameter(value,addServiceProvider,reader);
+    }
+ else {
+      throw ParseUtils.unexpectedAttribute(reader,i);
+    }
+  }
+  if (!policySet) {
+    throw ParseUtils.missingRequired(reader,Constants.XML.PRINCIPAL_NAME_MAPPING_POLICY);
+  }
+  ParseUtils.requireNoContent(reader);
+}

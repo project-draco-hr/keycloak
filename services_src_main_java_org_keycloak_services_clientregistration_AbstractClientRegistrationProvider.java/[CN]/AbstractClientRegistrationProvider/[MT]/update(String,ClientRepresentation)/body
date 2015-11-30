@@ -1,0 +1,16 @@
+{
+  event.event(EventType.CLIENT_UPDATE).client(clientId);
+  ClientModel client=session.getContext().getRealm().getClientByClientId(clientId);
+  auth.requireUpdate(client);
+  if (!client.getClientId().equals(rep.getClientId())) {
+    throw new ErrorResponseException(ErrorCodes.INVALID_CLIENT_METADATA,"Client Identifier modified",Response.Status.BAD_REQUEST);
+  }
+  RepresentationToModel.updateClient(rep,client);
+  rep=ModelToRepresentation.toRepresentation(client);
+  if (auth.isRegistrationAccessToken()) {
+    String registrationAccessToken=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,client);
+    rep.setRegistrationAccessToken(registrationAccessToken);
+  }
+  event.client(client.getClientId()).success();
+  return rep;
+}

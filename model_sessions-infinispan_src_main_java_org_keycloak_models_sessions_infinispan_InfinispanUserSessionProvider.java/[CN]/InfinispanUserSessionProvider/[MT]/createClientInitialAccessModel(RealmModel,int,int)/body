@@ -1,0 +1,12 @@
+{
+  String id=KeycloakModelUtils.generateId();
+  ClientInitialAccessEntity entity=new ClientInitialAccessEntity();
+  entity.setId(id);
+  entity.setRealm(realm.getId());
+  entity.setTimestamp(Time.currentTime());
+  entity.setExpiration(expiration);
+  entity.setCount(count);
+  entity.setRemainingCount(count);
+  tx.put(sessionCache,id,entity);
+  return wrap(realm,entity);
+}

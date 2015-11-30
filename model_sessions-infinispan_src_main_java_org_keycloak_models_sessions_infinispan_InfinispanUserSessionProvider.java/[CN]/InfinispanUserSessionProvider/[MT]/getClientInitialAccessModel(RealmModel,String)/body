@@ -1,0 +1,8 @@
+{
+  Cache<String,SessionEntity> cache=getCache(false);
+  ClientInitialAccessEntity entity=(ClientInitialAccessEntity)cache.get(id);
+  if (entity == null) {
+    entity=(ClientInitialAccessEntity)tx.get(cache,id);
+  }
+  return wrap(realm,entity);
+}

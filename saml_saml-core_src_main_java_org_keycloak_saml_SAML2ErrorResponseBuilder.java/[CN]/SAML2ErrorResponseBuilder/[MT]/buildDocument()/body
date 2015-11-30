@@ -1,17 +1,18 @@
 {
-  Document samlResponse=null;
-  ResponseType responseType=null;
-  SAML2Response saml2Response=new SAML2Response();
-  String id=IDGenerator.create("ID_");
-  IssuerInfoHolder issuerHolder=new IssuerInfoHolder(issuer);
-  issuerHolder.setStatusCode(status);
-  IDPInfoHolder idp=new IDPInfoHolder();
-  idp.setNameIDFormatValue(null);
-  idp.setNameIDFormat(JBossSAMLURIConstants.NAMEID_FORMAT_PERSISTENT.get());
-  SPInfoHolder sp=new SPInfoHolder();
-  sp.setResponseDestinationURI(destination);
-  responseType=saml2Response.createResponseType(id);
-  responseType.setStatus(JBossSAMLAuthnResponseFactory.createStatusTypeForResponder(status));
-  responseType.setDestination(destination);
-  return samlResponse;
+  try {
+    StatusResponseType statusResponse=new StatusResponseType(IDGenerator.create("ID_"),XMLTimeUtil.getIssueInstant());
+    statusResponse.setStatus(JBossSAMLAuthnResponseFactory.createStatusTypeForResponder(status));
+    NameIDType issuer=new NameIDType();
+    issuer.setValue(this.issuer);
+    statusResponse.setIssuer(issuer);
+    statusResponse.setDestination(destination);
+    SAML2Response saml2Response=new SAML2Response();
+    return saml2Response.convert(statusResponse);
+  }
+ catch (  ConfigurationException e) {
+    throw new ProcessingException(e);
+  }
+catch (  ParsingException e) {
+    throw new ProcessingException(e);
+  }
 }

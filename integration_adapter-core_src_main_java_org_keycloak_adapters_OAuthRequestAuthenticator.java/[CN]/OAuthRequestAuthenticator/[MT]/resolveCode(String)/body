@@ -1,7 +1,7 @@
 {
   if (!isRequestSecure() && deployment.getSslRequired().isRequired(facade.getRequest().getRemoteAddr())) {
     log.error("Adapter requires SSL. Request: " + facade.getRequest().getURI());
-    return challenge(403);
+    return challenge(403,OIDCAuthenticationError.Reason.SSL_REQUIRED,null);
   }
   log.debug("checking state cookie for after code");
   AuthChallenge challenge=checkStateCookie();
@@ -18,11 +18,11 @@
     if (failure.getStatus() == 400 && failure.getError() != null) {
       log.error("   " + failure.getError());
     }
-    return challenge(403);
+    return challenge(403,OIDCAuthenticationError.Reason.CODE_TO_TOKEN_FAILURE,null);
   }
 catch (  IOException e) {
     log.error("failed to turn code into token",e);
-    return challenge(403);
+    return challenge(403,OIDCAuthenticationError.Reason.CODE_TO_TOKEN_FAILURE,null);
   }
   tokenString=tokenResponse.getToken();
   refreshToken=tokenResponse.getRefreshToken();
@@ -30,11 +30,11 @@ catch (  IOException e) {
   try {
     token=RSATokenVerifier.verifyToken(tokenString,deployment.getRealmKey(),deployment.getRealmInfoUrl());
     if (idTokenString != null) {
-      JWSInput input=new JWSInput(idTokenString);
       try {
+        JWSInput input=new JWSInput(idTokenString);
         idToken=input.readJsonContent(IDToken.class);
       }
- catch (      IOException e) {
+ catch (      JWSInputException e) {
         throw new VerificationException();
       }
     }
@@ -42,14 +42,14 @@ catch (  IOException e) {
   }
  catch (  VerificationException e) {
     log.error("failed verification of token: " + e.getMessage());
-    return challenge(403);
+    return challenge(403,OIDCAuthenticationError.Reason.INVALID_TOKEN,null);
   }
   if (tokenResponse.getNotBeforePolicy() > deployment.getNotBefore()) {
     deployment.setNotBefore(tokenResponse.getNotBeforePolicy());
   }
   if (token.getIssuedAt() < deployment.getNotBefore()) {
     log.error("Stale token");
-    return challenge(403);
+    return challenge(403,OIDCAuthenticationError.Reason.STALE_TOKEN,null);
   }
   log.debug("successful authenticated");
   return null;

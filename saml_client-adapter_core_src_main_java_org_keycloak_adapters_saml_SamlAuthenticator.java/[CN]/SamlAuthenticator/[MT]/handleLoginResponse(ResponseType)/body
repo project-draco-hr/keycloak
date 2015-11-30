@@ -7,8 +7,19 @@
     }
   }
  catch (  Exception e) {
-    log.error("Error extracting SAML assertion, e");
-    return AuthOutcome.FAILED;
+    log.error("Error extracting SAML assertion: " + e.getMessage());
+    challenge=new AuthChallenge(){
+      @Override public boolean challenge(      HttpFacade exchange){
+        SamlAuthenticationError error=new SamlAuthenticationError(SamlAuthenticationError.Reason.EXTRACTION_FAILURE);
+        exchange.getRequest().setError(error);
+        exchange.getResponse().sendError(403);
+        return true;
+      }
+      @Override public int getResponseCode(){
+        return 403;
+      }
+    }
+;
   }
   SubjectType subject=assertion.getSubject();
   SubjectType.STSubType subType=subject.getSubType();
@@ -68,7 +79,9 @@
       break;
     }
   }
-  final SamlPrincipal principal=new SamlPrincipal(principalName,principalName,subjectNameID.getFormat().toString(),attributes,friendlyAttributes);
+  URI nameFormat=subjectNameID.getFormat();
+  String nameFormatString=nameFormat == null ? JBossSAMLURIConstants.NAMEID_FORMAT_UNSPECIFIED.get() : nameFormat.toString();
+  final SamlPrincipal principal=new SamlPrincipal(assertion,principalName,principalName,nameFormatString,attributes,friendlyAttributes);
   String index=authn == null ? null : authn.getSessionIndex();
   final String sessionIndex=index;
   SamlSession account=new SamlSession(principal,roles,sessionIndex);

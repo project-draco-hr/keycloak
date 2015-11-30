@@ -1,0 +1,39 @@
+{
+  GroupModel newGroup=realm.createGroup(group.getId(),group.getName());
+  if (group.getAttributes() != null) {
+    for (    Map.Entry<String,List<String>> attr : group.getAttributes().entrySet()) {
+      newGroup.setAttribute(attr.getKey(),attr.getValue());
+    }
+  }
+  realm.moveGroup(newGroup,parent);
+  if (group.getRealmRoles() != null) {
+    for (    String roleString : group.getRealmRoles()) {
+      RoleModel role=realm.getRole(roleString.trim());
+      if (role == null) {
+        role=realm.addRole(roleString.trim());
+      }
+      newGroup.grantRole(role);
+    }
+  }
+  if (group.getClientRoles() != null) {
+    for (    Map.Entry<String,List<String>> entry : group.getClientRoles().entrySet()) {
+      ClientModel client=clientMap.get(entry.getKey());
+      if (client == null) {
+        throw new RuntimeException("Unable to find client role mappings for client: " + entry.getKey());
+      }
+      List<String> roleNames=entry.getValue();
+      for (      String roleName : roleNames) {
+        RoleModel role=client.getRole(roleName.trim());
+        if (role == null) {
+          role=client.addRole(roleName.trim());
+        }
+        newGroup.grantRole(role);
+      }
+    }
+  }
+  if (group.getSubGroups() != null) {
+    for (    GroupRepresentation subGroup : group.getSubGroups()) {
+      importGroup(realm,clientMap,newGroup,subGroup);
+    }
+  }
+}

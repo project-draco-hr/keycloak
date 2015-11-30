@@ -1,0 +1,31 @@
+{
+  if (!realm.equals(e.getRealm())) {
+    return;
+  }
+  if (!(e instanceof ClientInitialAccessEntity)) {
+    return;
+  }
+  ClientInitialAccessEntity entity=(ClientInitialAccessEntity)e;
+  boolean include=false;
+  if (expired != null) {
+    if (entity.getRemainingCount() <= 0) {
+      include=true;
+    }
+ else     if (entity.getExpiration() > 0 && (entity.getTimestamp() + entity.getExpiration()) < expired) {
+      include=true;
+    }
+  }
+ else {
+    include=true;
+  }
+  if (include) {
+switch (emit) {
+case KEY:
+      collector.emit(key,key);
+    break;
+case ENTITY:
+  collector.emit(key,entity);
+break;
+}
+}
+}

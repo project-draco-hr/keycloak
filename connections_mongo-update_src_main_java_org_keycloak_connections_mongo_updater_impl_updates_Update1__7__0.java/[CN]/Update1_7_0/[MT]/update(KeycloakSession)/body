@@ -1,0 +1,18 @@
+{
+  DBCollection clients=db.getCollection("clients");
+  DBCursor clientsCursor=clients.find();
+  try {
+    while (clientsCursor.hasNext()) {
+      BasicDBObject client=(BasicDBObject)clientsCursor.next();
+      boolean directGrantsOnly=client.getBoolean("directGrantsOnly",false);
+      client.append("standardFlowEnabled",!directGrantsOnly);
+      client.append("implicitFlowEnabled",false);
+      client.append("directAccessGrantsEnabled",true);
+      client.removeField("directGrantsOnly");
+      clients.save(client);
+    }
+  }
+  finally {
+    clientsCursor.close();
+  }
+}

@@ -1,0 +1,11 @@
+{
+  event.event(EventType.CLIENT_DELETE).client(clientId);
+  ClientModel client=session.getContext().getRealm().getClientByClientId(clientId);
+  auth.requireUpdate(client);
+  if (session.getContext().getRealm().removeClient(client.getId())) {
+    event.client(client.getClientId()).success();
+  }
+ else {
+    throw new ForbiddenException();
+  }
+}

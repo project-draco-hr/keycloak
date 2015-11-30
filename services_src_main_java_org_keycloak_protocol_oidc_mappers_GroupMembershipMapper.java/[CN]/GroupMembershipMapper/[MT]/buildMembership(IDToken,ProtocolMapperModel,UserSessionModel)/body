@@ -1,0 +1,14 @@
+{
+  List<String> membership=new LinkedList<>();
+  boolean fullPath=useFullPath(mappingModel);
+  for (  GroupModel group : userSession.getUser().getGroups()) {
+    if (fullPath) {
+      membership.add(ModelToRepresentation.buildGroupPath(group));
+    }
+ else {
+      membership.add(group.getName());
+    }
+  }
+  String protocolClaim=mappingModel.getConfig().get(OIDCAttributeMapperHelper.TOKEN_CLAIM_NAME);
+  token.getOtherClaims().put(protocolClaim,membership);
+}

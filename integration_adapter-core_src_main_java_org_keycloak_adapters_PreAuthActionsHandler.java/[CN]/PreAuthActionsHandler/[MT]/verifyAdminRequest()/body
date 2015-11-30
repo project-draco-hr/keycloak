@@ -10,17 +10,15 @@
     facade.getResponse().sendError(403,"no token");
     return null;
   }
-  JWSInput input=new JWSInput(token);
-  boolean verified=false;
   try {
-    verified=RSAProvider.verify(input,deployment.getRealmKey());
+    JWSInput input=new JWSInput(token);
+    if (RSAProvider.verify(input,deployment.getRealmKey())) {
+      return input;
+    }
   }
- catch (  Exception ignore) {
+ catch (  JWSInputException ignore) {
   }
-  if (!verified) {
-    log.warn("admin request failed, unable to verify token");
-    facade.getResponse().sendError(403,"no token");
-    return null;
-  }
-  return input;
+  log.warn("admin request failed, unable to verify token");
+  facade.getResponse().sendError(403,"no token");
+  return null;
 }

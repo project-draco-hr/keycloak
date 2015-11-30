@@ -1,11 +1,28 @@
 {
   ClientSessionModel clientSession=accessCode.getClientSession();
+  setupResponseTypeAndMode(clientSession);
   String redirect=clientSession.getRedirectUri();
+  OIDCRedirectUriBuilder redirectUri=OIDCRedirectUriBuilder.fromUri(redirect,responseMode);
   String state=clientSession.getNote(OIDCLoginProtocol.STATE_PARAM);
-  accessCode.setAction(ClientSessionModel.Action.CODE_TO_TOKEN.name());
-  UriBuilder redirectUri=UriBuilder.fromUri(redirect).queryParam(OAuth2Constants.CODE,accessCode.getCode());
   log.debugv("redirectAccessCode: state: {0}",state);
-  if (state != null)   redirectUri.queryParam(OAuth2Constants.STATE,state);
-  Response.ResponseBuilder location=Response.status(302).location(redirectUri.build());
-  return location.build();
+  if (state != null)   redirectUri.addParam(OAuth2Constants.STATE,state);
+  if (responseType.hasResponseType(OIDCResponseType.CODE)) {
+    accessCode.setAction(ClientSessionModel.Action.CODE_TO_TOKEN.name());
+    redirectUri.addParam(OAuth2Constants.CODE,accessCode.getCode());
+  }
+  if (responseType.isImplicitOrHybridFlow()) {
+    TokenManager tokenManager=new TokenManager();
+    AccessTokenResponse res=tokenManager.responseBuilder(realm,clientSession.getClient(),event,session,userSession,clientSession).generateAccessToken().generateIDToken().build();
+    if (responseType.hasResponseType(OIDCResponseType.ID_TOKEN)) {
+      redirectUri.addParam("id_token",res.getIdToken());
+    }
+    if (responseType.hasResponseType(OIDCResponseType.TOKEN)) {
+      redirectUri.addParam("access_token",res.getToken());
+      redirectUri.addParam("token_type",res.getTokenType());
+      redirectUri.addParam("session-state",res.getSessionState());
+      redirectUri.addParam("expires_in",String.valueOf(res.getExpiresIn()));
+    }
+    redirectUri.addParam("not-before-policy",String.valueOf(res.getNotBeforePolicy()));
+  }
+  return redirectUri.build();
 }

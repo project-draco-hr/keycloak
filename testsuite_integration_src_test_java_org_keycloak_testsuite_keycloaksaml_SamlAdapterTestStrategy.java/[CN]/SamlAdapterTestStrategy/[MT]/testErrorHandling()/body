@@ -1,0 +1,20 @@
+{
+  ErrorServlet.authError=null;
+  Client client=ClientBuilder.newClient();
+  Response response=client.target(APP_SERVER_BASE_URL + "/employee-sig/").request().get();
+  response.close();
+  SAML2ErrorResponseBuilder builder=new SAML2ErrorResponseBuilder().destination(APP_SERVER_BASE_URL + "/employee-sig/").issuer(AUTH_SERVER_URL + "/realms/demo").status(JBossSAMLURIConstants.STATUS_REQUEST_DENIED.get());
+  BaseSAML2BindingBuilder binding=new BaseSAML2BindingBuilder().relayState(null);
+  Document document=builder.buildDocument();
+  URI uri=binding.redirectBinding(document).generateURI(APP_SERVER_BASE_URL + "/employee-sig/",false);
+  response=client.target(uri).request().get();
+  String errorPage=response.readEntity(String.class);
+  response.close();
+  Assert.assertTrue(errorPage.contains("Error Page"));
+  client.close();
+  Assert.assertNotNull(ErrorServlet.authError);
+  SamlAuthenticationError error=(SamlAuthenticationError)ErrorServlet.authError;
+  Assert.assertEquals(SamlAuthenticationError.Reason.ERROR_STATUS,error.getReason());
+  Assert.assertNotNull(error.getStatus());
+  ErrorServlet.authError=null;
+}

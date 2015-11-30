@@ -1,0 +1,20 @@
+{
+  AddUser.main(new String[]{"-u","addusertest-admin","-p","password"});
+  Assert.assertEquals(1,dir.listFiles().length);
+  KeycloakServer server=new KeycloakServer();
+  try {
+    server.start();
+    Keycloak keycloak=Keycloak.getInstance("http://localhost:8081/auth","master","addusertest-admin","password",Constants.ADMIN_CONSOLE_CLIENT_ID);
+    keycloak.realms().findAll();
+    RealmRepresentation testRealm=new RealmRepresentation();
+    testRealm.setEnabled(true);
+    testRealm.setId("test");
+    testRealm.setRealm("test");
+    keycloak.realms().create(testRealm);
+    keycloak.close();
+    Assert.assertEquals(0,dir.listFiles().length);
+  }
+  finally {
+    server.stop();
+  }
+}

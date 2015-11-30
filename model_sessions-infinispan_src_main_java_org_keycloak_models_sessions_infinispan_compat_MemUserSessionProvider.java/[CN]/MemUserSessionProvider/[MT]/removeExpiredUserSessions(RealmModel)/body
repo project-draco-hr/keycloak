@@ -33,4 +33,11 @@
       persister.removeClientSession(s.getId(),true);
     }
   }
+  Iterator<ClientInitialAccessEntity> iaitr=clientInitialAccess.values().iterator();
+  while (iaitr.hasNext()) {
+    ClientInitialAccessEntity e=iaitr.next();
+    if (e.getRealmId().equals(realm.getId()) && (e.getExpires() < Time.currentTime())) {
+      iaitr.remove();
+    }
+  }
 }

@@ -38,11 +38,14 @@
   if (challenge != null) {
     log.fine("challenge");
     challenge.challenge(facade);
-    if (challenge.errorPage()) {
-      response.sendError(challenge.getResponseCode());
+    return;
+  }
+  if (deployment.isIsPassive() && outcome == AuthOutcome.NOT_AUTHENTICATED) {
+    log.fine("PASSIVE_NOT_AUTHENTICATED");
+    if (facade.isEnded()) {
       return;
     }
-    log.fine("sending challenge");
+    chain.doFilter(req,res);
     return;
   }
   if (!facade.isEnded()) {

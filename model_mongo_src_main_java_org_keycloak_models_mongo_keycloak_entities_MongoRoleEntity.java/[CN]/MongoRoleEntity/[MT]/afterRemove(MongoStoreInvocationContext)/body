@@ -1,5 +1,12 @@
 {
   MongoStore mongoStore=invContext.getMongoStore();
+{
+    DBObject query=new QueryBuilder().and("roleIds").is(getId()).get();
+    List<MongoGroupEntity> groups=mongoStore.loadEntities(MongoGroupEntity.class,query,invContext);
+    for (    MongoGroupEntity group : groups) {
+      mongoStore.pullItemFromList(group,"roleIds",getId(),invContext);
+    }
+  }
   DBObject query=new QueryBuilder().and("scopeIds").is(getId()).get();
   List<MongoClientEntity> clients=mongoStore.loadEntities(MongoClientEntity.class,query,invContext);
   for (  MongoClientEntity client : clients) {

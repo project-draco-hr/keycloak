@@ -1,0 +1,24 @@
+{
+  level--;
+  if (state != START_ELEMENT) {
+    runAttrQueue();
+    if (state != CHARACTERS || indentEndElement) {
+      nl();
+      indent();
+      indentEndElement=false;
+    }
+    delegate.writeEndElement();
+  }
+ else {
+    ArgRunnable start=attrQueue.poll();
+    if (start == null) {
+      delegate.writeEndElement();
+    }
+ else {
+      start.run(1);
+      runAttrQueue();
+    }
+  }
+  unspecifiedNamespaces.pop();
+  state=END_ELEMENT;
+}

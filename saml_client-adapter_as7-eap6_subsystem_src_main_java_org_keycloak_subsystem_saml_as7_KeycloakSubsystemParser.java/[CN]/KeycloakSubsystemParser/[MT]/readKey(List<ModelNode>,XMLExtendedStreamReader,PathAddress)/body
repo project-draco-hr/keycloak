@@ -1,0 +1,26 @@
+{
+  PathAddress addr=PathAddress.pathAddress(parentAddr,PathElement.pathElement(Constants.Model.KEY,"key-" + list.size()));
+  ModelNode addKey=Util.createAddOperation(addr);
+  list.add(addKey);
+  for (int i=0; i < reader.getAttributeCount(); i++) {
+    String name=reader.getAttributeLocalName(i);
+    String value=reader.getAttributeValue(i);
+    SimpleAttributeDefinition attr=KeyDefinition.lookup(name);
+    if (attr == null) {
+      throw ParseUtils.unexpectedAttribute(reader,i);
+    }
+    attr.parseAndSetParameter(value,addKey,reader);
+  }
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    String tagName=reader.getLocalName();
+    if (Constants.XML.KEY_STORE.equals(tagName)) {
+      readKeyStore(addKey,reader);
+    }
+ else     if (Constants.XML.PRIVATE_KEY_PEM.equals(tagName) || Constants.XML.PUBLIC_KEY_PEM.equals(tagName) || Constants.XML.CERTIFICATE_PEM.equals(tagName)) {
+      readNoAttrElementContent(KeyDefinition.lookupElement(tagName),addKey,reader);
+    }
+ else {
+      throw ParseUtils.unexpectedElement(reader);
+    }
+  }
+}

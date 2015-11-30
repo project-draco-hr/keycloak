@@ -13,7 +13,13 @@
   StringBuilder response=new StringBuilder("<html><head><title>Offline token servlet</title></head><body><pre>");
   RefreshableKeycloakSecurityContext ctx=(RefreshableKeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
   String accessTokenPretty=JsonSerialization.writeValueAsPrettyString(ctx.getToken());
-  RefreshToken refreshToken=new JWSInput(ctx.getRefreshToken()).readJsonContent(RefreshToken.class);
+  RefreshToken refreshToken=null;
+  try {
+    refreshToken=new JWSInput(ctx.getRefreshToken()).readJsonContent(RefreshToken.class);
+  }
+ catch (  JWSInputException e) {
+    throw new IOException(e);
+  }
   String refreshTokenPretty=JsonSerialization.writeValueAsPrettyString(refreshToken);
   response=response.append(accessTokenPretty).append(refreshTokenPretty).append("</pre></body></html>");
   resp.getWriter().println(response.toString());

@@ -1,37 +1,30 @@
 {
-  event.event(EventType.LOGIN).detail(Details.RESPONSE_TYPE,"code");
+  event.event(EventType.LOGIN);
   if (!checkSsl()) {
     return ErrorPage.error(session,Messages.HTTPS_REQUIRED);
   }
   String code=formData.getFirst("code");
   ClientSessionCode accessCode=ClientSessionCode.parse(code,session,realm);
-  if (accessCode == null || !accessCode.isValid(ClientSessionModel.Action.OAUTH_GRANT.name())) {
+  if (accessCode == null || !accessCode.isValid(ClientSessionModel.Action.OAUTH_GRANT.name(),ClientSessionCode.ActionType.LOGIN)) {
     event.error(Errors.INVALID_CODE);
     return ErrorPage.error(session,Messages.INVALID_ACCESS_CODE);
   }
   ClientSessionModel clientSession=accessCode.getClientSession();
-  event.detail(Details.CODE_ID,clientSession.getId());
-  String redirect=clientSession.getRedirectUri();
+  initEvent(clientSession);
   UserSessionModel userSession=clientSession.getUserSession();
   UserModel user=userSession.getUser();
   ClientModel client=clientSession.getClient();
-  event.client(client).user(user).detail(Details.RESPONSE_TYPE,"code").detail(Details.REDIRECT_URI,redirect);
-  event.detail(Details.AUTH_METHOD,userSession.getAuthMethod());
-  event.detail(Details.USERNAME,userSession.getLoginUsername());
-  if (userSession.isRememberMe()) {
-    event.detail(Details.REMEMBER_ME,"true");
-  }
   if (!AuthenticationManager.isSessionValid(realm,userSession)) {
     AuthenticationManager.backchannelLogout(session,realm,userSession,uriInfo,clientConnection,headers,true);
     event.error(Errors.INVALID_CODE);
     return ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE);
   }
-  event.session(userSession);
   if (formData.containsKey("cancel")) {
     LoginProtocol protocol=session.getProvider(LoginProtocol.class,clientSession.getAuthMethod());
-    protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo);
+    protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo).setEventBuilder(event);
+    Response response=protocol.sendError(clientSession,Error.CONSENT_DENIED);
     event.error(Errors.REJECTED_BY_USER);
-    return protocol.consentDenied(clientSession);
+    return response;
   }
   UserConsentModel grantedConsent=user.getConsentByClient(client.getId());
   if (grantedConsent == null) {
@@ -49,5 +42,5 @@
   user.updateConsent(grantedConsent);
   event.detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED);
   event.success();
-  return authManager.redirectAfterSuccessfulFlow(session,realm,userSession,clientSession,request,uriInfo,clientConnection);
+  return authManager.redirectAfterSuccessfulFlow(session,realm,userSession,clientSession,request,uriInfo,clientConnection,event);
 }

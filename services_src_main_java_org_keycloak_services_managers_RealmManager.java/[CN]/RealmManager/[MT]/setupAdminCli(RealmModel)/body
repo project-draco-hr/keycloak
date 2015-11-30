@@ -1,0 +1,22 @@
+{
+  ClientModel adminCli=realm.getClientByClientId(Constants.ADMIN_CLI_CLIENT_ID);
+  if (adminCli == null) {
+    adminCli=new ClientManager(this).createClient(realm,Constants.ADMIN_CLI_CLIENT_ID);
+    adminCli.setName("${client_" + Constants.ADMIN_CLI_CLIENT_ID + "}");
+    adminCli.setEnabled(true);
+    adminCli.setPublicClient(true);
+    adminCli.setFullScopeAllowed(false);
+    adminCli.setStandardFlowEnabled(false);
+    adminCli.setDirectAccessGrantsEnabled(true);
+    RoleModel adminRole;
+    if (realm.getName().equals(Config.getAdminRealm())) {
+      adminRole=realm.getRole(AdminRoles.ADMIN);
+    }
+ else {
+      String realmAdminApplicationClientId=getRealmAdminClientId(realm);
+      ClientModel realmAdminApp=realm.getClientByClientId(realmAdminApplicationClientId);
+      adminRole=realmAdminApp.getRole(AdminRoles.REALM_ADMIN);
+    }
+    adminCli.addScopeMapping(adminRole);
+  }
+}

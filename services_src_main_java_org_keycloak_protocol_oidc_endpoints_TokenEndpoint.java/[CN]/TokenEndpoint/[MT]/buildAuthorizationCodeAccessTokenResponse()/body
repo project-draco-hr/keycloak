@@ -36,6 +36,10 @@
     event.error(Errors.INVALID_CODE);
     throw new ErrorResponseException("invalid_grant","Auth error",Response.Status.BAD_REQUEST);
   }
+  if (!client.isStandardFlowEnabled()) {
+    event.error(Errors.NOT_ALLOWED);
+    throw new ErrorResponseException("invalid_grant","Client not allowed to exchange code",Response.Status.BAD_REQUEST);
+  }
   UserModel user=session.users().getUserById(userSession.getUser().getId(),realm);
   if (user == null) {
     event.error(Errors.USER_NOT_FOUND);

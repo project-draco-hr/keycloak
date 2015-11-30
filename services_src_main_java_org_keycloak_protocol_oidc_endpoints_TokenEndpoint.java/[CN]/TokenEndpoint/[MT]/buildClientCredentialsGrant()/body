@@ -11,7 +11,6 @@
     event.error(Errors.INVALID_CLIENT);
     throw new ErrorResponseException("unauthorized_client","Client not enabled to retrieve service account",Response.Status.UNAUTHORIZED);
   }
-  event.detail(Details.RESPONSE_TYPE,OAuth2Constants.CLIENT_CREDENTIALS);
   UserModel clientUser=session.users().getUserByServiceAccountClient(client);
   if (clientUser == null || client.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,ServiceAccountConstants.CLIENT_ID_PROTOCOL_MAPPER) == null) {
     logger.debugf("Service account user for client '%s' not found or default protocol mapper for service account not found. Creating now",client.getClientId());

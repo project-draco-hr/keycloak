@@ -3,13 +3,14 @@
   event.event(EventType.UPDATE_PROFILE);
   MultivaluedMap<String,String> formData=context.getHttpRequest().getDecodedFormParameters();
   RealmModel realm=context.getRealm();
-  List<FormMessage> errors=Validation.validateUpdateProfileForm(true,formData);
+  List<FormMessage> errors=Validation.validateUpdateProfileForm(!realm.isRegistrationEmailAsUsername(),formData);
   if (errors != null && !errors.isEmpty()) {
     Response challenge=context.form().setErrors(errors).setAttribute(LoginFormsProvider.UPDATE_PROFILE_CONTEXT_ATTR,userCtx).setFormData(formData).createUpdateProfilePage();
     context.challenge(challenge);
     return;
   }
-  userCtx.setUsername(formData.getFirst(UserModel.USERNAME));
+  String username=realm.isRegistrationEmailAsUsername() ? formData.getFirst(UserModel.EMAIL) : formData.getFirst(UserModel.USERNAME);
+  userCtx.setUsername(username);
   userCtx.setFirstName(formData.getFirst(UserModel.FIRST_NAME));
   userCtx.setLastName(formData.getFirst(UserModel.LAST_NAME));
   String email=formData.getFirst(UserModel.EMAIL);

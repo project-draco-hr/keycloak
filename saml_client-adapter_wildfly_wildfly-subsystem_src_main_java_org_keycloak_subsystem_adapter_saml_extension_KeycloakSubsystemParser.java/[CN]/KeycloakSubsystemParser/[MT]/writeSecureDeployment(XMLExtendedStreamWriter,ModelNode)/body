@@ -1,0 +1,11 @@
+{
+  if (!model.get(Constants.Model.SECURE_DEPLOYMENT).isDefined()) {
+    return;
+  }
+  for (  Property sp : model.get(Constants.Model.SECURE_DEPLOYMENT).asPropertyList()) {
+    writer.writeStartElement(Constants.XML.SECURE_DEPLOYMENT);
+    writer.writeAttribute(Constants.XML.NAME,sp.getName());
+    writeSps(writer,sp.getValue());
+    writer.writeEndElement();
+  }
+}

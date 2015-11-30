@@ -1,3 +1,8 @@
 {
-  return JsonSerialization.readValue(decodedToken,RefreshToken.class);
+  try {
+    return JsonSerialization.readValue(decodedToken,RefreshToken.class);
+  }
+ catch (  IOException e) {
+    throw new JWSInputException(e);
+  }
 }

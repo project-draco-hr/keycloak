@@ -1,11 +1,13 @@
 {
-  event.event(EventType.LOGIN).client(clientSession.getClient()).user(clientSession.getUserSession().getUser()).session(clientSession.getUserSession().getId()).detail(Details.CODE_ID,clientSession.getId()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.USERNAME,clientSession.getNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME)).detail(Details.RESPONSE_TYPE,"code");
   UserSessionModel userSession=clientSession.getUserSession();
-  if (userSession != null) {
-    event.detail(Details.AUTH_METHOD,userSession.getAuthMethod());
-    event.detail(Details.USERNAME,userSession.getLoginUsername());
-    if (userSession.isRememberMe()) {
-      event.detail(Details.REMEMBER_ME,"true");
-    }
+  String responseType=clientSession.getNote(OIDCLoginProtocol.RESPONSE_TYPE_PARAM);
+  if (responseType == null) {
+    responseType="code";
+  }
+  String respMode=clientSession.getNote(OIDCLoginProtocol.RESPONSE_MODE_PARAM);
+  OIDCResponseMode responseMode=OIDCResponseMode.parse(respMode,OIDCResponseType.parse(responseType));
+  event.event(EventType.LOGIN).client(clientSession.getClient()).user(userSession.getUser()).session(userSession.getId()).detail(Details.CODE_ID,clientSession.getId()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.USERNAME,clientSession.getNote(AbstractUsernameFormAuthenticator.ATTEMPTED_USERNAME)).detail(Details.AUTH_METHOD,userSession.getAuthMethod()).detail(Details.USERNAME,userSession.getLoginUsername()).detail(Details.RESPONSE_TYPE,responseType).detail(Details.RESPONSE_MODE,responseMode.toString().toLowerCase());
+  if (userSession.isRememberMe()) {
+    event.detail(Details.REMEMBER_ME,"true");
   }
 }

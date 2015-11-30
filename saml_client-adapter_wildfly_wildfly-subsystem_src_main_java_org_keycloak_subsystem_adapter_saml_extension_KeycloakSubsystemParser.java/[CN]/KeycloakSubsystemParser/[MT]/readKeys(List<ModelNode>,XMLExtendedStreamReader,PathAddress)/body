@@ -1,0 +1,12 @@
+{
+  ParseUtils.requireNoAttributes(reader);
+  List<ModelNode> keyList=new LinkedList<>();
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    String tagName=reader.getLocalName();
+    if (!Constants.XML.KEY.equals(tagName)) {
+      throw ParseUtils.unexpectedElement(reader);
+    }
+    readKey(keyList,reader,parentAddr);
+  }
+  list.addAll(keyList);
+}

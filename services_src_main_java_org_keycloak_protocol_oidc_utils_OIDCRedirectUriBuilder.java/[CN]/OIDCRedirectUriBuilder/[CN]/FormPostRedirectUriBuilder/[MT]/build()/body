@@ -1,0 +1,21 @@
+{
+  StringBuilder builder=new StringBuilder();
+  URI redirectUri=uriBuilder.build();
+  builder.append("<HTML>");
+  builder.append("  <HEAD>");
+  builder.append("    <TITLE>OIDC Form_Post Response</TITLE>");
+  builder.append("  </HEAD>");
+  builder.append("  <BODY Onload=\"document.forms[0].submit()\">");
+  builder.append("    <FORM METHOD=\"POST\" ACTION=\"" + redirectUri.toString() + "\">");
+  for (  Map.Entry<String,String> param : params.entrySet()) {
+    builder.append("  <INPUT TYPE=\"HIDDEN\" NAME=\"").append(param.getKey()).append("\" VALUE=\"").append(param.getValue()).append("\" />");
+  }
+  builder.append("      <NOSCRIPT>");
+  builder.append("        <P>JavaScript is disabled. We strongly recommend to enable it. Click the button below to continue .</P>");
+  builder.append("        <INPUT name=\"continue\" TYPE=\"SUBMIT\" VALUE=\"CONTINUE\" />");
+  builder.append("      </NOSCRIPT>");
+  builder.append("    </FORM>");
+  builder.append("  </BODY>");
+  builder.append("</HTML>");
+  return Response.status(Response.Status.OK).type(MediaType.TEXT_HTML_TYPE).entity(builder.toString()).build();
+}

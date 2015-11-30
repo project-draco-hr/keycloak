@@ -1,10 +1,7 @@
 {
-  if (event.isPre() && event.getValue() != null) {
-    CachedUser cachedUser=event.getValue();
-    String realm=cachedUser.getRealm();
-    usernameLookup.remove(realm,cachedUser.getUsername());
-    if (cachedUser.getEmail() != null) {
-      emailLookup.remove(realm,cachedUser.getEmail());
-    }
+  CachedUser user=event.getOldValue();
+  if (event.isPre() && user != null) {
+    removeUser(user);
+    log.tracev("User invalidated realm={0}, id={1}, username={2}",user.getRealm(),user.getId(),user.getUsername());
   }
 }

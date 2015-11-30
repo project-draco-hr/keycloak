@@ -38,4 +38,9 @@
     ErrorRepresentation error=e.getResponse().readEntity(ErrorRepresentation.class);
     Assert.assertEquals("invalidClientId not enabled",error.getErrorMessage());
   }
+  user.sendVerifyEmail();
+  assertEquals(1,greenMail.getReceivedMessages().length);
+  String link=RequiredActionEmailVerificationTest.getPasswordResetEmailLink(greenMail.getReceivedMessages()[0]);
+  driver.navigate().to(link);
+  Assert.assertEquals("Your account has been updated.",infoPage.getInfo());
 }

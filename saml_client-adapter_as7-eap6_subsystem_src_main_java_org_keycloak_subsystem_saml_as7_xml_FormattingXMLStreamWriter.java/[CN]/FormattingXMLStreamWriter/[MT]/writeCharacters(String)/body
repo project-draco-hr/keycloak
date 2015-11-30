@@ -1,0 +1,18 @@
+{
+  runAttrQueue();
+  if (state != CHARACTERS) {
+    nl();
+    indent();
+  }
+  final Iterator<String> iterator=Spliterator.over(text,'\n');
+  while (iterator.hasNext()) {
+    final String t=iterator.next();
+    delegate.writeCharacters(t);
+    if (iterator.hasNext()) {
+      nl();
+      indent();
+    }
+  }
+  state=CHARACTERS;
+  indentEndElement=true;
+}

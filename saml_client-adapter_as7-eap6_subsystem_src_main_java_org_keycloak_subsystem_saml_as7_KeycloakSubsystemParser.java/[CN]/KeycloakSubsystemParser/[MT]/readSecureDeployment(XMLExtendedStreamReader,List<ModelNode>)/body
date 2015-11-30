@@ -1,0 +1,15 @@
+{
+  String name=readRequiredAttribute(reader,Constants.XML.NAME);
+  PathAddress addr=PathAddress.pathAddress(PathElement.pathElement(ModelDescriptionConstants.SUBSYSTEM,KeycloakSamlExtension.SUBSYSTEM_NAME),PathElement.pathElement(Constants.Model.SECURE_DEPLOYMENT,name));
+  ModelNode addSecureDeployment=Util.createAddOperation(addr);
+  list.add(addSecureDeployment);
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    String tagName=reader.getLocalName();
+    if (tagName.equals(Constants.XML.SERVICE_PROVIDER)) {
+      readServiceProvider(reader,list,addr);
+    }
+ else {
+      throw ParseUtils.unexpectedElement(reader);
+    }
+  }
+}

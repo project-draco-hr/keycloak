@@ -1,0 +1,17 @@
+{
+  if (!model.isDefined()) {
+    return;
+  }
+  for (  Property idp : model.asPropertyList()) {
+    writer.writeStartElement(Constants.XML.IDENTITY_PROVIDER);
+    writer.writeAttribute(Constants.XML.ENTITY_ID,idp.getName());
+    ModelNode idpAttributes=idp.getValue();
+    for (    SimpleAttributeDefinition attr : IdentityProviderDefinition.ATTRIBUTES) {
+      attr.getAttributeMarshaller().marshallAsAttribute(attr,idpAttributes,false,writer);
+    }
+    writeSingleSignOn(writer,idpAttributes.get(Constants.Model.SINGLE_SIGN_ON));
+    writeSingleLogout(writer,idpAttributes.get(Constants.Model.SINGLE_LOGOUT));
+    writeKeys(writer,idpAttributes.get(Constants.Model.KEY));
+  }
+  writer.writeEndElement();
+}

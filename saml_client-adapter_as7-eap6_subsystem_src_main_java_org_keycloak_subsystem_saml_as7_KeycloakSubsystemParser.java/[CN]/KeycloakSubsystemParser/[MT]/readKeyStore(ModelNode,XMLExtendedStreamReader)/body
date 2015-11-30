@@ -1,0 +1,30 @@
+{
+  ModelNode addKeyStore=addKey.get(Constants.Model.KEY_STORE);
+  for (int i=0; i < reader.getAttributeCount(); i++) {
+    String name=reader.getAttributeLocalName(i);
+    String value=reader.getAttributeValue(i);
+    SimpleAttributeDefinition attr=KeyStoreDefinition.lookup(name);
+    if (attr == null) {
+      throw ParseUtils.unexpectedAttribute(reader,i);
+    }
+    attr.parseAndSetParameter(value,addKeyStore,reader);
+  }
+  if (!addKeyStore.hasDefined(Constants.Model.FILE) && !addKeyStore.hasDefined(Constants.Model.RESOURCE)) {
+    throw new XMLStreamException("KeyStore element must have 'file' or 'resource' attribute set",reader.getLocation());
+  }
+  if (!addKeyStore.hasDefined(Constants.Model.PASSWORD)) {
+    throw ParseUtils.missingRequired(reader,Constants.XML.PASSWORD);
+  }
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    String tagName=reader.getLocalName();
+    if (Constants.XML.PRIVATE_KEY.equals(tagName)) {
+      readPrivateKey(reader,addKeyStore);
+    }
+ else     if (Constants.XML.CERTIFICATE.equals(tagName)) {
+      readCertificate(reader,addKeyStore);
+    }
+ else {
+      throw ParseUtils.unexpectedElement(reader);
+    }
+  }
+}

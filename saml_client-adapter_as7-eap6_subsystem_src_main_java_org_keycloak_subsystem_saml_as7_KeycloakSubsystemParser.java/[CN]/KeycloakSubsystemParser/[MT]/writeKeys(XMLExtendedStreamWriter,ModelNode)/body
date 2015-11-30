@@ -1,0 +1,25 @@
+{
+  if (!model.isDefined()) {
+    return;
+  }
+  boolean contains=false;
+  for (  Property key : model.asPropertyList()) {
+    if (!contains) {
+      writer.writeStartElement(Constants.XML.KEYS);
+      contains=true;
+    }
+    writer.writeStartElement(Constants.XML.KEY);
+    ModelNode keyAttributes=key.getValue();
+    for (    SimpleAttributeDefinition attr : KeyDefinition.ATTRIBUTES) {
+      attr.getAttributeMarshaller().marshallAsAttribute(attr,keyAttributes,false,writer);
+    }
+    for (    SimpleAttributeDefinition attr : KeyDefinition.ELEMENTS) {
+      attr.getAttributeMarshaller().marshallAsElement(attr,keyAttributes,false,writer);
+    }
+    writeKeyStore(writer,keyAttributes.get(Constants.Model.KEY_STORE));
+    writer.writeEndElement();
+  }
+  if (contains) {
+    writer.writeEndElement();
+  }
+}

@@ -1,0 +1,33 @@
+{
+  String entityId=readRequiredAttribute(reader,Constants.XML.ENTITY_ID);
+  PathAddress addr=PathAddress.pathAddress(parentAddr,PathElement.pathElement(Constants.Model.IDENTITY_PROVIDER,entityId));
+  ModelNode addIdentityProvider=Util.createAddOperation(addr);
+  list.add(addIdentityProvider);
+  for (int i=0; i < reader.getAttributeCount(); i++) {
+    String name=reader.getAttributeLocalName(i);
+    String value=reader.getAttributeValue(i);
+    if (Constants.XML.ENTITY_ID.equals(name) || "encryption".equals(name)) {
+      continue;
+    }
+    SimpleAttributeDefinition attr=IdentityProviderDefinition.lookup(name);
+    if (attr == null) {
+      throw ParseUtils.unexpectedAttribute(reader,i);
+    }
+    attr.parseAndSetParameter(value,addIdentityProvider,reader);
+  }
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    String tagName=reader.getLocalName();
+    if (Constants.XML.SINGLE_SIGN_ON.equals(tagName)) {
+      readSingleSignOn(addIdentityProvider,reader);
+    }
+ else     if (Constants.XML.SINGLE_LOGOUT.equals(tagName)) {
+      readSingleLogout(addIdentityProvider,reader);
+    }
+ else     if (Constants.XML.KEYS.equals(tagName)) {
+      readKeys(list,reader,addr);
+    }
+ else {
+      throw ParseUtils.unexpectedElement(reader);
+    }
+  }
+}

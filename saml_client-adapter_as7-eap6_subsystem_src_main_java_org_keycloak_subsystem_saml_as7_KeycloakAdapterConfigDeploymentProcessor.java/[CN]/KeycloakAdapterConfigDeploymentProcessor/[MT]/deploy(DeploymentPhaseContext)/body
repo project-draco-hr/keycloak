@@ -11,9 +11,25 @@
     warMetaData.setMergedJBossWebMetaData(webMetaData);
   }
   LoginConfigMetaData loginConfig=webMetaData.getLoginConfig();
-  boolean webRequiresKC=loginConfig != null && "KEYCLOAK-SAML".equalsIgnoreCase(loginConfig.getAuthMethod());
-  if (webRequiresKC) {
-    log.debug("Setting up KEYCLOAK-SAML auth method for WAR: " + deploymentName);
-    addValve(webMetaData);
+  try {
+    boolean webRequiresKC=loginConfig != null && "KEYCLOAK-SAML".equalsIgnoreCase(loginConfig.getAuthMethod());
+    boolean hasSubsystemConfig=Configuration.INSTANCE.isSecureDeployment(deploymentName);
+    if (hasSubsystemConfig || webRequiresKC) {
+      log.debug("Setting up KEYCLOAK-SAML auth method for WAR: " + deploymentName);
+      if (hasSubsystemConfig) {
+        addXMLData(getXML(deploymentName),warMetaData);
+        if (loginConfig != null) {
+          loginConfig.setAuthMethod("KEYCLOAK-SAML");
+        }
+ else {
+          log.warn("Failed to set up KEYCLOAK-SAML auth method for WAR: " + deploymentName + " (loginConfig == null)");
+        }
+      }
+      addValve(webMetaData);
+      KeycloakLogger.ROOT_LOGGER.deploymentSecured(deploymentName);
+    }
+  }
+ catch (  Exception e) {
+    throw new DeploymentUnitProcessingException("Failed to configure KeycloakSamlExtension from subsystem model",e);
   }
 }

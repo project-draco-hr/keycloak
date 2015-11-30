@@ -1,0 +1,12 @@
+{
+  ParseUtils.requireNoAttributes(reader);
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    String tagName=reader.getLocalName();
+    if (!Constants.XML.ATTRIBUTE.equals(tagName)) {
+      throw ParseUtils.unexpectedElement(reader);
+    }
+    ParseUtils.requireSingleAttribute(reader,Constants.XML.NAME);
+    String name=ParseUtils.readStringAttributeElement(reader,Constants.XML.NAME);
+    ServiceProviderDefinition.ROLE_ATTRIBUTES.parseAndAddParameterElement(name,addServiceProvider,reader);
+  }
+}

@@ -1,0 +1,17 @@
+{
+  ModelNode value=model.get(Constants.Model.ROLE_ATTRIBUTES);
+  if (!value.isDefined()) {
+    return;
+  }
+  List<ModelNode> items=value.asList();
+  if (items.size() == 0) {
+    return;
+  }
+  writer.writeStartElement(Constants.XML.ROLE_IDENTIFIERS);
+  for (  ModelNode item : items) {
+    writer.writeStartElement(Constants.XML.ATTRIBUTE);
+    writer.writeAttribute("name",item.asString());
+    writer.writeEndElement();
+  }
+  writer.writeEndElement();
+}

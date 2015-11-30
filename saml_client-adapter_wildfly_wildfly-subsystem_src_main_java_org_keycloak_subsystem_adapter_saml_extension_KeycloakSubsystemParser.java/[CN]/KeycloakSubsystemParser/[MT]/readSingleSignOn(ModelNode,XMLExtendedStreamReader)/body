@@ -1,0 +1,13 @@
+{
+  ModelNode sso=addIdentityProvider.get(Constants.Model.SINGLE_SIGN_ON);
+  for (int i=0; i < reader.getAttributeCount(); i++) {
+    String name=reader.getAttributeLocalName(i);
+    String value=reader.getAttributeValue(i);
+    SimpleAttributeDefinition attr=SingleSignOnDefinition.lookup(name);
+    if (attr == null) {
+      throw ParseUtils.unexpectedAttribute(reader,i);
+    }
+    attr.parseAndSetParameter(value,sso,reader);
+  }
+  ParseUtils.requireNoContent(reader);
+}

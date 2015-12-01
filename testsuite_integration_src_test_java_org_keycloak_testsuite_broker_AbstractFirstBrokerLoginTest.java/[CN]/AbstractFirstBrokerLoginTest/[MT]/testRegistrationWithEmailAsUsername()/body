@@ -1,0 +1,26 @@
+{
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      setUpdateProfileFirstLogin(realmWithBroker,IdentityProviderRepresentation.UPFLM_ON);
+      realmWithBroker.setRegistrationEmailAsUsername(true);
+    }
+  }
+,APP_REALM_ID);
+  loginIDP("pedroigor");
+  this.updateProfileWithUsernamePage.assertCurrent();
+  try {
+    this.updateProfileWithUsernamePage.update("Test","User","some-user@redhat.com","some-user");
+    Assert.fail("It is not expected to see username field");
+  }
+ catch (  NoSuchElementException expected) {
+  }
+  this.updateProfileWithUsernamePage.update("Test","User","some-user@redhat.com");
+  assertFederatedUser("some-user@redhat.com","some-user@redhat.com","pedroigor");
+  brokerServerRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel realmWithBroker){
+      setUpdateProfileFirstLogin(realmWithBroker,IdentityProviderRepresentation.UPFLM_MISSING);
+      realmWithBroker.setRegistrationEmailAsUsername(false);
+    }
+  }
+,APP_REALM_ID);
+}

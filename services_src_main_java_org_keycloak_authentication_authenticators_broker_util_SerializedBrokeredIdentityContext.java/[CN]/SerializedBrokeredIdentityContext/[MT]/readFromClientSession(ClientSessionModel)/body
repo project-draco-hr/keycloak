@@ -5,7 +5,9 @@
   }
  else {
     try {
-      return JsonSerialization.readValue(asString,SerializedBrokeredIdentityContext.class);
+      SerializedBrokeredIdentityContext serializedCtx=JsonSerialization.readValue(asString,SerializedBrokeredIdentityContext.class);
+      serializedCtx.emailAsUsername=clientSession.getRealm().isRegistrationEmailAsUsername();
+      return serializedCtx;
     }
  catch (    IOException ioe) {
       throw new RuntimeException(ioe);

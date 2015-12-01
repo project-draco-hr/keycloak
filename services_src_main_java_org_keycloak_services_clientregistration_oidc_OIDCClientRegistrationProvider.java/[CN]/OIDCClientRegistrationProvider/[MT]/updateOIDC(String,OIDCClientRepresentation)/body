@@ -1,7 +1,13 @@
 {
-  ClientRepresentation client=DescriptionConverter.toInternal(clientOIDC);
-  client=update(clientId,client);
-  URI uri=session.getContext().getUri().getAbsolutePathBuilder().path(client.getClientId()).build();
-  clientOIDC=DescriptionConverter.toExternalResponse(client,uri);
-  return Response.ok(clientOIDC).build();
+  try {
+    ClientRepresentation client=DescriptionConverter.toInternal(clientOIDC);
+    client=update(clientId,client);
+    URI uri=session.getContext().getUri().getAbsolutePathBuilder().path(client.getClientId()).build();
+    clientOIDC=DescriptionConverter.toExternalResponse(client,uri);
+    return Response.ok(clientOIDC).build();
+  }
+ catch (  ClientRegistrationException cre) {
+    log.error(cre.getMessage());
+    throw new ErrorResponseException(ErrorCodes.INVALID_CLIENT_METADATA,"Client metadata invalid",Response.Status.BAD_REQUEST);
+  }
 }

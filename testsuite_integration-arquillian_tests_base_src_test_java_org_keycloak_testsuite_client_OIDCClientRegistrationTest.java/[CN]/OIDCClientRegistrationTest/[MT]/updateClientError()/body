@@ -1,0 +1,11 @@
+{
+  try {
+    OIDCClientRepresentation response=create();
+    reg.auth(Auth.token(response));
+    response.setResponseTypes(Arrays.asList("code","token"));
+    reg.oidc().update(response);
+    fail("Not expected to end with success");
+  }
+ catch (  ClientRegistrationException cre) {
+  }
+}

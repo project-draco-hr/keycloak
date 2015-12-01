@@ -1,5 +1,9 @@
 {
-  event.detail(Details.AUTH_METHOD,"oauth_credentials").detail(Details.RESPONSE_TYPE,OAuth2Constants.PASSWORD);
+  event.detail(Details.AUTH_METHOD,"oauth_credentials");
+  if (!client.isDirectAccessGrantsEnabled()) {
+    event.error(Errors.NOT_ALLOWED);
+    throw new ErrorResponseException("invalid_grant","Client not allowed for direct access grants",Response.Status.BAD_REQUEST);
+  }
   if (client.isConsentRequired()) {
     event.error(Errors.CONSENT_DENIED);
     throw new ErrorResponseException("invalid_client","Client requires user consent",Response.Status.BAD_REQUEST);

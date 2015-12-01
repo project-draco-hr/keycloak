@@ -88,6 +88,9 @@
   execution.setRequirement(AuthenticationExecutionModel.Requirement.OPTIONAL);
   if (migrate) {
     AuthenticationFlowModel browserFlow=realm.getBrowserFlow();
+    if (browserFlow == null) {
+      browserFlow=realm.getFlowByAlias(DefaultAuthenticationFlows.BROWSER_FLOW);
+    }
     List<AuthenticationExecutionModel> browserExecutions=new LinkedList<>();
     KeycloakModelUtils.deepFindAuthenticationExecutions(realm,browserFlow,browserExecutions);
     for (    AuthenticationExecutionModel browserExecution : browserExecutions) {

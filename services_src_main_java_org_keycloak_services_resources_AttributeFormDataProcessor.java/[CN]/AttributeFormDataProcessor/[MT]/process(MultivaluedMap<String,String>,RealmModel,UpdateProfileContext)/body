@@ -1,8 +1,9 @@
 {
   for (  String key : formData.keySet()) {
-    if (!key.startsWith("user.attributes."))     continue;
-    String attribute=key.substring("user.attributes.".length());
-    List<String> modelValue=new ArrayList<>(user.getAttribute(attribute));
+    if (!key.startsWith(Constants.USER_ATTRIBUTES_PREFIX))     continue;
+    String attribute=key.substring(Constants.USER_ATTRIBUTES_PREFIX.length());
+    List<String> modelVal=user.getAttribute(attribute);
+    List<String> modelValue=modelVal == null ? new ArrayList<String>() : new ArrayList<>(modelVal);
     int index=0;
     for (    String value : formData.get(key)) {
       addOrSetValue(modelValue,index,value);

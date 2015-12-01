@@ -1,14 +1,20 @@
 {
-  if (clazz.equals(String.class)) {
-    return clazz.cast(serialized);
-  }
+  try {
+    if (clazz.equals(String.class)) {
+      return clazz.cast(serialized);
+    }
  else {
-    byte[] bytes=Base64Url.decode(serialized);
-    try {
-      return JsonSerialization.readValue(bytes,clazz);
+      byte[] bytes=Base64Url.decode(serialized);
+      if (List.class.isAssignableFrom(clazz)) {
+        List list=JsonSerialization.readValue(bytes,List.class);
+        return clazz.cast(list);
+      }
+ else {
+        return JsonSerialization.readValue(bytes,clazz);
+      }
     }
- catch (    IOException ioe) {
-      throw new RuntimeException(ioe);
-    }
+  }
+ catch (  IOException ioe) {
+    throw new RuntimeException(ioe);
   }
 }

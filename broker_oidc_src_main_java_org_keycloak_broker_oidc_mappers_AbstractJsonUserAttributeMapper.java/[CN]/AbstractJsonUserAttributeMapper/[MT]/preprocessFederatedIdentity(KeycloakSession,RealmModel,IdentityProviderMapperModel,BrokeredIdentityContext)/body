@@ -1,0 +1,12 @@
+{
+  String attribute=mapperModel.getConfig().get(CONF_USER_ATTRIBUTE);
+  if (attribute == null || attribute.trim().isEmpty()) {
+    logger.warnf("Attribute is not configured for mapper %s",mapperModel.getName());
+    return;
+  }
+  attribute=attribute.trim();
+  String value=getJsonValue(mapperModel,context);
+  if (value != null) {
+    context.setUserAttribute(attribute,value);
+  }
+}

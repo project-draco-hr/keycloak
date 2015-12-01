@@ -1,0 +1,17 @@
+{
+  List<String> responseTypes=new ArrayList<>();
+  if (client.isStandardFlowEnabled()) {
+    responseTypes.add(OAuth2Constants.CODE);
+    responseTypes.add(OIDCResponseType.NONE);
+  }
+  if (client.isImplicitFlowEnabled()) {
+    responseTypes.add(OIDCResponseType.ID_TOKEN);
+    responseTypes.add("id_token token");
+  }
+  if (client.isStandardFlowEnabled() && client.isImplicitFlowEnabled()) {
+    responseTypes.add("code id_token");
+    responseTypes.add("code token");
+    responseTypes.add("code id_token token");
+  }
+  return responseTypes;
+}

@@ -5,10 +5,17 @@
     context.attempted();
     return;
   }
-  ExistingUserInfo duplication=checkExistingUser(context,serializedCtx,brokerContext);
+  String username=getUsername(context,serializedCtx,brokerContext);
+  if (username == null) {
+    logger.warnf("%s is null. Reset flow and enforce showing reviewProfile page",realm.isRegistrationEmailAsUsername() ? "Email" : "Username");
+    context.getClientSession().setNote(ENFORCE_UPDATE_PROFILE,"true");
+    context.resetFlow();
+    return;
+  }
+  ExistingUserInfo duplication=checkExistingUser(context,username,serializedCtx,brokerContext);
   if (duplication == null) {
-    logger.debugf("No duplication detected. Creating account for user '%s' and linking with identity provider '%s' .",brokerContext.getModelUsername(),brokerContext.getIdpConfig().getAlias());
-    UserModel federatedUser=session.users().addUser(realm,brokerContext.getModelUsername());
+    logger.debugf("No duplication detected. Creating account for user '%s' and linking with identity provider '%s' .",username,brokerContext.getIdpConfig().getAlias());
+    UserModel federatedUser=session.users().addUser(realm,username);
     federatedUser.setEnabled(true);
     federatedUser.setEmail(brokerContext.getEmail());
     federatedUser.setFirstName(brokerContext.getFirstName());

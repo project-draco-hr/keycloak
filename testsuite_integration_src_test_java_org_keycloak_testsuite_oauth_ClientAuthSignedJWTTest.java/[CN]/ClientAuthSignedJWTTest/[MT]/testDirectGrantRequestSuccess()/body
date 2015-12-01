@@ -4,5 +4,5 @@
   assertEquals(200,response.getStatusCode());
   AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
   RefreshToken refreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
-  events.expectLogin().client("client2").session(accessToken.getSessionState()).detail(Details.RESPONSE_TYPE,OAuth2Constants.PASSWORD).detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).detail(Details.USERNAME,"test-user@localhost").detail(Details.CLIENT_AUTH_METHOD,JWTClientAuthenticator.PROVIDER_ID).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).assertEvent();
+  events.expectLogin().client("client2").session(accessToken.getSessionState()).detail(Details.GRANT_TYPE,OAuth2Constants.PASSWORD).detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).detail(Details.USERNAME,"test-user@localhost").detail(Details.CLIENT_AUTH_METHOD,JWTClientAuthenticator.PROVIDER_ID).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).assertEvent();
 }

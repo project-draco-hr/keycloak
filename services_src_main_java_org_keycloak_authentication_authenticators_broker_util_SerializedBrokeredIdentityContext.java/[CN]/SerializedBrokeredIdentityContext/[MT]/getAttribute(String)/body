@@ -1,9 +1,10 @@
 {
-  ContextDataEntry ctxEntry=this.contextData.get("user.attributes." + key);
+  ContextDataEntry ctxEntry=this.contextData.get(Constants.USER_ATTRIBUTES_PREFIX + key);
   if (ctxEntry != null) {
     try {
       String asString=ctxEntry.getData();
-      List<String> asList=JsonSerialization.readValue(asString,List.class);
+      byte[] asBytes=Base64Url.decode(asString);
+      List<String> asList=JsonSerialization.readValue(asBytes,List.class);
       return asList;
     }
  catch (    IOException ioe) {

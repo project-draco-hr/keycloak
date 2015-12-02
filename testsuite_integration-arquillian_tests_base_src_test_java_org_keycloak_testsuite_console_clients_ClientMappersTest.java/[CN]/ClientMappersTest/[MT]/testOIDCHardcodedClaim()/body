@@ -1,0 +1,22 @@
+{
+  clientMappersPage.mapperTable().createMapper();
+  setInitialValues("hardcoded claim",false,null);
+  createClientMappersPage.form().setMapperType(HARDCODED_CLAIM);
+  createClientMappersPage.form().setTokenClaimName("claim name");
+  createClientMappersPage.form().setTokenClaimValue("claim value");
+  createClientMappersPage.form().setClaimJSONType("long");
+  createClientMappersPage.form().setAddToIDToken(true);
+  createClientMappersPage.form().setAddToAccessToken(true);
+  createClientMappersPage.form().save();
+  assertFlashMessageSuccess();
+  ProtocolMapperRepresentation found=findClientMapperByName("hardcoded claim");
+  assertNotNull(found);
+  assertFalse(found.isConsentRequired());
+  assertEquals("oidc-hardcoded-claim-mapper",found.getProtocolMapper());
+  Map<String,String> config=found.getConfig();
+  assertEquals("true",config.get("id.token.claim"));
+  assertEquals("true",config.get("access.token.claim"));
+  assertEquals("claim name",config.get("claim.name"));
+  assertEquals("claim value",config.get("claim.value"));
+  assertEquals("long",config.get("jsonType.label"));
+}

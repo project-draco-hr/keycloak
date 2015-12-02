@@ -1,0 +1,14 @@
+{
+  clientMappersPage.mapperTable().createMapper();
+  setInitialValues("user attribute",false,null);
+  createClientMappersPage.form().setMapperType(USER_ATTRIBUTE);
+  createClientMappersPage.form().setUserAttribute("user attribute");
+  createClientMappersPage.form().setMultivalued(true);
+  createClientMappersPage.form().save();
+  assertFlashMessageSuccess();
+  ProtocolMapperRepresentation found=findClientMapperByName("user attribute");
+  assertEquals("oidc-usermodel-attribute-mapper",found.getProtocolMapper());
+  Map<String,String> config=found.getConfig();
+  assertEquals("true",config.get("multivalued"));
+  assertEquals("user attribute",config.get("user.attribute"));
+}

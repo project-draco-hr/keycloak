@@ -2,7 +2,7 @@
   newClient=createClientRepresentation("oidc-confidential",TEST_REDIRECT_URIS);
   createClient(newClient);
   assertFlashMessageSuccess();
-  ClientRepresentation found=findClientRepByClientId(newClient.getClientId());
+  ClientRepresentation found=findClientByClientId(newClient.getClientId());
   assertNotNull("Client " + newClient.getClientId() + " was not found.",found);
   assertClientSettingsEqual(newClient,found);
   newClient.setClientId("oidc-confidential-updated");
@@ -23,11 +23,11 @@
   clientSettingsPage.form().setWebOrigins(webOrigins);
   clientSettingsPage.form().save();
   assertFlashMessageSuccess();
-  found=findClientRepByClientId(newClient.getClientId());
+  found=findClientByClientId(newClient.getClientId());
   assertNotNull("Client " + newClient.getClientId() + " was not found.",found);
   assertClientSettingsEqual(newClient,found);
   clientPage.delete();
   assertFlashMessageSuccess();
-  found=findClientRepByClientId(newClient.getClientId());
+  found=findClientByClientId(newClient.getClientId());
   assertNull("Deleted client " + newClient.getClientId() + " was found.",found);
 }

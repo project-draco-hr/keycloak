@@ -1,0 +1,35 @@
+{
+  ProtocolMapperRepresentation mapper=new ProtocolMapperRepresentation();
+  mapper.setName("mapper name");
+  mapper.setConsentRequired(true);
+  mapper.setConsentText("consent text");
+  mapper.setProtocol("openid-connect");
+  mapper.setProtocolMapper("oidc-usersessionmodel-note-mapper");
+  Map<String,String> config=new HashMap<>();
+  config.put("access.token.claim","true");
+  config.put("id.token.claim","true");
+  config.put("claim.name","claim name");
+  config.put("jsonType.label","String");
+  config.put("user.session.note","session note");
+  mapper.setConfig(config);
+  testRealmResource().clients().get(id).getProtocolMappers().createMapper(mapper).close();
+  clientMapperPage.setId(id);
+  String mapperId=findClientMapperByName("mapper name").getId();
+  clientMapperPage.setMapperId(mapperId);
+  clientMapperPage.navigateTo();
+  assertEquals("openid-connect",clientMapperPage.form().getProtocol());
+  assertEquals(mapperId,clientMapperPage.form().getMapperId());
+  assertEquals("mapper name",clientMapperPage.form().getName());
+  assertTrue(clientMapperPage.form().isConsentRequired());
+  assertEquals("consent text",clientMapperPage.form().getConsentText());
+  assertEquals("User Session Note",clientMapperPage.form().getMapperType());
+  assertEquals("session note",clientMapperPage.form().getUserSessionNote());
+  assertEquals("claim name",clientMapperPage.form().getTokenClaimName());
+  assertEquals("String",clientMapperPage.form().getClaimJSONType());
+  assertTrue(clientMapperPage.form().isAddToIDToken());
+  assertTrue(clientMapperPage.form().isAddToAccessToken());
+  clientMapperPage.form().setConsentRequired(false);
+  clientMapperPage.form().save();
+  assertFlashMessageSuccess();
+  assertFalse(findClientMapperByName("mapper name").isConsentRequired());
+}

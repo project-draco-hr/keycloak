@@ -1,8 +1,9 @@
 {
   try {
-    String listStr=JsonSerialization.writeValueAsString(value);
+    byte[] listBytes=JsonSerialization.writeValueAsBytes(value);
+    String listStr=Base64Url.encode(listBytes);
     ContextDataEntry ctxEntry=ContextDataEntry.create(List.class.getName(),listStr);
-    this.contextData.put("user.attributes." + key,ctxEntry);
+    this.contextData.put(Constants.USER_ATTRIBUTES_PREFIX + key,ctxEntry);
   }
  catch (  IOException ioe) {
     throw new RuntimeException(ioe);

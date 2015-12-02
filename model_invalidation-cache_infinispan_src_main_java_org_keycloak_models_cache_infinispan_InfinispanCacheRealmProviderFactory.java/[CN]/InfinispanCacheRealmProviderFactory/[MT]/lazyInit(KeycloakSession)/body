@@ -1,0 +1,10 @@
+{
+  if (realmCache == null) {
+synchronized (this) {
+      if (realmCache == null) {
+        Cache<String,Object> cache=session.getProvider(InfinispanConnectionProvider.class).getCache(InfinispanConnectionProvider.REALM_CACHE_NAME);
+        realmCache=new InfinispanRealmCache(cache,realmLookup);
+      }
+    }
+  }
+}

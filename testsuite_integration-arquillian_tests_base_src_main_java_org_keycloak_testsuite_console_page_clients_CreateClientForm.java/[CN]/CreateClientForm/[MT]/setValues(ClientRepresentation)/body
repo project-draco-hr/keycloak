@@ -4,17 +4,21 @@
   setName(client.getName());
   setEnabled(client.isEnabled());
   setConsentRequired(client.isConsentRequired());
-  setStandardFlowEnabled(client.isStandardFlowEnabled());
-  setImplicitFlowEnabled(client.isImplicitFlowEnabled());
-  setDirectAccessGrantsEnabled(client.isDirectAccessGrantsEnabled());
   setProtocol(client.getProtocol());
   if (OIDC.equals(client.getProtocol())) {
     setAccessType(client);
     if (!client.isBearerOnly()) {
-      if (!client.isPublicClient()) {
+      setStandardFlowEnabled(client.isStandardFlowEnabled());
+      setDirectAccessGrantsEnabled(client.isDirectAccessGrantsEnabled());
+      if (client.isPublicClient()) {
+        setImplicitFlowEnabled(client.isImplicitFlowEnabled());
+      }
+ else {
         setServiceAccountsEnabled(client.isServiceAccountsEnabled());
       }
-      setRedirectUris(client.getRedirectUris());
+      if (client.isStandardFlowEnabled() || client.isImplicitFlowEnabled()) {
+        setRedirectUris(client.getRedirectUris());
+      }
     }
   }
 }

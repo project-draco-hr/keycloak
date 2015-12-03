@@ -1,0 +1,17 @@
+{
+  try {
+    RealmRepresentation rep=new RealmRepresentation();
+    rep.setRealm("new-realm");
+    keycloak.realms().create(rep);
+    assertNames(keycloak.realms().findAll(),"master","test",REALM_NAME,"new-realm");
+  }
+  finally {
+    KeycloakSession session=keycloakRule.startSession();
+    RealmManager manager=new RealmManager(session);
+    RealmModel newRealm=manager.getRealmByName("new-realm");
+    if (newRealm != null) {
+      manager.removeRealm(newRealm);
+    }
+    keycloakRule.stopSession(session,true);
+  }
+}

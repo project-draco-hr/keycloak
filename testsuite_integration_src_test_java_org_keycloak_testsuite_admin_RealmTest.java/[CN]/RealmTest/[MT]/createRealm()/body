@@ -1,14 +1,14 @@
 {
   try {
-    RealmRepresentation rep=new RealmRepresentation();
-    rep.setRealm("new-realm");
+    RealmRepresentation rep=KeycloakServer.loadJson(getClass().getResourceAsStream("/admin-test/testrealm.json"),RealmRepresentation.class);
     keycloak.realms().create(rep);
-    assertNames(keycloak.realms().findAll(),"master","test",REALM_NAME,"new-realm");
+    RealmRepresentation created=keycloak.realms().realm("admin-test-1").toRepresentation();
+    assertRealm(rep,created);
   }
   finally {
     KeycloakSession session=keycloakRule.startSession();
     RealmManager manager=new RealmManager(session);
-    RealmModel newRealm=manager.getRealmByName("new-realm");
+    RealmModel newRealm=manager.getRealmByName("admin-test-1");
     if (newRealm != null) {
       manager.removeRealm(newRealm);
     }

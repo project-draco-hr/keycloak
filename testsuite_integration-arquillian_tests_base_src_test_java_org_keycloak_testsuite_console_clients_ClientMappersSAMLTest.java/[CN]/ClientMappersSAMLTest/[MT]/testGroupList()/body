@@ -1,0 +1,16 @@
+{
+  clientMappersPage.mapperTable().createMapper();
+  setInitialValues("group list",false,null);
+  createClientMappersPage.form().setMapperType(GROUP_LIST);
+  createClientMappersPage.form().setGroupAttributeName("group attribute name");
+  createClientMappersPage.form().setSingleGroupAttribute(true);
+  createClientMappersPage.form().setFullGroupPath(true);
+  createClientMappersPage.form().save();
+  assertFlashMessageSuccess();
+  ProtocolMapperRepresentation found=findClientMapperByName(id,"group list");
+  assertEquals("saml-group-membership-mapper",found.getProtocolMapper());
+  Map<String,String> config=found.getConfig();
+  assertEquals("true",config.get("full.path"));
+  assertEquals("true",config.get("single"));
+  assertEquals("group attribute name",config.get("attribute.name"));
+}

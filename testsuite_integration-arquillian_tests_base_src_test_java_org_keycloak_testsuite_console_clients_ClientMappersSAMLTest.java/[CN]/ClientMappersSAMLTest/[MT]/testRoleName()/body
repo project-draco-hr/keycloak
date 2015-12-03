@@ -1,0 +1,14 @@
+{
+  clientMappersPage.mapperTable().createMapper();
+  setInitialValues("role name",false,null);
+  createClientMappersPage.form().setMapperType(ROLE_NAME_MAPPER);
+  createClientMappersPage.form().setRole("offline_access");
+  createClientMappersPage.form().setNewRole("new role");
+  createClientMappersPage.form().save();
+  assertFlashMessageSuccess();
+  ProtocolMapperRepresentation found=findClientMapperByName(id,"role name");
+  assertEquals("saml-role-name-mapper",found.getProtocolMapper());
+  Map<String,String> config=found.getConfig();
+  assertEquals("offline_access",config.get("role"));
+  assertEquals("new role",config.get("new.role.name"));
+}

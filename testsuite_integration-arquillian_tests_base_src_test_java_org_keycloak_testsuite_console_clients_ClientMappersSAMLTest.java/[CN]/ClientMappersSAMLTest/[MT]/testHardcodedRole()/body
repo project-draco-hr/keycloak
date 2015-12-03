@@ -1,0 +1,14 @@
+{
+  clientMappersPage.mapperTable().createMapper();
+  setInitialValues("hardcoded role",false,null);
+  createClientMappersPage.form().setMapperType(HARDCODED_ROLE_SAML);
+  createClientMappersPage.form().selectRole(REALM_ROLE,"offline_access",null);
+  createClientMappersPage.form().save();
+  assertFlashMessageSuccess();
+  ProtocolMapperRepresentation found=findClientMapperByName(id,"hardcoded role");
+  assertNotNull(found);
+  assertEquals("saml-hardcode-role-mapper",found.getProtocolMapper());
+  Map<String,String> config=found.getConfig();
+  assertEquals(1,config.size());
+  assertEquals("offline_access",config.get("role"));
+}

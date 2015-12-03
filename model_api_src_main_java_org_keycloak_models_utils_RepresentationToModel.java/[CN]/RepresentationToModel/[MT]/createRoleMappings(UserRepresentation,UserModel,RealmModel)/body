@@ -1,0 +1,21 @@
+{
+  if (userRep.getRealmRoles() != null) {
+    for (    String roleString : userRep.getRealmRoles()) {
+      RoleModel role=realm.getRole(roleString.trim());
+      if (role == null) {
+        role=realm.addRole(roleString.trim());
+      }
+      user.grantRole(role);
+    }
+  }
+  if (userRep.getClientRoles() != null) {
+    Map<String,ClientModel> clientMap=realm.getClientNameMap();
+    for (    Map.Entry<String,List<String>> entry : userRep.getClientRoles().entrySet()) {
+      ClientModel client=clientMap.get(entry.getKey());
+      if (client == null) {
+        throw new RuntimeException("Unable to find client role mappings for client: " + entry.getKey());
+      }
+      createClientRoleMappings(client,user,entry.getValue());
+    }
+  }
+}

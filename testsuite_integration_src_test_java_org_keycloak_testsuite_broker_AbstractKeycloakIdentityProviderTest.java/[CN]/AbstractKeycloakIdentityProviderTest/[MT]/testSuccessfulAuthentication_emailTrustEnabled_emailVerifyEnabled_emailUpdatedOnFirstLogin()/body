@@ -1,10 +1,11 @@
 {
-  getRealm().setVerifyEmail(true);
+  RealmModel realm=getRealm();
+  realm.setVerifyEmail(true);
+  setUpdateProfileFirstLogin(realm,IdentityProviderRepresentation.UPFLM_ON);
   brokerServerRule.stopSession(this.session,true);
   this.session=brokerServerRule.startSession();
   IdentityProviderModel identityProviderModel=getIdentityProviderModel();
   try {
-    setUpdateProfileFirstLogin(IdentityProviderRepresentation.UPFLM_ON);
     identityProviderModel.setTrustEmail(true);
     UserModel user=assertSuccessfulAuthenticationWithEmailVerification(identityProviderModel,"test-user","new@email.com",true);
     Assert.assertEquals("617-666-7777",user.getFirstAttribute("mobile"));

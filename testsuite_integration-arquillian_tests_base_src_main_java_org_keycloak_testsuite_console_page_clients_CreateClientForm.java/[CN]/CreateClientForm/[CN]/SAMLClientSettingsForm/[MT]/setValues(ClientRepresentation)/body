@@ -1,5 +1,5 @@
 {
-  waitAjaxForElementVisible(fineGrainCollapsor);
+  waitUntilElement(fineGrainCollapsor).is().visible();
   Map<String,String> attributes=client.getAttributes();
   samlAuthnStatement.setOn("true".equals(attributes.get(SAML_AUTHNSTATEMENT)));
   samlServerSignature.setOn("true".equals(attributes.get(SAML_SERVER_SIGNATURE)));
@@ -15,7 +15,7 @@
   samlForceNameIdFormat.setOn("true".equals(attributes.get(SAML_FORCE_NAME_ID_FORMAT)));
   samlNameIdFormat.selectByVisibleText(attributes.get(SAML_NAME_ID_FORMAT));
   fineGrainCollapsor.click();
-  waitAjaxForElement(consumerServicePostInput);
+  waitUntilElement(consumerServicePostInput).is().present();
   setInputValue(consumerServicePostInput,attributes.get(SAML_ASSERTION_CONSUMER_URL_POST));
   setInputValue(consumerServiceRedirectInput,attributes.get(SAML_ASSERTION_CONSUMER_URL_REDIRECT));
   setInputValue(logoutPostBindingInput,attributes.get(SAML_SINGLE_LOGOUT_SERVICE_URL_POST));

@@ -3,9 +3,11 @@
   MailServer.createEmailAccount(testUser.getEmail(),"password");
   log.info("enabling verify email in login settings");
   loginSettingsPage.form().setVerifyEmailAllowed(true);
+  assertTrue(loginSettingsPage.form().isVerifyEmailAllowed());
   loginSettingsPage.form().save();
+  assertFlashMessageSuccess();
   log.debug("enabled");
-  log.info("configure smpt server in test realm");
+  log.info("configure smtp server in test realm");
   RealmRepresentation testRealmRep=testRealmResource().toRepresentation();
   testRealmRep.setSmtpServer(suiteContext.getSmtpServer());
   testRealmResource().update(testRealmRep);
@@ -16,8 +18,9 @@
   log.info("disabling verify email");
   loginSettingsPage.navigateTo();
   loginSettingsPage.form().setVerifyEmailAllowed(false);
-  loginSettingsPage.form().save();
   assertFalse(loginSettingsPage.form().isVerifyEmailAllowed());
+  loginSettingsPage.form().save();
+  assertFlashMessageSuccess();
   log.debug("disabled");
   log.debug("create new test user");
   UserRepresentation newUser=createUserRepresentation("new_user","new_user@email.test","new","user",true);

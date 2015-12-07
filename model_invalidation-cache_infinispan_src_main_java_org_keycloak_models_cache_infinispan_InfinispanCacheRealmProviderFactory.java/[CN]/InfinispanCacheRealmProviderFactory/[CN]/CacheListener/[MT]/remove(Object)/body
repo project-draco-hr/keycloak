@@ -1,0 +1,10 @@
+{
+  if (object instanceof CachedRealm) {
+    CachedRealm realm=(CachedRealm)object;
+    realmLookup.remove(realm.getName());
+    for (    String c : realm.getClients().values()) {
+      realmCache.evictCachedApplicationById(c);
+    }
+    log.tracev("Realm removed realm={0}",realm.getName());
+  }
+}

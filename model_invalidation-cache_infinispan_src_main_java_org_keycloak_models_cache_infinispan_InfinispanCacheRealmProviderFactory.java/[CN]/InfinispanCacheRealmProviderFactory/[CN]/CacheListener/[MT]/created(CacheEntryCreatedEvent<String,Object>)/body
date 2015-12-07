@@ -1,0 +1,19 @@
+{
+  if (!event.isPre()) {
+    Object object;
+    if (isNewInfinispan) {
+      object=event.getValue();
+    }
+ else {
+      String id=event.getKey();
+      object=event.getCache().get(id);
+    }
+    if (object != null) {
+      if (object instanceof CachedRealm) {
+        CachedRealm realm=(CachedRealm)object;
+        realmLookup.put(realm.getName(),realm.getId());
+        log.tracev("Realm added realm={0}",realm.getName());
+      }
+    }
+  }
+}

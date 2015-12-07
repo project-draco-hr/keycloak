@@ -3,10 +3,12 @@
 {
     KeycloakSession session=kc.startSession();
     RealmModel realm=session.realms().getRealmByName("test");
+    assertTrue(realm instanceof RealmAdapter);
     ClientModel testApp=realm.getClientByClientId("test-app");
+    assertTrue(testApp instanceof ClientAdapter);
     assertNotNull(testApp);
     appId=testApp.getId();
-    Assert.assertTrue(testApp.isEnabled());
+    assertTrue(testApp.isEnabled());
     kc.stopSession(session,true);
   }
 {
@@ -14,12 +16,12 @@
     RealmModel realm=null;
     List<RealmModel> realms=session.realms().getRealms();
     for (    RealmModel current : realms) {
+      assertTrue(current instanceof RealmAdapter);
       if ("test".equals(current.getName())) {
         realm=current;
         break;
       }
     }
-    Assert.assertTrue(realm instanceof RealmAdapter);
     realm.setAccessCodeLifespanLogin(200);
     ClientModel testApp=realm.getClientByClientId("test-app");
     assertNotNull(testApp);

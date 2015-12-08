@@ -9,7 +9,9 @@
   UserRepresentation user=realms.get(0).getUsers().get(0);
   assertEquals(new Integer(100000),user.getCredentials().get(0).getHashIterations());
   assertNull(user.getCredentials().get(0).getValue());
-  assertEquals(new Pbkdf2PasswordEncoder(Base64Url.decode(user.getCredentials().get(0).getSalt()),100000).encode("password"),user.getCredentials().get(0).getHashedSaltedValue());
+  CredentialRepresentation credentials=user.getCredentials().get(0);
+  assertEquals(Pbkdf2PasswordHashProvider.ID,credentials.getAlgorithm());
+  assertEquals(new Integer(100000),credentials.getHashIterations());
   KeycloakServer server=new KeycloakServer();
   try {
     server.start();

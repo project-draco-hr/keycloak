@@ -1,0 +1,19 @@
+{
+  if (passwordHistoryPolicyValue != -1) {
+    UserCredentialValueModel cred=getCredentialValueModel(user,UserCredentialModel.PASSWORD);
+    if (cred != null) {
+      PasswordHashProvider hashProvider=session.getProvider(PasswordHashProvider.class,cred.getAlgorithm());
+      if (hashProvider.verify(password,cred)) {
+        return new Error(INVALID_PASSWORD_HISTORY,passwordHistoryPolicyValue);
+      }
+    }
+    List<UserCredentialValueModel> passwordExpiredCredentials=getCredentialValueModels(user,passwordHistoryPolicyValue - 1,UserCredentialModel.PASSWORD_HISTORY);
+    for (    UserCredentialValueModel credential : passwordExpiredCredentials) {
+      PasswordHashProvider hashProvider=session.getProvider(PasswordHashProvider.class,cred.getAlgorithm());
+      if (hashProvider.verify(password,credential)) {
+        return new Error(INVALID_PASSWORD_HISTORY,passwordHistoryPolicyValue);
+      }
+    }
+  }
+  return null;
+}

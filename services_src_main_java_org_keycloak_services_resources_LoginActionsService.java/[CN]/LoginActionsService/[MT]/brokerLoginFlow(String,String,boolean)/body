@@ -1,0 +1,42 @@
+{
+  EventType eventType=firstBrokerLogin ? EventType.IDENTITY_PROVIDER_FIRST_LOGIN : EventType.IDENTITY_PROVIDER_POST_LOGIN;
+  event.event(eventType);
+  Checks checks=new Checks();
+  if (!checks.verifyCode(code,ClientSessionModel.Action.AUTHENTICATE.name(),ClientSessionCode.ActionType.LOGIN)) {
+    return checks.response;
+  }
+  event.detail(Details.CODE_ID,code);
+  ClientSessionCode clientSessionCode=checks.clientCode;
+  final ClientSessionModel clientSessionn=clientSessionCode.getClientSession();
+  String noteKey=firstBrokerLogin ? AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE : PostBrokerLoginConstants.PBL_BROKERED_IDENTITY_CONTEXT;
+  SerializedBrokeredIdentityContext serializedCtx=SerializedBrokeredIdentityContext.readFromClientSession(clientSessionn,noteKey);
+  if (serializedCtx == null) {
+    logger.errorf("Not found serialized context in clientSession under note '%s'",noteKey);
+    throw new WebApplicationException(ErrorPage.error(session,"Not found serialized context in clientSession."));
+  }
+  BrokeredIdentityContext brokerContext=serializedCtx.deserialize(session,clientSessionn);
+  final String identityProviderAlias=brokerContext.getIdpConfig().getAlias();
+  String flowId=firstBrokerLogin ? brokerContext.getIdpConfig().getFirstBrokerLoginFlowId() : brokerContext.getIdpConfig().getPostBrokerLoginFlowId();
+  if (flowId == null) {
+    logger.errorf("Flow not configured for identity provider '%s'",identityProviderAlias);
+    throw new WebApplicationException(ErrorPage.error(session,"Flow not configured for identity provider"));
+  }
+  AuthenticationFlowModel brokerLoginFlow=realm.getAuthenticationFlowById(flowId);
+  if (brokerLoginFlow == null) {
+    logger.errorf("Not found configured flow with ID '%s' for identity provider '%s'",flowId,identityProviderAlias);
+    throw new WebApplicationException(ErrorPage.error(session,"Flow not found for identity provider"));
+  }
+  event.detail(Details.IDENTITY_PROVIDER,identityProviderAlias).detail(Details.IDENTITY_PROVIDER_USERNAME,brokerContext.getUsername());
+  AuthenticationProcessor processor=new AuthenticationProcessor(){
+    @Override protected Response authenticationComplete(){
+      if (!firstBrokerLogin) {
+        String authStateNoteKey=PostBrokerLoginConstants.PBL_AUTH_STATE_PREFIX + identityProviderAlias;
+        clientSessionn.setNote(authStateNoteKey,"true");
+      }
+      return redirectToAfterBrokerLoginEndpoint(clientSession,firstBrokerLogin);
+    }
+  }
+;
+  String flowPath=firstBrokerLogin ? FIRST_BROKER_LOGIN_PATH : POST_BROKER_LOGIN_PATH;
+  return processFlow(execution,clientSessionn,flowPath,brokerLoginFlow,null,processor);
+}

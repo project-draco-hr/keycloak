@@ -2,24 +2,32 @@
   ClientSessionCode clientCode=parseClientSessionCode(code);
   ClientSessionModel clientSession=clientCode.getClientSession();
   try {
-    SerializedBrokeredIdentityContext serializedCtx=SerializedBrokeredIdentityContext.readFromClientSession(clientSession);
+    this.event.detail(Details.CODE_ID,clientSession.getId()).removeDetail("auth_method");
+    SerializedBrokeredIdentityContext serializedCtx=SerializedBrokeredIdentityContext.readFromClientSession(clientSession,AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE);
     if (serializedCtx == null) {
       throw new IdentityBrokerException("Not found serialized context in clientSession");
     }
     BrokeredIdentityContext context=serializedCtx.deserialize(session,clientSession);
     String providerId=context.getIdpConfig().getAlias();
+    event.detail(Details.IDENTITY_PROVIDER,providerId);
+    event.detail(Details.IDENTITY_PROVIDER_USERNAME,context.getUsername());
     clientSession.removeNote(AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE);
     UserModel federatedUser=clientSession.getAuthenticatedUser();
     if (federatedUser == null) {
       throw new IdentityBrokerException("Couldn't found authenticated federatedUser in clientSession");
     }
+    event.user(federatedUser);
+    event.detail(Details.USERNAME,federatedUser.getUsername());
     if (context.getIdpConfig().isAddReadTokenRoleOnCreate()) {
-      RoleModel readTokenRole=realmModel.getClientByClientId(Constants.BROKER_SERVICE_CLIENT_ID).getRole(Constants.READ_TOKEN_ROLE);
+      ClientModel brokerClient=realmModel.getClientByClientId(Constants.BROKER_SERVICE_CLIENT_ID);
+      if (brokerClient == null) {
+        throw new IdentityBrokerException("Client 'broker' not available. Maybe realm has not migrated to support the broker token exchange service");
+      }
+      RoleModel readTokenRole=brokerClient.getRole(Constants.READ_TOKEN_ROLE);
       federatedUser.grantRole(readTokenRole);
     }
     FederatedIdentityModel federatedIdentityModel=new FederatedIdentityModel(context.getIdpConfig().getAlias(),context.getId(),context.getUsername(),context.getToken());
     session.users().addFederatedIdentity(realmModel,federatedUser,federatedIdentityModel);
-    EventBuilder event=this.event.clone().user(federatedUser).detail(Details.CODE_ID,clientSession.getId()).detail(Details.USERNAME,federatedUser.getUsername()).detail(Details.IDENTITY_PROVIDER,providerId).detail(Details.IDENTITY_PROVIDER_USERNAME,context.getUsername()).removeDetail("auth_method");
     String isRegisteredNewUser=clientSession.getNote(AbstractIdpAuthenticator.BROKER_REGISTERED_NEW_USER);
     if (Boolean.parseBoolean(isRegisteredNewUser)) {
       LOGGER.debugf("Registered new user '%s' after first login with identity provider '%s'. Identity provider username is '%s' . ",federatedUser.getUsername(),providerId,context.getUsername());
@@ -43,14 +51,7 @@
       event.event(EventType.FEDERATED_IDENTITY_LINK).success();
       updateFederatedIdentity(context,federatedUser);
     }
-    String isDifferentBrowser=clientSession.getNote(AbstractIdpAuthenticator.IS_DIFFERENT_BROWSER);
-    if (Boolean.parseBoolean(isDifferentBrowser)) {
-      session.sessions().removeClientSession(realmModel,clientSession);
-      return session.getProvider(LoginFormsProvider.class).setSuccess(Messages.IDENTITY_PROVIDER_LINK_SUCCESS,context.getIdpConfig().getAlias(),context.getUsername()).createInfoPage();
-    }
- else {
-      return finishBrokerAuthentication(context,federatedUser,clientSession,providerId);
-    }
+    return finishOrRedirectToPostBrokerLogin(clientSession,context,true);
   }
  catch (  Exception e) {
     return redirectToErrorPage(Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR,e);

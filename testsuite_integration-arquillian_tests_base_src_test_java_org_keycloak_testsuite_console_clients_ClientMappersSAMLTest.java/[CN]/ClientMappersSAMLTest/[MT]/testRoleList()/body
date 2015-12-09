@@ -1,0 +1,20 @@
+{
+  clientMappersPage.mapperTable().createMapper();
+  setInitialValues("new role list",false,null);
+  createClientMappersPage.form().setMapperType(ROLE_LIST);
+  createClientMappersPage.form().setRoleAttributeName("role attribute name");
+  createClientMappersPage.form().setFriendlyName("friendly name");
+  createClientMappersPage.form().setSamlAttributeNameFormat("URI Reference");
+  createClientMappersPage.form().setSingleRoleAttribute(true);
+  createClientMappersPage.form().save();
+  assertAlertSuccess();
+  ProtocolMapperRepresentation found=findClientMapperByName(id,"new role list");
+  assertNotNull(found);
+  assertFalse(found.isConsentRequired());
+  assertEquals("saml-role-list-mapper",found.getProtocolMapper());
+  Map<String,String> config=found.getConfig();
+  assertEquals("role attribute name",config.get("attribute.name"));
+  assertEquals("URI Reference",config.get("attribute.nameformat"));
+  assertEquals("friendly name",config.get("friendly.name"));
+  assertEquals("true",config.get("single"));
+}

@@ -1,0 +1,10 @@
+{
+  newClient=createSamlClientRep("saml");
+  createClient(newClient);
+  assertAlertSuccess();
+  ClientRepresentation found=findClientByClientId(newClient.getClientId());
+  System.out.println("...." + found.isFrontchannelLogout());
+  assertNotNull("Client " + newClient.getClientId() + " was not found.",found);
+  assertClientSettingsEqual(newClient,found);
+  assertClientSamlAttributes(getSAMLAttributes(),found.getAttributes());
+}

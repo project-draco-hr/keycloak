@@ -1,0 +1,21 @@
+{
+  assertTrue(found.isFullScopeAllowed());
+  clientScopePage.scopeForm().setFullScopeAllowed(false);
+  assertAlertSuccess();
+  found=findClientByClientId(TEST_CLIENT_ID);
+  assertFalse(found.isFullScopeAllowed());
+  assertNull(getAllMappingsRepresentation().getRealmMappings());
+  assertNull(getAllMappingsRepresentation().getClientMappings());
+  clientScopePage.roleForm().addRealmRole("offline_access");
+  assertAlertSuccess();
+  clientScopePage.roleForm().selectClientRole("account");
+  clientScopePage.roleForm().addClientRole("view-profile");
+  assertAlertSuccess();
+  found=findClientByClientId(TEST_CLIENT_ID);
+  List<RoleRepresentation> realmMappings=getAllMappingsRepresentation().getRealmMappings();
+  assertEquals(1,realmMappings.size());
+  assertEquals("offline_access",realmMappings.get(0).getName());
+  Map<String,ClientMappingsRepresentation> clientMappings=getAllMappingsRepresentation().getClientMappings();
+  assertEquals(1,clientMappings.size());
+  assertEquals("view-profile",clientMappings.get("account").getMappings().get(0).getName());
+}

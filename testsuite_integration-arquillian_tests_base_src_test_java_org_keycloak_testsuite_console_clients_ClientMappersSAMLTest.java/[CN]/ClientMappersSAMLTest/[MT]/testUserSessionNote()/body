@@ -1,0 +1,11 @@
+{
+  clientMappersPage.mapperTable().createMapper();
+  setInitialValues("user session note",false,null);
+  createClientMappersPage.form().setMapperType(USER_SESSION_NOTE);
+  createClientMappersPage.form().save();
+  assertAlertSuccess();
+  ProtocolMapperRepresentation found=findClientMapperByName(id,"user session note");
+  assertNotNull(found);
+  assertFalse(found.isConsentRequired());
+  assertEquals("saml-user-session-note-mapper",found.getProtocolMapper());
+}

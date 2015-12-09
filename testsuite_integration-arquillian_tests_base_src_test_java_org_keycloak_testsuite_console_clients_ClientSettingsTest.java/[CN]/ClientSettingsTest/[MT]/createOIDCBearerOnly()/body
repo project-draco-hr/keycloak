@@ -1,9 +1,8 @@
 {
-  newClient=createClientRepresentation("oidc-bearer-only","http://example.test/app/*");
-  newClient.setBearerOnly(true);
+  newClient=createOidcClientRep(BEARER_ONLY,"oidc-bearer-only");
   createClient(newClient);
   assertAlertSuccess();
-  clientPage.backToClientsViaBreadcrumb();
-  assertCurrentUrlEquals(clientsPage);
-  assertEquals(1,clientsPage.table().searchClients(newClient.getClientId()).size());
+  ClientRepresentation found=findClientByClientId(newClient.getClientId());
+  assertNotNull("Client " + newClient.getClientId() + " was not found.",found);
+  assertClientSettingsEqual(newClient,found);
 }

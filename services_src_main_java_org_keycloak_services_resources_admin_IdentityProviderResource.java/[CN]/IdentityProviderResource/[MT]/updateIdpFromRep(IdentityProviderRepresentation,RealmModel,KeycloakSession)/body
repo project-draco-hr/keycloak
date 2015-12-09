@@ -1,0 +1,10 @@
+{
+  String internalId=providerRep.getInternalId();
+  String newProviderId=providerRep.getAlias();
+  String oldProviderId=getProviderIdByInternalId(realm,internalId);
+  realm.updateIdentityProvider(RepresentationToModel.toModel(realm,providerRep));
+  if (oldProviderId != null && !oldProviderId.equals(newProviderId)) {
+    logger.debug("Changing providerId in all clients and linked users. oldProviderId=" + oldProviderId + ", newProviderId="+ newProviderId);
+    updateUsersAfterProviderAliasChange(session.users().getUsers(realm,false),oldProviderId,newProviderId,realm,session);
+  }
+}

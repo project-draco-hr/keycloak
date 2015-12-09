@@ -1,0 +1,35 @@
+{
+  PartialImportResults results=new PartialImportResults();
+  List<T> repList=getRepList(partialImportRep);
+  if ((repList == null) || repList.isEmpty())   return results;
+  final Set<T> toOverwrite=new HashSet<>();
+  final Set<T> toSkip=new HashSet<>();
+  prepare(partialImportRep,realm,session,toOverwrite,toSkip);
+  for (  T resourceRep : toOverwrite) {
+    System.out.println("overwriting " + getResourceType() + " "+ getName(resourceRep));
+    try {
+      overwrite(realm,session,resourceRep);
+    }
+ catch (    Exception e) {
+      throw new ErrorResponseException(ErrorResponse.error(e.getMessage(),Response.Status.INTERNAL_SERVER_ERROR));
+    }
+    results.addResult(overwritten(resourceRep));
+  }
+  for (  T resourceRep : toSkip) {
+    System.out.println("skipping " + getResourceType() + " "+ getName(resourceRep));
+    results.addResult(skipped(resourceRep));
+  }
+  for (  T resourceRep : repList) {
+    if (toOverwrite.contains(resourceRep))     continue;
+    if (toSkip.contains(resourceRep))     continue;
+    try {
+      System.out.println("adding " + getResourceType() + " "+ getName(resourceRep));
+      create(realm,session,resourceRep);
+      results.addResult(added(resourceRep));
+    }
+ catch (    Exception e) {
+      throw new ErrorResponseException(ErrorResponse.error(e.getMessage(),Response.Status.INTERNAL_SERVER_ERROR));
+    }
+  }
+  return results;
+}

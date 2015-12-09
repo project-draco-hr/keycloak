@@ -1,0 +1,26 @@
+{
+  PartialImportResults results=new PartialImportResults();
+  for (  PartialImport partialImport : partialImports) {
+    try {
+      results.addAllResults(partialImport.doImport(rep,realm,session));
+    }
+ catch (    ErrorResponseException error) {
+      if (session.getTransaction().isActive())       session.getTransaction().setRollbackOnly();
+      return error.getResponse();
+    }
+  }
+  for (  PartialImportResult result : results.getResults()) {
+switch (result.getAction()) {
+case ADDED:
+      addedEvent(result);
+    break;
+case OVERWRITTEN:
+  overwrittenEvent(result);
+break;
+}
+}
+if (session.getTransaction().isActive()) {
+session.getTransaction().commit();
+}
+return Response.ok(results).build();
+}

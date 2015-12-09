@@ -1,0 +1,21 @@
+{
+  Map<String,List<RoleRepresentation>> repList=getRepList(partialImportRep);
+  for (  String clientId : repList.keySet()) {
+    resourcesToOverwrite.put(clientId,new HashSet<RoleRepresentation>());
+    resourcesToSkip.put(clientId,new HashSet<RoleRepresentation>());
+    for (    RoleRepresentation roleRep : repList.get(clientId)) {
+      if (exists(realm,session,clientId,roleRep)) {
+switch (partialImportRep.getPolicy()) {
+case SKIP:
+          resourcesToSkip.get(clientId).add(roleRep);
+        break;
+case OVERWRITE:
+      resourcesToOverwrite.get(clientId).add(roleRep);
+    break;
+default :
+  throw exists(existsMessage(clientId,roleRep));
+}
+}
+}
+}
+}

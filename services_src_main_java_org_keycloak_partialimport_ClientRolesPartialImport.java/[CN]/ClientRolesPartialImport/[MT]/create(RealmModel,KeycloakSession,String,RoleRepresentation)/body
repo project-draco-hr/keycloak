@@ -1,0 +1,9 @@
+{
+  ClientModel client=realm.getClientByClientId(clientId);
+  if (client == null) {
+    throw new IllegalStateException("Client '" + clientId + "' does not exist for client role "+ getName(roleRep));
+  }
+  checkForComposite(roleRep);
+  client.addRole(getName(roleRep));
+  overwrite(realm,session,clientId,roleRep);
+}

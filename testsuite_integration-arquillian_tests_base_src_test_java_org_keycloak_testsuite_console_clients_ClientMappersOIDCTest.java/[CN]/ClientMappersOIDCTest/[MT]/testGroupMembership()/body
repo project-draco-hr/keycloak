@@ -1,0 +1,12 @@
+{
+  clientMappersPage.mapperTable().createMapper();
+  setInitialValues("group membership",false,null);
+  createClientMappersPage.form().setMapperType(GROUP_MEMBERSHIP);
+  createClientMappersPage.form().setFullGroupPath(true);
+  createClientMappersPage.form().save();
+  assertAlertSuccess();
+  ProtocolMapperRepresentation found=findClientMapperByName(id,"group membership");
+  assertEquals("oidc-group-membership-mapper",found.getProtocolMapper());
+  Map<String,String> config=found.getConfig();
+  assertEquals("true",config.get("full.path"));
+}

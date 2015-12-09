@@ -1,0 +1,14 @@
+{
+  clientMappersPage.mapperTable().createMapper();
+  setInitialValues("hardcoded attribute",false,null);
+  createClientMappersPage.form().setMapperType(HARDCODED_ATTRIBUTE);
+  createClientMappersPage.form().setAttributeValue("attribute value");
+  createClientMappersPage.form().save();
+  assertAlertSuccess();
+  ProtocolMapperRepresentation found=findClientMapperByName(id,"hardcoded attribute");
+  assertNotNull(found);
+  assertFalse(found.isConsentRequired());
+  assertEquals("saml-hardcode-attribute-mapper",found.getProtocolMapper());
+  Map<String,String> config=found.getConfig();
+  assertEquals("attribute value",config.get("attribute.value"));
+}

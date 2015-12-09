@@ -1,0 +1,25 @@
+{
+  assertTrue(found.getNodeReRegistrationTimeout() == -1);
+  clientClusteringPage.form().setNodeReRegistrationTimeout("10","Seconds");
+  clientClusteringPage.form().save();
+  assertAlertSuccess();
+  assertTrue(findClientByClientId(TEST_CLIENT_ID).getNodeReRegistrationTimeout() == 10);
+  clientClusteringPage.form().setNodeReRegistrationTimeout("10","Minutes");
+  clientClusteringPage.form().save();
+  assertAlertSuccess();
+  assertTrue(findClientByClientId(TEST_CLIENT_ID).getNodeReRegistrationTimeout() == 600);
+  clientClusteringPage.form().setNodeReRegistrationTimeout("1","Hours");
+  clientClusteringPage.form().save();
+  assertAlertSuccess();
+  assertTrue(findClientByClientId(TEST_CLIENT_ID).getNodeReRegistrationTimeout() == 3600);
+  clientClusteringPage.form().setNodeReRegistrationTimeout("1","Days");
+  clientClusteringPage.form().save();
+  assertAlertSuccess();
+  assertTrue(findClientByClientId(TEST_CLIENT_ID).getNodeReRegistrationTimeout() == 86400);
+  clientClusteringPage.form().setNodeReRegistrationTimeout("","Days");
+  clientClusteringPage.form().save();
+  assertAlertDanger();
+  clientClusteringPage.form().setNodeReRegistrationTimeout("text","Days");
+  clientClusteringPage.form().save();
+  assertAlertDanger();
+}

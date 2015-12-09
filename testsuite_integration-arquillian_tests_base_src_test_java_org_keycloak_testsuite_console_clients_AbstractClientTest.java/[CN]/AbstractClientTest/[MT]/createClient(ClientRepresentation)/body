@@ -2,5 +2,8 @@
   assertCurrentUrlEquals(clientsPage);
   clientsPage.table().createClient();
   createClientPage.form().setValues(client);
+  if (SAML.equals(client.getProtocol())) {
+    createClientPage.form().samlForm().setValues(client);
+  }
   createClientPage.form().save();
 }

@@ -1,0 +1,7 @@
+{
+  ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
+  clientSession.setTimestamp(Time.currentTime());
+  URI redirect=firstBrokerLogin ? Urls.identityProviderAfterFirstBrokerLogin(uriInfo.getBaseUri(),realm.getName(),accessCode.getCode()) : Urls.identityProviderAfterPostBrokerLogin(uriInfo.getBaseUri(),realm.getName(),accessCode.getCode());
+  logger.debugf("Redirecting to '%s' ",redirect);
+  return Response.status(302).location(redirect).build();
+}

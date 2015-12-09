@@ -1,0 +1,13 @@
+{
+  RealmModel realmWithBroker=getRealm();
+  IdentityProviderModel samlIdentityProvider=realmWithBroker.getIdentityProviderByAlias("kc-saml-idp-basic");
+  setPostBrokerFlowForProvider(samlIdentityProvider,realmWithBroker,true);
+  brokerServerRule.stopSession(this.session,true);
+  this.session=brokerServerRule.startSession();
+  reauthenticateOIDCWithSAMLBroker(true,false);
+  realmWithBroker=getRealm();
+  samlIdentityProvider=realmWithBroker.getIdentityProviderByAlias("kc-saml-idp-basic");
+  setPostBrokerFlowForProvider(samlIdentityProvider,realmWithBroker,false);
+  brokerServerRule.stopSession(this.session,true);
+  this.session=brokerServerRule.startSession();
+}

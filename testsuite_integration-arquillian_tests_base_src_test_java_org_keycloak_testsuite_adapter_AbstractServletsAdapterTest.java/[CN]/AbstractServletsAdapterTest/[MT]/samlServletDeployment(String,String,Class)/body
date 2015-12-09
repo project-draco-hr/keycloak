@@ -1,0 +1,21 @@
+{
+  String baseSAMLPath="/adapter-test/keycloak-saml/";
+  String webInfPath=baseSAMLPath + name + "/WEB-INF/";
+  URL keycloakSAMLConfig=AbstractServletsAdapterTest.class.getResource(webInfPath + adapterConfig);
+  URL webXML=AbstractServletsAdapterTest.class.getResource(baseSAMLPath + "web.xml");
+  WebArchive deployment=ShrinkWrap.create(WebArchive.class,name + ".war").addClasses(servletClasses).addAsWebInfResource(keycloakSAMLConfig,"keycloak-saml.xml").addAsWebInfResource(jbossDeploymentStructure,JBOSS_DEPLOYMENT_STRUCTURE_XML);
+  String webXMLContent;
+  try {
+    webXMLContent=IOUtils.toString(webXML.openStream()).replace("%CONTEXT_PATH%",name);
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  deployment.add(new StringAsset(webXMLContent),"/WEB-INF/web.xml");
+  URL keystore=AbstractServletsAdapterTest.class.getResource(webInfPath + "keystore.jks");
+  if (keystore != null) {
+    deployment.addAsWebInfResource(keystore,"keystore.jks");
+  }
+  addContextXml(deployment,name);
+  return deployment;
+}

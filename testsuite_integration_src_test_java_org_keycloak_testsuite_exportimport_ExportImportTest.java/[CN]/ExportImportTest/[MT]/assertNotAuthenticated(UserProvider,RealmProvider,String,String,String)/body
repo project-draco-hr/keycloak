@@ -7,5 +7,11 @@
   if (user == null) {
     return;
   }
-  Assert.assertFalse(userProvider.validCredentials(realm,user,UserCredentialModel.password(password)));
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    Assert.assertFalse(userProvider.validCredentials(session,realm,user,UserCredentialModel.password(password)));
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
 }

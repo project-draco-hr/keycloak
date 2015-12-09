@@ -19,13 +19,13 @@
  catch (  PatternSyntaxException e) {
   }
   policy=new PasswordPolicy("regexPattern(jdoe) and regexPattern(j*d)");
-  Assert.assertEquals("invalidPasswordRegexPatternMessage",policy.validate("jdoe","jdoe").getMessage());
+  Assert.assertEquals("invalidPasswordRegexPatternMessage",policy.validate(null,"jdoe","jdoe").getMessage());
   policy=new PasswordPolicy("regexPattern(j*p) and regexPattern(j*d) and regexPattern(adoe)");
-  Assert.assertEquals("invalidPasswordRegexPatternMessage",policy.validate("jdoe","jdoe").getMessage());
+  Assert.assertEquals("invalidPasswordRegexPatternMessage",policy.validate(null,"jdoe","jdoe").getMessage());
   policy=new PasswordPolicy("regexPattern([a-z][a-z][a-z][a-z][0-9])");
-  Assert.assertEquals("invalidPasswordRegexPatternMessage",policy.validate("jdoe","jdoe").getMessage());
+  Assert.assertEquals("invalidPasswordRegexPatternMessage",policy.validate(null,"jdoe","jdoe").getMessage());
   policy=new PasswordPolicy("regexPattern(jdoe)");
-  Assert.assertNull(policy.validate("jdoe","jdoe"));
+  Assert.assertNull(policy.validate(null,"jdoe","jdoe"));
   policy=new PasswordPolicy("regexPattern([a-z][a-z][a-z][a-z][0-9])");
-  Assert.assertNull(policy.validate("jdoe","jdoe0"));
+  Assert.assertNull(policy.validate(null,"jdoe","jdoe0"));
 }

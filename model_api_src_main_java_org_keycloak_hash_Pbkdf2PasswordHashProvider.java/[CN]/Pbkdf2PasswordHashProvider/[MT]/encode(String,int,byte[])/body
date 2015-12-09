@@ -1,0 +1,10 @@
+{
+  KeySpec spec=new PBEKeySpec(rawPassword.toCharArray(),salt,iterations,DERIVED_KEY_SIZE);
+  try {
+    byte[] key=getSecretKeyFactory().generateSecret(spec).getEncoded();
+    return Base64.encodeBytes(key);
+  }
+ catch (  InvalidKeySpecException e) {
+    throw new RuntimeException("Credential could not be encoded");
+  }
+}

@@ -1,13 +1,8 @@
 {
-  byte[] salt=getSalt();
-  int hashIterations=1;
-  PasswordPolicy policy=realm.getPasswordPolicy();
-  if (policy != null) {
-    hashIterations=policy.getHashIterations();
-    if (hashIterations == -1)     hashIterations=1;
-  }
+  UserCredentialValueModel encoded=PasswordHashManager.encode(session,realm,cred.getValue());
   credentialEntity.setCreatedDate(Time.toMillis(Time.currentTime()));
-  credentialEntity.setValue(new Pbkdf2PasswordEncoder(salt).encode(cred.getValue(),hashIterations));
-  credentialEntity.setSalt(salt);
-  credentialEntity.setHashIterations(hashIterations);
+  credentialEntity.setAlgorithm(encoded.getAlgorithm());
+  credentialEntity.setValue(encoded.getValue());
+  credentialEntity.setSalt(encoded.getSalt());
+  credentialEntity.setHashIterations(encoded.getHashIterations());
 }

@@ -1,0 +1,14 @@
+{
+  if (unhashedCredValue == null) {
+    return false;
+  }
+  boolean validated=PasswordHashManager.verify(session,realm,unhashedCredValue,credential);
+  if (validated) {
+    int iterations=hashIterations(realm);
+    if (iterations > -1 && iterations != credential.getHashIterations()) {
+      UserCredentialValueModel newCred=PasswordHashManager.encode(session,realm,unhashedCredValue);
+      user.updateCredentialDirectly(newCred);
+    }
+  }
+  return validated;
+}

@@ -9,19 +9,19 @@
   createLdapUserProvider.form().setLdapBindCredentialInput("secret");
   createLdapUserProvider.form().setAccountAfterPasswordUpdateEnabled(true);
   createLdapUserProvider.form().save();
-  assertFlashMessageSuccess();
+  assertAlertSuccess();
   LDAPEmbeddedServer ldapServer=null;
   try {
     ldapServer=startEmbeddedLdapServer();
     createLdapUserProvider.form().testConnection();
-    assertFlashMessageSuccess();
+    assertAlertSuccess();
     createLdapUserProvider.form().testAuthentication();
-    assertFlashMessageSuccess();
+    assertAlertSuccess();
     createLdapUserProvider.form().synchronizeAllUsers();
-    assertFlashMessageSuccess();
+    assertAlertSuccess();
     createLdapUserProvider.form().setLdapBindCredentialInput("secret1");
     createLdapUserProvider.form().testAuthentication();
-    assertFlashMessageDanger();
+    assertAlertDanger();
   }
   finally {
     if (ldapServer != null) {

@@ -1,0 +1,17 @@
+{
+  salesPostPassiveServletPage.navigateTo();
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  salesPostServletPage.navigateTo();
+  testRealmSAMLLoginPage.form().login(bburkeUser);
+  salesPostPassiveServletPage.navigateTo();
+  assertTrue(driver.getPageSource().contains("principal=bburke"));
+  salesPostPassiveServletPage.logout();
+  salesPostPassiveServletPage.navigateTo();
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  salesPostServletPage.navigateTo();
+  testRealmSAMLLoginPage.form().login("unauthorized","password");
+  salesPostPassiveServletPage.navigateTo();
+  assertFalse(driver.getPageSource().contains("principal="));
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  salesPostPassiveServletPage.logout();
+}

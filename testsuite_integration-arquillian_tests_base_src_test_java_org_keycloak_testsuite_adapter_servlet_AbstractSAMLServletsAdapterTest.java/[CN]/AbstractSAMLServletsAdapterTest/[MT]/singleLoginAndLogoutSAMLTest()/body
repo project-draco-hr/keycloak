@@ -1,0 +1,20 @@
+{
+  salesPostServletPage.navigateTo();
+  testRealmSAMLLoginPage.form().login(bburkeUser);
+  assertTrue(driver.getPageSource().contains("principal=bburke"));
+  salesPostSigServletPage.navigateTo();
+  assertTrue(driver.getPageSource().contains("principal=bburke"));
+  employee2ServletPage.navigateTo();
+  assertTrue(driver.getPageSource().contains("principal=bburke"));
+  salesPostEncServletPage.navigateTo();
+  assertTrue(driver.getPageSource().contains("principal=bburke"));
+  employeeSigFrontServletPage.logout();
+  employeeSigFrontServletPage.navigateTo();
+  assertCurrentUrlStartsWith(testRealmSAMLLoginPage);
+  employeeSigServletPage.navigateTo();
+  assertCurrentUrlStartsWith(testRealmSAMLLoginPage);
+  salesPostPassiveServletPage.navigateTo();
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  salesPostSigEmailServletPage.navigateTo();
+  assertCurrentUrlStartsWith(testRealmSAMLLoginPage);
+}

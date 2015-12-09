@@ -1,0 +1,13 @@
+{
+  salesPostSigTransientServletPage.navigateTo();
+  testRealmSAMLLoginPage.form().login(bburkeUser);
+  assertFalse(driver.getPageSource().contains("bburke"));
+  assertTrue(driver.getPageSource().contains("principal=G-"));
+  salesPostSigTransientServletPage.logout();
+  salesPostSigTransientServletPage.navigateTo();
+  assertCurrentUrlStartsWith(testRealmSAMLLoginPage);
+  testRealmSAMLLoginPage.form().login("unauthorized","password");
+  assertFalse(driver.getPageSource().contains("principal="));
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  salesPostSigTransientServletPage.logout();
+}

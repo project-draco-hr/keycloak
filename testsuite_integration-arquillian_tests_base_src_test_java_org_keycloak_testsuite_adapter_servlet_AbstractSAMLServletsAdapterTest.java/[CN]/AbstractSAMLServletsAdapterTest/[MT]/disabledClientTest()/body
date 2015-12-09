@@ -1,0 +1,10 @@
+{
+  ClientResource clientResource=ApiUtil.findClientResourceByClientId(testRealmResource(),"http://localhost:8081/sales-post-sig/");
+  ClientRepresentation client=clientResource.toRepresentation();
+  client.setEnabled(false);
+  clientResource.update(client);
+  salesPostSigServletPage.navigateTo();
+  assertTrue(driver.getPageSource().contains("Login requester not enabled"));
+  client.setEnabled(true);
+  clientResource.update(client);
+}

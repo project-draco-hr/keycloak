@@ -1,0 +1,12 @@
+{
+  employee2ServletPage.navigateTo();
+  testRealmSAMLLoginPage.form().login(bburkeUser);
+  assertTrue(driver.getPageSource().contains("principal=bburke"));
+  employee2ServletPage.logout();
+  employee2ServletPage.navigateTo();
+  assertCurrentUrlStartsWith(testRealmSAMLLoginPage);
+  testRealmSAMLLoginPage.form().login("unauthorized","password");
+  assertFalse(driver.getPageSource().contains("principal="));
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  employee2ServletPage.logout();
+}

@@ -13,11 +13,13 @@
  catch (    Exception e) {
       throw new ErrorResponseException(ErrorResponse.error(e.getMessage(),Response.Status.INTERNAL_SERVER_ERROR));
     }
-    results.addResult(overwritten(resourceRep));
+    String modelId=getModelId(realm,session,resourceRep);
+    results.addResult(overwritten(modelId,resourceRep));
   }
   for (  T resourceRep : toSkip) {
     System.out.println("skipping " + getResourceType() + " "+ getName(resourceRep));
-    results.addResult(skipped(resourceRep));
+    String modelId=getModelId(realm,session,resourceRep);
+    results.addResult(skipped(modelId,resourceRep));
   }
   for (  T resourceRep : repList) {
     if (toOverwrite.contains(resourceRep))     continue;
@@ -25,7 +27,8 @@
     try {
       System.out.println("adding " + getResourceType() + " "+ getName(resourceRep));
       create(realm,session,resourceRep);
-      results.addResult(added(resourceRep));
+      String modelId=getModelId(realm,session,resourceRep);
+      results.addResult(added(modelId,resourceRep));
     }
  catch (    Exception e) {
       throw new ErrorResponseException(ErrorResponse.error(e.getMessage(),Response.Status.INTERNAL_SERVER_ERROR));

@@ -14,13 +14,15 @@
  catch (      Exception e) {
         throw new ErrorResponseException(ErrorResponse.error(e.getMessage(),Response.Status.INTERNAL_SERVER_ERROR));
       }
-      results.addResult(overwritten(clientId,roleRep));
+      String modelId=getModelId(realm,clientId);
+      results.addResult(overwritten(clientId,modelId,roleRep));
     }
   }
   for (  String clientId : toSkip.keySet()) {
     for (    RoleRepresentation roleRep : toSkip.get(clientId)) {
       System.out.println("skipping " + getResourceType() + " "+ getCombinedName(clientId,roleRep));
-      results.addResult(skipped(clientId,roleRep));
+      String modelId=getModelId(realm,clientId);
+      results.addResult(skipped(clientId,modelId,roleRep));
     }
   }
   for (  String clientId : repList.keySet()) {
@@ -30,7 +32,8 @@
       try {
         System.out.println("adding " + getResourceType() + " "+ getCombinedName(clientId,roleRep));
         create(realm,session,clientId,roleRep);
-        results.addResult(added(clientId,roleRep));
+        String modelId=getModelId(realm,clientId);
+        results.addResult(added(clientId,modelId,roleRep));
       }
  catch (      Exception e) {
         throw new ErrorResponseException(ErrorResponse.error(e.getMessage(),Response.Status.INTERNAL_SERVER_ERROR));

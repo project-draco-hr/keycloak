@@ -1,0 +1,34 @@
+{
+  driver.navigate().to("http://localhost:8081/test-app");
+  this.loginPage.clickSocial("kc-saml-idp-basic");
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8082/auth/"));
+  Assert.assertEquals("Log in to realm-with-saml-idp-basic",this.driver.getTitle());
+  this.loginPage.login("test-user","password");
+  String totpSecret=null;
+  if (samlBrokerTotpEnabled) {
+    totpPage.assertCurrent();
+    totpSecret=totpPage.getTotpSecret();
+    totpPage.configure(totp.generateTOTP(totpSecret));
+  }
+  assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/test-app"));
+  driver.navigate().to("http://localhost:8081/test-app/logout");
+  loginIDP("test-user");
+  this.idpConfirmLinkPage.assertCurrent();
+  Assert.assertEquals("User with email test-user@localhost already exists. How do you want to continue?",this.idpConfirmLinkPage.getMessage());
+  this.idpConfirmLinkPage.clickLinkAccount();
+  Assert.assertEquals("Log in to " + APP_REALM_ID,this.driver.getTitle());
+  Assert.assertEquals("Authenticate as kc-saml-idp-basic.test-user to link your account with " + getProviderId(),this.loginPage.getSuccessMessage());
+  this.loginPage.clickSocial("kc-saml-idp-basic");
+  Assert.assertEquals("Log in to realm-with-saml-idp-basic",this.driver.getTitle());
+  this.loginPage.login("test-user","password");
+  if (samlBrokerTotpEnabled) {
+    loginTotpPage.assertCurrent();
+    loginTotpPage.login(totp.generateTOTP(totpSecret));
+  }
+ else   if (oidcBrokerTotpEnabled) {
+    totpPage.assertCurrent();
+    totpSecret=totpPage.getTotpSecret();
+    totpPage.configure(totp.generateTOTP(totpSecret));
+  }
+  assertFederatedUser("kc-saml-idp-basic.test-user","test-user@localhost","test-user",getProviderId(),"kc-saml-idp-basic");
+}

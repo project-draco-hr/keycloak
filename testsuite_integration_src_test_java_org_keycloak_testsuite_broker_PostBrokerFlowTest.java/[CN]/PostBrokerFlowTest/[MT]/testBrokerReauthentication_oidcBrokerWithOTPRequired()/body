@@ -1,0 +1,11 @@
+{
+  IdentityProviderModel oidcIdentityProvider=getIdentityProviderModel();
+  setPostBrokerFlowForProvider(oidcIdentityProvider,getRealm(),true);
+  brokerServerRule.stopSession(this.session,true);
+  this.session=brokerServerRule.startSession();
+  reauthenticateOIDCWithSAMLBroker(false,true);
+  oidcIdentityProvider=getIdentityProviderModel();
+  setPostBrokerFlowForProvider(oidcIdentityProvider,getRealm(),false);
+  brokerServerRule.stopSession(this.session,true);
+  this.session=brokerServerRule.startSession();
+}

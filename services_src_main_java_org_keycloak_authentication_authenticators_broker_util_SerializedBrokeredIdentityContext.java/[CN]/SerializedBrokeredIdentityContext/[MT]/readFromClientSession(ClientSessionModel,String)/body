@@ -1,0 +1,16 @@
+{
+  String asString=clientSession.getNote(noteKey);
+  if (asString == null) {
+    return null;
+  }
+ else {
+    try {
+      SerializedBrokeredIdentityContext serializedCtx=JsonSerialization.readValue(asString,SerializedBrokeredIdentityContext.class);
+      serializedCtx.emailAsUsername=clientSession.getRealm().isRegistrationEmailAsUsername();
+      return serializedCtx;
+    }
+ catch (    IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
+}

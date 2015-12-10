@@ -1,0 +1,24 @@
+{
+  ClientSessionCode clientCode=parseClientSessionCode(code);
+  ClientSessionModel clientSession=clientCode.getClientSession();
+  try {
+    SerializedBrokeredIdentityContext serializedCtx=SerializedBrokeredIdentityContext.readFromClientSession(clientSession,PostBrokerLoginConstants.PBL_BROKERED_IDENTITY_CONTEXT);
+    if (serializedCtx == null) {
+      throw new IdentityBrokerException("Not found serialized context in clientSession. Note " + PostBrokerLoginConstants.PBL_BROKERED_IDENTITY_CONTEXT + " was null");
+    }
+    BrokeredIdentityContext context=serializedCtx.deserialize(session,clientSession);
+    String wasFirstBrokerLoginNote=clientSession.getNote(PostBrokerLoginConstants.PBL_AFTER_FIRST_BROKER_LOGIN);
+    boolean wasFirstBrokerLogin=Boolean.parseBoolean(wasFirstBrokerLoginNote);
+    String authStateNoteKey=PostBrokerLoginConstants.PBL_AUTH_STATE_PREFIX + context.getIdpConfig().getAlias();
+    String authState=clientSession.getNote(authStateNoteKey);
+    if (!Boolean.parseBoolean(authState)) {
+      throw new IdentityBrokerException("Invalid request. Not found the flag that post-broker-login flow was finished");
+    }
+    clientSession.removeNote(PostBrokerLoginConstants.PBL_BROKERED_IDENTITY_CONTEXT);
+    clientSession.removeNote(PostBrokerLoginConstants.PBL_AFTER_FIRST_BROKER_LOGIN);
+    return afterPostBrokerLoginFlowSuccess(clientSession,context,wasFirstBrokerLogin);
+  }
+ catch (  IdentityBrokerException e) {
+    return redirectToErrorPage(Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR,e);
+  }
+}

@@ -1,0 +1,11 @@
+{
+  auth.requireManage();
+  try {
+    RepresentationToModel.updateClientTemplate(rep,client);
+    adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();
+    return Response.noContent().build();
+  }
+ catch (  ModelDuplicateException e) {
+    return ErrorResponse.exists("Client Template " + rep.getName() + " already exists");
+  }
+}

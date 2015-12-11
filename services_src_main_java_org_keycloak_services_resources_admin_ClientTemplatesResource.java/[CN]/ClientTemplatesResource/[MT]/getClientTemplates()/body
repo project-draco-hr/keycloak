@@ -1,0 +1,19 @@
+{
+  auth.requireAny();
+  List<ClientTemplateRepresentation> rep=new ArrayList<>();
+  List<ClientTemplateModel> clientModels=realm.getClientTemplates();
+  boolean view=auth.hasView();
+  for (  ClientTemplateModel clientModel : clientModels) {
+    if (view) {
+      rep.add(ModelToRepresentation.toRepresentation(clientModel));
+    }
+ else {
+      ClientTemplateRepresentation client=new ClientTemplateRepresentation();
+      client.setId(clientModel.getId());
+      client.setName(clientModel.getName());
+      client.setDescription(clientModel.getDescription());
+      rep.add(client);
+    }
+  }
+  return rep;
+}

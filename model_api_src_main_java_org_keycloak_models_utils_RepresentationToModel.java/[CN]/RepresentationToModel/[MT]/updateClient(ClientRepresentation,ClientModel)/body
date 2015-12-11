@@ -44,4 +44,18 @@
       resource.registerNode(entry.getKey(),entry.getValue());
     }
   }
+  if (rep.getClientTemplate() != null) {
+    if (rep.getClientTemplate().equals(ClientTemplateRepresentation.NONE)) {
+      resource.setClientTemplate(null);
+    }
+ else {
+      RealmModel realm=resource.getRealm();
+      for (      ClientTemplateModel template : realm.getClientTemplates()) {
+        if (template.getName().equals(rep.getClientTemplate())) {
+          resource.setClientTemplate(template);
+          break;
+        }
+      }
+    }
+  }
 }

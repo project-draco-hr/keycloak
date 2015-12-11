@@ -1,0 +1,11 @@
+{
+  auth.requireManage();
+  try {
+    ClientTemplateModel clientModel=RepresentationToModel.createClientTemplate(session,realm,rep);
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,clientModel.getId()).representation(rep).success();
+    return Response.created(uriInfo.getAbsolutePathBuilder().path(clientModel.getId()).build()).build();
+  }
+ catch (  ModelDuplicateException e) {
+    return ErrorResponse.exists("Client Template " + rep.getName() + " already exists");
+  }
+}

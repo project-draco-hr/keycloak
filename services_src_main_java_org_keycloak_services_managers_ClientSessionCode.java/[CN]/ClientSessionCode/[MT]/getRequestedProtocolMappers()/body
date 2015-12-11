@@ -1,8 +1,14 @@
 {
   Set<ProtocolMapperModel> requestedProtocolMappers=new HashSet<ProtocolMapperModel>();
-  if (clientSession.getProtocolMappers() != null) {
-    for (    String protocolMapperId : clientSession.getProtocolMappers()) {
-      ProtocolMapperModel protocolMapper=clientSession.getClient().getProtocolMapperById(protocolMapperId);
+  Set<String> protocolMappers=clientSession.getProtocolMappers();
+  ClientModel client=clientSession.getClient();
+  ClientTemplateModel template=client.getClientTemplate();
+  if (protocolMappers != null) {
+    for (    String protocolMapperId : protocolMappers) {
+      ProtocolMapperModel protocolMapper=client.getProtocolMapperById(protocolMapperId);
+      if (protocolMapper == null && template != null) {
+        protocolMapper=template.getProtocolMapperById(protocolMapperId);
+      }
       if (protocolMapper != null) {
         requestedProtocolMappers.add(protocolMapper);
       }

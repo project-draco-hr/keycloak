@@ -1,0 +1,9 @@
+{
+  DBObject query=new QueryBuilder().and("realmId").is(getId()).get();
+  List<MongoClientTemplateEntity> clientEntities=getMongoStore().loadEntities(MongoClientTemplateEntity.class,query,invocationContext);
+  List<ClientTemplateModel> result=new LinkedList<>();
+  for (  MongoClientTemplateEntity clientEntity : clientEntities) {
+    result.add(new ClientTemplateAdapter(session,this,clientEntity,invocationContext));
+  }
+  return result;
+}

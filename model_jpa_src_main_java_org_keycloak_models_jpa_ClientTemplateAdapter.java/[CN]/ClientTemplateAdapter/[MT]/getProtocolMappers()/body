@@ -1,0 +1,19 @@
+{
+  Set<ProtocolMapperModel> mappings=new HashSet<ProtocolMapperModel>();
+  for (  ProtocolMapperEntity entity : this.entity.getProtocolMappers()) {
+    ProtocolMapperModel mapping=new ProtocolMapperModel();
+    mapping.setId(entity.getId());
+    mapping.setName(entity.getName());
+    mapping.setProtocol(entity.getProtocol());
+    mapping.setProtocolMapper(entity.getProtocolMapper());
+    mapping.setConsentRequired(entity.isConsentRequired());
+    mapping.setConsentText(entity.getConsentText());
+    Map<String,String> config=new HashMap<String,String>();
+    if (entity.getConfig() != null) {
+      config.putAll(entity.getConfig());
+    }
+    mapping.setConfig(config);
+    mappings.add(mapping);
+  }
+  return mappings;
+}

@@ -1,0 +1,60 @@
+{
+  RealmResource realm=keycloak.realms().realm("test");
+  ClientTemplateRepresentation rep=new ClientTemplateRepresentation();
+  rep.setName("template");
+  rep.setProtocol("oidc");
+  Response response=realm.clientTemplates().create(rep);
+  Assert.assertEquals(201,response.getStatus());
+  URI templateUri=response.getLocation();
+  response.close();
+  ClientTemplateResource templateResource=keycloak.proxy(ClientTemplateResource.class,templateUri);
+  ProtocolMapperModel hard=HardcodedClaim.create("hard","hard","coded","String",false,null,true,true);
+  ProtocolMapperRepresentation mapper=ModelToRepresentation.toRepresentation(hard);
+  response=templateResource.getProtocolMappers().createMapper(mapper);
+  Assert.assertEquals(201,response.getStatus());
+  response.close();
+  List<ClientRepresentation> clients=realm.clients().findAll();
+  ClientRepresentation clientRep=null;
+  for (  ClientRepresentation c : clients) {
+    if (c.getClientId().equals("test-app")) {
+      clientRep=c;
+      break;
+    }
+  }
+  Assert.assertNotNull(clientRep);
+  clientRep.setClientTemplate("template");
+  realm.clients().get(clientRep.getId()).update(clientRep);
+{
+    Client client=ClientBuilder.newClient();
+    UriBuilder builder=UriBuilder.fromUri(org.keycloak.testsuite.Constants.AUTH_SERVER_ROOT);
+    URI grantUri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
+    WebTarget grantTarget=client.target(grantUri);
+    response=executeGrantAccessTokenRequest(grantTarget);
+    Assert.assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    IDToken idToken=getIdToken(tokenResponse);
+    Assert.assertEquals("coded",idToken.getOtherClaims().get("hard"));
+    AccessToken accessToken=getAccessToken(tokenResponse);
+    Assert.assertEquals("coded",accessToken.getOtherClaims().get("hard"));
+    response.close();
+    client.close();
+  }
+  clientRep.setClientTemplate(ClientTemplateRepresentation.NONE);
+  realm.clients().get(clientRep.getId()).update(clientRep);
+{
+    Client client=ClientBuilder.newClient();
+    UriBuilder builder=UriBuilder.fromUri(org.keycloak.testsuite.Constants.AUTH_SERVER_ROOT);
+    URI grantUri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
+    WebTarget grantTarget=client.target(grantUri);
+    response=executeGrantAccessTokenRequest(grantTarget);
+    Assert.assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    IDToken idToken=getIdToken(tokenResponse);
+    Assert.assertNull(idToken.getOtherClaims().get("hard"));
+    AccessToken accessToken=getAccessToken(tokenResponse);
+    Assert.assertNull(accessToken.getOtherClaims().get("hard"));
+    response.close();
+    client.close();
+  }
+  events.clear();
+}

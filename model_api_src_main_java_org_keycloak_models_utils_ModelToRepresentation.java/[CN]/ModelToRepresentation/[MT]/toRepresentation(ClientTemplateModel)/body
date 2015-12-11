@@ -1,0 +1,15 @@
+{
+  ClientTemplateRepresentation rep=new ClientTemplateRepresentation();
+  rep.setId(clientModel.getId());
+  rep.setName(clientModel.getName());
+  rep.setDescription(clientModel.getDescription());
+  rep.setProtocol(clientModel.getProtocol());
+  if (!clientModel.getProtocolMappers().isEmpty()) {
+    List<ProtocolMapperRepresentation> mappings=new LinkedList<>();
+    for (    ProtocolMapperModel model : clientModel.getProtocolMappers()) {
+      mappings.add(toRepresentation(model));
+    }
+    rep.setProtocolMappers(mappings);
+  }
+  return rep;
+}

@@ -1,0 +1,14 @@
+{
+  ProtocolMapperEntity entity=getProtocolMapperEntity(mapping.getId());
+  entity.setProtocolMapper(mapping.getProtocolMapper());
+  entity.setConsentRequired(mapping.isConsentRequired());
+  entity.setConsentText(mapping.getConsentText());
+  if (entity.getConfig() == null) {
+    entity.setConfig(mapping.getConfig());
+  }
+ else {
+    entity.getConfig().clear();
+    entity.getConfig().putAll(mapping.getConfig());
+  }
+  em.flush();
+}

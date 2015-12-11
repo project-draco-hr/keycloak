@@ -18,7 +18,8 @@
     ClientModel app=realm.getClientByClientId("test-app");
     ProtocolMapperModel mapper=AddressMapper.createAddressMapper(true,true);
     app.addProtocolMapper(mapper);
-    app.addProtocolMapper(HardcodedClaim.create("hard","hard","coded","String",false,null,true,true));
+    ProtocolMapperModel hard=HardcodedClaim.create("hard","hard","coded","String",false,null,true,true);
+    app.addProtocolMapper(hard);
     app.addProtocolMapper(HardcodedClaim.create("hard-nested","nested.hard","coded-nested","String",false,null,true,true));
     app.addProtocolMapper(UserAttributeMapper.createClaimMapper("custom phone","phone","home_phone","String",true,"",true,true,false));
     app.addProtocolMapper(UserAttributeMapper.createClaimMapper("nested phone","phone","home.phone","String",true,"",true,true,false));
@@ -75,13 +76,12 @@
     Assert.assertTrue(accessToken.getResourceAccess("app").getRoles().contains("hardcoded"));
     response.close();
   }
-  client.close();
 {
     KeycloakSession session=keycloakRule.startSession();
     RealmModel realm=session.realms().getRealmByName("test");
     ClientModel app=realm.getClientByClientId("test-app");
     for (    ProtocolMapperModel model : app.getProtocolMappers()) {
-      if (model.getName().equals("address") || model.getName().equals("hard") || model.getName().equals("hard-nested")|| model.getName().equals("custom phone")|| model.getName().equals("nested phone")|| model.getName().equals("rename-app-role")|| model.getName().equals("hard-realm")|| model.getName().equals("hard-app")) {
+      if (model.getName().equals("address") || model.getName().equals("hard") || model.getName().equals("hard-nested")|| model.getName().equals("custom phone")|| model.getName().equals("departments")|| model.getName().equals("nested phone")|| model.getName().equals("rename-app-role")|| model.getName().equals("hard-realm")|| model.getName().equals("hard-app")) {
         app.removeProtocolMapper(model);
       }
     }
@@ -89,4 +89,18 @@
     session.close();
   }
   events.clear();
+{
+    Response response=executeGrantAccessTokenRequest(grantTarget);
+    Assert.assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    IDToken idToken=getIdToken(tokenResponse);
+    Assert.assertNull(idToken.getAddress());
+    Assert.assertNull(idToken.getOtherClaims().get("home_phone"));
+    Assert.assertNull(idToken.getOtherClaims().get("hard"));
+    Assert.assertNull(idToken.getOtherClaims().get("nested"));
+    Assert.assertNull(idToken.getOtherClaims().get("department"));
+    response.close();
+  }
+  events.clear();
+  client.close();
 }

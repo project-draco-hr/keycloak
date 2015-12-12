@@ -1,0 +1,15 @@
+{
+  logger.debug("Create client template: {0}" + resourceRep.getName());
+  ClientTemplateModel client=resourceRep.getId() != null ? realm.addClientTemplate(resourceRep.getId(),resourceRep.getName()) : realm.addClientTemplate(resourceRep.getName());
+  if (resourceRep.getName() != null)   client.setName(resourceRep.getName());
+  if (resourceRep.getDescription() != null)   client.setDescription(resourceRep.getDescription());
+  if (resourceRep.getProtocol() != null)   client.setProtocol(resourceRep.getProtocol());
+  if (resourceRep.getProtocolMappers() != null) {
+    Set<ProtocolMapperModel> mappers=client.getProtocolMappers();
+    for (    ProtocolMapperModel mapper : mappers)     client.removeProtocolMapper(mapper);
+    for (    ProtocolMapperRepresentation mapper : resourceRep.getProtocolMappers()) {
+      client.addProtocolMapper(toModel(mapper));
+    }
+  }
+  return client;
+}

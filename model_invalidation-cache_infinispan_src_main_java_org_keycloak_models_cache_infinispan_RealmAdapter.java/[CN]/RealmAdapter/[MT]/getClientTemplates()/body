@@ -1,0 +1,12 @@
+{
+  if (updated != null)   return updated.getClientTemplates();
+  List<ClientTemplateModel> apps=new LinkedList<ClientTemplateModel>();
+  for (  String id : cached.getClientTemplates()) {
+    ClientTemplateModel model=cacheSession.getClientTemplateById(id,this);
+    if (model == null) {
+      throw new IllegalStateException("Cached clientemplate not found: " + id);
+    }
+    apps.add(model);
+  }
+  return apps;
+}

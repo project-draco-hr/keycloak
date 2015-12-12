@@ -1,0 +1,21 @@
+{
+  if (id == null)   return false;
+  ClientTemplateModel client=getClientTemplateById(id);
+  if (client == null)   return false;
+  ClientTemplateEntity clientEntity=null;
+  Iterator<ClientTemplateEntity> it=realm.getClientTemplates().iterator();
+  while (it.hasNext()) {
+    ClientTemplateEntity ae=it.next();
+    if (ae.getId().equals(id)) {
+      clientEntity=ae;
+      it.remove();
+      break;
+    }
+  }
+  if (client == null) {
+    return false;
+  }
+  em.remove(clientEntity);
+  em.flush();
+  return true;
+}

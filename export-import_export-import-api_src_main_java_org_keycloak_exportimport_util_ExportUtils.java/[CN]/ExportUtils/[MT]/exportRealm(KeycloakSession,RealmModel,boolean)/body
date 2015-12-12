@@ -1,5 +1,12 @@
 {
   RealmRepresentation rep=ModelToRepresentation.toRepresentation(realm,true);
+  List<ClientTemplateModel> templates=realm.getClientTemplates();
+  List<ClientTemplateRepresentation> templateReps=new ArrayList<>();
+  for (  ClientTemplateModel app : templates) {
+    ClientTemplateRepresentation clientRep=ModelToRepresentation.toRepresentation(app);
+    templateReps.add(clientRep);
+  }
+  rep.setClientTemplates(templateReps);
   List<ClientModel> clients=realm.getClients();
   List<ClientRepresentation> clientReps=new ArrayList<>();
   for (  ClientModel app : clients) {

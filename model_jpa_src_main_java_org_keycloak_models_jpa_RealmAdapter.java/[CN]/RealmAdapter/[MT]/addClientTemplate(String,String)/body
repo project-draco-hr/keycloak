@@ -1,0 +1,12 @@
+{
+  ClientTemplateEntity entity=new ClientTemplateEntity();
+  entity.setId(id);
+  entity.setName(name);
+  entity.setRealm(realm);
+  realm.getClientTemplates().add(entity);
+  em.persist(entity);
+  em.flush();
+  final ClientTemplateModel resource=new ClientTemplateAdapter(this,em,session,entity);
+  em.flush();
+  return resource;
+}

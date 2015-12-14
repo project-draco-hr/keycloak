@@ -1,7 +1,8 @@
 {
   LDAPQuery ldapQuery=createRoleQuery(mapperModel,ldapProvider);
   String membershipAttr=getMembershipLdapAttribute(mapperModel);
-  Condition membershipCondition=new LDAPQueryConditionsBuilder().equal(membershipAttr,ldapUser.getDn().toString());
+  String userMembership=getMembershipFromUser(ldapUser,getMembershipTypeLdapAttribute(mapperModel));
+  Condition membershipCondition=new LDAPQueryConditionsBuilder().equal(membershipAttr,userMembership);
   ldapQuery.addWhereCondition(membershipCondition);
   return ldapQuery.getResultList();
 }

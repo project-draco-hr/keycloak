@@ -2,8 +2,8 @@
   LDAPQuery ldapQuery=LDAPUtils.createQueryForUserSearch(this,realm);
   LDAPQueryConditionsBuilder conditionsBuilder=new LDAPQueryConditionsBuilder();
   String usernameMappedAttribute=this.ldapIdentityStore.getConfig().getUsernameLdapAttribute();
-  Condition usernameCondition=conditionsBuilder.equal(new QueryParameter(usernameMappedAttribute),username);
-  ldapQuery.where(usernameCondition);
+  Condition usernameCondition=conditionsBuilder.equal(usernameMappedAttribute,username);
+  ldapQuery.addWhereCondition(usernameCondition);
   LDAPObject ldapUser=ldapQuery.getFirstResult();
   if (ldapUser == null) {
     return null;

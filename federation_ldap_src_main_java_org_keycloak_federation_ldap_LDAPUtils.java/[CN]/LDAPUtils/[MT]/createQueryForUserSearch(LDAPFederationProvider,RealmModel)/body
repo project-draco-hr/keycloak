@@ -4,6 +4,11 @@
   ldapQuery.setSearchScope(config.getSearchScope());
   ldapQuery.setSearchDn(config.getUsersDn());
   ldapQuery.addObjectClasses(config.getUserObjectClasses());
+  String customFilter=config.getCustomUserSearchFilter();
+  if (customFilter != null) {
+    Condition customFilterCondition=new LDAPQueryConditionsBuilder().addCustomLDAPFilter(customFilter);
+    ldapQuery.addWhereCondition(customFilterCondition);
+  }
   Set<UserFederationMapperModel> mapperModels=realm.getUserFederationMappersByFederationProvider(ldapProvider.getModel().getId());
   ldapQuery.addMappers(mapperModels);
   return ldapQuery;

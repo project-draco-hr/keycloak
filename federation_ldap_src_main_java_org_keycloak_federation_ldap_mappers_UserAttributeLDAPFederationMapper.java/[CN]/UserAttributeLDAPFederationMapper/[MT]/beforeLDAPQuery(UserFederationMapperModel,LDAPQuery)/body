@@ -6,9 +6,9 @@
     query.addReturningReadOnlyLdapAttribute(ldapAttrName);
   }
   for (  Condition condition : query.getConditions()) {
-    QueryParameter param=condition.getParameter();
-    if (param != null && param.getName().equalsIgnoreCase(userModelAttrName)) {
-      param.setName(ldapAttrName);
+    String paramName=condition.getParameterName();
+    if (paramName != null && paramName.equalsIgnoreCase(userModelAttrName)) {
+      condition.setParameterName(ldapAttrName);
     }
   }
 }

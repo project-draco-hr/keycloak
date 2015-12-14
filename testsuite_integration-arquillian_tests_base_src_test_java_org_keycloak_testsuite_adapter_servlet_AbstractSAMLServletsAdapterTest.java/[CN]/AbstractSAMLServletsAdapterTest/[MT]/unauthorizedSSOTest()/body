@@ -1,0 +1,16 @@
+{
+  salesPostServletPage.navigateTo();
+  testRealmSAMLLoginPage.form().login("unauthorized","password");
+  assertFalse(driver.getPageSource().contains("principal="));
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  employee2ServletPage.navigateTo();
+  assertFalse(driver.getPageSource().contains("principal="));
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  employeeSigFrontServletPage.navigateTo();
+  assertFalse(driver.getPageSource().contains("principal="));
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  salesPostSigPersistentServletPage.navigateTo();
+  assertFalse(driver.getPageSource().contains("principal="));
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  salesPostServletPage.logout();
+}

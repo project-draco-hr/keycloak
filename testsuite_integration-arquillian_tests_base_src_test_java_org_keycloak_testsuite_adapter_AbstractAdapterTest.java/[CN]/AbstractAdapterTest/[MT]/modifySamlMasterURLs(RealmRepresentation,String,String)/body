@@ -1,0 +1,13 @@
+{
+  for (  ClientRepresentation client : realm.getClients()) {
+    if (client.getProtocol() != null && client.getProtocol().equals("saml")) {
+      log.info("Modifying master URL of SAML client: " + client.getClientId());
+      String masterUrl=client.getAdminUrl();
+      if (masterUrl == null) {
+        masterUrl=client.getBaseUrl();
+      }
+      masterUrl=masterUrl.replaceFirst(regex,replacement);
+      client.setAdminUrl(masterUrl);
+    }
+  }
+}

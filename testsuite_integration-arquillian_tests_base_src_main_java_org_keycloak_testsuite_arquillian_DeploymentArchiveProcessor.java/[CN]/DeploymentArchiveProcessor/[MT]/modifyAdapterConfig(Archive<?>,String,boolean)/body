@@ -1,23 +1,39 @@
 {
   if (archive.contains(adapterConfigPath)) {
     log.info("Modifying adapter config " + adapterConfigPath + " in "+ archive.getName());
-    try {
-      BaseAdapterConfig adapterConfig=loadJson(archive.get(adapterConfigPath).getAsset().openStream(),BaseAdapterConfig.class);
-      log.info(" setting " + (relative ? "" : "non-") + "relative auth-server-url");
-      if (relative) {
-        adapterConfig.setAuthServerUrl("/auth");
+    if (adapterConfigPath.equals(SAML_ADAPTER_CONFIG_PATH)) {
+      log.info("Modyfying saml adapter config in " + archive.getName());
+      Document doc=loadXML(archive.get("WEB-INF/keycloak-saml.xml").getAsset().openStream());
+      modifyDocElementAttribute(doc,"SingleSignOnService","bindingUrl","8080",System.getProperty("auth.server.http.port",null));
+      modifyDocElementAttribute(doc,"SingleLogoutService","postBindingUrl","8080",System.getProperty("auth.server.http.port",null));
+      modifyDocElementAttribute(doc,"SingleLogoutService","redirectBindingUrl","8080",System.getProperty("auth.server.http.port",null));
+      try {
+        archive.add(new StringAsset(IOUtil.documentToString(doc)),adapterConfigPath);
       }
- else {
-        adapterConfig.setAuthServerUrl(getAuthServerContextRootFromSystemProperty() + "/auth");
-        adapterConfig.setRealmKey(REALM_KEY);
+ catch (      TransformerException e) {
+        log.error("Can't transform document to String");
+        throw new RuntimeException(e);
       }
-      if ("true".equals(System.getProperty("app.server.ssl.required"))) {
-        adapterConfig.setSslRequired("all");
-      }
-      archive.add(new StringAsset(JsonSerialization.writeValueAsPrettyString(adapterConfig)),adapterConfigPath);
     }
- catch (    IOException ex) {
-      log.log(Level.FATAL,"Cannot serialize adapter config to JSON.",ex);
+ else {
+      try {
+        BaseAdapterConfig adapterConfig=loadJson(archive.get(adapterConfigPath).getAsset().openStream(),BaseAdapterConfig.class);
+        log.info(" setting " + (relative ? "" : "non-") + "relative auth-server-url");
+        if (relative) {
+          adapterConfig.setAuthServerUrl("/auth");
+        }
+ else {
+          adapterConfig.setAuthServerUrl(getAuthServerContextRootFromSystemProperty() + "/auth");
+          adapterConfig.setRealmKey(REALM_KEY);
+        }
+        if ("true".equals(System.getProperty("app.server.ssl.required"))) {
+          adapterConfig.setSslRequired("all");
+        }
+        archive.add(new StringAsset(JsonSerialization.writeValueAsPrettyString(adapterConfig)),adapterConfigPath);
+      }
+ catch (      IOException ex) {
+        log.log(Level.FATAL,"Cannot serialize adapter config to JSON.",ex);
+      }
     }
   }
 }

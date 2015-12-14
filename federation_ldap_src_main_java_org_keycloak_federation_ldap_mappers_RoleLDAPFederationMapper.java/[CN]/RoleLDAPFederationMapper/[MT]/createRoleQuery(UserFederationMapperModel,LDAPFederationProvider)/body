@@ -6,7 +6,11 @@
   Collection<String> roleObjectClasses=getRoleObjectClasses(mapperModel,ldapProvider);
   ldapQuery.addObjectClasses(roleObjectClasses);
   String rolesRdnAttr=getRoleNameLdapAttribute(mapperModel);
-  ldapQuery.setLdapFilter(mapperModel.getConfig().get(RoleLDAPFederationMapper.ROLES_LDAP_FILTER));
+  String customFilter=mapperModel.getConfig().get(RoleLDAPFederationMapper.ROLES_LDAP_FILTER);
+  if (customFilter != null && customFilter.trim().length() > 0) {
+    Condition customFilterCondition=new LDAPQueryConditionsBuilder().addCustomLDAPFilter(customFilter);
+    ldapQuery.addWhereCondition(customFilterCondition);
+  }
   String membershipAttr=getMembershipLdapAttribute(mapperModel);
   ldapQuery.addReturningLdapAttribute(rolesRdnAttr);
   ldapQuery.addReturningLdapAttribute(membershipAttr);

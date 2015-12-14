@@ -7,15 +7,15 @@
     String baseDN=identityQuery.getSearchDn();
     for (    Condition condition : identityQuery.getConditions()) {
       String uuidAttrName=getConfig().getUuidLDAPAttributeName();
-      if (condition.getParameter() != null && condition.getParameter().getName().equalsIgnoreCase(uuidAttrName)) {
-        if (EqualCondition.class.isInstance(condition)) {
-          EqualCondition equalCondition=(EqualCondition)condition;
+      if (condition instanceof EqualCondition) {
+        EqualCondition equalCondition=(EqualCondition)condition;
+        if (equalCondition.getParameterName().equalsIgnoreCase(uuidAttrName)) {
           SearchResult search=this.operationManager.lookupById(baseDN,equalCondition.getValue().toString(),identityQuery.getReturningLdapAttributes());
           if (search != null) {
             results.add(populateAttributedType(search,identityQuery));
           }
+          return results;
         }
-        return results;
       }
     }
     StringBuilder filter=createIdentityTypeSearchFilter(identityQuery);

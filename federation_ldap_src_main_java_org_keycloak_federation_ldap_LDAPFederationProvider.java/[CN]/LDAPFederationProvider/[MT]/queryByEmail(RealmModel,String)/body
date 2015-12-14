@@ -1,7 +1,7 @@
 {
   LDAPQuery ldapQuery=LDAPUtils.createQueryForUserSearch(this,realm);
   LDAPQueryConditionsBuilder conditionsBuilder=new LDAPQueryConditionsBuilder();
-  Condition emailCondition=conditionsBuilder.equal(new QueryParameter(UserModel.EMAIL),email);
-  ldapQuery.where(emailCondition);
+  Condition emailCondition=conditionsBuilder.equal(UserModel.EMAIL,email);
+  ldapQuery.addWhereCondition(emailCondition);
   return ldapQuery.getFirstResult();
 }

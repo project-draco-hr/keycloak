@@ -9,4 +9,8 @@
       throw new MapperConfigValidationException("Client ID needs to be provided in config when Realm Roles Mapping is not used");
     }
   }
+  String customLdapFilter=mapperModel.getConfig().get(RoleLDAPFederationMapper.ROLES_LDAP_FILTER);
+  if ((customLdapFilter != null && customLdapFilter.trim().length() > 0) && (!customLdapFilter.startsWith("(") || !customLdapFilter.endsWith(")"))) {
+    throw new MapperConfigValidationException("Custom Roles LDAP filter must starts with '(' and ends with ')'");
+  }
 }

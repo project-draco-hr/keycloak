@@ -1,0 +1,23 @@
+{
+  auth.requireManage();
+  UserFederationMapperModel mapperModel=realm.getUserFederationMapperById(mapperId);
+  if (mapperModel == null)   throw new NotFoundException("Mapper model not found");
+  UserFederationMapper mapper=session.getProvider(UserFederationMapper.class,mapperModel.getFederationMapperType());
+  UserFederationProviderModel providerModel=KeycloakModelUtils.findUserFederationProviderById(mapperModel.getFederationProviderId(),realm);
+  if (providerModel == null)   throw new NotFoundException("Provider model not found");
+  UserFederationProviderFactory providerFactory=(UserFederationProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(UserFederationProvider.class,providerModel.getProviderName());
+  UserFederationProvider federationProvider=providerFactory.getInstance(session,providerModel);
+  logger.infof("Syncing data for mapper '%s' of type '%s'. Direction: %s",mapperModel.getName(),mapperModel.getFederationMapperType(),direction);
+  UserFederationSyncResult syncResult;
+  if ("fedToKeycloak".equals(direction)) {
+    syncResult=mapper.syncDataFromFederationProviderToKeycloak(mapperModel,federationProvider,session,realm);
+  }
+ else   if ("keycloakToFed".equals(direction)) {
+    syncResult=mapper.syncDataFromKeycloakToFederationProvider(mapperModel,federationProvider,session,realm);
+  }
+ else {
+    throw new NotFoundException("Unknown direction: " + direction);
+  }
+  adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).success();
+  return syncResult;
+}

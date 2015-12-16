@@ -71,12 +71,7 @@
     bindingBuilder.encrypt(publicKey);
   }
   try {
-    if (isPostBinding(clientSession)) {
-      return bindingBuilder.postBinding(samlDocument).response(redirectUri);
-    }
- else {
-      return bindingBuilder.redirectBinding(samlDocument).response(redirectUri);
-    }
+    return buildAuthenticatedResponse(clientSession,redirectUri,samlDocument,bindingBuilder);
   }
  catch (  Exception e) {
     logger.error("failed",e);

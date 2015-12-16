@@ -1,0 +1,62 @@
+{
+  return new Authenticator(){
+    private static final String BASIC="Basic";
+    private static final String BASIC_PREFIX=BASIC + " ";
+    @Override public void authenticate(    AuthenticationFlowContext context){
+      HttpRequest httpRequest=context.getHttpRequest();
+      HttpHeaders httpHeaders=httpRequest.getHttpHeaders();
+      String[] usernameAndPassword=getUsernameAndPassword(httpHeaders);
+      context.attempted();
+      if (usernameAndPassword != null) {
+        RealmModel realm=context.getRealm();
+        UserModel user=context.getSession().users().getUserByUsername(usernameAndPassword[0],realm);
+        if (user != null) {
+          String password=usernameAndPassword[1];
+          boolean valid=context.getSession().users().validCredentials(context.getSession(),realm,user,UserCredentialModel.password(password));
+          if (valid) {
+            context.getClientSession().setAuthenticatedUser(user);
+            context.success();
+          }
+ else {
+            context.getEvent().user(user);
+            context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
+            context.failure(AuthenticationFlowError.INVALID_USER,Response.status(Response.Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE,BASIC_PREFIX + "realm=\"" + realm.getName()+ "\"").build());
+          }
+        }
+      }
+    }
+    private String[] getUsernameAndPassword(    HttpHeaders httpHeaders){
+      List<String> authHeaders=httpHeaders.getRequestHeader(HttpHeaders.AUTHORIZATION);
+      if (authHeaders == null || authHeaders.size() == 0) {
+        return null;
+      }
+      String credentials=null;
+      for (      String authHeader : authHeaders) {
+        if (authHeader.startsWith(BASIC_PREFIX)) {
+          String[] split=authHeader.trim().split("\\s+");
+          if (split == null || split.length != 2)           return null;
+          credentials=split[1];
+        }
+      }
+      try {
+        return new String(Base64.decode(credentials)).split(":");
+      }
+ catch (      IOException e) {
+        throw new RuntimeException("Failed to parse credentials.",e);
+      }
+    }
+    @Override public void action(    AuthenticationFlowContext context){
+    }
+    @Override public boolean requiresUser(){
+      return false;
+    }
+    @Override public boolean configuredFor(    KeycloakSession session,    RealmModel realm,    UserModel user){
+      return false;
+    }
+    @Override public void setRequiredActions(    KeycloakSession session,    RealmModel realm,    UserModel user){
+    }
+    @Override public void close(){
+    }
+  }
+;
+}

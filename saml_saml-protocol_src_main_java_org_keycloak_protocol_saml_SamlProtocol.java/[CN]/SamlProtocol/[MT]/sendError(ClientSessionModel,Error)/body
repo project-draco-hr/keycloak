@@ -19,12 +19,7 @@
       try {
         JaxrsSAML2BindingBuilder binding=new JaxrsSAML2BindingBuilder().relayState(clientSession.getNote(GeneralConstants.RELAY_STATE));
         Document document=builder.buildDocument();
-        if (isPostBinding(clientSession)) {
-          return binding.postBinding(document).response(clientSession.getRedirectUri());
-        }
- else {
-          return binding.redirectBinding(document).response(clientSession.getRedirectUri());
-        }
+        return buildErrorResponse(clientSession,binding,document);
       }
  catch (      Exception e) {
         return ErrorPage.error(session,Messages.FAILED_TO_PROCESS_RESPONSE);

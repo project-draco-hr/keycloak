@@ -1,8 +1,10 @@
 {
+  logger.debugv("processAction: {0}",actionExecution);
   while (executionIterator.hasNext()) {
     AuthenticationExecutionModel model=executionIterator.next();
+    logger.debugv("check: {0} requirement: {1}",model.getAuthenticator(),model.getRequirement().toString());
     if (isProcessed(model)) {
-      AuthenticationProcessor.logger.debug("execution is processed");
+      logger.debug("execution is processed");
       if (!alternativeSuccessful && model.isAlternative() && processor.isSuccessful(model))       alternativeSuccessful=true;
       continue;
     }
@@ -17,6 +19,7 @@
       }
       Authenticator authenticator=factory.create(processor.getSession());
       AuthenticationProcessor.Result result=processor.createAuthenticatorContext(model,authenticator,executions);
+      logger.debugv("action: {0}",model.getAuthenticator());
       authenticator.action(result);
       Response response=processResult(result);
       if (response == null) {

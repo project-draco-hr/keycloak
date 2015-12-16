@@ -1,0 +1,21 @@
+{
+  LDAPObject ldapGroup=ldapGroupsMap.get(kcGroup.getName());
+  Set<LDAPDn> toRemoveSubgroupsDNs=getLDAPSubgroups(ldapGroup);
+  Set<GroupModel> kcSubgroups=kcGroup.getSubGroups();
+  for (  GroupModel kcSubgroup : kcSubgroups) {
+    LDAPObject ldapSubgroup=ldapGroupsMap.get(kcSubgroup.getName());
+    LDAPUtils.addMember(ldapProvider,MembershipType.DN,config.getMembershipLdapAttribute(),ldapGroup,ldapSubgroup,false);
+    toRemoveSubgroupsDNs.remove(ldapSubgroup.getDn());
+  }
+  for (  LDAPDn toRemoveDN : toRemoveSubgroupsDNs) {
+    LDAPObject fakeGroup=new LDAPObject();
+    fakeGroup.setDn(toRemoveDN);
+    LDAPUtils.deleteMember(ldapProvider,MembershipType.DN,config.getMembershipLdapAttribute(),ldapGroup,fakeGroup,false);
+  }
+  if (!kcGroup.getSubGroups().isEmpty() || !toRemoveSubgroupsDNs.isEmpty()) {
+    ldapProvider.getLdapIdentityStore().update(ldapGroup);
+  }
+  for (  GroupModel kcSubgroup : kcGroup.getSubGroups()) {
+    processLdapGroupMembershipsSyncToLDAP(kcSubgroup,ldapGroupsMap);
+  }
+}

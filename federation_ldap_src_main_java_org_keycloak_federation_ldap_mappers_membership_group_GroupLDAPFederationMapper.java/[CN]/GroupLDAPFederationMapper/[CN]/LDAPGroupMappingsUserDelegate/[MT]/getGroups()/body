@@ -1,0 +1,11 @@
+{
+  Set<GroupModel> ldapGroupMappings=getLDAPGroupMappingsConverted();
+  if (config.getMode() == LDAPGroupMapperMode.LDAP_ONLY) {
+    return ldapGroupMappings;
+  }
+ else {
+    Set<GroupModel> modelGroupMappings=super.getGroups();
+    ldapGroupMappings.addAll(modelGroupMappings);
+    return ldapGroupMappings;
+  }
+}

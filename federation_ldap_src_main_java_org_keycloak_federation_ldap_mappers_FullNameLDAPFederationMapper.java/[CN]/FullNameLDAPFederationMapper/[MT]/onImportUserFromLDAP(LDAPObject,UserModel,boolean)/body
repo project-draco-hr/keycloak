@@ -1,0 +1,18 @@
+{
+  String ldapFullNameAttrName=getLdapFullNameAttrName();
+  String fullName=ldapUser.getAttributeAsString(ldapFullNameAttrName);
+  if (fullName == null) {
+    return;
+  }
+  fullName=fullName.trim();
+  if (!fullName.isEmpty()) {
+    int lastSpaceIndex=fullName.lastIndexOf(" ");
+    if (lastSpaceIndex == -1) {
+      user.setLastName(fullName);
+    }
+ else {
+      user.setFirstName(fullName.substring(0,lastSpaceIndex));
+      user.setLastName(fullName.substring(lastSpaceIndex + 1));
+    }
+  }
+}

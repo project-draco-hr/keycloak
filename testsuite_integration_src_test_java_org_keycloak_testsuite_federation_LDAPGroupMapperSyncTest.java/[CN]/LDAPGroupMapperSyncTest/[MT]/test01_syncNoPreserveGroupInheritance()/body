@@ -1,0 +1,33 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    UserFederationMapperModel mapperModel=realm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    GroupLDAPFederationMapper groupMapper=FederationTestUtils.getGroupMapper(mapperModel,ldapProvider,realm);
+    LDAPObject group1=groupMapper.loadLDAPGroupByName("group1");
+    LDAPObject group12=groupMapper.loadLDAPGroupByName("group12");
+    LDAPUtils.addMember(ldapProvider,MembershipType.DN,LDAPConstants.MEMBER,group12,group1,true);
+    try {
+      new GroupLDAPFederationMapperFactory().create(session).syncDataFromFederationProviderToKeycloak(mapperModel,ldapProvider,session,realm);
+      Assert.fail("Not expected group sync to pass");
+    }
+ catch (    ModelException expected) {
+      Assert.assertTrue(expected.getMessage().contains("Recursion detected"));
+    }
+    FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.PRESERVE_GROUP_INHERITANCE,"false");
+    realm.updateUserFederationMapper(mapperModel);
+    new GroupLDAPFederationMapperFactory().create(session).syncDataFromFederationProviderToKeycloak(mapperModel,ldapProvider,session,realm);
+    GroupModel kcGroup1=KeycloakModelUtils.findGroupByPath(realm,"/group1");
+    GroupModel kcGroup11=KeycloakModelUtils.findGroupByPath(realm,"/group11");
+    GroupModel kcGroup12=KeycloakModelUtils.findGroupByPath(realm,"/group12");
+    Assert.assertEquals(0,kcGroup1.getSubGroups().size());
+    Assert.assertEquals("group1 - description",kcGroup1.getFirstAttribute(descriptionAttrName));
+    Assert.assertNull(kcGroup11.getFirstAttribute(descriptionAttrName));
+    Assert.assertEquals("group12 - description",kcGroup12.getFirstAttribute(descriptionAttrName));
+    LDAPUtils.deleteMember(ldapProvider,MembershipType.DN,LDAPConstants.MEMBER,group12,group1,true);
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

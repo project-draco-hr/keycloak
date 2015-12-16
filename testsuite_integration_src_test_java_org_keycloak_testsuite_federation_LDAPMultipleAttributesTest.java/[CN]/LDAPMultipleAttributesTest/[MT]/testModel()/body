@@ -2,7 +2,6 @@
   KeycloakSession session=keycloakRule.startSession();
   try {
     RealmModel appRealm=session.realms().getRealmByName("test");
-    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
     FederationTestUtils.assertUserImported(session.users(),appRealm,"jbrown","James","Brown","jbrown@keycloak.org","88441");
     UserModel user=session.users().getUserByUsername("bwilson",appRealm);
     Assert.assertEquals("bwilson@keycloak.org",user.getEmail());

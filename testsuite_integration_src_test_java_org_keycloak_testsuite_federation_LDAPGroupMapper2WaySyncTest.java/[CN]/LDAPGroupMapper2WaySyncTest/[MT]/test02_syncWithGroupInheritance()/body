@@ -1,0 +1,47 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    UserFederationMapperModel mapperModel=realm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.PRESERVE_GROUP_INHERITANCE,"true");
+    realm.updateUserFederationMapper(mapperModel);
+    UserFederationSyncResult syncResult=new GroupLDAPFederationMapperFactory().create(session).syncDataFromKeycloakToFederationProvider(mapperModel,ldapProvider,session,realm);
+    FederationTestUtils.assertSyncEquals(syncResult,4,0,0,0);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    removeAllModelGroups(realm);
+    Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/group1"));
+    Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/group11"));
+    Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/group2"));
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    UserFederationMapperModel mapperModel=realm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    UserFederationSyncResult syncResult=new GroupLDAPFederationMapperFactory().create(session).syncDataFromFederationProviderToKeycloak(mapperModel,ldapProvider,session,realm);
+    FederationTestUtils.assertSyncEquals(syncResult,4,0,0,0);
+    GroupModel kcGroup1=KeycloakModelUtils.findGroupByPath(realm,"/group1");
+    GroupModel kcGroup11=KeycloakModelUtils.findGroupByPath(realm,"/group1/group11");
+    GroupModel kcGroup12=KeycloakModelUtils.findGroupByPath(realm,"/group1/group12");
+    GroupModel kcGroup2=KeycloakModelUtils.findGroupByPath(realm,"/group2");
+    Assert.assertEquals(2,kcGroup1.getSubGroups().size());
+    Assert.assertEquals("group1 - description1",kcGroup1.getFirstAttribute(descriptionAttrName));
+    Assert.assertNull(kcGroup11.getFirstAttribute(descriptionAttrName));
+    Assert.assertEquals("group12 - description12",kcGroup12.getFirstAttribute(descriptionAttrName));
+    Assert.assertNull(kcGroup2.getFirstAttribute(descriptionAttrName));
+    testDropNonExisting(session,realm,mapperModel,ldapProvider);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

@@ -1,0 +1,19 @@
+{
+  LDAPQuery ldapQuery=new LDAPQuery(ldapProvider);
+  ldapQuery.setSearchScope(ldapProvider.getLdapIdentityStore().getConfig().getSearchScope());
+  String groupsDn=config.getGroupsDn();
+  ldapQuery.setSearchDn(groupsDn);
+  Collection<String> groupObjectClasses=config.getGroupObjectClasses(ldapProvider);
+  ldapQuery.addObjectClasses(groupObjectClasses);
+  String customFilter=config.getCustomLdapFilter();
+  if (customFilter != null && customFilter.trim().length() > 0) {
+    Condition customFilterCondition=new LDAPQueryConditionsBuilder().addCustomLDAPFilter(customFilter);
+    ldapQuery.addWhereCondition(customFilterCondition);
+  }
+  ldapQuery.addReturningLdapAttribute(config.getGroupNameLdapAttribute());
+  ldapQuery.addReturningLdapAttribute(config.getMembershipLdapAttribute());
+  for (  String groupAttr : config.getGroupAttributes()) {
+    ldapQuery.addReturningLdapAttribute(groupAttr);
+  }
+  return ldapQuery;
+}

@@ -1,0 +1,16 @@
+{
+  GroupTreeResolver.Group group1=new GroupTreeResolver.Group("group1","group2");
+  GroupTreeResolver.Group group2=new GroupTreeResolver.Group("group2");
+  GroupTreeResolver.Group group3=new GroupTreeResolver.Group("group3","group2");
+  GroupTreeResolver.Group group4=new GroupTreeResolver.Group("group4","group1","group5");
+  GroupTreeResolver.Group group5=new GroupTreeResolver.Group("group5","group4");
+  List<GroupTreeResolver.Group> groups=Arrays.asList(group1,group2,group3,group4,group5);
+  GroupTreeResolver resolver=new GroupTreeResolver();
+  try {
+    resolver.resolveGroupTree(groups);
+    Assert.fail("Exception expected because of some groups have multiple parents");
+  }
+ catch (  GroupTreeResolver.GroupTreeResolveException gre) {
+    Assert.assertTrue(gre.getMessage().contains("detected to have multiple parents"));
+  }
+}

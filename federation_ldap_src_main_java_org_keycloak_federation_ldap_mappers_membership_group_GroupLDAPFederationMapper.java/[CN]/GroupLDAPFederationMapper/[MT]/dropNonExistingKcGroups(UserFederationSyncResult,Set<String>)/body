@@ -1,0 +1,10 @@
+{
+  List<GroupModel> allGroups=realm.getGroups();
+  for (  GroupModel kcGroup : allGroups) {
+    if (!visitedGroupIds.contains(kcGroup.getId())) {
+      logger.infof("Removing Keycloak group '%s', which doesn't exist in LDAP",kcGroup.getName());
+      realm.removeGroup(kcGroup);
+      syncResult.increaseRemoved();
+    }
+  }
+}

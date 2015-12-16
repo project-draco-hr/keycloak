@@ -2,7 +2,7 @@
   KeycloakSession session=keycloakRule.startSession();
   try {
     RealmModel appRealm=session.realms().getRealmByName("test");
-    FederationTestUtils.addOrUpdateRoleLDAPMappers(appRealm,ldapModel,RoleLDAPFederationMapper.Mode.READ_ONLY);
+    FederationTestUtils.addOrUpdateRoleLDAPMappers(appRealm,ldapModel,LDAPGroupMapperMode.READ_ONLY);
     UserModel mary=session.users().getUserByUsername("marykeycloak",appRealm);
     RoleModel realmRole1=appRealm.getRole("realmRole1");
     RoleModel realmRole2=appRealm.getRole("realmRole2");
@@ -10,12 +10,12 @@
     if (realmRole3 == null) {
       realmRole3=appRealm.addRole("realmRole3");
     }
-    RoleLDAPFederationMapper roleMapper=new RoleLDAPFederationMapper();
     UserFederationMapperModel roleMapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"realmRolesMapper");
     LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    RoleLDAPFederationMapper roleMapper=FederationTestUtils.getRoleMapper(roleMapperModel,ldapProvider,appRealm);
     LDAPObject maryLdap=ldapProvider.loadLDAPUserByUsername(appRealm,"marykeycloak");
-    roleMapper.addRoleMappingInLDAP(roleMapperModel,"realmRole1",ldapProvider,maryLdap);
-    roleMapper.addRoleMappingInLDAP(roleMapperModel,"realmRole2",ldapProvider,maryLdap);
+    roleMapper.addRoleMappingInLDAP("realmRole1",maryLdap);
+    roleMapper.addRoleMappingInLDAP("realmRole2",maryLdap);
     mary.grantRole(realmRole3);
     Set<RoleModel> maryRoles=mary.getRealmRoleMappings();
     Assert.assertTrue(maryRoles.contains(realmRole1));
@@ -33,8 +33,8 @@
     }
  catch (    ModelException expected) {
     }
-    deleteRoleMappingsInLDAP(roleMapperModel,roleMapper,ldapProvider,maryLdap,"realmRole1");
-    deleteRoleMappingsInLDAP(roleMapperModel,roleMapper,ldapProvider,maryLdap,"realmRole2");
+    deleteRoleMappingsInLDAP(roleMapper,maryLdap,"realmRole1");
+    deleteRoleMappingsInLDAP(roleMapper,maryLdap,"realmRole2");
   }
   finally {
     keycloakRule.stopSession(session,false);

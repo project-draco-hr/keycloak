@@ -1,0 +1,14 @@
+{
+  Set<RoleModel> modelRoleMappings=super.getRoleMappings();
+  Set<RoleModel> ldapRoleMappings=getLDAPRoleMappingsConverted();
+  if (config.getMode() == LDAPGroupMapperMode.LDAP_ONLY) {
+    Set<RoleModel> modelRolesCopy=new HashSet<>(modelRoleMappings);
+    for (    RoleModel role : modelRolesCopy) {
+      if (role.getContainer().equals(roleContainer)) {
+        modelRoleMappings.remove(role);
+      }
+    }
+  }
+  modelRoleMappings.addAll(ldapRoleMappings);
+  return modelRoleMappings;
+}

@@ -1,0 +1,15 @@
+{
+  if (cachedLDAPGroupMappings != null) {
+    return new HashSet<>(cachedLDAPGroupMappings);
+  }
+  List<LDAPObject> ldapGroups=getLDAPGroupMappings(ldapUser);
+  Set<GroupModel> result=new HashSet<>();
+  for (  LDAPObject ldapGroup : ldapGroups) {
+    GroupModel kcGroup=findKcGroupOrSyncFromLDAP(ldapGroup,this);
+    if (kcGroup != null) {
+      result.add(kcGroup);
+    }
+  }
+  cachedLDAPGroupMappings=new HashSet<>(result);
+  return result;
+}

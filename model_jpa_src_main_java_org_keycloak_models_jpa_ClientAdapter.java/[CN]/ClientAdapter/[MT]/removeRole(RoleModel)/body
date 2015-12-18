@@ -11,6 +11,7 @@
   String compositeRoleTable=JpaUtils.getTableNameForNativeQuery("COMPOSITE_ROLE",em);
   em.createNativeQuery("delete from " + compositeRoleTable + " where CHILD_ROLE = :role").setParameter("role",role).executeUpdate();
   em.createNamedQuery("deleteScopeMappingByRole").setParameter("role",role).executeUpdate();
+  em.createNamedQuery("deleteTemplateScopeMappingByRole").setParameter("role",role).executeUpdate();
   role.setClient(null);
   em.flush();
   em.remove(role);

@@ -44,6 +44,9 @@
       resource.registerNode(entry.getKey(),entry.getValue());
     }
   }
+  if (rep.isUseTemplateConfig() != null)   resource.setUseTemplateConfig(rep.isUseTemplateConfig());
+  if (rep.isUseTemplateScope() != null)   resource.setUseTemplateScope(rep.isUseTemplateScope());
+  if (rep.isUseTemplateMappers() != null)   resource.setUseTemplateMappers(rep.isUseTemplateMappers());
   if (rep.getClientTemplate() != null) {
     if (rep.getClientTemplate().equals(ClientTemplateRepresentation.NONE)) {
       resource.setClientTemplate(null);
@@ -53,6 +56,9 @@
       for (      ClientTemplateModel template : realm.getClientTemplates()) {
         if (template.getName().equals(rep.getClientTemplate())) {
           resource.setClientTemplate(template);
+          if (rep.isUseTemplateConfig() == null)           resource.setUseTemplateConfig(true);
+          if (rep.isUseTemplateScope() == null)           resource.setUseTemplateScope(true);
+          if (rep.isUseTemplateMappers() == null)           resource.setUseTemplateMappers(true);
           break;
         }
       }

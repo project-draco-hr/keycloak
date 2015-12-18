@@ -1,7 +1,7 @@
 {
   auth.requireView();
   MappingsRepresentation all=new MappingsRepresentation();
-  Set<RoleModel> realmMappings=client.getRealmScopeMappings();
+  Set<RoleModel> realmMappings=scopeContainer.getRealmScopeMappings();
   if (realmMappings.size() > 0) {
     List<RoleRepresentation> realmRep=new ArrayList<RoleRepresentation>();
     for (    RoleModel roleModel : realmMappings) {
@@ -13,7 +13,7 @@
   if (clients.size() > 0) {
     Map<String,ClientMappingsRepresentation> clientMappings=new HashMap<String,ClientMappingsRepresentation>();
     for (    ClientModel client : clients) {
-      Set<RoleModel> roleMappings=client.getClientScopeMappings(this.client);
+      Set<RoleModel> roleMappings=KeycloakModelUtils.getClientScopeMappings(client,this.scopeContainer);
       if (roleMappings.size() > 0) {
         ClientMappingsRepresentation mappings=new ClientMappingsRepresentation();
         mappings.setId(client.getId());

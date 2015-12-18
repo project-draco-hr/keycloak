@@ -1,0 +1,10 @@
+{
+  if (hasScope(role))   return;
+  TemplateScopeMappingEntity entity=new TemplateScopeMappingEntity();
+  entity.setTemplate(getEntity());
+  RoleEntity roleEntity=RoleAdapter.toRoleEntity(role,em);
+  entity.setRole(roleEntity);
+  em.persist(entity);
+  em.flush();
+  em.detach(entity);
+}

@@ -1,0 +1,42 @@
+{
+  return new AbstractInitiateLogin(deployment,sessionStore){
+    @Override protected void sendAuthnRequest(    HttpFacade httpFacade,    SAML2AuthnRequestBuilder authnRequestBuilder,    BaseSAML2BindingBuilder binding){
+      try {
+        MessageFactory messageFactory=MessageFactory.newInstance();
+        SOAPMessage message=messageFactory.createMessage();
+        SOAPEnvelope envelope=message.getSOAPPart().getEnvelope();
+        envelope.addNamespaceDeclaration(NS_PREFIX_SAML_ASSERTION,JBossSAMLURIConstants.ASSERTION_NSURI.get());
+        envelope.addNamespaceDeclaration(NS_PREFIX_SAML_PROTOCOL,JBossSAMLURIConstants.PROTOCOL_NSURI.get());
+        envelope.addNamespaceDeclaration(NS_PREFIX_PAOS_BINDING,JBossSAMLURIConstants.PAOS_BINDING.get());
+        envelope.addNamespaceDeclaration(NS_PREFIX_PROFILE_ECP,JBossSAMLURIConstants.ECP_PROFILE.get());
+        createPaosRequestHeader(envelope);
+        createEcpRequestHeader(envelope);
+        SOAPBody body=envelope.getBody();
+        body.addDocument(binding.postBinding(authnRequestBuilder.toDocument()).getDocument());
+        message.writeTo(httpFacade.getResponse().getOutputStream());
+      }
+ catch (      Exception e) {
+        throw new RuntimeException("Could not create AuthnRequest.",e);
+      }
+    }
+    private void createEcpRequestHeader(    SOAPEnvelope envelope) throws SOAPException {
+      SOAPHeader headers=envelope.getHeader();
+      SOAPHeaderElement ecpRequestHeader=headers.addHeaderElement(envelope.createQName(JBossSAMLConstants.REQUEST.get(),NS_PREFIX_PROFILE_ECP));
+      ecpRequestHeader.setMustUnderstand(true);
+      ecpRequestHeader.setActor("http://schemas.xmlsoap.org/soap/actor/next");
+      ecpRequestHeader.addAttribute(envelope.createName("ProviderName"),deployment.getEntityID());
+      ecpRequestHeader.addAttribute(envelope.createName("IsPassive"),"0");
+      ecpRequestHeader.addChildElement(envelope.createQName("Issuer","saml")).setValue(deployment.getEntityID());
+      ecpRequestHeader.addChildElement(envelope.createQName("IDPList","samlp")).addChildElement(envelope.createQName("IDPEntry","samlp")).addAttribute(envelope.createName("ProviderID"),deployment.getIDP().getEntityID()).addAttribute(envelope.createName("Name"),deployment.getIDP().getEntityID()).addAttribute(envelope.createName("Loc"),deployment.getIDP().getSingleSignOnService().getRequestBindingUrl());
+    }
+    private void createPaosRequestHeader(    SOAPEnvelope envelope) throws SOAPException {
+      SOAPHeader headers=envelope.getHeader();
+      SOAPHeaderElement paosRequestHeader=headers.addHeaderElement(envelope.createQName(JBossSAMLConstants.REQUEST.get(),NS_PREFIX_PAOS_BINDING));
+      paosRequestHeader.setMustUnderstand(true);
+      paosRequestHeader.setActor("http://schemas.xmlsoap.org/soap/actor/next");
+      paosRequestHeader.addAttribute(envelope.createName("service"),JBossSAMLURIConstants.ECP_PROFILE.get());
+      paosRequestHeader.addAttribute(envelope.createName("responseConsumerURL"),deployment.getAssertionConsumerServiceUrl());
+    }
+  }
+;
+}

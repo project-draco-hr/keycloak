@@ -1,0 +1,21 @@
+{
+  String header=facade.getRequest().getHeader(PAOS_HEADER);
+  if (header != null) {
+    return doHandle(new SamlInvocationContext(),onCreateSession);
+  }
+ else {
+    try {
+      MessageFactory messageFactory=MessageFactory.newInstance();
+      SOAPMessage soapMessage=messageFactory.createMessage(null,facade.getRequest().getInputStream());
+      SOAPBody soapBody=soapMessage.getSOAPBody();
+      Node authnRequestNode=soapBody.getFirstChild();
+      Document document=DocumentUtil.createDocument();
+      document.appendChild(document.importNode(authnRequestNode,true));
+      String samlResponse=PostBindingUtil.base64Encode(DocumentUtil.asString(document));
+      return doHandle(new SamlInvocationContext(null,samlResponse,null),onCreateSession);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Error creating fault message.",e);
+    }
+  }
+}

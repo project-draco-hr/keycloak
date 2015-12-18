@@ -1,0 +1,10 @@
+{
+  ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+  try {
+    this.message.writeTo(outputStream);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Error while building SOAP Fault.",e);
+  }
+  return Response.status(status).entity(outputStream.toByteArray()).build();
+}

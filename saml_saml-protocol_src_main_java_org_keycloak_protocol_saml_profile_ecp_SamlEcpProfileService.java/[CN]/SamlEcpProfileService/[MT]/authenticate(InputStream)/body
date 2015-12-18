@@ -1,0 +1,23 @@
+{
+  try {
+    return new PostBindingProtocol(){
+      @Override protected String getBindingType(      AuthnRequestType requestAbstractType){
+        return SamlProtocol.SAML_SOAP_BINDING;
+      }
+      @Override protected Response loginRequest(      String relayState,      AuthnRequestType requestAbstractType,      ClientModel client){
+        requestAbstractType.setIsPassive(true);
+        requestAbstractType.setDestination(uriInfo.getAbsolutePath());
+        return super.loginRequest(relayState,requestAbstractType,client);
+      }
+    }
+.execute(Soap.toSamlHttpPostMessage(inputStream),null,null);
+  }
+ catch (  Exception e) {
+    String reason="Some error occurred while processing the AuthnRequest.";
+    String detail=e.getMessage();
+    if (detail == null) {
+      detail=reason;
+    }
+    return Soap.createFault().reason(reason).detail(detail).build();
+  }
+}

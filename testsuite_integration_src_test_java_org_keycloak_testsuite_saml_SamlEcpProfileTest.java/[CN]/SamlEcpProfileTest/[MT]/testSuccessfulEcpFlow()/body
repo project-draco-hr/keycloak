@@ -1,0 +1,51 @@
+{
+  Response authnRequestResponse=ClientBuilder.newClient().target(APP_SERVER_BASE_URL + "/ecp-sp/").request().header("Accept","text/html; application/vnd.paos+xml").header("PAOS","ver='urn:liberty:paos:2003-08' ;'urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp'").get();
+  SOAPMessage authnRequestMessage=MessageFactory.newInstance().createMessage(null,new ByteArrayInputStream(authnRequestResponse.readEntity(byte[].class)));
+  printDocument(authnRequestMessage.getSOAPPart().getContent(),System.out);
+  Iterator<SOAPHeaderElement> it=authnRequestMessage.getSOAPHeader().<SOAPHeaderElement>getChildElements(new QName("urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp","Request"));
+  SOAPHeaderElement ecpRequestHeader=it.next();
+  NodeList idpList=ecpRequestHeader.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:protocol","IDPList");
+  assertEquals("No IDPList returned from Service Provider",1,idpList.getLength());
+  NodeList idpEntries=idpList.item(0).getChildNodes();
+  assertEquals("No IDPEntry returned from Service Provider",1,idpEntries.getLength());
+  String singleSignOnService=null;
+  for (int i=0; i < idpEntries.getLength(); i++) {
+    Node item=idpEntries.item(i);
+    NamedNodeMap attributes=item.getAttributes();
+    Node location=attributes.getNamedItem("Loc");
+    singleSignOnService=location.getNodeValue();
+  }
+  assertNotNull("Could not obtain SSO Service URL",singleSignOnService);
+  Document authenticationRequest=authnRequestMessage.getSOAPBody().getFirstChild().getOwnerDocument();
+  String username="pedroigor";
+  String password="password";
+  String pair=username + ":" + password;
+  String authHeader="Basic " + new String(Base64.encodeBytes(pair.getBytes()));
+  Response authenticationResponse=ClientBuilder.newClient().target(singleSignOnService).request().header(HttpHeaders.AUTHORIZATION,authHeader).post(Entity.entity(DocumentUtil.asString(authenticationRequest),"application/soap+xml"));
+  assertEquals(OK.getStatusCode(),authenticationResponse.getStatus());
+  SOAPMessage responseMessage=MessageFactory.newInstance().createMessage(null,new ByteArrayInputStream(authenticationResponse.readEntity(byte[].class)));
+  printDocument(responseMessage.getSOAPPart().getContent(),System.out);
+  SOAPHeader responseMessageHeaders=responseMessage.getSOAPHeader();
+  NodeList ecpResponse=responseMessageHeaders.getElementsByTagNameNS(JBossSAMLURIConstants.ECP_PROFILE.get(),JBossSAMLConstants.RESPONSE.get());
+  assertEquals("No ECP Response",1,ecpResponse.getLength());
+  Node samlResponse=responseMessage.getSOAPBody().getFirstChild();
+  assertNotNull(samlResponse);
+  ResponseType responseType=(ResponseType)new SAMLParser().parse(DocumentUtil.getNodeAsStream(samlResponse));
+  StatusCodeType statusCode=responseType.getStatus().getStatusCode();
+  assertEquals(statusCode.getValue().toString(),JBossSAMLURIConstants.STATUS_SUCCESS.get());
+  assertEquals("http://localhost:8081/ecp-sp/",responseType.getDestination());
+  assertNotNull(responseType.getSignature());
+  assertEquals(1,responseType.getAssertions().size());
+  SOAPMessage samlResponseRequest=MessageFactory.newInstance().createMessage();
+  samlResponseRequest.getSOAPBody().addDocument(responseMessage.getSOAPBody().extractContentAsDocument());
+  ByteArrayOutputStream os=new ByteArrayOutputStream();
+  samlResponseRequest.writeTo(os);
+  Response serviceProviderFinalResponse=ClientBuilder.newClient().target(responseType.getDestination()).request().post(Entity.entity(os.toByteArray(),"application/vnd.paos+xml"));
+  Map<String,NewCookie> cookies=serviceProviderFinalResponse.getCookies();
+  Builder resourceRequest=ClientBuilder.newClient().target(responseType.getDestination() + "/index.html").request();
+  for (  NewCookie cookie : cookies.values()) {
+    resourceRequest.cookie(cookie);
+  }
+  Response resourceResponse=resourceRequest.get();
+  assertTrue(resourceResponse.readEntity(String.class).contains("pedroigor"));
+}

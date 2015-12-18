@@ -27,7 +27,7 @@
     return ErrorPage.error(session,Messages.INVALID_REDIRECT_URI);
   }
   ClientSessionModel clientSession=session.sessions().createClientSession(realm,client);
-  clientSession.setAuthMethod(SamlProtocol.LOGIN_PROTOCOL);
+  clientSession.setAuthMethod(getLoginProtocol());
   clientSession.setRedirectUri(redirect);
   clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
   clientSession.setNote(ClientSessionCode.ACTION_KEY,KeycloakModelUtils.generateCodeSecret());

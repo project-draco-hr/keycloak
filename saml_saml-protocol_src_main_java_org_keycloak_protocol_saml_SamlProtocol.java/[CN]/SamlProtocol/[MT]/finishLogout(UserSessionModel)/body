@@ -22,12 +22,7 @@
     binding.signatureAlgorithm(algorithm).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
   }
   try {
-    if (isLogoutPostBindingForInitiator(userSession)) {
-      return binding.postBinding(builder.buildDocument()).response(logoutBindingUri);
-    }
- else {
-      return binding.redirectBinding(builder.buildDocument()).response(logoutBindingUri);
-    }
+    return buildLogoutResponse(userSession,logoutBindingUri,builder,binding);
   }
  catch (  ConfigurationException e) {
     throw new RuntimeException(e);

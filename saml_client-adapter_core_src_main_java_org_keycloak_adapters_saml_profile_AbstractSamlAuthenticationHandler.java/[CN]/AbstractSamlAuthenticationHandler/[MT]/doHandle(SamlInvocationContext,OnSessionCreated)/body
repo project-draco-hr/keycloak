@@ -1,0 +1,17 @@
+{
+  String samlRequest=context.getSamlRequest();
+  String samlResponse=context.getSamlResponse();
+  String relayState=context.getRelayState();
+  if (samlRequest != null) {
+    return handleSamlRequest(samlRequest,relayState);
+  }
+ else   if (samlResponse != null) {
+    return handleSamlResponse(samlResponse,relayState,onCreateSession);
+  }
+ else   if (sessionStore.isLoggedIn()) {
+    if (verifySSL())     return AuthOutcome.FAILED;
+    log.debug("AUTHENTICATED: was cached");
+    return handleRequest();
+  }
+  return initiateLogin();
+}

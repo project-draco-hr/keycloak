@@ -1,3 +1,5 @@
 {
-  return handleBrowserAuthenticationRequest(clientSession,new SamlProtocol().setEventBuilder(event).setHttpHeaders(headers).setRealm(realm).setSession(session).setUriInfo(uriInfo),isPassive);
+  LoginProtocol protocol=session.getProvider(LoginProtocol.class,clientSession.getAuthMethod());
+  protocol.setRealm(realm).setHttpHeaders(request.getHttpHeaders()).setUriInfo(uriInfo).setEventBuilder(event);
+  return handleBrowserAuthenticationRequest(clientSession,protocol,isPassive);
 }

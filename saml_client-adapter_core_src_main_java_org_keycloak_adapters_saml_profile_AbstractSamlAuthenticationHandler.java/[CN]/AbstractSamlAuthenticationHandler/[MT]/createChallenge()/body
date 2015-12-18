@@ -1,0 +1,10 @@
+{
+  return new AbstractInitiateLogin(deployment,sessionStore){
+    @Override protected void sendAuthnRequest(    HttpFacade httpFacade,    SAML2AuthnRequestBuilder authnRequestBuilder,    BaseSAML2BindingBuilder binding) throws ProcessingException, ConfigurationException, IOException {
+      Document document=authnRequestBuilder.toDocument();
+      SamlDeployment.Binding samlBinding=deployment.getIDP().getSingleSignOnService().getRequestBinding();
+      SamlUtil.sendSaml(true,httpFacade,deployment.getIDP().getSingleSignOnService().getRequestBindingUrl(),binding,document,samlBinding);
+    }
+  }
+;
+}

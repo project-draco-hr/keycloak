@@ -3,12 +3,12 @@
   FlowStatus status=result.getStatus();
 switch (status) {
 case SUCCESS:
-    AuthenticationProcessor.logger.debugv("authenticator SUCCESS: {0}",execution.getAuthenticator());
+    logger.debugv("authenticator SUCCESS: {0}",execution.getAuthenticator());
   processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.SUCCESS);
 if (execution.isAlternative()) alternativeSuccessful=true;
 return null;
 case FAILED:
-AuthenticationProcessor.logger.debugv("authenticator FAILED: {0}",execution.getAuthenticator());
+logger.debugv("authenticator FAILED: {0}",execution.getAuthenticator());
 processor.logFailure();
 processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.FAILED);
 if (result.getChallenge() != null) {
@@ -16,14 +16,14 @@ return sendChallenge(result,execution);
 }
 throw new AuthenticationFlowException(result.getError());
 case FORK:
-AuthenticationProcessor.logger.debugv("reset browser login from authenticator: {0}",execution.getAuthenticator());
+logger.debugv("reset browser login from authenticator: {0}",execution.getAuthenticator());
 processor.getClientSession().setNote(AuthenticationProcessor.CURRENT_AUTHENTICATION_EXECUTION,execution.getId());
 throw new ForkFlowException(result.getSuccessMessage(),result.getErrorMessage());
 case FORCE_CHALLENGE:
 processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
 return sendChallenge(result,execution);
 case CHALLENGE:
-AuthenticationProcessor.logger.debugv("authenticator CHALLENGE: {0}",execution.getAuthenticator());
+logger.debugv("authenticator CHALLENGE: {0}",execution.getAuthenticator());
 if (execution.isRequired()) {
 processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
 return sendChallenge(result,execution);
@@ -42,12 +42,12 @@ processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionM
 }
 return null;
 case FAILURE_CHALLENGE:
-AuthenticationProcessor.logger.debugv("authenticator FAILURE_CHALLENGE: {0}",execution.getAuthenticator());
+logger.debugv("authenticator FAILURE_CHALLENGE: {0}",execution.getAuthenticator());
 processor.logFailure();
 processor.getClientSession().setExecutionStatus(execution.getId(),ClientSessionModel.ExecutionStatus.CHALLENGED);
 return sendChallenge(result,execution);
 case ATTEMPTED:
-AuthenticationProcessor.logger.debugv("authenticator ATTEMPTED: {0}",execution.getAuthenticator());
+logger.debugv("authenticator ATTEMPTED: {0}",execution.getAuthenticator());
 if (execution.getRequirement() == AuthenticationExecutionModel.Requirement.REQUIRED) {
 throw new AuthenticationFlowException(AuthenticationFlowError.INVALID_CREDENTIALS);
 }
@@ -57,8 +57,8 @@ case FLOW_RESET:
 AuthenticationProcessor.resetFlow(processor.getClientSession());
 return processor.authenticate();
 default :
-AuthenticationProcessor.logger.debugv("authenticator INTERNAL_ERROR: {0}",execution.getAuthenticator());
-AuthenticationProcessor.logger.error("Unknown result status");
+logger.debugv("authenticator INTERNAL_ERROR: {0}",execution.getAuthenticator());
+logger.error("Unknown result status");
 throw new AuthenticationFlowException(AuthenticationFlowError.INTERNAL_ERROR);
 }
 }

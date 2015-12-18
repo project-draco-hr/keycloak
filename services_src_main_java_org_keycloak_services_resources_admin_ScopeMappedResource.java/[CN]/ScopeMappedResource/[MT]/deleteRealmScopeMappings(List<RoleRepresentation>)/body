@@ -1,9 +1,9 @@
 {
   auth.requireManage();
   if (roles == null) {
-    Set<RoleModel> roleModels=client.getRealmScopeMappings();
+    Set<RoleModel> roleModels=scopeContainer.getRealmScopeMappings();
     for (    RoleModel roleModel : roleModels) {
-      client.deleteScopeMapping(roleModel);
+      scopeContainer.deleteScopeMapping(roleModel);
     }
     adminEvent.operation(OperationType.DELETE).resourcePath(session.getContext().getUri()).representation(roles).success();
   }
@@ -13,7 +13,7 @@
       if (roleModel == null) {
         throw new NotFoundException("Client not found");
       }
-      client.deleteScopeMapping(roleModel);
+      scopeContainer.deleteScopeMapping(roleModel);
       adminEvent.operation(OperationType.DELETE).resourcePath(session.getContext().getUri(),roleModel.getId()).representation(roles).success();
     }
   }

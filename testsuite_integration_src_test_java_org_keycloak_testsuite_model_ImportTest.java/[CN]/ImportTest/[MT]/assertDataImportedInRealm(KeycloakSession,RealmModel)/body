@@ -86,7 +86,7 @@
   Assert.assertTrue(allScopes.contains(application.getRole("app-user")));
   Set<RoleModel> realmScopes=oauthClient.getRealmScopeMappings();
   Assert.assertTrue(realmScopes.contains(realm.getRole("admin")));
-  Set<RoleModel> appScopes=application.getClientScopeMappings(oauthClient);
+  Set<RoleModel> appScopes=KeycloakModelUtils.getClientScopeMappings(application,oauthClient);
   Assert.assertTrue(appScopes.contains(application.getRole("app-user")));
   UserModel socialUser=session.users().getUserByUsername("mySocialUser",realm);
   Set<FederatedIdentityModel> socialLinks=session.users().getFederatedIdentities(socialUser,realm);

@@ -1,10 +1,11 @@
 {
   Document doc=loadXML(AbstractSAMLServletsAdapterTest.class.getResourceAsStream("/adapter-test/keycloak-saml/sp-metadata.xml"));
-  modifyDocElementAttribute(doc,"SingleLogoutService","Location","8080",System.getProperty("auth.server.http.port",null));
-  modifyDocElementAttribute(doc,"AssertionConsumerService","Location","8080",System.getProperty("auth.server.http.port",null));
+  modifyDocElementAttribute(doc,"SingleLogoutService","Location","8080",System.getProperty("app.server.http.port",null));
+  modifyDocElementAttribute(doc,"AssertionConsumerService","Location","8080",System.getProperty("app.server.http.port",null));
   ClientRepresentation clientRep=testRealmResource().convertClientDescription(IOUtil.documentToString(doc));
   Response response=testRealmResource().clients().create(clientRep);
   assertEquals(201,response.getStatus());
+  response.close();
   salesMetadataServletPage.navigateTo();
   testRealmSAMLLoginPage.form().login(bburkeUser);
   assertTrue(driver.getPageSource().contains("principal=bburke"));
@@ -13,6 +14,6 @@
   assertCurrentUrlStartsWith(testRealmSAMLLoginPage);
   testRealmSAMLLoginPage.form().login("unauthorized","password");
   assertFalse(driver.getPageSource().contains("principal="));
-  assertTrue(driver.getPageSource().contains("Forbidden"));
+  assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("Status 403"));
   salesMetadataServletPage.logout();
 }

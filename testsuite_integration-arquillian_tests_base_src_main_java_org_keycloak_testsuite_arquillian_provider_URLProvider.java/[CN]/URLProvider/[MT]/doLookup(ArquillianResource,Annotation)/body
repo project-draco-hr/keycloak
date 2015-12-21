@@ -16,6 +16,27 @@
       log.debug("Fixed injected @ArquillianResource URL to: " + url);
     }
   }
+  try {
+    if ("true".equals(System.getProperty("app.server.eap6"))) {
+      if (url == null) {
+        url=new URL("http://localhost:8080/");
+      }
+      URL fixedUrl=url;
+      if (url.getPort() == 8080) {
+        for (        Annotation a : qualifiers) {
+          if (OperateOnDeployment.class.isAssignableFrom(a.annotationType())) {
+            url=new URL(fixedUrl.toExternalForm().replace("8080",System.getProperty("app.server.http.port",null)) + "/" + ((OperateOnDeployment)a).value());
+          }
+        }
+      }
+      if (url.getPort() == 8080) {
+        url=null;
+      }
+    }
+  }
+ catch (  MalformedURLException e) {
+    e.printStackTrace();
+  }
   for (  Annotation a : qualifiers) {
     if (AuthServerContext.class.isAssignableFrom(a.annotationType())) {
       return testContext.get().getAuthServerContextRoot();

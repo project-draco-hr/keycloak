@@ -1,7 +1,9 @@
 {
   log.info("enabling reset password");
   loginSettingsPage.form().setResetPasswordAllowed(true);
+  assertTrue(loginSettingsPage.form().isResetPasswordAllowed());
   loginSettingsPage.form().save();
+  assertAlertSuccess();
   log.debug("enabled");
   testRealmAdminConsolePage.navigateTo();
   testRealmLoginPage.form().forgotPassword();
@@ -10,8 +12,9 @@
   log.info("disabling reset password");
   loginSettingsPage.navigateTo();
   loginSettingsPage.form().setResetPasswordAllowed(false);
-  loginSettingsPage.form().save();
   assertFalse(loginSettingsPage.form().isResetPasswordAllowed());
+  loginSettingsPage.form().save();
+  assertAlertSuccess();
   log.debug("disabled");
   testRealmAdminConsolePage.navigateTo();
   testRealmLoginPage.form().waitForResetPasswordLinkNotPresent();

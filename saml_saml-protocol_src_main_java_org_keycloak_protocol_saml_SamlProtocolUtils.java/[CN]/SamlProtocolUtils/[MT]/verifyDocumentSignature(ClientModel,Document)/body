@@ -1,5 +1,6 @@
 {
-  if (!"true".equals(client.getAttribute(SamlProtocol.SAML_CLIENT_SIGNATURE_ATTRIBUTE))) {
+  SamlClient samlClient=new SamlClient(client);
+  if (!samlClient.requiresClientSignature()) {
     return;
   }
   PublicKey publicKey=getSignatureValidationKey(client);

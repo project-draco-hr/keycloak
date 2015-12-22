@@ -1,0 +1,11 @@
+{
+  if (certPem == null)   throw new VerificationException("Client does not have a public key.");
+  Certificate cert=null;
+  try {
+    cert=PemUtils.decodeCertificate(certPem);
+  }
+ catch (  Exception e) {
+    throw new VerificationException("Could not decode cert",e);
+  }
+  return cert.getPublicKey();
+}

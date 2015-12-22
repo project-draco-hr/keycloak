@@ -1,0 +1,21 @@
+{
+  try {
+    Map<String,Object> map=new HashMap<>();
+    map.put("bootstrap",bootstrap);
+    if (bootstrap) {
+      map.put("localUser",isLocal());
+    }
+    if (successMessage != null) {
+      map.put("successMessage",successMessage);
+    }
+    if (errorMessage != null) {
+      map.put("errorMessage",errorMessage);
+    }
+    FreeMarkerUtil freeMarkerUtil=new FreeMarkerUtil();
+    String result=freeMarkerUtil.processTemplate(map,"index.ftl",getTheme());
+    return Response.status(errorMessage == null ? Response.Status.OK : Response.Status.BAD_REQUEST).entity(result).cacheControl(CacheControlUtil.noCache()).build();
+  }
+ catch (  Exception e) {
+    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+  }
+}

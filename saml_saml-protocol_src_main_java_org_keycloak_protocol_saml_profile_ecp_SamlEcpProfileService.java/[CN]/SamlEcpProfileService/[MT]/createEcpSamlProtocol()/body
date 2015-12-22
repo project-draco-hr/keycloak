@@ -3,7 +3,7 @@
     @Override protected Response buildAuthenticatedResponse(    ClientSessionModel clientSession,    String redirectUri,    Document samlDocument,    JaxrsSAML2BindingBuilder bindingBuilder) throws ConfigurationException, ProcessingException, IOException {
       Document document=bindingBuilder.postBinding(samlDocument).getDocument();
       try {
-        SoapMessageBuilder messageBuilder=Soap.createMessage().addNamespace(NS_PREFIX_SAML_ASSERTION,JBossSAMLURIConstants.ASSERTION_NSURI.get()).addNamespace(NS_PREFIX_SAML_PROTOCOL,JBossSAMLURIConstants.PROTOCOL_NSURI.get()).addNamespace(NS_PREFIX_PROFILE_ECP,JBossSAMLURIConstants.ECP_PROFILE.get());
+        Soap.SoapMessageBuilder messageBuilder=Soap.createMessage().addNamespace(NS_PREFIX_SAML_ASSERTION,JBossSAMLURIConstants.ASSERTION_NSURI.get()).addNamespace(NS_PREFIX_SAML_PROTOCOL,JBossSAMLURIConstants.PROTOCOL_NSURI.get()).addNamespace(NS_PREFIX_PROFILE_ECP,JBossSAMLURIConstants.ECP_PROFILE.get());
         createEcpResponseHeader(redirectUri,messageBuilder);
         createRequestAuthenticatedHeader(clientSession,messageBuilder);
         messageBuilder.addToBody(document);
@@ -13,7 +13,7 @@
         throw new RuntimeException("Error while creating SAML response.",e);
       }
     }
-    private void createRequestAuthenticatedHeader(    ClientSessionModel clientSession,    SoapMessageBuilder messageBuilder){
+    private void createRequestAuthenticatedHeader(    ClientSessionModel clientSession,    Soap.SoapMessageBuilder messageBuilder){
       ClientModel client=clientSession.getClient();
       if ("true".equals(client.getAttribute(SamlProtocol.SAML_CLIENT_SIGNATURE_ATTRIBUTE))) {
         SOAPHeaderElement ecpRequestAuthenticated=messageBuilder.addHeader(JBossSAMLConstants.REQUEST_AUTHENTICATED.get(),NS_PREFIX_PROFILE_ECP);
@@ -21,7 +21,7 @@
         ecpRequestAuthenticated.setActor("http://schemas.xmlsoap.org/soap/actor/next");
       }
     }
-    private void createEcpResponseHeader(    String redirectUri,    SoapMessageBuilder messageBuilder) throws SOAPException {
+    private void createEcpResponseHeader(    String redirectUri,    Soap.SoapMessageBuilder messageBuilder) throws SOAPException {
       SOAPHeaderElement ecpResponseHeader=messageBuilder.addHeader(JBossSAMLConstants.RESPONSE.get(),NS_PREFIX_PROFILE_ECP);
       ecpResponseHeader.setMustUnderstand(true);
       ecpResponseHeader.setActor("http://schemas.xmlsoap.org/soap/actor/next");
@@ -34,5 +34,5 @@
       return Soap.createFault().reason("Logout not supported.").build();
     }
   }
-.setSession(session);
+.setEventBuilder(event).setHttpHeaders(headers).setRealm(realm).setSession(session).setUriInfo(uriInfo);
 }

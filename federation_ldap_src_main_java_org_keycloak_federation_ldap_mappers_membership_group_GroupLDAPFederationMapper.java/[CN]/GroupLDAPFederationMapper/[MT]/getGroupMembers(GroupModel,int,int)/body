@@ -3,16 +3,6 @@
   if (ldapGroup == null) {
     return Collections.emptyList();
   }
-  LDAPDn usersDn=LDAPDn.fromString(ldapProvider.getLdapIdentityStore().getConfig().getUsersDn());
-  Set<LDAPDn> userDns=getLDAPMembersWithParent(ldapGroup,usersDn);
-  if (userDns == null) {
-    return Collections.emptyList();
-  }
-  if (userDns.size() <= firstResult) {
-    return Collections.emptyList();
-  }
-  List<LDAPDn> dns=new ArrayList<>(userDns);
-  int max=Math.min(dns.size(),firstResult + maxResults);
-  dns=dns.subList(firstResult,max);
-  return ldapProvider.loadUsersByLDAPDns(dns,realm);
+  MembershipType membershipType=config.getMembershipTypeLdapAttribute();
+  return membershipType.getGroupMembers(this,ldapGroup,firstResult,maxResults);
 }

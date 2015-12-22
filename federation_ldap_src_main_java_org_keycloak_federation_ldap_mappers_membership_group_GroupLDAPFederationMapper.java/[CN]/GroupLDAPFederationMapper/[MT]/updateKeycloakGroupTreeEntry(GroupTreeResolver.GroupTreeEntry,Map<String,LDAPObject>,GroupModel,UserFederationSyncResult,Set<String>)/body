@@ -9,7 +9,7 @@
     }
   }
   if (kcGroup != null) {
-    logger.infof("Updated Keycloak group '%s' from LDAP",kcGroup.getName());
+    logger.debugf("Updated Keycloak group '%s' from LDAP",kcGroup.getName());
     updateAttributesOfKCGroup(kcGroup,ldapGroups.get(kcGroup.getName()));
     syncResult.increaseUpdated();
   }
@@ -17,11 +17,11 @@
     kcGroup=realm.createGroup(groupTreeEntry.getGroupName());
     if (kcParent == null) {
       realm.moveGroup(kcGroup,null);
-      logger.infof("Imported top-level group '%s' from LDAP",kcGroup.getName());
+      logger.debugf("Imported top-level group '%s' from LDAP",kcGroup.getName());
     }
  else {
       realm.moveGroup(kcGroup,kcParent);
-      logger.infof("Imported group '%s' from LDAP as child of group '%s'",kcGroup.getName(),kcParent.getName());
+      logger.debugf("Imported group '%s' from LDAP as child of group '%s'",kcGroup.getName(),kcParent.getName());
     }
     updateAttributesOfKCGroup(kcGroup,ldapGroups.get(kcGroup.getName()));
     syncResult.increaseAdded();

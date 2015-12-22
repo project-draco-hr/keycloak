@@ -1,0 +1,17 @@
+{
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      LDAPFederationProvider ldapProvider=getInstance(session,model);
+      RealmModel realm=session.realms().getRealm(realmId);
+      Set<UserFederationMapperModel> mappers=realm.getUserFederationMappersByFederationProvider(model.getId());
+      for (      UserFederationMapperModel mapperModel : mappers) {
+        UserFederationMapper ldapMapper=session.getProvider(UserFederationMapper.class,mapperModel.getFederationMapperType());
+        UserFederationSyncResult syncResult=ldapMapper.syncDataFromFederationProviderToKeycloak(mapperModel,ldapProvider,session,realm);
+        if (syncResult.getAdded() > 0 || syncResult.getUpdated() > 0 || syncResult.getRemoved() > 0 || syncResult.getFailed() > 0) {
+          logger.infof("Sync of federation mapper '%s' finished. Status: %s",mapperModel.getName(),syncResult.toString());
+        }
+      }
+    }
+  }
+);
+}

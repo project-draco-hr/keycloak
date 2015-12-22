@@ -1,0 +1,11 @@
+{
+  FederationTestUtils.createLDAPGroup(session,realm,ldapModel,"group3");
+  UserFederationSyncResult syncResult=new GroupLDAPFederationMapperFactory().create(session).syncDataFromKeycloakToFederationProvider(mapperModel,ldapProvider,session,realm);
+  FederationTestUtils.assertSyncEquals(syncResult,0,4,0,0);
+  Assert.assertNotNull(FederationTestUtils.getGroupMapper(mapperModel,ldapProvider,realm).loadLDAPGroupByName("group3"));
+  FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.DROP_NON_EXISTING_GROUPS_DURING_SYNC,"true");
+  realm.updateUserFederationMapper(mapperModel);
+  syncResult=new GroupLDAPFederationMapperFactory().create(session).syncDataFromKeycloakToFederationProvider(mapperModel,ldapProvider,session,realm);
+  FederationTestUtils.assertSyncEquals(syncResult,0,4,1,0);
+  Assert.assertNull(FederationTestUtils.getGroupMapper(mapperModel,ldapProvider,realm).loadLDAPGroupByName("group3"));
+}

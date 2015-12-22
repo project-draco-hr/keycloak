@@ -1,0 +1,16 @@
+{
+  if (visitedGroups.contains(groupName)) {
+    throw new GroupTreeResolveException("Recursion detected when trying to resolve group '" + groupName + "'. Whole recursion path: "+ currentSubtree);
+  }
+  visitedGroups.add(groupName);
+  Group group=asMap.get(groupName);
+  List<GroupTreeEntry> children=new LinkedList<>();
+  GroupTreeEntry result=new GroupTreeEntry(group.getGroupName(),children);
+  for (  String childrenName : group.getChildrenNames()) {
+    List<String> subtreeCopy=new LinkedList<>(currentSubtree);
+    subtreeCopy.add(childrenName);
+    GroupTreeEntry childEntry=resolveGroupTree(childrenName,asMap,visitedGroups,subtreeCopy);
+    children.add(childEntry);
+  }
+  return result;
+}

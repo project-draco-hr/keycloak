@@ -17,16 +17,38 @@
   classes.add(QRCodeResource.class);
   classes.add(ThemeResource.class);
   classes.add(JsResource.class);
-  classes.add(WelcomeResource.class);
   singletons.add(new ObjectMapperResolver(Boolean.parseBoolean(System.getProperty("keycloak.jsonPrettyPrint","false"))));
-  boolean defaultRealmCreated=ApplianceBootstrap.setupDefaultRealm(sessionFactory,context.getContextPath());
   migrateModel();
   sessionFactory.publish(new PostMigrationEvent());
-  new ExportImportManager().checkExportImport(this.sessionFactory,context.getContextPath());
-  importRealms(context);
-  importAddUser();
-  if (defaultRealmCreated) {
-    ApplianceBootstrap.setupDefaultUser(sessionFactory);
+  boolean bootstrapAdminUser=false;
+  KeycloakSession session=sessionFactory.create();
+  try {
+    session.getTransaction().begin();
+    ApplianceBootstrap applianceBootstrap=new ApplianceBootstrap(session);
+    ExportImportManager exportImportManager=new ExportImportManager(session);
+    boolean createMasterRealm=applianceBootstrap.isNewInstall();
+    if (exportImportManager.isRunImport() && exportImportManager.isImportMasterIncluded()) {
+      createMasterRealm=false;
+    }
+    if (createMasterRealm) {
+      applianceBootstrap.createMasterRealm(contextPath);
+    }
+    if (exportImportManager.isRunImport()) {
+      exportImportManager.runImport();
+    }
+ else {
+      importRealms();
+    }
+    importAddUser();
+    if (exportImportManager.isRunExport()) {
+      exportImportManager.runExport();
+    }
+    bootstrapAdminUser=applianceBootstrap.isNoMasterUser();
+    session.getTransaction().commit();
   }
+  finally {
+    session.close();
+  }
+  singletons.add(new WelcomeResource(bootstrapAdminUser));
   setupScheduledTasks(sessionFactory);
 }

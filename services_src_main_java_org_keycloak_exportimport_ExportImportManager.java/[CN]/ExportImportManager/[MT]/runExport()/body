@@ -1,0 +1,16 @@
+{
+  try {
+    if (realmName == null) {
+      logger.info("Full model export requested");
+      exportProvider.exportModel(session.getKeycloakSessionFactory());
+    }
+ else {
+      logger.infof("Export of realm '%s' requested",realmName);
+      exportProvider.exportRealm(session.getKeycloakSessionFactory(),realmName);
+    }
+    logger.info("Export finished successfully");
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Failed to run export");
+  }
+}

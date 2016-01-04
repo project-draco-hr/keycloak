@@ -1,0 +1,35 @@
+{
+  checkBootstrap();
+  if (!bootstrap) {
+    return createWelcomePage(null,null);
+  }
+ else {
+    if (!isLocal()) {
+      logger.errorv("Rejected non-local attempt to create initial user from {0}",session.getContext().getConnection().getRemoteAddr());
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+    String username=formData.getFirst("username");
+    String password=formData.getFirst("password");
+    String passwordConfirmation=formData.getFirst("passwordConfirmation");
+    if (username == null || username.length() == 0) {
+      return createWelcomePage(null,"Username is missing");
+    }
+    if (password == null || password.length() == 0) {
+      return createWelcomePage(null,"Password is missing");
+    }
+    if (!password.equals(passwordConfirmation)) {
+      return createWelcomePage(null,"Password and confirmation doesn't match");
+    }
+    ApplianceBootstrap applianceBootstrap=new ApplianceBootstrap(session);
+    if (applianceBootstrap.isNoMasterUser()) {
+      bootstrap=false;
+      applianceBootstrap.createMasterRealmUser(session,username,password);
+      logger.infov("Created initial admin user with username {0}",username);
+      return createWelcomePage("User created",null);
+    }
+ else {
+      logger.warnv("Rejected attempt to create initial user as user is already created");
+      return createWelcomePage(null,"Users already exists");
+    }
+  }
+}

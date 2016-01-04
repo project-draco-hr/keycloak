@@ -1,0 +1,15 @@
+{
+  super.updateCredential(cred);
+  if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE && cred.getType().equals(UserCredentialModel.PASSWORD)) {
+    logger.debugf("Going to update userAccountControl for ldap user '%s' after successful password update",ldapUser.getDn().toString());
+    ldapUser.removeReadOnlyAttributeName(LDAPConstants.PWD_LAST_SET);
+    ldapUser.setSingleAttribute(LDAPConstants.PWD_LAST_SET,"-1");
+    UserAccountControl control=getUserAccountControl();
+    control.remove(UserAccountControl.PASSWD_NOTREQD);
+    control.remove(UserAccountControl.PASSWORD_EXPIRED);
+    if (super.isEnabled()) {
+      control.remove(UserAccountControl.ACCOUNTDISABLE);
+    }
+    updateUserAccountControl(control);
+  }
+}

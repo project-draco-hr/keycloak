@@ -1,0 +1,12 @@
+{
+  super.removeRequiredAction(action);
+  if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE && RequiredAction.UPDATE_PASSWORD.toString().equals(action)) {
+    UserAccountControl accountControl=getUserAccountControl();
+    if (accountControl.getValue() != 0 && !accountControl.has(UserAccountControl.PASSWD_NOTREQD)) {
+      logger.debugf("Going to remove required action UPDATE_PASSWORD from MSAD for ldap user '%s' ",ldapUser.getDn().toString());
+      ldapUser.removeReadOnlyAttributeName(LDAPConstants.PWD_LAST_SET);
+      ldapUser.setSingleAttribute(LDAPConstants.PWD_LAST_SET,"-1");
+      ldapProvider.getLdapIdentityStore().update(ldapUser);
+    }
+  }
+}

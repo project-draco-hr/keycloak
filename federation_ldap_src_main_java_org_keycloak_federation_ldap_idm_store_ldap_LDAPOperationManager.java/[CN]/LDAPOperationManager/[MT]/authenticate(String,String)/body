@@ -2,7 +2,7 @@
   InitialContext authCtx=null;
   try {
     if (password == null || password.isEmpty()) {
-      throw new Exception("Empty password used");
+      throw new AuthenticationException("Empty password used");
     }
     Hashtable<String,Object> env=new Hashtable<String,Object>(this.connectionProperties);
     env.put(Context.SECURITY_AUTHENTICATION,LDAPConstants.AUTH_TYPE_SIMPLE);
@@ -10,13 +10,16 @@
     env.put(Context.SECURITY_CREDENTIALS,password);
     env.put("com.sun.jndi.ldap.connect.pool","false");
     authCtx=new InitialLdapContext(env,null);
-    return true;
   }
- catch (  Exception e) {
+ catch (  AuthenticationException ae) {
     if (logger.isDebugEnabled()) {
-      logger.debugf(e,"Authentication failed for DN [%s]",dn);
+      logger.debugf(ae,"Authentication failed for DN [%s]",dn);
     }
-    return false;
+    throw ae;
+  }
+catch (  Exception e) {
+    logger.errorf(e,"Unexpected exception when validating password of DN [%s]",dn);
+    throw new AuthenticationException("Unexpected exception when validating password of user");
   }
  finally {
     if (authCtx != null) {

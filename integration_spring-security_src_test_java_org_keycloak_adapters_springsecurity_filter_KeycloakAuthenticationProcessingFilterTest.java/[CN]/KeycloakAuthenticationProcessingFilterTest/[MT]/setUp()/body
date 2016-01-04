@@ -5,8 +5,8 @@
   filter.setApplicationContext(applicationContext);
   filter.setAuthenticationSuccessHandler(successHandler);
   filter.setAuthenticationFailureHandler(failureHandler);
-  when(applicationContext.getBean(eq(AdapterDeploymentContextBean.class))).thenReturn(adapterDeploymentContextBean);
-  when(adapterDeploymentContextBean.getDeployment()).thenReturn(keycloakDeployment);
+  when(applicationContext.getBean(eq(AdapterDeploymentContext.class))).thenReturn(adapterDeploymentContext);
+  when(adapterDeploymentContext.resolveDeployment(any(HttpFacade.class))).thenReturn(keycloakDeployment);
   when(keycloakAccount.getPrincipal()).thenReturn(new KeycloakPrincipal<KeycloakSecurityContext>(UUID.randomUUID().toString(),keycloakSecurityContext));
   filter.afterPropertiesSet();
 }

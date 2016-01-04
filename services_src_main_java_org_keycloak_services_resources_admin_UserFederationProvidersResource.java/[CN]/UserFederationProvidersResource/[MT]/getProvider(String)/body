@@ -4,6 +4,14 @@
     if (!factory.getId().equals(id)) {
       continue;
     }
+    if (factory instanceof ConfiguredProvider) {
+      UserFederationProviderFactoryDescription rep=new UserFederationProviderFactoryDescription();
+      rep.setId(factory.getId());
+      ConfiguredProvider cp=(ConfiguredProvider)factory;
+      rep.setHelpText(cp.getHelpText());
+      rep.setProperties(toConfigPropertyRepresentationList(cp.getConfigProperties()));
+      return rep;
+    }
     UserFederationProviderFactoryRepresentation rep=new UserFederationProviderFactoryRepresentation();
     rep.setId(factory.getId());
     rep.setOptions(((UserFederationProviderFactory)factory).getConfigurationOptions());

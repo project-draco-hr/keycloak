@@ -1,0 +1,34 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    UserFederationMapperModel mapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+    FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.MODE,LDAPGroupMapperMode.IMPORT.toString());
+    appRealm.updateUserFederationMapper(mapperModel);
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    GroupLDAPFederationMapper groupMapper=FederationTestUtils.getGroupMapper(mapperModel,ldapProvider,appRealm);
+    LDAPObject robLdap=ldapProvider.loadLDAPUserByUsername(appRealm,"robkeycloak");
+    groupMapper.addGroupMappingInLDAP("group11",robLdap);
+    groupMapper.addGroupMappingInLDAP("group12",robLdap);
+    UserModel rob=session.users().getUserByUsername("robkeycloak",appRealm);
+    Set<GroupModel> robGroups=rob.getGroups();
+    GroupModel group1=KeycloakModelUtils.findGroupByPath(appRealm,"/group1");
+    GroupModel group11=KeycloakModelUtils.findGroupByPath(appRealm,"/group1/group11");
+    GroupModel group12=KeycloakModelUtils.findGroupByPath(appRealm,"/group1/group12");
+    Assert.assertFalse(robGroups.contains(group1));
+    Assert.assertTrue(robGroups.contains(group11));
+    Assert.assertTrue(robGroups.contains(group12));
+    deleteGroupMappingsInLDAP(groupMapper,robLdap,"group11");
+    deleteGroupMappingsInLDAP(groupMapper,robLdap,"group12");
+    robGroups=rob.getGroups();
+    Assert.assertTrue(robGroups.contains(group11));
+    Assert.assertTrue(robGroups.contains(group12));
+    rob.leaveGroup(group11);
+    rob.leaveGroup(group12);
+    robGroups=rob.getGroups();
+    Assert.assertEquals(0,robGroups.size());
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

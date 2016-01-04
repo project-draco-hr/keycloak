@@ -1,0 +1,16 @@
+{
+  Map<String,List<String>> result=new TreeMap<>();
+  for (  Group group : groups) {
+    result.put(group.getGroupName(),new LinkedList<String>());
+  }
+  for (  Group group : groups) {
+    for (    String child : group.getChildrenNames()) {
+      List<String> list=result.get(child);
+      if (list == null) {
+        throw new GroupTreeResolveException("Group '" + child + "' referenced as member of group '"+ group.getGroupName()+ "' doesn't exists");
+      }
+      list.add(group.getGroupName());
+    }
+  }
+  return result;
+}

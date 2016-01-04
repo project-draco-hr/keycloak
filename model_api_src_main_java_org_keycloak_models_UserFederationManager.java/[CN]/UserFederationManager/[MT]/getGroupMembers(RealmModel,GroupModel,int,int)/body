@@ -1,3 +1,26 @@
 {
-  return session.userStorage().getGroupMembers(realm,group,firstResult,maxResults);
+  int maxTotal=firstResult + maxResults;
+  List<UserModel> localMembers=query(new PaginatedQuery(){
+    @Override public List<UserModel> query(    RealmModel realm,    int first,    int max){
+      return session.userStorage().getGroupMembers(realm,group,first,max);
+    }
+  }
+,realm,0,maxTotal);
+  Set<UserModel> result=new LinkedHashSet<>(localMembers);
+  for (  UserFederationProviderModel federation : realm.getUserFederationProviders()) {
+    if (result.size() >= maxTotal) {
+      break;
+    }
+    int max=maxTotal - result.size();
+    UserFederationProvider fed=getFederationProvider(federation);
+    List<UserModel> current=fed.getGroupMembers(realm,group,0,max);
+    if (current != null) {
+      result.addAll(current);
+    }
+  }
+  if (result.size() <= firstResult) {
+    return Collections.emptyList();
+  }
+  int max=Math.min(maxTotal,result.size());
+  return new ArrayList<>(result).subList(firstResult,max);
 }

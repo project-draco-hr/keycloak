@@ -1,0 +1,16 @@
+{
+  if (roleContainer.equals(client)) {
+    Set<RoleModel> ldapRoleMappings=getLDAPRoleMappingsConverted();
+    if (config.getMode() == LDAPGroupMapperMode.LDAP_ONLY) {
+      return ldapRoleMappings;
+    }
+ else {
+      Set<RoleModel> modelRoleMappings=super.getClientRoleMappings(client);
+      ldapRoleMappings.addAll(modelRoleMappings);
+      return ldapRoleMappings;
+    }
+  }
+ else {
+    return super.getClientRoleMappings(client);
+  }
+}

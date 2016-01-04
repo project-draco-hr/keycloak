@@ -1,0 +1,10 @@
+{
+  Set<String> memberships=getExistingMemberships(memberAttrName,ldapParent);
+  String userMembership=getMemberValueOfChildObject(ldapChild,membershipType);
+  memberships.remove(userMembership);
+  if (memberships.size() == 0 && membershipType == MembershipType.DN && !ldapProvider.getLdapIdentityStore().getConfig().isActiveDirectory()) {
+    memberships.add(LDAPConstants.EMPTY_MEMBER_ATTRIBUTE_VALUE);
+  }
+  ldapParent.setAttribute(memberAttrName,memberships);
+  ldapProvider.getLdapIdentityStore().update(ldapParent);
+}

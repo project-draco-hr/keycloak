@@ -1,0 +1,23 @@
+{
+  LDAPQuery ldapQuery=createGroupQuery();
+  LDAPQueryConditionsBuilder conditionsBuilder=new LDAPQueryConditionsBuilder();
+  Condition roleNameCondition=conditionsBuilder.equal(config.getGroupNameLdapAttribute(),group.getName());
+  String membershipUserAttr=LDAPUtils.getMemberValueOfChildObject(ldapUser,config.getMembershipTypeLdapAttribute());
+  Condition membershipCondition=conditionsBuilder.equal(config.getMembershipLdapAttribute(),membershipUserAttr);
+  ldapQuery.addWhereCondition(roleNameCondition).addWhereCondition(membershipCondition);
+  LDAPObject ldapGroup=ldapQuery.getFirstResult();
+  if (ldapGroup == null) {
+    if (config.getMode() == LDAPGroupMapperMode.READ_ONLY) {
+      super.leaveGroup(group);
+    }
+  }
+ else {
+    if (config.getMode() == LDAPGroupMapperMode.READ_ONLY) {
+      throw new ModelException("Not possible to delete LDAP group mappings as mapper mode is READ_ONLY");
+    }
+ else {
+      cachedLDAPGroupMappings=null;
+      deleteGroupMappingInLDAP(ldapUser,ldapGroup);
+    }
+  }
+}

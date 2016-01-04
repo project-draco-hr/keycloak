@@ -1,0 +1,14 @@
+{
+  GroupModel kcGroup=findKcGroupByLDAPGroup(ldapGroup);
+  if (kcGroup == null) {
+    if (!syncFromLDAPPerformedInThisTransaction) {
+      syncDataFromFederationProviderToKeycloak();
+      kcGroup=findKcGroupByLDAPGroup(ldapGroup);
+    }
+    if (kcGroup == null) {
+      String groupName=ldapGroup.getAttributeAsString(config.getGroupNameLdapAttribute());
+      logger.warnf("User '%s' is member of group '%s', which doesn't exists in LDAP",user.getUsername(),groupName);
+    }
+  }
+  return kcGroup;
+}

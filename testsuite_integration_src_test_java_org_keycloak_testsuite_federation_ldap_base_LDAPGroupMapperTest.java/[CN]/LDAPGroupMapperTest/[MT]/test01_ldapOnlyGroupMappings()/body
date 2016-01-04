@@ -1,0 +1,43 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    UserFederationMapperModel mapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+    FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.MODE,LDAPGroupMapperMode.LDAP_ONLY.toString());
+    appRealm.updateUserFederationMapper(mapperModel);
+    UserModel john=session.users().getUserByUsername("johnkeycloak",appRealm);
+    UserModel mary=session.users().getUserByUsername("marykeycloak",appRealm);
+    GroupModel group1=KeycloakModelUtils.findGroupByPath(appRealm,"/group1");
+    john.joinGroup(group1);
+    GroupModel group11=KeycloakModelUtils.findGroupByPath(appRealm,"/group1/group11");
+    mary.joinGroup(group11);
+    GroupModel group12=KeycloakModelUtils.findGroupByPath(appRealm,"/group1/group12");
+    john.joinGroup(group12);
+    mary.joinGroup(group12);
+    UserModel johnDb=session.userStorage().getUserByUsername("johnkeycloak",appRealm);
+    Set<GroupModel> johnDbGroups=johnDb.getGroups();
+    Assert.assertEquals(0,johnDbGroups.size());
+    Set<GroupModel> johnGroups=john.getGroups();
+    Assert.assertEquals(2,johnGroups.size());
+    Assert.assertTrue(johnGroups.contains(group1));
+    Assert.assertFalse(johnGroups.contains(group11));
+    Assert.assertTrue(johnGroups.contains(group12));
+    List<UserModel> group1Members=session.users().getGroupMembers(appRealm,group1,0,10);
+    List<UserModel> group11Members=session.users().getGroupMembers(appRealm,group11,0,10);
+    List<UserModel> group12Members=session.users().getGroupMembers(appRealm,group12,0,10);
+    Assert.assertEquals(1,group1Members.size());
+    Assert.assertEquals("johnkeycloak",group1Members.get(0).getUsername());
+    Assert.assertEquals(1,group11Members.size());
+    Assert.assertEquals("marykeycloak",group11Members.get(0).getUsername());
+    Assert.assertEquals(2,group12Members.size());
+    john.leaveGroup(group1);
+    john.leaveGroup(group12);
+    mary.leaveGroup(group1);
+    mary.leaveGroup(group12);
+    johnGroups=john.getGroups();
+    Assert.assertEquals(0,johnGroups.size());
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

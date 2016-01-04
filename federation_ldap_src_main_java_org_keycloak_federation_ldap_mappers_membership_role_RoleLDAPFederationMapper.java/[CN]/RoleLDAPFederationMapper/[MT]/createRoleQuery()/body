@@ -1,0 +1,18 @@
+{
+  LDAPQuery ldapQuery=new LDAPQuery(ldapProvider);
+  ldapQuery.setSearchScope(ldapProvider.getLdapIdentityStore().getConfig().getSearchScope());
+  String rolesDn=config.getRolesDn();
+  ldapQuery.setSearchDn(rolesDn);
+  Collection<String> roleObjectClasses=config.getRoleObjectClasses(ldapProvider);
+  ldapQuery.addObjectClasses(roleObjectClasses);
+  String rolesRdnAttr=config.getRoleNameLdapAttribute();
+  String customFilter=config.getCustomLdapFilter();
+  if (customFilter != null && customFilter.trim().length() > 0) {
+    Condition customFilterCondition=new LDAPQueryConditionsBuilder().addCustomLDAPFilter(customFilter);
+    ldapQuery.addWhereCondition(customFilterCondition);
+  }
+  String membershipAttr=config.getMembershipLdapAttribute();
+  ldapQuery.addReturningLdapAttribute(rolesRdnAttr);
+  ldapQuery.addReturningLdapAttribute(membershipAttr);
+  return ldapQuery;
+}

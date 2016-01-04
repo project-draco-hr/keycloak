@@ -1,0 +1,16 @@
+{
+  if (roleContainer.equals(realm)) {
+    Set<RoleModel> ldapRoleMappings=getLDAPRoleMappingsConverted();
+    if (config.getMode() == LDAPGroupMapperMode.LDAP_ONLY) {
+      return ldapRoleMappings;
+    }
+ else {
+      Set<RoleModel> modelRoleMappings=super.getRealmRoleMappings();
+      ldapRoleMappings.addAll(modelRoleMappings);
+      return ldapRoleMappings;
+    }
+  }
+ else {
+    return super.getRealmRoleMappings();
+  }
+}

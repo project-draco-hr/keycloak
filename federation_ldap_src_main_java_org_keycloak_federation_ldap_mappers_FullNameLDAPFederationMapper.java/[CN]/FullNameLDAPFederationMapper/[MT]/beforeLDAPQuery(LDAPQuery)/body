@@ -1,0 +1,41 @@
+{
+  String ldapFullNameAttrName=getLdapFullNameAttrName();
+  query.addReturningLdapAttribute(ldapFullNameAttrName);
+  EqualCondition firstNameCondition=null;
+  EqualCondition lastNameCondition=null;
+  Set<Condition> conditionsCopy=new HashSet<Condition>(query.getConditions());
+  for (  Condition condition : conditionsCopy) {
+    String paramName=condition.getParameterName();
+    if (paramName != null) {
+      if (paramName.equals(UserModel.FIRST_NAME)) {
+        firstNameCondition=(EqualCondition)condition;
+        query.getConditions().remove(condition);
+      }
+ else       if (paramName.equals(UserModel.LAST_NAME)) {
+        lastNameCondition=(EqualCondition)condition;
+        query.getConditions().remove(condition);
+      }
+ else       if (paramName.equals(LDAPConstants.GIVENNAME)) {
+        firstNameCondition=(EqualCondition)condition;
+      }
+ else       if (paramName.equals(LDAPConstants.SN)) {
+        lastNameCondition=(EqualCondition)condition;
+      }
+    }
+  }
+  String fullName=null;
+  if (firstNameCondition != null && lastNameCondition != null) {
+    fullName=firstNameCondition.getValue() + " " + lastNameCondition.getValue();
+  }
+ else   if (firstNameCondition != null) {
+    fullName=(String)firstNameCondition.getValue();
+  }
+ else   if (lastNameCondition != null) {
+    fullName=(String)lastNameCondition.getValue();
+  }
+ else {
+    return;
+  }
+  EqualCondition fullNameCondition=new EqualCondition(ldapFullNameAttrName,fullName);
+  query.addWhereCondition(fullNameCondition);
+}

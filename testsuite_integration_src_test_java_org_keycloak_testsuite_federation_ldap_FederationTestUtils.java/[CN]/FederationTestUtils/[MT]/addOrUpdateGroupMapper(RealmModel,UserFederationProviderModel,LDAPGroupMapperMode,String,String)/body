@@ -1,0 +1,14 @@
+{
+  UserFederationMapperModel mapperModel=realm.getUserFederationMapperByName(providerModel.getId(),"groupsMapper");
+  if (mapperModel != null) {
+    mapperModel.getConfig().put(GroupMapperConfig.MODE,mode.toString());
+    updateGroupMapperConfigOptions(mapperModel,otherConfigOptions);
+    realm.updateUserFederationMapper(mapperModel);
+  }
+ else {
+    String baseDn=providerModel.getConfig().get(LDAPConstants.BASE_DN);
+    mapperModel=KeycloakModelUtils.createUserFederationMapperModel("groupsMapper",providerModel.getId(),GroupLDAPFederationMapperFactory.PROVIDER_ID,GroupMapperConfig.GROUPS_DN,"ou=Groups," + baseDn,GroupMapperConfig.MAPPED_GROUP_ATTRIBUTES,descriptionAttrName,GroupMapperConfig.PRESERVE_GROUP_INHERITANCE,"true",GroupMapperConfig.MODE,mode.toString());
+    updateGroupMapperConfigOptions(mapperModel,otherConfigOptions);
+    realm.addUserFederationMapper(mapperModel);
+  }
+}

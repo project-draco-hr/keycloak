@@ -1,0 +1,25 @@
+{
+  UserFederationSyncResult syncResult=new UserFederationSyncResult(){
+    @Override public String getStatus(){
+      return String.format("%d imported roles, %d roles already exists in Keycloak",getAdded(),getUpdated());
+    }
+  }
+;
+  logger.debugf("Syncing roles from LDAP into Keycloak DB. Mapper is [%s], LDAP provider is [%s]",mapperModel.getName(),ldapProvider.getModel().getDisplayName());
+  LDAPQuery ldapQuery=createRoleQuery();
+  List<LDAPObject> ldapRoles=ldapQuery.getResultList();
+  RoleContainerModel roleContainer=getTargetRoleContainer();
+  String rolesRdnAttr=config.getRoleNameLdapAttribute();
+  for (  LDAPObject ldapRole : ldapRoles) {
+    String roleName=ldapRole.getAttributeAsString(rolesRdnAttr);
+    if (roleContainer.getRole(roleName) == null) {
+      logger.debugf("Syncing role [%s] from LDAP to keycloak DB",roleName);
+      roleContainer.addRole(roleName);
+      syncResult.increaseAdded();
+    }
+ else {
+      syncResult.increaseUpdated();
+    }
+  }
+  return syncResult;
+}

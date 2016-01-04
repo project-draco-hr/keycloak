@@ -1,5 +1,5 @@
 {
-  SamlClientRepresentation rep=new SamlClientRepresentation(clientRep);
+  SamlRepresentationAttributes rep=new SamlRepresentationAttributes(clientRep.getAttributes());
   SamlClient client=new SamlClient(newClient);
   if (clientRep.isStandardFlowEnabled() == null)   newClient.setStandardFlowEnabled(true);
   if (rep.getCanonicalizationMethod() == null) {
@@ -25,6 +25,8 @@
   }
   if (rep.getClientSignature() == null) {
     client.setRequiresClientSignature(true);
+  }
+  if (client.requiresClientSignature() && client.getClientSigningCertificate() == null) {
     CertificateRepresentation info=KeycloakModelUtils.generateKeyPairCertificate(newClient.getClientId());
     client.setClientSigningCertificate(info.getCertificate());
     client.setClientSigningPrivateKey(info.getPrivateKey());

@@ -3,6 +3,11 @@
   ldapServer.setServiceName("DefaultLdapServer");
   ldapServer.setSearchBaseDn(this.baseDN);
   Transport ldap=new TcpTransport(this.bindHost,this.bindPort,3,50);
+  if (enableSSL) {
+    ldap.setEnableSSL(true);
+    ldapServer.setKeystoreFile(keystoreFile);
+    ldapServer.setCertificatePassword(certPassword);
+  }
   ldapServer.addTransports(ldap);
   ldapServer.setDirectoryService(directoryService);
   directoryService.setAllowAnonymousAccess(false);

@@ -1,4 +1,10 @@
 {
-  clientRep.setId(null);
+  clientRep.setId(KeycloakModelUtils.generateId());
+  List<ProtocolMapperRepresentation> mappers=clientRep.getProtocolMappers();
+  if (mappers != null) {
+    for (    ProtocolMapperRepresentation mapper : mappers) {
+      mapper.setId(KeycloakModelUtils.generateId());
+    }
+  }
   RepresentationToModel.createClient(session,realm,clientRep,true);
 }

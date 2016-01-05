@@ -2,9 +2,6 @@
   PartialImportResults results=new PartialImportResults();
   Map<String,List<RoleRepresentation>> repList=getRepList(partialImportRep);
   if ((repList == null) || repList.isEmpty())   return results;
-  final Map<String,Set<RoleRepresentation>> toOverwrite=new HashMap<>();
-  final Map<String,Set<RoleRepresentation>> toSkip=new HashMap<>();
-  prepare(partialImportRep,realm,session,toOverwrite,toSkip);
   for (  String clientId : toOverwrite.keySet()) {
     for (    RoleRepresentation roleRep : toOverwrite.get(clientId)) {
       System.out.println("overwriting " + getResourceType() + " "+ getCombinedName(clientId,roleRep));

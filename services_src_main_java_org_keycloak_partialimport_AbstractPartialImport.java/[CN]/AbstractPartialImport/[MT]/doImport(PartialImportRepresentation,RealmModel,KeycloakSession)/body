@@ -2,11 +2,7 @@
   PartialImportResults results=new PartialImportResults();
   List<T> repList=getRepList(partialImportRep);
   if ((repList == null) || repList.isEmpty())   return results;
-  final Set<T> toOverwrite=new HashSet<>();
-  final Set<T> toSkip=new HashSet<>();
-  prepare(partialImportRep,realm,session,toOverwrite,toSkip);
   for (  T resourceRep : toOverwrite) {
-    System.out.println("overwriting " + getResourceType() + " "+ getName(resourceRep));
     try {
       overwrite(realm,session,resourceRep);
     }
@@ -17,7 +13,6 @@
     results.addResult(overwritten(modelId,resourceRep));
   }
   for (  T resourceRep : toSkip) {
-    System.out.println("skipping " + getResourceType() + " "+ getName(resourceRep));
     String modelId=getModelId(realm,session,resourceRep);
     results.addResult(skipped(modelId,resourceRep));
   }
@@ -25,7 +20,6 @@
     if (toOverwrite.contains(resourceRep))     continue;
     if (toSkip.contains(resourceRep))     continue;
     try {
-      System.out.println("adding " + getResourceType() + " "+ getName(resourceRep));
       create(realm,session,resourceRep);
       String modelId=getModelId(realm,session,resourceRep);
       results.addResult(added(modelId,resourceRep));

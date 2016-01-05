@@ -2,6 +2,15 @@
   PartialImportResults results=new PartialImportResults();
   for (  PartialImport partialImport : partialImports) {
     try {
+      partialImport.prepare(rep,realm,session);
+    }
+ catch (    ErrorResponseException error) {
+      if (session.getTransaction().isActive())       session.getTransaction().setRollbackOnly();
+      return error.getResponse();
+    }
+  }
+  for (  PartialImport partialImport : partialImports) {
+    try {
       results.addAllResults(partialImport.doImport(rep,realm,session));
     }
  catch (    ErrorResponseException error) {

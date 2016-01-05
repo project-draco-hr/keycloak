@@ -1,0 +1,14 @@
+{
+  PartialImportResults results=new PartialImportResults();
+  if (!rep.hasRealmRoles() && !rep.hasClientRoles())   return results;
+  removeRealmRoleSkips(results,rep,realm,session);
+  removeClientRoleSkips(results,rep,realm);
+  deleteRealmRoleOverwrites(results,realm,session);
+  deleteClientRoleOverwrites(results,realm);
+  if (rep.hasRealmRoles())   setUniqueIds(rep.getRoles().getRealm());
+  if (rep.hasClientRoles())   setUniqueIds(rep.getRoles().getClient());
+  RepresentationToModel.importRoles(rep.getRoles(),realm);
+  realmRoleAdds(results,rep,realm,session);
+  clientRoleAdds(results,rep,realm);
+  return results;
+}

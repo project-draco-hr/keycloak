@@ -9,14 +9,14 @@
       skip=true;
     }
     if (!skip) {
-      LDAPObject johnDot=FederationTestUtils.addLDAPUser(ldapFedProvider,appRealm,"john,dot","John","Dot","johndot@email.org",null,"12387");
-      ldapFedProvider.getLdapIdentityStore().updatePassword(johnDot,"Password1");
+      LDAPObject johnComma=FederationTestUtils.addLDAPUser(ldapFedProvider,appRealm,"john,comma","John","Comma","johncomma@email.org",null,"12387");
+      FederationTestUtils.updateLDAPPassword(ldapFedProvider,johnComma,"Password1");
     }
   }
   finally {
     keycloakRule.stopSession(session,false);
   }
   if (!skip) {
-    loginSuccessAndLogout("john,dot","Password1");
+    loginSuccessAndLogout("john,comma","Password1");
   }
 }

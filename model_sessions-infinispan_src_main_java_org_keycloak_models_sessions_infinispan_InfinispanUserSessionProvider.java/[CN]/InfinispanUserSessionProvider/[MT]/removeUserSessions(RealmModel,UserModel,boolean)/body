@@ -1,7 +1,7 @@
 {
   Cache<String,SessionEntity> cache=getCache(offline);
-  Map<String,String> sessions=new MapReduceTask(cache).mappedWith(UserSessionMapper.create(realm.getId()).user(user.getId()).emitKey()).reducedWith(new FirstResultReducer()).execute();
-  for (  String id : sessions.keySet()) {
-    removeUserSession(realm,id,offline);
+  Iterator<String> itr=cache.entrySet().stream().filter(UserSessionPredicate.create(realm.getId()).user(user.getId())).map(Mappers.sessionId()).iterator();
+  while (itr.hasNext()) {
+    removeUserSession(realm,itr.next(),offline);
   }
 }

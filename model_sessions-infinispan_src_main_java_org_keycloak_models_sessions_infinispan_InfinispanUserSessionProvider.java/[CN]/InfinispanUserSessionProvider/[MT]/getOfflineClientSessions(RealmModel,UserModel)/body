@@ -1,14 +1,15 @@
 {
-  Map<String,UserSessionEntity> sessions=new MapReduceTask(offlineSessionCache).mappedWith(UserSessionMapper.create(realm.getId()).user(user.getId())).reducedWith(new FirstResultReducer()).execute();
-  List<ClientSessionEntity> clientSessions=new LinkedList<>();
-  for (  UserSessionEntity userSession : sessions.values()) {
-    Set<String> currClientSessions=userSession.getClientSessions();
+  Iterator<Map.Entry<String,SessionEntity>> itr=offlineSessionCache.entrySet().stream().filter(UserSessionPredicate.create(realm.getId()).user(user.getId())).iterator();
+  List<ClientSessionModel> clientSessions=new LinkedList<>();
+  while (itr.hasNext()) {
+    UserSessionEntity entity=(UserSessionEntity)itr.next().getValue();
+    Set<String> currClientSessions=entity.getClientSessions();
     for (    String clientSessionId : currClientSessions) {
       ClientSessionEntity cls=(ClientSessionEntity)offlineSessionCache.get(clientSessionId);
       if (cls != null) {
-        clientSessions.add(cls);
+        clientSessions.add(wrap(realm,cls,true));
       }
     }
   }
-  return wrapClientSessions(realm,clientSessions,true);
+  return clientSessions;
 }

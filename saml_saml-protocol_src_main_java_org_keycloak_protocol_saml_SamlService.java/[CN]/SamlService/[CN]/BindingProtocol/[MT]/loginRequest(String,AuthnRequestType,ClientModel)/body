@@ -1,11 +1,12 @@
 {
+  SamlClient samlClient=new SamlClient(client);
   if (requestAbstractType.getDestination() != null && !uriInfo.getAbsolutePath().equals(requestAbstractType.getDestination())) {
     event.detail(Details.REASON,"invalid_destination");
     event.error(Errors.INVALID_SAML_AUTHN_REQUEST);
     return ErrorPage.error(session,Messages.INVALID_REQUEST);
   }
   String bindingType=getBindingType(requestAbstractType);
-  if ("true".equals(client.getAttribute(SamlProtocol.SAML_FORCE_POST_BINDING)))   bindingType=SamlProtocol.SAML_POST_BINDING;
+  if (samlClient.forcePostBinding())   bindingType=SamlProtocol.SAML_POST_BINDING;
   String redirect=null;
   URI redirectUri=requestAbstractType.getAssertionConsumerServiceURL();
   if (redirectUri != null && !"null".equals(redirectUri)) {
@@ -35,7 +36,7 @@
   clientSession.setNote(GeneralConstants.RELAY_STATE,relayState);
   clientSession.setNote(SamlProtocol.SAML_REQUEST_ID,requestAbstractType.getID());
   NameIDPolicyType nameIdPolicy=requestAbstractType.getNameIDPolicy();
-  if (nameIdPolicy != null && !SamlProtocol.forceNameIdFormat(client)) {
+  if (nameIdPolicy != null && !samlClient.forceNameIDFormat()) {
     String nameIdFormat=nameIdPolicy.getFormat().toString();
     if (isSupportedNameIdFormat(nameIdFormat)) {
       clientSession.setNote(GeneralConstants.NAMEID_FORMAT,nameIdFormat);

@@ -1,18 +1,19 @@
 {
   ClientModel client=clientSession.getClient();
+  SamlClient samlClient=new SamlClient(client);
   if (!(client instanceof ClientModel))   return null;
   try {
     if (isLogoutPostBindingForClient(clientSession)) {
       String bindingUri=getLogoutServiceUrl(uriInfo,client,SAML_POST_BINDING);
       SAML2LogoutRequestBuilder logoutBuilder=createLogoutRequest(bindingUri,clientSession,client);
-      JaxrsSAML2BindingBuilder binding=createBindingBuilder(client);
+      JaxrsSAML2BindingBuilder binding=createBindingBuilder(samlClient);
       return binding.postBinding(logoutBuilder.buildDocument()).request(bindingUri);
     }
  else {
       logger.debug("frontchannel redirect binding");
       String bindingUri=getLogoutServiceUrl(uriInfo,client,SAML_REDIRECT_BINDING);
       SAML2LogoutRequestBuilder logoutBuilder=createLogoutRequest(bindingUri,clientSession,client);
-      JaxrsSAML2BindingBuilder binding=createBindingBuilder(client);
+      JaxrsSAML2BindingBuilder binding=createBindingBuilder(samlClient);
       return binding.redirectBinding(logoutBuilder.buildDocument()).request(bindingUri);
     }
   }

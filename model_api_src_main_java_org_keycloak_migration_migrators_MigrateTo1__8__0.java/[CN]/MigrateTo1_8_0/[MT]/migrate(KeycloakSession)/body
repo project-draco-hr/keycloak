@@ -1,0 +1,17 @@
+{
+  List<RealmModel> realms=session.realms().getRealms();
+  for (  RealmModel realm : realms) {
+    List<UserFederationProviderModel> federationProviders=realm.getUserFederationProviders();
+    for (    UserFederationProviderModel fedProvider : federationProviders) {
+      if (fedProvider.getProviderName().equals(LDAPConstants.LDAP_PROVIDER)) {
+        Map<String,String> config=fedProvider.getConfig();
+        if (isActiveDirectory(config)) {
+          if (realm.getUserFederationMapperByName(fedProvider.getId(),"MSAD account controls") == null) {
+            UserFederationMapperModel mapperModel=KeycloakModelUtils.createUserFederationMapperModel("MSAD account controls",fedProvider.getId(),LDAPConstants.MSAD_USER_ACCOUNT_CONTROL_MAPPER);
+            realm.addUserFederationMapper(mapperModel);
+          }
+        }
+      }
+    }
+  }
+}

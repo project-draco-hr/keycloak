@@ -1,0 +1,11 @@
+{
+  Set<String> requiredActions=super.getRequiredActions();
+  if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE) {
+    if (getPwdLastSet() == 0 || getUserAccountControl().has(UserAccountControl.PASSWORD_EXPIRED)) {
+      requiredActions=new HashSet<>(requiredActions);
+      requiredActions.add(RequiredAction.UPDATE_PASSWORD.toString());
+      return requiredActions;
+    }
+  }
+  return requiredActions;
+}

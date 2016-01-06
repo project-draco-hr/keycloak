@@ -1,0 +1,20 @@
+{
+  info.setClientInstallations(new HashMap<String,List<ClientInstallationRepresentation>>());
+  for (  ProviderFactory p : session.getKeycloakSessionFactory().getProviderFactories(ClientInstallationProvider.class)) {
+    ClientInstallationProvider provider=(ClientInstallationProvider)p;
+    List<ClientInstallationRepresentation> types=info.getClientInstallations().get(provider.getProtocol());
+    if (types == null) {
+      types=new LinkedList<>();
+      info.getClientInstallations().put(provider.getProtocol(),types);
+    }
+    ClientInstallationRepresentation rep=new ClientInstallationRepresentation();
+    rep.setId(p.getId());
+    rep.setHelpText(provider.getHelpText());
+    rep.setDisplayType(provider.getDisplayType());
+    rep.setProtocol(provider.getProtocol());
+    rep.setDownloadOnly(provider.isDownloadOnly());
+    rep.setFilename(provider.getFilename());
+    rep.setMediaType(provider.getMediaType());
+    types.add(rep);
+  }
+}

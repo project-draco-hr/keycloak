@@ -1,0 +1,7 @@
+{
+  int expiredDettachedClientSession=Time.currentTime() - RealmInfoUtil.getDettachedClientSessionLifespan(realm);
+  Iterator<Map.Entry<String,SessionEntity>> itr=sessionCache.entrySet().stream().filter(ClientSessionPredicate.create(realm.getId()).expiredRefresh(expiredDettachedClientSession).requireNullUserSession()).iterator();
+  while (itr.hasNext()) {
+    tx.remove(sessionCache,itr.next().getKey());
+  }
+}

@@ -1,4 +1,3 @@
 {
-  Map<String,UserSessionEntity> sessions=new MapReduceTask(sessionCache).mappedWith(UserSessionMapper.create(realm.getId()).brokerUserId(brokerUserId)).reducedWith(new FirstResultReducer()).execute();
-  return wrapUserSessions(realm,sessions.values(),false);
+  return getUserSessions(realm,UserSessionPredicate.create(realm.getId()).brokerUserId(brokerUserId),false);
 }

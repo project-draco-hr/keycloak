@@ -1,32 +1,29 @@
 {
-  Cache<String,SessionEntity> cache=getCache(offline);
-  Map<String,Integer> map=new MapReduceTask(cache).mappedWith(ClientSessionMapper.create(realm.getId()).client(client.getId()).emitUserSessionAndTimestamp()).reducedWith(new LargestResultReducer()).execute();
-  List<Map.Entry<String,Integer>> sessionTimestamps=new LinkedList<Map.Entry<String,Integer>>(map.entrySet());
-  Collections.sort(sessionTimestamps,new Comparator<Map.Entry<String,Integer>>(){
-    @Override public int compare(    Map.Entry<String,Integer> e1,    Map.Entry<String,Integer> e2){
-      return e1.getValue().compareTo(e2.getValue());
+  final Cache<String,SessionEntity> cache=getCache(offline);
+  Iterator<UserSessionTimestamp> itr=cache.entrySet().stream().filter(ClientSessionPredicate.create(realm.getId()).client(client.getId()).requireUserSession()).map(Mappers.clientSessionToUserSessionTimestamp()).iterator();
+  Map<String,UserSessionTimestamp> m=new HashMap<>();
+  while (itr.hasNext()) {
+    UserSessionTimestamp next=itr.next();
+    if (!m.containsKey(next.getUserSessionId()) || m.get(next.getUserSessionId()).getClientSessionTimestamp() < next.getClientSessionTimestamp()) {
+      m.put(next.getUserSessionId(),next);
+    }
+  }
+  Stream<UserSessionTimestamp> stream=new LinkedList<>(m.values()).stream().sorted(Comparators.userSessionTimestamp());
+  if (firstResult > 0) {
+    stream=stream.skip(firstResult);
+  }
+  if (maxResults > 0) {
+    stream=stream.limit(maxResults);
+  }
+  final List<UserSessionModel> sessions=new LinkedList<>();
+  stream.forEach(new Consumer<UserSessionTimestamp>(){
+    @Override public void accept(    UserSessionTimestamp userSessionTimestamp){
+      SessionEntity entity=cache.get(userSessionTimestamp.getUserSessionId());
+      if (entity != null) {
+        sessions.add(wrap(realm,(UserSessionEntity)entity,offline));
+      }
     }
   }
 );
-  if (firstResult != -1 || maxResults == -1) {
-    if (firstResult == -1) {
-      firstResult=0;
-    }
-    if (maxResults == -1) {
-      maxResults=Integer.MAX_VALUE;
-    }
-    if (firstResult > sessionTimestamps.size()) {
-      return Collections.emptyList();
-    }
-    int toIndex=(firstResult + maxResults) < sessionTimestamps.size() ? firstResult + maxResults : sessionTimestamps.size();
-    sessionTimestamps=sessionTimestamps.subList(firstResult,toIndex);
-  }
-  List<UserSessionModel> userSessions=new LinkedList<UserSessionModel>();
-  for (  Map.Entry<String,Integer> e : sessionTimestamps) {
-    UserSessionEntity userSessionEntity=(UserSessionEntity)cache.get(e.getKey());
-    if (userSessionEntity != null) {
-      userSessions.add(wrap(realm,userSessionEntity,offline));
-    }
-  }
-  return userSessions;
+  return sessions;
 }

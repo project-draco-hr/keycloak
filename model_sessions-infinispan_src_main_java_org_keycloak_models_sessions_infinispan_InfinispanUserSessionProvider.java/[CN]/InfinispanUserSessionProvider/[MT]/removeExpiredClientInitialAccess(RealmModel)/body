@@ -1,0 +1,6 @@
+{
+  Iterator<String> itr=sessionCache.entrySet().stream().filter(ClientInitialAccessPredicate.create(realm.getId()).expired(Time.currentTime())).map(Mappers.sessionId()).iterator();
+  while (itr.hasNext()) {
+    tx.remove(sessionCache,itr.next());
+  }
+}

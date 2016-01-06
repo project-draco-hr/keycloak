@@ -1,0 +1,9 @@
+{
+  Cache<String,SessionEntity> cache=getCache(offline);
+  Map<String,ClientSessionEntity> map=new MapReduceTask(cache).mappedWith(ClientSessionMapper.create(realm.getId()).client(client.getId())).reducedWith(new FirstResultReducer()).execute();
+  for (  Map.Entry<String,ClientSessionEntity> entry : map.entrySet()) {
+    ClientSessionAdapter adapter=wrap(realm,entry.getValue(),offline);
+    adapter.setUserSession(null);
+    tx.remove(cache,entry.getKey());
+  }
+}

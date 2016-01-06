@@ -1,0 +1,10 @@
+{
+  UserSessionPersisterProvider persister=session.getProvider(UserSessionPersisterProvider.class);
+  int expiredOffline=Time.currentTime() - realm.getOfflineSessionIdleTimeout();
+  Iterator<String> itr=offlineSessionCache.entrySet().stream().filter(ClientSessionPredicate.create(realm.getId()).expiredRefresh(expiredOffline)).map(Mappers.sessionId()).iterator();
+  while (itr.hasNext()) {
+    String sessionId=itr.next();
+    tx.remove(offlineSessionCache,sessionId);
+    persister.removeClientSession(sessionId,true);
+  }
+}

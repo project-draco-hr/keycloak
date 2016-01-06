@@ -1,5 +1,3 @@
 {
-  Cache<String,SessionEntity> cache=getCache(offline);
-  Map map=new MapReduceTask(cache).mappedWith(ClientSessionMapper.create(realm.getId()).client(client.getId()).emitUserSessionAndTimestamp()).reducedWith(new LargestResultReducer()).execute();
-  return map.size();
+  return getCache(offline).entrySet().stream().filter(ClientSessionPredicate.create(realm.getId()).client(client.getId()).requireUserSession()).map(Mappers.clientSessionToUserSessionId()).distinct().count();
 }

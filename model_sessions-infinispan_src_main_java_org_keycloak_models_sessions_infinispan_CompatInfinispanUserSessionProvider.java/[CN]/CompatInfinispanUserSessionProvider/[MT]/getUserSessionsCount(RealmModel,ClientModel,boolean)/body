@@ -1,0 +1,5 @@
+{
+  Cache<String,SessionEntity> cache=getCache(offline);
+  Map map=new MapReduceTask(cache).mappedWith(ClientSessionMapper.create(realm.getId()).client(client.getId()).emitUserSessionAndTimestamp()).reducedWith(new LargestResultReducer()).execute();
+  return map.size();
+}

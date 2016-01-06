@@ -1,0 +1,10 @@
+{
+  CacheStream<Map.Entry<String,SessionEntity>> cacheStream=getCache(offline).entrySet().stream();
+  Iterator<Map.Entry<String,SessionEntity>> itr=cacheStream.filter(predicate).iterator();
+  List<UserSessionModel> sessions=new LinkedList<>();
+  while (itr.hasNext()) {
+    UserSessionEntity e=(UserSessionEntity)itr.next().getValue();
+    sessions.add(wrap(realm,e,offline));
+  }
+  return sessions;
+}

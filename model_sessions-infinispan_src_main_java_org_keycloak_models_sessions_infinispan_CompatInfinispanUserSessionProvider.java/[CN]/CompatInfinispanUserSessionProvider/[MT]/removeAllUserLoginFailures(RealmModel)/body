@@ -1,0 +1,6 @@
+{
+  Map<LoginFailureKey,Object> sessions=new MapReduceTask(loginFailureCache).mappedWith(UserLoginFailureMapper.create(realm.getId()).emitKey()).reducedWith(new FirstResultReducer()).execute();
+  for (  LoginFailureKey id : sessions.keySet()) {
+    tx.remove(loginFailureCache,id);
+  }
+}

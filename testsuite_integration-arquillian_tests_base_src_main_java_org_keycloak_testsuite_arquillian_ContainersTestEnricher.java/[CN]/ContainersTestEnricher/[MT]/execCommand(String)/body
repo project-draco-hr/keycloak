@@ -1,0 +1,15 @@
+{
+  Process process=Runtime.getRuntime().exec(command);
+  printOutput(process.getInputStream());
+  if (process.waitFor(10,TimeUnit.SECONDS)) {
+    if (process.exitValue() != 0) {
+      log.error("Std Error:");
+      printOutput(process.getErrorStream());
+      throw new RuntimeException("Adapter installation failed.");
+    }
+  }
+ else {
+    process.destroy();
+    throw new RuntimeException("Timeout after 10 seconds.");
+  }
+}

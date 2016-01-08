@@ -1,0 +1,17 @@
+{
+  LDAPGroupMapperMode mode=config.getMode();
+  if (mode == LDAPGroupMapperMode.IMPORT && isCreate) {
+    List<LDAPObject> ldapRoles=getLDAPRoleMappings(ldapUser);
+    String roleNameAttr=config.getRoleNameLdapAttribute();
+    for (    LDAPObject ldapRole : ldapRoles) {
+      String roleName=ldapRole.getAttributeAsString(roleNameAttr);
+      RoleContainerModel roleContainer=getTargetRoleContainer();
+      RoleModel role=roleContainer.getRole(roleName);
+      if (role == null) {
+        role=roleContainer.addRole(roleName);
+      }
+      logger.debugf("Granting role [%s] to user [%s] during import from LDAP",roleName,user.getUsername());
+      user.grantRole(role);
+    }
+  }
+}

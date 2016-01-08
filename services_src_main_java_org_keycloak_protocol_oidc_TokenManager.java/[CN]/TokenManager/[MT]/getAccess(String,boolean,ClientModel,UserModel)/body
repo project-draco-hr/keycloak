@@ -6,12 +6,21 @@
   for (  GroupModel group : user.getGroups()) {
     addGroupRoles(group,roleMappings);
   }
-  if (client.isFullScopeAllowed()) {
+  ClientTemplateModel template=client.getClientTemplate();
+  boolean useTemplateScope=template != null && client.useTemplateScope();
+  if ((useTemplateScope && template.isFullScopeAllowed()) || (client.isFullScopeAllowed())) {
+    logger.debug("Using full scope for client");
     requestedRoles=roleMappings;
   }
  else {
-    Set<RoleModel> scopeMappings=client.getScopeMappings();
+    Set<RoleModel> scopeMappings=new HashSet<>();
+    if (useTemplateScope) {
+      logger.debug("Adding template scope mappings");
+      scopeMappings.addAll(template.getScopeMappings());
+    }
     scopeMappings.addAll(client.getRoles());
+    Set<RoleModel> clientScopeMappings=client.getScopeMappings();
+    scopeMappings.addAll(clientScopeMappings);
     for (    RoleModel role : roleMappings) {
       for (      RoleModel desiredRole : scopeMappings) {
         Set<RoleModel> visited=new HashSet<RoleModel>();

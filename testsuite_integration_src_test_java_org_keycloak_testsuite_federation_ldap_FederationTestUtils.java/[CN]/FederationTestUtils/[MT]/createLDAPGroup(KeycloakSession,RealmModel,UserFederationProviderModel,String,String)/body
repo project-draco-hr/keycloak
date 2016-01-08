@@ -1,0 +1,11 @@
+{
+  UserFederationMapperModel mapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+  LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+  Map<String,Set<String>> additAttrs=new HashMap<>();
+  for (int i=0; i < additionalAttrs.length; i+=2) {
+    String attrName=additionalAttrs[i];
+    String attrValue=additionalAttrs[i + 1];
+    additAttrs.put(attrName,Collections.singleton(attrValue));
+  }
+  return getGroupMapper(mapperModel,ldapProvider,appRealm).createLDAPGroup(groupName,additAttrs);
+}

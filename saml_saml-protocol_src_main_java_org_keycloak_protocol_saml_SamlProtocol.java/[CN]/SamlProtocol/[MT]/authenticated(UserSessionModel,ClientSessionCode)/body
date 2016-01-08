@@ -1,17 +1,18 @@
 {
   ClientSessionModel clientSession=accessCode.getClientSession();
   ClientModel client=clientSession.getClient();
+  SamlClient samlClient=new SamlClient(client);
   String requestID=clientSession.getNote(SAML_REQUEST_ID);
   String relayState=clientSession.getNote(GeneralConstants.RELAY_STATE);
   String redirectUri=clientSession.getRedirectUri();
   String responseIssuer=getResponseIssuer(realm);
-  String nameIdFormat=getNameIdFormat(clientSession);
+  String nameIdFormat=getNameIdFormat(samlClient,clientSession);
   String nameId=getNameId(nameIdFormat,clientSession,userSession);
   clientSession.setNote(SAML_NAME_ID,nameId);
   clientSession.setNote(SAML_NAME_ID_FORMAT,nameIdFormat);
   SAML2LoginResponseBuilder builder=new SAML2LoginResponseBuilder();
   builder.requestID(requestID).destination(redirectUri).issuer(responseIssuer).assertionExpiration(realm.getAccessCodeLifespan()).subjectExpiration(realm.getAccessTokenLifespan()).sessionIndex(clientSession.getId()).requestIssuer(clientSession.getClient().getClientId()).nameIdentifier(nameIdFormat,nameId).authMethod(JBossSAMLURIConstants.AC_UNSPECIFIED.get());
-  if (!includeAuthnStatement(client)) {
+  if (!samlClient.includeAuthnStatement()) {
     builder.disableAuthnStatement(true);
   }
   List<ProtocolMapperProcessor<SAMLAttributeStatementMapper>> attributeStatementMappers=new LinkedList<>();
@@ -45,21 +46,21 @@
   }
   JaxrsSAML2BindingBuilder bindingBuilder=new JaxrsSAML2BindingBuilder();
   bindingBuilder.relayState(relayState);
-  if (requiresRealmSignature(client)) {
-    String canonicalization=client.getAttribute(SAML_CANONICALIZATION_METHOD_ATTRIBUTE);
+  if (samlClient.requiresRealmSignature()) {
+    String canonicalization=samlClient.getCanonicalizationMethod();
     if (canonicalization != null) {
       bindingBuilder.canonicalizationMethod(canonicalization);
     }
-    bindingBuilder.signatureAlgorithm(getSignatureAlgorithm(client)).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
+    bindingBuilder.signatureAlgorithm(samlClient.getSignatureAlgorithm()).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
   }
-  if (requiresAssertionSignature(client)) {
-    String canonicalization=client.getAttribute(SAML_CANONICALIZATION_METHOD_ATTRIBUTE);
+  if (samlClient.requiresAssertionSignature()) {
+    String canonicalization=samlClient.getCanonicalizationMethod();
     if (canonicalization != null) {
       bindingBuilder.canonicalizationMethod(canonicalization);
     }
-    bindingBuilder.signatureAlgorithm(getSignatureAlgorithm(client)).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signAssertions();
+    bindingBuilder.signatureAlgorithm(samlClient.getSignatureAlgorithm()).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signAssertions();
   }
-  if (requiresEncryption(client)) {
+  if (samlClient.requiresEncryption()) {
     PublicKey publicKey=null;
     try {
       publicKey=SamlProtocolUtils.getEncryptionValidationKey(client);
@@ -71,12 +72,7 @@
     bindingBuilder.encrypt(publicKey);
   }
   try {
-    if (isPostBinding(clientSession)) {
-      return bindingBuilder.postBinding(samlDocument).response(redirectUri);
-    }
- else {
-      return bindingBuilder.redirectBinding(samlDocument).response(redirectUri);
-    }
+    return buildAuthenticatedResponse(clientSession,redirectUri,samlDocument,bindingBuilder);
   }
  catch (  Exception e) {
     logger.error("failed",e);

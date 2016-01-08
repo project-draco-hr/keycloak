@@ -1,0 +1,33 @@
+{
+  Response authnRequestResponse=ClientBuilder.newClient().target(APP_SERVER_BASE_URL + "/ecp-sp/").request().header("Accept","text/html; application/vnd.paos+xml").header("PAOS","ver='urn:liberty:paos:2003-08' ;'urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp'").get();
+  SOAPMessage authnRequestMessage=MessageFactory.newInstance().createMessage(null,new ByteArrayInputStream(authnRequestResponse.readEntity(byte[].class)));
+  Iterator<SOAPHeaderElement> it=authnRequestMessage.getSOAPHeader().<SOAPHeaderElement>getChildElements(new QName("urn:liberty:paos:2003-08","Request"));
+  it.next();
+  it=authnRequestMessage.getSOAPHeader().<SOAPHeaderElement>getChildElements(new QName("urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp","Request"));
+  SOAPHeaderElement ecpRequestHeader=it.next();
+  NodeList idpList=ecpRequestHeader.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:protocol","IDPList");
+  assertEquals("No IDPList returned from Service Provider",1,idpList.getLength());
+  NodeList idpEntries=idpList.item(0).getChildNodes();
+  assertEquals("No IDPEntry returned from Service Provider",1,idpEntries.getLength());
+  String singleSignOnService=null;
+  for (int i=0; i < idpEntries.getLength(); i++) {
+    Node item=idpEntries.item(i);
+    NamedNodeMap attributes=item.getAttributes();
+    Node location=attributes.getNamedItem("Loc");
+    singleSignOnService=location.getNodeValue();
+  }
+  assertNotNull("Could not obtain SSO Service URL",singleSignOnService);
+  Document authenticationRequest=authnRequestMessage.getSOAPBody().getFirstChild().getOwnerDocument();
+  String username="pedroigor";
+  String password="baspassword";
+  String pair=username + ":" + password;
+  String authHeader="Basic " + new String(Base64.encodeBytes(pair.getBytes()));
+  Response authenticationResponse=ClientBuilder.newClient().target(singleSignOnService).request().header(HttpHeaders.AUTHORIZATION,authHeader).post(Entity.entity(DocumentUtil.asString(authenticationRequest),"application/soap+xml"));
+  assertEquals(OK.getStatusCode(),authenticationResponse.getStatus());
+  SOAPMessage responseMessage=MessageFactory.newInstance().createMessage(null,new ByteArrayInputStream(authenticationResponse.readEntity(byte[].class)));
+  Node samlResponse=responseMessage.getSOAPBody().getFirstChild();
+  assertNotNull(samlResponse);
+  StatusResponseType responseType=(StatusResponseType)new SAMLParser().parse(DocumentUtil.getNodeAsStream(samlResponse));
+  StatusCodeType statusCode=responseType.getStatus().getStatusCode();
+  assertNotEquals(statusCode.getStatusCode().getValue().toString(),JBossSAMLURIConstants.STATUS_SUCCESS.get());
+}

@@ -1,0 +1,22 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  boolean skip=false;
+  try {
+    RealmModel appRealm=new RealmManager(session).getRealmByName("test");
+    LDAPFederationProvider ldapFedProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    LDAPConfig config=ldapFedProvider.getLdapIdentityStore().getConfig();
+    if (config.isActiveDirectory() && config.getUsernameLdapAttribute().equals(LDAPConstants.SAM_ACCOUNT_NAME)) {
+      skip=true;
+    }
+    if (!skip) {
+      LDAPObject johnComma=FederationTestUtils.addLDAPUser(ldapFedProvider,appRealm,"john,comma","John","Comma","johncomma@email.org",null,"12387");
+      FederationTestUtils.updateLDAPPassword(ldapFedProvider,johnComma,"Password1");
+    }
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+  if (!skip) {
+    loginSuccessAndLogout("john,comma","Password1");
+  }
+}

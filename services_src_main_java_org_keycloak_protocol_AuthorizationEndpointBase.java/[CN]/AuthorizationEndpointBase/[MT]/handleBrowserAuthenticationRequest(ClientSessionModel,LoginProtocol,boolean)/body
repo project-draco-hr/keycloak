@@ -5,7 +5,7 @@
       return buildRedirectToIdentityProvider(identityProvider.getAlias(),new ClientSessionCode(realm,clientSession).getCode());
     }
   }
-  AuthenticationFlowModel flow=realm.getBrowserFlow();
+  AuthenticationFlowModel flow=getAuthenticationFlow();
   String flowId=flow.getId();
   AuthenticationProcessor processor=createProcessor(clientSession,flowId,LoginActionsService.AUTHENTICATE_PATH);
   if (isPassive) {
@@ -28,7 +28,7 @@
  else       return protocol.sendError(clientSession,Error.PASSIVE_INTERACTION_REQUIRED);
     }
  else {
-      return processor.finishAuthentication();
+      return processor.finishAuthentication(protocol);
     }
   }
  else {

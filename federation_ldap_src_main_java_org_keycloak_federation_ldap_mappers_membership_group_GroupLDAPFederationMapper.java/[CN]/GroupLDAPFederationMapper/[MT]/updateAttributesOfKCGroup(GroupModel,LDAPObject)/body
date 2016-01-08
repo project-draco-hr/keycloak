@@ -1,0 +1,12 @@
+{
+  Collection<String> groupAttributes=config.getGroupAttributes();
+  for (  String attrName : groupAttributes) {
+    Set<String> attrValues=ldapGroup.getAttributeAsSet(attrName);
+    if (attrValues == null) {
+      kcGroup.removeAttribute(attrName);
+    }
+ else {
+      kcGroup.setAttribute(attrName,new LinkedList<>(attrValues));
+    }
+  }
+}

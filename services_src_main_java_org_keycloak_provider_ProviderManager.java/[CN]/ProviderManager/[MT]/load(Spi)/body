@@ -2,10 +2,16 @@
   List<ProviderFactory> factories=cache.get(spi.getName());
   if (factories == null) {
     factories=new LinkedList<ProviderFactory>();
+    IdentityHashMap factoryClasses=new IdentityHashMap();
     for (    ProviderLoader loader : loaders) {
       List<ProviderFactory> f=loader.load(spi);
       if (f != null) {
-        factories.addAll(f);
+        for (        ProviderFactory pf : f) {
+          if (!factoryClasses.containsKey(pf.getClass())) {
+            factories.add(pf);
+            factoryClasses.put(pf.getClass(),pf);
+          }
+        }
       }
     }
   }

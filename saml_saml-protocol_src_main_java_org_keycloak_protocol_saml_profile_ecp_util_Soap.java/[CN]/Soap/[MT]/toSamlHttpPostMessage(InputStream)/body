@@ -1,0 +1,14 @@
+{
+  try {
+    MessageFactory messageFactory=MessageFactory.newInstance();
+    SOAPMessage soapMessage=messageFactory.createMessage(null,inputStream);
+    SOAPBody soapBody=soapMessage.getSOAPBody();
+    Node authnRequestNode=soapBody.getFirstChild();
+    Document document=DocumentUtil.createDocument();
+    document.appendChild(document.importNode(authnRequestNode,true));
+    return PostBindingUtil.base64Encode(DocumentUtil.asString(document));
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Error creating fault message.",e);
+  }
+}

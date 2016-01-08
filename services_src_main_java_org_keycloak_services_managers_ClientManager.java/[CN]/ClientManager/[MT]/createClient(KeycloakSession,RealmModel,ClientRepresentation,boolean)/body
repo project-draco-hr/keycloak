@@ -1,5 +1,9 @@
 {
   ClientModel client=RepresentationToModel.createClient(session,realm,rep,addDefaultRoles);
+  if (rep.getProtocol() != null) {
+    LoginProtocolFactory providerFactory=(LoginProtocolFactory)session.getKeycloakSessionFactory().getProviderFactory(LoginProtocol.class,rep.getProtocol());
+    providerFactory.setupClientDefaults(rep,client);
+  }
   if (rep.getProtocolMappers() == null && rep.getClientTemplate() != null) {
     Set<ProtocolMapperModel> mappers=client.getProtocolMappers();
     for (    ProtocolMapperModel mapper : mappers)     client.removeProtocolMapper(mapper);

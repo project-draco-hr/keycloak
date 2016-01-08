@@ -1,7 +1,9 @@
 {
   log.info("enabling remember me");
   loginSettingsPage.form().setRememberMeAllowed(true);
+  assertTrue(loginSettingsPage.form().isRememberMeAllowed());
   loginSettingsPage.form().save();
+  assertAlertSuccess();
   log.debug("enabled");
   log.info("login with remember me checked");
   testAccountPage.navigateTo();
@@ -12,8 +14,9 @@
   log.info("disabling remember me");
   loginSettingsPage.navigateTo();
   loginSettingsPage.form().setRememberMeAllowed(false);
-  loginSettingsPage.form().save();
   assertFalse(loginSettingsPage.form().isRememberMeAllowed());
+  loginSettingsPage.form().save();
+  assertAlertSuccess();
   log.debug("disabled");
   testAccountPage.navigateTo();
   testAccountPage.signOut();

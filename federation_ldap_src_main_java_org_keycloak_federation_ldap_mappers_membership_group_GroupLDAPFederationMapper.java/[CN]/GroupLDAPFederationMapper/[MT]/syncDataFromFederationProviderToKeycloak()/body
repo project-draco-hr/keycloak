@@ -1,0 +1,56 @@
+{
+  UserFederationSyncResult syncResult=new UserFederationSyncResult(){
+    @Override public String getStatus(){
+      return String.format("%d imported groups, %d updated groups, %d removed groups",getAdded(),getUpdated(),getRemoved());
+    }
+  }
+;
+  logger.debugf("Syncing groups from LDAP into Keycloak DB. Mapper is [%s], LDAP provider is [%s]",mapperModel.getName(),ldapProvider.getModel().getDisplayName());
+  LDAPQuery ldapQuery=createGroupQuery();
+  List<LDAPObject> ldapGroups=ldapQuery.getResultList();
+  Map<String,LDAPObject> ldapGroupsMap=new HashMap<>();
+  List<GroupTreeResolver.Group> ldapGroupsRep=new LinkedList<>();
+  String groupsRdnAttr=config.getGroupNameLdapAttribute();
+  for (  LDAPObject ldapGroup : ldapGroups) {
+    String groupName=ldapGroup.getAttributeAsString(groupsRdnAttr);
+    Set<String> subgroupNames=new HashSet<>();
+    for (    LDAPDn groupDn : getLDAPSubgroups(ldapGroup)) {
+      subgroupNames.add(groupDn.getFirstRdnAttrValue());
+    }
+    ldapGroupsRep.add(new GroupTreeResolver.Group(groupName,subgroupNames));
+    ldapGroupsMap.put(groupName,ldapGroup);
+  }
+  if (config.isPreserveGroupsInheritance()) {
+    try {
+      List<GroupTreeResolver.GroupTreeEntry> groupTrees=new GroupTreeResolver().resolveGroupTree(ldapGroupsRep);
+      updateKeycloakGroupTree(groupTrees,ldapGroupsMap,syncResult);
+    }
+ catch (    GroupTreeResolver.GroupTreeResolveException gre) {
+      throw new ModelException("Couldn't resolve groups from LDAP. Fix LDAP or skip preserve inheritance. Details: " + gre.getMessage(),gre);
+    }
+  }
+ else {
+    Set<String> visitedGroupIds=new HashSet<>();
+    for (    Map.Entry<String,LDAPObject> groupEntry : ldapGroupsMap.entrySet()) {
+      String groupName=groupEntry.getKey();
+      GroupModel kcExistingGroup=KeycloakModelUtils.findGroupByPath(realm,"/" + groupName);
+      if (kcExistingGroup != null) {
+        updateAttributesOfKCGroup(kcExistingGroup,groupEntry.getValue());
+        syncResult.increaseUpdated();
+        visitedGroupIds.add(kcExistingGroup.getId());
+      }
+ else {
+        GroupModel kcGroup=realm.createGroup(groupName);
+        updateAttributesOfKCGroup(kcGroup,groupEntry.getValue());
+        realm.moveGroup(kcGroup,null);
+        syncResult.increaseAdded();
+        visitedGroupIds.add(kcGroup.getId());
+      }
+    }
+    if (config.isDropNonExistingGroupsDuringSync()) {
+      dropNonExistingKcGroups(syncResult,visitedGroupIds);
+    }
+  }
+  syncFromLDAPPerformedInThisTransaction=true;
+  return syncResult;
+}

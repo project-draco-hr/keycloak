@@ -1,7 +1,9 @@
 {
   log.info("enabling edit username");
   loginSettingsPage.form().setEditUsernameAllowed(true);
+  assertTrue(loginSettingsPage.form().isEditUsernameAllowed());
   loginSettingsPage.form().save();
+  assertAlertSuccess();
   log.debug("enabled");
   log.info("edit username");
   testAccountPage.navigateTo();
@@ -18,6 +20,8 @@
   log.info("disabling edit username");
   loginSettingsPage.navigateTo();
   loginSettingsPage.form().setEditUsernameAllowed(false);
+  assertFalse(loginSettingsPage.form().isEditUsernameAllowed());
   loginSettingsPage.form().save();
+  assertAlertSuccess();
   log.debug("disabled");
 }

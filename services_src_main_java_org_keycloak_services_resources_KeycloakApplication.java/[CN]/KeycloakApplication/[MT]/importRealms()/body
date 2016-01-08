@@ -1,0 +1,17 @@
+{
+  String files=System.getProperty("keycloak.import");
+  if (files != null) {
+    StringTokenizer tokenizer=new StringTokenizer(files,",");
+    while (tokenizer.hasMoreTokens()) {
+      String file=tokenizer.nextToken().trim();
+      RealmRepresentation rep;
+      try {
+        rep=loadJson(new FileInputStream(file),RealmRepresentation.class);
+      }
+ catch (      FileNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+      importRealm(rep,"file " + file);
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  logger.debugf("MSAD Error code is '%s' after failed LDAP login of user",errorCode,user.getUsername());
+  if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE) {
+    if (errorCode.equals("532") || errorCode.equals("773")) {
+      user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
+      return true;
+    }
+ else     if (errorCode.equals("533")) {
+      user.setEnabled(false);
+      return true;
+    }
+  }
+  return false;
+}

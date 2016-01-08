@@ -1,9 +1,9 @@
 {
   auth.requireManage();
   if (roles == null) {
-    Set<RoleModel> roleModels=scopedClient.getClientScopeMappings(client);
+    Set<RoleModel> roleModels=KeycloakModelUtils.getClientScopeMappings(scopedClient,scopeContainer);
     for (    RoleModel roleModel : roleModels) {
-      client.deleteScopeMapping(roleModel);
+      scopeContainer.deleteScopeMapping(roleModel);
     }
     adminEvent.operation(OperationType.DELETE).resourcePath(session.getContext().getUri()).representation(roles).success();
   }
@@ -13,7 +13,7 @@
       if (roleModel == null) {
         throw new NotFoundException("Role not found");
       }
-      client.deleteScopeMapping(roleModel);
+      scopeContainer.deleteScopeMapping(roleModel);
       adminEvent.operation(OperationType.DELETE).resourcePath(session.getContext().getUri(),roleModel.getId()).representation(roles).success();
     }
   }

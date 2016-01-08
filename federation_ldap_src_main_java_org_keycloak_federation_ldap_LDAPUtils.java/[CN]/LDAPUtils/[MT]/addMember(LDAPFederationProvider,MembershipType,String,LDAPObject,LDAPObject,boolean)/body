@@ -1,0 +1,17 @@
+{
+  Set<String> memberships=getExistingMemberships(memberAttrName,ldapParent);
+  if (membershipType == MembershipType.DN) {
+    for (    String membership : memberships) {
+      if (LDAPConstants.EMPTY_MEMBER_ATTRIBUTE_VALUE.equals(membership)) {
+        memberships.remove(membership);
+        break;
+      }
+    }
+  }
+  String membership=getMemberValueOfChildObject(ldapChild,membershipType);
+  memberships.add(membership);
+  ldapParent.setAttribute(memberAttrName,memberships);
+  if (sendLDAPUpdateRequest) {
+    ldapProvider.getLdapIdentityStore().update(ldapParent);
+  }
+}

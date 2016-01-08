@@ -1,0 +1,26 @@
+{
+  SessionEntity e=entry.getValue();
+  if (!realm.equals(e.getRealm())) {
+    return false;
+  }
+  if (!(e instanceof ClientSessionEntity)) {
+    return false;
+  }
+  ClientSessionEntity entity=(ClientSessionEntity)e;
+  if (client != null && !entity.getClient().equals(client)) {
+    return false;
+  }
+  if (userSession != null && !userSession.equals(entity.getUserSession())) {
+    return false;
+  }
+  if (requireUserSession && entity.getUserSession() == null) {
+    return false;
+  }
+  if (requireNullUserSession && entity.getUserSession() != null) {
+    return false;
+  }
+  if (expiredRefresh != null && entity.getTimestamp() > expiredRefresh) {
+    return false;
+  }
+  return true;
+}

@@ -1,0 +1,35 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    UserFederationMapperModel mapperModel=realm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    GroupLDAPFederationMapper groupMapper=FederationTestUtils.getGroupMapper(mapperModel,ldapProvider,realm);
+    UserFederationSyncResult syncResult=new GroupLDAPFederationMapperFactory().create(session).syncDataFromFederationProviderToKeycloak(mapperModel,ldapProvider,session,realm);
+    FederationTestUtils.assertSyncEquals(syncResult,3,0,0,0);
+    GroupModel kcGroup1=KeycloakModelUtils.findGroupByPath(realm,"/group1");
+    Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/group11"));
+    Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/group12"));
+    GroupModel kcGroup11=KeycloakModelUtils.findGroupByPath(realm,"/group1/group11");
+    GroupModel kcGroup12=KeycloakModelUtils.findGroupByPath(realm,"/group1/group12");
+    Assert.assertEquals(2,kcGroup1.getSubGroups().size());
+    Assert.assertEquals("group1 - description",kcGroup1.getFirstAttribute(descriptionAttrName));
+    Assert.assertNull(kcGroup11.getFirstAttribute(descriptionAttrName));
+    Assert.assertEquals("group12 - description",kcGroup12.getFirstAttribute(descriptionAttrName));
+    LDAPObject group1=groupMapper.loadLDAPGroupByName("group1");
+    group1.setSingleAttribute(descriptionAttrName,"group1 - changed description");
+    ldapProvider.getLdapIdentityStore().update(group1);
+    LDAPObject group12=groupMapper.loadLDAPGroupByName("group12");
+    group12.setAttribute(descriptionAttrName,null);
+    ldapProvider.getLdapIdentityStore().update(group12);
+    syncResult=new GroupLDAPFederationMapperFactory().create(session).syncDataFromFederationProviderToKeycloak(mapperModel,ldapProvider,session,realm);
+    FederationTestUtils.assertSyncEquals(syncResult,0,3,0,0);
+    kcGroup1=KeycloakModelUtils.findGroupByPath(realm,"/group1");
+    kcGroup12=KeycloakModelUtils.findGroupByPath(realm,"/group1/group12");
+    Assert.assertEquals("group1 - changed description",kcGroup1.getFirstAttribute(descriptionAttrName));
+    Assert.assertNull(kcGroup12.getFirstAttribute(descriptionAttrName));
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

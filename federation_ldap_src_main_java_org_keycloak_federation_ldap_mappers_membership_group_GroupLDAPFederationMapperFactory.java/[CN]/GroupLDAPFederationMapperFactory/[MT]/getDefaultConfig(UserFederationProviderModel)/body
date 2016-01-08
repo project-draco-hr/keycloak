@@ -1,0 +1,14 @@
+{
+  Map<String,String> defaultValues=new HashMap<>();
+  LDAPConfig config=new LDAPConfig(providerModel.getConfig());
+  defaultValues.put(GroupMapperConfig.GROUP_NAME_LDAP_ATTRIBUTE,LDAPConstants.CN);
+  String roleObjectClasses=config.isActiveDirectory() ? LDAPConstants.GROUP : LDAPConstants.GROUP_OF_NAMES;
+  defaultValues.put(GroupMapperConfig.GROUP_OBJECT_CLASSES,roleObjectClasses);
+  defaultValues.put(GroupMapperConfig.PRESERVE_GROUP_INHERITANCE,"true");
+  defaultValues.put(GroupMapperConfig.MEMBERSHIP_LDAP_ATTRIBUTE,LDAPConstants.MEMBER);
+  String mode=config.getEditMode() == UserFederationProvider.EditMode.WRITABLE ? LDAPGroupMapperMode.LDAP_ONLY.toString() : LDAPGroupMapperMode.READ_ONLY.toString();
+  defaultValues.put(GroupMapperConfig.MODE,mode);
+  defaultValues.put(RoleMapperConfig.USER_ROLES_RETRIEVE_STRATEGY,GroupMapperConfig.LOAD_GROUPS_BY_MEMBER_ATTRIBUTE);
+  defaultValues.put(GroupMapperConfig.DROP_NON_EXISTING_GROUPS_DURING_SYNC,"false");
+  return defaultValues;
+}

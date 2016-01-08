@@ -1,0 +1,14 @@
+{
+  RealmModel realm=session.realms().getRealm(Config.getAdminRealm());
+  if (session.users().getUsersCount(realm) > 0) {
+    throw new IllegalStateException("Can't create initial user as users already exists");
+  }
+  UserModel adminUser=session.users().addUser(realm,username);
+  adminUser.setEnabled(true);
+  UserCredentialModel usrCredModel=new UserCredentialModel();
+  usrCredModel.setType(UserCredentialModel.PASSWORD);
+  usrCredModel.setValue(password);
+  session.users().updateCredential(realm,adminUser,usrCredModel);
+  RoleModel adminRole=realm.getRole(AdminRoles.ADMIN);
+  adminUser.grantRole(adminRole);
+}

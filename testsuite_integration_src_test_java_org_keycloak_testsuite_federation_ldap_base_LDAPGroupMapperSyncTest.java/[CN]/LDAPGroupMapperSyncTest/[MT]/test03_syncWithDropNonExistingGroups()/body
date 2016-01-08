@@ -1,0 +1,36 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    UserFederationMapperModel mapperModel=realm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    UserFederationSyncResult syncResult=new GroupLDAPFederationMapperFactory().create(session).syncDataFromFederationProviderToKeycloak(mapperModel,ldapProvider,session,realm);
+    FederationTestUtils.assertSyncEquals(syncResult,3,0,0,0);
+    GroupModel kcGroup1=KeycloakModelUtils.findGroupByPath(realm,"/group1");
+    Assert.assertNotNull(KeycloakModelUtils.findGroupByPath(realm,"/group1/group11"));
+    Assert.assertNotNull(KeycloakModelUtils.findGroupByPath(realm,"/group1/group12"));
+    Assert.assertEquals(2,kcGroup1.getSubGroups().size());
+    GroupModel model1=realm.createGroup("model1");
+    realm.moveGroup(model1,null);
+    GroupModel model2=realm.createGroup("model2");
+    kcGroup1.addChild(model2);
+    syncResult=new GroupLDAPFederationMapperFactory().create(session).syncDataFromFederationProviderToKeycloak(mapperModel,ldapProvider,session,realm);
+    FederationTestUtils.assertSyncEquals(syncResult,0,3,0,0);
+    Assert.assertNotNull(KeycloakModelUtils.findGroupByPath(realm,"/group1/group11"));
+    Assert.assertNotNull(KeycloakModelUtils.findGroupByPath(realm,"/group1/group12"));
+    Assert.assertNotNull(KeycloakModelUtils.findGroupByPath(realm,"/model1"));
+    Assert.assertNotNull(KeycloakModelUtils.findGroupByPath(realm,"/group1/model2"));
+    FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.DROP_NON_EXISTING_GROUPS_DURING_SYNC,"true");
+    realm.updateUserFederationMapper(mapperModel);
+    syncResult=new GroupLDAPFederationMapperFactory().create(session).syncDataFromFederationProviderToKeycloak(mapperModel,ldapProvider,session,realm);
+    Assert.assertEquals(3,syncResult.getUpdated());
+    Assert.assertTrue(syncResult.getRemoved() >= 2);
+    Assert.assertNotNull(KeycloakModelUtils.findGroupByPath(realm,"/group1/group11"));
+    Assert.assertNotNull(KeycloakModelUtils.findGroupByPath(realm,"/group1/group12"));
+    Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/model1"));
+    Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/group1/model2"));
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

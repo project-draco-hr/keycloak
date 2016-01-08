@@ -5,6 +5,18 @@
   }
  else {
     LDAPObject ldapUser=loadAndValidateUser(realm,user);
-    return ldapIdentityStore.validatePassword(ldapUser,password);
+    try {
+      ldapIdentityStore.validatePassword(ldapUser,password);
+      return true;
+    }
+ catch (    AuthenticationException ae) {
+      Set<UserFederationMapperModel> federationMappers=realm.getUserFederationMappersByFederationProvider(getModel().getId());
+      boolean processed=false;
+      for (      UserFederationMapperModel mapperModel : federationMappers) {
+        LDAPFederationMapper ldapMapper=getMapper(mapperModel);
+        processed=processed || ldapMapper.onAuthenticationFailure(mapperModel,this,ldapUser,user,ae,realm);
+      }
+      return processed;
+    }
   }
 }

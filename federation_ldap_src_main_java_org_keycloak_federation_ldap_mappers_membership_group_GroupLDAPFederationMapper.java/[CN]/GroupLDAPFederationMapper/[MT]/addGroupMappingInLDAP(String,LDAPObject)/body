@@ -1,0 +1,8 @@
+{
+  LDAPObject ldapGroup=loadLDAPGroupByName(groupName);
+  if (ldapGroup == null) {
+    syncDataFromKeycloakToFederationProvider();
+    ldapGroup=loadLDAPGroupByName(groupName);
+  }
+  LDAPUtils.addMember(ldapProvider,config.getMembershipTypeLdapAttribute(),config.getMembershipLdapAttribute(),ldapGroup,ldapUser,true);
+}

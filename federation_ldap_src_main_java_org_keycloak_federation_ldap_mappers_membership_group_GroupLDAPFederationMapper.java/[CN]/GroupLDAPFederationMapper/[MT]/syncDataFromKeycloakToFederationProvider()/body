@@ -1,0 +1,41 @@
+{
+  UserFederationSyncResult syncResult=new UserFederationSyncResult(){
+    @Override public String getStatus(){
+      return String.format("%d groups imported to LDAP, %d groups updated to LDAP, %d groups removed from LDAP",getAdded(),getUpdated(),getRemoved());
+    }
+  }
+;
+  if (config.getMode() != LDAPGroupMapperMode.LDAP_ONLY) {
+    logger.warnf("Ignored sync for federation mapper '%s' as it's mode is '%s'",mapperModel.getName(),config.getMode().toString());
+    return syncResult;
+  }
+  logger.debugf("Syncing groups from Keycloak into LDAP. Mapper is [%s], LDAP provider is [%s]",mapperModel.getName(),ldapProvider.getModel().getDisplayName());
+  LDAPQuery ldapQuery=createGroupQuery();
+  List<LDAPObject> ldapGroups=ldapQuery.getResultList();
+  Map<String,LDAPObject> ldapGroupsMap=new HashMap<>();
+  String groupsRdnAttr=config.getGroupNameLdapAttribute();
+  for (  LDAPObject ldapGroup : ldapGroups) {
+    String groupName=ldapGroup.getAttributeAsString(groupsRdnAttr);
+    ldapGroupsMap.put(groupName,ldapGroup);
+  }
+  Set<String> ldapGroupNames=new HashSet<>();
+  for (  GroupModel kcGroup : realm.getTopLevelGroups()) {
+    processLdapGroupSyncToLDAP(kcGroup,ldapGroupsMap,ldapGroupNames,syncResult);
+  }
+  if (config.isDropNonExistingGroupsDuringSync()) {
+    Set<String> copy=new HashSet<>(ldapGroupsMap.keySet());
+    for (    String groupName : copy) {
+      if (!ldapGroupNames.contains(groupName)) {
+        LDAPObject ldapGroup=ldapGroupsMap.remove(groupName);
+        ldapProvider.getLdapIdentityStore().remove(ldapGroup);
+        syncResult.increaseRemoved();
+      }
+    }
+  }
+  if (config.isPreserveGroupsInheritance()) {
+    for (    GroupModel kcGroup : realm.getTopLevelGroups()) {
+      processLdapGroupMembershipsSyncToLDAP(kcGroup,ldapGroupsMap);
+    }
+  }
+  return syncResult;
+}

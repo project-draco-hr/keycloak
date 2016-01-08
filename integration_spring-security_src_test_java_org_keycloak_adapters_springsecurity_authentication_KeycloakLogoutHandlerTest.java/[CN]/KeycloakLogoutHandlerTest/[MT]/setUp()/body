@@ -1,10 +1,10 @@
 {
   MockitoAnnotations.initMocks(this);
   keycloakAuthenticationToken=mock(KeycloakAuthenticationToken.class);
-  keycloakLogoutHandler=new KeycloakLogoutHandler(adapterDeploymentContextBean);
+  keycloakLogoutHandler=new KeycloakLogoutHandler(adapterDeploymentContext);
   request=new MockHttpServletRequest();
   response=new MockHttpServletResponse();
-  when(adapterDeploymentContextBean.getDeployment()).thenReturn(keycloakDeployment);
+  when(adapterDeploymentContext.resolveDeployment(any(HttpFacade.class))).thenReturn(keycloakDeployment);
   when(keycloakAuthenticationToken.getAccount()).thenReturn(keycloakAccount);
   when(keycloakAccount.getKeycloakSecurityContext()).thenReturn(session);
 }

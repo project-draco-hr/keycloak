@@ -1,0 +1,11 @@
+{
+  Set<UserFederationMapperModel> federationMappers=realm.getUserFederationMappersByFederationProvider(model.getId());
+  for (  UserFederationMapperModel mapperModel : federationMappers) {
+    LDAPFederationMapper ldapMapper=getMapper(mapperModel);
+    List<UserModel> users=ldapMapper.getGroupMembers(mapperModel,this,realm,group,firstResult,maxResults);
+    if (users.size() > 0) {
+      return users;
+    }
+  }
+  return Collections.emptyList();
+}

@@ -1,0 +1,22 @@
+{
+  SessionEntity e=entry.getValue();
+  if (!realm.equals(e.getRealm())) {
+    return false;
+  }
+  if (!(e instanceof ClientInitialAccessEntity)) {
+    return false;
+  }
+  ClientInitialAccessEntity entity=(ClientInitialAccessEntity)e;
+  if (expired != null) {
+    if (entity.getRemainingCount() <= 0) {
+      return true;
+    }
+ else     if (entity.getExpiration() > 0 && (entity.getTimestamp() + entity.getExpiration()) < expired) {
+      return true;
+    }
+ else {
+      return false;
+    }
+  }
+  return true;
+}

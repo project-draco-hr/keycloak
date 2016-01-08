@@ -1,0 +1,33 @@
+{
+  String groupName=groupTreeEntry.getGroupName();
+  GroupModel kcGroup=null;
+  Collection<GroupModel> subgroups=kcParent == null ? realm.getTopLevelGroups() : kcParent.getSubGroups();
+  for (  GroupModel group : subgroups) {
+    if (group.getName().equals(groupName)) {
+      kcGroup=group;
+      break;
+    }
+  }
+  if (kcGroup != null) {
+    logger.debugf("Updated Keycloak group '%s' from LDAP",kcGroup.getName());
+    updateAttributesOfKCGroup(kcGroup,ldapGroups.get(kcGroup.getName()));
+    syncResult.increaseUpdated();
+  }
+ else {
+    kcGroup=realm.createGroup(groupTreeEntry.getGroupName());
+    if (kcParent == null) {
+      realm.moveGroup(kcGroup,null);
+      logger.debugf("Imported top-level group '%s' from LDAP",kcGroup.getName());
+    }
+ else {
+      realm.moveGroup(kcGroup,kcParent);
+      logger.debugf("Imported group '%s' from LDAP as child of group '%s'",kcGroup.getName(),kcParent.getName());
+    }
+    updateAttributesOfKCGroup(kcGroup,ldapGroups.get(kcGroup.getName()));
+    syncResult.increaseAdded();
+  }
+  visitedGroupIds.add(kcGroup.getId());
+  for (  GroupTreeResolver.GroupTreeEntry childEntry : groupTreeEntry.getChildren()) {
+    updateKeycloakGroupTreeEntry(childEntry,ldapGroups,kcGroup,syncResult,visitedGroupIds);
+  }
+}

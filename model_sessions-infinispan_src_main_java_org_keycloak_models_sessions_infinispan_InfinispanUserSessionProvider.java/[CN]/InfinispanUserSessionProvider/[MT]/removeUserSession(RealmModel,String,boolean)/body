@@ -1,8 +1,10 @@
 {
   Cache<String,SessionEntity> cache=getCache(offline);
   tx.remove(cache,userSessionId);
-  Map<String,String> map=new MapReduceTask(cache).mappedWith(ClientSessionMapper.create(realm.getId()).userSession(userSessionId).emitKey()).reducedWith(new FirstResultReducer()).execute();
-  for (  String id : map.keySet()) {
-    tx.remove(cache,id);
+  UserSessionEntity sessionEntity=(UserSessionEntity)cache.get(userSessionId);
+  if (sessionEntity.getClientSessions() != null) {
+    for (    String clientSessionId : sessionEntity.getClientSessions()) {
+      tx.remove(cache,clientSessionId);
+    }
   }
 }

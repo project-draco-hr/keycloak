@@ -1,5 +1,6 @@
 {
   ClientModel client=clientSession.getClient();
+  SamlClient samlClient=new SamlClient(client);
   String logoutUrl=getLogoutServiceUrl(uriInfo,client,SAML_POST_BINDING);
   if (logoutUrl == null) {
     logger.warnv("Can't do backchannel logout. No SingleLogoutService POST Binding registered for client: {1}",client.getClientId());
@@ -8,7 +9,7 @@
   SAML2LogoutRequestBuilder logoutBuilder=createLogoutRequest(logoutUrl,clientSession,client);
   String logoutRequestString=null;
   try {
-    JaxrsSAML2BindingBuilder binding=createBindingBuilder(client);
+    JaxrsSAML2BindingBuilder binding=createBindingBuilder(samlClient);
     logoutRequestString=binding.postBinding(logoutBuilder.buildDocument()).encoded();
   }
  catch (  Exception e) {

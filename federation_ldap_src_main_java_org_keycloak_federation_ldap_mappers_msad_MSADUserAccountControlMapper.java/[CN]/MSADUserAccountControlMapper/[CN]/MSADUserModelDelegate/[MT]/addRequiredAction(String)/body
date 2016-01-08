@@ -1,0 +1,9 @@
+{
+  super.addRequiredAction(action);
+  if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE && RequiredAction.UPDATE_PASSWORD.toString().equals(action)) {
+    logger.debugf("Going to propagate required action UPDATE_PASSWORD to MSAD for ldap user '%s' ",ldapUser.getDn().toString());
+    ldapUser.removeReadOnlyAttributeName(LDAPConstants.PWD_LAST_SET);
+    ldapUser.setSingleAttribute(LDAPConstants.PWD_LAST_SET,"0");
+    ldapProvider.getLdapIdentityStore().update(ldapUser);
+  }
+}

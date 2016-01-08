@@ -1,0 +1,39 @@
+{
+  Map<String,List<String>> parentsTree=getParentsTree(groups);
+  List<String> rootGroups=new LinkedList<>();
+  for (  Map.Entry<String,List<String>> group : parentsTree.entrySet()) {
+    int parentCount=group.getValue().size();
+    if (parentCount == 0) {
+      rootGroups.add(group.getKey());
+    }
+ else     if (parentCount > 1) {
+      throw new GroupTreeResolveException("Group '" + group.getKey() + "' detected to have multiple parents. This is not allowed in Keycloak. Parents are: "+ group.getValue());
+    }
+  }
+  Map<String,Group> asMap=new TreeMap<>();
+  for (  Group group : groups) {
+    asMap.put(group.getGroupName(),group);
+  }
+  List<GroupTreeEntry> finalResult=new LinkedList<>();
+  Set<String> visitedGroups=new TreeSet<>();
+  for (  String rootGroupName : rootGroups) {
+    List<String> subtree=new LinkedList<>();
+    subtree.add(rootGroupName);
+    GroupTreeEntry groupTree=resolveGroupTree(rootGroupName,asMap,visitedGroups,subtree);
+    finalResult.add(groupTree);
+  }
+  if (visitedGroups.size() != asMap.size()) {
+    for (    Map.Entry<String,Group> entry : asMap.entrySet()) {
+      String groupName=entry.getKey();
+      if (!visitedGroups.contains(groupName)) {
+        List<String> subtree=new LinkedList<>();
+        subtree.add(groupName);
+        Set<String> newVisitedGroups=new TreeSet<>();
+        resolveGroupTree(groupName,asMap,newVisitedGroups,subtree);
+        visitedGroups.addAll(newVisitedGroups);
+      }
+    }
+    throw new GroupTreeResolveException("Illegal state: Recursion detected, but wasn't able to find it");
+  }
+  return finalResult;
+}

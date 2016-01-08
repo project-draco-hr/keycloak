@@ -1,0 +1,50 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    UserFederationMapperModel mapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+    FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.MODE,LDAPGroupMapperMode.READ_ONLY.toString());
+    appRealm.updateUserFederationMapper(mapperModel);
+    UserModel mary=session.users().getUserByUsername("marykeycloak",appRealm);
+    GroupModel group1=KeycloakModelUtils.findGroupByPath(appRealm,"/group1");
+    GroupModel group11=KeycloakModelUtils.findGroupByPath(appRealm,"/group1/group11");
+    GroupModel group12=KeycloakModelUtils.findGroupByPath(appRealm,"/group1/group12");
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    GroupLDAPFederationMapper groupMapper=FederationTestUtils.getGroupMapper(mapperModel,ldapProvider,appRealm);
+    LDAPObject maryLdap=ldapProvider.loadLDAPUserByUsername(appRealm,"marykeycloak");
+    groupMapper.addGroupMappingInLDAP("group1",maryLdap);
+    groupMapper.addGroupMappingInLDAP("group11",maryLdap);
+    mary.joinGroup(group12);
+    Set<GroupModel> maryGroups=mary.getGroups();
+    Assert.assertEquals(3,maryGroups.size());
+    Assert.assertTrue(maryGroups.contains(group1));
+    Assert.assertTrue(maryGroups.contains(group11));
+    Assert.assertTrue(maryGroups.contains(group12));
+    UserModel maryDB=session.userStorage().getUserByUsername("marykeycloak",appRealm);
+    Set<GroupModel> maryDBGroups=maryDB.getGroups();
+    Assert.assertFalse(maryDBGroups.contains(group1));
+    Assert.assertFalse(maryDBGroups.contains(group11));
+    Assert.assertTrue(maryDBGroups.contains(group12));
+    List<UserModel> group1Members=session.users().getGroupMembers(appRealm,group1,0,10);
+    List<UserModel> group11Members=session.users().getGroupMembers(appRealm,group11,0,10);
+    List<UserModel> group12Members=session.users().getGroupMembers(appRealm,group12,0,10);
+    Assert.assertEquals(1,group1Members.size());
+    Assert.assertEquals("marykeycloak",group1Members.get(0).getUsername());
+    Assert.assertEquals(1,group11Members.size());
+    Assert.assertEquals("marykeycloak",group11Members.get(0).getUsername());
+    Assert.assertEquals(1,group12Members.size());
+    Assert.assertEquals("marykeycloak",group12Members.get(0).getUsername());
+    mary.leaveGroup(group12);
+    try {
+      mary.leaveGroup(group1);
+      Assert.fail("It wasn't expected to successfully delete LDAP group mappings in READ_ONLY mode");
+    }
+ catch (    ModelException expected) {
+    }
+    deleteGroupMappingsInLDAP(groupMapper,maryLdap,"group1");
+    deleteGroupMappingsInLDAP(groupMapper,maryLdap,"group11");
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

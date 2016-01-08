@@ -15,4 +15,10 @@
   resetSession();
   failure1=session.sessions().getUserLoginFailure(realm,"user1");
   assertEquals(0,failure1.getNumFailures());
+  session.sessions().removeUserLoginFailure(realm,"user1");
+  resetSession();
+  assertNull(session.sessions().getUserLoginFailure(realm,"user1"));
+  session.sessions().removeAllUserLoginFailures(realm);
+  resetSession();
+  assertNull(session.sessions().getUserLoginFailure(realm,"user2"));
 }

@@ -1,0 +1,11 @@
+{
+  String exceptionMessage=ldapException.getMessage();
+  Matcher m=AUTH_EXCEPTION_REGEX.matcher(exceptionMessage);
+  if (m.matches()) {
+    String errorCode=m.group(1);
+    return processAuthErrorCode(errorCode,user);
+  }
+ else {
+    return false;
+  }
+}

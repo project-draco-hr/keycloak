@@ -1,0 +1,9 @@
+{
+  Set<String> visitedGroupIds=new HashSet<>();
+  for (  GroupTreeResolver.GroupTreeEntry groupEntry : groupTrees) {
+    updateKeycloakGroupTreeEntry(groupEntry,ldapGroups,null,syncResult,visitedGroupIds);
+  }
+  if (config.isDropNonExistingGroupsDuringSync()) {
+    dropNonExistingKcGroups(syncResult,visitedGroupIds);
+  }
+}

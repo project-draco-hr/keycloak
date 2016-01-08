@@ -1,0 +1,33 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  UserFederationMapperModel firstNameMapper=null;
+  try {
+    RealmModel appRealm=new RealmManager(session).getRealmByName("test");
+    RoleModel hardcodedRole=appRealm.addRole("hardcoded-role");
+    UserModel john=session.users().getUserByUsername("johnkeycloak",appRealm);
+    Assert.assertFalse(john.hasRole(hardcodedRole));
+    UserFederationMapperModel hardcodedMapperModel=KeycloakModelUtils.createUserFederationMapperModel("hardcoded role",ldapModel.getId(),HardcodedLDAPRoleMapperFactory.PROVIDER_ID,HardcodedLDAPRoleMapper.ROLE,"hardcoded-role");
+    appRealm.addUserFederationMapper(hardcodedMapperModel);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=new RealmManager(session).getRealmByName("test");
+    RoleModel hardcodedRole=appRealm.getRole("hardcoded-role");
+    UserModel john=session.users().getUserByUsername("johnkeycloak",appRealm);
+    Assert.assertTrue(john.hasRole(hardcodedRole));
+    try {
+      john.deleteRoleMapping(hardcodedRole);
+      Assert.fail("Didn't expected to remove role mapping");
+    }
+ catch (    ModelException expected) {
+    }
+    UserFederationMapperModel hardcodedMapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"hardcoded role");
+    appRealm.removeUserFederationMapper(hardcodedMapperModel);
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

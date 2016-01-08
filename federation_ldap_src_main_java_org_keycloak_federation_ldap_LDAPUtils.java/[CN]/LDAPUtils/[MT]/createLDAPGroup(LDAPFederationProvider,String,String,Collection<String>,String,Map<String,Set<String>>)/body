@@ -1,0 +1,14 @@
+{
+  LDAPObject ldapObject=new LDAPObject();
+  ldapObject.setRdnAttributeName(groupNameAttribute);
+  ldapObject.setObjectClasses(objectClasses);
+  ldapObject.setSingleAttribute(groupNameAttribute,groupName);
+  LDAPDn roleDn=LDAPDn.fromString(parentDn);
+  roleDn.addFirst(groupNameAttribute,groupName);
+  ldapObject.setDn(roleDn);
+  for (  Map.Entry<String,Set<String>> attrEntry : additionalAttributes.entrySet()) {
+    ldapObject.setAttribute(attrEntry.getKey(),attrEntry.getValue());
+  }
+  ldapProvider.getLdapIdentityStore().add(ldapObject);
+  return ldapObject;
+}

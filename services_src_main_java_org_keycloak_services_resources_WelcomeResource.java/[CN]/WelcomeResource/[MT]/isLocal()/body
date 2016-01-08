@@ -1,0 +1,9 @@
+{
+  try {
+    InetAddress inetAddress=InetAddress.getByName(session.getContext().getConnection().getRemoteAddr());
+    return inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress();
+  }
+ catch (  UnknownHostException e) {
+    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+  }
+}

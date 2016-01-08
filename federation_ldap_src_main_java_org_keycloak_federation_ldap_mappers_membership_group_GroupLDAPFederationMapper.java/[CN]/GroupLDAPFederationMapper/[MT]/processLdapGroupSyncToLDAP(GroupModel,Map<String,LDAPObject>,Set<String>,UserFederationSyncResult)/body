@@ -1,0 +1,26 @@
+{
+  String groupName=kcGroup.getName();
+  Map<String,Set<String>> supportedLdapAttributes=new HashMap<>();
+  for (  String attrName : config.getGroupAttributes()) {
+    List<String> kcAttrValues=kcGroup.getAttribute(attrName);
+    Set<String> attrValues2=(kcAttrValues == null || kcAttrValues.isEmpty()) ? null : new HashSet<>(kcAttrValues);
+    supportedLdapAttributes.put(attrName,attrValues2);
+  }
+  LDAPObject ldapGroup=ldapGroupsMap.get(groupName);
+  if (ldapGroup == null) {
+    ldapGroup=createLDAPGroup(groupName,supportedLdapAttributes);
+    syncResult.increaseAdded();
+  }
+ else {
+    for (    Map.Entry<String,Set<String>> attrEntry : supportedLdapAttributes.entrySet()) {
+      ldapGroup.setAttribute(attrEntry.getKey(),attrEntry.getValue());
+    }
+    ldapProvider.getLdapIdentityStore().update(ldapGroup);
+    syncResult.increaseUpdated();
+  }
+  ldapGroupsMap.put(groupName,ldapGroup);
+  ldapGroupNames.add(groupName);
+  for (  GroupModel kcSubgroup : kcGroup.getSubGroups()) {
+    processLdapGroupSyncToLDAP(kcSubgroup,ldapGroupsMap,ldapGroupNames,syncResult);
+  }
+}

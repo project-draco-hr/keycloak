@@ -26,7 +26,7 @@
   session0.setLastSessionRefresh(0);
   cls1.setTimestamp(0);
   resetSession();
-  session.sessions().removeExpiredUserSessions(realm);
+  session.sessions().removeExpired(realm);
   resetSession();
   Assert.assertNull(session.sessions().getOfflineUserSession(realm,origSessions[0].getId()));
   for (  String clientSession : clientSessions) {
@@ -45,7 +45,7 @@
   Assert.assertEquals(1,persister.getUserSessionsCount(true));
   Time.setOffset(3000000);
   try {
-    session.sessions().removeExpiredUserSessions(realm);
+    session.sessions().removeExpired(realm);
     resetSession();
     for (    Map.Entry<String,String> entry : offlineSessions.entrySet()) {
       Assert.assertTrue(sessionManager.findOfflineClientSession(realm,entry.getKey(),entry.getValue()) == null);

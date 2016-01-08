@@ -1,0 +1,13 @@
+{
+  LDAPGroupMapperMode mode=config.getMode();
+  if (mode == LDAPGroupMapperMode.IMPORT && isCreate) {
+    List<LDAPObject> ldapGroups=getLDAPGroupMappings(ldapUser);
+    for (    LDAPObject ldapGroup : ldapGroups) {
+      GroupModel kcGroup=findKcGroupOrSyncFromLDAP(ldapGroup,user);
+      if (kcGroup != null) {
+        logger.debugf("User '%s' joins group '%s' during import from LDAP",user.getUsername(),kcGroup.getName());
+        user.joinGroup(kcGroup);
+      }
+    }
+  }
+}

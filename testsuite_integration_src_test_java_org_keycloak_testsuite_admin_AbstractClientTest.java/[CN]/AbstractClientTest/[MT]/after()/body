@@ -1,12 +1,8 @@
 {
-  keycloak.close();
-  keycloakRule.configure(new KeycloakRule.KeycloakSetup(){
-    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
-      RealmModel realm=manager.getRealmByName(REALM_NAME);
-      if (realm != null) {
-        manager.removeRealm(realm);
-      }
+  for (  RealmRepresentation r : keycloak.realms().findAll()) {
+    if (r.getRealm().equals(REALM_NAME)) {
+      keycloak.realm(REALM_NAME).remove();
     }
   }
-);
+  keycloak.close();
 }

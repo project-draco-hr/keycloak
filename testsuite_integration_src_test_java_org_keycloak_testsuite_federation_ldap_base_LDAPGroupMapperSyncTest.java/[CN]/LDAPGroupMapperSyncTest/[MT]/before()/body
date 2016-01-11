@@ -1,0 +1,13 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    List<GroupModel> kcGroups=realm.getTopLevelGroups();
+    for (    GroupModel kcGroup : kcGroups) {
+      realm.removeGroup(kcGroup);
+    }
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+}

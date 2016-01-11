@@ -1,7 +1,9 @@
 {
   if (context.getHttpRequest().getDecodedFormParameters().containsKey("cancel")) {
+    context.getUser().removeAttribute(USER_ATTRIBUTE);
     context.failure();
     return;
   }
+  context.getUser().setAttribute(USER_ATTRIBUTE,Arrays.asList(Integer.toString(Time.currentTime())));
   context.success();
 }

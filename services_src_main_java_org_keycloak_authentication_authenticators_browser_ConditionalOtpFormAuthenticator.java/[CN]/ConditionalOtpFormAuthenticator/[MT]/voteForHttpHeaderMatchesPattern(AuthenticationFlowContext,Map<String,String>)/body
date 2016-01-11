@@ -1,0 +1,13 @@
+{
+  if (!config.containsKey(FORCE_OTP_FOR_HTTP_HEADER) && !config.containsKey(NO_OTP_REQUIRED_FOR_HTTP_HEADER)) {
+    return ABSTAIN;
+  }
+  MultivaluedMap<String,String> requestHeaders=context.getHttpRequest().getHttpHeaders().getRequestHeaders();
+  if (containsMatchingRequestHeader(requestHeaders,config.get(NO_OTP_REQUIRED_FOR_HTTP_HEADER))) {
+    return SKIP_OTP;
+  }
+  if (containsMatchingRequestHeader(requestHeaders,config.get(FORCE_OTP_FOR_HTTP_HEADER))) {
+    return SHOW_OTP;
+  }
+  return ABSTAIN;
+}

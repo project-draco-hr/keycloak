@@ -1,0 +1,8 @@
+{
+  UserModel userModel=session.users().getUserByUsername(user.getUsername(),realm);
+  if (userModel == null) {
+    userModel=session.users().getUserByEmail(user.getEmail(),realm);
+  }
+  boolean success=new UserManager(session).removeUser(realm,userModel);
+  if (!success)   throw new RuntimeException("Unable to overwrite user " + getName(user));
+}

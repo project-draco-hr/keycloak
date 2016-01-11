@@ -1,0 +1,25 @@
+{
+  Map<String,List<RoleRepresentation>> repList=getRepList(partialImportRep);
+  if (repList == null || repList.isEmpty())   return;
+  for (  String clientId : repList.keySet()) {
+    if (!clientExists(partialImportRep,realm,clientId)) {
+      throw noClientFound(clientId);
+    }
+    toOverwrite.put(clientId,new HashSet<RoleRepresentation>());
+    toSkip.put(clientId,new HashSet<RoleRepresentation>());
+    for (    RoleRepresentation roleRep : repList.get(clientId)) {
+      if (exists(realm,session,clientId,roleRep)) {
+switch (partialImportRep.getPolicy()) {
+case SKIP:
+          toSkip.get(clientId).add(roleRep);
+        break;
+case OVERWRITE:
+      toOverwrite.get(clientId).add(roleRep);
+    break;
+default :
+  throw exists(existsMessage(clientId,roleRep));
+}
+}
+}
+}
+}

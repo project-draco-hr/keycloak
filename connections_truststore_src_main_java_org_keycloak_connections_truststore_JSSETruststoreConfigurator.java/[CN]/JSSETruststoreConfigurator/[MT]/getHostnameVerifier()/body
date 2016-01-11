@@ -1,0 +1,21 @@
+{
+  if (provider == null) {
+    return null;
+  }
+  HostnameVerificationPolicy policy=provider.getPolicy();
+switch (policy) {
+case ANY:
+    return new HostnameVerifier(){
+      @Override public boolean verify(      String s,      SSLSession sslSession){
+        return true;
+      }
+    }
+;
+case WILDCARD:
+  return new BrowserCompatHostnameVerifier();
+case STRICT:
+return new StrictHostnameVerifier();
+default :
+throw new IllegalStateException("Unknown policy: " + policy.name());
+}
+}

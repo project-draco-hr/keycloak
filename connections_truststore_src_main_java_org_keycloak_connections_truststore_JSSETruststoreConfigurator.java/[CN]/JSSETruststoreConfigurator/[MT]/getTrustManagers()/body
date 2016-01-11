@@ -1,0 +1,21 @@
+{
+  if (provider == null) {
+    return null;
+  }
+  if (tm == null) {
+synchronized (this) {
+      if (tm == null) {
+        TrustManagerFactory tmf=null;
+        try {
+          tmf=TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+          tmf.init(provider.getTruststore());
+          tm=tmf.getTrustManagers();
+        }
+ catch (        Exception e) {
+          throw new RuntimeException("Failed to initialize TrustManager: ",e);
+        }
+      }
+    }
+  }
+  return tm;
+}

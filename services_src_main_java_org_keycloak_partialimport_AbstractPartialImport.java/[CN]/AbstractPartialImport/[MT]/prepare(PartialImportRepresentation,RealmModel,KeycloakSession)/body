@@ -1,0 +1,18 @@
+{
+  List<T> repList=getRepList(partialImportRep);
+  if ((repList == null) || repList.isEmpty())   return;
+  for (  T resourceRep : getRepList(partialImportRep)) {
+    if (exists(realm,session,resourceRep)) {
+switch (partialImportRep.getPolicy()) {
+case SKIP:
+        toSkip.add(resourceRep);
+      break;
+case OVERWRITE:
+    toOverwrite.add(resourceRep);
+  break;
+default :
+throw existsError(existsMessage(resourceRep));
+}
+}
+}
+}

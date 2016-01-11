@@ -1,0 +1,12 @@
+{
+  if (!rep.hasClientRoles())   return;
+  Map<String,List<RoleRepresentation>> repList=clientRolesPI.getRepList(rep);
+  for (  String clientId : repList.keySet()) {
+    for (    RoleRepresentation roleRep : repList.get(clientId)) {
+      if (clientRolesToOverwrite.get(clientId).contains(roleRep))       continue;
+      if (clientRolesToSkip.get(clientId).contains(roleRep))       continue;
+      String modelId=clientRolesPI.getModelId(realm,clientId);
+      results.addResult(clientRolesPI.added(clientId,modelId,roleRep));
+    }
+  }
+}

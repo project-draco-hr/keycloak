@@ -1,0 +1,40 @@
+{
+  if (realmRoles == null)   return;
+  if (realmRoles.getRealm() != null) {
+    for (    RoleRepresentation roleRep : realmRoles.getRealm()) {
+      createRole(realm,roleRep);
+    }
+  }
+  if (realmRoles.getClient() != null) {
+    for (    Map.Entry<String,List<RoleRepresentation>> entry : realmRoles.getClient().entrySet()) {
+      ClientModel client=realm.getClientByClientId(entry.getKey());
+      if (client == null) {
+        throw new RuntimeException("App doesn't exist in role definitions: " + entry.getKey());
+      }
+      for (      RoleRepresentation roleRep : entry.getValue()) {
+        RoleModel role=roleRep.getId() != null ? client.addRole(roleRep.getId(),roleRep.getName()) : client.addRole(roleRep.getName());
+        role.setDescription(roleRep.getDescription());
+        boolean scopeParamRequired=roleRep.isScopeParamRequired() == null ? false : roleRep.isScopeParamRequired();
+        role.setScopeParamRequired(scopeParamRequired);
+      }
+    }
+  }
+  if (realmRoles.getRealm() != null) {
+    for (    RoleRepresentation roleRep : realmRoles.getRealm()) {
+      RoleModel role=realm.getRole(roleRep.getName());
+      addComposites(role,roleRep,realm);
+    }
+  }
+  if (realmRoles.getClient() != null) {
+    for (    Map.Entry<String,List<RoleRepresentation>> entry : realmRoles.getClient().entrySet()) {
+      ClientModel client=realm.getClientByClientId(entry.getKey());
+      if (client == null) {
+        throw new RuntimeException("App doesn't exist in role definitions: " + entry.getKey());
+      }
+      for (      RoleRepresentation roleRep : entry.getValue()) {
+        RoleModel role=client.getRole(roleRep.getName());
+        addComposites(role,roleRep,realm);
+      }
+    }
+  }
+}

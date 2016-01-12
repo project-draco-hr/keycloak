@@ -1,0 +1,15 @@
+{
+  try {
+    ClientModel client=AuthorizeClientUtil.authorizeClient(session,event).getClient();
+    this.event.client(client);
+    if (client == null || client.isPublicClient()) {
+      throw throwErrorResponseException(Errors.INVALID_REQUEST,"Client not allowed.",Status.FORBIDDEN);
+    }
+  }
+ catch (  ErrorResponseException ere) {
+    throw ere;
+  }
+catch (  Exception e) {
+    throw throwErrorResponseException(Errors.INVALID_REQUEST,"Authentication failed.",Status.UNAUTHORIZED);
+  }
+}

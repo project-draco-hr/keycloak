@@ -1,19 +1,5 @@
 {
-  JWSInput input=null;
-  try {
-    input=new JWSInput(tokenString);
-  }
- catch (  JWSInputException e) {
-    throw new VerificationException("Couldn't parse token",e);
-  }
-  if (!isPublicKeyValid(input,realmKey))   throw new VerificationException("Invalid token signature.");
-  AccessToken token;
-  try {
-    token=input.readJsonContent(AccessToken.class);
-  }
- catch (  JWSInputException e) {
-    throw new VerificationException("Couldn't parse token signature",e);
-  }
+  AccessToken token=toAccessToken(tokenString,realmKey);
   String user=token.getSubject();
   if (user == null) {
     throw new VerificationException("Token user was null.");

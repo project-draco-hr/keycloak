@@ -1,0 +1,10 @@
+{
+  if (isEmpty(clientRolesToSkip))   return;
+  for (  String clientId : clientRolesToSkip.keySet()) {
+    for (    RoleRepresentation roleRep : clientRolesToSkip.get(clientId)) {
+      rep.getRoles().getClient().get(clientId).remove(roleRep);
+      String modelId=clientRolesPI.getModelId(realm,clientId);
+      results.addResult(clientRolesPI.skipped(clientId,modelId,roleRep));
+    }
+  }
+}

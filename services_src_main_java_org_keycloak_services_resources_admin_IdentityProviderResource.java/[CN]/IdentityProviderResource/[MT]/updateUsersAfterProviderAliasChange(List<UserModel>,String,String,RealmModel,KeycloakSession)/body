@@ -1,0 +1,10 @@
+{
+  for (  UserModel user : users) {
+    FederatedIdentityModel federatedIdentity=session.users().getFederatedIdentity(user,oldProviderId,realm);
+    if (federatedIdentity != null) {
+      session.users().removeFederatedIdentity(realm,user,oldProviderId);
+      FederatedIdentityModel newFederatedIdentity=new FederatedIdentityModel(newProviderId,federatedIdentity.getUserId(),federatedIdentity.getUserName(),federatedIdentity.getToken());
+      session.users().addFederatedIdentity(realm,user,newFederatedIdentity);
+    }
+  }
+}

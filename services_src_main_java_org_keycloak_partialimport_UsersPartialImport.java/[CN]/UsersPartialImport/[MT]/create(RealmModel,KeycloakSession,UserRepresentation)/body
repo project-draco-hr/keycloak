@@ -1,0 +1,7 @@
+{
+  Map<String,ClientModel> apps=realm.getClientNameMap();
+  user.setId(KeycloakModelUtils.generateId());
+  UserModel userModel=RepresentationToModel.createUser(session,realm,user,apps);
+  if (userModel == null)   throw new RuntimeException("Unable to create user " + getName(user));
+  createdIds.put(getName(user),userModel.getId());
+}

@@ -1,11 +1,7 @@
 {
   auth.requireManage();
   try {
-    if (TRUE.equals(rep.isServiceAccountsEnabled()) && !client.isServiceAccountsEnabled()) {
-      new ClientManager(new RealmManager(session)).enableServiceAccount(client);
-      ;
-    }
-    RepresentationToModel.updateClient(rep,client);
+    updateClientFromRep(rep,client,session);
     adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();
     return Response.noContent().build();
   }

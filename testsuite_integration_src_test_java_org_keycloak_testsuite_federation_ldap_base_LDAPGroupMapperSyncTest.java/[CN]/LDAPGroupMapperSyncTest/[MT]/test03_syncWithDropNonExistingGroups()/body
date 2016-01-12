@@ -24,7 +24,7 @@
     realm.updateUserFederationMapper(mapperModel);
     syncResult=new GroupLDAPFederationMapperFactory().create(session).syncDataFromFederationProviderToKeycloak(mapperModel,ldapProvider,session,realm);
     Assert.assertEquals(3,syncResult.getUpdated());
-    Assert.assertTrue(syncResult.getRemoved() >= 2);
+    Assert.assertTrue(syncResult.getRemoved() == 2);
     Assert.assertNotNull(KeycloakModelUtils.findGroupByPath(realm,"/group1/group11"));
     Assert.assertNotNull(KeycloakModelUtils.findGroupByPath(realm,"/group1/group12"));
     Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/model1"));

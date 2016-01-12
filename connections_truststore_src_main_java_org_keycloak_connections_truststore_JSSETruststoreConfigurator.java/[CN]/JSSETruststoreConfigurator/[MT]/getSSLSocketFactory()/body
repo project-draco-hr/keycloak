@@ -1,0 +1,20 @@
+{
+  if (provider == null) {
+    return null;
+  }
+  if (sslFactory == null) {
+synchronized (this) {
+      if (sslFactory == null) {
+        try {
+          SSLContext sslctx=SSLContext.getInstance("TLS");
+          sslctx.init(null,getTrustManagers(),null);
+          sslFactory=sslctx.getSocketFactory();
+        }
+ catch (        Exception e) {
+          throw new RuntimeException("Failed to initialize SSLContext: ",e);
+        }
+      }
+    }
+  }
+  return sslFactory;
+}

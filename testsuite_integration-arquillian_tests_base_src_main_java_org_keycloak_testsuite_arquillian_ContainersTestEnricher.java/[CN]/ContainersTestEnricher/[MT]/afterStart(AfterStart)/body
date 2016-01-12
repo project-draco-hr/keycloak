@@ -1,27 +1,33 @@
 {
   Container container=containers.pollFirst();
-  String jbossHomePath=null;
   if (isJBossBased(container)) {
     jbossHomePath=container.getContainerConfiguration().getContainerProperties().get("jbossHome");
     log.debug("jbossHome: " + jbossHomePath + "\n");
-    if (System.getProperty("check.server.log","true").equals("true")) {
-      checkServerLog(jbossHomePath);
-    }
   }
+  checkServerLog(jbossHomePath);
   if (migrationTests && !alreadyStopped) {
     log.info("\n\n### Stopping keycloak " + System.getProperty("version","- previous") + " ###\n");
     stopSuiteContainers.fire(new StopSuiteContainers());
     log.info("\n\n### Starting keycloak current version ###\n");
     alreadyStopped=true;
   }
-  if (isJBossBased(container) && container.getName().startsWith("app-server")) {
-    log.info("Installing adapter to app server via cli script");
+  if (!alreadyInstalled && !skipInstallAdapters && isJBossBased(container)) {
     String jbossCliPath=jbossHomePath + "/bin/jboss-cli.sh";
-    String scriptPathArg="--file=" + jbossHomePath + "/bin/adapter-install.cli";
+    String adapterScriptPathArg="--file=" + jbossHomePath + "/bin/adapter-install.cli";
+    String samlAdapterScriptPathArg="--file=" + jbossHomePath + "/bin/adapter-install-saml.cli";
     String managementPort=container.getContainerConfiguration().getContainerProperties().get("managementPort");
     String controllerArg="--controller=localhost:" + managementPort;
-    execCommand(new String[]{"/bin/sh",jbossCliPath,"--connect",scriptPathArg,controllerArg});
-    log.debug("Restarting container");
+    log.info("Installing adapter to app server via cli script");
+    execCommand(new String[]{"/bin/sh",jbossCliPath,"--connect",adapterScriptPathArg,controllerArg});
+    log.info("Installing saml adapter to app server via cli script");
+    execCommand(new String[]{"/bin/sh",jbossCliPath,"--connect",samlAdapterScriptPathArg,controllerArg});
+    log.info("Restarting container");
     execCommand(new String[]{"/bin/sh",jbossCliPath,"--connect","--command=:reload",controllerArg});
+    pause(5000);
+    log.info("Container restarted");
+    checkServerLog(jbossHomePath);
+    if (container.getName().startsWith("app-server")) {
+      alreadyInstalled=true;
+    }
   }
 }

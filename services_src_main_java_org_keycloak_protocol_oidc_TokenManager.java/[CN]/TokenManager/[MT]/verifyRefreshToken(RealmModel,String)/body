@@ -1,11 +1,6 @@
 {
   try {
-    JWSInput jws=new JWSInput(encodedRefreshToken);
-    RefreshToken refreshToken=null;
-    if (!RSAProvider.verify(jws,realm.getPublicKey())) {
-      throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid refresh token");
-    }
-    refreshToken=jws.readJsonContent(RefreshToken.class);
+    RefreshToken refreshToken=toRefreshToken(realm,encodedRefreshToken);
     if (refreshToken.getExpiration() != 0 && refreshToken.isExpired()) {
       throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Refresh token expired");
     }

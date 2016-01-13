@@ -1,13 +1,6 @@
 {
   if (!event.isPre()) {
-    CachedUser user;
-    if (isNewInfinispan) {
-      user=event.getValue();
-    }
- else {
-      String userId=event.getKey();
-      user=event.getCache().get(userId);
-    }
+    CachedUser user=event.getValue();
     if (user != null) {
       String realm=user.getRealm();
       usernameLookup.put(realm,user.getUsername(),user.getId());

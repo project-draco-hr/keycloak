@@ -1,0 +1,16 @@
+{
+  if (headerPattern == null) {
+    return false;
+  }
+  Pattern pattern=Pattern.compile(headerPattern,Pattern.DOTALL);
+  for (  Map.Entry<String,List<String>> entry : requestHeaders.entrySet()) {
+    String key=entry.getKey();
+    for (    String value : entry.getValue()) {
+      String headerEntry=key.trim() + ": " + value.trim();
+      if (pattern.matcher(headerEntry).matches()) {
+        return true;
+      }
+    }
+  }
+  return false;
+}

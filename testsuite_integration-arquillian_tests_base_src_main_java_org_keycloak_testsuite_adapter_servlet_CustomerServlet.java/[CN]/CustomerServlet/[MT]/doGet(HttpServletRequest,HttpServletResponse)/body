@@ -8,21 +8,18 @@
     return;
   }
   KeycloakSecurityContext context=(KeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
-  Client client=ClientBuilder.newClient();
-  try {
-    String appBase=System.getProperty("app.server.base.url","http://localhost:8280");
-    WebTarget target=client.target(appBase + "/customer-db/");
-    Response response=target.request().get();
-    if (response.getStatus() != 401) {
-      throw new AssertionError("Response status code is not 401.");
-    }
-    response.close();
-    String html=target.request().header(HttpHeaders.AUTHORIZATION,"Bearer " + context.getTokenString()).get(String.class);
-    resp.setContentType("text/html");
-    pw.println(html);
-    pw.flush();
+  StringBuilder result=new StringBuilder();
+  URL url=new URL(System.getProperty("app.server.base.url","http://localhost:8280") + "/customer-db/");
+  HttpURLConnection conn=(HttpURLConnection)url.openConnection();
+  conn.setRequestMethod("GET");
+  conn.setRequestProperty(HttpHeaders.AUTHORIZATION,"Bearer " + context.getTokenString());
+  BufferedReader rd=new BufferedReader(new InputStreamReader(conn.getInputStream()));
+  String line;
+  while ((line=rd.readLine()) != null) {
+    result.append(line);
   }
-  finally {
-    client.close();
-  }
+  rd.close();
+  resp.setContentType("text/html");
+  pw.println(result.toString());
+  pw.flush();
 }

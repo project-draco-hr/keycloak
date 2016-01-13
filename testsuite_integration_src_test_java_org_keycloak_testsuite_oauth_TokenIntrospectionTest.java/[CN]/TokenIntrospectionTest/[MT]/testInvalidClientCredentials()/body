@@ -1,0 +1,8 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  AccessTokenResponse accessTokenResponse=oauth.doAccessTokenRequest(code,"password");
+  String tokenResponse=oauth.introspectAccessTokenWithClientCredential("confidential-cli","bad_credential",accessTokenResponse.getAccessToken());
+  assertEquals("{\"error_description\":\"Authentication failed.\",\"error\":\"invalid_request\"}",tokenResponse);
+  events.clear();
+}

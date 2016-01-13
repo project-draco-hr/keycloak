@@ -1,4 +1,10 @@
 {
   attachSession();
-  return redirectToRequiredActions(realm,clientSession,uriInfo);
+  if (isActionRequired()) {
+    return redirectToRequiredActions(realm,clientSession,uriInfo);
+  }
+ else {
+    event.detail(Details.CODE_ID,clientSession.getId());
+    return AuthenticationManager.finishedRequiredActions(session,userSession,clientSession,connection,request,uriInfo,event);
+  }
 }

@@ -7,11 +7,13 @@
   response.close();
   response=client.target(basicAuthExample.setTemplateValues("invalid-user","password",value).buildUri()).request().get();
   assertEquals(401,response.getStatus());
-  assertTrue(response.readEntity(String.class).contains("Unauthorized"));
+  String readResponse=response.readEntity(String.class);
+  assertTrue(readResponse.contains("Unauthorized") || readResponse.contains("Status 401"));
   response.close();
   response=client.target(basicAuthExample.setTemplateValues("admin","invalid-password",value).buildUri()).request().get();
   assertEquals(401,response.getStatus());
-  assertTrue(response.readEntity(String.class).contains("Unauthorized"));
+  readResponse=response.readEntity(String.class);
+  assertTrue(readResponse.contains("Unauthorized") || readResponse.contains("Status 401"));
   response.close();
   client.close();
 }

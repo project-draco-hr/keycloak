@@ -1,6 +1,4 @@
 {
-  clientsPage.navigateTo();
-  loginPage.form().login(adminUser);
   ClientResource clientResource=ApiUtil.findClientResourceByClientId(testRealmResource(),"customer-portal");
   ClientRepresentation client=clientResource.toRepresentation();
   client.setConsentRequired(true);
@@ -22,6 +20,7 @@
   customerPortalExamplePage.customerSession();
   assertTrue(oAuthGrantPage.isCurrent());
   loginEventsPage.navigateTo();
+  loginPage.form().login(adminUser);
   loginEventsPage.table().filter();
   loginEventsPage.table().filterForm().addEventType("REVOKE_GRANT");
   loginEventsPage.table().update();

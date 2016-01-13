@@ -1,0 +1,30 @@
+{
+  CloseableHttpClient client=new DefaultHttpClient();
+  try {
+    HttpPost post=new HttpPost(getTokenIntrospectionUrl());
+    String authorization=BasicAuthHelper.createHeader(clientId,clientSecret);
+    post.setHeader("Authorization",authorization);
+    List<NameValuePair> parameters=new LinkedList<>();
+    parameters.add(new BasicNameValuePair("token",tokenToIntrospect));
+    parameters.add(new BasicNameValuePair("token_type_hint",tokenType));
+    UrlEncodedFormEntity formEntity;
+    try {
+      formEntity=new UrlEncodedFormEntity(parameters,"UTF-8");
+    }
+ catch (    UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    post.setEntity(formEntity);
+    try {
+      ByteArrayOutputStream out=new ByteArrayOutputStream();
+      client.execute(post).getEntity().writeTo(out);
+      return new String(out.toByteArray());
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to retrieve access token",e);
+    }
+  }
+  finally {
+    closeClient(client);
+  }
+}

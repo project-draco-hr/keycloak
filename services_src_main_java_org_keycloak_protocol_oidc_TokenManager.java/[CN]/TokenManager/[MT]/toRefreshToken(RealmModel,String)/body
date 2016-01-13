@@ -1,0 +1,7 @@
+{
+  JWSInput jws=new JWSInput(encodedRefreshToken);
+  if (!RSAProvider.verify(jws,realm.getPublicKey())) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid refresh token");
+  }
+  return jws.readJsonContent(RefreshToken.class);
+}

@@ -1,0 +1,33 @@
+{
+  event.event(EventType.INTROSPECT_TOKEN);
+  checkSsl();
+  checkRealm();
+  authorizeClient();
+  MultivaluedMap<String,String> formParams=request.getDecodedFormParameters();
+  String tokenTypeHint=formParams.getFirst(PARAM_TOKEN_TYPE_HINT);
+  if (tokenTypeHint == null) {
+    tokenTypeHint=TOKEN_TYPE_ACCESS_TOKEN;
+  }
+  String token=formParams.getFirst(PARAM_TOKEN);
+  if (token == null) {
+    throw throwErrorResponseException(Errors.INVALID_REQUEST,"Token not provided.",Status.BAD_REQUEST);
+  }
+  try {
+    AccessToken toIntrospect=toAccessToken(tokenTypeHint,token);
+    ObjectNode tokenMetadata;
+    if (toIntrospect.isActive()) {
+      tokenMetadata=JsonSerialization.createObjectNode(toIntrospect);
+      tokenMetadata.put("client_id",toIntrospect.getIssuedFor());
+      tokenMetadata.put("username",toIntrospect.getPreferredUsername());
+    }
+ else {
+      tokenMetadata=JsonSerialization.createObjectNode();
+    }
+    tokenMetadata.put("active",toIntrospect.isActive());
+    this.event.success();
+    return Response.ok(JsonSerialization.writeValueAsBytes(tokenMetadata)).build();
+  }
+ catch (  Exception e) {
+    throw throwErrorResponseException(Errors.INVALID_REQUEST,"Failed to introspect token.",Status.BAD_REQUEST);
+  }
+}

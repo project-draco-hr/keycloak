@@ -1,0 +1,13 @@
+{
+  if (pojo == null) {
+    throw new IllegalArgumentException("Pojo can not be null.");
+  }
+  ObjectNode objectNode=createObjectNode();
+  JsonParser jsonParser=mapper.getJsonFactory().createJsonParser(writeValueAsBytes(pojo));
+  JsonNode jsonNode=jsonParser.readValueAsTree();
+  if (!jsonNode.isObject()) {
+    throw new RuntimeException("JsonNode [" + jsonNode + "] is not a object.");
+  }
+  objectNode.putAll((ObjectNode)jsonNode);
+  return objectNode;
+}

@@ -1,0 +1,30 @@
+{
+  final RealmModel realm=clientSession.getRealm();
+  final UserModel user=userSession.getUser();
+  final ClientModel client=clientSession.getClient();
+  evaluateRequiredActionTriggers(session,userSession,clientSession,clientConnection,request,uriInfo,event,realm,user);
+  if (!user.getRequiredActions().isEmpty() || !clientSession.getRequiredActions().isEmpty())   return true;
+  if (client.isConsentRequired()) {
+    UserConsentModel grantedConsent=user.getConsentByClient(client.getId());
+    ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
+    for (    RoleModel r : accessCode.getRequestedRoles()) {
+      if (grantedConsent != null && grantedConsent.isRoleGranted(r)) {
+        continue;
+      }
+      return true;
+    }
+    for (    ProtocolMapperModel protocolMapper : accessCode.getRequestedProtocolMappers()) {
+      if (protocolMapper.isConsentRequired() && protocolMapper.getConsentText() != null) {
+        if (grantedConsent == null || !grantedConsent.isProtocolMapperGranted(protocolMapper)) {
+          return true;
+        }
+      }
+    }
+    String consentDetail=(grantedConsent != null) ? Details.CONSENT_VALUE_PERSISTED_CONSENT : Details.CONSENT_VALUE_NO_CONSENT_REQUIRED;
+    event.detail(Details.CONSENT,consentDetail);
+  }
+ else {
+    event.detail(Details.CONSENT,Details.CONSENT_VALUE_NO_CONSENT_REQUIRED);
+  }
+  return false;
+}

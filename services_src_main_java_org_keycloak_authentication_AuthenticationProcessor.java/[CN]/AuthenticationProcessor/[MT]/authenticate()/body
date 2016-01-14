@@ -1,18 +1,6 @@
 {
-  checkClientSession();
   logger.debug("AUTHENTICATE");
-  event.client(clientSession.getClient().getClientId()).detail(Details.REDIRECT_URI,clientSession.getRedirectUri()).detail(Details.AUTH_METHOD,clientSession.getAuthMethod());
-  String authType=clientSession.getNote(Details.AUTH_TYPE);
-  if (authType != null) {
-    event.detail(Details.AUTH_TYPE,authType);
-  }
-  UserModel authUser=clientSession.getAuthenticatedUser();
-  validateUser(authUser);
-  AuthenticationFlow authenticationFlow=createFlowExecution(this.flowId,null);
-  Response challenge=authenticationFlow.processFlow();
+  Response challenge=authenticateOnly();
   if (challenge != null)   return challenge;
-  if (clientSession.getAuthenticatedUser() == null) {
-    throw new AuthenticationFlowException(AuthenticationFlowError.UNKNOWN_USER);
-  }
   return authenticationComplete();
 }

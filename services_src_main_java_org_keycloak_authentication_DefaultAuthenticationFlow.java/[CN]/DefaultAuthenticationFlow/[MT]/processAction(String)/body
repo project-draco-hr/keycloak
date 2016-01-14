@@ -23,12 +23,8 @@
       authenticator.action(result);
       Response response=processResult(result);
       if (response == null) {
-        if (result.status == SUCCESS && processor.isBrowserFlow()) {
-          return processor.createSuccessRedirect();
-        }
- else {
-          return processFlow();
-        }
+        processor.getClientSession().removeNote(AuthenticationProcessor.CURRENT_AUTHENTICATION_EXECUTION);
+        return processFlow();
       }
  else       return response;
     }

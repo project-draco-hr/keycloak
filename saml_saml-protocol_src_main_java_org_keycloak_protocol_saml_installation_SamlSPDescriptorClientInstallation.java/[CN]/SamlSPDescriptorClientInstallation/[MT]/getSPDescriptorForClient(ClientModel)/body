@@ -1,0 +1,10 @@
+{
+  SamlClient samlClient=new SamlClient(client);
+  String assertionUrl=client.getAttribute(SamlProtocol.SAML_ASSERTION_CONSUMER_URL_POST_ATTRIBUTE);
+  if (assertionUrl == null)   assertionUrl=client.getManagementUrl();
+  String logoutUrl=client.getAttribute(SamlProtocol.SAML_SINGLE_LOGOUT_SERVICE_URL_POST_ATTRIBUTE);
+  if (logoutUrl == null)   logoutUrl=client.getManagementUrl();
+  String nameIdFormat=samlClient.getNameIDFormat();
+  if (nameIdFormat == null)   nameIdFormat=SamlProtocol.SAML_DEFAULT_NAMEID_FORMAT;
+  return SPMetadataDescriptor.getSPDescriptor(JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get(),assertionUrl,logoutUrl,samlClient.requiresClientSignature(),client.getClientId(),nameIdFormat,samlClient.getClientSigningCertificate());
+}

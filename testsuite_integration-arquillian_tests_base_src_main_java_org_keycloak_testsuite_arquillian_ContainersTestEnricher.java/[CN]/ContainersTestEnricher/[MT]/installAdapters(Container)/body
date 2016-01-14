@@ -1,0 +1,21 @@
+{
+  if (!alreadyInstalled && !skipInstallAdapters && isJBossBased(container)) {
+    String jbossCliPath=jbossHomePath + "/bin/jboss-cli.sh";
+    String adapterScriptPathArg="--file=" + jbossHomePath + "/bin/adapter-install.cli";
+    String samlAdapterScriptPathArg="--file=" + jbossHomePath + "/bin/adapter-install-saml.cli";
+    String managementPort=container.getContainerConfiguration().getContainerProperties().get("managementPort");
+    String controllerArg="--controller=localhost:" + managementPort;
+    log.info("Installing adapter to app server via cli script");
+    execCommand(new String[]{"/bin/sh",jbossCliPath,"--connect",adapterScriptPathArg,controllerArg});
+    log.info("Installing saml adapter to app server via cli script");
+    execCommand(new String[]{"/bin/sh",jbossCliPath,"--connect",samlAdapterScriptPathArg,controllerArg});
+    log.info("Restarting container");
+    execCommand(new String[]{"/bin/sh",jbossCliPath,"--connect","--command=:reload",controllerArg});
+    pause(5000);
+    log.info("Container restarted");
+    checkServerLog(jbossHomePath);
+    if (container.getName().startsWith("app-server")) {
+      alreadyInstalled=true;
+    }
+  }
+}

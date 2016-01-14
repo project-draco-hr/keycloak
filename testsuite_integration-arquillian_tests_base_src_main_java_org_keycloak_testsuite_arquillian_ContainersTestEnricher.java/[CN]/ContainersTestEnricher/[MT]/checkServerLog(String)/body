@@ -1,0 +1,11 @@
+{
+  if (jbossHomePath != null && System.getProperty("check.server.log","true").equals("true")) {
+    File serverLog=new File(jbossHomePath + "/standalone/log/server.log");
+    String serverLogContent=FileUtils.readFileToString(serverLog);
+    boolean containsError=serverLogContent.contains("ERROR") || serverLogContent.contains("SEVERE") || serverLogContent.contains("Exception ");
+    if (containsError) {
+      throw new RuntimeException(serverLog.getPath() + " contains ERROR.");
+    }
+    log.info(serverLog.getPath() + " doesn't contain Error");
+  }
+}

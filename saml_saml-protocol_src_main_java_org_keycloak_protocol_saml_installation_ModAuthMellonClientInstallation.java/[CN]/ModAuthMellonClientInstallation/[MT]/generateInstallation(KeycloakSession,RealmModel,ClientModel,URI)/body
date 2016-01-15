@@ -1,0 +1,34 @@
+{
+  SamlClient samlClient=new SamlClient(client);
+  ByteArrayOutputStream baos=new ByteArrayOutputStream();
+  ZipOutputStream zip=new ZipOutputStream(baos);
+  String idpDescriptor=SamlIDPDescriptorClientInstallation.getIDPDescriptorForClient(realm,client,serverBaseUri);
+  String spDescriptor=SamlSPDescriptorClientInstallation.getSPDescriptorForClient(client);
+  String clientDirName=client.getClientId().replace('/','_').replace(' ','_');
+  try {
+    zip.putNextEntry(new ZipEntry(clientDirName + "/idp-metadata.xml"));
+    zip.write(idpDescriptor.getBytes());
+    zip.closeEntry();
+    zip.putNextEntry(new ZipEntry(clientDirName + "/sp-metadata.xml"));
+    zip.write(spDescriptor.getBytes());
+    zip.closeEntry();
+    if (samlClient.requiresClientSignature()) {
+      if (samlClient.getClientSigningPrivateKey() != null) {
+        zip.putNextEntry(new ZipEntry(clientDirName + "/client-private-key.pem"));
+        zip.write(samlClient.getClientSigningPrivateKey().getBytes());
+        zip.closeEntry();
+      }
+      if (samlClient.getClientSigningCertificate() != null) {
+        zip.putNextEntry(new ZipEntry(clientDirName + "/client-cert.pem"));
+        zip.write(samlClient.getClientSigningCertificate().getBytes());
+        zip.closeEntry();
+      }
+    }
+    zip.close();
+    baos.close();
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+  return Response.ok(baos.toByteArray(),getMediaType()).build();
+}

@@ -5,21 +5,21 @@
     RealmManager manager=new RealmManager(session);
     manager.setContextPath(getContextPath());
     if (rep.getId() != null && manager.getRealm(rep.getId()) != null) {
-      log.info("Not importing realm " + rep.getRealm() + " from "+ from+ ".  It already exists.");
+      log.realmExists(rep.getRealm(),from);
       return;
     }
     if (manager.getRealmByName(rep.getRealm()) != null) {
-      log.info("Not importing realm " + rep.getRealm() + " from "+ from+ ".  It already exists.");
+      log.realmExists(rep.getRealm(),from);
       return;
     }
     try {
       RealmModel realm=manager.importRealm(rep);
       session.getTransaction().commit();
-      log.info("Imported realm " + realm.getName() + " from "+ from);
+      log.importedRealm(realm.getName(),from);
     }
  catch (    Throwable t) {
       session.getTransaction().rollback();
-      log.warn("Unable to import realm " + rep.getRealm() + " from "+ from+ ". Cause: "+ t.getMessage());
+      log.unableToImportRealm(t,rep.getRealm(),from);
     }
   }
   finally {

@@ -3,12 +3,7 @@
   this.contextPath=context.getContextPath();
   this.sessionFactory=createSessionFactory();
   dispatcher.getDefaultContextObjects().put(KeycloakApplication.class,this);
-  BruteForceProtector protector=new BruteForceProtector(sessionFactory);
-  dispatcher.getDefaultContextObjects().put(BruteForceProtector.class,protector);
-  ResteasyProviderFactory.pushContext(BruteForceProtector.class,protector);
   ResteasyProviderFactory.pushContext(KeycloakApplication.class,this);
-  protector.start();
-  context.setAttribute(BruteForceProtector.class.getName(),protector);
   context.setAttribute(KeycloakSessionFactory.class.getName(),this.sessionFactory);
   singletons.add(new ServerVersionResource());
   singletons.add(new RealmsResource());

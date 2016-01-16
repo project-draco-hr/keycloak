@@ -1,9 +1,8 @@
 {
   RealmModel realm=init(name);
   EventBuilder event=new EventBuilder(realm,session,clientConnection);
-  AuthenticationManager authManager=new AuthenticationManager(protector);
   LoginProtocolFactory factory=(LoginProtocolFactory)session.getKeycloakSessionFactory().getProviderFactory(LoginProtocol.class,protocol);
-  Object endpoint=factory.createProtocolEndpoint(realm,event,authManager);
+  Object endpoint=factory.createProtocolEndpoint(realm,event);
   ResteasyProviderFactory.getInstance().injectProperties(endpoint);
   return endpoint;
 }

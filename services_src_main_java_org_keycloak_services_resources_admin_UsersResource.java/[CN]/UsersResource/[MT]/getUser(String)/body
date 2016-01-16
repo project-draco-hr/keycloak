@@ -9,7 +9,7 @@
     List<FederatedIdentityRepresentation> reps=getFederatedIdentities(user);
     rep.setFederatedIdentities(reps);
   }
-  if ((protector != null) && protector.isTemporarilyDisabled(session,realm,rep.getUsername())) {
+  if (session.getProvider(BruteForceProtector.class).isTemporarilyDisabled(session,realm,rep.getUsername())) {
     rep.setEnabled(false);
   }
   return rep;

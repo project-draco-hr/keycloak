@@ -6,7 +6,7 @@
       throw new AuthenticationFlowException("Could not find ClientAuthenticatorFactory for: " + model.getAuthenticator(),AuthenticationFlowError.INTERNAL_ERROR);
     }
     ClientAuthenticator authenticator=factory.create();
-    AuthenticationProcessor.logger.debugv("client authenticator: {0}",factory.getId());
+    logger.debugv("client authenticator: {0}",factory.getId());
     AuthenticationProcessor.Result context=processor.createClientAuthenticatorContext(model,authenticator,executions);
     authenticator.authenticateClient(context);
     ClientModel client=processor.getClient();
@@ -14,7 +14,7 @@
       String expectedClientAuthType=client.getClientAuthenticatorType();
       if (expectedClientAuthType == null) {
         expectedClientAuthType=KeycloakModelUtils.getDefaultClientAuthenticatorType();
-        AuthenticationProcessor.logger.warnv("Client {0} doesn't have have authentication method configured. Fallback to {1}",client.getClientId(),expectedClientAuthType);
+        logger.authMethodFallback(client.getClientId(),expectedClientAuthType);
       }
       if (factory.getId().equals(expectedClientAuthType)) {
         Response response=processResult(context);
@@ -22,7 +22,7 @@
         if (!context.getStatus().equals(FlowStatus.SUCCESS)) {
           throw new AuthenticationFlowException("Expected success, but for an unknown reason the status was " + context.getStatus(),AuthenticationFlowError.INTERNAL_ERROR);
         }
-        AuthenticationProcessor.logger.debugv("Client {0} authenticated by {1}",client.getClientId(),factory.getId());
+        logger.debugv("Client {0} authenticated by {1}",client.getClientId(),factory.getId());
         processor.getEvent().detail(Details.CLIENT_AUTH_METHOD,factory.getId());
         return null;
       }

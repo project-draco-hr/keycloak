@@ -1,14 +1,11 @@
 {
   testRealmPage.setAuthRealm(EXAMPLE);
   testRealmLoginPage.setAuthRealm(EXAMPLE);
-  clientsPage.setConsoleRealm(EXAMPLE);
   configPage.setConsoleRealm(EXAMPLE);
   loginEventsPage.setConsoleRealm(EXAMPLE);
   applicationsPage.setAuthRealm(EXAMPLE);
   jsConsoleExamplePage.navigateTo();
   driver.manage().deleteAllCookies();
-  clientsPage.navigateTo();
-  loginPage.form().login("admin","admin");
   ClientResource clientResource=ApiUtil.findClientResourceByClientId(testRealmResource(),"js-console");
   ClientRepresentation client=clientResource.toRepresentation();
   client.setConsentRequired(true);
@@ -29,6 +26,7 @@
   jsConsoleExamplePage.logIn();
   assertTrue(oAuthGrantPage.isCurrent());
   loginEventsPage.navigateTo();
+  loginPage.form().login(adminUser);
   loginEventsPage.table().filter();
   loginEventsPage.table().filterForm().addEventType("REVOKE_GRANT");
   loginEventsPage.table().update();

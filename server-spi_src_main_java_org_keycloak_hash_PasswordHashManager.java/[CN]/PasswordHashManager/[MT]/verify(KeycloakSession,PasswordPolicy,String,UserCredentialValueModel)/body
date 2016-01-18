@@ -1,5 +1,9 @@
 {
   String algorithm=credential.getAlgorithm() != null ? credential.getAlgorithm() : passwordPolicy.getHashAlgorithm();
   PasswordHashProvider provider=session.getProvider(PasswordHashProvider.class,algorithm);
+  if (provider == null) {
+    log.warnv("Could not find hash provider {0} for password",algorithm);
+    return false;
+  }
   return provider.verify(password,credential);
 }

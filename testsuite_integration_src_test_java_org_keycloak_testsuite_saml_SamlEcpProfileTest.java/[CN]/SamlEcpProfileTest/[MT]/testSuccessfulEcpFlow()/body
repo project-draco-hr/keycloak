@@ -21,7 +21,7 @@
   String password="password";
   String pair=username + ":" + password;
   String authHeader="Basic " + new String(Base64.encodeBytes(pair.getBytes()));
-  Response authenticationResponse=ClientBuilder.newClient().target(singleSignOnService).request().header(HttpHeaders.AUTHORIZATION,authHeader).post(Entity.entity(DocumentUtil.asString(authenticationRequest),"application/soap+xml"));
+  Response authenticationResponse=ClientBuilder.newClient().target(singleSignOnService).request().header(HttpHeaders.AUTHORIZATION,authHeader).post(Entity.entity(DocumentUtil.asString(authenticationRequest),"text/xml"));
   assertEquals(OK.getStatusCode(),authenticationResponse.getStatus());
   SOAPMessage responseMessage=MessageFactory.newInstance().createMessage(null,new ByteArrayInputStream(authenticationResponse.readEntity(byte[].class)));
   printDocument(responseMessage.getSOAPPart().getContent(),System.out);

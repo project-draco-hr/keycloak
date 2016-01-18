@@ -11,7 +11,7 @@
     }
   }
  catch (  IllegalArgumentException iae) {
-    logger.error(iae.getMessage());
+    logger.error(iae);
     event.error(Errors.INVALID_REQUEST);
     throw new ErrorPageException(session,Messages.INVALID_PARAMETER,OIDCLoginProtocol.RESPONSE_TYPE_PARAM);
   }
@@ -19,7 +19,7 @@
     OIDCResponseMode parsedResponseMode=OIDCResponseMode.parse(responseMode,parsedResponseType);
     event.detail(Details.RESPONSE_MODE,parsedResponseMode.toString().toLowerCase());
     if (parsedResponseType.isImplicitOrHybridFlow() && parsedResponseMode == OIDCResponseMode.QUERY) {
-      logger.error("Response_mode 'query' not allowed for implicit or hybrid flow");
+      logger.responseModeQueryNotAllowed();
       event.error(Errors.INVALID_REQUEST);
       throw new ErrorPageException(session,Messages.INVALID_PARAMETER,OIDCLoginProtocol.RESPONSE_MODE_PARAM);
     }

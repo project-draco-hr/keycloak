@@ -3,7 +3,7 @@
   if (configDir != null) {
     File addUserFile=new File(configDir + File.separator + "keycloak-add-user.json");
     if (addUserFile.isFile()) {
-      log.imprtingUsersFrom(addUserFile);
+      logger.imprtingUsersFrom(addUserFile);
       List<RealmRepresentation> realms;
       try {
         realms=JsonSerialization.readValue(new FileInputStream(addUserFile),new TypeReference<List<RealmRepresentation>>(){
@@ -11,7 +11,7 @@
 );
       }
  catch (      IOException e) {
-        log.failedToLoadUsers(e);
+        logger.failedToLoadUsers(e);
         return;
       }
       for (      RealmRepresentation realmRep : realms) {
@@ -21,7 +21,7 @@
             session.getTransaction().begin();
             RealmModel realm=session.realms().getRealmByName(realmRep.getRealm());
             if (realm == null) {
-              log.addUserFailedRealmNotFound(userRep.getUsername(),realmRep.getRealm());
+              logger.addUserFailedRealmNotFound(userRep.getUsername(),realmRep.getRealm());
             }
  else {
               UserModel user=session.users().addUser(realm,userRep.getUsername());
@@ -30,14 +30,14 @@
               RepresentationToModel.createRoleMappings(userRep,user,realm);
             }
             session.getTransaction().commit();
-            log.addUserSuccess(userRep.getUsername(),realmRep.getRealm());
+            logger.addUserSuccess(userRep.getUsername(),realmRep.getRealm());
           }
  catch (          ModelDuplicateException e) {
-            log.addUserFailedUserExists(userRep.getUsername(),realmRep.getRealm());
+            logger.addUserFailedUserExists(userRep.getUsername(),realmRep.getRealm());
           }
 catch (          Throwable t) {
             session.getTransaction().rollback();
-            log.addUserFailed(t,userRep.getUsername(),realmRep.getRealm());
+            logger.addUserFailed(t,userRep.getUsername(),realmRep.getRealm());
           }
  finally {
             session.close();
@@ -45,7 +45,7 @@ catch (          Throwable t) {
         }
       }
       if (!addUserFile.delete()) {
-        log.failedToDeleteFile(addUserFile.getAbsolutePath());
+        logger.failedToDeleteFile(addUserFile.getAbsolutePath());
       }
     }
   }

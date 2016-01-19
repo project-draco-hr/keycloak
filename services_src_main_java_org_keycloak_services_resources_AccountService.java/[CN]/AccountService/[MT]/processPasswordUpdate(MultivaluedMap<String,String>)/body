@@ -37,12 +37,12 @@
     return account.setError(Messages.READ_ONLY_PASSWORD).createResponse(AccountPages.PASSWORD);
   }
 catch (  ModelException me) {
-    logger.error("Failed to update password",me);
+    logger.failedToUpdatePassword(me);
     setReferrerOnPage();
     return account.setError(me.getMessage(),me.getParameters()).createResponse(AccountPages.PASSWORD);
   }
 catch (  Exception ape) {
-    logger.error("Failed to update password",ape);
+    logger.failedToUpdatePassword(ape);
     setReferrerOnPage();
     return account.setError(ape.getMessage()).createResponse(AccountPages.PASSWORD);
   }

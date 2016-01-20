@@ -1,12 +1,14 @@
 {
-  for (  ClientRepresentation client : realm.getClients()) {
-    List<String> webOrigins=client.getWebOrigins();
-    if (webOrigins != null) {
-      List<String> newWebOrigins=new ArrayList<>();
-      for (      String uri : webOrigins) {
-        newWebOrigins.add(uri.replaceAll(regex,replacement));
+  if (realm.getClients() != null) {
+    for (    ClientRepresentation client : realm.getClients()) {
+      List<String> webOrigins=client.getWebOrigins();
+      if (webOrigins != null) {
+        List<String> newWebOrigins=new ArrayList<>();
+        for (        String uri : webOrigins) {
+          newWebOrigins.add(uri.replaceAll(regex,replacement));
+        }
+        client.setWebOrigins(newWebOrigins);
       }
-      client.setWebOrigins(newWebOrigins);
     }
   }
 }

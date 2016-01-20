@@ -7,7 +7,7 @@
     logger.debug("Executed scheduled task " + task.getClass().getSimpleName());
   }
  catch (  Throwable t) {
-    logger.error("Failed to run scheduled task " + task.getClass().getSimpleName(),t);
+    logger.failedToRunScheduledTask(t,task.getClass().getSimpleName());
     session.getTransaction().rollback();
   }
  finally {
@@ -15,7 +15,7 @@
       session.close();
     }
  catch (    Throwable t) {
-      logger.error("Failed to close ProviderSession",t);
+      logger.failedToCloseProviderSession(t);
     }
   }
 }

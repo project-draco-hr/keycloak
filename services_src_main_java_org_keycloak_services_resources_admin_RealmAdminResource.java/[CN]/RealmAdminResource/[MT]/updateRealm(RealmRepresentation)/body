@@ -3,14 +3,6 @@
   logger.debug("updating realm: " + realm.getName());
   try {
     RepresentationToModel.updateRealm(rep,realm);
-    if (rep.isRealmCacheEnabled() != null && session.realms() instanceof CacheRealmProvider) {
-      CacheRealmProvider cacheRealmProvider=(CacheRealmProvider)session.realms();
-      cacheRealmProvider.setEnabled(rep.isRealmCacheEnabled());
-    }
-    if (rep.isUserCacheEnabled() != null && session.userStorage() instanceof CacheUserProvider) {
-      CacheUserProvider cache=(CacheUserProvider)session.userStorage();
-      cache.setEnabled(rep.isUserCacheEnabled());
-    }
     List<UserFederationProviderModel> federationProviders=realm.getUserFederationProviders();
     UsersSyncManager usersSyncManager=new UsersSyncManager();
     for (    final UserFederationProviderModel fedProvider : federationProviders) {

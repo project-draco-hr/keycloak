@@ -1,7 +1,7 @@
 {
   AuthenticationExecutionModel execution=result.getExecution();
   FlowStatus status=result.getStatus();
-  AuthenticationProcessor.logger.debugv("client authenticator {0}: {1}",status.toString(),execution.getAuthenticator());
+  logger.debugv("client authenticator {0}: {1}",status.toString(),execution.getAuthenticator());
   if (status == FlowStatus.SUCCESS) {
     return null;
   }
@@ -26,7 +26,7 @@
     return sendChallenge(result,execution);
   }
  else {
-    AuthenticationProcessor.logger.error("Unknown result status");
+    logger.unknownResultStatus();
     throw new AuthenticationFlowException(AuthenticationFlowError.INTERNAL_ERROR);
   }
 }

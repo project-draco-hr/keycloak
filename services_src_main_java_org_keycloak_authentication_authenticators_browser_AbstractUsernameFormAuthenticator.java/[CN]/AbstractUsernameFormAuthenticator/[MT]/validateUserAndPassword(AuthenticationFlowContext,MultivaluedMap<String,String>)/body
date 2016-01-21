@@ -13,7 +13,7 @@
     user=KeycloakModelUtils.findUserByNameOrEmail(context.getSession(),context.getRealm(),username);
   }
  catch (  ModelDuplicateException mde) {
-    logger.error(mde.getMessage(),mde);
+    logger.modelDuplicateException(mde);
     if (mde.getDuplicateFieldName() != null && mde.getDuplicateFieldName().equals(UserModel.EMAIL)) {
       setDuplicateUserChallenge(context,Errors.EMAIL_IN_USE,Messages.EMAIL_EXISTS,AuthenticationFlowError.INVALID_USER);
     }

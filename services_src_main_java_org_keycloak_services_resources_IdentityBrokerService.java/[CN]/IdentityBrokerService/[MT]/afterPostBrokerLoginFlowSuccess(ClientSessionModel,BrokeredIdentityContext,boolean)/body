@@ -14,7 +14,7 @@
  else {
     boolean firstBrokerLoginInProgress=(clientSession.getNote(AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE) != null);
     if (firstBrokerLoginInProgress) {
-      LOGGER.debugf("Reauthenticated with broker '%s' when linking user '%s' with other broker",context.getIdpConfig().getAlias(),federatedUser.getUsername());
+      logger.debugf("Reauthenticated with broker '%s' when linking user '%s' with other broker",context.getIdpConfig().getAlias(),federatedUser.getUsername());
       UserModel linkingUser=AbstractIdpAuthenticator.getExistingUser(session,realmModel,clientSession);
       if (!linkingUser.getId().equals(federatedUser.getId())) {
         return redirectToErrorPage(Messages.IDENTITY_PROVIDER_DIFFERENT_USER_MESSAGE,federatedUser.getUsername(),linkingUser.getUsername());

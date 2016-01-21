@@ -11,19 +11,19 @@
   String noteKey=firstBrokerLogin ? AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE : PostBrokerLoginConstants.PBL_BROKERED_IDENTITY_CONTEXT;
   SerializedBrokeredIdentityContext serializedCtx=SerializedBrokeredIdentityContext.readFromClientSession(clientSessionn,noteKey);
   if (serializedCtx == null) {
-    logger.errorf("Not found serialized context in clientSession under note '%s'",noteKey);
+    logger.notFoundSerializedCtxInClientSession(noteKey);
     throw new WebApplicationException(ErrorPage.error(session,"Not found serialized context in clientSession."));
   }
   BrokeredIdentityContext brokerContext=serializedCtx.deserialize(session,clientSessionn);
   final String identityProviderAlias=brokerContext.getIdpConfig().getAlias();
   String flowId=firstBrokerLogin ? brokerContext.getIdpConfig().getFirstBrokerLoginFlowId() : brokerContext.getIdpConfig().getPostBrokerLoginFlowId();
   if (flowId == null) {
-    logger.errorf("Flow not configured for identity provider '%s'",identityProviderAlias);
+    logger.flowNotConfigForIDP(identityProviderAlias);
     throw new WebApplicationException(ErrorPage.error(session,"Flow not configured for identity provider"));
   }
   AuthenticationFlowModel brokerLoginFlow=realm.getAuthenticationFlowById(flowId);
   if (brokerLoginFlow == null) {
-    logger.errorf("Not found configured flow with ID '%s' for identity provider '%s'",flowId,identityProviderAlias);
+    logger.flowNotFoundForIDP(flowId,identityProviderAlias);
     throw new WebApplicationException(ErrorPage.error(session,"Flow not found for identity provider"));
   }
   event.detail(Details.IDENTITY_PROVIDER,identityProviderAlias).detail(Details.IDENTITY_PROVIDER_USERNAME,brokerContext.getUsername());

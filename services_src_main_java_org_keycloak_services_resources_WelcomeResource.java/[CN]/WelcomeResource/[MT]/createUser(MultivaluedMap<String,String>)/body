@@ -5,7 +5,7 @@
   }
  else {
     if (!isLocal()) {
-      logger.errorv("Rejected non-local attempt to create initial user from {0}",session.getContext().getConnection().getRemoteAddr());
+      logger.rejectedNonLocalAttemptToCreateInitialUser(session.getContext().getConnection().getRemoteAddr());
       throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
     String username=formData.getFirst("username");
@@ -24,11 +24,11 @@
     if (applianceBootstrap.isNoMasterUser()) {
       bootstrap=false;
       applianceBootstrap.createMasterRealmUser(username,password);
-      logger.infov("Created initial admin user with username {0}",username);
+      logger.createdInitialAdminUser(username);
       return createWelcomePage("User created",null);
     }
  else {
-      logger.warnv("Rejected attempt to create initial user as user is already created");
+      logger.initialUserAlreadyCreated();
       return createWelcomePage(null,"Users already exists");
     }
   }

@@ -1,11 +1,11 @@
 {
   String postBrokerLoginFlowId=context.getIdpConfig().getPostBrokerLoginFlowId();
   if (postBrokerLoginFlowId == null) {
-    LOGGER.debugf("Skip redirect to postBrokerLogin flow. PostBrokerLogin flow not set for identityProvider '%s'.",context.getIdpConfig().getAlias());
+    logger.debugf("Skip redirect to postBrokerLogin flow. PostBrokerLogin flow not set for identityProvider '%s'.",context.getIdpConfig().getAlias());
     return afterPostBrokerLoginFlowSuccess(clientSession,context,wasFirstBrokerLogin);
   }
  else {
-    LOGGER.debugf("Redirect to postBrokerLogin flow after authentication with identityProvider '%s'.",context.getIdpConfig().getAlias());
+    logger.debugf("Redirect to postBrokerLogin flow after authentication with identityProvider '%s'.",context.getIdpConfig().getAlias());
     clientSession.setTimestamp(Time.currentTime());
     SerializedBrokeredIdentityContext ctx=SerializedBrokeredIdentityContext.serialize(context);
     ctx.saveToClientSession(clientSession,PostBrokerLoginConstants.PBL_BROKERED_IDENTITY_CONTEXT);

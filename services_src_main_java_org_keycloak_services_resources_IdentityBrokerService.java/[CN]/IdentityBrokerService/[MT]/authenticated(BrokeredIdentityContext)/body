@@ -10,7 +10,7 @@
   String providerId=identityProviderConfig.getAlias();
   if (!identityProviderConfig.isStoreToken()) {
     if (isDebugEnabled()) {
-      LOGGER.debugf("Token will not be stored for identity provider [%s].",providerId);
+      logger.debugf("Token will not be stored for identity provider [%s].",providerId);
     }
     context.setToken(null);
   }
@@ -33,7 +33,7 @@
     return performAccountLinking(clientSession,context,federatedIdentityModel,federatedUser);
   }
   if (federatedUser == null) {
-    LOGGER.debugf("Federated user not found for provider '%s' and broker username '%s' . Redirecting to flow for firstBrokerLogin",providerId,context.getUsername());
+    logger.debugf("Federated user not found for provider '%s' and broker username '%s' . Redirecting to flow for firstBrokerLogin",providerId,context.getUsername());
     String username=context.getModelUsername();
     if (username == null) {
       if (this.realmModel.isRegistrationEmailAsUsername() && !Validation.isBlank(context.getEmail())) {

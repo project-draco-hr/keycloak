@@ -24,6 +24,9 @@
       Response response=processResult(result);
       if (response == null) {
         processor.getClientSession().removeNote(AuthenticationProcessor.CURRENT_AUTHENTICATION_EXECUTION);
+        if (result.status == FlowStatus.SUCCESS) {
+          processor.setActionSuccessful();
+        }
         return processFlow();
       }
  else       return response;

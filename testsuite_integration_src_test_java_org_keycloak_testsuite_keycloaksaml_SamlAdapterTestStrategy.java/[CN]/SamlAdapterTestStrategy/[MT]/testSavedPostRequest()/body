@@ -1,0 +1,20 @@
+{
+  driver.navigate().to(APP_SERVER_BASE_URL + "/input-portal");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertTrue(driver.getCurrentUrl().startsWith(APP_SERVER_BASE_URL + "/input-portal"));
+  inputPage.execute("hello");
+  assertEquals(driver.getCurrentUrl(),AUTH_SERVER_URL + "/realms/demo/protocol/saml");
+  loginPage.login("bburke@redhat.com","password");
+  System.out.println("Current url: " + driver.getCurrentUrl());
+  Assert.assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/input-portal/secured/post");
+  String pageSource=driver.getPageSource();
+  System.out.println(pageSource);
+  Assert.assertTrue(pageSource.contains("parameter=hello"));
+  driver.navigate().to(APP_SERVER_BASE_URL + "/input-portal?GLO=true");
+  Client client=ClientBuilder.newClient();
+  Form form=new Form();
+  form.param("parameter","hello");
+  String text=client.target(APP_SERVER_BASE_URL + "/input-portal/unsecured").request().post(Entity.form(form),String.class);
+  Assert.assertTrue(text.contains("parameter=hello"));
+  client.close();
+}

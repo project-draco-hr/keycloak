@@ -1,0 +1,26 @@
+{
+  try {
+    String URL=PROFILE_URL + "?access_token=" + URLEncoder.encode(accessToken,"UTF-8");
+    if (log.isDebugEnabled()) {
+      log.debug("Microsoft Live user profile request to: " + URL);
+    }
+    JsonNode profile=JsonSimpleHttp.asJson(SimpleHttp.doGet(URL));
+    String id=getJsonProperty(profile,"id");
+    String email=null;
+    if (profile.has("emails")) {
+      email=getJsonProperty(profile.get("emails"),"preferred");
+    }
+    BrokeredIdentityContext user=new BrokeredIdentityContext(id);
+    user.setUsername(email != null ? email : id);
+    user.setFirstName(getJsonProperty(profile,"first_name"));
+    user.setLastName(getJsonProperty(profile,"last_name"));
+    if (email != null)     user.setEmail(email);
+    user.setIdpConfig(getConfig());
+    user.setIdp(this);
+    AbstractJsonUserAttributeMapper.storeUserProfileForMapper(user,profile,getConfig().getAlias());
+    return user;
+  }
+ catch (  Exception e) {
+    throw new IdentityBrokerException("Could not obtain user profile from Microsoft Live ID.",e);
+  }
+}

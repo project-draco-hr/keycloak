@@ -1,0 +1,16 @@
+{
+  if (session instanceof HttpSessionImpl) {
+    Session underlyingSession;
+    if (System.getSecurityManager() == null) {
+      underlyingSession=((HttpSessionImpl)session).getSession();
+    }
+ else {
+      underlyingSession=AccessController.doPrivileged(new HttpSessionImpl.UnwrapSessionAction(session));
+    }
+    io.undertow.servlet.util.SavedRequest request=(io.undertow.servlet.util.SavedRequest)underlyingSession.removeAttribute(SESSION_KEY);
+    if (request != null) {
+      underlyingSession.setAttribute(io.undertow.servlet.util.SavedRequest.class.getName(),request);
+      io.undertow.servlet.util.SavedRequest.tryRestoreRequest(exchange,session);
+    }
+  }
+}

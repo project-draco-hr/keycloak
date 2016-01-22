@@ -1,0 +1,14 @@
+{
+  io.undertow.servlet.util.SavedRequest.trySaveRequest(exchange);
+  final ServletRequestContext sc=exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+  HttpSessionImpl session=sc.getCurrentServletContext().getSession(exchange,true);
+  Session underlyingSession;
+  if (System.getSecurityManager() == null) {
+    underlyingSession=session.getSession();
+  }
+ else {
+    underlyingSession=AccessController.doPrivileged(new HttpSessionImpl.UnwrapSessionAction(session));
+  }
+  io.undertow.servlet.util.SavedRequest request=(io.undertow.servlet.util.SavedRequest)underlyingSession.removeAttribute(io.undertow.servlet.util.SavedRequest.class.getName());
+  if (request != null)   underlyingSession.setAttribute(SESSION_KEY,request);
+}

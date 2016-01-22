@@ -1,0 +1,16 @@
+{
+  final ServletRequestContext sc=exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+  ServletContextImpl currentServletContext=sc.getCurrentServletContext();
+  HttpSessionImpl session=currentServletContext.getSession(exchange,create);
+  if (session == null) {
+    return null;
+  }
+  Session underlyingSession;
+  if (System.getSecurityManager() == null) {
+    underlyingSession=session.getSession();
+  }
+ else {
+    underlyingSession=AccessController.doPrivileged(new HttpSessionImpl.UnwrapSessionAction(session));
+  }
+  return underlyingSession.changeSessionId(exchange,currentServletContext.getSessionConfig());
+}

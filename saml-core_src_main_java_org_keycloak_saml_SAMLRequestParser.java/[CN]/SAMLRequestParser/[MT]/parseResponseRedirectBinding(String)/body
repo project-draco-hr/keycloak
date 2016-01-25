@@ -1,5 +1,17 @@
 {
   InputStream is=RedirectBindingUtil.base64DeflateDecode(samlMessage);
+  if (log.isDebugEnabled()) {
+    String message=null;
+    try {
+      message=StreamUtil.readString(is);
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+    log.debug("SAML Redirect Binding");
+    log.debug(message);
+    is=new ByteArrayInputStream(message.getBytes());
+  }
   SAML2Response response=new SAML2Response();
   try {
     response.getSAML2ObjectFromStream(is);

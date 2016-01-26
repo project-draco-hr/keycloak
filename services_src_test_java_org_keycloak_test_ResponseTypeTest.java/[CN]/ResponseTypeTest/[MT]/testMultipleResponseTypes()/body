@@ -1,11 +1,10 @@
 {
-  try {
-    OIDCResponseType.parse(Arrays.asList("code","token"));
-    Assert.fail("Not expected to parse with success");
-  }
- catch (  IllegalArgumentException iae) {
-  }
-  OIDCResponseType responseType=OIDCResponseType.parse(Collections.singletonList("code"));
+  OIDCResponseType responseType=OIDCResponseType.parse(Arrays.asList("code","token"));
+  Assert.assertTrue(responseType.hasResponseType("code"));
+  Assert.assertFalse(responseType.hasResponseType("none"));
+  Assert.assertTrue(responseType.isImplicitOrHybridFlow());
+  Assert.assertFalse(responseType.isImplicitFlow());
+  responseType=OIDCResponseType.parse(Collections.singletonList("code"));
   Assert.assertTrue(responseType.hasResponseType("code"));
   Assert.assertFalse(responseType.hasResponseType("none"));
   Assert.assertFalse(responseType.isImplicitOrHybridFlow());

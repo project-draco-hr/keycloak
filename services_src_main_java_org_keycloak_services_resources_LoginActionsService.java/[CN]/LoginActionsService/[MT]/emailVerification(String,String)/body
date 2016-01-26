@@ -3,6 +3,9 @@
   if (key != null) {
     Checks checks=new Checks();
     if (!checks.verifyCode(code,ClientSessionModel.Action.REQUIRED_ACTIONS.name(),ClientSessionCode.ActionType.USER)) {
+      if (checks.clientCode == null && checks.result.isClientSessionNotFound() || checks.result.isIllegalHash()) {
+        return ErrorPage.error(session,Messages.STALE_VERIFY_EMAIL_LINK);
+      }
       return checks.response;
     }
     ClientSessionCode accessCode=checks.clientCode;
@@ -10,7 +13,7 @@
     if (!ClientSessionModel.Action.VERIFY_EMAIL.name().equals(clientSession.getNote(AuthenticationManager.CURRENT_REQUIRED_ACTION))) {
       logger.reqdActionDoesNotMatch();
       event.error(Errors.INVALID_CODE);
-      throw new WebApplicationException(ErrorPage.error(session,Messages.INVALID_CODE));
+      throw new WebApplicationException(ErrorPage.error(session,Messages.STALE_VERIFY_EMAIL_LINK));
     }
     UserSessionModel userSession=clientSession.getUserSession();
     UserModel user=userSession.getUser();

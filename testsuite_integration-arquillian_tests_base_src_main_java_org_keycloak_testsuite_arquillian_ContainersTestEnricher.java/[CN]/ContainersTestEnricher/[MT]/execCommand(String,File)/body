@@ -1,0 +1,17 @@
+{
+  Process process=Runtime.getRuntime().exec(command,null,dir);
+  if (process.waitFor(10,TimeUnit.SECONDS)) {
+    if (process.exitValue() != 0) {
+      getOutput("ERROR",process.getErrorStream());
+      throw new RuntimeException("Adapter installation failed. Process exitValue: " + process.exitValue());
+    }
+    getOutput("OUTPUT",process.getInputStream());
+    log.debug("process.isAlive(): " + process.isAlive());
+  }
+ else {
+    if (process.isAlive()) {
+      process.destroyForcibly();
+    }
+    throw new RuntimeException("Timeout after 10 seconds.");
+  }
+}

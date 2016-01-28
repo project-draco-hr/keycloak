@@ -1,11 +1,11 @@
 {
   driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post-sig-persistent/");
-  assertEquals(driver.getCurrentUrl(),AUTH_SERVER_URL + "/realms/demo/protocol/saml");
+  assertAtLoginPagePostBinding();
   loginPage.login("bburke","password");
   assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/sales-post-sig-persistent/");
   System.out.println(driver.getPageSource());
   Assert.assertFalse(driver.getPageSource().contains("bburke"));
   Assert.assertTrue(driver.getPageSource().contains("principal=G-"));
   driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post-sig-persistent?GLO=true");
-  checkLoggedOut(APP_SERVER_BASE_URL + "/sales-post-sig-persistent/");
+  checkLoggedOut(APP_SERVER_BASE_URL + "/sales-post-sig-persistent/",true);
 }

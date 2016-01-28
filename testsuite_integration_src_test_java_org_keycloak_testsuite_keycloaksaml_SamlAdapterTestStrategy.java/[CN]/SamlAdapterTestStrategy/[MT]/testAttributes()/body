@@ -12,7 +12,7 @@
     SendUsernameServlet.sentPrincipal=null;
     SendUsernameServlet.checkRoles=null;
     driver.navigate().to(APP_SERVER_BASE_URL + "/employee2/");
-    Assert.assertTrue(driver.getCurrentUrl().startsWith(AUTH_SERVER_URL + "/realms/demo/protocol/saml"));
+    assertAtLoginPagePostBinding();
     List<String> requiredRoles=new LinkedList<>();
     requiredRoles.add("manager");
     requiredRoles.add("user");
@@ -30,13 +30,13 @@
     Set<String> groupSet=new HashSet<>();
     assertEquals("level2@redhat.com",principal.getFriendlyAttribute("email"));
     driver.navigate().to(APP_SERVER_BASE_URL + "/employee2/?GLO=true");
-    checkLoggedOut(APP_SERVER_BASE_URL + "/employee2/");
+    checkLoggedOut(APP_SERVER_BASE_URL + "/employee2/",true);
   }
 {
     SendUsernameServlet.sentPrincipal=null;
     SendUsernameServlet.checkRoles=null;
     driver.navigate().to(APP_SERVER_BASE_URL + "/employee2/");
-    Assert.assertTrue(driver.getCurrentUrl().startsWith(AUTH_SERVER_URL + "/realms/demo/protocol/saml"));
+    assertAtLoginPagePostBinding();
     List<String> requiredRoles=new LinkedList<>();
     requiredRoles.add("manager");
     requiredRoles.add("employee");
@@ -52,7 +52,7 @@
     assertEquals("617",principal.getAttribute("phone"));
     Assert.assertNull(principal.getFriendlyAttribute("phone"));
     driver.navigate().to(APP_SERVER_BASE_URL + "/employee2/?GLO=true");
-    checkLoggedOut(APP_SERVER_BASE_URL + "/employee2/");
+    checkLoggedOut(APP_SERVER_BASE_URL + "/employee2/",true);
   }
   keycloakRule.update(new KeycloakRule.KeycloakSetup(){
     @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
@@ -78,7 +78,7 @@
     SendUsernameServlet.sentPrincipal=null;
     SendUsernameServlet.checkRoles=null;
     driver.navigate().to(APP_SERVER_BASE_URL + "/employee2/");
-    Assert.assertTrue(driver.getCurrentUrl().startsWith(AUTH_SERVER_URL + "/realms/demo/protocol/saml"));
+    assertAtLoginPagePostBinding();
     List<String> requiredRoles=new LinkedList<>();
     requiredRoles.add("el-jefe");
     requiredRoles.add("user");

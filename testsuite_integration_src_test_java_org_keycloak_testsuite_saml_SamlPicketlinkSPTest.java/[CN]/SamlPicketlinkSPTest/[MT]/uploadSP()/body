@@ -1,0 +1,14 @@
+{
+  try {
+    Keycloak keycloak=Keycloak.getInstance("http://localhost:8081/auth","master","admin","admin",Constants.ADMIN_CLI_CLIENT_ID,null);
+    RealmResource admin=keycloak.realm("demo");
+    admin.toRepresentation();
+    ClientRepresentation clientRep=admin.convertClientDescription(IOUtils.toString(SamlPicketlinkSPTest.class.getResourceAsStream("/saml/sp-metadata.xml")));
+    Response response=admin.clients().create(clientRep);
+    assertEquals(201,response.getStatus());
+    keycloak.close();
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+}

@@ -2,27 +2,12 @@
   event.event(EventType.CUSTOM_REQUIRED_ACTION);
   event.detail(Details.CUSTOM_REQUIRED_ACTION,action);
   Checks checks=new Checks();
-  if (!checks.verifyCode(code,ClientSessionModel.Action.REQUIRED_ACTIONS.name(),ClientSessionCode.ActionType.USER)) {
+  if (!checks.verifyRequiredAction(code,action)) {
     return checks.response;
   }
   final ClientSessionCode clientCode=checks.clientCode;
   final ClientSessionModel clientSession=clientCode.getClientSession();
   final UserSessionModel userSession=clientSession.getUserSession();
-  if (userSession == null) {
-    logger.userSessionNull();
-    event.error(Errors.USER_SESSION_NOT_FOUND);
-    throw new WebApplicationException(ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE));
-  }
-  if (action == null && userSession != null) {
-    initEvent(clientSession);
-    event.event(EventType.LOGIN);
-    return AuthenticationManager.nextActionAfterAuthentication(session,userSession,clientSession,clientConnection,request,uriInfo,event);
-  }
-  if (!action.equals(clientSession.getNote(AuthenticationManager.CURRENT_REQUIRED_ACTION))) {
-    logger.debug("required action doesn't match current required action");
-    clientSession.removeNote(AuthenticationManager.CURRENT_REQUIRED_ACTION);
-    redirectToRequiredActions(code);
-  }
   RequiredActionFactory factory=(RequiredActionFactory)session.getKeycloakSessionFactory().getProviderFactory(RequiredActionProvider.class,action);
   if (factory == null) {
     logger.actionProviderNull();

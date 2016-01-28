@@ -5,10 +5,10 @@
     if (clientCode.getClientSession().getAction().equals(ClientSessionModel.Action.AUTHENTICATE.name())) {
       AuthenticationProcessor.resetFlow(clientCode.getClientSession());
       response=processAuthentication(null,clientCode.getClientSession(),Messages.LOGIN_TIMEOUT);
-      return true;
+      return false;
     }
     response=ErrorPage.error(session,Messages.EXPIRED_CODE);
-    return true;
+    return false;
   }
-  return false;
+  return true;
 }

@@ -2,10 +2,15 @@
   if (!verifyCode(code)) {
     return false;
   }
-  if (!verifyAction(requiredAction,actionType)) {
-    return false;
-  }
+  if (!clientCode.isValidAction(requiredAction)) {
+    if (ClientSessionModel.Action.REQUIRED_ACTIONS.name().equals(clientCode.getClientSession().getAction())) {
+      response=redirectToRequiredActions(code);
+      return false;
+    }
  else {
-    return true;
+      invalidAction();
+    }
   }
+  if (isActionActive(actionType))   return false;
+  return true;
 }

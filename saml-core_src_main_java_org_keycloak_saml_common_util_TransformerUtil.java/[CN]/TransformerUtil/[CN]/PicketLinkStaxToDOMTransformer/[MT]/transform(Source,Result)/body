@@ -1,6 +1,6 @@
 {
   if (!(xmlSource instanceof StAXSource))   throw logger.wrongTypeError("xmlSource should be a stax source");
-  if (outputTarget instanceof DOMResult == false)   throw logger.wrongTypeError("outputTarget should be a dom result");
+  if (!(outputTarget instanceof DOMResult))   throw logger.wrongTypeError("outputTarget should be a dom result");
   String rootTag=null;
   StAXSource staxSource=(StAXSource)xmlSource;
   XMLEventReader xmlEventReader=staxSource.getXMLEventReader();
@@ -10,7 +10,7 @@
   Stack<Node> stack=new Stack<Node>();
   try {
     XMLEvent xmlEvent=StaxParserUtil.getNextEvent(xmlEventReader);
-    if (xmlEvent instanceof StartElement == false)     throw new TransformerException(ErrorCodes.WRITER_SHOULD_START_ELEMENT);
+    if (!(xmlEvent instanceof StartElement))     throw new TransformerException(ErrorCodes.WRITER_SHOULD_START_ELEMENT);
     StartElement rootElement=(StartElement)xmlEvent;
     rootTag=StaxParserUtil.getStartElementName(rootElement);
     Element docRoot=handleStartElement(xmlEventReader,rootElement,new CustomHolder(doc,false));

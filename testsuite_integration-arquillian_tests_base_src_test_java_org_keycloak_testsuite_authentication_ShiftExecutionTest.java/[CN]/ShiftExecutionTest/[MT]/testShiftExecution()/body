@@ -1,0 +1,35 @@
+{
+  HashMap<String,String> params=new HashMap<>();
+  params.put("newName","Copy of browser");
+  Response response=authMgmtResource.copy("browser",params);
+  try {
+    Assert.assertEquals("Copy flow",201,response.getStatus());
+  }
+  finally {
+    response.close();
+  }
+  response=authMgmtResource.getExecutions("Copy of browser");
+  List<AuthenticationExecutionInfoRepresentation> executions=response.readEntity(new GenericType<List<AuthenticationExecutionInfoRepresentation>>(){
+  }
+);
+  AuthenticationExecutionInfoRepresentation last=executions.get(executions.size() - 1);
+  AuthenticationExecutionInfoRepresentation oneButLast=executions.get(executions.size() - 2);
+  authMgmtResource.raisePriority(last.getId());
+  response=authMgmtResource.getExecutions("Copy of browser");
+  List<AuthenticationExecutionInfoRepresentation> executions2=response.readEntity(new GenericType<List<AuthenticationExecutionInfoRepresentation>>(){
+  }
+);
+  AuthenticationExecutionInfoRepresentation last2=executions2.get(executions.size() - 1);
+  AuthenticationExecutionInfoRepresentation oneButLast2=executions2.get(executions.size() - 2);
+  Assert.assertEquals("Execution shifted up - N",last.getId(),oneButLast2.getId());
+  Assert.assertEquals("Execution shifted up - N-1",oneButLast.getId(),last2.getId());
+  authMgmtResource.lowerPriority(oneButLast2.getId());
+  response=authMgmtResource.getExecutions("Copy of browser");
+  executions2=response.readEntity(new GenericType<List<AuthenticationExecutionInfoRepresentation>>(){
+  }
+);
+  last2=executions2.get(executions.size() - 1);
+  oneButLast2=executions2.get(executions.size() - 2);
+  Assert.assertEquals("Execution shifted down - N",last.getId(),last2.getId());
+  Assert.assertEquals("Execution shifted down - N-1",oneButLast.getId(),oneButLast2.getId());
+}

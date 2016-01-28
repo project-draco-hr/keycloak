@@ -1,0 +1,18 @@
+{
+  List<FlowExecutions> result=new LinkedList<>();
+  List<AuthenticationFlowRepresentation> flows=authMgmtResource.getFlows();
+  for (  AuthenticationFlowRepresentation flow : flows) {
+    Response executions=authMgmtResource.getExecutions(flow.getAlias());
+    List<AuthenticationExecutionInfoRepresentation> executionReps=executions.readEntity(new GenericType<List<AuthenticationExecutionInfoRepresentation>>(){
+    }
+);
+    for (    AuthenticationExecutionInfoRepresentation exec : executionReps) {
+      String configId=exec.getAuthenticationConfig();
+      if (configId != null && !configs.containsKey(configId)) {
+        configs.put(configId,authMgmtResource.getAuthenticatorConfig(exec.getId(),configId));
+      }
+    }
+    result.add(new FlowExecutions(flow,executionReps));
+  }
+  compare(expectedFlows(),orderAlphabetically(result));
+}

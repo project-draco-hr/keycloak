@@ -1,0 +1,35 @@
+{
+  HashMap<String,String> params=new HashMap<>();
+  params.put("newName","clients");
+  Response response=authMgmtResource.copy("browser",params);
+  try {
+    Assert.assertEquals("Copy flow using the new alias of existing flow should fail",409,response.getStatus());
+  }
+  finally {
+    response.close();
+  }
+  params.clear();
+  response=authMgmtResource.copy("non-existent",params);
+  try {
+    Assert.assertEquals("Copy non-existing flow",404,response.getStatus());
+  }
+  finally {
+    response.close();
+  }
+  params.put("newName","Copy of browser");
+  response=authMgmtResource.copy("browser",params);
+  try {
+    Assert.assertEquals("Copy flow",201,response.getStatus());
+  }
+  finally {
+    response.close();
+  }
+  List<AuthenticationFlowRepresentation> flows=authMgmtResource.getFlows();
+  AuthenticationFlowRepresentation browser=findFlowByAlias("browser",flows);
+  AuthenticationFlowRepresentation copyOfBrowser=findFlowByAlias("Copy of browser",flows);
+  Assert.assertNotNull(browser);
+  Assert.assertNotNull(copyOfBrowser);
+  browser.setAlias("Copy of browser");
+  browser.setBuiltIn(false);
+  compareFlows(browser,copyOfBrowser);
+}

@@ -7,17 +7,17 @@
   totpPage.assertCurrent();
   String totpSecret=totpPage.getTotpSecret();
   totpPage.configure(totp.generateTOTP(totpSecret));
-  assertFederatedUser(getProviderId() + ".test-user","test-user@localhost","test-user",getProviderId());
+  assertFederatedUser("test-user","test-user@localhost","test-user",getProviderId());
   driver.navigate().to("http://localhost:8081/test-app/logout");
   loginIDP("test-user");
   loginTotpPage.assertCurrent();
   loginTotpPage.login(totp.generateTOTP(totpSecret));
-  assertFederatedUser(getProviderId() + ".test-user","test-user@localhost","test-user",getProviderId());
+  assertFederatedUser("test-user","test-user@localhost","test-user",getProviderId());
   driver.navigate().to("http://localhost:8081/test-app/logout");
   setPostBrokerFlowForProvider(identityProvider,getRealm(),false);
   brokerServerRule.stopSession(this.session,true);
   this.session=brokerServerRule.startSession();
   loginIDP("test-user");
-  assertFederatedUser(getProviderId() + ".test-user","test-user@localhost","test-user",getProviderId());
+  assertFederatedUser("test-user","test-user@localhost","test-user",getProviderId());
   driver.navigate().to("http://localhost:8081/test-app/logout");
 }

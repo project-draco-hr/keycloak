@@ -1,0 +1,24 @@
+{
+  AuthOutcome outcome=authenticator.authenticate();
+  if (outcome == AuthOutcome.AUTHENTICATED) {
+    log.fine("AUTHENTICATED");
+    if (facade.isEnded()) {
+      return false;
+    }
+    return true;
+  }
+  if (outcome == AuthOutcome.LOGGED_OUT) {
+    logoutInternal(request);
+    if (deployment.getLogoutPage() != null) {
+      forwardToLogoutPage(request,response,deployment);
+    }
+    log.fine("Logging OUT");
+    return false;
+  }
+  AuthChallenge challenge=authenticator.getChallenge();
+  if (challenge != null) {
+    log.fine("challenge");
+    challenge.challenge(facade);
+  }
+  return false;
+}

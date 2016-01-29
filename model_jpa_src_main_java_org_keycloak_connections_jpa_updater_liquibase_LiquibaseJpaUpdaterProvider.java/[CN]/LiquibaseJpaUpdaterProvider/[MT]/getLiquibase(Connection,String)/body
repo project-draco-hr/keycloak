@@ -19,5 +19,7 @@
   if (defaultSchema != null) {
     database.setDefaultSchemaName(defaultSchema);
   }
-  return new Liquibase(CHANGELOG,new ClassLoaderResourceAccessor(getClass().getClassLoader()),database);
+  String changelog=(database instanceof DB2Database) ? DB2_CHANGELOG : CHANGELOG;
+  logger.debugf("Using changelog file: %s",changelog);
+  return new Liquibase(changelog,new ClassLoaderResourceAccessor(getClass().getClassLoader()),database);
 }

@@ -1,10 +1,10 @@
 {
   driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post-sig-email/");
-  assertEquals(driver.getCurrentUrl(),AUTH_SERVER_URL + "/realms/demo/protocol/saml");
+  assertAtLoginPagePostBinding();
   loginPage.login("bburke","password");
   assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/sales-post-sig-email/");
   System.out.println(driver.getPageSource());
   Assert.assertTrue(driver.getPageSource().contains("principal=bburke@redhat.com"));
   driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post-sig-email?GLO=true");
-  checkLoggedOut(APP_SERVER_BASE_URL + "/sales-post-sig-email/");
+  checkLoggedOut(APP_SERVER_BASE_URL + "/sales-post-sig-email/",true);
 }

@@ -1,24 +1,16 @@
 {
   event.event(EventType.LOGIN);
-  if (!checkSsl()) {
-    return ErrorPage.error(session,Messages.HTTPS_REQUIRED);
-  }
   String code=formData.getFirst("code");
-  ClientSessionCode accessCode=ClientSessionCode.parse(code,session,realm);
-  if (accessCode == null || !accessCode.isValid(ClientSessionModel.Action.OAUTH_GRANT.name(),ClientSessionCode.ActionType.LOGIN)) {
-    event.error(Errors.INVALID_CODE);
-    return ErrorPage.error(session,Messages.INVALID_ACCESS_CODE);
+  Checks checks=new Checks();
+  if (!checks.verifyRequiredAction(code,ClientSessionModel.Action.OAUTH_GRANT.name())) {
+    return checks.response;
   }
+  ClientSessionCode accessCode=checks.clientCode;
   ClientSessionModel clientSession=accessCode.getClientSession();
   initEvent(clientSession);
   UserSessionModel userSession=clientSession.getUserSession();
   UserModel user=userSession.getUser();
   ClientModel client=clientSession.getClient();
-  if (!AuthenticationManager.isSessionValid(realm,userSession)) {
-    AuthenticationManager.backchannelLogout(session,realm,userSession,uriInfo,clientConnection,headers,true);
-    event.error(Errors.INVALID_CODE);
-    return ErrorPage.error(session,Messages.SESSION_NOT_ACTIVE);
-  }
   if (formData.containsKey("cancel")) {
     LoginProtocol protocol=session.getProvider(LoginProtocol.class,clientSession.getAuthMethod());
     protocol.setRealm(realm).setHttpHeaders(headers).setUriInfo(uriInfo).setEventBuilder(event);

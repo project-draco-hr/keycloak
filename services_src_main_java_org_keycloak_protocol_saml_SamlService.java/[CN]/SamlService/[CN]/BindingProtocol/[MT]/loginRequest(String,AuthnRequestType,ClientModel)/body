@@ -31,7 +31,6 @@
   clientSession.setAuthMethod(SamlProtocol.LOGIN_PROTOCOL);
   clientSession.setRedirectUri(redirect);
   clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
-  clientSession.setNote(ClientSessionCode.ACTION_KEY,KeycloakModelUtils.generateCodeSecret());
   clientSession.setNote(SamlProtocol.SAML_BINDING,bindingType);
   clientSession.setNote(GeneralConstants.RELAY_STATE,relayState);
   clientSession.setNote(SamlProtocol.SAML_REQUEST_ID,requestAbstractType.getID());
@@ -47,5 +46,5 @@
       return ErrorPage.error(session,Messages.UNSUPPORTED_NAME_ID_FORMAT);
     }
   }
-  return newBrowserAuthentication(clientSession,requestAbstractType.isIsPassive());
+  return newBrowserAuthentication(clientSession,requestAbstractType.isIsPassive(),redirectToAuthentication);
 }

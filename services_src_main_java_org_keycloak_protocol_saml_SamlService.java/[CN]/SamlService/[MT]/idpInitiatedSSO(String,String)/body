@@ -1,5 +1,6 @@
 {
   event.event(EventType.LOGIN);
+  CacheControlUtil.noBackButtonCacheControlHeader();
   ClientModel client=null;
   for (  ClientModel c : realm.getClients()) {
     String urlName=c.getAttribute(SamlProtocol.SAML_IDP_INITIATED_SSO_URL_NAME);
@@ -35,7 +36,6 @@
   ClientSessionModel clientSession=session.sessions().createClientSession(realm,client);
   clientSession.setAuthMethod(SamlProtocol.LOGIN_PROTOCOL);
   clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
-  clientSession.setNote(ClientSessionCode.ACTION_KEY,KeycloakModelUtils.generateCodeSecret());
   clientSession.setNote(SamlProtocol.SAML_BINDING,SamlProtocol.SAML_POST_BINDING);
   clientSession.setNote(SamlProtocol.SAML_IDP_INITIATED_LOGIN,"true");
   clientSession.setRedirectUri(redirect);
@@ -45,5 +45,5 @@
   if (relayState != null && !relayState.trim().equals("")) {
     clientSession.setNote(GeneralConstants.RELAY_STATE,relayState);
   }
-  return newBrowserAuthentication(clientSession,false);
+  return newBrowserAuthentication(clientSession,false,false);
 }

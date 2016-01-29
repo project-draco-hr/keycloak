@@ -1,9 +1,9 @@
 {
   driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post-sig/");
-  assertEquals(driver.getCurrentUrl(),AUTH_SERVER_URL + "/realms/demo/protocol/saml");
+  assertAtLoginPagePostBinding();
   loginPage.login("bburke","password");
   assertEquals(driver.getCurrentUrl(),APP_SERVER_BASE_URL + "/sales-post-sig/");
   Assert.assertTrue(driver.getPageSource().contains("bburke"));
   driver.navigate().to(APP_SERVER_BASE_URL + "/sales-post-sig?GLO=true");
-  checkLoggedOut(APP_SERVER_BASE_URL + "/sales-post-sig/");
+  checkLoggedOut(APP_SERVER_BASE_URL + "/sales-post-sig/",true);
 }

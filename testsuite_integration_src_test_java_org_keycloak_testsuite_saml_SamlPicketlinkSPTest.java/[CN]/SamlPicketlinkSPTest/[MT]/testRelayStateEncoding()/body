@@ -1,0 +1,10 @@
+{
+  SamlSPFacade.samlResponse=null;
+  driver.navigate().to("http://localhost:8081/employee/");
+  assertAtLoginPageRedirectBinding();
+  System.out.println(driver.getCurrentUrl());
+  loginPage.login("bburke","password");
+  Assert.assertEquals(driver.getCurrentUrl(),"http://localhost:8081/employee/");
+  Assert.assertEquals(SamlSPFacade.sentRelayState,SamlSPFacade.RELAY_STATE);
+  Assert.assertNotNull(SamlSPFacade.samlResponse);
+}

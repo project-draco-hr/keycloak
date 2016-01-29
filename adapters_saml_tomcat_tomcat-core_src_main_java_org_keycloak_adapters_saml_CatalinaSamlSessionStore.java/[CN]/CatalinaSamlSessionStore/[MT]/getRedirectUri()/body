@@ -1,3 +1,9 @@
 {
-  return (String)getSession(true).getAttribute(SAML_REDIRECT_URI);
+  String redirect=(String)getSession(true).getAttribute(SAML_REDIRECT_URI);
+  if (redirect == null) {
+    String contextPath=request.getContextPath();
+    String baseUri=KeycloakUriBuilder.fromUri(request.getRequestURL().toString()).replacePath(contextPath).build().toString();
+    return SamlUtil.getRedirectTo(facade,contextPath,baseUri);
+  }
+  return redirect;
 }

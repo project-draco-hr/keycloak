@@ -1,5 +1,11 @@
 {
   HttpSession session=request.getSession(false);
   if (session == null)   return null;
-  return (String)session.getAttribute(REDIRECT_URI);
+  String redirect=(String)session.getAttribute(REDIRECT_URI);
+  if (redirect == null) {
+    String contextPath=request.getContextPath();
+    String baseUri=KeycloakUriBuilder.fromUri(request.getRequestURL().toString()).replacePath(contextPath).build().toString();
+    return SamlUtil.getRedirectTo(facade,contextPath,baseUri);
+  }
+  return redirect;
 }

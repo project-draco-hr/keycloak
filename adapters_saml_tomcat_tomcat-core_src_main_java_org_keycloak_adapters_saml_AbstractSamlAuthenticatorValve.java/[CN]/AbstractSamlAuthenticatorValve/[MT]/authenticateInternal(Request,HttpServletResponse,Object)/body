@@ -7,30 +7,6 @@
     return false;
   }
   SamlSessionStore tokenStore=getSessionStore(request,facade,deployment);
-  CatalinaSamlAuthenticator authenticator=new CatalinaSamlAuthenticator(facade,deployment,tokenStore);
-  AuthOutcome outcome=authenticator.authenticate();
-  if (outcome == AuthOutcome.AUTHENTICATED) {
-    log.fine("AUTHENTICATED");
-    if (facade.isEnded()) {
-      return false;
-    }
-    return true;
-  }
-  if (outcome == AuthOutcome.LOGGED_OUT) {
-    logoutInternal(request);
-    if (deployment.getLogoutPage() != null) {
-      forwardToLogoutPage(request,response,deployment);
-    }
-    log.fine("Logging OUT");
-    return false;
-  }
-  AuthChallenge challenge=authenticator.getChallenge();
-  if (challenge != null) {
-    log.fine("challenge");
-    if (loginConfig == null) {
-      loginConfig=request.getContext().getLoginConfig();
-    }
-    challenge.challenge(facade);
-  }
-  return false;
+  SamlAuthenticator authenticator=new CatalinaSamlAuthenticator(facade,deployment,tokenStore);
+  return executeAuthenticator(request,response,facade,deployment,authenticator);
 }

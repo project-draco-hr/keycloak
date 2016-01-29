@@ -1,4 +1,9 @@
 {
+  deploymentContext=(SamlDeploymentContext)filterConfig.getServletContext().getAttribute(SamlDeploymentContext.class.getName());
+  if (deploymentContext != null) {
+    idMapper=(SessionIdMapper)filterConfig.getServletContext().getAttribute(SessionIdMapper.class.getName());
+    return;
+  }
   String configResolverClass=filterConfig.getInitParameter("keycloak.config.resolver");
   if (configResolverClass != null) {
     try {
@@ -47,5 +52,7 @@
     deploymentContext=new SamlDeploymentContext(deployment);
     log.fine("Keycloak is using a per-deployment configuration.");
   }
+  idMapper=new InMemorySessionIdMapper();
   filterConfig.getServletContext().setAttribute(SamlDeploymentContext.class.getName(),deploymentContext);
+  filterConfig.getServletContext().setAttribute(SessionIdMapper.class.getName(),idMapper);
 }

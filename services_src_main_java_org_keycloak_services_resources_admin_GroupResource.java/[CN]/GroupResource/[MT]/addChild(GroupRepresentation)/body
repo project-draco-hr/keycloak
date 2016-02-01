@@ -1,4 +1,5 @@
 {
+  this.auth.requireManage();
   Response.ResponseBuilder builder=Response.status(204);
   GroupModel child=null;
   if (rep.getId() != null) {
@@ -6,12 +7,14 @@
     if (child == null) {
       throw new NotFoundException("Could not find child by id");
     }
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo).representation(rep).success();
   }
  else {
     child=realm.createGroup(rep.getName());
     updateGroup(rep,child);
     URI uri=uriInfo.getBaseUriBuilder().path(uriInfo.getMatchedURIs().get(1)).path(child.getId()).build();
     builder.status(201).location(uri);
+    adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();
   }
   realm.moveGroup(child,group);
   GroupRepresentation childRep=ModelToRepresentation.toGroupHierarchy(child,true);

@@ -1,24 +1,5 @@
 {
   waitUntilElement(clientIdInput).is().present();
   setClientId(client.getClientId());
-  setName(client.getName());
-  setEnabled(client.isEnabled());
-  setConsentRequired(client.isConsentRequired());
   setProtocol(client.getProtocol());
-  if (OIDC.equals(client.getProtocol())) {
-    setAccessType(client);
-    if (!client.isBearerOnly()) {
-      setStandardFlowEnabled(client.isStandardFlowEnabled());
-      setDirectAccessGrantsEnabled(client.isDirectAccessGrantsEnabled());
-      if (client.isPublicClient()) {
-        setImplicitFlowEnabled(client.isImplicitFlowEnabled());
-      }
- else {
-        setServiceAccountsEnabled(client.isServiceAccountsEnabled());
-      }
-      if (client.isStandardFlowEnabled() || client.isImplicitFlowEnabled()) {
-        setRedirectUris(client.getRedirectUris());
-      }
-    }
-  }
 }

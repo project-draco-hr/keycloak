@@ -1,8 +1,21 @@
 {
-  RefreshableKeycloakSecurityContext securityContext=principal.getKeycloakSecurityContext();
-  Set<String> roles=AdapterUtils.getRolesFromSecurityContext(securityContext);
+  final RefreshableKeycloakSecurityContext securityContext=principal.getKeycloakSecurityContext();
+  final Set<String> roles=AdapterUtils.getRolesFromSecurityContext(securityContext);
   if (log.isLoggable(Level.FINE)) {
     log.fine("Completing bearer authentication. Bearer roles: " + roles);
   }
   request.setAttribute(KeycloakSecurityContext.class.getName(),securityContext);
+  OidcKeycloakAccount account=new OidcKeycloakAccount(){
+    @Override public Principal getPrincipal(){
+      return principal;
+    }
+    @Override public Set<String> getRoles(){
+      return roles;
+    }
+    @Override public KeycloakSecurityContext getKeycloakSecurityContext(){
+      return securityContext;
+    }
+  }
+;
+  request.setAttribute(KeycloakAccount.class.getName(),account);
 }

@@ -3,9 +3,6 @@
   auth.requireCreate();
   try {
     ClientModel clientModel=RepresentationToModel.createClient(session,session.getContext().getRealm(),client,true);
-    if (client.getClientId() == null) {
-      clientModel.setClientId(clientModel.getId());
-    }
     client=ModelToRepresentation.toRepresentation(clientModel);
     String registrationAccessToken=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,clientModel);
     client.setRegistrationAccessToken(registrationAccessToken);

@@ -1,0 +1,18 @@
+{
+  if (socket instanceof SSLSocket) {
+    try {
+      Method setHostMethod=AccessController.doPrivileged(new PrivilegedExceptionAction<Method>(){
+        public Method run() throws NoSuchMethodException {
+          return socket.getClass().getMethod("setHost",String.class);
+        }
+      }
+);
+      setHostMethod.invoke(socket,hostname);
+      log.finest("Applied SNI to socket for: " + hostname);
+    }
+ catch (    Exception e) {
+      log.log(Level.WARNING,"Failed to apply SNI to SSLSocket",e);
+    }
+  }
+  return socket;
+}

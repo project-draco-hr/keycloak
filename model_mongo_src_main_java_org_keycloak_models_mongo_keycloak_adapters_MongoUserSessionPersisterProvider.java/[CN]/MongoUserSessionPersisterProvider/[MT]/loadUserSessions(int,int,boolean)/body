@@ -5,7 +5,13 @@
   List<? extends MongoUserSessionEntity> entities=getMongoStore().loadEntities(clazz,query,sort,firstResult,maxResults,invocationContext);
   List<UserSessionModel> results=new LinkedList<>();
   for (  MongoUserSessionEntity entity : entities) {
-    PersistentUserSessionAdapter userSession=toAdapter(entity);
+    RealmModel realm=session.realms().getRealm(entity.getRealmId());
+    UserModel user=session.users().getUserById(entity.getUserId(),realm);
+    if (user == null) {
+      onUserRemoved(realm,entity.getUserId());
+      return loadUserSessions(firstResult,maxResults,offline);
+    }
+    PersistentUserSessionAdapter userSession=toAdapter(realm,user,entity);
     results.add(userSession);
   }
   return results;

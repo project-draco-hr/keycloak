@@ -14,7 +14,7 @@
  else {
         logger.warn("User with username " + username + " already exists and is linked to provider ["+ model.getDisplayName()+ "] but kerberos principal is not correct. Kerberos principal on user is: "+ user.getFirstAttribute(KERBEROS_PRINCIPAL));
         logger.warn("Will re-create user");
-        session.userStorage().removeUser(realm,user);
+        new UserManager(session).removeUser(realm,user,session.userStorage());
       }
     }
   }

@@ -1,0 +1,20 @@
+{
+  int started=Time.currentTime();
+  UserSessionModel[] origSessions=createSessions();
+  resetSession();
+  UserSessionModel userSession1=session.sessions().getUserSession(realm,origSessions[1].getId());
+  UserSessionModel userSession2=session.sessions().getUserSession(realm,origSessions[2].getId());
+  persistUserSession(userSession1,true);
+  persistUserSession(userSession2,true);
+  resetSession();
+  List<UserSessionModel> loadedSessions=loadPersistedSessionsPaginated(true,10,1,2);
+  UserModel user1=session.users().getUserByUsername("user1",realm);
+  new UserManager(session).removeUser(realm,user1);
+  resetSession();
+  loadedSessions=loadPersistedSessionsPaginated(true,10,1,1);
+  UserSessionModel persistedSession=loadedSessions.get(0);
+  UserSessionProviderTest.assertSession(persistedSession,session.users().getUserByUsername("user2",realm),"127.0.0.3",started,started,"test-app");
+  UserModel user2=session.users().getUserByUsername("user2",realm);
+  session.users().removeUser(realm,user2);
+  loadedSessions=loadPersistedSessionsPaginated(true,10,0,0);
+}

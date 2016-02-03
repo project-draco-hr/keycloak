@@ -12,7 +12,13 @@
   List<UserSessionModel> result=new ArrayList<>();
   List<String> userSessionIds=new ArrayList<>();
   for (  PersistentUserSessionEntity entity : results) {
-    result.add(toAdapter(entity));
+    RealmModel realm=session.realms().getRealm(entity.getRealmId());
+    UserModel user=session.users().getUserById(entity.getUserId(),realm);
+    if (user == null) {
+      onUserRemoved(realm,entity.getUserId());
+      return loadUserSessions(firstResult,maxResults,offline);
+    }
+    result.add(toAdapter(realm,user,entity));
     userSessionIds.add(entity.getUserSessionId());
   }
   if (!userSessionIds.isEmpty()) {

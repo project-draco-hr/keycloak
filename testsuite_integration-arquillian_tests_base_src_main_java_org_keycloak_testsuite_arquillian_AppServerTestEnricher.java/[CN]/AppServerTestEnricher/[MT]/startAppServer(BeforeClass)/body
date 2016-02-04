@@ -1,0 +1,11 @@
+{
+  ContainerController controller=containerController.get();
+  if (testContext.isAdapterTest()) {
+    String appServerQualifier=testContext.getAppServerInfo().getQualifier();
+    if (!controller.isStarted(appServerQualifier)) {
+      controller.start(appServerQualifier);
+    }
+    log.info("\n\n\nAPP SERVER STARTED\n\n\n");
+    installAdapterLibsUsingJBossCLIClient(testContext.getAppServerInfo());
+  }
+}

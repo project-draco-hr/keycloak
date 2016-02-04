@@ -1,0 +1,8 @@
+{
+  log.info(String.format("Checking server log: '%s'",logFile.getAbsolutePath()));
+  String logContent=FileUtils.readFileToString(logFile);
+  boolean containsError=logContent.contains("ERROR") || logContent.contains("SEVERE") || logContent.contains("Exception ");
+  if (containsError) {
+    throw new RuntimeException(String.format("Server log file contains ERROR: '%s'",logFile.getPath()));
+  }
+}

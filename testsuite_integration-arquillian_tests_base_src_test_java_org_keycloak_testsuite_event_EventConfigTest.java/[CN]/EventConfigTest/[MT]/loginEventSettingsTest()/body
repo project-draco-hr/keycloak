@@ -1,0 +1,14 @@
+{
+  enableEvents();
+  assertTrue(hasEventType("LOGIN"));
+  assertTrue(hasEventType("LOGOUT"));
+  assertTrue(hasEventType("CLIENT_DELETE_ERROR"));
+  int defaultEventCount=configRep.getEnabledEventTypes().size();
+  configRep.setEnabledEventTypes(Arrays.asList("CLIENT_DELETE","CLEINT_DELETE_ERROR"));
+  saveConfig();
+  List<String> enabledEventTypes=configRep.getEnabledEventTypes();
+  assertEquals(2,enabledEventTypes.size());
+  configRep.setEnabledEventTypes(Collections.EMPTY_LIST);
+  saveConfig();
+  assertEquals(defaultEventCount,configRep.getEnabledEventTypes().size());
+}

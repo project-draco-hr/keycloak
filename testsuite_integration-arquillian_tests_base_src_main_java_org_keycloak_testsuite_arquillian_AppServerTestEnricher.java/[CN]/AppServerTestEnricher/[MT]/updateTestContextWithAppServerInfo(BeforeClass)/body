@@ -1,9 +1,9 @@
 {
   testContext=testContextProducer.get();
   String appServerQualifier=getAppServerQualifier(testContext.getTestClass());
-  for (  Container container : testContext.getSuiteContext().getArquillianContainers()) {
-    if (container.getContainerConfiguration().getContainerName().equals(appServerQualifier)) {
-      testContext.setAppServerInfo(initializeAppServerInfo(container));
+  for (  ContainerInfo container : testContext.getSuiteContext().getContainers()) {
+    if (container.getQualifier().equals(appServerQualifier)) {
+      testContext.setAppServerInfo(updateWithAppServerInfo(container));
     }
   }
   if (appServerQualifier != null && testContext.getAppServerInfo() == null) {

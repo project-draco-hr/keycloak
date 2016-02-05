@@ -1,5 +1,9 @@
 {
-  suiteContext=new SuiteContext(new ArrayList<>(containerRegistry.get().getContainers()));
+  Set<ContainerInfo> containers=new LinkedHashSet<>();
+  for (  Container c : containerRegistry.get().getContainers()) {
+    containers.add(new ContainerInfo(c));
+  }
+  suiteContext=new SuiteContext(containers);
   String authServerQualifier=getAuthServerQualifier();
   String migratedAuthServerQualifier=getMigratedAuthServerQualifier();
   if (authServerQualifier.startsWith("auth-server-")) {
@@ -8,12 +12,14 @@
     String authServerFrontend=authServerCluster ? "auth-server-" + authServerType + "-balancer" : authServerQualifier;
     String authServerBackend="auth-server-" + authServerType + "-backend";
     int backends=0;
-    for (    Container container : suiteContext.getArquillianContainers()) {
-      if (container.getContainerConfiguration().getContainerName().equals(authServerFrontend)) {
-        suiteContext.setAuthServerInfo(initializeAuthServerInfo(container));
+    for (    ContainerInfo container : suiteContext.getContainers()) {
+      if (container.getQualifier().equals(authServerFrontend)) {
+        updateWithAuthServerInfo(container);
+        suiteContext.setAuthServerInfo(container);
       }
-      if (container.getContainerConfiguration().getContainerName().startsWith(authServerBackend)) {
-        suiteContext.getAuthServerBackendsInfo().add(initializeAuthServerInfo(container,++backends));
+      if (container.getQualifier().startsWith(authServerBackend)) {
+        updateWithAuthServerInfo(container,++backends);
+        suiteContext.getAuthServerBackendsInfo().add(container);
       }
     }
     if (suiteContext.getAuthServerInfo() == null) {
@@ -28,9 +34,10 @@
   }
   if (migratedAuthServerQualifier != null) {
     if (migratedAuthServerQualifier.startsWith("migrated-auth-server-")) {
-      for (      Container container : suiteContext.getArquillianContainers()) {
-        if (container.getContainerConfiguration().getContainerName().equals(migratedAuthServerQualifier)) {
-          suiteContext.setMigratedAuthServerInfo(initializeAuthServerInfo(container));
+      for (      ContainerInfo container : suiteContext.getContainers()) {
+        if (container.getQualifier().equals(migratedAuthServerQualifier)) {
+          updateWithAuthServerInfo(container);
+          suiteContext.setMigratedAuthServerInfo(container);
         }
       }
     }

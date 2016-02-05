@@ -1,0 +1,13 @@
+{
+  log.info("BEFORE DEPLOY");
+  if (testContext.isAdapterTest()) {
+    if (testContext.getAppServerInfo().isJBossBased()) {
+      try {
+        installAdapterLibsUsingJBossCLIClient(testContext.getAppServerInfo());
+      }
+ catch (      InterruptedException|IOException ex) {
+        throw new RuntimeException("Failed to install adapter libs.",ex);
+      }
+    }
+  }
+}

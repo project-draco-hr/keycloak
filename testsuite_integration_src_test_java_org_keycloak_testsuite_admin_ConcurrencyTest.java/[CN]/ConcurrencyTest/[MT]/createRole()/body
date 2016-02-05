@@ -1,0 +1,11 @@
+{
+  run(new KeycloakRunnable(){
+    @Override public void run(    Keycloak keycloak,    RealmResource realm,    int threadNum,    int iterationNum){
+      String name="r-" + threadNum + "-"+ iterationNum;
+      RoleRepresentation r=new RoleRepresentation(name,null,false);
+      realm.roles().create(r);
+      assertNotNull(realm.roles().get(name).toRepresentation());
+    }
+  }
+);
+}

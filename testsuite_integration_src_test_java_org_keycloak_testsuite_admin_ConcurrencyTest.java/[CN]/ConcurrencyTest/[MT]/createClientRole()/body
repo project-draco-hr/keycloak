@@ -1,0 +1,17 @@
+{
+  ClientRepresentation c=new ClientRepresentation();
+  c.setClientId("client");
+  Response response=realm.clients().create(c);
+  final String clientId=ApiUtil.getCreatedId(response);
+  response.close();
+  run(new KeycloakRunnable(){
+    @Override public void run(    Keycloak keycloak,    RealmResource realm,    int threadNum,    int iterationNum){
+      String name="r-" + threadNum + "-"+ iterationNum;
+      RoleRepresentation r=new RoleRepresentation(name,null,false);
+      ClientResource client=realm.clients().get(clientId);
+      client.roles().create(r);
+      assertNotNull(client.roles().get(name).toRepresentation());
+    }
+  }
+);
+}

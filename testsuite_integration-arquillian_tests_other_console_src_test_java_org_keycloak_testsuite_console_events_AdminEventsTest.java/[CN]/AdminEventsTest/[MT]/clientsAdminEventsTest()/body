@@ -1,11 +1,11 @@
 {
   newClient=AbstractClientTest.createOidcClientRep(CONFIDENTIAL,"test_client","http://example.test/test_client/*");
-  Response response=clientsPage.clientsResource().create(newClient);
+  Response response=clientsResource().create(newClient);
   String id=ApiUtil.getCreatedId(response);
   response.close();
   newClient.setClientId("test_client2");
-  clientsPage.clientsResource().get(id).update(newClient);
-  clientsPage.clientsResource().get(id).remove();
+  clientsResource().get(id).update(newClient);
+  clientsResource().get(id).remove();
   adminEventsPage.navigateTo();
   adminEventsPage.table().filter();
   adminEventsPage.table().filterForm().addOperationType("CREATE");

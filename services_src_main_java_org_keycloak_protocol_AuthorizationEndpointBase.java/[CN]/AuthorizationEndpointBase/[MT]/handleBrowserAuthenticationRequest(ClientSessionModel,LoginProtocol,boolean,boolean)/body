@@ -1,7 +1,7 @@
 {
   List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
   for (  IdentityProviderModel identityProvider : identityProviders) {
-    if (identityProvider.isAuthenticateByDefault()) {
+    if (identityProvider.isEnabled() && identityProvider.isAuthenticateByDefault()) {
       return buildRedirectToIdentityProvider(identityProvider.getAlias(),new ClientSessionCode(realm,clientSession).getCode());
     }
   }

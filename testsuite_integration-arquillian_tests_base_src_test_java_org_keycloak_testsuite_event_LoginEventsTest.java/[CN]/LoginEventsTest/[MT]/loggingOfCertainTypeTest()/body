@@ -1,0 +1,11 @@
+{
+  assertEquals(0,events().size());
+  configRep.setEnabledEventTypes(Arrays.asList("REVOKE_GRANT"));
+  saveConfig();
+  badLogin();
+  assertEquals(0,events().size());
+  configRep.setEnabledEventTypes(Arrays.asList("LOGIN_ERROR"));
+  saveConfig();
+  badLogin();
+  assertEquals(1,events().size());
+}

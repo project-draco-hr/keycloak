@@ -1,10 +1,10 @@
 {
-  boolean migrationTest="true".equals(System.getProperty("migration","false"));
+  String migratedAuthServerVersion=System.getProperty(MIGRATED_AUTH_SERVER_VERSION_PROPERTY);
+  boolean migrationTest=migratedAuthServerVersion != null;
   Migration migrationAnnotation=method.getAnnotation(Migration.class);
   if (migrationTest && migrationAnnotation != null) {
     String versionFrom=migrationAnnotation.versionFrom();
-    String version=System.getProperty("version");
-    if (version.equals(versionFrom)) {
+    if (migratedAuthServerVersion.equals(versionFrom)) {
       return ExecutionDecision.execute();
     }
  else {

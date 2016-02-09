@@ -1,0 +1,38 @@
+{
+  log.info("Starting infinispan CLI. Exit with 'exit' . Available commands with 'help' ");
+  BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
+  String line;
+  try {
+    while ((line=reader.readLine()) != null) {
+      log.info("Command: " + line);
+      String[] splits=line.split(" ");
+      String commandName=splits[0];
+      Class<? extends AbstractCommand> commandClass=commands.get(commandName);
+      if (commandClass == null) {
+        log.errorf("Unknown command: %s",commandName);
+      }
+ else {
+        try {
+          AbstractCommand command=commandClass.newInstance();
+          List<String> args=new ArrayList<>(Arrays.asList(splits));
+          args.remove(0);
+          command.injectProperties(args,this,sessionFactory);
+          command.runCommand();
+          if (command instanceof ExitCommand) {
+            return;
+          }
+        }
+ catch (        InstantiationException ex) {
+          log.error(ex);
+        }
+catch (        IllegalAccessException ex) {
+          log.error(ex);
+        }
+      }
+    }
+  }
+  finally {
+    log.info("Exit infinispan CLI");
+    reader.close();
+  }
+}

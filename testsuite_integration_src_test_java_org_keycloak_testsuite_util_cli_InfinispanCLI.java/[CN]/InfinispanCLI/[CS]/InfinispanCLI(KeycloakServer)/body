@@ -1,0 +1,13 @@
+{
+  this.sessionFactory=server.getSessionFactory();
+  for (  Class<?> clazz : BUILTIN_COMMANDS) {
+    Class<? extends AbstractCommand> commandClazz=(Class<? extends AbstractCommand>)clazz;
+    try {
+      AbstractCommand command=commandClazz.newInstance();
+      commands.put(command.getName(),commandClazz);
+    }
+ catch (    Exception ex) {
+      log.error("Error registering command of class: " + commandClazz.getName(),ex);
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  String usernamePrefix=getArg(0);
+  String password=getArg(1);
+  String realmName=getArg(2);
+  int first=getIntArg(3);
+  int count=getIntArg(4);
+  String roleNames=getArg(5);
+  RealmModel realm=session.realms().getRealmByName(realmName);
+  if (realm == null) {
+    log.errorf("Unknown realm: %s",realmName);
+    return;
+  }
+  Set<RoleModel> roles=findRoles(realm,roleNames);
+  int last=first + count;
+  for (int counter=first; counter < last; counter++) {
+    String username=usernamePrefix + counter;
+    UserModel user=session.users().addUser(realm,username);
+    user.setEnabled(true);
+    user.setEmail(username + "@keycloak.org");
+    UserCredentialModel passwordCred=UserCredentialModel.password(password);
+    user.updateCredential(passwordCred);
+    for (    RoleModel role : roles) {
+      user.grantRole(role);
+    }
+  }
+  log.infof("Users from %s to %s created",usernamePrefix + first,usernamePrefix + (last - 1));
+}

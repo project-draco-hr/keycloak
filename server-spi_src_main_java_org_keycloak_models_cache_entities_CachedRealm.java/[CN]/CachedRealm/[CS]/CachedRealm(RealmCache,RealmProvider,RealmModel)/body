@@ -62,21 +62,9 @@
   defaultRoles.addAll(model.getDefaultRoles());
   ClientModel masterAdminClient=model.getMasterAdminClient();
   this.masterAdminClient=(masterAdminClient != null) ? masterAdminClient.getId() : null;
-  for (  RoleModel role : model.getRoles()) {
-    realmRoles.put(role.getName(),role.getId());
-    CachedRole cachedRole=new CachedRealmRole(role,model);
-    cache.addCachedRole(cachedRole);
-  }
-  for (  ClientModel client : model.getClients()) {
-    clients.put(client.getClientId(),client.getId());
-    CachedClient cachedClient=new CachedClient(cache,delegate,model,client);
-    cache.addCachedClient(cachedClient);
-  }
-  for (  ClientTemplateModel template : model.getClientTemplates()) {
-    clientTemplates.add(template.getId());
-    CachedClientTemplate cachedClient=new CachedClientTemplate(cache,delegate,model,template);
-    cache.addCachedClientTemplate(cachedClient);
-  }
+  cacheRealmRoles(cache,model);
+  cacheClients(cache,delegate,model);
+  cacheClientTemplates(cache,delegate,model);
   internationalizationEnabled=model.isInternationalizationEnabled();
   supportedLocales.addAll(model.getSupportedLocales());
   defaultLocale=model.getDefaultLocale();

@@ -1,0 +1,37 @@
+{
+  cache.startBatch();
+  boolean batchEnded=false;
+  try {
+    CachedRealm cached=cache.getCachedRealmByName(name);
+    boolean wasNull=cached == null;
+    if (cached == null) {
+      RealmModel model=getDelegate().getRealmByName(name);
+      if (model == null)       return null;
+      if (realmInvalidations.contains(model.getId()))       return model;
+      cached=new CachedRealm(cache,this,model);
+      cache.addCachedRealm(cached);
+      try {
+        batchEnded=true;
+        cache.endBatch(true);
+        logger.trace("returning new cached realm: " + cached.getName());
+      }
+ catch (      Exception exception) {
+        logger.info("failed to add to cache",exception);
+        return model;
+      }
+    }
+ else     if (realmInvalidations.contains(cached.getId())) {
+      return getDelegate().getRealmByName(name);
+    }
+ else     if (managedRealms.containsKey(cached.getId())) {
+      return managedRealms.get(cached.getId());
+    }
+    if (!wasNull)     logger.trace("returning cached realm: " + cached.getName());
+    RealmAdapter adapter=new RealmAdapter(cached,this);
+    managedRealms.put(cached.getId(),adapter);
+    return adapter;
+  }
+  finally {
+    if (!batchEnded)     cache.endBatch(true);
+  }
+}

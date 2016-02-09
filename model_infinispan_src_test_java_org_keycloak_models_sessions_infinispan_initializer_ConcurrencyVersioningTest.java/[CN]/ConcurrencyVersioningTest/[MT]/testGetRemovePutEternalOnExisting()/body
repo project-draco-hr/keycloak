@@ -1,0 +1,19 @@
+{
+  final DefaultCacheManager cacheManager=getVersionedCacheManager();
+  ExecutorService executor=Executors.newSingleThreadExecutor();
+  RemoveThread removeThread=new RemoveThread(cacheManager);
+  Cache<String,String> cache=cacheManager.getCache(InfinispanConnectionProvider.REALM_CACHE_NAME);
+  cache.put("key","value0");
+  startBatch(cache);
+  cache.get("key");
+  executor.execute(removeThread);
+  cache.putForExternalRead("key","value1");
+  removeThread.getLatch().await();
+  try {
+    endBatch(cache);
+  }
+ catch (  Exception e) {
+  }
+  Assert.assertNull(cache.get("key"));
+  Assert.assertTrue(removeThread.isSuccess());
+}

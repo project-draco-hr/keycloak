@@ -1,0 +1,20 @@
+{
+  final DefaultCacheManager cacheManager=getVersionedCacheManager();
+  ExecutorService executor=Executors.newSingleThreadExecutor();
+  RemoveThread removeThread=new RemoveThread(cacheManager);
+  Cache<String,String> cache=cacheManager.getCache(InfinispanConnectionProvider.REALM_CACHE_NAME);
+  cache.put("key","value0");
+  startBatch(cache);
+  cache.get("key");
+  executor.execute(removeThread);
+  removeThread.getLatch().await();
+  cache.put("key","value1");
+  try {
+    endBatch(cache);
+    Assert.fail("Write skew should be detected");
+  }
+ catch (  Exception e) {
+  }
+  Assert.assertNull(cache.get("key"));
+  Assert.assertTrue(removeThread.isSuccess());
+}

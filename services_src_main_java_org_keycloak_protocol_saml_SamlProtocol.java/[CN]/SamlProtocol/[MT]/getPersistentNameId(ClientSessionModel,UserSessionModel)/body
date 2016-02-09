@@ -1,0 +1,16 @@
+{
+  final UserModel user=userSession.getUser();
+  final String clientNameId=String.format("%s.%s",SAML_PERSISTENT_NAME_ID_FOR,clientSession.getClient().getClientId());
+  String samlPersistentNameId=user.getFirstAttribute(clientNameId);
+  if (samlPersistentNameId != null) {
+    return samlPersistentNameId;
+  }
+  final String wildcardNameId=String.format("%s.*",SAML_PERSISTENT_NAME_ID_FOR);
+  samlPersistentNameId=user.getFirstAttribute(wildcardNameId);
+  if (samlPersistentNameId != null) {
+    return samlPersistentNameId;
+  }
+  samlPersistentNameId="G-" + UUID.randomUUID().toString();
+  user.setSingleAttribute(clientNameId,samlPersistentNameId);
+  return samlPersistentNameId;
+}

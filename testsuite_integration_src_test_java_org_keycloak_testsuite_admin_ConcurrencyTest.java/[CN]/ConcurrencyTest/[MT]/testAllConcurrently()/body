@@ -1,0 +1,32 @@
+{
+  Thread client=new Thread(new Runnable(){
+    @Override public void run(){
+      try {
+        createClient();
+        passedCreateClient=true;
+      }
+ catch (      Throwable throwable) {
+        throw new RuntimeException(throwable);
+      }
+    }
+  }
+);
+  Thread role=new Thread(new Runnable(){
+    @Override public void run(){
+      try {
+        createRole();
+        passedCreateRole=true;
+      }
+ catch (      Throwable throwable) {
+        throw new RuntimeException(throwable);
+      }
+    }
+  }
+);
+  client.start();
+  role.start();
+  client.join();
+  role.join();
+  Assert.assertTrue(passedCreateClient);
+  Assert.assertTrue(passedCreateRole);
+}

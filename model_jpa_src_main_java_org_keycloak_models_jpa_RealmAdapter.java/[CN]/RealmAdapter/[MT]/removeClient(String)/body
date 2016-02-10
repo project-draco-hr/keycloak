@@ -6,26 +6,10 @@
   for (  RoleModel role : client.getRoles()) {
     client.removeRole(role);
   }
-  ClientEntity clientEntity=null;
-  Iterator<ClientEntity> it=realm.getClients().iterator();
-  while (it.hasNext()) {
-    ClientEntity ae=it.next();
-    if (ae.getId().equals(id)) {
-      clientEntity=ae;
-      it.remove();
-      break;
-    }
-  }
-  for (  ClientEntity a : realm.getClients()) {
-    if (a.getId().equals(id)) {
-      clientEntity=a;
-    }
-  }
-  if (client == null) {
-    return false;
-  }
-  em.remove(clientEntity);
+  ClientEntity clientEntity=em.find(ClientEntity.class,id);
+  if (clientEntity == null)   return false;
   em.createNamedQuery("deleteScopeMappingByClient").setParameter("client",clientEntity).executeUpdate();
+  em.remove(clientEntity);
   em.flush();
   return true;
 }

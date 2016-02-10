@@ -8,7 +8,10 @@
   int num=em.createNamedQuery("deleteGroupRoleMappingsByRealm").setParameter("realm",realm).executeUpdate();
   num=em.createNamedQuery("deleteGroupAttributesByRealm").setParameter("realm",realm).executeUpdate();
   num=em.createNamedQuery("deleteGroupsByRealm").setParameter("realm",realm).executeUpdate();
-  for (  ClientEntity a : new LinkedList<>(realm.getClients())) {
+  TypedQuery<ClientEntity> query=em.createNamedQuery("getClientsByRealm",ClientEntity.class);
+  query.setParameter("realm",realm);
+  List<ClientEntity> clients=query.getResultList();
+  for (  ClientEntity a : clients) {
     adapter.removeClient(a.getId());
   }
   for (  ClientTemplateEntity a : new LinkedList<>(realm.getClientTemplates())) {

@@ -1,0 +1,23 @@
+{
+  CachedGroup cached=cache.getGroup(id);
+  if (cached != null && !cached.getRealm().equals(realm.getId())) {
+    cached=null;
+  }
+  if (cached == null) {
+    Long loaded=cache.getCurrentRevision(id);
+    GroupModel model=getDelegate().getGroupById(id,realm);
+    if (model == null)     return null;
+    if (groupInvalidations.contains(id))     return model;
+    cached=new RevisionedCachedGroup(loaded,realm,model);
+    cache.addCachedGroup(cached);
+  }
+ else   if (groupInvalidations.contains(id)) {
+    return getDelegate().getGroupById(id,realm);
+  }
+ else   if (managedGroups.containsKey(id)) {
+    return managedGroups.get(id);
+  }
+  GroupAdapter adapter=new GroupAdapter(cached,this,session,realm);
+  managedGroups.put(id,adapter);
+  return adapter;
+}

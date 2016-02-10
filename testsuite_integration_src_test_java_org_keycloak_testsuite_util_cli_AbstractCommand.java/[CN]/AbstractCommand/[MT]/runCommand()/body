@@ -1,0 +1,15 @@
+{
+  try {
+    KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+      @Override public void run(      KeycloakSession session){
+        doRunCommand(session);
+      }
+    }
+);
+  }
+ catch (  HandledException handled) {
+  }
+catch (  RuntimeException e) {
+    log.error("Error occured during command. ",e);
+  }
+}

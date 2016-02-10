@@ -1,0 +1,16 @@
+{
+  String realmName=getArg(0);
+  String username=getArg(1);
+  RealmModel realm=session.realms().getRealmByName(realmName);
+  if (realm == null) {
+    log.errorf("Unknown realm: %s",realmName);
+    return;
+  }
+  UserModel user=session.users().getUserByUsername(username,realm);
+  if (user == null) {
+    log.infof("User '%s' doesn't exist in realm '%s'",username,realmName);
+  }
+ else {
+    log.infof("User: ID: '%s', username: '%s', mail: '%s'",user.getId(),user.getUsername(),user.getEmail());
+  }
+}

@@ -1,0 +1,26 @@
+{
+  Set<RoleModel> result=new HashSet<>();
+  String[] roles=rolesList.split(",");
+  for (  String roleName : roles) {
+    roleName=roleName.trim();
+    RoleModel role;
+    if (roleName.contains("/")) {
+      String[] spl=roleName.split("/");
+      ClientModel client=realm.getClientByClientId(spl[0]);
+      if (client == null) {
+        log.errorf("Client not found: %s",spl[0]);
+        throw new HandledException();
+      }
+      role=client.getRole(spl[1]);
+    }
+ else {
+      role=realm.getRole(roleName);
+    }
+    if (role == null) {
+      log.errorf("Role not found: %s",roleName);
+      throw new HandledException();
+    }
+    result.add(role);
+  }
+  return result;
+}

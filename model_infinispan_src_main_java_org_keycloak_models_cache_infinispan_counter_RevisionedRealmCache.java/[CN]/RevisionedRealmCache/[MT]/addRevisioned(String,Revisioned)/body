@@ -1,10 +1,10 @@
 {
   Long rev=revisions.get(id);
   if (rev == null) {
+    logger.tracev("rev was null in addRevisioned, adding one");
     rev=UpdateCounter.next();
     revisions.put(id,rev);
+    return;
   }
-  if (rev.equals(object.getRevision())) {
-    cache.putForExternalRead(id,object);
-  }
+  cache.putForExternalRead(id,object);
 }

@@ -4,11 +4,12 @@
     logger.tracev("by id cache hit: {0}",cached.getName());
   }
   if (cached == null) {
-    Long loaded=cache.getCurrentRevision(id);
+    Long loaded=UpdateCounter.current();
     RealmModel model=getDelegate().getRealm(id);
     if (model == null)     return null;
     if (realmInvalidations.contains(id))     return model;
     cached=new RevisionedCachedRealm(loaded,cache,this,model);
+    logger.tracev("try caching realm: {0} {1}",cached.getName(),loaded);
     cache.addCachedRealm(cached);
   }
  else   if (realmInvalidations.contains(id)) {

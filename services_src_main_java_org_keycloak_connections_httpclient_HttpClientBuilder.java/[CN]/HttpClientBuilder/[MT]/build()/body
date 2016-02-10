@@ -36,7 +36,10 @@ tlsContext.init(null,null,null);
 sslsf=new SSLConnectionSocketFactory(tlsContext,verifier);
 }
 RequestConfig requestConfig=RequestConfig.custom().setConnectTimeout((int)establishConnectionTimeout).setSocketTimeout((int)socketTimeout).build();
-org.apache.http.impl.client.HttpClientBuilder builder=HttpClients.custom().setDefaultRequestConfig(requestConfig).setSSLSocketFactory(sslsf).setMaxConnTotal(connectionPoolSize).setMaxConnPerRoute(maxPooledPerRoute);
+org.apache.http.impl.client.HttpClientBuilder builder=HttpClients.custom().setDefaultRequestConfig(requestConfig).setSSLSocketFactory(sslsf).setMaxConnTotal(connectionPoolSize).setMaxConnPerRoute(maxPooledPerRoute).setConnectionTimeToLive(connectionTTL,connectionTTLUnit);
+if (maxConnectionIdleTime > 0) {
+builder.evictIdleConnections(maxConnectionIdleTime,maxConnectionIdleTimeUnit);
+}
 if (disableCookies) builder.disableCookieManagement();
 return builder.build();
 }

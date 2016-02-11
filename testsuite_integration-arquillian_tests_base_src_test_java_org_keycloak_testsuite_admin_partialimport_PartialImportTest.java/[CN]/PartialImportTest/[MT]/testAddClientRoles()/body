@@ -1,0 +1,11 @@
+{
+  setFail();
+  addClientRoles();
+  PartialImportResults results=doImport();
+  assertEquals(NUM_ENTITIES,results.getAdded());
+  List<RoleRepresentation> clientRoles=clientRolesClient().roles().list();
+  assertEquals(NUM_ENTITIES,clientRoles.size());
+  for (  RoleRepresentation roleRep : clientRoles) {
+    assertTrue(roleRep.getName().startsWith(CLIENT_ROLE_PREFIX));
+  }
+}

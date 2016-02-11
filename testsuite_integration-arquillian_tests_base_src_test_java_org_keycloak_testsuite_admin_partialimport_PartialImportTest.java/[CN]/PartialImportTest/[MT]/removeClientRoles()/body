@@ -1,0 +1,8 @@
+{
+  List<RoleRepresentation> toRemove=clientRolesClient().roles().list();
+  for (  RoleRepresentation role : toRemove) {
+    if (role.getName().startsWith(CLIENT_ROLE_PREFIX)) {
+      testRealmResource().clients().get(CLIENT_ROLES_CLIENT).roles().get(role.getName()).remove();
+    }
+  }
+}

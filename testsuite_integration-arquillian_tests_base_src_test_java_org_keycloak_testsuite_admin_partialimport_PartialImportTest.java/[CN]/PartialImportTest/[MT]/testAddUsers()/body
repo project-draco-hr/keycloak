@@ -1,0 +1,12 @@
+{
+  setFail();
+  addUsers();
+  PartialImportResults results=doImport();
+  assertEquals(NUM_ENTITIES,results.getAdded());
+  for (  PartialImportResult result : results.getResults()) {
+    String id=result.getId();
+    UserResource userRsc=testRealmResource().users().get(id);
+    UserRepresentation user=userRsc.toRepresentation();
+    assertTrue(user.getUsername().startsWith(USER_PREFIX));
+  }
+}

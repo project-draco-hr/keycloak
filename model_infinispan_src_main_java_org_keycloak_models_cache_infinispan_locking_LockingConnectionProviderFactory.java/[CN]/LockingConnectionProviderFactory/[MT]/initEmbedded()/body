@@ -1,7 +1,7 @@
 {
   super.initEmbedded();
   ConfigurationBuilder counterConfigBuilder=new ConfigurationBuilder();
-  counterConfigBuilder.transaction().transactionMode(TransactionMode.TRANSACTIONAL);
+  counterConfigBuilder.invocationBatching().enable().transaction().transactionMode(TransactionMode.TRANSACTIONAL);
   counterConfigBuilder.transaction().transactionManagerLookup(new DummyTransactionManagerLookup());
   counterConfigBuilder.transaction().lockingMode(LockingMode.PESSIMISTIC);
   Configuration counterCacheConfiguration=counterConfigBuilder.build();

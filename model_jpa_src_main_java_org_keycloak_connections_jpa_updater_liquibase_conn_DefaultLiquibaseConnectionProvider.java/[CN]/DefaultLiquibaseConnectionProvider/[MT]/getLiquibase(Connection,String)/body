@@ -5,5 +5,7 @@
   }
   String changelog=(database instanceof DB2Database) ? LiquibaseJpaUpdaterProvider.DB2_CHANGELOG : LiquibaseJpaUpdaterProvider.CHANGELOG;
   logger.debugf("Using changelog file: %s",changelog);
-  return new Liquibase(changelog,new ClassLoaderResourceAccessor(getClass().getClassLoader()),database);
+  ResourceAccessor resourceAccessor=new ClassLoaderResourceAccessor(getClass().getClassLoader());
+  DatabaseChangeLog databaseChangeLog=generateDynamicChangeLog(changelog,resourceAccessor,database);
+  return new Liquibase(databaseChangeLog,resourceAccessor,database);
 }

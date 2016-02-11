@@ -3,7 +3,11 @@
   List<ParsedPersistenceXmlDescriptor> persistenceUnits=parser.doResolve(properties);
   for (  ParsedPersistenceXmlDescriptor persistenceUnit : persistenceUnits) {
     if (persistenceUnit.getName().equals(unitName)) {
-      return Bootstrap.getEntityManagerFactoryBuilder(persistenceUnit,properties,classLoader).build();
+      List<Class<?>> providedEntities=getProvidedEntities(session);
+      for (      Class<?> entityClass : providedEntities) {
+        persistenceUnit.addClasses(entityClass.getName());
+      }
+      return Bootstrap.getEntityManagerFactoryBuilder(persistenceUnit,properties,new ProxyClassLoader(providedEntities,classLoader)).build();
     }
   }
   throw new RuntimeException("Persistence unit '" + unitName + "' not found");

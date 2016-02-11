@@ -1,0 +1,34 @@
+{
+  ChangeLogParameters changeLogParameters=new ChangeLogParameters(database);
+  ChangeLogParser parser=ChangeLogParserFactory.getInstance().getParser(changelog,resourceAccessor);
+  DatabaseChangeLog keycloakDatabaseChangeLog=parser.parse(changelog,changeLogParameters,resourceAccessor);
+  List<String> locations=new ArrayList<>();
+  Set<JpaEntityProvider> entityProviders=keycloakSession.getAllProviders(JpaEntityProvider.class);
+  for (  JpaEntityProvider entityProvider : entityProviders) {
+    String location=entityProvider.getChangelogLocation();
+    if (location != null) {
+      locations.add(location);
+    }
+  }
+  final DatabaseChangeLog dynamicMasterChangeLog;
+  if (locations.isEmpty()) {
+    dynamicMasterChangeLog=keycloakDatabaseChangeLog;
+  }
+ else {
+    dynamicMasterChangeLog=new DatabaseChangeLog();
+    dynamicMasterChangeLog.setChangeLogParameters(changeLogParameters);
+    for (    ChangeSet changeSet : keycloakDatabaseChangeLog.getChangeSets()) {
+      dynamicMasterChangeLog.addChangeSet(changeSet);
+    }
+    ProxyClassLoader proxyClassLoader=new ProxyClassLoader(JpaUtils.getProvidedEntities(keycloakSession));
+    for (    String location : locations) {
+      ResourceAccessor proxyResourceAccessor=new ClassLoaderResourceAccessor(proxyClassLoader);
+      ChangeLogParser locationParser=ChangeLogParserFactory.getInstance().getParser(location,proxyResourceAccessor);
+      DatabaseChangeLog locationDatabaseChangeLog=locationParser.parse(location,changeLogParameters,proxyResourceAccessor);
+      for (      ChangeSet changeSet : locationDatabaseChangeLog.getChangeSets()) {
+        dynamicMasterChangeLog.addChangeSet(changeSet);
+      }
+    }
+  }
+  return dynamicMasterChangeLog;
+}

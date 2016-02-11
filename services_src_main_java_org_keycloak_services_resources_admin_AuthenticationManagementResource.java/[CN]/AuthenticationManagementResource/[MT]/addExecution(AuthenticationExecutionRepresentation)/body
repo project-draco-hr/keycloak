@@ -1,0 +1,11 @@
+{
+  this.auth.requireManage();
+  AuthenticationExecutionModel model=RepresentationToModel.toModel(realm,execution);
+  AuthenticationFlowModel parentFlow=getParentFlow(model);
+  if (parentFlow.isBuiltIn()) {
+    throw new BadRequestException("It is illegal to add execution to a built in flow");
+  }
+  model.setPriority(getNextPriority(parentFlow));
+  model=realm.addAuthenticatorExecution(model);
+  return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
+}

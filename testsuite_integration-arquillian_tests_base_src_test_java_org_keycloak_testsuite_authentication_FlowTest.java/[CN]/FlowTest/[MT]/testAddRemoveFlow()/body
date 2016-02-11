@@ -1,0 +1,35 @@
+{
+  List<AuthenticationFlowRepresentation> flows=authMgmtResource.getFlows();
+  for (  AuthenticationFlowRepresentation flow : flows) {
+    try {
+      authMgmtResource.deleteFlow(flow.getId());
+      Assert.fail("deleteFlow should fail for built in flow");
+    }
+ catch (    BadRequestException e) {
+      break;
+    }
+  }
+  Response response=authMgmtResource.createFlow(newFlow("browser","Browser flow","basic-flow",true,false));
+  try {
+    Assert.assertEquals("createFlow using the alias of existing flow should fail",409,response.getStatus());
+  }
+  finally {
+    response.close();
+  }
+  AuthenticationFlowRepresentation newFlow=newFlow("browser-2","Browser flow","basic-flow",true,false);
+  response=authMgmtResource.createFlow(newFlow);
+  try {
+    Assert.assertEquals("createFlow success",201,response.getStatus());
+  }
+  finally {
+    response.close();
+  }
+  flows=authMgmtResource.getFlows();
+  AuthenticationFlowRepresentation found=findFlowByAlias("browser-2",flows);
+  Assert.assertNotNull("created flow visible",found);
+  compareFlows(newFlow,found);
+  authMgmtResource.deleteFlow(found.getId());
+  flows=authMgmtResource.getFlows();
+  found=findFlowByAlias("browser-2",flows);
+  Assert.assertNull("flow deleted",found);
+}

@@ -1,0 +1,11 @@
+{
+  this.auth.requireManage();
+  if (flow.getAlias() == null || flow.getAlias().isEmpty()) {
+    return ErrorResponse.exists("Failed to create flow with empty alias name");
+  }
+  if (realm.getFlowByAlias(flow.getAlias()) != null) {
+    return ErrorResponse.exists("Flow " + flow.getAlias() + " already exists");
+  }
+  realm.addAuthenticationFlow(RepresentationToModel.toModel(flow));
+  return Response.status(201).build();
+}

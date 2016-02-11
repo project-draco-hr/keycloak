@@ -1,7 +1,9 @@
 {
-  List<ClientModel> list=new ArrayList<ClientModel>();
-  if (realm.getClients() == null)   return list;
-  for (  ClientEntity entity : realm.getClients()) {
+  List<ClientModel> list=new LinkedList<>();
+  TypedQuery<ClientEntity> query=em.createNamedQuery("getClientsByRealm",ClientEntity.class);
+  query.setParameter("realm",realm);
+  List<ClientEntity> clients=query.getResultList();
+  for (  ClientEntity entity : clients) {
     list.add(new ClientAdapter(this,em,session,entity));
   }
   return list;

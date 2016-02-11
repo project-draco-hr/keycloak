@@ -1,0 +1,17 @@
+{
+  Revisioned o=(Revisioned)cache.get(id);
+  if (o == null) {
+    return null;
+  }
+  Long rev=revisions.get(id);
+  if (rev == null) {
+    logger.tracev("get() missing rev");
+    return null;
+  }
+  long oRev=o.getRevision() == null ? -1L : o.getRevision().longValue();
+  if (rev > oRev) {
+    logger.tracev("stale rev: {0} o.rev: {1}",rev.longValue(),oRev);
+    return null;
+  }
+  return o != null && type.isInstance(o) ? type.cast(o) : null;
+}

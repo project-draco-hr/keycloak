@@ -21,11 +21,9 @@
       clientEntity=a;
     }
   }
-  if (client == null) {
-    return false;
-  }
-  em.remove(clientEntity);
+  if (clientEntity == null)   return false;
   em.createNamedQuery("deleteScopeMappingByClient").setParameter("client",clientEntity).executeUpdate();
+  em.remove(clientEntity);
   em.flush();
   return true;
 }

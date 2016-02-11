@@ -1,0 +1,13 @@
+{
+  Cache<String,String> cache=cacheManager.getCache(InfinispanConnectionProvider.REALM_CACHE_NAME);
+  try {
+    startBatch(cache);
+    cache.remove("key");
+    endBatch(cache);
+    success=true;
+  }
+ catch (  Exception e) {
+    success=false;
+  }
+  latch.countDown();
+}

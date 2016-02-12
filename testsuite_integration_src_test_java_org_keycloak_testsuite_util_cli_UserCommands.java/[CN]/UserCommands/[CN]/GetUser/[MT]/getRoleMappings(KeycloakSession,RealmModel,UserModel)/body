@@ -1,0 +1,14 @@
+{
+  Set<RoleModel> roles=user.getRoleMappings();
+  List<String> result=new LinkedList<>();
+  for (  RoleModel role : roles) {
+    if (role.getContainer() instanceof RealmModel) {
+      result.add(role.getName());
+    }
+ else {
+      ClientModel client=(ClientModel)role.getContainer();
+      result.add(client.getClientId() + "/" + role.getName());
+    }
+  }
+  return result;
+}

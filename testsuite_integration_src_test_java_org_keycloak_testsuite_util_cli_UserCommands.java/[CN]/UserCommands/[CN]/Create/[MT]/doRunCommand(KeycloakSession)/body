@@ -1,27 +1,25 @@
 {
-  String usernamePrefix=getArg(0);
-  String password=getArg(1);
-  String realmName=getArg(2);
+  usernamePrefix=getArg(0);
+  password=getArg(1);
+  realmName=getArg(2);
   int first=getIntArg(3);
   int count=getIntArg(4);
-  String roleNames=getArg(5);
-  RealmModel realm=session.realms().getRealmByName(realmName);
-  if (realm == null) {
-    log.errorf("Unknown realm: %s",realmName);
-    return;
-  }
-  Set<RoleModel> roles=findRoles(realm,roleNames);
-  int last=first + count;
-  for (int counter=first; counter < last; counter++) {
-    String username=usernamePrefix + counter;
-    UserModel user=session.users().addUser(realm,username);
-    user.setEnabled(true);
-    user.setEmail(username + "@keycloak.org");
-    UserCredentialModel passwordCred=UserCredentialModel.password(password);
-    user.updateCredential(passwordCred);
-    for (    RoleModel role : roles) {
-      user.grantRole(role);
+  int batchCount=getIntArg(5);
+  roleNames=getArg(6);
+  final StateHolder state=new StateHolder();
+  state.firstInThisBatch=first;
+  state.remaining=count;
+  state.countInThisBatch=Math.min(batchCount,state.remaining);
+  while (state.remaining > 0) {
+    KeycloakModelUtils.runJobInTransaction(session.getKeycloakSessionFactory(),new KeycloakSessionTask(){
+      @Override public void run(      KeycloakSession session){
+        createUsersInBatch(session,state.firstInThisBatch,state.countInThisBatch);
+      }
     }
+);
+    state.firstInThisBatch=state.firstInThisBatch + state.countInThisBatch;
+    state.remaining=state.remaining - state.countInThisBatch;
+    state.countInThisBatch=Math.min(batchCount,state.remaining);
   }
-  log.infof("Users from %s to %s created",usernamePrefix + first,usernamePrefix + (last - 1));
+  log.infof("Command finished. All users from %s to %s created",usernamePrefix + first,usernamePrefix + (first + count - 1));
 }

@@ -1,0 +1,21 @@
+{
+  List<StressTest> tests=new LinkedList<>();
+  ExecutorService executor=Executors.newFixedThreadPool(threads);
+  ExecutorCompletionService<StressTest> completionService=new ExecutorCompletionService<>(executor);
+  StressResult result=new StressResult("num threads:" + threads);
+  addTest(factory,result,tests,threads + 5);
+  long start=System.currentTimeMillis();
+  for (  StressTest stressTest : tests) {
+    completionService.submit(stressTest);
+  }
+  for (int i=0; i < jobs; i++) {
+    Future<StressTest> future=completionService.take();
+    StressTest stressTest=future.get();
+    if (i < jobs - threads - 5)     completionService.submit(stressTest);
+  }
+  executor.shutdown();
+  executor.awaitTermination(10,TimeUnit.SECONDS);
+  long end=System.currentTimeMillis() - start;
+  RateResult rate=new RateResult(result,threads,end);
+  return rate;
+}

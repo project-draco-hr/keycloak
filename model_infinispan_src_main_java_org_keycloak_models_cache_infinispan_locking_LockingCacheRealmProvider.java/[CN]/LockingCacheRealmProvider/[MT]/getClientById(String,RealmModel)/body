@@ -8,6 +8,7 @@
   }
   if (cached == null) {
     Long loaded=cache.getCurrentRevision(id);
+    if (loaded == null)     loaded=UpdateCounter.current();
     ClientModel model=getDelegate().getClientById(id,realm);
     if (model == null)     return null;
     if (appInvalidations.contains(id))     return model;

@@ -1,15 +1,16 @@
 {
-  CachedRealm cached=cache.getCachedRealm(id);
+  CachedRealm cached=cache.getRealm(id);
   if (cached != null) {
     logger.tracev("by id cache hit: {0}",cached.getName());
   }
   if (cached == null) {
     Long loaded=cache.getCurrentRevision(id);
+    if (loaded == null)     loaded=UpdateCounter.current();
     RealmModel model=getDelegate().getRealm(id);
     if (model == null)     return null;
     if (realmInvalidations.contains(id))     return model;
     cached=new RevisionedCachedRealm(loaded,cache,this,model);
-    cache.addCachedRealm(cached);
+    cache.addRealm(cached);
   }
  else   if (realmInvalidations.contains(id)) {
     return getDelegate().getRealm(id);

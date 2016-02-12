@@ -1,14 +1,15 @@
 {
-  CachedRealm cached=cache.getCachedRealmByName(name);
+  CachedRealm cached=cache.getRealmByName(name);
   if (cached != null) {
     logger.tracev("by name cache hit: {0}",cached.getName());
   }
   if (cached == null) {
+    Long loaded=UpdateCounter.current();
     RealmModel model=getDelegate().getRealmByName(name);
     if (model == null)     return null;
     if (realmInvalidations.contains(model.getId()))     return model;
-    cached=new RevisionedCachedRealm(null,cache,this,model);
-    cache.addCachedRealm(cached);
+    cached=new RevisionedCachedRealm(loaded,cache,this,model);
+    cache.addRealm(cached);
   }
  else   if (realmInvalidations.contains(cached.getId())) {
     return getDelegate().getRealmByName(name);

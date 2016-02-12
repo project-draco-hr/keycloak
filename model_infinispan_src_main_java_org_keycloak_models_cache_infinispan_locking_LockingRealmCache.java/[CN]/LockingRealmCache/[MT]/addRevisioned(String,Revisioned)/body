@@ -1,0 +1,29 @@
+{
+  try {
+    Long rev=revisions.get(id);
+    if (rev == null) {
+      rev=UpdateCounter.current();
+      revisions.put(id,rev);
+    }
+    revisions.startBatch();
+    if (!revisions.getAdvancedCache().lock(id)) {
+      logger.trace("Could not obtain version lock");
+    }
+    rev=revisions.get(id);
+    if (rev == null) {
+      return;
+    }
+    if (rev.equals(object.getRevision())) {
+      cache.putForExternalRead(id,object);
+      return;
+    }
+    if (rev > object.getRevision()) {
+      return;
+    }
+    revisions.put(id,object.getRevision());
+    cache.putForExternalRead(id,object);
+  }
+  finally {
+    endRevisionBatch();
+  }
+}

@@ -5,11 +5,12 @@
   }
   if (cached == null) {
     Long loaded=cache.getCurrentRevision(id);
+    if (loaded == null)     loaded=UpdateCounter.current();
     GroupModel model=getDelegate().getGroupById(id,realm);
     if (model == null)     return null;
     if (groupInvalidations.contains(id))     return model;
     cached=new RevisionedCachedGroup(loaded,realm,model);
-    cache.addCachedGroup(cached);
+    cache.addGroup(cached);
   }
  else   if (groupInvalidations.contains(id)) {
     return getDelegate().getGroupById(id,realm);

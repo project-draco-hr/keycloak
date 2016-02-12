@@ -1,0 +1,17 @@
+{
+  System.out.println("*************************");
+  System.out.println();
+  System.out.println();
+  TestFactory factory=new TestFactory(){
+    @Override public org.keycloak.test.stress.Test create(){
+      LoginLogout test=new LoginLogout();
+      test.authServerUrl("http://localhost:8081/auth").realm("demo").username("bburke@redhat.com").password("password").securedResourceUrl("http://localhost:8081/customer-portal");
+      return test;
+    }
+  }
+;
+  MaxRateExecutor executor=new MaxRateExecutor();
+  executor.best(factory,10);
+  executor.printResults();
+  executor.printSummary();
+}

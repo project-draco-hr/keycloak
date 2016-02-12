@@ -1,0 +1,13 @@
+{
+  ClientModel client=getClientById(id,realm);
+  if (client == null)   return false;
+  registerApplicationInvalidation(id);
+  registerRealmInvalidation(realm.getId());
+  cache.invalidateClientById(id);
+  cache.invalidateRealmById(realm.getId());
+  Set<RoleModel> roles=client.getRoles();
+  for (  RoleModel role : roles) {
+    registerRoleInvalidation(role.getId());
+  }
+  return getDelegate().removeClient(id,realm);
+}

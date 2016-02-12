@@ -5,11 +5,12 @@
   }
   if (cached == null) {
     Long loaded=cache.getCurrentRevision(id);
+    if (loaded == null)     loaded=UpdateCounter.current();
     ClientTemplateModel model=getDelegate().getClientTemplateById(id,realm);
     if (model == null)     return null;
     if (clientTemplateInvalidations.contains(id))     return model;
     cached=new RevisionedCachedClientTemplate(loaded,cache,getDelegate(),realm,model);
-    cache.addCachedClientTemplate(cached);
+    cache.addClientTemplate(cached);
   }
  else   if (clientTemplateInvalidations.contains(id)) {
     return getDelegate().getClientTemplateById(id,realm);

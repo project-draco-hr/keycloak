@@ -1,0 +1,12 @@
+{
+  System.out.println("*************************");
+  System.out.println();
+  System.out.println();
+  StressExecutor executor=new StressExecutor();
+  LoginLogout test=new LoginLogout();
+  test.authServerUrl("http://localhost:8081/auth").realm("demo").username("bburke@redhat.com").password("password").securedResourceUrl("http://localhost:8081/customer-portal");
+  test.init();
+  executor.addTest(test,5);
+  long time=executor.execute();
+  System.out.println("Took: " + time);
+}

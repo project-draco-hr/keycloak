@@ -1,0 +1,19 @@
+{
+  fastest=last=null;
+  int threads=2;
+  do {
+    fastest=last;
+    try {
+      last=execute(factory,threads,jobs);
+      allResults.add(last);
+    }
+ catch (    InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+catch (    ExecutionException e) {
+      throw new RuntimeException(e);
+    }
+    threads++;
+  }
+ while (fastest == null || fastest.time > last.time);
+}

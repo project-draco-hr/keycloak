@@ -1,6 +1,6 @@
 {
   if (updated != null)   return updated.getClients();
-  List<ClientModel> apps=new LinkedList<ClientModel>();
+  List<ClientModel> apps=new LinkedList<>();
   for (  String id : cached.getClients().values()) {
     ClientModel model=cacheSession.getClientById(id,this);
     if (model == null) {
@@ -8,5 +8,5 @@
     }
     apps.add(model);
   }
-  return apps;
+  return Collections.unmodifiableList(apps);
 }

@@ -1,9 +1,9 @@
 {
   Collection<RoleEntity> entities=realm.getDefaultRoles();
-  List<String> roles=new ArrayList<String>();
-  if (entities == null)   return roles;
+  if (entities == null || entities.isEmpty())   return Collections.emptyList();
+  List<String> roles=new LinkedList<>();
   for (  RoleEntity entity : entities) {
     roles.add(entity.getName());
   }
-  return roles;
+  return Collections.unmodifiableList(roles);
 }

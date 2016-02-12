@@ -1,3 +1,7 @@
 {
-  return new HashSet<String>(realm.getEnabledEventTypes());
+  List<String> enabledEventTypes=realm.getEnabledEventTypes();
+  if (enabledEventTypes.isEmpty())   return Collections.EMPTY_SET;
+  Set<String> copy=new HashSet<>();
+  copy.addAll(enabledEventTypes);
+  return Collections.unmodifiableSet(copy);
 }

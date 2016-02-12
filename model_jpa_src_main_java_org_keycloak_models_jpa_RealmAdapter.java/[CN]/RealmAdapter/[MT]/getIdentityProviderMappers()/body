@@ -1,8 +1,10 @@
 {
+  Collection<IdentityProviderMapperEntity> entities=this.realm.getIdentityProviderMappers();
+  if (entities.isEmpty())   return Collections.EMPTY_SET;
   Set<IdentityProviderMapperModel> mappings=new HashSet<IdentityProviderMapperModel>();
-  for (  IdentityProviderMapperEntity entity : this.realm.getIdentityProviderMappers()) {
+  for (  IdentityProviderMapperEntity entity : entities) {
     IdentityProviderMapperModel mapping=entityToModel(entity);
     mappings.add(mapping);
   }
-  return mappings;
+  return Collections.unmodifiableSet(mappings);
 }

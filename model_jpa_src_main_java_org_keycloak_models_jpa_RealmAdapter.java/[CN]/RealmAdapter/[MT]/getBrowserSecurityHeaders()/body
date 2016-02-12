@@ -1,10 +1,11 @@
 {
   Map<String,String> attributes=getAttributes();
+  if (attributes.isEmpty())   return Collections.EMPTY_MAP;
   Map<String,String> headers=new HashMap<String,String>();
   for (  Map.Entry<String,String> entry : attributes.entrySet()) {
     if (entry.getKey().startsWith(BROWSER_HEADER_PREFIX)) {
       headers.put(entry.getKey().substring(BROWSER_HEADER_PREFIX.length()),entry.getValue());
     }
   }
-  return headers;
+  return Collections.unmodifiableMap(headers);
 }

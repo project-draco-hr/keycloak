@@ -1,7 +1,9 @@
 {
+  Collection<RequiredActionProviderEntity> entities=realm.getRequiredActionProviders();
+  if (entities.isEmpty())   return Collections.EMPTY_LIST;
   List<RequiredActionProviderModel> actions=new LinkedList<>();
-  for (  RequiredActionProviderEntity entity : realm.getRequiredActionProviders()) {
+  for (  RequiredActionProviderEntity entity : entities) {
     actions.add(entityToModel(entity));
   }
-  return actions;
+  return Collections.unmodifiableList(actions);
 }

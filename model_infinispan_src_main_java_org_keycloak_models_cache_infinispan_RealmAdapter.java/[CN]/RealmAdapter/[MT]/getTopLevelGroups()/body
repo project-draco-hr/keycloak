@@ -1,11 +1,11 @@
 {
-  List<GroupModel> all=getGroups();
-  Iterator<GroupModel> it=all.iterator();
-  while (it.hasNext()) {
-    GroupModel group=it.next();
-    if (group.getParent() != null) {
-      it.remove();
+  List<GroupModel> base=getGroups();
+  if (base.isEmpty())   return base;
+  List<GroupModel> copy=new LinkedList<>();
+  for (  GroupModel group : base) {
+    if (group.getParent() == null) {
+      copy.add(group);
     }
   }
-  return all;
+  return Collections.unmodifiableList(copy);
 }

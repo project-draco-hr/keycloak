@@ -44,35 +44,38 @@
   emailTheme=model.getEmailTheme();
   requiredCredentials=model.getRequiredCredentials();
   userFederationProviders=model.getUserFederationProviders();
-  for (  UserFederationMapperModel mapper : model.getUserFederationMappers()) {
-    userFederationMappers.add(mapper.getFederationProviderId(),mapper);
+  userFederationMapperSet=model.getUserFederationMappers();
+  for (  UserFederationMapperModel mapper : userFederationMapperSet) {
+    this.userFederationMappers.add(mapper.getFederationProviderId(),mapper);
   }
   this.identityProviders=new ArrayList<>();
   for (  IdentityProviderModel identityProviderModel : model.getIdentityProviders()) {
     this.identityProviders.add(new IdentityProviderModel(identityProviderModel));
   }
+  this.identityProviders=Collections.unmodifiableList(this.identityProviders);
   for (  IdentityProviderMapperModel mapper : model.getIdentityProviderMappers()) {
     identityProviderMappers.add(mapper.getIdentityProviderAlias(),mapper);
   }
-  smtpConfig.putAll(model.getSmtpConfig());
-  browserSecurityHeaders.putAll(model.getBrowserSecurityHeaders());
+  smtpConfig=model.getSmtpConfig();
+  browserSecurityHeaders=model.getBrowserSecurityHeaders();
   eventsEnabled=model.isEventsEnabled();
   eventsExpiration=model.getEventsExpiration();
-  eventsListeners.addAll(model.getEventsListeners());
-  enabledEventTypes.addAll(model.getEnabledEventTypes());
+  eventsListeners=model.getEventsListeners();
+  enabledEventTypes=model.getEnabledEventTypes();
   adminEventsEnabled=model.isAdminEventsEnabled();
   adminEventsDetailsEnabled=model.isAdminEventsDetailsEnabled();
-  defaultRoles.addAll(model.getDefaultRoles());
+  defaultRoles=model.getDefaultRoles();
   ClientModel masterAdminClient=model.getMasterAdminClient();
   this.masterAdminClient=(masterAdminClient != null) ? masterAdminClient.getId() : null;
   cacheRealmRoles(cache,model);
   cacheClients(cache,delegate,model);
   cacheClientTemplates(cache,delegate,model);
   internationalizationEnabled=model.isInternationalizationEnabled();
-  supportedLocales.addAll(model.getSupportedLocales());
+  supportedLocales=model.getSupportedLocales();
   defaultLocale=model.getDefaultLocale();
-  for (  AuthenticationFlowModel flow : model.getAuthenticationFlows()) {
-    authenticationFlows.put(flow.getId(),flow);
+  authenticationFlowList=model.getAuthenticationFlows();
+  for (  AuthenticationFlowModel flow : authenticationFlowList) {
+    this.authenticationFlows.put(flow.getId(),flow);
     authenticationExecutions.put(flow.getId(),new LinkedList<AuthenticationExecutionModel>());
     for (    AuthenticationExecutionModel execution : model.getAuthenticationExecutions(flow.getId())) {
       authenticationExecutions.add(flow.getId(),execution);
@@ -85,8 +88,9 @@
   for (  AuthenticatorConfigModel authenticator : model.getAuthenticatorConfigs()) {
     authenticatorConfigs.put(authenticator.getId(),authenticator);
   }
-  for (  RequiredActionProviderModel action : model.getRequiredActionProviders()) {
-    requiredActionProviders.put(action.getId(),action);
+  requiredActionProviderList=model.getRequiredActionProviders();
+  for (  RequiredActionProviderModel action : requiredActionProviderList) {
+    this.requiredActionProviders.put(action.getId(),action);
     requiredActionProvidersByAlias.put(action.getAlias(),action);
   }
   for (  GroupModel group : model.getDefaultGroups()) {

@@ -1,3 +1,7 @@
 {
-  return new HashSet<String>(realm.getSupportedLocales());
+  List<String> supportedLocales=realm.getSupportedLocales();
+  if (supportedLocales == null || supportedLocales.isEmpty())   return Collections.EMPTY_SET;
+  Set<String> copy=new HashSet<>();
+  copy.addAll(supportedLocales);
+  return Collections.unmodifiableSet(copy);
 }

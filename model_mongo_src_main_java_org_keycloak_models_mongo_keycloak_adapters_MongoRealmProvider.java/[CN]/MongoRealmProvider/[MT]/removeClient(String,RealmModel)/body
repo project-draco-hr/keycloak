@@ -1,0 +1,7 @@
+{
+  if (id == null)   return false;
+  ClientModel client=getClientById(id,realm);
+  if (client == null)   return false;
+  session.users().preRemove(realm,client);
+  return getMongoStore().removeEntity(MongoClientEntity.class,id,invocationContext);
+}

@@ -1,0 +1,20 @@
+{
+  ClientModel client=getClientById(id,realm);
+  if (client == null)   return false;
+  session.users().preRemove(realm,client);
+  for (  RoleModel role : client.getRoles()) {
+    client.removeRole(role);
+  }
+  ClientEntity clientEntity=((ClientAdapter)client).getEntity();
+  em.createNamedQuery("deleteScopeMappingByClient").setParameter("client",clientEntity).executeUpdate();
+  em.flush();
+  em.remove(clientEntity);
+  try {
+    em.flush();
+  }
+ catch (  RuntimeException e) {
+    logger.errorv("Unable to delete client entity: {0} from realm {1}",client.getClientId(),realm.getName());
+    throw e;
+  }
+  return true;
+}

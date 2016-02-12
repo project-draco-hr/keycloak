@@ -1,0 +1,9 @@
+{
+  TypedQuery<ClientEntity> query=em.createNamedQuery("findClientByClientId",ClientEntity.class);
+  query.setParameter("clientId",clientId);
+  query.setParameter("realm",realm.getId());
+  List<ClientEntity> results=query.getResultList();
+  if (results.isEmpty())   return null;
+  ClientEntity entity=results.get(0);
+  return new ClientAdapter(realm,em,session,entity);
+}

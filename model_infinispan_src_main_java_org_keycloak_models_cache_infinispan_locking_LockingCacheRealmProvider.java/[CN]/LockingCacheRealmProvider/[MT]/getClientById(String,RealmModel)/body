@@ -1,9 +1,9 @@
 {
-  CachedClient cached=cache.getApplication(id);
+  CachedClient cached=cache.getClient(id);
   if (cached != null && !cached.getRealm().equals(realm.getId())) {
     cached=null;
   }
-  if (cached != null && cached.getClientId().equals("client")) {
+  if (cached != null) {
     logger.tracev("client by id cache hit: {0}",cached.getClientId());
   }
   if (cached == null) {
@@ -13,7 +13,8 @@
     if (model == null)     return null;
     if (appInvalidations.contains(id))     return model;
     cached=new RevisionedCachedClient(loaded,cache,getDelegate(),realm,model);
-    cache.addCachedClient(cached);
+    logger.tracev("adding client by id cache miss: {0}",cached.getClientId());
+    cache.addClient(cached);
   }
  else   if (appInvalidations.contains(id)) {
     return getDelegate().getClientById(id,realm);

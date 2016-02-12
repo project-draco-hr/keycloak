@@ -1,11 +1,11 @@
 {
-  CachedRealm cached=cache.getCachedRealm(id);
+  CachedRealm cached=cache.getRealm(id);
   if (cached == null) {
     RealmModel model=getDelegate().getRealm(id);
     if (model == null)     return null;
     if (realmInvalidations.contains(id))     return model;
     cached=new CachedRealm(cache,this,model);
-    cache.addCachedRealm(cached);
+    cache.addRealm(cached);
   }
  else   if (realmInvalidations.contains(id)) {
     return getDelegate().getRealm(id);

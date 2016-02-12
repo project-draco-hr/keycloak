@@ -1,5 +1,5 @@
 {
-  CachedRealm cached=cache.getCachedRealmByName(name);
+  CachedRealm cached=cache.getRealmByName(name);
   if (cached != null) {
     logger.tracev("by name cache hit: {0}",cached.getName());
   }
@@ -9,7 +9,7 @@
     if (model == null)     return null;
     if (realmInvalidations.contains(model.getId()))     return model;
     cached=new RevisionedCachedRealm(loaded,cache,this,model);
-    cache.addCachedRealm(cached);
+    cache.addRealm(cached);
   }
  else   if (realmInvalidations.contains(cached.getId())) {
     return getDelegate().getRealmByName(name);

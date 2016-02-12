@@ -13,9 +13,9 @@
     StressTest stressTest=future.get();
     if (i < jobs - threads - 5)     completionService.submit(stressTest);
   }
+  long end=System.currentTimeMillis() - start;
   executor.shutdown();
   executor.awaitTermination(10,TimeUnit.SECONDS);
-  long end=System.currentTimeMillis() - start;
   RateResult rate=new RateResult(result,threads,end);
   return rate;
 }

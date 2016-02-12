@@ -1,11 +1,11 @@
 {
   salesPostServletPage.navigateTo();
-  testRealmSAMLLoginPage.form().login(bburkeUser);
+  testRealmSAMLPostLoginPage.form().login(bburkeUser);
   assertTrue(driver.getPageSource().contains("principal=bburke"));
   salesPostServletPage.logout();
   salesPostServletPage.navigateTo();
-  assertCurrentUrlStartsWith(testRealmSAMLLoginPage);
-  testRealmSAMLLoginPage.form().login("unauthorized","password");
+  assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
+  testRealmSAMLPostLoginPage.form().login("unauthorized","password");
   assertFalse(driver.getPageSource().contains("principal="));
   assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("Status 403"));
   salesPostServletPage.logout();

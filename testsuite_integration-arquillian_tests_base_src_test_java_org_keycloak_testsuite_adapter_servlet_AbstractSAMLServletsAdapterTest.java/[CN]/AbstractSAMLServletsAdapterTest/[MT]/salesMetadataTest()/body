@@ -3,16 +3,24 @@
   modifyDocElementAttribute(doc,"SingleLogoutService","Location","8080",System.getProperty("app.server.http.port",null));
   modifyDocElementAttribute(doc,"AssertionConsumerService","Location","8080",System.getProperty("app.server.http.port",null));
   ClientRepresentation clientRep=testRealmResource().convertClientDescription(IOUtil.documentToString(doc));
+  String appServerUrl;
+  if (Boolean.parseBoolean(System.getProperty("app.server.ssl.required"))) {
+    appServerUrl="https://localhost:" + System.getProperty("app.server.https.port","8543") + "/";
+  }
+ else {
+    appServerUrl="http://localhost:" + System.getProperty("app.server.http.port","8280") + "/";
+  }
+  clientRep.setAdminUrl(appServerUrl + "sales-metadata/saml");
   Response response=testRealmResource().clients().create(clientRep);
   assertEquals(201,response.getStatus());
   response.close();
   salesMetadataServletPage.navigateTo();
-  testRealmSAMLLoginPage.form().login(bburkeUser);
+  testRealmSAMLPostLoginPage.form().login(bburkeUser);
   assertTrue(driver.getPageSource().contains("principal=bburke"));
   salesMetadataServletPage.logout();
   salesMetadataServletPage.navigateTo();
-  assertCurrentUrlStartsWith(testRealmSAMLLoginPage);
-  testRealmSAMLLoginPage.form().login("unauthorized","password");
+  assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
+  testRealmSAMLPostLoginPage.form().login("unauthorized","password");
   assertFalse(driver.getPageSource().contains("principal="));
   assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("Status 403"));
   salesMetadataServletPage.logout();

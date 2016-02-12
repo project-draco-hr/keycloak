@@ -23,12 +23,14 @@
       logger.debug("state not specified");
       throw new BadRequestException("state not specified");
     }
-    URI uri=getBaseRedirectUri();
-    URI redirectUri=path != null ? uri.resolve(path) : uri;
-    if (referrer != null) {
-      redirectUri=redirectUri.resolve("?referrer=" + referrer);
+    KeycloakUriBuilder redirect=KeycloakUriBuilder.fromUri(getBaseRedirectUri());
+    if (path != null) {
+      redirect.path(path);
     }
-    return Response.status(302).location(redirectUri).build();
+    if (referrer != null) {
+      redirect.queryParam("referrer",referrer);
+    }
+    return Response.status(302).location(redirect.build()).build();
   }
   finally {
   }

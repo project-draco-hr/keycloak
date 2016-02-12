@@ -1,0 +1,37 @@
+{
+  RealmRepresentation testRealm=new RealmRepresentation();
+  testRealm.setRealm(realm);
+  testRealm.setEnabled(true);
+  backend1AdminClient().realms().create(testRealm);
+  RealmRepresentation testRealmOnBackend1=backend1AdminClient().realms().realm(realm).toRepresentation();
+  assertEquals(testRealmOnBackend1.getRealm(),testRealm.getRealm());
+  if (containerFailover) {
+    killBackend1();
+  }
+  RealmRepresentation testRealmOnBackend2=backend2AdminClient().realms().realm(realm).toRepresentation();
+  assertEquals(testRealmOnBackend1.getId(),testRealmOnBackend2.getId());
+  assertEquals(testRealmOnBackend1.getRealm(),testRealmOnBackend2.getRealm());
+  failback();
+  String realmUpdated=realm + "_updated";
+  testRealmOnBackend2.setRealm(realmUpdated);
+  backend2AdminClient().realms().realm(realm).update(testRealmOnBackend2);
+  if (containerFailover) {
+    killBackend2();
+  }
+  testRealmOnBackend1=backend1AdminClient().realms().realm(realmUpdated).toRepresentation();
+  assertEquals(testRealmOnBackend1.getId(),testRealmOnBackend2.getId());
+  assertEquals(testRealmOnBackend1.getRealm(),testRealmOnBackend2.getRealm());
+  failback();
+  backend1AdminClient().realms().realm(realmUpdated).remove();
+  if (containerFailover) {
+    killBackend1();
+  }
+  boolean testRealmOnBackend2Exists=false;
+  for (  RealmRepresentation realmOnBackend2 : backend2AdminClient().realms().findAll()) {
+    if (realmUpdated.equals(realmOnBackend2.getRealm()) || testRealmOnBackend1.getId().equals(realmOnBackend2.getId())) {
+      testRealmOnBackend2Exists=true;
+      break;
+    }
+  }
+  assertFalse(testRealmOnBackend2Exists);
+}

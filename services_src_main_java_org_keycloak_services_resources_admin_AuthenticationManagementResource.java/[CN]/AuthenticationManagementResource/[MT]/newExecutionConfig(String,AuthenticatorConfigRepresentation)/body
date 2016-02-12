@@ -1,0 +1,13 @@
+{
+  this.auth.requireManage();
+  AuthenticationExecutionModel model=realm.getAuthenticationExecutionById(execution);
+  if (model == null) {
+    session.getTransaction().setRollbackOnly();
+    throw new NotFoundException("Illegal execution");
+  }
+  AuthenticatorConfigModel config=RepresentationToModel.toModel(json);
+  config=realm.addAuthenticatorConfig(config);
+  model.setAuthenticatorConfig(config.getId());
+  realm.updateAuthenticatorExecution(model);
+  return Response.created(uriInfo.getAbsolutePathBuilder().path(config.getId()).build()).build();
+}

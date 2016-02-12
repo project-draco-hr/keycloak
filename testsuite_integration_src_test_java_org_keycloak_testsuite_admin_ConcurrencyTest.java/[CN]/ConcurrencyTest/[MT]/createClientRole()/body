@@ -1,9 +1,11 @@
 {
+  long start=System.currentTimeMillis();
   ClientRepresentation c=new ClientRepresentation();
   c.setClientId("client");
   Response response=realm.clients().create(c);
   final String clientId=ApiUtil.getCreatedId(response);
   response.close();
+  System.out.println("*********************************************");
   run(new KeycloakRunnable(){
     @Override public void run(    Keycloak keycloak,    RealmResource realm,    int threadNum,    int iterationNum){
       String name="r-" + threadNum + "-"+ iterationNum;
@@ -14,4 +16,7 @@
     }
   }
 );
+  long end=System.currentTimeMillis() - start;
+  System.out.println("createClientRole took " + end);
+  System.out.println("*********************************************");
 }

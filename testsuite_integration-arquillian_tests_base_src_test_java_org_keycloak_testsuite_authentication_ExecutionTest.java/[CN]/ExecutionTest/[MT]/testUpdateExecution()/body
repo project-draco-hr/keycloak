@@ -1,0 +1,16 @@
+{
+  Response response=authMgmtResource.getExecutions("browser");
+  List<AuthenticationExecutionInfoRepresentation> executionReps=response.readEntity(new GenericType<List<AuthenticationExecutionInfoRepresentation>>(){
+  }
+);
+  AuthenticationExecutionInfoRepresentation exec=findExecutionByProvider("auth-cookie",executionReps);
+  Assert.assertEquals("auth-cookie set to ALTERNATIVE",ALTERNATIVE,exec.getRequirement());
+  exec.setRequirement(DISABLED);
+  authMgmtResource.updateExecutions("browser",exec);
+  response=authMgmtResource.getExecutions("browser");
+  executionReps=response.readEntity(new GenericType<List<AuthenticationExecutionInfoRepresentation>>(){
+  }
+);
+  AuthenticationExecutionInfoRepresentation exec2=findExecutionByProvider("auth-cookie",executionReps);
+  compareExecution(exec,exec2);
+}

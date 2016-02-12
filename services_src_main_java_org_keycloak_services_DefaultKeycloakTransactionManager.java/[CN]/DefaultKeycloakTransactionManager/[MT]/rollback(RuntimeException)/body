@@ -1,0 +1,22 @@
+{
+  for (  KeycloakTransaction tx : transactions) {
+    try {
+      tx.rollback();
+    }
+ catch (    RuntimeException e) {
+      exception=exception != null ? e : exception;
+    }
+  }
+  for (  KeycloakTransaction tx : afterCompletion) {
+    try {
+      tx.rollback();
+    }
+ catch (    RuntimeException e) {
+      exception=exception != null ? e : exception;
+    }
+  }
+  active=false;
+  if (exception != null) {
+    throw exception;
+  }
+}

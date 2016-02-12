@@ -9,11 +9,12 @@
     }
     for (    AuthenticationFlowRepresentation flowRep : rep.getAuthenticationFlows()) {
       AuthenticationFlowModel model=toModel(flowRep);
+      model.setId(null);
       model=newRealm.addAuthenticationFlow(model);
     }
     for (    AuthenticationFlowRepresentation flowRep : rep.getAuthenticationFlows()) {
       AuthenticationFlowModel model=newRealm.getFlowByAlias(flowRep.getAlias());
-      for (      AuthenticationExecutionRepresentation exeRep : flowRep.getAuthenticationExecutions()) {
+      for (      AuthenticationExecutionExportRepresentation exeRep : flowRep.getAuthenticationExecutions()) {
         AuthenticationExecutionModel execution=toModel(newRealm,exeRep);
         execution.setParentFlow(model.getId());
         newRealm.addAuthenticatorExecution(execution);

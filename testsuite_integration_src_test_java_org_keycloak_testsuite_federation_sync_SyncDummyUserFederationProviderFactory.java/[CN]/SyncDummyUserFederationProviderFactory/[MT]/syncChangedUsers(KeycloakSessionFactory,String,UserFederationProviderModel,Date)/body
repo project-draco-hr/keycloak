@@ -1,0 +1,28 @@
+{
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      int waitTime=Integer.parseInt(model.getConfig().get(WAIT_TIME));
+      logger.infof("Starting sync of changed users. Wait time is: %s",waitTime);
+      RealmModel realm=session.realms().getRealm(realmId);
+      for (int i=0; i < 10; i++) {
+        String username="dummyuser-" + i;
+        UserModel user=session.userStorage().getUserByUsername(username,realm);
+        if (user != null) {
+          session.userStorage().removeUser(realm,user);
+        }
+        user=session.userStorage().addUser(realm,username);
+      }
+      logger.infof("Finished sync of changed users. Waiting now for %d seconds",waitTime);
+      try {
+        Thread.sleep(waitTime * 1000);
+      }
+ catch (      InterruptedException ie) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException("Interrupted!",ie);
+      }
+      logger.infof("Finished waiting");
+    }
+  }
+);
+  return new UserFederationSyncResult();
+}

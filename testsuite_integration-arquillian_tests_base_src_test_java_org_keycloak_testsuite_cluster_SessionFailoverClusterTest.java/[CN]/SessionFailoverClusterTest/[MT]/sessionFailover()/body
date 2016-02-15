@@ -6,7 +6,7 @@
   assertCurrentUrlStartsWith(accountPage);
   Cookie sessionCookie=driver.manage().getCookieNamed(KEYCLOAK_SESSION_COOKIE);
   assertNotNull(sessionCookie);
-  killBackend1();
+  failure();
   driver.navigate().refresh();
   pause(3000);
   assertCurrentUrlStartsWith(accountPage);
@@ -14,6 +14,7 @@
   assertNotNull(sessionCookieAfterFailover);
   assertEquals(sessionCookieAfterFailover.getValue(),sessionCookie.getValue());
   failback();
+  iterateCurrentFailNode();
   driver.navigate().refresh();
   pause(3000);
   assertCurrentUrlStartsWith(accountPage);
@@ -26,7 +27,7 @@
   masterRealmPage.navigateTo();
   sessionCookie=driver.manage().getCookieNamed(KEYCLOAK_SESSION_COOKIE);
   assertNull(sessionCookie);
-  killBackend1();
+  failure();
   driver.navigate().refresh();
   pause(3000);
   assertCurrentUrlDoesntStartWith(accountPage);

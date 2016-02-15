@@ -6,10 +6,9 @@
   adminClient.realms().create(testRealm);
   RealmRepresentation testRealmOnFrontend=adminClient.realms().realm(realm).toRepresentation();
   assertEquals(testRealmOnFrontend.getRealm(),testRealm.getRealm());
-  RealmRepresentation testRealmOnBackend1=backend1AdminClient().realms().realm(realm).toRepresentation();
-  assertEquals(testRealmOnBackend1.getId(),testRealmOnFrontend.getId());
-  assertEquals(testRealmOnBackend1.getRealm(),testRealmOnFrontend.getRealm());
-  RealmRepresentation testRealmOnBackend2=backend2AdminClient().realms().realm(realm).toRepresentation();
-  assertEquals(testRealmOnBackend2.getId(),testRealmOnFrontend.getId());
-  assertEquals(testRealmOnBackend2.getRealm(),testRealmOnFrontend.getRealm());
+  for (  ContainerInfo backend : suiteContext.getAuthServerBackendsInfo()) {
+    RealmRepresentation testRealmOnBackend=getAdminClientFor(backend).realms().realm(realm).toRepresentation();
+    assertEquals(testRealmOnBackend.getId(),testRealmOnFrontend.getId());
+    assertEquals(testRealmOnBackend.getRealm(),testRealmOnFrontend.getRealm());
+  }
 }

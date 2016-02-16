@@ -1,0 +1,7 @@
+{
+  log.info("Updating realm on: " + getCurrentFailNode());
+  String originalName=realm.getRealm();
+  realm.setRealm(newName);
+  getAdminClientFor(getCurrentFailNode()).realms().realm(originalName).update(realm);
+  return readEntity(realm,getCurrentFailNode());
+}

@@ -1,0 +1,17 @@
+{
+  boolean entityDiffers=false;
+  for (  ContainerInfo survivorNode : getCurrentSurvivorNodes()) {
+    T testEntityOnSurvivorNode=readEntity(testEntityOnFailNode,survivorNode);
+    if (EqualsBuilder.reflectionEquals(testEntityOnSurvivorNode,testEntityOnFailNode,excludedComparisonFields)) {
+      log.info("Verification on survivor " + survivorNode + " PASSED");
+    }
+ else {
+      entityDiffers=true;
+      log.error("Verification on survivor " + survivorNode + " FAILED");
+      String tf=ReflectionToStringBuilder.reflectionToString(testEntityOnFailNode,ToStringStyle.SHORT_PREFIX_STYLE);
+      String ts=ReflectionToStringBuilder.reflectionToString(testEntityOnSurvivorNode,ToStringStyle.SHORT_PREFIX_STYLE);
+      log.error("\nEntity on fail node: \n\n" + tf + "\n"+ "\nEntity on survivor node: \n"+ ts+ "\n"+ "\nDifference: \n"+ StringUtils.difference(tf,ts)+ "\n");
+    }
+  }
+  assertFalse(entityDiffers);
+}

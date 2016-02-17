@@ -1,0 +1,17 @@
+{
+  List<IdentityProviderRepresentation> providers=new ArrayList<>();
+  for (  String alias : IDP_ALIASES) {
+    IdentityProviderRepresentation idpRep=new IdentityProviderRepresentation();
+    idpRep.setAlias(alias);
+    idpRep.setProviderId(alias);
+    idpRep.setEnabled(true);
+    idpRep.setAuthenticateByDefault(false);
+    idpRep.setFirstBrokerLoginFlowAlias("first broker login");
+    Map<String,String> config=new HashMap<>();
+    config.put("clientSecret","secret");
+    config.put("clientId",alias);
+    idpRep.setConfig(config);
+    providers.add(idpRep);
+  }
+  piRep.setIdentityProviders(providers);
+}

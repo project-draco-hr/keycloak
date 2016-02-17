@@ -1,0 +1,12 @@
+{
+  setFail();
+  addClients();
+  PartialImportResults results=doImport();
+  assertEquals(NUM_ENTITIES,results.getAdded());
+  for (  PartialImportResult result : results.getResults()) {
+    String id=result.getId();
+    ClientResource clientRsc=testRealmResource().clients().get(id);
+    ClientRepresentation client=clientRsc.toRepresentation();
+    assertTrue(client.getName().startsWith(CLIENT_PREFIX));
+  }
+}

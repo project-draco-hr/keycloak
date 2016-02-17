@@ -1,0 +1,12 @@
+{
+  setFail();
+  addRealmRoles();
+  PartialImportResults results=doImport();
+  assertEquals(NUM_ENTITIES,results.getAdded());
+  for (  PartialImportResult result : results.getResults()) {
+    String name=result.getResourceName();
+    RoleResource roleRsc=testRealmResource().roles().get(name);
+    RoleRepresentation role=roleRsc.toRepresentation();
+    assertTrue(role.getName().startsWith(REALM_ROLE_PREFIX));
+  }
+}

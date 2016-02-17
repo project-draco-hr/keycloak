@@ -1,5 +1,6 @@
 {
-  List<RequiredCredentialModel> result=new ArrayList<RequiredCredentialModel>();
+  if (credEntities == null || credEntities.isEmpty())   return Collections.EMPTY_LIST;
+  List<RequiredCredentialModel> result=new LinkedList<>();
   for (  RequiredCredentialEntity entity : credEntities) {
     RequiredCredentialModel model=new RequiredCredentialModel();
     model.setFormLabel(entity.getFormLabel());
@@ -8,5 +9,5 @@
     model.setType(entity.getType());
     result.add(model);
   }
-  return result;
+  return Collections.unmodifiableList(result);
 }

@@ -1,5 +1,6 @@
 {
   List<UserFederationProviderEntity> entities=realm.getUserFederationProviders();
+  if (entities.isEmpty())   return Collections.EMPTY_LIST;
   List<UserFederationProviderEntity> copy=new ArrayList<UserFederationProviderEntity>();
   for (  UserFederationProviderEntity entity : entities) {
     copy.add(entity);
@@ -14,5 +15,5 @@
   for (  UserFederationProviderEntity entity : copy) {
     result.add(new UserFederationProviderModel(entity.getId(),entity.getProviderName(),entity.getConfig(),entity.getPriority(),entity.getDisplayName(),entity.getFullSyncPeriod(),entity.getChangedSyncPeriod(),entity.getLastSync()));
   }
-  return result;
+  return Collections.unmodifiableList(result);
 }

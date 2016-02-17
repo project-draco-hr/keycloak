@@ -1,11 +1,16 @@
 {
+  List<IdentityProviderEntity> entities=realm.getIdentityProviders();
+  if (entities.isEmpty())   return Collections.EMPTY_LIST;
   List<IdentityProviderModel> identityProviders=new ArrayList<IdentityProviderModel>();
-  for (  IdentityProviderEntity entity : realm.getIdentityProviders()) {
+  for (  IdentityProviderEntity entity : entities) {
     IdentityProviderModel identityProviderModel=new IdentityProviderModel();
     identityProviderModel.setProviderId(entity.getProviderId());
     identityProviderModel.setAlias(entity.getAlias());
     identityProviderModel.setInternalId(entity.getInternalId());
-    identityProviderModel.setConfig(entity.getConfig());
+    Map<String,String> config=entity.getConfig();
+    Map<String,String> copy=new HashMap<>();
+    copy.putAll(config);
+    identityProviderModel.setConfig(copy);
     identityProviderModel.setEnabled(entity.isEnabled());
     identityProviderModel.setTrustEmail(entity.isTrustEmail());
     identityProviderModel.setAuthenticateByDefault(entity.isAuthenticateByDefault());
@@ -15,5 +20,5 @@
     identityProviderModel.setAddReadTokenRoleOnCreate(entity.isAddReadTokenRoleOnCreate());
     identityProviders.add(identityProviderModel);
   }
-  return identityProviders;
+  return Collections.unmodifiableList(identityProviders);
 }

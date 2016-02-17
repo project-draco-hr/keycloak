@@ -109,10 +109,9 @@
       }
     }
   }
-  Map<String,ClientModel> appMap=newRealm.getClientNameMap();
   if (rep.getClientScopeMappings() != null) {
     for (    Map.Entry<String,List<ScopeMappingRepresentation>> entry : rep.getClientScopeMappings().entrySet()) {
-      ClientModel app=appMap.get(entry.getKey());
+      ClientModel app=newRealm.getClientByClientId(entry.getKey());
       if (app == null) {
         throw new RuntimeException("Unable to find client role mappings for client: " + entry.getKey());
       }
@@ -181,7 +180,7 @@
   }
   if (rep.getUsers() != null) {
     for (    UserRepresentation userRep : rep.getUsers()) {
-      UserModel user=createUser(session,newRealm,userRep,appMap);
+      UserModel user=createUser(session,newRealm,userRep);
     }
   }
   if (rep.isInternationalizationEnabled() != null) {

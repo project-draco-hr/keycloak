@@ -1,8 +1,10 @@
 {
+  List<UserFederationMapperEntity> entities=getMongoEntity().getUserFederationMappers();
+  if (entities.isEmpty())   return Collections.EMPTY_SET;
   Set<UserFederationMapperModel> mappers=new HashSet<UserFederationMapperModel>();
-  for (  UserFederationMapperEntity entity : getMongoEntity().getUserFederationMappers()) {
+  for (  UserFederationMapperEntity entity : entities) {
     UserFederationMapperModel mapper=entityToModel(entity);
     mappers.add(mapper);
   }
-  return mappers;
+  return Collections.unmodifiableSet(mappers);
 }

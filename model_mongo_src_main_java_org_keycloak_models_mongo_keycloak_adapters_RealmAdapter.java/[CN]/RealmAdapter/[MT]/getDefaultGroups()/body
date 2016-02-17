@@ -1,7 +1,9 @@
 {
+  List<String> entities=realm.getDefaultGroups();
+  if (entities == null || entities.isEmpty())   return Collections.EMPTY_LIST;
   List<GroupModel> defaultGroups=new LinkedList<>();
-  for (  String id : realm.getDefaultGroups()) {
+  for (  String id : entities) {
     defaultGroups.add(session.realms().getGroupById(id,this));
   }
-  return defaultGroups;
+  return Collections.unmodifiableList(defaultGroups);
 }

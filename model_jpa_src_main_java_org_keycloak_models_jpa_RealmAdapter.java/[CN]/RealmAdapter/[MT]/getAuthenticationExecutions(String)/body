@@ -4,11 +4,12 @@
   query.setParameter("realm",realm);
   query.setParameter("parentFlow",flow);
   List<AuthenticationExecutionEntity> queryResult=query.getResultList();
+  if (queryResult.isEmpty())   return Collections.EMPTY_LIST;
   List<AuthenticationExecutionModel> executions=new LinkedList<>();
   for (  AuthenticationExecutionEntity entity : queryResult) {
     AuthenticationExecutionModel model=entityToModel(entity);
     executions.add(model);
   }
   Collections.sort(executions,AuthenticationExecutionModel.ExecutionComparator.SINGLETON);
-  return executions;
+  return Collections.unmodifiableList(executions);
 }

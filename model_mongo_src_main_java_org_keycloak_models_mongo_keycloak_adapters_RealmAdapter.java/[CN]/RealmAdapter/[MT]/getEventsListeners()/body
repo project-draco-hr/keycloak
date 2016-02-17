@@ -1,3 +1,7 @@
 {
-  return new HashSet<String>(realm.getEventsListeners());
+  List<String> eventsListeners=realm.getEventsListeners();
+  if (eventsListeners.isEmpty())   return Collections.EMPTY_SET;
+  Set<String> copy=new HashSet<>();
+  copy.addAll(eventsListeners);
+  return Collections.unmodifiableSet(copy);
 }

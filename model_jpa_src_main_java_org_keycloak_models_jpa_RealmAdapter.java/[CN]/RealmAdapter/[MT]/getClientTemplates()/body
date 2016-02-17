@@ -1,8 +1,9 @@
 {
+  Collection<ClientTemplateEntity> entities=realm.getClientTemplates();
+  if (entities == null || entities.isEmpty())   return Collections.EMPTY_LIST;
   List<ClientTemplateModel> list=new LinkedList<>();
-  if (realm.getClientTemplates() == null)   return list;
-  for (  ClientTemplateEntity entity : realm.getClientTemplates()) {
+  for (  ClientTemplateEntity entity : entities) {
     list.add(new ClientTemplateAdapter(this,em,session,entity));
   }
-  return list;
+  return Collections.unmodifiableList(list);
 }

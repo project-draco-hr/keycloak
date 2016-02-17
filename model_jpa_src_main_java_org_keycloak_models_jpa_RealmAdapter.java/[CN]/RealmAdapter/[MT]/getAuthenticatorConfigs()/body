@@ -1,7 +1,9 @@
 {
+  Collection<AuthenticatorConfigEntity> entities=realm.getAuthenticatorConfigs();
+  if (entities.isEmpty())   return Collections.EMPTY_LIST;
   List<AuthenticatorConfigModel> authenticators=new LinkedList<>();
-  for (  AuthenticatorConfigEntity entity : realm.getAuthenticatorConfigs()) {
+  for (  AuthenticatorConfigEntity entity : entities) {
     authenticators.add(entityToModel(entity));
   }
-  return authenticators;
+  return Collections.unmodifiableList(authenticators);
 }

@@ -1,0 +1,24 @@
+{
+  String originalName=realm.getRealm();
+  realm.setRealm(realm.getRealm() + "_updated");
+  realm=updateEntity(originalName,realm,getCurrentFailNode());
+  verifyEntityUpdateDuringFailover(realm,backendFailover);
+  realm.setEnabled(!realm.isEnabled());
+  realm=updateEntityOnCurrentFailNode(realm,"enabled");
+  verifyEntityUpdateDuringFailover(realm,backendFailover);
+  realm.setPublicKey("GENERATE");
+  realm=updateEntityOnCurrentFailNode(realm,"public key");
+  assertNotEquals("GENERATE",realm.getPublicKey());
+  verifyEntityUpdateDuringFailover(realm,backendFailover);
+  realm.setSslRequired("all");
+  realm=updateEntityOnCurrentFailNode(realm,"require ssl");
+  verifyEntityUpdateDuringFailover(realm,backendFailover);
+  realm.setBruteForceProtected(!realm.isBruteForceProtected());
+  realm=updateEntityOnCurrentFailNode(realm,"brute force");
+  verifyEntityUpdateDuringFailover(realm,backendFailover);
+  realm.setBruteForceProtected(true);
+  realm.setFailureFactor(realm.getFailureFactor() + 1);
+  realm=updateEntityOnCurrentFailNode(realm,"brute force failure factor");
+  verifyEntityUpdateDuringFailover(realm,backendFailover);
+  return realm;
+}

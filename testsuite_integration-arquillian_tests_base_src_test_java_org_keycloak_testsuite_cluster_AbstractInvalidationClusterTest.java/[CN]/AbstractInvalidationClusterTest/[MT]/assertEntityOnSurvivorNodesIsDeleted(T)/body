@@ -1,0 +1,14 @@
+{
+  boolean entityExists=false;
+  for (  ContainerInfo survivorNode : getCurrentSurvivorNodes()) {
+    T testEntityOnSurvivorNode=readEntity(testEntityOnFailNode,survivorNode);
+    if (testEntityOnSurvivorNode == null) {
+      log.info(String.format("Verification of %s deletion on survivor %s PASSED",getEntityType(testEntityOnFailNode),survivorNode));
+    }
+ else {
+      entityExists=true;
+      log.error(String.format("Verification of %s deletion on survivor %s FAILED",getEntityType(testEntityOnFailNode),survivorNode));
+    }
+  }
+  assertFalse(entityExists);
+}

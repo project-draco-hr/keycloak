@@ -1,0 +1,16 @@
+{
+  T testEntity=createTestEntityRepresentation();
+  testEntity=createEntityOnCurrentFailNode(testEntity);
+  if (backendFailover) {
+    failure();
+  }
+  assertEntityOnSurvivorNodesEqualsTo(testEntity);
+  failback();
+  iterateCurrentFailNode();
+  testEntity=testEntityUpdates(testEntity,backendFailover);
+  deleteEntityOnCurrentFailNode(testEntity);
+  if (backendFailover) {
+    failure();
+  }
+  assertEntityOnSurvivorNodesIsDeleted(testEntity);
+}

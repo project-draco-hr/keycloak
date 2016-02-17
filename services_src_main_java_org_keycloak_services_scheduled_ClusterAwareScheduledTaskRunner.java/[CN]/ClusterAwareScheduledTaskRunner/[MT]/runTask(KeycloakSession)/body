@@ -1,0 +1,19 @@
+{
+  session.getTransaction().begin();
+  ClusterProvider clusterProvider=session.getProvider(ClusterProvider.class);
+  String taskKey=task.getClass().getSimpleName();
+  ExecutionResult<Void> result=clusterProvider.executeIfNotExecuted(taskKey,intervalSecs,new Callable<Void>(){
+    @Override public Void call() throws Exception {
+      task.run(session);
+      return null;
+    }
+  }
+);
+  session.getTransaction().commit();
+  if (result.isExecuted()) {
+    logger.debugf("Executed scheduled task %s",taskKey);
+  }
+ else {
+    logger.debugf("Skipped execution of task %s as other cluster node is executing it",taskKey);
+  }
+}

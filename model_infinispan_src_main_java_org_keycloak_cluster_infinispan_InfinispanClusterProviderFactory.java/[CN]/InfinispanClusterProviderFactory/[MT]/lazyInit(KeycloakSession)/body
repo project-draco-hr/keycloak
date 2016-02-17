@@ -1,0 +1,11 @@
+{
+  if (workCache == null) {
+synchronized (this) {
+      if (workCache == null) {
+        workCache=session.getProvider(InfinispanConnectionProvider.class).getCache(InfinispanConnectionProvider.WORK_CACHE_NAME);
+        workCache.getCacheManager().addListener(new ViewChangeListener());
+        workCache.addListener(new CacheEntryListener());
+      }
+    }
+  }
+}

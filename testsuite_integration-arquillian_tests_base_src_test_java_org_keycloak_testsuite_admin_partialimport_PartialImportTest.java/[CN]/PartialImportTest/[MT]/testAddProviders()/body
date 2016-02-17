@@ -1,0 +1,13 @@
+{
+  setFail();
+  addProviders();
+  PartialImportResults results=doImport();
+  assertEquals(IDP_ALIASES.length,results.getAdded());
+  for (  PartialImportResult result : results.getResults()) {
+    String id=result.getId();
+    IdentityProviderResource idpRsc=testRealmResource().identityProviders().get(id);
+    IdentityProviderRepresentation idp=idpRsc.toRepresentation();
+    Map<String,String> config=idp.getConfig();
+    assertTrue(Arrays.asList(IDP_ALIASES).contains(config.get("clientId")));
+  }
+}

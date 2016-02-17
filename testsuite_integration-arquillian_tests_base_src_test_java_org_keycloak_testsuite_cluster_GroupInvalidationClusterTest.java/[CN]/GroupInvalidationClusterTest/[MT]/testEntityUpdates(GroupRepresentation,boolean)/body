@@ -1,0 +1,30 @@
+{
+  group.setName(group.getName() + "_updated");
+  group=updateEntityOnCurrentFailNode(group,"name");
+  verifyEntityUpdateDuringFailover(group,backendFailover);
+  group.getAttributes().put("attr3",Arrays.asList(new String[]{"attr3 value"}));
+  group=updateEntityOnCurrentFailNode(group,"attributes - adding");
+  verifyEntityUpdateDuringFailover(group,backendFailover);
+  group.getAttributes().remove("attr3");
+  group=updateEntityOnCurrentFailNode(group,"attributes - removing");
+  verifyEntityUpdateDuringFailover(group,backendFailover);
+  group.getAttributes().get("attr1").set(0,group.getAttributes().get("attr1").get(0) + " - updated");
+  group=updateEntityOnCurrentFailNode(group,"attributes");
+  verifyEntityUpdateDuringFailover(group,backendFailover);
+  group.getAttributes().get("attr2").set(1,group.getAttributes().get("attr2").get(1) + " - updated");
+  group=updateEntityOnCurrentFailNode(group,"attributes");
+  verifyEntityUpdateDuringFailover(group,backendFailover);
+  log.info("Updating Group parent on " + getCurrentFailNode());
+  GroupRepresentation parentGroup=new GroupRepresentation();
+  parentGroup.setName("parent");
+  parentGroup=createEntityOnCurrentFailNode(parentGroup);
+  assertEquals("/" + parentGroup.getName(),parentGroup.getPath());
+  Response r=entityResourceOnCurrentFailNode(parentGroup).subGroup(group);
+  r.close();
+  parentGroup=readEntityOnCurrentFailNode(parentGroup);
+  group=readEntityOnCurrentFailNode(group);
+  assertTrue(ApiUtil.groupContainsSubgroup(parentGroup,group));
+  assertEquals(parentGroup.getPath() + "/" + group.getName(),group.getPath());
+  verifyEntityUpdateDuringFailover(group,backendFailover);
+  return group;
+}

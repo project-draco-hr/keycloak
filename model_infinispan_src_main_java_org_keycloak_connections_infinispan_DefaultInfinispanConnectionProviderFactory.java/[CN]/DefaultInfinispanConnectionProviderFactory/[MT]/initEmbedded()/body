@@ -35,4 +35,10 @@
   cacheManager.defineConfiguration(InfinispanConnectionProvider.SESSION_CACHE_NAME,sessionCacheConfiguration);
   cacheManager.defineConfiguration(InfinispanConnectionProvider.OFFLINE_SESSION_CACHE_NAME,sessionCacheConfiguration);
   cacheManager.defineConfiguration(InfinispanConnectionProvider.LOGIN_FAILURE_CACHE_NAME,sessionCacheConfiguration);
+  ConfigurationBuilder replicationConfigBuilder=new ConfigurationBuilder();
+  if (clustered) {
+    replicationConfigBuilder.clustering().cacheMode(async ? CacheMode.REPL_ASYNC : CacheMode.REPL_SYNC);
+  }
+  Configuration replicationCacheConfiguration=replicationConfigBuilder.build();
+  cacheManager.defineConfiguration(InfinispanConnectionProvider.WORK_CACHE_NAME,replicationCacheConfiguration);
 }

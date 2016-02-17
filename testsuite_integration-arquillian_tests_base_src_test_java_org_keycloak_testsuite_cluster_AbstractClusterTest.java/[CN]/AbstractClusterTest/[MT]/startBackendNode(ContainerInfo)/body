@@ -1,0 +1,11 @@
+{
+  if (!controller.isStarted(node.getQualifier())) {
+    log.info("Starting backend node: " + node);
+    controller.start(node.getQualifier());
+    assertTrue(controller.isStarted(node.getQualifier()));
+  }
+  log.info("Backend node " + node + " is started");
+  if (!backendAdminClients.containsKey(node)) {
+    backendAdminClients.put(node,createAdminClientFor(node));
+  }
+}

@@ -1,0 +1,35 @@
+{
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      dummyModel=appRealm.addUserFederationProvider(DummyUserFederationProviderFactory.PROVIDER_NAME,new HashMap<String,String>(),1,"test-sync-dummy",-1,1,0);
+    }
+  }
+);
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+    DummyUserFederationProviderFactory dummyFedFactory=(DummyUserFederationProviderFactory)sessionFactory.getProviderFactory(UserFederationProvider.class,DummyUserFederationProviderFactory.PROVIDER_NAME);
+    int full=dummyFedFactory.getFullSyncCounter();
+    int changed=dummyFedFactory.getChangedSyncCounter();
+    UsersSyncManager usersSyncManager=new UsersSyncManager();
+    usersSyncManager.bootstrapPeriodic(sessionFactory,session.getProvider(TimerProvider.class));
+    sleep(1800);
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    usersSyncManager.notifyToRefreshPeriodicSync(session,appRealm,dummyModel,true);
+    int newChanged=dummyFedFactory.getChangedSyncCounter();
+    Assert.assertEquals(full,dummyFedFactory.getFullSyncCounter());
+    Assert.assertTrue(newChanged > changed);
+    sleep(1800);
+    Assert.assertEquals(full,dummyFedFactory.getFullSyncCounter());
+    Assert.assertEquals(newChanged,dummyFedFactory.getChangedSyncCounter());
+  }
+  finally {
+    keycloakRule.stopSession(session,true);
+  }
+  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
+    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
+      appRealm.removeUserFederationProvider(dummyModel);
+    }
+  }
+);
+}

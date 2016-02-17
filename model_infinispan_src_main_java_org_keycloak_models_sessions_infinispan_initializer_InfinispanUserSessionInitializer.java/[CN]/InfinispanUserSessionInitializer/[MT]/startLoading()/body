@@ -2,9 +2,9 @@
   InitializerState state=getOrCreateInitializerState();
   int processors=Runtime.getRuntime().availableProcessors();
   ExecutorService localExecutor=Executors.newCachedThreadPool();
-  Transport transport=cache.getCacheManager().getTransport();
+  Transport transport=workCache.getCacheManager().getTransport();
   boolean distributed=transport != null;
-  ExecutorService executorService=distributed ? new DefaultExecutorService(cache,localExecutor) : localExecutor;
+  ExecutorService executorService=distributed ? new DefaultExecutorService(workCache,localExecutor) : localExecutor;
   int errors=0;
   try {
     while (!state.isFinished()) {
@@ -20,7 +20,7 @@
         SessionInitializerWorker worker=new SessionInitializerWorker();
         worker.setWorkerEnvironment(segment,sessionsPerSegment,sessionLoader);
         if (!distributed) {
-          worker.setEnvironment(cache,null);
+          worker.setEnvironment(workCache,null);
         }
         Future<WorkerResult> future=executorService.submit(worker);
         futures.add(future);

@@ -1,0 +1,24 @@
+{
+  String cacheKey=TASK_KEY_PREFIX + taskKey;
+  boolean locked=tryLock(cacheKey,taskTimeoutInSeconds);
+  if (locked) {
+    try {
+      try {
+        T result=task.call();
+        return ExecutionResult.executed(result);
+      }
+ catch (      RuntimeException re) {
+        throw re;
+      }
+catch (      Exception e) {
+        throw new RuntimeException("Unexpected exception when executed task " + taskKey,e);
+      }
+    }
+  finally {
+      removeFromCache(cacheKey);
+    }
+  }
+ else {
+    return ExecutionResult.notExecuted();
+  }
+}

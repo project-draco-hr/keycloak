@@ -1,10 +1,7 @@
 {
   KeycloakSession session=sessionFactory.create();
   try {
-    session.getTransaction().begin();
-    task.run(session);
-    session.getTransaction().commit();
-    logger.debug("Executed scheduled task " + task.getClass().getSimpleName());
+    runTask(session);
   }
  catch (  Throwable t) {
     logger.failedToRunScheduledTask(t,task.getClass().getSimpleName());

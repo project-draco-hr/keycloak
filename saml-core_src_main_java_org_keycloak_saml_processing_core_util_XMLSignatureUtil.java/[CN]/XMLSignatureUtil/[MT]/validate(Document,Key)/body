@@ -6,7 +6,17 @@
     throw logger.nullValueError("Cannot find Signature element");
   }
   if (publicKey == null)   throw logger.nullValueError("Public Key");
+  int signedAssertions=0;
+  String assertionNameSpaceUri=null;
   for (int i=0; i < nl.getLength(); i++) {
+    Node signatureNode=nl.item(i);
+    Node parent=signatureNode.getParentNode();
+    if (parent != null && JBossSAMLConstants.ASSERTION.get().equals(parent.getLocalName())) {
+      ++signedAssertions;
+      if (assertionNameSpaceUri == null) {
+        assertionNameSpaceUri=parent.getNamespaceURI();
+      }
+    }
     DOMValidateContext valContext=new DOMValidateContext(publicKey,nl.item(i));
     XMLSignature signature=fac.unmarshalXMLSignature(valContext);
     boolean coreValidity=signature.validate(valContext);
@@ -21,6 +31,13 @@
       }
       return false;
     }
+  }
+  NodeList assertions=signedDoc.getElementsByTagNameNS(assertionNameSpaceUri,JBossSAMLConstants.ASSERTION.get());
+  if (signedAssertions > 0 && assertions != null && assertions.getLength() != signedAssertions) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("SAML Response document may contain malicious assertions. Signature validation will fail.");
+    }
+    return false;
   }
   return true;
 }

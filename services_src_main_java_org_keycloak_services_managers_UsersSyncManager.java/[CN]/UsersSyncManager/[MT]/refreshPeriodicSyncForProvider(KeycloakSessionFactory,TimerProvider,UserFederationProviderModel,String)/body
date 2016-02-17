@@ -1,9 +1,16 @@
 {
+  logger.debugf("Going to refresh periodic sync for provider '%s' . Full sync period: %d , changed users sync period: %d",fedProvider.getDisplayName(),fedProvider.getFullSyncPeriod(),fedProvider.getChangedSyncPeriod());
   if (fedProvider.getFullSyncPeriod() > 0) {
     timer.schedule(new Runnable(){
       @Override public void run(){
         try {
-          syncAllUsers(sessionFactory,realmId,fedProvider);
+          boolean shouldPerformSync=shouldPerformNewPeriodicSync(fedProvider.getLastSync(),fedProvider.getChangedSyncPeriod());
+          if (shouldPerformSync) {
+            syncAllUsers(sessionFactory,realmId,fedProvider);
+          }
+ else {
+            logger.debugf("Ignored periodic full sync with federation provider %s due small time since last sync",fedProvider.getDisplayName());
+          }
         }
  catch (        Throwable t) {
           logger.errorDuringFullUserSync(t);
@@ -19,7 +26,13 @@
     timer.schedule(new Runnable(){
       @Override public void run(){
         try {
-          syncChangedUsers(sessionFactory,realmId,fedProvider);
+          boolean shouldPerformSync=shouldPerformNewPeriodicSync(fedProvider.getLastSync(),fedProvider.getChangedSyncPeriod());
+          if (shouldPerformSync) {
+            syncChangedUsers(sessionFactory,realmId,fedProvider);
+          }
+ else {
+            logger.debugf("Ignored periodic changed-users sync with federation provider %s due small time since last sync",fedProvider.getDisplayName());
+          }
         }
  catch (        Throwable t) {
           logger.errorDuringChangedUserSync(t);

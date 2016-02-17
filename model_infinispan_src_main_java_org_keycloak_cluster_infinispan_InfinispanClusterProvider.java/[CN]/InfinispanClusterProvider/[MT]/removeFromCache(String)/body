@@ -1,0 +1,24 @@
+{
+  int retry=3;
+  while (true) {
+    try {
+      cache.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES,Flag.FORCE_SYNCHRONOUS).remove(cacheKey);
+      if (logger.isTraceEnabled()) {
+        logger.tracef("Task %s removed from the cache",cacheKey);
+      }
+      return;
+    }
+ catch (    RuntimeException e) {
+      ComponentStatus status=cache.getStatus();
+      if (status.isStopping() || status.isTerminated()) {
+        logger.warnf("Failed to remove task %s from the cache. Cache is already terminating",cacheKey);
+        logger.debug(e.getMessage(),e);
+        return;
+      }
+      retry--;
+      if (retry == 0) {
+        throw e;
+      }
+    }
+  }
+}

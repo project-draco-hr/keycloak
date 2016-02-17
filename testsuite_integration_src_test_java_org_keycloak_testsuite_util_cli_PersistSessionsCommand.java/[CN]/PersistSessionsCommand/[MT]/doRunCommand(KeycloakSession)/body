@@ -1,57 +1,16 @@
 {
   final int count=getIntArg(0);
-  final List<String> userSessionIds=new LinkedList<>();
-  final List<String> clientSessionIds=new LinkedList<>();
-  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
-    @Override public void run(    KeycloakSession session){
-      RealmModel realm=session.realms().getRealmByName("master");
-      UserModel john=session.users().getUserByUsername("admin",realm);
-      ClientModel testApp=realm.getClientByClientId("security-admin-console");
-      UserSessionPersisterProvider persister=session.getProvider(UserSessionPersisterProvider.class);
-      for (int i=0; i < count; i++) {
-        UserSessionModel userSession=session.sessions().createUserSession(realm,john,"john-doh@localhost","127.0.0.2","form",true,null,null);
-        ClientSessionModel clientSession=session.sessions().createClientSession(realm,testApp);
-        clientSession.setUserSession(userSession);
-        clientSession.setRedirectUri("http://redirect");
-        clientSession.setNote("foo","bar-" + i);
-        userSessionIds.add(userSession.getId());
-        clientSessionIds.add(clientSession.getId());
-      }
-    }
+  final int batchCount=getIntArg(1);
+  int remaining=count;
+  while (remaining > 0) {
+    int createInThisBatch=Math.min(batchCount,remaining);
+    createSessionsBatch(createInThisBatch);
+    remaining=remaining - createInThisBatch;
   }
-);
-  log.info("Sessions created in infinispan storage");
-  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
-    @Override public void run(    KeycloakSession session){
-      RealmModel realm=session.realms().getRealmByName("master");
-      UserSessionPersisterProvider persister=session.getProvider(UserSessionPersisterProvider.class);
-      int counter=0;
-      for (      String userSessionId : userSessionIds) {
-        counter++;
-        UserSessionModel userSession=session.sessions().getUserSession(realm,userSessionId);
-        persister.createUserSession(userSession,true);
-        if (counter % 1000 == 0) {
-          log.infof("%d user sessions persisted. Continue",counter);
-        }
-      }
-      log.infof("All %d user sessions persisted",counter);
-      counter=0;
-      for (      String clientSessionId : clientSessionIds) {
-        counter++;
-        ClientSessionModel clientSession=session.sessions().getClientSession(realm,clientSessionId);
-        persister.createClientSession(clientSession,true);
-        if (counter % 1000 == 0) {
-          log.infof("%d client sessions persisted. Continue",counter);
-        }
-      }
-      log.infof("All %d client sessions persisted",counter);
-    }
-  }
-);
   KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
     @Override public void run(    KeycloakSession session){
       UserSessionPersisterProvider persister=session.getProvider(UserSessionPersisterProvider.class);
-      log.info("Total number of sessions in persister: " + persister.getUserSessionsCount(true));
+      log.info("Command finished. Total number of sessions in persister: " + persister.getUserSessionsCount(true));
     }
   }
 );

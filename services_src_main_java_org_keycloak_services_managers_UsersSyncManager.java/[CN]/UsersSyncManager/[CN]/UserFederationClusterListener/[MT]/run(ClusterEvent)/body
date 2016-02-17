@@ -1,0 +1,15 @@
+{
+  final FederationProviderClusterEvent fedEvent=(FederationProviderClusterEvent)event;
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      TimerProvider timer=session.getProvider(TimerProvider.class);
+      if (fedEvent.isRemoved()) {
+        removePeriodicSyncForProvider(timer,fedEvent.getFederationProvider());
+      }
+ else {
+        refreshPeriodicSyncForProvider(sessionFactory,timer,fedEvent.getFederationProvider(),fedEvent.getRealmId());
+      }
+    }
+  }
+);
+}

@@ -3,8 +3,8 @@
   KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
     @Override public void run(    KeycloakSession session){
       InfinispanConnectionProvider connections=session.getProvider(InfinispanConnectionProvider.class);
-      Cache<String,SessionEntity> cache=connections.getCache(InfinispanConnectionProvider.OFFLINE_SESSION_CACHE_NAME);
-      InfinispanUserSessionInitializer initializer=new InfinispanUserSessionInitializer(sessionFactory,cache,new OfflineUserSessionLoader(),maxErrors,sessionsPerSegment,SESSION_INITIALIZER_STATE_KEY);
+      Cache<String,Serializable> cache=connections.getCache(InfinispanConnectionProvider.WORK_CACHE_NAME);
+      InfinispanUserSessionInitializer initializer=new InfinispanUserSessionInitializer(sessionFactory,cache,new OfflineUserSessionLoader(),maxErrors,sessionsPerSegment,"offlineUserSessions");
       initializer.initCache();
       initializer.loadPersistentSessions();
     }

@@ -5,6 +5,12 @@
       return;
     }
  catch (    RuntimeException e) {
+      ComponentStatus status=workCache.getStatus();
+      if (status.isStopping() || status.isTerminated()) {
+        log.warn("Failed to put initializerState to the cache. Cache is already terminating");
+        log.debug(e.getMessage(),e);
+        return;
+      }
       retry--;
       if (retry == 0) {
         throw e;

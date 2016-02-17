@@ -1,0 +1,19 @@
+{
+  int waitTime=getIntArg(0);
+  int changedSyncPeriod=getIntArg(1);
+  RealmModel realm=session.realms().getRealmByName("master");
+  UserFederationProviderModel fedProviderModel=KeycloakModelUtils.findUserFederationProviderByDisplayName("cluster-dummy",realm);
+  if (fedProviderModel == null) {
+    Map<String,String> cfg=new HashMap<>();
+    updateConfig(cfg,waitTime);
+    fedProviderModel=realm.addUserFederationProvider(SyncDummyUserFederationProviderFactory.SYNC_PROVIDER_ID,cfg,1,"cluster-dummy",-1,changedSyncPeriod,-1);
+  }
+ else {
+    Map<String,String> cfg=fedProviderModel.getConfig();
+    updateConfig(cfg,waitTime);
+    fedProviderModel.setChangedSyncPeriod(changedSyncPeriod);
+    realm.updateUserFederationProvider(fedProviderModel);
+  }
+  new UsersSyncManager().notifyToRefreshPeriodicSync(session,realm,fedProviderModel,false);
+  log.infof("User federation provider created and sync was started",waitTime);
+}

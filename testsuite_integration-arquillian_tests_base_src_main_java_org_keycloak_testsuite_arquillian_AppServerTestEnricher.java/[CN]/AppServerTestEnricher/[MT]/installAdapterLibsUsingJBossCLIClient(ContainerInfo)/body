@@ -30,7 +30,9 @@
       execCommand(command + " --connect --command=reload" + controllerArg,bin);
       log.info("Container restarted");
       pause(5000);
-      LogChecker.checkJBossServerLog(jbossHomePath);
+      if (System.getProperty("app.server.log.check","true").equals("true")) {
+        LogChecker.checkJBossServerLog(jbossHomePath);
+      }
     }
     appServerInfo.setAdapterLibsInstalled(true);
   }

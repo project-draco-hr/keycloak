@@ -3,7 +3,9 @@
   while (true) {
     try {
       cache.getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES,Flag.FORCE_SYNCHRONOUS).remove(cacheKey);
-      logger.infof("Task %s removed from the cache",cacheKey);
+      if (logger.isTraceEnabled()) {
+        logger.tracef("Task %s removed from the cache",cacheKey);
+      }
       return;
     }
  catch (    RuntimeException e) {

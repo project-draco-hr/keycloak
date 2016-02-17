@@ -17,7 +17,7 @@
   }
   if (group.getClientRoles() != null) {
     for (    Map.Entry<String,List<String>> entry : group.getClientRoles().entrySet()) {
-      ClientModel client=clientMap.get(entry.getKey());
+      ClientModel client=realm.getClientByClientId(entry.getKey());
       if (client == null) {
         throw new RuntimeException("Unable to find client role mappings for client: " + entry.getKey());
       }
@@ -33,7 +33,7 @@
   }
   if (group.getSubGroups() != null) {
     for (    GroupRepresentation subGroup : group.getSubGroups()) {
-      importGroup(realm,clientMap,newGroup,subGroup);
+      importGroup(realm,newGroup,subGroup);
     }
   }
 }

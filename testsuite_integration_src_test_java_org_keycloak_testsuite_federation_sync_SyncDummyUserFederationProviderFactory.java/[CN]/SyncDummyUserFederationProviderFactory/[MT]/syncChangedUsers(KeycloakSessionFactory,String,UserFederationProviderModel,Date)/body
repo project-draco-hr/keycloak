@@ -14,7 +14,7 @@
       }
       logger.infof("Finished sync of changed users. Waiting now for %d seconds",waitTime);
       try {
-        Thread.sleep(waitTime * 1000);
+        latch1.await(waitTime * 1000,TimeUnit.MILLISECONDS);
       }
  catch (      InterruptedException ie) {
         Thread.currentThread().interrupt();
@@ -24,5 +24,6 @@
     }
   }
 );
+  latch2.countDown();
   return new UserFederationSyncResult();
 }

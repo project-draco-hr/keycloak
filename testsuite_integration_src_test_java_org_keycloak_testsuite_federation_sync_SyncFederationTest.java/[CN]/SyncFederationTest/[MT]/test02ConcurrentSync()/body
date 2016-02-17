@@ -1,4 +1,5 @@
 {
+  SyncDummyUserFederationProviderFactory.restartLatches();
   keycloakRule.update(new KeycloakRule.KeycloakSetup(){
     @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
       Map<String,String> config=new HashMap<>();
@@ -16,11 +17,13 @@
     RealmModel realm=session.realms().getRealm("test");
     UserFederationSyncResult syncResult=usersSyncManager.syncChangedUsers(sessionFactory,realm.getId(),dummyModel);
     Assert.assertTrue(syncResult.isIgnored());
-    usersSyncManager.removePeriodicSyncForProvider(session.getProvider(TimerProvider.class),dummyModel);
+    usersSyncManager.notifyToRefreshPeriodicSync(session,realm,dummyModel,true);
+    SyncDummyUserFederationProviderFactory.latch1.countDown();
   }
   finally {
     keycloakRule.stopSession(session,true);
   }
+  SyncDummyUserFederationProviderFactory.latch2.await(20000,TimeUnit.MILLISECONDS);
   keycloakRule.update(new KeycloakRule.KeycloakSetup(){
     @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
       appRealm.removeUserFederationProvider(dummyModel);

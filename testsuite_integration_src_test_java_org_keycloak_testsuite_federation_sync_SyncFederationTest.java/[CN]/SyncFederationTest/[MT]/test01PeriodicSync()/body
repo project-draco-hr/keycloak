@@ -14,7 +14,8 @@
     UsersSyncManager usersSyncManager=new UsersSyncManager();
     usersSyncManager.bootstrapPeriodic(sessionFactory,session.getProvider(TimerProvider.class));
     sleep(1800);
-    usersSyncManager.removePeriodicSyncForProvider(session.getProvider(TimerProvider.class),dummyModel);
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    usersSyncManager.notifyToRefreshPeriodicSync(session,appRealm,dummyModel,true);
     int newChanged=dummyFedFactory.getChangedSyncCounter();
     Assert.assertEquals(full,dummyFedFactory.getFullSyncCounter());
     Assert.assertTrue(newChanged > changed);

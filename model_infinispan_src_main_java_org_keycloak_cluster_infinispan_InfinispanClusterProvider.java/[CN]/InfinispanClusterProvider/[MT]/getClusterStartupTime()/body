@@ -1,0 +1,17 @@
+{
+  Integer existingClusterStartTime=(Integer)cache.get(InfinispanClusterProvider.CLUSTER_STARTUP_TIME_KEY);
+  if (existingClusterStartTime != null) {
+    return existingClusterStartTime;
+  }
+ else {
+    int serverStartTime=(int)(session.getKeycloakSessionFactory().getServerStartupTimestamp() / 1000);
+    existingClusterStartTime=(Integer)cache.putIfAbsent(InfinispanClusterProvider.CLUSTER_STARTUP_TIME_KEY,serverStartTime);
+    if (existingClusterStartTime == null) {
+      logger.infof("Initialized cluster startup time to %s",Time.toDate(serverStartTime).toString());
+      return serverStartTime;
+    }
+ else {
+      return existingClusterStartTime;
+    }
+  }
+}

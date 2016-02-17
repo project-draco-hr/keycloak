@@ -1,11 +1,10 @@
 {
-  TimeAwareInitializerState state=(TimeAwareInitializerState)cache.get(stateKey);
+  InitializerState state=(InitializerState)workCache.get(stateKey);
   if (state == null) {
-    int startTime=(int)(sessionFactory.getServerStartupTimestamp() / 1000);
     final int[] count=new int[1];
     KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
       @Override public void run(      KeycloakSession session){
-        sessionLoader.init(session,startTime);
+        sessionLoader.init(session);
       }
     }
 );
@@ -15,9 +14,8 @@
       }
     }
 );
-    state=new TimeAwareInitializerState();
+    state=new InitializerState();
     state.init(count[0],sessionsPerSegment);
-    state.setClusterStartupTime(startTime);
     saveStateToCache(state);
   }
   return state;

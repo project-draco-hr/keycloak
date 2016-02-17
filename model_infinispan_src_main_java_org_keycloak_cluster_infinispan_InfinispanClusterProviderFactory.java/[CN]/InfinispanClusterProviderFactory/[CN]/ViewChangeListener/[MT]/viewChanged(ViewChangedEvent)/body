@@ -1,0 +1,34 @@
+{
+  EmbeddedCacheManager cacheManager=event.getCacheManager();
+  Transport transport=cacheManager.getTransport();
+  if (transport != null && transport.isCoordinator()) {
+    Set<String> newAddresses=convertAddresses(event.getNewMembers());
+    Set<String> removedNodesAddresses=convertAddresses(event.getOldMembers());
+    removedNodesAddresses.removeAll(newAddresses);
+    if (removedNodesAddresses.isEmpty()) {
+      return;
+    }
+    logger.infof("Nodes %s removed from cluster. Removing tasks locked by this nodes",removedNodesAddresses.toString());
+    Cache<String,Serializable> cache=cacheManager.getCache(InfinispanConnectionProvider.WORK_CACHE_NAME);
+    Iterator<String> toRemove=cache.entrySet().stream().filter(new Predicate<Map.Entry<String,Serializable>>(){
+      @Override public boolean test(      Map.Entry<String,Serializable> entry){
+        if (!(entry.getValue() instanceof LockEntry)) {
+          return false;
+        }
+        LockEntry lock=(LockEntry)entry.getValue();
+        return removedNodesAddresses.contains(lock.getNode());
+      }
+    }
+).map(new Function<Map.Entry<String,Serializable>,String>(){
+      @Override public String apply(      Map.Entry<String,Serializable> entry){
+        return entry.getKey();
+      }
+    }
+).iterator();
+    while (toRemove.hasNext()) {
+      String rem=toRemove.next();
+      logger.infof("Removing task %s due it's node left cluster",rem);
+      cache.remove(rem);
+    }
+  }
+}

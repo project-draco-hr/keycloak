@@ -2,7 +2,7 @@
   UserSessionModel[] origSessions=createSessions();
   resetSession();
   int started=Time.currentTime();
-  int serverStartTime=session.sessions().getClusterStartupTime();
+  int serverStartTime=session.getProvider(ClusterProvider.class).getClusterStartupTime();
   for (  UserSessionModel origSession : origSessions) {
     UserSessionModel userSession=session.sessions().getUserSession(realm,origSession.getId());
     for (    ClientSessionModel clientSession : userSession.getClientSessions()) {

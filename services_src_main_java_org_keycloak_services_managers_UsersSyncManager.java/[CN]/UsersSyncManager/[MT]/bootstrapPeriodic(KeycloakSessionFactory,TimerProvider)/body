@@ -8,6 +8,8 @@
           refreshPeriodicSyncForProvider(sessionFactory,timer,fedProvider,realm.getId());
         }
       }
+      ClusterProvider clusterProvider=session.getProvider(ClusterProvider.class);
+      clusterProvider.registerListener(FEDERATION_TASK_KEY,new UserFederationClusterListener(sessionFactory));
     }
   }
 );

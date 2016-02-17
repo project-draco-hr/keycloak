@@ -1,5 +1,26 @@
 {
-  final UserFederationProviderFactory fedProviderFactory=(UserFederationProviderFactory)sessionFactory.getProviderFactory(UserFederationProvider.class,fedProvider.getProviderName());
-  updateLastSyncInterval(sessionFactory,fedProvider,realmId);
-  return fedProviderFactory.syncAllUsers(sessionFactory,realmId,fedProvider);
+  final Holder holder=new Holder();
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      ClusterProvider clusterProvider=session.getProvider(ClusterProvider.class);
+      String taskKey=fedProvider.getId() + "::sync";
+      int timeout=Math.max(30,fedProvider.getFullSyncPeriod());
+      holder.result=clusterProvider.executeIfNotExecuted(taskKey,timeout,new Callable<UserFederationSyncResult>(){
+        @Override public UserFederationSyncResult call() throws Exception {
+          final UserFederationProviderFactory fedProviderFactory=(UserFederationProviderFactory)sessionFactory.getProviderFactory(UserFederationProvider.class,fedProvider.getProviderName());
+          updateLastSyncInterval(sessionFactory,fedProvider,realmId);
+          return fedProviderFactory.syncAllUsers(sessionFactory,realmId,fedProvider);
+        }
+      }
+);
+    }
+  }
+);
+  if (holder.result == null || !holder.result.isExecuted()) {
+    logger.infof("syncAllUsers for federation provider %s was ignored as it's already in progress",fedProvider.getDisplayName());
+    return UserFederationSyncResult.ignored();
+  }
+ else {
+    return holder.result.getResult();
+  }
 }

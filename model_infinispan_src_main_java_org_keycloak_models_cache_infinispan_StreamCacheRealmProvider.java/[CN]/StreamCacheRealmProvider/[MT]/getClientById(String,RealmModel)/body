@@ -1,0 +1,27 @@
+{
+  CachedClient cached=cache.get(id,CachedClient.class);
+  if (cached != null && !cached.getRealm().equals(realm.getId())) {
+    cached=null;
+  }
+  if (cached != null) {
+    logger.tracev("client by id cache hit: {0}",cached.getClientId());
+  }
+  if (cached == null) {
+    Long loaded=cache.getCurrentRevision(id);
+    ClientModel model=getDelegate().getClientById(id,realm);
+    if (model == null)     return null;
+    if (invalidations.contains(id))     return model;
+    cached=new CachedClient(loaded,realm,model);
+    logger.tracev("adding client by id cache miss: {0}",cached.getClientId());
+    cache.addRevisioned(cached);
+  }
+ else   if (invalidations.contains(id)) {
+    return getDelegate().getClientById(id,realm);
+  }
+ else   if (managedApplications.containsKey(id)) {
+    return managedApplications.get(id);
+  }
+  ClientAdapter adapter=new ClientAdapter(realm,cached,this,null);
+  managedApplications.put(id,adapter);
+  return adapter;
+}

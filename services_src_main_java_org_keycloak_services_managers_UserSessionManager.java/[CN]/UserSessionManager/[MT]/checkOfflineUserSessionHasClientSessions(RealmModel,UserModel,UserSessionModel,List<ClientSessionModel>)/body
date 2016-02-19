@@ -1,4 +1,5 @@
 {
+  String userSessionId=userSession.getId();
   for (  ClientSessionModel clientSession : clientSessions) {
     if (clientSession.getUserSession().getId().equals(userSessionId)) {
       return;
@@ -7,6 +8,6 @@
   if (logger.isTraceEnabled()) {
     logger.tracef("Removing offline userSession for user %s as it doesn't have any client sessions attached. UserSessionID: %s",user.getUsername(),userSessionId);
   }
-  kcSession.sessions().removeOfflineUserSession(realm,userSessionId);
+  kcSession.sessions().removeOfflineUserSession(realm,userSession);
   persister.removeUserSession(userSessionId,true);
 }

@@ -1,9 +1,9 @@
 {
-  List<GroupEntity> groups=em.createNamedQuery("getAllGroupsByRealm").setParameter("realm",realm).getResultList();
+  List<String> groups=em.createNamedQuery("getAllGroupIdsByRealm",String.class).setParameter("realm",realm.getId()).getResultList();
   if (groups == null)   return Collections.EMPTY_LIST;
   List<GroupModel> list=new LinkedList<>();
-  for (  GroupEntity entity : groups) {
-    list.add(new GroupAdapter(this,em,entity));
+  for (  String id : groups) {
+    list.add(session.realms().getGroupById(id,this));
   }
   return Collections.unmodifiableList(list);
 }

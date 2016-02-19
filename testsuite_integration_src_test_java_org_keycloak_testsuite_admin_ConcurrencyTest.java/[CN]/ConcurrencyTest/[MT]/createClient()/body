@@ -1,4 +1,5 @@
 {
+  System.out.println("***************************");
   long start=System.currentTimeMillis();
   run(new KeycloakRunnable(){
     @Override public void run(    Keycloak keycloak,    RealmResource realm,    int threadNum,    int iterationNum){
@@ -8,7 +9,8 @@
       Response response=realm.clients().create(c);
       String id=ApiUtil.getCreatedId(response);
       response.close();
-      assertNotNull(realm.clients().get(id));
+      c=realm.clients().get(id).toRepresentation();
+      assertNotNull(c);
       boolean found=false;
       for (      ClientRepresentation r : realm.clients().findAll()) {
         if (r.getClientId().equals(name)) {

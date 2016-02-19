@@ -3,6 +3,13 @@
   if (masterAdminClient == null) {
     return null;
   }
-  RealmAdapter masterRealm=new RealmAdapter(session,em,masterAdminClient.getRealm());
-  return new ClientAdapter(masterRealm,em,session,masterAdminClient);
+  RealmModel masterRealm=null;
+  String masterAdminClientRealmId=masterAdminClient.getRealm().getId();
+  if (masterAdminClientRealmId.equals(getId())) {
+    masterRealm=this;
+  }
+ else {
+    masterRealm=session.realms().getRealm(masterAdminClientRealmId);
+  }
+  return session.realms().getClientById(masterAdminClient.getId(),masterRealm);
 }

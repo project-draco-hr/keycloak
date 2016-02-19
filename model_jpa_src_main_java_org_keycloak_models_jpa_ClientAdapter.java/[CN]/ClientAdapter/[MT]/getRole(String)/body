@@ -1,8 +1,8 @@
 {
-  TypedQuery<RoleEntity> query=em.createNamedQuery("getClientRoleByName",RoleEntity.class);
+  TypedQuery<String> query=em.createNamedQuery("getClientRoleIdByName",String.class);
   query.setParameter("name",name);
-  query.setParameter("client",entity);
-  List<RoleEntity> roles=query.getResultList();
+  query.setParameter("client",entity.getId());
+  List<String> roles=query.getResultList();
   if (roles.size() == 0)   return null;
-  return new RoleAdapter(realm,em,roles.get(0));
+  return session.realms().getRoleById(roles.get(0),realm);
 }

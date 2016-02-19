@@ -1,0 +1,12 @@
+{
+  TypedQuery<String> query=em.createNamedQuery("getClientIdsByRealm",String.class);
+  query.setParameter("realm",realm.getId());
+  List<String> clients=query.getResultList();
+  if (clients.isEmpty())   return Collections.EMPTY_LIST;
+  List<ClientModel> list=new LinkedList<>();
+  for (  String id : clients) {
+    ClientModel client=session.realms().getClientById(id,realm);
+    if (client != null)     list.add(client);
+  }
+  return Collections.unmodifiableList(list);
+}

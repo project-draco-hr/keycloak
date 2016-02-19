@@ -8,11 +8,11 @@
   int num=em.createNamedQuery("deleteGroupRoleMappingsByRealm").setParameter("realm",realm).executeUpdate();
   num=em.createNamedQuery("deleteGroupAttributesByRealm").setParameter("realm",realm).executeUpdate();
   num=em.createNamedQuery("deleteGroupsByRealm").setParameter("realm",realm).executeUpdate();
-  TypedQuery<ClientEntity> query=em.createNamedQuery("getClientsByRealm",ClientEntity.class);
-  query.setParameter("realm",realm);
-  List<ClientEntity> clients=query.getResultList();
-  for (  ClientEntity a : clients) {
-    adapter.removeClient(a.getId());
+  TypedQuery<String> query=em.createNamedQuery("getClientIdsByRealm",String.class);
+  query.setParameter("realm",realm.getId());
+  List<String> clients=query.getResultList();
+  for (  String client : clients) {
+    session.realms().removeClient(client,adapter);
   }
   for (  ClientTemplateEntity a : new LinkedList<>(realm.getClientTemplates())) {
     adapter.removeClientTemplate(a.getId());
@@ -20,9 +20,5 @@
   em.remove(realm);
   em.flush();
   em.clear();
-  realm=em.find(RealmEntity.class,id);
-  if (realm != null) {
-    logger.error("WTF is the realm still there after a removal????????");
-  }
   return true;
 }

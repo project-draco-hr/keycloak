@@ -3,8 +3,8 @@
 synchronized (this) {
       if (realmCache == null) {
         Cache<String,Object> cache=session.getProvider(InfinispanConnectionProvider.class).getCache(InfinispanConnectionProvider.REALM_CACHE_NAME);
-        cache.addListener(new CacheListener());
-        realmCache=new InfinispanRealmCache(cache,realmLookup);
+        Cache<String,Long> revisions=session.getProvider(InfinispanConnectionProvider.class).getCache(InfinispanConnectionProvider.VERSION_CACHE_NAME);
+        realmCache=new StreamRealmCache(cache,revisions);
       }
     }
   }

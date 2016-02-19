@@ -1,0 +1,23 @@
+{
+  if (clientId == null) {
+    clientId=id;
+  }
+  ClientEntity entity=new ClientEntity();
+  entity.setId(id);
+  entity.setClientId(clientId);
+  entity.setEnabled(true);
+  entity.setStandardFlowEnabled(true);
+  RealmEntity realmRef=em.getReference(RealmEntity.class,realm.getId());
+  entity.setRealm(realmRef);
+  em.persist(entity);
+  em.flush();
+  final ClientModel resource=new ClientAdapter(realm,em,session,entity);
+  em.flush();
+  session.getKeycloakSessionFactory().publish(new RealmModel.ClientCreationEvent(){
+    @Override public ClientModel getCreatedClient(){
+      return resource;
+    }
+  }
+);
+  return resource;
+}

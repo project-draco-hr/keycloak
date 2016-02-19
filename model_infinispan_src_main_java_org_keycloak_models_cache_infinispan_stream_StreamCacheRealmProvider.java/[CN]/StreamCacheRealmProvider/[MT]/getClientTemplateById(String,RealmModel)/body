@@ -1,0 +1,23 @@
+{
+  RevisionedCachedClientTemplate cached=cache.get(id,RevisionedCachedClientTemplate.class);
+  if (cached != null && !cached.getRealm().equals(realm.getId())) {
+    cached=null;
+  }
+  if (cached == null) {
+    Long loaded=cache.getCurrentRevision(id);
+    ClientTemplateModel model=getDelegate().getClientTemplateById(id,realm);
+    if (model == null)     return null;
+    if (invalidations.contains(id))     return model;
+    cached=new RevisionedCachedClientTemplate(loaded,null,getDelegate(),realm,model);
+    cache.addRevisioned(cached);
+  }
+ else   if (invalidations.contains(id)) {
+    return getDelegate().getClientTemplateById(id,realm);
+  }
+ else   if (managedClientTemplates.containsKey(id)) {
+    return managedClientTemplates.get(id);
+  }
+  ClientTemplateModel adapter=new ClientTemplateAdapter(realm,cached,this,null);
+  managedClientTemplates.put(id,adapter);
+  return adapter;
+}

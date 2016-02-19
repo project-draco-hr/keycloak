@@ -1,7 +1,6 @@
 {
   Cache<String,SessionEntity> cache=getCache(offline);
-  tx.remove(cache,userSessionId);
-  UserSessionEntity sessionEntity=(UserSessionEntity)cache.get(userSessionId);
+  tx.remove(cache,sessionEntity.getId());
   if (sessionEntity.getClientSessions() != null) {
     for (    String clientSessionId : sessionEntity.getClientSessions()) {
       tx.remove(cache,clientSessionId);

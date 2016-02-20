@@ -1,6 +1,6 @@
 {
-  for (  Object object : event.getEntries().values()) {
-    Predicate<Map.Entry<String,Revisioned>> predicate=getEvictionPredicate(object);
+  if (!event.isPre())   for (  Object object : event.getEntries().values()) {
+    Predicate<Map.Entry<String,Revisioned>> predicate=getInvalidationPredicate(object);
     if (predicate != null)     runEvictions(predicate);
   }
 }

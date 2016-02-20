@@ -1,6 +1,8 @@
 {
-  if (getRealm(id) == null)   return false;
+  RealmModel realm=getRealm(id);
+  if (realm == null)   return false;
   invalidations.add(getRealmClientsQueryCacheKey(id));
+  invalidations.add(getRealmByNameCacheKey(realm.getName()));
   cache.invalidateObject(id);
   cache.realmRemoval(id,invalidations);
   return getDelegate().removeRealm(id);

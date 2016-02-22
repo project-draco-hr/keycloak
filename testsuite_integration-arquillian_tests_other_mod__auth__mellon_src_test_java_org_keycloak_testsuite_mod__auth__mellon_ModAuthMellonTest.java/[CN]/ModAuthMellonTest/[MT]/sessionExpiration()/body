@@ -1,0 +1,11 @@
+{
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  realm.setSsoSessionIdleTimeout(2);
+  testRealmResource().update(realm);
+  modAuthMellonProtectedResourcePage.navigateTo();
+  testRealmSAMLRedirectLoginPage.form().login(bburkeUser);
+  assertTrue(driver.getPageSource().contains("Protected resource"));
+  pause(2000);
+  modAuthMellonProtectedResourcePage.navigateTo();
+  URLAssert.assertCurrentUrlStartsWith(testRealmSAMLRedirectLoginPage);
+}

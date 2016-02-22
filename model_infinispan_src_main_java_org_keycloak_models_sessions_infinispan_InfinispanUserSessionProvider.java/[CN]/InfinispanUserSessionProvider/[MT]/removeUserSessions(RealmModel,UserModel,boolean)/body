@@ -1,7 +1,8 @@
 {
   Cache<String,SessionEntity> cache=getCache(offline);
-  Iterator<String> itr=cache.entrySet().stream().filter(UserSessionPredicate.create(realm.getId()).user(user.getId())).map(Mappers.sessionId()).iterator();
+  Iterator<SessionEntity> itr=cache.entrySet().stream().filter(UserSessionPredicate.create(realm.getId()).user(user.getId())).map(Mappers.sessionEntity()).iterator();
   while (itr.hasNext()) {
-    removeUserSession(realm,itr.next(),offline);
+    UserSessionEntity userSessionEntity=(UserSessionEntity)itr.next();
+    removeUserSession(realm,userSessionEntity,offline);
   }
 }

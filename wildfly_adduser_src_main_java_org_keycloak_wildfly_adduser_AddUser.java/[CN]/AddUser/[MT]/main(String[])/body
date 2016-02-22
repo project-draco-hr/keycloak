@@ -18,10 +18,13 @@
   }
  else {
     try {
+      String password=command.getPassword();
       checkRequired(command,"user");
-      checkRequired(command,"password");
+      if (isEmpty(command,"password")) {
+        password=promptForInput();
+      }
       File addUserFile=getAddUserFile(command);
-      createUser(addUserFile,command.getRealm(),command.getUser(),command.getPassword(),command.getRoles(),command.getIterations());
+      createUser(addUserFile,command.getRealm(),command.getUser(),password,command.getRoles(),command.getIterations());
     }
  catch (    Exception e) {
       System.err.println(e.getMessage());

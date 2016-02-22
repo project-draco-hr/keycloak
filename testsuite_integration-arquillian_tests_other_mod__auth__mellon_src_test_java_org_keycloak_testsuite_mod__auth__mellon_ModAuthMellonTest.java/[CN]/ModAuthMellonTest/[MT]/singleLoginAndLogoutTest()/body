@@ -1,0 +1,15 @@
+{
+  modAuthMellonProtectedResourcePage.navigateTo();
+  URLAssert.assertCurrentUrlStartsWith(testRealmSAMLRedirectLoginPage);
+  testRealmSAMLRedirectLoginPage.form().login(bburkeUser);
+  assertTrue(driver.getPageSource().contains("Protected resource"));
+  modAuthMellonProtectedResourcePage2.navigateTo();
+  assertTrue(driver.getPageSource().contains("Protected resource 2"));
+  modAuthMellonProtectedResourcePage2.logout();
+  assertTrue(driver.getPageSource().contains("Unprotected resource 2"));
+  modAuthMellonProtectedResourcePage2.navigateTo();
+  URLAssert.assertCurrentUrlStartsWith(testRealmSAMLRedirectLoginPage);
+  pause(2000);
+  modAuthMellonProtectedResourcePage.navigateTo();
+  URLAssert.assertCurrentUrlStartsWith(testRealmSAMLRedirectLoginPage);
+}

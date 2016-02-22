@@ -1,0 +1,9 @@
+{
+  modAuthMellonProtectedResourcePage2.navigateTo();
+  URLAssert.assertCurrentUrlStartsWith(testRealmSAMLRedirectLoginPage);
+  testRealmSAMLRedirectLoginPage.form().login("unauthorized","password");
+  assertTrue(driver.getPageSource().contains("Forbidden"));
+  modAuthMellonProtectedResourcePage.navigateTo();
+  assertTrue(driver.getPageSource().contains("Protected resource"));
+  modAuthMellonProtectedResourcePage.logout();
+}

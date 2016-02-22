@@ -6,7 +6,6 @@
   session.users().preRemove(getRealm(),roleModel);
   RoleEntity role=RoleAdapter.toRoleEntity(roleModel,em);
   if (!role.isClientRole())   return false;
-  entity.getRoles().remove(role);
   entity.getDefaultRoles().remove(role);
   String compositeRoleTable=JpaUtils.getTableNameForNativeQuery("COMPOSITE_ROLE",em);
   em.createNativeQuery("delete from " + compositeRoleTable + " where CHILD_ROLE = :role").setParameter("role",role).executeUpdate();

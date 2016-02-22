@@ -1,0 +1,9 @@
+{
+  DBObject query=new QueryBuilder().and("clientId").is(client.getId()).get();
+  List<MongoRoleEntity> roles=getMongoStore().loadEntities(MongoRoleEntity.class,query,invocationContext);
+  Set<RoleModel> result=new HashSet<RoleModel>();
+  for (  MongoRoleEntity role : roles) {
+    result.add(session.realms().getRoleById(role.getId(),realm));
+  }
+  return result;
+}

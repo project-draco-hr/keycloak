@@ -1,10 +1,3 @@
 {
-  Set<RoleModel> list=new HashSet<RoleModel>();
-  TypedQuery<RoleEntity> query=em.createNamedQuery("getClientRoles",RoleEntity.class);
-  query.setParameter("client",entity);
-  List<RoleEntity> roles=query.getResultList();
-  for (  RoleEntity roleEntity : roles) {
-    list.add(new RoleAdapter(session,realm,em,roleEntity));
-  }
-  return list;
+  return session.realms().getClientRoles(realm,this);
 }

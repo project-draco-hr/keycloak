@@ -17,6 +17,9 @@
   for (  ClientTemplateEntity a : new LinkedList<>(realm.getClientTemplates())) {
     adapter.removeClientTemplate(a.getId());
   }
+  for (  RoleModel role : adapter.getRoles()) {
+    session.realms().removeRole(adapter,role);
+  }
   em.remove(realm);
   em.flush();
   em.clear();

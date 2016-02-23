@@ -1,9 +1,11 @@
 {
-  WaitUtils.waitUntilElement(By.tagName("body"));
+  WaitUtils.waitUntilElement(By.tagName("body")).is().present();
   assertCurrentUrlEquals(clientsPage);
   clientsPage.table().createClient();
   createClientPage.form().setValues(client);
   createClientPage.form().save();
+  assertAlertSuccess();
+  pause(500);
   clientSettingsPage.form().setValues(client);
   if (SAML.equals(client.getProtocol())) {
     createClientPage.form().samlForm().setValues(client);

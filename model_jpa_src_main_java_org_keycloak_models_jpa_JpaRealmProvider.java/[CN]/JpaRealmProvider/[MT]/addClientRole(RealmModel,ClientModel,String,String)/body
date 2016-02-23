@@ -1,0 +1,12 @@
+{
+  ClientEntity clientEntity=em.getReference(ClientEntity.class,client.getId());
+  RoleEntity roleEntity=new RoleEntity();
+  roleEntity.setId(id);
+  roleEntity.setName(name);
+  roleEntity.setClient(clientEntity);
+  roleEntity.setClientRole(true);
+  roleEntity.setRealmId(realm.getId());
+  em.persist(roleEntity);
+  em.flush();
+  return new RoleAdapter(session,realm,em,roleEntity);
+}

@@ -1,0 +1,24 @@
+{
+  if (object instanceof CachedRealm) {
+    CachedRealm cached=(CachedRealm)object;
+    return getRealmRemovalPredicate(cached.getId());
+  }
+ else   if (object instanceof CachedClient) {
+    CachedClient cached=(CachedClient)object;
+    Predicate<Map.Entry<String,Revisioned>> predicate=getClientRemovalPredicate(cached.getRealm(),cached.getId());
+    return predicate;
+  }
+ else   if (object instanceof CachedRole) {
+    CachedRole cached=(CachedRole)object;
+    return getRoleRemovalPredicate(cached.getId());
+  }
+ else   if (object instanceof CachedGroup) {
+    CachedGroup cached=(CachedGroup)object;
+    return getGroupInvalidationPredicate(cached.getId());
+  }
+ else   if (object instanceof CachedClientTemplate) {
+    CachedClientTemplate cached=(CachedClientTemplate)object;
+    return getClientTemplateInvalidationPredicate(cached.getId());
+  }
+  return null;
+}

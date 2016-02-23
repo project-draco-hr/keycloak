@@ -1,11 +1,3 @@
 {
-  TypedQuery<ClientEntity> query=em.createNamedQuery("getClientsByRealm",ClientEntity.class);
-  query.setParameter("realm",realm);
-  List<ClientEntity> clients=query.getResultList();
-  if (clients.isEmpty())   return Collections.EMPTY_LIST;
-  List<ClientModel> list=new LinkedList<>();
-  for (  ClientEntity entity : clients) {
-    list.add(new ClientAdapter(this,em,session,entity));
-  }
-  return Collections.unmodifiableList(list);
+  return session.realms().getClients(this);
 }

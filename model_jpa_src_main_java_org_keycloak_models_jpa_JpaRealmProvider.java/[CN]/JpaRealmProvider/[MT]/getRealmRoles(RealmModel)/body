@@ -1,0 +1,11 @@
+{
+  TypedQuery<String> query=em.createNamedQuery("getRealmRoleIds",String.class);
+  query.setParameter("realm",realm.getId());
+  List<String> roles=query.getResultList();
+  if (roles.isEmpty())   return Collections.EMPTY_SET;
+  Set<RoleModel> list=new HashSet<RoleModel>();
+  for (  String id : roles) {
+    list.add(session.realms().getRoleById(id,realm));
+  }
+  return Collections.unmodifiableSet(list);
+}

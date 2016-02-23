@@ -1,0 +1,16 @@
+{
+  session.users().preRemove(realm,role);
+  RoleEntity roleEntity=em.getReference(RoleEntity.class,role.getId());
+  RoleContainerModel container=role.getContainer();
+  if (container.getDefaultRoles().contains(role.getName())) {
+    container.removeDefaultRoles(role.getName());
+  }
+  String compositeRoleTable=JpaUtils.getTableNameForNativeQuery("COMPOSITE_ROLE",em);
+  em.createNativeQuery("delete from " + compositeRoleTable + " where CHILD_ROLE = :role").setParameter("role",roleEntity).executeUpdate();
+  em.createNamedQuery("deleteScopeMappingByRole").setParameter("role",roleEntity).executeUpdate();
+  em.createNamedQuery("deleteTemplateScopeMappingByRole").setParameter("role",roleEntity).executeUpdate();
+  em.createNamedQuery("deleteGroupRoleMappingsByRole").setParameter("roleId",roleEntity.getId()).executeUpdate();
+  em.remove(roleEntity);
+  em.flush();
+  return true;
+}

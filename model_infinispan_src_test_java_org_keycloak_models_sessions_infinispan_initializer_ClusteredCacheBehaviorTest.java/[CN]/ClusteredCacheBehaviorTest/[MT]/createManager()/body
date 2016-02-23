@@ -1,0 +1,18 @@
+{
+  GlobalConfigurationBuilder gcb=new GlobalConfigurationBuilder();
+  boolean clustered=true;
+  boolean async=false;
+  boolean allowDuplicateJMXDomains=true;
+  if (clustered) {
+    gcb.transport().defaultTransport();
+  }
+  gcb.globalJmxStatistics().allowDuplicateDomains(allowDuplicateJMXDomains);
+  EmbeddedCacheManager cacheManager=new DefaultCacheManager(gcb.build());
+  ConfigurationBuilder invalidationConfigBuilder=new ConfigurationBuilder();
+  if (clustered) {
+    invalidationConfigBuilder.clustering().cacheMode(async ? CacheMode.INVALIDATION_ASYNC : CacheMode.INVALIDATION_SYNC);
+  }
+  Configuration invalidationCacheConfiguration=invalidationConfigBuilder.build();
+  cacheManager.defineConfiguration(InfinispanConnectionProvider.REALM_CACHE_NAME,invalidationCacheConfiguration);
+  return cacheManager;
+}

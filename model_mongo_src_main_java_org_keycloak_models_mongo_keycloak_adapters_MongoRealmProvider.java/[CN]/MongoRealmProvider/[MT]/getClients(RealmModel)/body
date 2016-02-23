@@ -1,0 +1,10 @@
+{
+  DBObject query=new QueryBuilder().and("realmId").is(realm.getId()).get();
+  List<MongoClientEntity> clientEntities=getMongoStore().loadEntities(MongoClientEntity.class,query,invocationContext);
+  if (clientEntities.isEmpty())   return Collections.EMPTY_LIST;
+  List<ClientModel> result=new ArrayList<ClientModel>();
+  for (  MongoClientEntity clientEntity : clientEntities) {
+    result.add(session.realms().getClientById(clientEntity.getId(),realm));
+  }
+  return Collections.unmodifiableList(result);
+}

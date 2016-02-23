@@ -3,7 +3,8 @@
   List<MongoRealmEntity> realms=getMongoStore().loadEntities(MongoRealmEntity.class,query,invocationContext);
   List<RealmModel> results=new ArrayList<RealmModel>();
   for (  MongoRealmEntity realmEntity : realms) {
-    results.add(new RealmAdapter(session,realmEntity,invocationContext));
+    RealmModel realm=session.realms().getRealm(realmEntity.getId());
+    if (realm != null)     results.add(realm);
   }
   return results;
 }

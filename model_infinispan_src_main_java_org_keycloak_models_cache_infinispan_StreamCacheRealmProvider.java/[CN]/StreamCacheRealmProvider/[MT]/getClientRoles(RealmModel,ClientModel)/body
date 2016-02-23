@@ -1,0 +1,32 @@
+{
+  String cacheKey=getRolesCacheKey(client.getId());
+  boolean queryDB=invalidations.contains(cacheKey) || listInvalidations.contains(client.getId());
+  if (queryDB) {
+    return getDelegate().getClientRoles(realm,client);
+  }
+  RoleListQuery query=cache.get(cacheKey,RoleListQuery.class);
+  if (query != null) {
+    logger.tracev("getClientRoles cache hit: {0}",client.getClientId());
+  }
+  if (query == null) {
+    Long loaded=cache.getCurrentRevision(cacheKey);
+    Set<RoleModel> model=getDelegate().getClientRoles(realm,client);
+    if (model == null)     return null;
+    Set<String> ids=new HashSet<>();
+    for (    RoleModel role : model)     ids.add(role.getId());
+    query=new RoleListQuery(loaded,cacheKey,realm,ids,client.getClientId());
+    logger.tracev("adding client roles cache miss: client {0} key {1}",client.getClientId(),cacheKey);
+    cache.addRevisioned(query);
+    return model;
+  }
+  Set<RoleModel> list=new HashSet<>();
+  for (  String id : query.getRoles()) {
+    RoleModel role=session.realms().getRoleById(id,realm);
+    if (role == null) {
+      invalidations.add(cacheKey);
+      return getDelegate().getClientRoles(realm,client);
+    }
+    list.add(role);
+  }
+  return list;
+}

@@ -1,0 +1,28 @@
+{
+  String cacheKey=getClientByClientIdCacheKey(clientId,realm);
+  ClientListQuery query=cache.get(cacheKey,ClientListQuery.class);
+  String id=null;
+  if (query != null) {
+    logger.tracev("client by name cache hit: {0}",clientId);
+  }
+  if (query == null) {
+    Long loaded=cache.getCurrentRevision(cacheKey);
+    ClientModel model=getDelegate().getClientByClientId(clientId,realm);
+    if (model == null)     return null;
+    if (invalidations.contains(model.getId()))     return model;
+    id=model.getId();
+    query=new ClientListQuery(loaded,cacheKey,realm,id);
+    logger.tracev("adding client by name cache miss: {0}",clientId);
+    cache.addRevisioned(query);
+  }
+ else   if (invalidations.contains(cacheKey)) {
+    return getDelegate().getClientByClientId(clientId,realm);
+  }
+ else {
+    id=query.getClients().iterator().next();
+    if (invalidations.contains(id)) {
+      return getDelegate().getClientByClientId(clientId,realm);
+    }
+  }
+  return getClientById(id,realm);
+}

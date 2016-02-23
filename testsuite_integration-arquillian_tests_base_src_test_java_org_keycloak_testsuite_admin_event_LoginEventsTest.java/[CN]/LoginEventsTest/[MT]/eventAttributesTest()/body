@@ -1,0 +1,19 @@
+{
+  badLogin();
+  List<EventRepresentation> events=events();
+  assertEquals(1,events.size());
+  EventRepresentation event=events.get(0);
+  assertTrue(event.getTime() > 0);
+  assertNotNull(event.getIpAddress());
+  assertEquals("LOGIN_ERROR",event.getType());
+  assertEquals(realmName(),event.getRealmId());
+  assertNull(event.getUserId());
+  assertNull(event.getSessionId());
+  assertEquals("user_not_found",event.getError());
+  Map<String,String> details=event.getDetails();
+  assertEquals("openid-connect",details.get("auth_method"));
+  assertEquals("code",details.get("auth_type"));
+  assertNotNull(details.get("redirect_uri"));
+  assertNotNull(details.get("code_id"));
+  assertEquals("bad",details.get("username"));
+}

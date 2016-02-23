@@ -1,0 +1,16 @@
+{
+  createUser("user5");
+  List<AdminEventRepresentation> events=events();
+  assertEquals(1,events.size());
+  AdminEventRepresentation event=events.get(0);
+  assertTrue(event.getTime() > 0);
+  assertEquals(realmName(),event.getRealmId());
+  assertEquals("CREATE",event.getOperationType());
+  assertNotNull(event.getResourcePath());
+  assertNull(event.getError());
+  AuthDetailsRepresentation details=event.getAuthDetails();
+  assertEquals(realmName(),details.getRealmId());
+  assertNotNull(details.getClientId());
+  assertNotNull(details.getUserId());
+  assertNotNull(details.getIpAddress());
+}

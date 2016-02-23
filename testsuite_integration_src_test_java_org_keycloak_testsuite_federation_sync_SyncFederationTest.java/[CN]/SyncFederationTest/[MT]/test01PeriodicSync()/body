@@ -16,12 +16,24 @@
     sleep(1800);
     RealmModel appRealm=session.realms().getRealmByName("test");
     usersSyncManager.notifyToRefreshPeriodicSync(session,appRealm,dummyModel,true);
+    log.infof("Notified sync manager about cancel periodic sync");
+    while (true) {
+      UserFederationSyncResult result=usersSyncManager.syncChangedUsers(session.getKeycloakSessionFactory(),appRealm.getId(),dummyModel);
+      if (result.isIgnored()) {
+        log.infof("Still waiting for lock before periodic sync is finished",result.toString());
+        sleep(1000);
+      }
+ else {
+        break;
+      }
+    }
     int newChanged=dummyFedFactory.getChangedSyncCounter();
     Assert.assertEquals(full,dummyFedFactory.getFullSyncCounter());
-    Assert.assertTrue(newChanged > changed);
+    Assert.assertTrue("Assertion failed. newChanged=" + newChanged + ", changed="+ changed,newChanged > (changed + 1));
     sleep(1800);
     Assert.assertEquals(full,dummyFedFactory.getFullSyncCounter());
-    Assert.assertEquals(newChanged,dummyFedFactory.getChangedSyncCounter());
+    int newestChanged=dummyFedFactory.getChangedSyncCounter();
+    Assert.assertEquals("Assertion failed. newChanged=" + newChanged + ", newestChanged="+ newestChanged,newChanged,newestChanged);
   }
   finally {
     keycloakRule.stopSession(session,true);

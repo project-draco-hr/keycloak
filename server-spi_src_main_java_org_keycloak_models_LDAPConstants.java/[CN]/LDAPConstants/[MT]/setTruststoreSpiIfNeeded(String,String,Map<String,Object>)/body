@@ -1,0 +1,15 @@
+{
+  boolean shouldSetTruststore;
+  if (useTruststoreSpi != null && useTruststoreSpi.equals(LDAPConstants.USE_TRUSTSTORE_ALWAYS)) {
+    shouldSetTruststore=true;
+  }
+ else   if (useTruststoreSpi != null && useTruststoreSpi.equals(LDAPConstants.USE_TRUSTSTORE_NEVER)) {
+    shouldSetTruststore=false;
+  }
+ else {
+    shouldSetTruststore=(url != null && url.startsWith("ldaps"));
+  }
+  if (shouldSetTruststore) {
+    env.put("java.naming.ldap.factory.socket","org.keycloak.truststore.SSLSocketFactory");
+  }
+}

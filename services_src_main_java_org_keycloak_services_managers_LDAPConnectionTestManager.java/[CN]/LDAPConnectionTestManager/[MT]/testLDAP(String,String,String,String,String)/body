@@ -1,0 +1,47 @@
+{
+  if (!TEST_CONNECTION.equals(action) && !TEST_AUTHENTICATION.equals(action)) {
+    logger.unknownAction(action);
+    return false;
+  }
+  Context ldapContext=null;
+  try {
+    Hashtable<String,Object> env=new Hashtable<String,Object>();
+    env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
+    if (connectionUrl == null) {
+      logger.errorf("Unknown connection URL");
+      return false;
+    }
+    env.put(Context.PROVIDER_URL,connectionUrl);
+    if (TEST_AUTHENTICATION.equals(action)) {
+      env.put(Context.SECURITY_AUTHENTICATION,"simple");
+      if (bindDn == null) {
+        logger.error("Unknown bind DN");
+        return false;
+      }
+      env.put(Context.SECURITY_PRINCIPAL,bindDn);
+      char[] bindCredentialChar=null;
+      if (bindCredential != null) {
+        bindCredentialChar=bindCredential.toCharArray();
+      }
+      env.put(Context.SECURITY_CREDENTIALS,bindCredentialChar);
+    }
+    LDAPConstants.setTruststoreSpiIfNeeded(useTruststoreSpi,connectionUrl,env);
+    ldapContext=new InitialLdapContext(env,null);
+    return true;
+  }
+ catch (  Exception ne) {
+    String errorMessage=(TEST_AUTHENTICATION.equals(action)) ? "Error when authenticating to LDAP: " : "Error when connecting to LDAP: ";
+    logger.errorAuthenticating(ne,errorMessage + ne.getMessage());
+    return false;
+  }
+ finally {
+    if (ldapContext != null) {
+      try {
+        ldapContext.close();
+      }
+ catch (      NamingException ne) {
+        logger.errorClosingLDAP(ne);
+      }
+    }
+  }
+}

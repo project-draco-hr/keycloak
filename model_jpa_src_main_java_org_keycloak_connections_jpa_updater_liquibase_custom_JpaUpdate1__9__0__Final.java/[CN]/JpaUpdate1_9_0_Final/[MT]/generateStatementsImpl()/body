@@ -1,0 +1,27 @@
+{
+  String userFederationProviderTableName=database.correctObjectName("USER_FEDERATION_PROVIDER",Table.class);
+  try {
+    PreparedStatement statement=jdbcConnection.prepareStatement("select REALM_ID, USERFEDERATIONPROVIDERS_ID from " + getTableName("FED_PROVIDERS"));
+    try {
+      ResultSet resultSet=statement.executeQuery();
+      try {
+        while (resultSet.next()) {
+          String realmId=resultSet.getString(1);
+          String userFederationProviderId=resultSet.getString(2);
+          UpdateStatement updateStatement=new UpdateStatement(null,null,userFederationProviderTableName).addNewColumnValue("REALM_ID",realmId).setWhereClause("ID='" + userFederationProviderId + "'");
+          statements.add(updateStatement);
+        }
+      }
+  finally {
+        resultSet.close();
+      }
+    }
+  finally {
+      statement.close();
+    }
+    confirmationMessage.append("Updated " + statements.size() + " records in USER_FEDERATION_PROVIDER table");
+  }
+ catch (  Exception e) {
+    throw new CustomChangeException(getTaskId() + ": Exception when updating data from previous version",e);
+  }
+}

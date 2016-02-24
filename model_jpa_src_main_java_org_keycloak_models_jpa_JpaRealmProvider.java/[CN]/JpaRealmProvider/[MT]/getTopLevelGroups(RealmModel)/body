@@ -1,0 +1,9 @@
+{
+  List<String> groups=em.createNamedQuery("getTopLevelGroupIds",String.class).setParameter("realm",realm.getId()).getResultList();
+  if (groups == null)   return Collections.EMPTY_LIST;
+  List<GroupModel> list=new LinkedList<>();
+  for (  String id : groups) {
+    list.add(session.realms().getGroupById(id,realm));
+  }
+  return Collections.unmodifiableList(list);
+}

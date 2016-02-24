@@ -1,9 +1,3 @@
 {
-  List<String> groups=em.createNamedQuery("getAllGroupIdsByRealm",String.class).setParameter("realm",realm.getId()).getResultList();
-  if (groups == null)   return Collections.EMPTY_LIST;
-  List<GroupModel> list=new LinkedList<>();
-  for (  String id : groups) {
-    list.add(session.realms().getGroupById(id,this));
-  }
-  return Collections.unmodifiableList(list);
+  return session.realms().getGroups(this);
 }

@@ -1,11 +1,3 @@
 {
-  if (realm.getDefaultGroups() != null) {
-    getMongoStore().pullItemFromList(realm,"defaultGroups",group.getId(),invocationContext);
-  }
-  for (  GroupModel subGroup : group.getSubGroups()) {
-    removeGroup(subGroup);
-  }
-  session.users().preRemove(this,group);
-  moveGroup(group,null);
-  return getMongoStore().removeEntity(MongoGroupEntity.class,group.getId(),invocationContext);
+  return session.realms().removeGroup(this,group);
 }

@@ -1,0 +1,9 @@
+{
+  session.users().preRemove(realm,group);
+  realm.removeDefaultGroup(group);
+  for (  GroupModel subGroup : group.getSubGroups()) {
+    removeGroup(realm,subGroup);
+  }
+  moveGroup(realm,group,null);
+  return getMongoStore().removeEntity(MongoGroupEntity.class,group.getId(),invocationContext);
+}

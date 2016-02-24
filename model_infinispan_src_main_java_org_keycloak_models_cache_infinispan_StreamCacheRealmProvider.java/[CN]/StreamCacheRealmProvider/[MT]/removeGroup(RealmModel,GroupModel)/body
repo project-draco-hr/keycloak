@@ -1,0 +1,12 @@
+{
+  registerGroupInvalidation(group.getId());
+  listInvalidations.add(realm.getId());
+  invalidations.add(getGroupsQueryCacheKey(realm.getId()));
+  if (group.getParentId() == null) {
+    invalidations.add(getTopGroupsQueryCacheKey(realm.getId()));
+  }
+ else {
+    registerGroupInvalidation(group.getParentId());
+  }
+  return getDelegate().removeGroup(realm,group);
+}

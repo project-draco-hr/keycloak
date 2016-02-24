@@ -1,0 +1,18 @@
+{
+  if (group == null) {
+    return false;
+  }
+  session.users().preRemove(realm,group);
+  realm.removeDefaultGroup(group);
+  for (  GroupModel subGroup : group.getSubGroups()) {
+    session.realms().removeGroup(realm,subGroup);
+  }
+  moveGroup(realm,group,null);
+  GroupEntity groupEntity=em.find(GroupEntity.class,group.getId());
+  if (!groupEntity.getRealm().getId().equals(realm.getId())) {
+    return false;
+  }
+  em.createNamedQuery("deleteGroupRoleMappingsByGroup").setParameter("group",groupEntity).executeUpdate();
+  em.remove(groupEntity);
+  return true;
+}

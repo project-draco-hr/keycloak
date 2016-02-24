@@ -1,11 +1,3 @@
 {
-  DBObject query=new QueryBuilder().and("realmId").is(getId()).get();
-  List<MongoGroupEntity> groups=getMongoStore().loadEntities(MongoGroupEntity.class,query,invocationContext);
-  if (groups == null)   return Collections.EMPTY_LIST;
-  List<GroupModel> result=new LinkedList<>();
-  if (groups == null)   return result;
-  for (  MongoGroupEntity group : groups) {
-    result.add(model.getGroupById(group.getId(),this));
-  }
-  return Collections.unmodifiableList(result);
+  return session.realms().getGroups(this);
 }

@@ -1,5 +1,5 @@
 {
-  logger.debug("Checking existence of user: " + username);
+  logger.debugf("Checking existence of user: %s",username);
   try {
     String principal=getKerberosPrincipal(username);
     loginContext=new LoginContext("does-not-matter",null,createJaasCallbackHandler(principal,"fake-password-which-nobody-has"),createJaasConfiguration());
@@ -8,7 +8,7 @@
   }
  catch (  LoginException le) {
     String message=le.getMessage();
-    logger.debug("Message from kerberos: " + message);
+    logger.debugf("Message from kerberos: %s",message);
     checkKerberosServerAvailable(le);
     boolean exists=(!message.contains("Client not found"));
     return exists;

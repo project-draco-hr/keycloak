@@ -6,6 +6,8 @@
   loginPage.assertCurrent();
   loginPage.login("jduke","theduke");
   changePasswordPage.assertCurrent();
+  changePasswordPage.changePassword("theduke-invalid","newPass","newPass");
+  Assert.assertTrue(driver.getPageSource().contains("Invalid existing password."));
   changePasswordPage.changePassword("theduke","newPass","newPass");
   Assert.assertTrue(driver.getPageSource().contains("You can't update your password as your account is read only"));
   updateProviderEditMode(UserFederationProvider.EditMode.UNSYNCED);

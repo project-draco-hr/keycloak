@@ -1,0 +1,11 @@
+{
+  createOidcClient("updateMe");
+  ClientRepresentation clientRep=findClientRepresentation("updateMe");
+  assertEquals("updateMe",clientRep.getName());
+  clientRep.setName("iWasUpdated");
+  findClientResource("updateMe").update(clientRep);
+  ClientRepresentation updatedClient=findClientRepresentation("iWasUpdated");
+  assertNotNull(updatedClient);
+  assertEquals("updateMe",updatedClient.getClientId());
+  assertEquals("iWasUpdated",updatedClient.getName());
+}

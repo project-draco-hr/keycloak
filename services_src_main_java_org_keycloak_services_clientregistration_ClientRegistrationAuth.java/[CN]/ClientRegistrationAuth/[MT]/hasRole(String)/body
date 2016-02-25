@@ -6,16 +6,22 @@
       if (resourceAccess == null) {
         return false;
       }
-      Map<String,List<String>> realmManagement=resourceAccess.get(Constants.REALM_MANAGEMENT_CLIENT_ID);
-      if (realmManagement == null) {
-        return false;
+      List<String> roles=null;
+      Map<String,List<String>> map;
+      if (realm.getName().equals(Config.getAdminRealm())) {
+        map=resourceAccess.get(realm.getMasterAdminClient().getClientId());
       }
-      List<String> resources=realmManagement.get("roles");
-      if (resources == null) {
+ else {
+        map=resourceAccess.get(Constants.REALM_MANAGEMENT_CLIENT_ID);
+      }
+      if (map != null) {
+        roles=map.get("roles");
+      }
+      if (roles == null) {
         return false;
       }
       for (      String r : role) {
-        if (resources.contains(r)) {
+        if (roles.contains(r)) {
           return true;
         }
       }

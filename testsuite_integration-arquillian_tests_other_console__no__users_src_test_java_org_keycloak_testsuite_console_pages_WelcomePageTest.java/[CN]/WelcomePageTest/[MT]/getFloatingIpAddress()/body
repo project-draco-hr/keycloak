@@ -1,0 +1,12 @@
+{
+  Enumeration<NetworkInterface> netInterfaces=NetworkInterface.getNetworkInterfaces();
+  for (  NetworkInterface ni : Collections.list(netInterfaces)) {
+    Enumeration<InetAddress> inetAddresses=ni.getInetAddresses();
+    for (    InetAddress a : Collections.list(inetAddresses)) {
+      if (!a.isLoopbackAddress() && a.isSiteLocalAddress()) {
+        return a.getHostAddress();
+      }
+    }
+  }
+  return null;
+}

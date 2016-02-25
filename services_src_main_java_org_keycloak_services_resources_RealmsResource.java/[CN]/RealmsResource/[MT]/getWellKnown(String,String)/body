@@ -1,5 +1,6 @@
 {
   init(name);
   WellKnownProvider wellKnown=session.getProvider(WellKnownProvider.class,providerName);
-  return Response.ok(wellKnown.getConfig()).cacheControl(CacheControlUtil.getDefaultCacheControl()).build();
+  ResponseBuilder responseBuilder=Response.ok(wellKnown.getConfig()).cacheControl(CacheControlUtil.getDefaultCacheControl());
+  return Cors.add(request,responseBuilder).allowedOrigins("*").build();
 }

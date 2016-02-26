@@ -1,0 +1,12 @@
+{
+  try {
+    if (gssCredential == null) {
+      throw new KerberosSerializationException("Null credential given as input");
+    }
+    kerberosTicket=KerberosJdkProvider.getProvider().gssCredentialToKerberosTicket(kerberosTicket,gssCredential);
+    return serialize(kerberosTicket);
+  }
+ catch (  IOException e) {
+    throw new KerberosSerializationException("Unexpected exception when serialize GSSCredential",e);
+  }
+}

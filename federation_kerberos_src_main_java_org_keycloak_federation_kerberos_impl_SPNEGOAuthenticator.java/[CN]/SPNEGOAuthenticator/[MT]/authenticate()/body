@@ -5,6 +5,11 @@
   try {
     Subject serverSubject=kerberosSubjectAuthenticator.authenticateServerSubject();
     authenticated=Subject.doAs(serverSubject,new AcceptSecContext());
+    Set<KerberosTicket> kerberosTickets=serverSubject.getPrivateCredentials(KerberosTicket.class);
+    Iterator<KerberosTicket> iterator=kerberosTickets.iterator();
+    if (iterator.hasNext()) {
+      kerberosTicket=iterator.next();
+    }
   }
  catch (  Exception e) {
     log.warn("SPNEGO login failed",e);

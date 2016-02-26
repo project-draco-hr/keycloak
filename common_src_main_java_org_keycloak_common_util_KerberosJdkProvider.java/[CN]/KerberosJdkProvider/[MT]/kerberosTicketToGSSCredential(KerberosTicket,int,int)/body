@@ -1,0 +1,21 @@
+{
+  try {
+    final GSSManager gssManager=GSSManager.getInstance();
+    KerberosPrincipal kerberosPrincipal=kerberosTicket.getClient();
+    String krbPrincipalName=kerberosTicket.getClient().getName();
+    final GSSName gssName=gssManager.createName(krbPrincipalName,KerberosConstants.KRB5_NAME_OID);
+    Set<KerberosPrincipal> principals=Collections.singleton(kerberosPrincipal);
+    Set<GSSName> publicCreds=Collections.singleton(gssName);
+    Set<KerberosTicket> privateCreds=Collections.singleton(kerberosTicket);
+    Subject subject=new Subject(false,principals,publicCreds,privateCreds);
+    return Subject.doAs(subject,new PrivilegedExceptionAction<GSSCredential>(){
+      @Override public GSSCredential run() throws Exception {
+        return gssManager.createCredential(gssName,lifetime,KerberosConstants.KRB5_OID,usage);
+      }
+    }
+);
+  }
+ catch (  Exception e) {
+    throw new KerberosSerializationUtils.KerberosSerializationException("Unexpected exception during convert KerberosTicket to GSSCredential",e);
+  }
+}

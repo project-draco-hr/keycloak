@@ -1,0 +1,15 @@
+{
+  XYSeries series=new XYSeries(op);
+  int i=0;
+  for (  Long duration : stats.get(op)) {
+    series.add(++i,duration);
+  }
+  final XYSeriesCollection data=new XYSeriesCollection(series);
+  final JFreeChart chart=ChartFactory.createXYLineChart(op,"Operations","Duration (ms)",data,PlotOrientation.VERTICAL,true,true,false);
+  try {
+    ChartUtilities.saveChartAsPNG(new File(CHARTS_DIR,op.replace(" ","_") + ".png"),chart,640,480);
+  }
+ catch (  IOException ex) {
+    log.warn("Unable to save chart for operation '" + op + "'.");
+  }
+}

@@ -1,0 +1,16 @@
+{
+  try {
+    File f=new File(DATA_DIR,op.replace(" ","_") + ".txt");
+    assertTrue(f.createNewFile());
+    OutputStream stream=new BufferedOutputStream(new FileOutputStream(f));
+    for (    Long duration : stats.get(op)) {
+      IOUtils.write(duration.toString(),stream);
+      IOUtils.write("\n",stream);
+    }
+    stream.flush();
+    IOUtils.closeQuietly(stream);
+  }
+ catch (  IOException ex) {
+    log.error("Unable to save data for operation '" + op + "'");
+  }
+}

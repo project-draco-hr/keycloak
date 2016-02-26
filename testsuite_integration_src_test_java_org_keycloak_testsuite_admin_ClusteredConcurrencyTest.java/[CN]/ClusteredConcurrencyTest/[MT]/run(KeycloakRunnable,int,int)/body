@@ -1,0 +1,44 @@
+{
+  final CountDownLatch latch=new CountDownLatch(numThreads);
+  final AtomicReference<Throwable> failed=new AtomicReference();
+  final List<Thread> threads=new LinkedList<>();
+  final Lock lock=SYNCHRONIZED ? new ReentrantLock() : null;
+  for (int t=0; t < numThreads; t++) {
+    final int threadNum=t;
+    Thread thread=new Thread(){
+      @Override public void run(){
+        try {
+          if (lock != null) {
+            lock.lock();
+          }
+          for (int i=0; i < numIterationsPerThread && latch.getCount() > 0; i++) {
+            log.infov("thread {0}, iteration {1}",threadNum,i);
+            runnable.run(threadNum,i);
+          }
+          latch.countDown();
+        }
+ catch (        Throwable t) {
+          failed.compareAndSet(null,t);
+          while (latch.getCount() > 0) {
+            latch.countDown();
+          }
+        }
+ finally {
+          if (lock != null) {
+            lock.unlock();
+          }
+        }
+      }
+    }
+;
+    thread.start();
+    threads.add(thread);
+  }
+  latch.await();
+  for (  Thread t : threads) {
+    t.join();
+  }
+  if (failed.get() != null) {
+    throw failed.get();
+  }
+}

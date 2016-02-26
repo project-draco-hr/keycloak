@@ -1,0 +1,29 @@
+{
+  System.out.println("***************************");
+  long start=System.currentTimeMillis();
+  run(new KeycloakRunnable(){
+    @Override public void run(    Keycloak keycloak,    RealmResource realm,    int threadNum,    int iterationNum){
+      String name="c-" + threadNum + "-"+ iterationNum;
+      GroupRepresentation c=new GroupRepresentation();
+      c.setName(name);
+      Response response=realm.groups().add(c);
+      String id=ApiUtil.getCreatedId(response);
+      response.close();
+      c=realm.groups().group(id).toRepresentation();
+      assertNotNull(c);
+      boolean found=false;
+      for (      GroupRepresentation r : realm.groups().groups()) {
+        if (r.getName().equals(name)) {
+          found=true;
+          break;
+        }
+      }
+      if (!found) {
+        fail("Group " + name + " not found in group list");
+      }
+    }
+  }
+);
+  long end=System.currentTimeMillis() - start;
+  System.out.println("createGroup took " + end);
+}

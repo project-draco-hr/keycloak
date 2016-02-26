@@ -1,9 +1,12 @@
 {
   if (!event.isPre()) {
+    bumpVersion(event.getKey());
     Object object=event.getValue();
     if (object != null) {
+      bumpVersion(event.getKey());
       Predicate<Map.Entry<String,Revisioned>> predicate=getInvalidationPredicate(object);
       if (predicate != null)       runEvictions(predicate);
+      logger.tracev("invalidating: {0}" + object.getClass().getName());
     }
   }
 }

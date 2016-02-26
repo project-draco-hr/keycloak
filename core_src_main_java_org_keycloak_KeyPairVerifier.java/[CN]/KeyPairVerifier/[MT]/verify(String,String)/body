@@ -1,0 +1,25 @@
+{
+  PrivateKey privateKey;
+  try {
+    privateKey=PemUtils.decodePrivateKey(privateKeyPem);
+  }
+ catch (  Exception e) {
+    throw new VerificationException("Failed to decode private key");
+  }
+  PublicKey publicKey;
+  try {
+    publicKey=PemUtils.decodePublicKey(publicKeyPem);
+  }
+ catch (  Exception e) {
+    throw new VerificationException("Failed to decode public key");
+  }
+  try {
+    String jws=new JWSBuilder().content("content".getBytes()).rsa256(privateKey);
+    if (!RSAProvider.verify(new JWSInput(jws),publicKey)) {
+      throw new VerificationException("Keys don't match");
+    }
+  }
+ catch (  Exception e) {
+    throw new VerificationException("Keys don't match");
+  }
+}

@@ -1,0 +1,16 @@
+{
+  final String keytabUrl=getKeytabURL(keytab);
+  return new Configuration(){
+    @Override public AppConfigurationEntry[] getAppConfigurationEntry(    String name){
+      Map<String,Object> options=new HashMap<>();
+      options.put("noAddress","true");
+      options.put("credsType","acceptor");
+      options.put("useKeytab",keytabUrl);
+      options.put("principal",serverPrincipal);
+      options.put("debug",String.valueOf(debug));
+      AppConfigurationEntry kerberosLMConfiguration=new AppConfigurationEntry("com.ibm.security.auth.module.Krb5LoginModule",AppConfigurationEntry.LoginModuleControlFlag.REQUIRED,options);
+      return new AppConfigurationEntry[]{kerberosLMConfiguration};
+    }
+  }
+;
+}

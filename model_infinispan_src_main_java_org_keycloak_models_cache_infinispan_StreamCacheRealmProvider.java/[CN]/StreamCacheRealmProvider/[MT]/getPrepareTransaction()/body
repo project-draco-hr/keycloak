@@ -4,14 +4,6 @@
       transactionActive=true;
     }
     @Override public void commit(){
-      if (delegate == null)       return;
-      List<String> locks=new LinkedList<>();
-      locks.addAll(invalidations);
-      Collections.sort(locks);
-      cache.getRevisions().startBatch();
-      for (      String lock : locks) {
-        boolean success=cache.getRevisions().getAdvancedCache().lock(lock);
-      }
     }
     @Override public void rollback(){
       setRollbackOnly=true;

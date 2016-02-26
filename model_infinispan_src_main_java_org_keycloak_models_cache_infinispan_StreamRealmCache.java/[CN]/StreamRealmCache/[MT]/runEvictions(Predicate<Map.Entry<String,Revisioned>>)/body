@@ -1,5 +1,9 @@
 {
   Set<String> evictions=new HashSet<>();
   addInvalidations(current,evictions);
-  for (  String key : evictions)   cache.evict(key);
+  logger.tracev("running evictions size: {0}",evictions.size());
+  for (  String key : evictions) {
+    cache.evict(key);
+    bumpVersion(key);
+  }
 }

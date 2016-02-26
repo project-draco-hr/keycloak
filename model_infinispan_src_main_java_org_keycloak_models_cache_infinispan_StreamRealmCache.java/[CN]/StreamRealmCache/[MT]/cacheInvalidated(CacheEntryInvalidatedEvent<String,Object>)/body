@@ -1,9 +1,28 @@
 {
-  if (!event.isPre()) {
+  if (event.isPre()) {
+    String key=event.getKey();
+    if (key.startsWith("invalidation.key")) {
+      String bump=key.substring("invalidation.key".length());
+      logger.tracev("bumping invalidation key {0}",bump);
+      bumpVersion(bump);
+      return;
+    }
+  }
+ else {
+    String key=event.getKey();
+    if (key.startsWith("invalidation.key")) {
+      String bump=key.substring("invalidation.key".length());
+      bumpVersion(bump);
+      logger.tracev("bumping invalidation key {0}",bump);
+      return;
+    }
+    bumpVersion(key);
     Object object=event.getValue();
     if (object != null) {
+      bumpVersion(key);
       Predicate<Map.Entry<String,Revisioned>> predicate=getInvalidationPredicate(object);
       if (predicate != null)       runEvictions(predicate);
+      logger.tracev("invalidating: {0}" + object.getClass().getName());
     }
   }
 }

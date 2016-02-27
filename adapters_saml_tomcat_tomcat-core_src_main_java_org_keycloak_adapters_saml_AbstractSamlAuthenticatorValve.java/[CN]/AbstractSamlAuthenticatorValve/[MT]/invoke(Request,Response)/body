@@ -1,8 +1,8 @@
 {
   log.fine("*********************** SAML ************");
+  CatalinaHttpFacade facade=new CatalinaHttpFacade(response,request);
+  SamlDeployment deployment=deploymentContext.resolveDeployment(facade);
   if (request.getRequestURI().substring(request.getContextPath().length()).endsWith("/saml")) {
-    CatalinaHttpFacade facade=new CatalinaHttpFacade(response,request);
-    SamlDeployment deployment=deploymentContext.resolveDeployment(facade);
     if (deployment != null && deployment.isConfigured()) {
       SamlSessionStore tokenStore=getSessionStore(request,facade,deployment);
       SamlAuthenticator authenticator=new CatalinaSamlEndpoint(facade,deployment,tokenStore);
@@ -11,6 +11,7 @@
     }
   }
   try {
+    getSessionStore(request,facade,deployment).isLoggedIn();
     super.invoke(request,response);
   }
   finally {

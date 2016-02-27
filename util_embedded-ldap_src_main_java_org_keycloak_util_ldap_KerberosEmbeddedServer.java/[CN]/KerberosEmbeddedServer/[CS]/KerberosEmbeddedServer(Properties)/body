@@ -6,14 +6,7 @@
   this.kdcPort=Integer.parseInt(kdcPort);
   this.kdcEncryptionTypes=readProperty(PROPERTY_KDC_ENCTYPES,DEFAULT_KDC_ENCRYPTION_TYPES);
   if (ldapSaslPrincipal == null || ldapSaslPrincipal.isEmpty()) {
-    try {
-      GSSName gssName=GSSManager.getInstance().createName("ldap@" + bindHost,GSSName.NT_HOSTBASED_SERVICE);
-      GSSNameImpl gssName1=(GSSNameImpl)gssName;
-      Krb5NameElement krb5NameElement=(Krb5NameElement)gssName1.getElement(KerberosSerializationUtils.KRB5_OID);
-      this.ldapSaslPrincipal=krb5NameElement.getKrb5PrincipalName().toString();
-    }
- catch (    GSSException uhe) {
-      throw new RuntimeException(uhe);
-    }
+    String hostname=getHostnameForSASLPrincipal(bindHost);
+    this.ldapSaslPrincipal="ldap/" + hostname + "@"+ this.kerberosRealm;
   }
 }

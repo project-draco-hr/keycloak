@@ -1,0 +1,21 @@
+{
+  try {
+    Class<?> gssUtil=Class.forName("com.sun.security.jgss.GSSUtil");
+    Method createSubject=gssUtil.getMethod("createSubject",GSSName.class,GSSCredential.class);
+    Subject subject=(Subject)createSubject.invoke(null,null,gssCredential);
+    Set<KerberosTicket> kerberosTickets=subject.getPrivateCredentials(KerberosTicket.class);
+    Iterator<KerberosTicket> iterator=kerberosTickets.iterator();
+    if (iterator.hasNext()) {
+      return iterator.next();
+    }
+ else {
+      throw new KerberosSerializationUtils.KerberosSerializationException("Not available kerberosTicket in subject credentials. Subject was: " + subject.toString());
+    }
+  }
+ catch (  KerberosSerializationUtils.KerberosSerializationException ke) {
+    throw ke;
+  }
+catch (  Exception e) {
+    throw new KerberosSerializationUtils.KerberosSerializationException("Unexpected error during convert GSSCredential to KerberosTicket",e);
+  }
+}

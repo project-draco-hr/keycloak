@@ -10,6 +10,11 @@
   String pageSource=driver.getPageSource();
   System.out.println(pageSource);
   Assert.assertTrue(pageSource.contains("parameter=hello"));
+  driver.navigate().to(APP_SERVER_BASE_URL + "/input-portal/insecure");
+  System.out.println("insecure: ");
+  System.out.println(driver.getPageSource());
+  Assert.assertTrue(driver.getPageSource().contains("Insecure Page"));
+  if (System.getProperty("insecure.user.principal.unsupported") == null)   Assert.assertTrue(driver.getPageSource().contains("UserPrincipal"));
   String logoutUri=OIDCLoginProtocolService.logoutUrl(UriBuilder.fromUri(AUTH_SERVER_URL)).queryParam(OAuth2Constants.REDIRECT_URI,APP_SERVER_BASE_URL + "/customer-portal").build("demo").toString();
   driver.navigate().to(logoutUri);
   Assert.assertTrue(driver.getCurrentUrl().startsWith(LOGIN_URL));

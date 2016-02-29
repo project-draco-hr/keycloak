@@ -31,7 +31,8 @@
  else {
     log.debug("Refresh failed. Account was not active. Returning null and invalidating Http session");
     try {
-      session.setAttribute(KeycloakUndertowAccount.class.getName(),null);
+      session.removeAttribute(KeycloakUndertowAccount.class.getName());
+      session.removeAttribute(KeycloakSecurityContext.class.getName());
       session.invalidate();
     }
  catch (    Exception e) {

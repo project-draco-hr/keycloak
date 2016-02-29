@@ -10,11 +10,14 @@
       try {
         transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING,true);
       }
- catch (      TransformerConfigurationException e) {
-        throw new RuntimeException(e);
+ catch (      TransformerConfigurationException ignored) {
       }
-      transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD,"");
-      transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET,"");
+      try {
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD,"");
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET,"");
+      }
+ catch (      Exception ignored) {
+      }
     }
   finally {
       if (tccl_jaxp) {

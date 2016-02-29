@@ -1,0 +1,25 @@
+{
+  if (logStats) {
+    log.info("Timer Statistics:");
+    for (    String op : stats.keySet()) {
+      long sum=0;
+      for (      Long duration : stats.get(op)) {
+        sum+=duration;
+      }
+      log.info(String.format("Operation '%s' average: %s ms",op,sum / stats.get(op).size()));
+    }
+  }
+  if (PROJECT_BUILD_DIRECTORY.exists()) {
+    DATA_DIR.mkdirs();
+    CHARTS_DIR.mkdirs();
+    for (    String op : stats.keySet()) {
+      if (saveData) {
+        saveData(op);
+      }
+      if (saveCharts) {
+        saveChart(op);
+      }
+    }
+  }
+  stats.clear();
+}

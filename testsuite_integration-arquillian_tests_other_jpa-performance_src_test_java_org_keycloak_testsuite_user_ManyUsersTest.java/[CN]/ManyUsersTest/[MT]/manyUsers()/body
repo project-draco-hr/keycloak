@@ -1,0 +1,49 @@
+{
+  RealmRepresentation realm=realmResource().toRepresentation();
+  realm.setUsers(users);
+  realmTimer.reset("create " + users.size() + " users");
+  usersTimer.reset("create " + BATCH + " users");
+  int i=0;
+  for (  UserRepresentation user : users) {
+    createUser(realmResource().users(),user);
+    if (++i % BATCH == 0) {
+      usersTimer.reset();
+      log.info("Created users: " + i + " / "+ users.size());
+    }
+  }
+  if (i % BATCH != 0) {
+    usersTimer.reset();
+    log.info("Created users: " + i + " / "+ users.size());
+  }
+  realmTimer.reset("save realm with " + users.size() + " users");
+  File realmFile=new File(PROJECT_BUILD_DIRECTORY,REALM + ".json");
+  JsonSerialization.writeValueToStream(new BufferedOutputStream(new FileOutputStream(realmFile)),realm);
+  realmTimer.reset("delete realm with " + users.size() + " users");
+  realmResource().remove();
+  try {
+    realmResource().toRepresentation();
+    fail("realm not deleted");
+  }
+ catch (  Exception ex) {
+    log.debug("realm deleted");
+  }
+  realmTimer.reset("re-import realm with " + realm.getUsers().size() + " users");
+  realmsResouce().create(realm);
+  realmTimer.reset("load " + realm.getUsers().size() + " users");
+  users=realmResource().users().search("",0,Integer.MAX_VALUE);
+  realmTimer.reset("delete " + users.size() + " users");
+  usersTimer.reset("delete " + BATCH + " users",false);
+  i=0;
+  for (  UserRepresentation user : users) {
+    realmResource().users().get(user.getId()).remove();
+    if (++i % BATCH == 0) {
+      usersTimer.reset();
+      log.info("Deleted users: " + i + " / "+ users.size());
+    }
+  }
+  if (i % BATCH != 0) {
+    usersTimer.reset();
+    log.info("Deleted users: " + i + " / "+ users.size());
+  }
+  realmTimer.reset();
+}

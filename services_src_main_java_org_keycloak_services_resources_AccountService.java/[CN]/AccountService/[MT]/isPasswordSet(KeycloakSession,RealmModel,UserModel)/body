@@ -1,0 +1,23 @@
+{
+  boolean passwordSet=false;
+  if (user.getFederationLink() != null) {
+    UserFederationProvider federationProvider=null;
+    for (    UserFederationProviderModel fedProviderModel : realm.getUserFederationProviders()) {
+      if (fedProviderModel.getId().equals(user.getFederationLink())) {
+        federationProvider=KeycloakModelUtils.getFederationProviderInstance(session,fedProviderModel);
+      }
+    }
+    if (federationProvider != null) {
+      Set<String> supportedCreds=federationProvider.getSupportedCredentialTypes(user);
+      if (supportedCreds.contains(UserCredentialModel.PASSWORD)) {
+        passwordSet=true;
+      }
+    }
+  }
+  for (  UserCredentialValueModel c : user.getCredentialsDirectly()) {
+    if (c.getType().equals(CredentialRepresentation.PASSWORD)) {
+      passwordSet=true;
+    }
+  }
+  return passwordSet;
+}

@@ -7,6 +7,17 @@
         SecurityActions.setTCCL(TransformerUtil.class.getClassLoader());
       }
       transformerFactory=TransformerFactory.newInstance();
+      try {
+        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING,true);
+      }
+ catch (      TransformerConfigurationException ignored) {
+      }
+      try {
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD,"");
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET,"");
+      }
+ catch (      Exception ignored) {
+      }
     }
   finally {
       if (tccl_jaxp) {

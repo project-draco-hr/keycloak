@@ -1,0 +1,36 @@
+{
+  RealmModel realm=getRealm();
+  UserFederationProviderModel dummyModel=realm.addUserFederationProvider(DummyUserFederationProviderFactory.PROVIDER_NAME,new HashMap<String,String>(),1,"test-dummy",-1,-1,0);
+  setUpdateProfileFirstLogin(IdentityProviderRepresentation.UPFLM_OFF);
+  brokerServerRule.stopSession(session,true);
+  session=brokerServerRule.startSession();
+  try {
+    authenticateWithIdentityProvider(getIdentityProviderModel(),"test-user",false);
+    changePasswordPage.realm("realm-with-broker");
+    changePasswordPage.open();
+    assertTrue(changePasswordPage.isCurrent());
+    changePasswordPage.changePassword("new-password","new-password");
+    Assert.assertEquals("Please specify password.",accountUpdateProfilePage.getError());
+    changePasswordPage.changePassword("bad","new-password","new-password");
+    Assert.assertEquals("Invalid existing password.",accountUpdateProfilePage.getError());
+    changePasswordPage.changePassword("secret","new-password","new-password");
+    Assert.assertEquals("Your password has been updated.",accountUpdateProfilePage.getSuccess());
+    driver.navigate().to("http://localhost:8081/test-app/logout");
+    authenticateWithIdentityProvider(getIdentityProviderModel(),"test-user-noemail",false);
+    changePasswordPage.open();
+    assertTrue(changePasswordPage.isCurrent());
+    changePasswordPage.changePassword("new-password","new-password");
+    Assert.assertEquals("Your password has been updated.",accountUpdateProfilePage.getSuccess());
+    changePasswordPage.changePassword("new-password2","new-password2");
+    Assert.assertEquals("Please specify password.",accountUpdateProfilePage.getError());
+    changePasswordPage.changePassword("new-password","new-password2","new-password2");
+    Assert.assertEquals("Your password has been updated.",accountUpdateProfilePage.getSuccess());
+    driver.navigate().to("http://localhost:8081/test-app/logout");
+  }
+  finally {
+    realm=getRealm();
+    realm.removeUserFederationProvider(dummyModel);
+    brokerServerRule.stopSession(session,true);
+    session=brokerServerRule.startSession();
+  }
+}

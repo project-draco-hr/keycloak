@@ -46,7 +46,7 @@ case ADD:
 case REMOVE:
 FederatedIdentityModel link=session.users().getFederatedIdentity(user,providerId,realm);
 if (link != null) {
-if (session.users().getFederatedIdentities(user,realm).size() > 1 || user.getFederationLink() != null || isPasswordSet(user)) {
+if (session.users().getFederatedIdentities(user,realm).size() > 1 || user.getFederationLink() != null || isPasswordSet(session,realm,user)) {
   session.users().removeFederatedIdentity(realm,user,providerId);
   logger.debugv("Social provider {0} removed successfully from user {1}",providerId,user.getUsername());
   event.event(EventType.REMOVE_FEDERATED_IDENTITY).client(auth.getClient()).user(auth.getUser()).detail(Details.USERNAME,auth.getUser().getUsername()).detail(Details.IDENTITY_PROVIDER,link.getIdentityProvider()).detail(Details.IDENTITY_PROVIDER_USERNAME,link.getUserName()).success();

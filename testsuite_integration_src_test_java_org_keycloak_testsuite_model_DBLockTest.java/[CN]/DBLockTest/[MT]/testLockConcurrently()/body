@@ -1,0 +1,38 @@
+{
+  long startupTime=System.currentTimeMillis();
+  final Semaphore semaphore=new Semaphore();
+  final KeycloakSessionFactory sessionFactory=realmManager.getSession().getKeycloakSessionFactory();
+  List<Thread> threads=new LinkedList<>();
+  for (int i=0; i < THREADS_COUNT; i++) {
+    Thread thread=new Thread(){
+      @Override public void run(){
+        for (int i=0; i < ITERATIONS_PER_THREAD; i++) {
+          try {
+            KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+              @Override public void run(              KeycloakSession session){
+                lock(session,semaphore);
+              }
+            }
+);
+          }
+ catch (          RuntimeException e) {
+            semaphore.setException(e);
+            throw e;
+          }
+        }
+      }
+    }
+;
+    threads.add(thread);
+  }
+  for (  Thread thread : threads) {
+    thread.start();
+  }
+  for (  Thread thread : threads) {
+    thread.join();
+  }
+  long took=(System.currentTimeMillis() - startupTime);
+  log.infof("DBLockTest executed in %d ms with total counter %d. THREADS_COUNT=%d, ITERATIONS_PER_THREAD=%d",took,semaphore.getTotal(),THREADS_COUNT,ITERATIONS_PER_THREAD);
+  Assert.assertEquals(semaphore.getTotal(),THREADS_COUNT * ITERATIONS_PER_THREAD);
+  Assert.assertNull(semaphore.getException());
+}

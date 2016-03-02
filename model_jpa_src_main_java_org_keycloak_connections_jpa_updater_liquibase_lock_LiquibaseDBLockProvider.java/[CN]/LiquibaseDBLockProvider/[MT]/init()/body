@@ -1,0 +1,18 @@
+{
+  LiquibaseConnectionProvider liquibaseProvider=session.getProvider(LiquibaseConnectionProvider.class);
+  JpaConnectionProviderFactory jpaProviderFactory=(JpaConnectionProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(JpaConnectionProvider.class);
+  this.dbConnection=jpaProviderFactory.getConnection();
+  String defaultSchema=jpaProviderFactory.getSchema();
+  try {
+    Liquibase liquibase=liquibaseProvider.getLiquibase(dbConnection,defaultSchema);
+    this.lockService=new CustomLockService();
+    lockService.setChangeLogLockWaitTime(factory.getLockWaitTimeoutMillis());
+    lockService.setChangeLogLockRecheckTime(factory.getLockRecheckTimeMillis());
+    lockService.setDatabase(liquibase.getDatabase());
+  }
+ catch (  LiquibaseException exception) {
+    safeRollbackConnection();
+    safeCloseConnection();
+    throw new IllegalStateException(exception);
+  }
+}

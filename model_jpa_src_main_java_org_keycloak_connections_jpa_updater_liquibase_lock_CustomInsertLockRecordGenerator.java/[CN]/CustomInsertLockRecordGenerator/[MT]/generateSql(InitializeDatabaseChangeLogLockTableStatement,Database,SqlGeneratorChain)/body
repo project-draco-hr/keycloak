@@ -1,0 +1,11 @@
+{
+  Sql[] sqls=sqlGeneratorChain.generateSql(statement,database);
+  List<Sql> result=new ArrayList<>();
+  for (  Sql sql : sqls) {
+    String sqlCommand=sql.toSql();
+    if (!sqlCommand.toUpperCase().contains("DELETE")) {
+      result.add(sql);
+    }
+  }
+  return result.toArray(new Sql[result.size()]);
+}

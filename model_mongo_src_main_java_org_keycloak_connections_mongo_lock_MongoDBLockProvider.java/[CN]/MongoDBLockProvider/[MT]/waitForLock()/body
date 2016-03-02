@@ -1,0 +1,31 @@
+{
+  boolean locked=false;
+  long startTime=Time.toMillis(Time.currentTime());
+  long timeToGiveUp=startTime + (factory.getLockWaitTimeoutMillis());
+  while (!locked && Time.toMillis(Time.currentTime()) < timeToGiveUp) {
+    locked=acquireLock();
+    if (!locked) {
+      int remainingTime=((int)(timeToGiveUp / 1000)) - Time.currentTime();
+      logger.debugf("Waiting for changelog lock... Remaining time: %d seconds",remainingTime);
+      try {
+        Thread.sleep(factory.getLockRecheckTimeMillis());
+      }
+ catch (      InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+  if (!locked) {
+    DBObject query=new BasicDBObject("_id",1);
+    DBCursor cursor=db.getCollection(DB_LOCK_COLLECTION).find(query);
+    String lockedBy;
+    if (cursor.hasNext()) {
+      DBObject dbObj=cursor.next();
+      lockedBy=dbObj.get("lockedBy") + " since " + Time.toDate(((int)((long)dbObj.get("lockedSince") / 1000)));
+    }
+ else {
+      lockedBy="UNKNOWN";
+    }
+    throw new IllegalStateException("Could not acquire change log lock.  Currently locked by " + lockedBy);
+  }
+}

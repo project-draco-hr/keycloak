@@ -1,25 +1,12 @@
 {
-  if (client == null) {
+  lazyInitBeforeUpdate();
+  if (state == STATE_BEFORE_UPDATE) {
 synchronized (this) {
-      if (client == null) {
+      if (state == STATE_BEFORE_UPDATE) {
         try {
-          this.client=createMongoClient();
-          String dbName=config.get("db","keycloak");
-          this.db=client.getDB(dbName);
-          String databaseSchema=config.get("databaseSchema");
-          if (databaseSchema != null) {
-            if (databaseSchema.equals("update")) {
-              MongoUpdaterProvider mongoUpdater=session.getProvider(MongoUpdaterProvider.class);
-              if (mongoUpdater == null) {
-                throw new RuntimeException("Can't update database: Mongo updater provider not found");
-              }
-              mongoUpdater.update(session,db);
-            }
- else {
-              throw new RuntimeException("Invalid value for databaseSchema: " + databaseSchema);
-            }
-          }
+          update(session);
           this.mongoStore=new MongoStoreImpl(db,getManagedEntities());
+          state=STATE_AFTER_UPDATE;
         }
  catch (        Exception e) {
           throw new RuntimeException(e);

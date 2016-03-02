@@ -1,0 +1,58 @@
+{
+  boolean createdTable=false;
+  Executor executor=ExecutorService.getInstance().getExecutor(database);
+  if (!hasDatabaseChangeLogLockTable()) {
+    try {
+      if (log.isTraceEnabled()) {
+        log.trace("Create Database Lock Table");
+      }
+      executor.execute(new CreateDatabaseChangeLogLockTableStatement());
+      database.commit();
+    }
+ catch (    DatabaseException de) {
+      log.warn("Failed to create lock table. Maybe other transaction created in the meantime. Retrying...");
+      if (log.isDebugEnabled()) {
+        log.debug(de.getMessage(),de);
+      }
+      database.rollback();
+      throw new LockRetryException(de);
+    }
+    log.debugf("Created database lock table with name: %s",database.escapeTableName(database.getLiquibaseCatalogName(),database.getLiquibaseSchemaName(),database.getDatabaseChangeLogLockTableName()));
+    try {
+      Field field=Reflections.findDeclaredField(StandardLockService.class,"hasDatabaseChangeLogLockTable");
+      Reflections.setAccessible(field);
+      field.set(CustomLockService.this,true);
+    }
+ catch (    IllegalAccessException iae) {
+      throw new RuntimeException(iae);
+    }
+    createdTable=true;
+  }
+  if (!isDatabaseChangeLogLockTableInitialized(createdTable)) {
+    try {
+      if (log.isTraceEnabled()) {
+        log.trace("Initialize Database Lock Table");
+      }
+      executor.execute(new InitializeDatabaseChangeLogLockTableStatement());
+      database.commit();
+    }
+ catch (    DatabaseException de) {
+      log.warn("Failed to insert first record to the lock table. Maybe other transaction inserted in the meantime. Retrying...");
+      if (log.isDebugEnabled()) {
+        log.debug(de.getMessage(),de);
+      }
+      database.rollback();
+      throw new LockRetryException(de);
+    }
+    log.debug("Initialized record in the database lock table");
+  }
+  if (executor.updatesDatabase() && database instanceof DerbyDatabase && ((DerbyDatabase)database).supportsBooleanDataType()) {
+    String lockTable=database.escapeTableName(database.getLiquibaseCatalogName(),database.getLiquibaseSchemaName(),database.getDatabaseChangeLogLockTableName());
+    Object obj=executor.queryForObject(new RawSqlStatement("select min(locked) as test from " + lockTable + " fetch first row only"),Object.class);
+    if (!(obj instanceof Boolean)) {
+      executor.execute(new DropTableStatement(database.getLiquibaseCatalogName(),database.getLiquibaseSchemaName(),database.getDatabaseChangeLogLockTableName(),false));
+      executor.execute(new CreateDatabaseChangeLogLockTableStatement());
+      executor.execute(new InitializeDatabaseChangeLogLockTableStatement());
+    }
+  }
+}

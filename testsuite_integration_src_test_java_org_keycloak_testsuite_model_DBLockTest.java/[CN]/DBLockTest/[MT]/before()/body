@@ -1,0 +1,8 @@
+{
+  super.before();
+  DBLockManager lockManager=new DBLockManager();
+  DBLockProviderFactory lockFactory=lockManager.getDBLockFactory(session);
+  lockFactory.setTimeouts(LOCK_RECHECK_MILLIS,LOCK_TIMEOUT_MILLIS);
+  lockManager.getDBLock(session).destroyLockInfo();
+  commit();
+}

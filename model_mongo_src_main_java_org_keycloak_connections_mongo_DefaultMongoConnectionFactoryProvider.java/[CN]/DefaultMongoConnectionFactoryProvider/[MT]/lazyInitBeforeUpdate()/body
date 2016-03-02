@@ -1,0 +1,17 @@
+{
+  if (state == STATE_BEFORE_INIT) {
+synchronized (this) {
+      if (state == STATE_BEFORE_INIT) {
+        try {
+          this.client=createMongoClient();
+          String dbName=config.get("db","keycloak");
+          this.db=client.getDB(dbName);
+          state=STATE_BEFORE_UPDATE;
+        }
+ catch (        Exception e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+  }
+}

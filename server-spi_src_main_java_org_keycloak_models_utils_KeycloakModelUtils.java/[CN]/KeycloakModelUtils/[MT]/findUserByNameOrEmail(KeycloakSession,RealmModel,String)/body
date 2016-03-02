@@ -1,7 +1,9 @@
 {
-  UserModel user=session.users().getUserByUsername(username,realm);
-  if (user == null && username.contains("@")) {
-    user=session.users().getUserByEmail(username,realm);
+  if (username.indexOf('@') != -1) {
+    UserModel user=session.users().getUserByEmail(username,realm);
+    if (user != null) {
+      return user;
+    }
   }
-  return user;
+  return session.users().getUserByUsername(username,realm);
 }

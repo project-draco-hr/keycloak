@@ -1,5 +1,11 @@
 {
+  RealmAdapter adapter=(RealmAdapter)findJpaModel(id);
+  if (adapter != null) {
+    return adapter;
+  }
   RealmEntity realm=em.find(RealmEntity.class,id);
   if (realm == null)   return null;
-  return new RealmAdapter(session,em,realm);
+  adapter=new RealmAdapter(session,em,realm);
+  adapters.put(id,adapter);
+  return adapter;
 }

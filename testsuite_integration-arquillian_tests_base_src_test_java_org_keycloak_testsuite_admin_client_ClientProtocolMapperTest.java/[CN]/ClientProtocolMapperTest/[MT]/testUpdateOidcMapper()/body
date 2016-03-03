@@ -1,0 +1,12 @@
+{
+  ProtocolMapperRepresentation rep=makeOidcMapper("oidc-hardcoded-role-mapper2");
+  Response resp=oidcMappersRsc.createMapper(rep);
+  resp.close();
+  String createdId=ApiUtil.getCreatedId(resp);
+  rep.getConfig().put("role","myotherrole");
+  rep.setId(createdId);
+  rep.setConsentRequired(false);
+  oidcMappersRsc.update(createdId,rep);
+  ProtocolMapperRepresentation updated=oidcMappersRsc.getMapperById(createdId);
+  assertEqualMappers(rep,updated);
+}

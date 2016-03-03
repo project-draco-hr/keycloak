@@ -1,0 +1,12 @@
+{
+  ClientResource accountClient=findClientResourceById("account");
+  int sessionCount=accountClient.getApplicationSessionCount().get("count");
+  assertEquals(0,sessionCount);
+  testRealmAccountManagementPage.navigateTo();
+  loginPage.form().login(testUser);
+  sessionCount=accountClient.getApplicationSessionCount().get("count");
+  assertEquals(1,sessionCount);
+  testRealmAccountManagementPage.signOut();
+  sessionCount=accountClient.getApplicationSessionCount().get("count");
+  assertEquals(0,sessionCount);
+}

@@ -1,0 +1,17 @@
+{
+  ClientResource account=findClientResourceById("account");
+  testRealmAccountManagementPage.navigateTo();
+  loginPage.form().login(testUser);
+  List<UserSessionRepresentation> sessions=account.getUserSessions(0,5);
+  assertEquals(1,sessions.size());
+  UserSessionRepresentation rep=sessions.get(0);
+  UserRepresentation testUserRep=getFullUserRep(testUser.getUsername());
+  assertEquals(testUserRep.getId(),rep.getUserId());
+  assertEquals(testUserRep.getUsername(),rep.getUsername());
+  String clientId=account.toRepresentation().getId();
+  assertEquals("account",rep.getClients().get(clientId));
+  assertNotNull(rep.getIpAddress());
+  assertNotNull(rep.getLastAccess());
+  assertNotNull(rep.getStart());
+  testRealmAccountManagementPage.signOut();
+}

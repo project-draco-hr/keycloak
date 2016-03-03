@@ -10,10 +10,17 @@
     revisions.startBatch();
     if (!revisions.getAdvancedCache().lock(id)) {
       logger.trace("Could not obtain version lock");
+      return;
     }
     rev=revisions.get(id);
     if (rev == null) {
       if (id.endsWith("realm.clients"))       logger.trace("addRevisioned rev2 == null realm.clients");
+      return;
+    }
+    if (rev > session.getTransaction().getStartupRevision()) {
+      if (logger.isTraceEnabled()) {
+        logger.tracev("Skipped cache. Current revision {0}, Transaction start revision {1}",object.getRevision(),session.getTransaction().getStartupRevision());
+      }
       return;
     }
     if (rev.equals(object.getRevision())) {

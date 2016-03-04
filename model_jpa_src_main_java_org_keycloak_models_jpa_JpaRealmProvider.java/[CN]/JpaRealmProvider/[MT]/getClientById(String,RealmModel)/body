@@ -1,12 +1,6 @@
 {
-  ClientAdapter client=(ClientAdapter)findJpaModel(id);
-  if (client != null) {
-    if (!realm.getId().equals(client.getRealm().getId()))     return null;
-    return client;
-  }
   ClientEntity app=em.find(ClientEntity.class,id);
   if (app == null || !realm.getId().equals(app.getRealm().getId()))   return null;
-  client=new ClientAdapter(realm,em,session,app);
-  adapters.put(id,client);
+  ClientAdapter client=new ClientAdapter(realm,em,session,app);
   return client;
 }

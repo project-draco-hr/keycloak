@@ -1,10 +1,7 @@
 {
-  GroupAdapter adapter=(GroupAdapter)findJpaModel(id);
-  if (adapter != null)   return adapter;
   GroupEntity groupEntity=em.find(GroupEntity.class,id);
   if (groupEntity == null)   return null;
   if (!groupEntity.getRealm().getId().equals(realm.getId()))   return null;
-  adapter=new GroupAdapter(realm,em,groupEntity);
-  adapters.put(id,adapter);
+  GroupAdapter adapter=new GroupAdapter(realm,em,groupEntity);
   return adapter;
 }

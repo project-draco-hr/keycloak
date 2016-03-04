@@ -1,12 +1,6 @@
 {
-  ClientTemplateAdapter adapter=(ClientTemplateAdapter)findJpaModel(id);
-  if (adapter != null) {
-    if (!realm.getId().equals(adapter.getRealm().getId()))     return null;
-    return adapter;
-  }
   ClientTemplateEntity app=em.find(ClientTemplateEntity.class,id);
   if (app == null || !realm.getId().equals(app.getRealm().getId()))   return null;
-  adapter=new ClientTemplateAdapter(realm,em,session,app);
-  adapters.put(id,adapter);
+  ClientTemplateAdapter adapter=new ClientTemplateAdapter(realm,em,session,app);
   return adapter;
 }

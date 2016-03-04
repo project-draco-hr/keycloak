@@ -1,0 +1,23 @@
+{
+  RealmResource realmResource=adminClient.realm(REALM);
+  RealmRepresentation realmRepresentation=realmResource.toRepresentation();
+  realmRepresentation.setRegistrationAllowed(true);
+  realmResource.update(realmRepresentation);
+  setRequiredActionEnabled(REALM,RequiredActions.TERMS_AND_CONDITIONS,true,true);
+  CredentialRepresentation mrBurnsPassword=new CredentialRepresentation();
+  mrBurnsPassword.setType(CredentialRepresentation.PASSWORD);
+  mrBurnsPassword.setValue("Excellent.");
+  List<CredentialRepresentation> credentials=new ArrayList<CredentialRepresentation>();
+  credentials.add(mrBurnsPassword);
+  UserRepresentation mrBurns=new UserRepresentation();
+  mrBurns.setUsername("mrburns");
+  mrBurns.setFirstName("Montgomery");
+  mrBurns.setLastName("Burns");
+  mrBurns.setEmail("mburns@keycloak.org");
+  mrBurns.setCredentials(credentials);
+  testRealmAdminConsolePage.navigateTo();
+  testRealmLoginPage.form().register();
+  registrationPage.register(mrBurns);
+  Assert.assertTrue(termsAndConditionsPage.isCurrent());
+  setRequiredActionEnabled(REALM,RequiredActions.TERMS_AND_CONDITIONS,false,false);
+}

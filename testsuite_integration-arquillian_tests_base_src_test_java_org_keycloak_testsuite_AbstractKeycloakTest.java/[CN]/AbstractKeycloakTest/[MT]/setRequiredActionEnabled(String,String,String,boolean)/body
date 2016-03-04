@@ -1,0 +1,13 @@
+{
+  UsersResource usersResource=adminClient.realm(realm).users();
+  UserResource userResource=usersResource.get(userId);
+  UserRepresentation userRepresentation=userResource.toRepresentation();
+  List<String> requiredActions=userRepresentation.getRequiredActions();
+  if (enabled && !requiredActions.contains(requiredAction)) {
+    requiredActions.add(requiredAction);
+  }
+ else   if (!enabled && requiredActions.contains(requiredAction)) {
+    requiredActions.remove(requiredAction);
+  }
+  userResource.update(userRepresentation);
+}

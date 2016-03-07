@@ -1,0 +1,7 @@
+{
+  oauth.clientId("resource-owner");
+  OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("secret","direct-login-otp","password",totp.generateTOTP("totpSecret2"));
+  assertEquals(401,response.getStatusCode());
+  assertEquals("invalid_grant",response.getError());
+  events.expectLogin().client("resource-owner").session((String)null).clearDetails().error(Errors.INVALID_USER_CREDENTIALS).user(userId2).assertEvent();
+}

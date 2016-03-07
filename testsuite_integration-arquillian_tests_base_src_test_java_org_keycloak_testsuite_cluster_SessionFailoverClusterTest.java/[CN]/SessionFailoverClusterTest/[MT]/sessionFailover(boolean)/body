@@ -1,0 +1,22 @@
+{
+  Cookie sessionCookie=login(accountPage);
+  switchFailedNode();
+  if (expectSuccessfulFailover) {
+    verifyLoggedIn(accountPage,sessionCookie);
+  }
+ else {
+    verifyLoggedOut(accountPage);
+  }
+  switchFailedNode();
+  if (expectSuccessfulFailover) {
+    verifyLoggedIn(accountPage,sessionCookie);
+  }
+ else {
+    verifyLoggedOut(accountPage);
+    login(accountPage);
+  }
+  logout(accountPage);
+  verifyLoggedOut(accountPage);
+  switchFailedNode();
+  verifyLoggedOut(accountPage);
+}

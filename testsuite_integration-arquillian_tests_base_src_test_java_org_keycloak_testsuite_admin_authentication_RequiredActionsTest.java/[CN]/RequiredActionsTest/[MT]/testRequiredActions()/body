@@ -1,0 +1,23 @@
+{
+  List<RequiredActionProviderRepresentation> result=authMgmtResource.getRequiredActions();
+  List<RequiredActionProviderRepresentation> expected=new ArrayList<>();
+  addRequiredAction(expected,"CONFIGURE_TOTP","Configure Totp",true,false,null);
+  addRequiredAction(expected,"UPDATE_PASSWORD","Update Password",true,false,null);
+  addRequiredAction(expected,"UPDATE_PROFILE","Update Profile",true,false,null);
+  addRequiredAction(expected,"VERIFY_EMAIL","Verify Email",true,false,null);
+  addRequiredAction(expected,"terms_and_conditions","Terms and Conditions",false,false,null);
+  compareRequiredActions(expected,sort(result));
+  RequiredActionProviderRepresentation forUpdate=newRequiredAction("VERIFY_EMAIL","Verify Email",false,false,null);
+  try {
+    authMgmtResource.updateRequiredAction(forUpdate.getAlias(),forUpdate);
+    Assert.fail("updateRequiredAction should fail due to null config");
+  }
+ catch (  Exception ignored) {
+  }
+  forUpdate.setConfig(Collections.<String,String>emptyMap());
+  authMgmtResource.updateRequiredAction(forUpdate.getAlias(),forUpdate);
+  result=authMgmtResource.getRequiredActions();
+  RequiredActionProviderRepresentation updated=findRequiredActionByAlias(forUpdate.getAlias(),result);
+  Assert.assertNotNull("Required Action still there",updated);
+  compareRequiredAction(forUpdate,updated);
+}

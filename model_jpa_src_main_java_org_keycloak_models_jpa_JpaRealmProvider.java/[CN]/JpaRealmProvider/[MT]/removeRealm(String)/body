@@ -3,6 +3,7 @@
   if (realm == null) {
     return false;
   }
+  em.refresh(realm);
   RealmAdapter adapter=new RealmAdapter(session,em,realm);
   session.users().preRemove(adapter);
   int num=em.createNamedQuery("deleteGroupRoleMappingsByRealm").setParameter("realm",realm).executeUpdate();

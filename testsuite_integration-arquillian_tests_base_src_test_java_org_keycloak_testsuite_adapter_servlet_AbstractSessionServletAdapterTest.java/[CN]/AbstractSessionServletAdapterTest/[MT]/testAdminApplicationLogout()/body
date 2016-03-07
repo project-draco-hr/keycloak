@@ -1,6 +1,7 @@
 {
   loginAndCheckSession(driver,testRealmLoginPage);
-  findClientResourceByClientId(testRealmResource(),"session-portal").logoutUser("mposolda");
+  UserRepresentation mposolda=testRealmResource().users().search("mposolda",null,null,null,null,null).get(0);
+  testRealmResource().users().get(mposolda.getId()).logout();
   sessionPortalPage.navigateTo();
   assertEquals(driver.getCurrentUrl(),sessionPortalPage.toString());
   String pageSource=driver.getPageSource();

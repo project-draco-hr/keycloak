@@ -4,4 +4,12 @@
   Assert.assertEquals("Flow providerId",expected.getProviderId(),actual.getProviderId());
   Assert.assertEquals("Flow top level",expected.isTopLevel(),actual.isTopLevel());
   Assert.assertEquals("Flow built-in",expected.isBuiltIn(),actual.isBuiltIn());
+  List<AuthenticationExecutionExportRepresentation> expectedExecs=expected.getAuthenticationExecutions();
+  List<AuthenticationExecutionExportRepresentation> actualExecs=actual.getAuthenticationExecutions();
+  if (expectedExecs == null) {
+    Assert.assertTrue("Executions should be null or empty",actualExecs == null || actualExecs.size() == 0);
+  }
+ else {
+    compareExecutions(expectedExecs,actualExecs);
+  }
 }

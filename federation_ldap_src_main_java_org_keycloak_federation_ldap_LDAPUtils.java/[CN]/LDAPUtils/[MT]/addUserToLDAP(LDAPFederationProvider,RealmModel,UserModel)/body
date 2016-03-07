@@ -5,7 +5,8 @@
   ldapUser.setRdnAttributeName(ldapConfig.getRdnLdapAttribute());
   ldapUser.setObjectClasses(ldapConfig.getUserObjectClasses());
   Set<UserFederationMapperModel> federationMappers=realm.getUserFederationMappersByFederationProvider(ldapProvider.getModel().getId());
-  for (  UserFederationMapperModel mapperModel : federationMappers) {
+  List<UserFederationMapperModel> sortedMappers=ldapProvider.sortMappersAsc(federationMappers);
+  for (  UserFederationMapperModel mapperModel : sortedMappers) {
     LDAPFederationMapper ldapMapper=ldapProvider.getMapper(mapperModel);
     ldapMapper.onRegisterUserToLDAP(mapperModel,ldapProvider,ldapUser,user,realm);
   }

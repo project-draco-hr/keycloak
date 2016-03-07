@@ -1,0 +1,21 @@
+{
+  DBObject query=new BasicDBObject("locked",false);
+  BasicDBObject update=new BasicDBObject("locked",true);
+  update.append("_id",1);
+  update.append("lockedSince",Time.toMillis(Time.currentTime()));
+  update.append("lockedBy",HostUtils.getHostName());
+  try {
+    WriteResult wr=db.getCollection(DB_LOCK_COLLECTION).update(query,update,true,false);
+    if (wr.getN() == 1) {
+      logger.debugf("Successfully acquired DB lock");
+      return true;
+    }
+ else {
+      return false;
+    }
+  }
+ catch (  DuplicateKeyException dke) {
+    logger.debugf("Failed acquire lock. Reason: %s",dke.getMessage());
+  }
+  return false;
+}

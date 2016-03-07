@@ -4,7 +4,8 @@
   UserModel imported=session.userStorage().addUser(realm,ldapUsername);
   imported.setEnabled(true);
   Set<UserFederationMapperModel> federationMappers=realm.getUserFederationMappersByFederationProvider(getModel().getId());
-  for (  UserFederationMapperModel mapperModel : federationMappers) {
+  List<UserFederationMapperModel> sortedMappers=sortMappersDesc(federationMappers);
+  for (  UserFederationMapperModel mapperModel : sortedMappers) {
     if (logger.isTraceEnabled()) {
       logger.tracef("Using mapper %s during import user from LDAP",mapperModel);
     }

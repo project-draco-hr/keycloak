@@ -5,7 +5,7 @@
   if (realm != null) {
     if (strategy == Strategy.IGNORE_EXISTING) {
       logger.infof("Realm '%s' already exists. Import skipped",realmName);
-      return;
+      return false;
     }
  else {
       logger.infof("Realm '%s' already exists. Removing it before import",realmName);
@@ -18,9 +18,9 @@
     }
   }
   RealmImporter realmManager=session.getContext().getRealmManager();
-  realm=realmManager.importRealm(rep);
+  realmManager.importRealm(rep);
   if (System.getProperty(ExportImportConfig.ACTION) != null) {
     logger.infof("Realm '%s' imported",realmName);
   }
-  return;
+  return true;
 }

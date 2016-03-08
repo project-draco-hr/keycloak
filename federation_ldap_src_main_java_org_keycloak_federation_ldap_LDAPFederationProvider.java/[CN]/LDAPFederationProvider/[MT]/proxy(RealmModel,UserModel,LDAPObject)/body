@@ -11,7 +11,8 @@ case UNSYNCED:
 proxied=new UnsyncedLDAPUserModelDelegate(local,this);
 }
 Set<UserFederationMapperModel> federationMappers=realm.getUserFederationMappersByFederationProvider(model.getId());
-for (UserFederationMapperModel mapperModel : federationMappers) {
+List<UserFederationMapperModel> sortedMappers=sortMappersAsc(federationMappers);
+for (UserFederationMapperModel mapperModel : sortedMappers) {
 LDAPFederationMapper ldapMapper=getMapper(mapperModel);
 proxied=ldapMapper.proxy(mapperModel,this,ldapObject,proxied,realm);
 }

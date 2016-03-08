@@ -1,0 +1,9 @@
+{
+  setRequiredActionEnabled(REALM,RequiredActions.TERMS_AND_CONDITIONS,true,false);
+  String userId=createUser(REALM,BART,BART_PASS);
+  setRequiredActionEnabled(REALM,userId,RequiredActions.TERMS_AND_CONDITIONS,true);
+  testRealmAdminConsolePage.navigateTo();
+  testRealmLoginPage.form().login(BART,BART_PASS);
+  Assert.assertTrue(termsAndConditionsPage.isCurrent());
+  setRequiredActionEnabled(REALM,RequiredActions.TERMS_AND_CONDITIONS,false,false);
+}

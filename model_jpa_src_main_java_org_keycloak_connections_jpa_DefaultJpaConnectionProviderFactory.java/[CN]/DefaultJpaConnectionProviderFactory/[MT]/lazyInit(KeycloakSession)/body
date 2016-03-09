@@ -28,10 +28,6 @@ synchronized (this) {
             properties.put(AvailableSettings.JDBC_PASSWORD,password);
           }
         }
-        String driverDialect=config.get("driverDialect");
-        if (driverDialect != null && driverDialect.length() > 0) {
-          properties.put("hibernate.dialect",driverDialect);
-        }
         String schema=getSchema();
         if (schema != null) {
           properties.put(JpaUtils.HIBERNATE_DEFAULT_SCHEMA,schema);
@@ -51,6 +47,10 @@ synchronized (this) {
         connection=getConnection();
         try {
           prepareOperationalInfo(connection);
+          String driverDialect=detectDialect(connection);
+          if (driverDialect != null) {
+            properties.put("hibernate.dialect",driverDialect);
+          }
           if (databaseSchema != null) {
             logger.trace("Updating database");
             JpaUpdaterProvider updater=session.getProvider(JpaUpdaterProvider.class);

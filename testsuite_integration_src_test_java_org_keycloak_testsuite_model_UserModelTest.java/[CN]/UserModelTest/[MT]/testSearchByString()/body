@@ -1,0 +1,9 @@
+{
+  logger.infof("Started testSearchByString");
+  RealmModel realm=realmManager.getRealmByName("test");
+  UserModel user1=session.users().addUser(realm,"user1");
+  logger.infof("Added user1");
+  commit();
+  List<UserModel> users=session.users().searchForUser("user",realm,0,7);
+  Assert.assertTrue(users.contains(user1));
+}

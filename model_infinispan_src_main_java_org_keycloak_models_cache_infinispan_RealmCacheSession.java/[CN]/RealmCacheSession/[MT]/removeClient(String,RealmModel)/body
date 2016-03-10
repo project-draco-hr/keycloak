@@ -1,10 +1,7 @@
 {
   ClientModel client=getClientById(id,realm);
   if (client == null)   return false;
-  invalidations.add(getRealmClientsQueryCacheKey(realm.getId()));
-  invalidations.add(getClientByClientIdCacheKey(client.getClientId(),realm));
-  listInvalidations.add(realm.getId());
-  registerClientInvalidation(id);
+  invalidateClient(realm,client);
   cache.clientRemoval(realm.getId(),id,invalidations);
   for (  RoleModel role : client.getRoles()) {
     cache.roleInvalidation(role.getId(),invalidations);

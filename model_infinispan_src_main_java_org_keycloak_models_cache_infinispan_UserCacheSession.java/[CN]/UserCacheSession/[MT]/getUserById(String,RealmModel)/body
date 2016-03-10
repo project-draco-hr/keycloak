@@ -1,0 +1,32 @@
+{
+  logger.infov("getuserById {0}",id);
+  if (isRegisteredForInvalidation(realm,id)) {
+    logger.info("registered for invalidation return delegate");
+    return getDelegate().getUserById(id,realm);
+  }
+  CachedUser cached=cache.get(id,CachedUser.class);
+  if (cached == null) {
+    logger.info("not cached");
+    Long loaded=cache.getCurrentRevision(id);
+    UserModel model=getDelegate().getUserById(id,realm);
+    if (model == null) {
+      logger.info("delegate returning null");
+      return null;
+    }
+    if (managedUsers.containsKey(id)) {
+      logger.info("return managedusers");
+      return managedUsers.get(id);
+    }
+    if (invalidations.contains(id))     return model;
+    cached=new CachedUser(loaded,realm,model);
+    cache.addRevisioned(cached,startupRevision);
+  }
+ else   if (managedUsers.containsKey(id)) {
+    logger.info("return managedusers");
+    return managedUsers.get(id);
+  }
+  logger.info("returning new cache adapter");
+  UserAdapter adapter=new UserAdapter(cached,this,session,realm);
+  managedUsers.put(id,adapter);
+  return adapter;
+}

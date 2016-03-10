@@ -1,0 +1,50 @@
+{
+  logger.infov("getUserByUsername: {0}",username);
+  username=username.toLowerCase();
+  if (realmInvalidations.contains(realm.getId())) {
+    logger.infov("realmInvalidations");
+    return getDelegate().getUserByUsername(username,realm);
+  }
+  String cacheKey=getUserByUsernameCacheKey(realm.getId(),username);
+  if (invalidations.contains(cacheKey)) {
+    logger.infov("invalidations");
+    return getDelegate().getUserByUsername(username,realm);
+  }
+  UserListQuery query=cache.get(cacheKey,UserListQuery.class);
+  String userId=null;
+  if (query == null) {
+    logger.infov("query null");
+    Long loaded=cache.getCurrentRevision(cacheKey);
+    UserModel model=getDelegate().getUserByUsername(username,realm);
+    if (model == null) {
+      logger.infov("model from delegate null");
+      return null;
+    }
+    userId=model.getId();
+    query=new UserListQuery(loaded,cacheKey,realm,model.getId());
+    cache.addRevisioned(query,startupRevision);
+    if (invalidations.contains(userId))     return model;
+    if (managedUsers.containsKey(userId)) {
+      logger.infov("return managed user");
+      return managedUsers.get(userId);
+    }
+    CachedUser cached=cache.get(userId,CachedUser.class);
+    if (cached == null) {
+      cached=new CachedUser(loaded,realm,model);
+      cache.addRevisioned(cached,startupRevision);
+    }
+    logger.info("return new cache adapter");
+    UserAdapter adapter=new UserAdapter(cached,this,session,realm);
+    managedUsers.put(userId,adapter);
+    return adapter;
+  }
+ else {
+    userId=query.getUsers().iterator().next();
+    if (invalidations.contains(userId)) {
+      logger.infov("invalidated cache return delegate");
+      return getDelegate().getUserByUsername(username,realm);
+    }
+    logger.info("return getUserById");
+    return getUserById(userId,realm);
+  }
+}

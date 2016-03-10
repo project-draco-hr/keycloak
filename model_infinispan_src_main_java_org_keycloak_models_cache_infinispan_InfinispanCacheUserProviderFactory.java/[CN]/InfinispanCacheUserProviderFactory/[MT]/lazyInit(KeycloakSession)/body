@@ -2,9 +2,9 @@
   if (userCache == null) {
 synchronized (this) {
       if (userCache == null) {
-        Cache<String,CachedUser> cache=session.getProvider(InfinispanConnectionProvider.class).getCache(InfinispanConnectionProvider.USER_CACHE_NAME);
-        cache.addListener(new CacheListener());
-        userCache=new InfinispanUserCache(cache,usernameLookup,emailLookup);
+        Cache<String,Revisioned> cache=session.getProvider(InfinispanConnectionProvider.class).getCache(InfinispanConnectionProvider.USER_CACHE_NAME);
+        Cache<String,Long> revisions=session.getProvider(InfinispanConnectionProvider.class).getCache(InfinispanConnectionProvider.VERSION_CACHE_NAME);
+        userCache=new UserCacheManager(cache,revisions);
       }
     }
   }

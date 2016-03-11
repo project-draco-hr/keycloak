@@ -1,0 +1,13 @@
+{
+  UserFederationProviderFactory providerFactory=KeycloakModelUtils.getFederationProviderFactory(session,model);
+  if (providerFactory instanceof UserFederationValidatingProviderFactory) {
+    try {
+      ((UserFederationValidatingProviderFactory)providerFactory).validateConfig(realm,model);
+    }
+ catch (    FederationConfigValidationException fcve) {
+      logger.error(fcve.getMessage());
+      Properties messages=AdminRoot.getMessages(session,realm,auth.getAuth().getToken().getLocale());
+      throw new ErrorResponseException(fcve.getMessage(),MessageFormat.format(messages.getProperty(fcve.getMessage(),fcve.getMessage()),fcve.getParameters()),Response.Status.BAD_REQUEST);
+    }
+  }
+}

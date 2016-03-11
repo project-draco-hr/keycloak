@@ -5,6 +5,7 @@
     displayName=null;
   }
   UserFederationProviderModel model=new UserFederationProviderModel(rep.getId(),rep.getProviderName(),rep.getConfig(),rep.getPriority(),displayName,rep.getFullSyncPeriod(),rep.getChangedSyncPeriod(),rep.getLastSync());
+  UserFederationProvidersResource.validateFederationProviderConfig(session,auth,realm,model);
   realm.updateUserFederationProvider(model);
   new UsersSyncManager().notifyToRefreshPeriodicSync(session,realm,model,false);
   boolean kerberosCredsAdded=UserFederationProvidersResource.checkKerberosCredential(session,realm,model);

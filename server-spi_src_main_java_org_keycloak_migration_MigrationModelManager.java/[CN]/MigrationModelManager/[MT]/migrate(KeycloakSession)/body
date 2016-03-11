@@ -54,5 +54,11 @@
     }
     new MigrateTo1_9_0().migrate(session);
   }
+  if (stored == null || stored.lessThan(MigrateTo1_9_2.VERSION)) {
+    if (stored != null) {
+      logger.debug("Migrating older model to 1.9.2 updates");
+    }
+    new MigrateTo1_9_2().migrate(session);
+  }
   model.setStoredVersion(MigrationModel.LATEST_VERSION);
 }

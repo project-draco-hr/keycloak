@@ -20,6 +20,10 @@
 catch (  ModelReadOnlyException mre) {
     throw new BadRequestException("Can't reset password as account is read only");
   }
+catch (  ModelException e) {
+    Properties messages=AdminRoot.getMessages(session,realm,auth.getAuth().getToken().getLocale());
+    throw new ErrorResponseException(e.getMessage(),MessageFormat.format(messages.getProperty(e.getMessage(),e.getMessage()),e.getParameters()),Status.BAD_REQUEST);
+  }
   if (pass.isTemporary() != null && pass.isTemporary())   user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
   adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).success();
 }

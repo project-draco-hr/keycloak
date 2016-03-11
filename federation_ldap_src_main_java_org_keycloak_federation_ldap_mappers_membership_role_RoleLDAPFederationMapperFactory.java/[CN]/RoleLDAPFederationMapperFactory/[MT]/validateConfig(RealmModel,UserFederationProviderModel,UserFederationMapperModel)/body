@@ -1,0 +1,13 @@
+{
+  checkMandatoryConfigAttribute(RoleMapperConfig.ROLES_DN,"LDAP Roles DN",mapperModel);
+  checkMandatoryConfigAttribute(RoleMapperConfig.MODE,"Mode",mapperModel);
+  String realmMappings=mapperModel.getConfig().get(RoleMapperConfig.USE_REALM_ROLES_MAPPING);
+  boolean useRealmMappings=Boolean.parseBoolean(realmMappings);
+  if (!useRealmMappings) {
+    String clientId=mapperModel.getConfig().get(RoleMapperConfig.CLIENT_ID);
+    if (clientId == null || clientId.trim().isEmpty()) {
+      throw new FederationConfigValidationException("ldapErrorMissingClientId");
+    }
+  }
+  LDAPUtils.validateCustomLdapFilter(mapperModel.getConfig().get(RoleMapperConfig.ROLES_LDAP_FILTER));
+}

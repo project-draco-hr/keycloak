@@ -1,0 +1,10 @@
+{
+  String roleName=mapperModel.getConfig().get(HardcodedLDAPRoleMapper.ROLE);
+  if (roleName == null) {
+    throw new FederationConfigValidationException("Role can't be null");
+  }
+  RoleModel role=KeycloakModelUtils.getRoleFromString(realm,roleName);
+  if (role == null) {
+    throw new FederationConfigValidationException("There is no role corresponding to configured value");
+  }
+}

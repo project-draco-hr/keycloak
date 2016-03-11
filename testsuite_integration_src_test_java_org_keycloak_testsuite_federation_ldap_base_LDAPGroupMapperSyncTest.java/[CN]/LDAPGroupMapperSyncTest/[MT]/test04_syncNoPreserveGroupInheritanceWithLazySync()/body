@@ -1,0 +1,32 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel realm=session.realms().getRealmByName("test");
+    UserFederationMapperModel mapperModel=realm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    GroupLDAPFederationMapper groupMapper=FederationTestUtils.getGroupMapper(mapperModel,ldapProvider,realm);
+    FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.PRESERVE_GROUP_INHERITANCE,"false");
+    realm.updateUserFederationMapper(mapperModel);
+    FederationTestUtils.removeAllLDAPUsers(ldapProvider,realm);
+    LDAPObject johnLdap=FederationTestUtils.addLDAPUser(ldapProvider,realm,"johnkeycloak","John","Doe","john@email.org",null,"1234");
+    FederationTestUtils.updateLDAPPassword(ldapProvider,johnLdap,"Password1");
+    groupMapper.addGroupMappingInLDAP("group11",johnLdap);
+    Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/group1"));
+    Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/group11"));
+    Assert.assertNull(KeycloakModelUtils.findGroupByPath(realm,"/group12"));
+    UserModel john=session.users().getUserByUsername("johnkeycloak",realm);
+    Set<GroupModel> johnGroups=john.getGroups();
+    GroupModel group1=KeycloakModelUtils.findGroupByPath(realm,"/group1");
+    GroupModel group11=KeycloakModelUtils.findGroupByPath(realm,"/group11");
+    GroupModel group12=KeycloakModelUtils.findGroupByPath(realm,"/group12");
+    Assert.assertNull(group1);
+    Assert.assertNotNull(group11);
+    Assert.assertNull(group12);
+    Assert.assertEquals(1,johnGroups.size());
+    Assert.assertTrue(johnGroups.contains(group11));
+    john.leaveGroup(group11);
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

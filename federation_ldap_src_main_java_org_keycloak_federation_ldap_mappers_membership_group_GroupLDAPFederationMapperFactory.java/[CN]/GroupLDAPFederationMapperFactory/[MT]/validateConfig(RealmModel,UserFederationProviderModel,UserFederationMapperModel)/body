@@ -1,0 +1,11 @@
+{
+  checkMandatoryConfigAttribute(GroupMapperConfig.GROUPS_DN,"LDAP Groups DN",mapperModel);
+  checkMandatoryConfigAttribute(GroupMapperConfig.MODE,"Mode",mapperModel);
+  String mt=mapperModel.getConfig().get(CommonLDAPGroupMapperConfig.MEMBERSHIP_ATTRIBUTE_TYPE);
+  MembershipType membershipType=mt == null ? MembershipType.DN : Enum.valueOf(MembershipType.class,mt);
+  boolean preserveGroupInheritance=Boolean.parseBoolean(mapperModel.getConfig().get(GroupMapperConfig.PRESERVE_GROUP_INHERITANCE));
+  if (preserveGroupInheritance && membershipType != MembershipType.DN) {
+    throw new FederationConfigValidationException("ldapErrorCantPreserveGroupInheritanceWithUIDMembershipType");
+  }
+  LDAPUtils.validateCustomLdapFilter(mapperModel.getConfig().get(GroupMapperConfig.GROUPS_LDAP_FILTER));
+}

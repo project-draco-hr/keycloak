@@ -1,0 +1,19 @@
+{
+  LDAPConfig ldapConfig=ldapProvider.getLdapIdentityStore().getConfig();
+  boolean pagination=ldapConfig.isPagination();
+  if (pagination) {
+    int pageSize=ldapConfig.getBatchSizeForSync();
+    List<LDAPObject> result=new LinkedList<>();
+    boolean nextPage=true;
+    while (nextPage) {
+      ldapQuery.setLimit(pageSize);
+      final List<LDAPObject> currentPageGroups=ldapQuery.getResultList();
+      result.addAll(currentPageGroups);
+      nextPage=ldapQuery.getPaginationContext() != null;
+    }
+    return result;
+  }
+ else {
+    return ldapQuery.getResultList();
+  }
+}

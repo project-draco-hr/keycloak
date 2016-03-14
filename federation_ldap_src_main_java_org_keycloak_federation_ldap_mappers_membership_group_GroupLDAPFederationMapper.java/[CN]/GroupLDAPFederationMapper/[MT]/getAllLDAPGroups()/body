@@ -1,20 +1,4 @@
 {
   LDAPQuery ldapGroupQuery=createGroupQuery();
-  LDAPConfig ldapConfig=ldapProvider.getLdapIdentityStore().getConfig();
-  boolean pagination=ldapConfig.isPagination();
-  if (pagination) {
-    int pageSize=ldapConfig.getBatchSizeForSync();
-    List<LDAPObject> result=new LinkedList<>();
-    boolean nextPage=true;
-    while (nextPage) {
-      ldapGroupQuery.setLimit(pageSize);
-      final List<LDAPObject> currentPageGroups=ldapGroupQuery.getResultList();
-      result.addAll(currentPageGroups);
-      nextPage=ldapGroupQuery.getPaginationContext() != null;
-    }
-    return result;
-  }
- else {
-    return ldapGroupQuery.getResultList();
-  }
+  return LDAPUtils.loadAllLDAPObjects(ldapGroupQuery,ldapProvider);
 }

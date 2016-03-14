@@ -1,0 +1,13 @@
+{
+  checkMandatoryConfigAttribute(FullNameLDAPFederationMapper.LDAP_FULL_NAME_ATTRIBUTE,"LDAP Full Name Attribute",mapperModel);
+  boolean readOnly=AbstractLDAPFederationMapper.parseBooleanParameter(mapperModel,FullNameLDAPFederationMapper.READ_ONLY);
+  boolean writeOnly=AbstractLDAPFederationMapper.parseBooleanParameter(mapperModel,FullNameLDAPFederationMapper.WRITE_ONLY);
+  LDAPConfig cfg=new LDAPConfig(fedProviderModel.getConfig());
+  UserFederationProvider.EditMode editMode=cfg.getEditMode();
+  if (writeOnly && cfg.getEditMode() != UserFederationProvider.EditMode.WRITABLE) {
+    throw new FederationConfigValidationException("ldapErrorCantWriteOnlyForReadOnlyLdap");
+  }
+  if (writeOnly && readOnly) {
+    throw new FederationConfigValidationException("ldapErrorCantWriteOnlyAndReadOnly");
+  }
+}

@@ -8,43 +8,56 @@
   singletons.add(new ServerVersionResource());
   singletons.add(new RealmsResource());
   singletons.add(new AdminRoot());
-  singletons.add(new ModelExceptionMapper());
   classes.add(QRCodeResource.class);
   classes.add(ThemeResource.class);
   classes.add(JsResource.class);
   classes.add(KeycloakTransactionCommitter.class);
   singletons.add(new ObjectMapperResolver(Boolean.parseBoolean(System.getProperty("keycloak.jsonPrettyPrint","false"))));
-  migrateModel();
-  boolean bootstrapAdminUser=false;
-  KeycloakSession session=sessionFactory.create();
   ExportImportManager exportImportManager;
+  DBLockManager dbLockManager=new DBLockManager();
+  dbLockManager.checkForcedUnlock(sessionFactory);
+  dbLockManager.waitForLock(sessionFactory);
   try {
-    session.getTransaction().begin();
-    ApplianceBootstrap applianceBootstrap=new ApplianceBootstrap(session);
-    exportImportManager=new ExportImportManager(session);
-    boolean createMasterRealm=applianceBootstrap.isNewInstall();
-    if (exportImportManager.isRunImport() && exportImportManager.isImportMasterIncluded()) {
-      createMasterRealm=false;
+    migrateModel();
+    KeycloakSession session=sessionFactory.create();
+    try {
+      session.getTransaction().begin();
+      ApplianceBootstrap applianceBootstrap=new ApplianceBootstrap(session);
+      exportImportManager=new ExportImportManager(session);
+      boolean createMasterRealm=applianceBootstrap.isNewInstall();
+      if (exportImportManager.isRunImport() && exportImportManager.isImportMasterIncluded()) {
+        createMasterRealm=false;
+      }
+      if (createMasterRealm) {
+        applianceBootstrap.createMasterRealm(contextPath);
+      }
+      session.getTransaction().commit();
     }
-    if (createMasterRealm) {
-      applianceBootstrap.createMasterRealm(contextPath);
+ catch (    RuntimeException re) {
+      if (session.getTransaction().isActive()) {
+        session.getTransaction().rollback();
+      }
+      throw re;
     }
-    session.getTransaction().commit();
+ finally {
+      session.close();
+    }
+    if (exportImportManager.isRunImport()) {
+      exportImportManager.runImport();
+    }
+ else {
+      importRealms();
+    }
+    importAddUser();
   }
   finally {
-    session.close();
+    dbLockManager.releaseLock(sessionFactory);
   }
-  if (exportImportManager.isRunImport()) {
-    exportImportManager.runImport();
-  }
- else {
-    importRealms();
-  }
-  importAddUser();
   if (exportImportManager.isRunExport()) {
     exportImportManager.runExport();
   }
-  session=sessionFactory.create();
+  boolean bootstrapAdminUser=false;
+  KeycloakSession session=sessionFactory.create();
   try {
     session.getTransaction().begin();
     bootstrapAdminUser=new ApplianceBootstrap(session).isNoMasterUser();

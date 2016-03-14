@@ -1,0 +1,9 @@
+{
+  Map<String,String> cfg=new HashMap<>();
+  cfg.put(LDAPConstants.USERNAME_LDAP_ATTRIBUTE,LDAPConstants.SAM_ACCOUNT_NAME);
+  LDAPConfig config=new LDAPConfig(cfg);
+  List<UserFederationMapperModel> sorted=LDAPMappersComparator.sortAsc(config,getMappers());
+  assertOrder(sorted,"sAMAccountName","username-cn","first name","full name");
+  sorted=LDAPMappersComparator.sortDesc(config,getMappers());
+  assertOrder(sorted,"full name","first name","username-cn","sAMAccountName");
+}

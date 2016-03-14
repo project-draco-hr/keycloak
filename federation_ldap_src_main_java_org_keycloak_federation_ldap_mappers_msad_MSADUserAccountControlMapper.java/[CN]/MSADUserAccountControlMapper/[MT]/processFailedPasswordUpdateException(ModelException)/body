@@ -1,0 +1,13 @@
+{
+  String exceptionMessage=e.getCause().getMessage().replace('\n',' ');
+  Matcher m=AUTH_INVALID_NEW_PASSWORD.matcher(exceptionMessage);
+  if (m.matches()) {
+    String errorCode=m.group(1);
+    if (errorCode.equals("53")) {
+      ModelException me=new ModelException("invalidPasswordRegexPatternMessage",e);
+      me.setParameters(new Object[]{"passwordConstraintViolation"});
+      return me;
+    }
+  }
+  return e;
+}

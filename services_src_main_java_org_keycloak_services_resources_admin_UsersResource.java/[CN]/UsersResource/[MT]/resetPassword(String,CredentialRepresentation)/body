@@ -7,6 +7,9 @@
   if (pass == null || pass.getValue() == null || !CredentialRepresentation.PASSWORD.equals(pass.getType())) {
     throw new BadRequestException("No password provided");
   }
+  if (Validation.isBlank(pass.getValue())) {
+    throw new BadRequestException("Empty password not allowed");
+  }
   UserCredentialModel cred=RepresentationToModel.convertCredential(pass);
   try {
     session.users().updateCredential(realm,user,cred);
@@ -16,6 +19,10 @@
   }
 catch (  ModelReadOnlyException mre) {
     throw new BadRequestException("Can't reset password as account is read only");
+  }
+catch (  ModelException e) {
+    Properties messages=AdminRoot.getMessages(session,realm,auth.getAuth().getToken().getLocale());
+    throw new ErrorResponseException(e.getMessage(),MessageFormat.format(messages.getProperty(e.getMessage(),e.getMessage()),e.getParameters()),Status.BAD_REQUEST);
   }
   if (pass.isTemporary() != null && pass.isTemporary())   user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
   adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).success();

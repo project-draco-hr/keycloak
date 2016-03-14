@@ -5,7 +5,7 @@
   require(AccountRoles.MANAGE_ACCOUNT);
   csrfCheck(formData);
   UserModel user=auth.getUser();
-  boolean requireCurrent=isPasswordSet(user);
+  boolean requireCurrent=isPasswordSet(session,realm,user);
   account.setPasswordSet(requireCurrent);
   String password=formData.getFirst("password");
   String passwordNew=formData.getFirst("password-new");
@@ -21,7 +21,7 @@
       return account.setError(Messages.INVALID_PASSWORD_EXISTING).createResponse(AccountPages.PASSWORD);
     }
   }
-  if (Validation.isEmpty(passwordNew)) {
+  if (Validation.isBlank(passwordNew)) {
     setReferrerOnPage();
     return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
   }

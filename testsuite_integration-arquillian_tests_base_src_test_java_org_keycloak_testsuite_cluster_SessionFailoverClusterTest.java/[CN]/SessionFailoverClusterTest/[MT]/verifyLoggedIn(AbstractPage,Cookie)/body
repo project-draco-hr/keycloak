@@ -1,0 +1,12 @@
+{
+  masterRealmPage.navigateTo();
+  Cookie sessionCookieOnRealmPath=driver.manage().getCookieNamed(KEYCLOAK_SESSION_COOKIE);
+  assertNotNull(sessionCookieOnRealmPath);
+  assertEquals(sessionCookieOnRealmPath.getValue(),sessionCookieForVerification.getValue());
+  targetPage.navigateTo();
+  assertCurrentUrlStartsWith(targetPage);
+  Cookie sessionCookie=driver.manage().getCookieNamed(KEYCLOAK_SESSION_COOKIE);
+  assertNotNull(sessionCookie);
+  assertEquals(sessionCookie.getValue(),sessionCookieForVerification.getValue());
+  return sessionCookie;
+}

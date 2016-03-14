@@ -28,11 +28,7 @@ synchronized (this) {
             properties.put(AvailableSettings.JDBC_PASSWORD,password);
           }
         }
-        String driverDialect=config.get("driverDialect");
-        if (driverDialect != null && driverDialect.length() > 0) {
-          properties.put("hibernate.dialect",driverDialect);
-        }
-        String schema=config.get("schema");
+        String schema=getSchema();
         if (schema != null) {
           properties.put(JpaUtils.HIBERNATE_DEFAULT_SCHEMA,schema);
         }
@@ -51,6 +47,10 @@ synchronized (this) {
         connection=getConnection();
         try {
           prepareOperationalInfo(connection);
+          String driverDialect=detectDialect(connection);
+          if (driverDialect != null) {
+            properties.put("hibernate.dialect",driverDialect);
+          }
           if (databaseSchema != null) {
             logger.trace("Updating database");
             JpaUpdaterProvider updater=session.getProvider(JpaUpdaterProvider.class);
@@ -68,7 +68,7 @@ synchronized (this) {
  catch (              SQLException e) {
               }
               if (currentVersion == null || !JpaUpdaterProvider.LAST_VERSION.equals(currentVersion)) {
-                updater.update(session,connection,schema);
+                updater.update(connection,schema);
               }
  else {
                 logger.debug("Database is up to date");
@@ -86,13 +86,24 @@ synchronized (this) {
           emf=Persistence.createEntityManagerFactory(unitName,properties);
           logger.trace("EntityManagerFactory created");
         }
-  finally {
+ catch (        Exception e) {
+          if (connection != null) {
+            try {
+              connection.rollback();
+            }
+ catch (            SQLException e2) {
+              logger.warn("Can't rollback connection",e2);
+            }
+          }
+          throw e;
+        }
+ finally {
           if (connection != null) {
             try {
               connection.close();
             }
  catch (            SQLException e) {
-              logger.warn(e);
+              logger.warn("Can't close connection",e);
             }
           }
         }

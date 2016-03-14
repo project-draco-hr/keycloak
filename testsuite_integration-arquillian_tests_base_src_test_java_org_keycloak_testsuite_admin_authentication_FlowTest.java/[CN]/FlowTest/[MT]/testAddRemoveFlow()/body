@@ -26,8 +26,37 @@
   }
   flows=authMgmtResource.getFlows();
   AuthenticationFlowRepresentation found=findFlowByAlias("browser-2",flows);
-  Assert.assertNotNull("created flow visible",found);
+  Assert.assertNotNull("created flow visible in parent",found);
   compareFlows(newFlow,found);
+  AuthenticationFlowRepresentation found2=authMgmtResource.getFlow(found.getId());
+  Assert.assertNotNull("created flow visible directly",found2);
+  compareFlows(newFlow,found2);
+  Map<String,String> data=new HashMap<>();
+  data.put("alias","SomeFlow");
+  data.put("type","basic-flow");
+  data.put("description","Test flow");
+  data.put("provider","registration-page-form");
+  try {
+    authMgmtResource.addExecutionFlow("inexistent-parent-flow-alias",data);
+    Assert.fail("addExecutionFlow for inexistent parent should have failed");
+  }
+ catch (  Exception expected) {
+  }
+  authMgmtResource.addExecutionFlow("browser-2",data);
+  flows=authMgmtResource.getFlows();
+  found2=findFlowByAlias("browser-2",flows);
+  Assert.assertNotNull("created flow visible in parent",found2);
+  List<AuthenticationExecutionExportRepresentation> execs=found2.getAuthenticationExecutions();
+  Assert.assertNotNull(execs);
+  Assert.assertEquals("Size one",1,execs.size());
+  AuthenticationExecutionExportRepresentation expected=new AuthenticationExecutionExportRepresentation();
+  expected.setFlowAlias("SomeFlow");
+  expected.setUserSetupAllowed(false);
+  expected.setAuthenticator("registration-page-form");
+  expected.setAutheticatorFlow(true);
+  expected.setRequirement("DISABLED");
+  expected.setPriority(0);
+  compareExecution(expected,execs.get(0));
   authMgmtResource.deleteFlow(found.getId());
   flows=authMgmtResource.getFlows();
   found=findFlowByAlias("browser-2",flows);

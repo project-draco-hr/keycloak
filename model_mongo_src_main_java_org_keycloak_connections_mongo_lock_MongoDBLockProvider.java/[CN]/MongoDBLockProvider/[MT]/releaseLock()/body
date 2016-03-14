@@ -1,0 +1,19 @@
+{
+  DBObject query=new BasicDBObject("locked",true);
+  BasicDBObject update=new BasicDBObject("locked",false);
+  update.append("_id",1);
+  update.append("lockedBy",null);
+  update.append("lockedSince",null);
+  try {
+    WriteResult wr=db.getCollection(DB_LOCK_COLLECTION).update(query,update,true,false);
+    if (wr.getN() > 0) {
+      logger.debugf("Successfully released DB lock");
+    }
+ else {
+      logger.warnf("Attempt to release DB lock, but nothing was released");
+    }
+  }
+ catch (  DuplicateKeyException dke) {
+    logger.debugf("Failed release lock. Reason: %s",dke.getMessage());
+  }
+}

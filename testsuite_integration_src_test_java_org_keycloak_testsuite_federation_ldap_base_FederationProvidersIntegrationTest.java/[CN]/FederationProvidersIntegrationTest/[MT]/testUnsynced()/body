@@ -17,7 +17,9 @@
     LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,model);
     LDAPObject ldapUser=ldapProvider.loadLDAPUserByUsername(appRealm,"johnkeycloak");
     ldapProvider.getLdapIdentityStore().validatePassword(ldapUser,"Password1");
-    Assert.assertFalse(session.users().removeUser(appRealm,user));
+    Assert.assertTrue(session.users().removeUser(appRealm,user));
+    Assert.assertNull(session.userStorage().getUserByUsername("johnkeycloak",appRealm));
+    Assert.assertNotNull(session.users().getUserByUsername("johnkeycloak",appRealm));
   }
   finally {
     keycloakRule.stopSession(session,false);

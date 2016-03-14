@@ -8,9 +8,19 @@
   RefreshableKeycloakSecurityContext session=account.getKeycloakSecurityContext();
   if (session == null)   return;
   if (session.getDeployment() == null)   session.setCurrentRequestInfo(deployment,this);
-  if (session.isActive() && !session.getDeployment().isAlwaysRefreshToken())   return;
+  if (session.isActive() && !session.getDeployment().isAlwaysRefreshToken()) {
+    request.setAttribute(KeycloakSecurityContext.class.getName(),session);
+    request.setUserPrincipal(account.getPrincipal());
+    request.setAuthType("KEYCLOAK");
+    return;
+  }
   boolean success=session.refreshExpiredToken(false);
-  if (success && session.isActive())   return;
+  if (success && session.isActive()) {
+    request.setAttribute(KeycloakSecurityContext.class.getName(),session);
+    request.setUserPrincipal(account.getPrincipal());
+    request.setAuthType("KEYCLOAK");
+    return;
+  }
   log.fine("Cleanup and expire session " + catalinaSession.getId() + " after failed refresh");
   request.setUserPrincipal(null);
   request.setAuthType(null);

@@ -1,5 +1,5 @@
 {
-  logger.debugf("MSAD Error code is '%s' after failed LDAP login of user",errorCode,user.getUsername());
+  logger.debugf("MSAD Error code is '%s' after failed LDAP login of user '%s'",errorCode,user.getUsername());
   if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE) {
     if (errorCode.equals("532") || errorCode.equals("773")) {
       user.addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
@@ -8,6 +8,9 @@
  else     if (errorCode.equals("533")) {
       user.setEnabled(false);
       return true;
+    }
+ else     if (errorCode.equals("775")) {
+      logger.warnf("Locked user '%s' attempt to login",user.getUsername());
     }
   }
   return false;

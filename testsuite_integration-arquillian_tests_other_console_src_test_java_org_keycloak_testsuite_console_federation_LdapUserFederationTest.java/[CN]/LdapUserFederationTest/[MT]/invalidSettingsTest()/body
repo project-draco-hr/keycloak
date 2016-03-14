@@ -21,6 +21,19 @@
   createLdapUserProvider.form().save();
   assertAlertDanger();
   createLdapUserProvider.form().setLdapBindCredentialInput("secret");
+  createLdapUserProvider.form().setCustomUserSearchFilter("foo");
+  createLdapUserProvider.form().save();
+  assertAlertDanger();
+  createLdapUserProvider.form().setCustomUserSearchFilter("");
+  createLdapUserProvider.form().save();
+  assertAlertSuccess();
+  createLdapUserProvider.form().setCustomUserSearchFilter("(foo=bar");
+  createLdapUserProvider.form().save();
+  assertAlertDanger();
+  createLdapUserProvider.form().setCustomUserSearchFilter("foo=bar)");
+  createLdapUserProvider.form().save();
+  assertAlertDanger();
+  createLdapUserProvider.form().setCustomUserSearchFilter("(foo=bar)");
   createLdapUserProvider.form().save();
   assertAlertSuccess();
 }

@@ -1,5 +1,11 @@
 {
-  super.updateCredential(cred);
+  try {
+    super.updateCredential(cred);
+  }
+ catch (  ModelException me) {
+    me=processFailedPasswordUpdateException(me);
+    throw me;
+  }
   if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE && cred.getType().equals(UserCredentialModel.PASSWORD)) {
     logger.debugf("Going to update userAccountControl for ldap user '%s' after successful password update",ldapUser.getDn().toString());
     ldapUser.removeReadOnlyAttributeName(LDAPConstants.PWD_LAST_SET);

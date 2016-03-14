@@ -12,14 +12,6 @@
       return locale;
     }
   }
-  if (user != null && user.getAttributes().containsKey(UserModel.LOCALE)) {
-    String localeString=user.getFirstAttribute(UserModel.LOCALE);
-    Locale locale=findLocale(realm.getSupportedLocales(),localeString);
-    if (locale != null) {
-      updateLocaleCookie(session,realm,localeString);
-      return locale;
-    }
-  }
   if (httpHeaders != null && httpHeaders.getCookies().containsKey(LOCALE_COOKIE)) {
     String localeString=httpHeaders.getCookies().get(LOCALE_COOKIE).getValue();
     Locale locale=findLocale(realm.getSupportedLocales(),localeString);
@@ -27,6 +19,14 @@
       if (user != null) {
         updateUsersLocale(user,localeString);
       }
+      return locale;
+    }
+  }
+  if (user != null && user.getAttributes().containsKey(UserModel.LOCALE)) {
+    String localeString=user.getFirstAttribute(UserModel.LOCALE);
+    Locale locale=findLocale(realm.getSupportedLocales(),localeString);
+    if (locale != null) {
+      updateLocaleCookie(session,realm,localeString);
       return locale;
     }
   }

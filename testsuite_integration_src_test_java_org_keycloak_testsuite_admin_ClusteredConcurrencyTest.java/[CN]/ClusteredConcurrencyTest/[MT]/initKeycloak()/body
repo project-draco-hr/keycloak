@@ -1,0 +1,20 @@
+{
+  System.setProperty("keycloak.connectionsInfinispan.clustered","true");
+  System.setProperty("keycloak.connectionsInfinispan.async","false");
+  KeycloakApplication.loadConfig();
+  node1factory=new DefaultKeycloakSessionFactory();
+  node1factory.init();
+  nodes[0]=node1factory;
+  node2factory=new DefaultKeycloakSessionFactory();
+  node2factory.init();
+  nodes[1]=node2factory;
+  KeycloakSession session=nodes[0].create();
+  session.getTransaction().begin();
+  session.realms().createRealm("testrealm");
+  session.getTransaction().commit();
+  session=nodes[1].create();
+  session.getTransaction().begin();
+  RealmModel realm=session.realms().getRealmByName("testrealm");
+  Assert.assertNotNull(realm);
+  session.getTransaction().commit();
+}

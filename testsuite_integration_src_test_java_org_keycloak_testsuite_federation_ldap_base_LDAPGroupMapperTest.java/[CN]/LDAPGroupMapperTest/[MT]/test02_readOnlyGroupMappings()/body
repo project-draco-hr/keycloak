@@ -1,6 +1,7 @@
 {
   KeycloakSession session=keycloakRule.startSession();
   try {
+    System.out.println("starting test02_readOnlyGroupMappings");
     RealmModel appRealm=session.realms().getRealmByName("test");
     UserFederationMapperModel mapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
     FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.MODE,LDAPGroupMapperMode.READ_ONLY.toString());
@@ -20,6 +21,7 @@
     Assert.assertTrue(maryGroups.contains(group1));
     Assert.assertTrue(maryGroups.contains(group11));
     Assert.assertTrue(maryGroups.contains(group12));
+    System.out.println("******");
     UserModel maryDB=session.userStorage().getUserByUsername("marykeycloak",appRealm);
     Set<GroupModel> maryDBGroups=maryDB.getGroups();
     Assert.assertFalse(maryDBGroups.contains(group1));

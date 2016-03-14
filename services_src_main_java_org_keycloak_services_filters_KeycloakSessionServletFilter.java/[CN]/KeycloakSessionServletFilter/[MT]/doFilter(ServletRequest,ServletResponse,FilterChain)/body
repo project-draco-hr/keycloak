@@ -25,6 +25,9 @@
     filterChain.doFilter(servletRequest,servletResponse);
   }
   finally {
+    if (session.getTransaction() != null && session.getTransaction().isActive()) {
+      session.getTransaction().rollback();
+    }
     session.close();
     ResteasyProviderFactory.clearContextData();
   }

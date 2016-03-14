@@ -1,11 +1,16 @@
 {
   String groupNameAttr=config.getGroupNameLdapAttribute();
   String groupName=ldapGroup.getAttributeAsString(groupNameAttr);
-  List<GroupModel> groups=realm.getGroups();
-  for (  GroupModel group : groups) {
-    if (group.getName().equals(groupName)) {
-      return group;
+  if (config.isPreserveGroupsInheritance()) {
+    List<GroupModel> groups=realm.getGroups();
+    for (    GroupModel group : groups) {
+      if (group.getName().equals(groupName)) {
+        return group;
+      }
     }
+    return null;
   }
-  return null;
+ else {
+    return KeycloakModelUtils.findGroupByPath(realm,"/" + groupName);
+  }
 }

@@ -1,0 +1,15 @@
+{
+  DBLockProvider dbLock=new DBLockManager().getDBLock(session);
+  dbLock.waitForLock();
+  try {
+    semaphore.increase();
+    Thread.sleep(SLEEP_TIME_MILLIS);
+    semaphore.decrease();
+  }
+ catch (  InterruptedException ie) {
+    throw new RuntimeException(ie);
+  }
+ finally {
+    dbLock.releaseLock();
+  }
+}

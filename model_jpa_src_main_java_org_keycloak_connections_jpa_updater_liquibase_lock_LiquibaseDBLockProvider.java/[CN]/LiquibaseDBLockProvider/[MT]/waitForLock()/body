@@ -1,0 +1,18 @@
+{
+  while (maxAttempts > 0) {
+    try {
+      lockService.waitForLock();
+      this.maxAttempts=DEFAULT_MAX_ATTEMPTS;
+      return;
+    }
+ catch (    LockException le) {
+      if (le.getCause() != null && le.getCause() instanceof LockRetryException) {
+        restart();
+        maxAttempts--;
+      }
+ else {
+        throw new IllegalStateException("Failed to retrieve lock",le);
+      }
+    }
+  }
+}

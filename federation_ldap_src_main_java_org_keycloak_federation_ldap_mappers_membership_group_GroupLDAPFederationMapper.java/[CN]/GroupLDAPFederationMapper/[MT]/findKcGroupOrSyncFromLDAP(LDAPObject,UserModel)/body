@@ -1,9 +1,18 @@
 {
   GroupModel kcGroup=findKcGroupByLDAPGroup(ldapGroup);
   if (kcGroup == null) {
-    if (!syncFromLDAPPerformedInThisTransaction) {
-      syncDataFromFederationProviderToKeycloak();
-      kcGroup=findKcGroupByLDAPGroup(ldapGroup);
+    if (config.isPreserveGroupsInheritance()) {
+      if (!syncFromLDAPPerformedInThisTransaction) {
+        syncDataFromFederationProviderToKeycloak();
+        kcGroup=findKcGroupByLDAPGroup(ldapGroup);
+      }
+    }
+ else {
+      String groupNameAttr=config.getGroupNameLdapAttribute();
+      String groupName=ldapGroup.getAttributeAsString(groupNameAttr);
+      kcGroup=realm.createGroup(groupName);
+      updateAttributesOfKCGroup(kcGroup,ldapGroup);
+      realm.moveGroup(kcGroup,null);
     }
     if (kcGroup == null) {
       String groupName=ldapGroup.getAttributeAsString(config.getGroupNameLdapAttribute());

@@ -1,0 +1,42 @@
+{
+  String id=object.getId();
+  try {
+    Long rev=revisions.get(id);
+    if (rev == null) {
+      if (id.endsWith("realm.clients"))       RealmCacheManager.logger.trace("addRevisioned rev == null realm.clients");
+      rev=counter.current();
+      revisions.put(id,rev);
+    }
+    revisions.startBatch();
+    if (!revisions.getAdvancedCache().lock(id)) {
+      RealmCacheManager.logger.trace("Could not obtain version lock");
+      return;
+    }
+    rev=revisions.get(id);
+    if (rev == null) {
+      if (id.endsWith("realm.clients"))       RealmCacheManager.logger.trace("addRevisioned rev2 == null realm.clients");
+      return;
+    }
+    if (rev > startupRevision) {
+      if (RealmCacheManager.logger.isTraceEnabled()) {
+        RealmCacheManager.logger.tracev("Skipped cache. Current revision {0}, Transaction start revision {1}",object.getRevision(),startupRevision);
+      }
+      return;
+    }
+    if (rev.equals(object.getRevision())) {
+      if (id.endsWith("realm.clients"))       RealmCacheManager.logger.tracev("adding Object.revision {0} rev {1}",object.getRevision(),rev);
+      cache.putForExternalRead(id,object);
+      return;
+    }
+    if (rev > object.getRevision()) {
+      if (id.endsWith("realm.clients"))       RealmCacheManager.logger.trace("addRevisioned revision is ahead realm.clients");
+      return;
+    }
+    if (id.endsWith("realm.clients"))     RealmCacheManager.logger.tracev("adding Object.revision {0} rev {1}",object.getRevision(),rev);
+    revisions.put(id,object.getRevision());
+    cache.putForExternalRead(id,object);
+  }
+  finally {
+    endRevisionBatch();
+  }
+}

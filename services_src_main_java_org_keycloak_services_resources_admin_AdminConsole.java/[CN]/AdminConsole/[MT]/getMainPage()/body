@@ -3,7 +3,7 @@
     return Response.status(302).location(uriInfo.getRequestUriBuilder().path("/").build()).build();
   }
  else {
-    Theme theme=getTheme();
+    Theme theme=AdminRoot.getTheme(session,realm);
     Map<String,Object> map=new HashMap<>();
     URI baseUri=uriInfo.getBaseUri();
     String authUrl=baseUri.toString();
@@ -14,7 +14,7 @@
     map.put("properties",theme.getProperties());
     FreeMarkerUtil freeMarkerUtil=new FreeMarkerUtil();
     String result=freeMarkerUtil.processTemplate(map,"index.ftl",theme);
-    Response.ResponseBuilder builder=Response.status(Response.Status.OK).type(MediaType.TEXT_HTML).entity(result);
+    Response.ResponseBuilder builder=Response.status(Response.Status.OK).type(MediaType.TEXT_HTML_UTF_8).language(Locale.ENGLISH).entity(result);
     BrowserSecurityHeaderSetup.headers(builder,realm);
     return builder.build();
   }

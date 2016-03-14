@@ -2,7 +2,9 @@
   Map<String,String> defaultValues=new HashMap<>();
   LDAPConfig config=new LDAPConfig(providerModel.getConfig());
   defaultValues.put(FullNameLDAPFederationMapper.LDAP_FULL_NAME_ATTRIBUTE,LDAPConstants.CN);
-  String readOnly=config.getEditMode() == UserFederationProvider.EditMode.WRITABLE ? "false" : "true";
-  defaultValues.put(UserAttributeLDAPFederationMapper.READ_ONLY,readOnly);
+  boolean readOnly=config.getEditMode() != UserFederationProvider.EditMode.WRITABLE;
+  defaultValues.put(FullNameLDAPFederationMapper.READ_ONLY,String.valueOf(readOnly));
+  String writeOnly=String.valueOf(!readOnly);
+  defaultValues.put(FullNameLDAPFederationMapper.WRITE_ONLY,writeOnly);
   return defaultValues;
 }

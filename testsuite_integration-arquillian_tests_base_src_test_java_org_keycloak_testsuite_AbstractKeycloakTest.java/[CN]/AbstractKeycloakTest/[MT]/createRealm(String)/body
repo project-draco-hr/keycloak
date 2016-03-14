@@ -1,0 +1,13 @@
+{
+  try {
+    RealmResource realmResource=adminClient.realms().realm(realm);
+    RealmRepresentation realmRepresentation=realmResource.toRepresentation();
+  }
+ catch (  NotFoundException ex) {
+    RealmRepresentation realmRepresentation=new RealmRepresentation();
+    realmRepresentation.setRealm(realm);
+    realmRepresentation.setEnabled(true);
+    realmRepresentation.setRegistrationAllowed(true);
+    adminClient.realms().create(realmRepresentation);
+  }
+}

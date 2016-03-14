@@ -1,0 +1,12 @@
+{
+  ProtocolMapperRepresentation rep=makeOidcMapper("oidc-hardcoded-role-mapper");
+  int totalMappers=oidcMappersRsc.getMappers().size();
+  int totalOidcMappers=oidcMappersRsc.getMappersPerProtocol("openid-connect").size();
+  Response resp=oidcMappersRsc.createMapper(rep);
+  resp.close();
+  assertEquals(totalMappers + 1,oidcMappersRsc.getMappers().size());
+  assertEquals(totalOidcMappers + 1,oidcMappersRsc.getMappersPerProtocol("openid-connect").size());
+  String createdId=ApiUtil.getCreatedId(resp);
+  ProtocolMapperRepresentation created=oidcMappersRsc.getMapperById(createdId);
+  assertEqualMappers(rep,created);
+}

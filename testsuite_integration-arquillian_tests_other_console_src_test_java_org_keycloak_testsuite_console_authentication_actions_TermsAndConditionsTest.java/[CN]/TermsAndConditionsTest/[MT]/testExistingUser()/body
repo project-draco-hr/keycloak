@@ -1,0 +1,18 @@
+{
+  String userId=createUser(REALM,HOMER,HOMER_PASS);
+  testRealmAdminConsolePage.navigateTo();
+  testRealmLoginPage.form().login(HOMER,HOMER_PASS);
+  testRealmAdminConsolePage.logOut();
+  setRequiredActionEnabled(REALM,RequiredActions.TERMS_AND_CONDITIONS,true,false);
+  setRequiredActionEnabled(REALM,userId,RequiredActions.TERMS_AND_CONDITIONS,true);
+  testRealmLoginPage.form().login(HOMER,HOMER_PASS);
+  Assert.assertEquals(TERMS_TEXT,termsAndConditionsPage.getText());
+  termsAndConditionsPage.declineTerms();
+  testRealmLoginPage.form().login(HOMER,HOMER_PASS);
+  Assert.assertEquals(TERMS_TEXT,termsAndConditionsPage.getText());
+  termsAndConditionsPage.acceptTerms();
+  testRealmAdminConsolePage.logOut();
+  testRealmLoginPage.form().login(HOMER,HOMER_PASS);
+  testRealmAdminConsolePage.logOut();
+  setRequiredActionEnabled(REALM,RequiredActions.TERMS_AND_CONDITIONS,false,false);
+}

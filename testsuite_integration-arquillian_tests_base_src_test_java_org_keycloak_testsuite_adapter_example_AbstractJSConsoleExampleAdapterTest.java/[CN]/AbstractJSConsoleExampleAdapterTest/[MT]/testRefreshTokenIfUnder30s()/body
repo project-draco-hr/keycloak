@@ -1,15 +1,17 @@
 {
   jsConsoleExamplePage.navigateTo();
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
+  jsConsoleExamplePage.init();
   jsConsoleExamplePage.refreshToken();
-  assertTrue(driver.getPageSource().contains("Failed to refresh token"));
+  assertTrue(jsConsoleExamplePage.getOutputText().contains("Failed to refresh token"));
   jsConsoleExamplePage.logIn();
   testRealmLoginPage.form().login("user","password");
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
-  assertTrue(driver.getPageSource().contains("Auth Success"));
+  jsConsoleExamplePage.init();
+  assertTrue(jsConsoleExamplePage.getEventsText().contains("Auth Success"));
   jsConsoleExamplePage.refreshTokenIfUnder30s();
-  assertTrue(driver.getPageSource().contains("Token not refreshed, valid for"));
+  assertTrue(jsConsoleExamplePage.getOutputText().contains("Token not refreshed, valid for"));
   pause((TOKEN_LIFESPAN_LEEWAY + 2) * 1000);
   jsConsoleExamplePage.refreshTokenIfUnder30s();
-  assertTrue(driver.getPageSource().contains("Auth Refresh Success"));
+  assertTrue(jsConsoleExamplePage.getEventsText().contains("Auth Refresh Success"));
 }

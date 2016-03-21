@@ -1,7 +1,9 @@
 {
   for (  RealmModel realm : session.realms().getRealms()) {
     if (realm.getBrowserSecurityHeaders() != null) {
-      realm.getBrowserSecurityHeaders().put("xFrameOptions","nosniff");
+      Map<String,String> browserSecurityHeaders=new HashMap<>(realm.getBrowserSecurityHeaders());
+      browserSecurityHeaders.put("xFrameOptions","nosniff");
+      realm.setBrowserSecurityHeaders(Collections.unmodifiableMap(browserSecurityHeaders));
     }
   }
 }

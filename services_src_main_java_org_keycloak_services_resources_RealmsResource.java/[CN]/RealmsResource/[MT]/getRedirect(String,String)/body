@@ -1,0 +1,15 @@
+{
+  RealmModel realm=init(realmName);
+  if (realm == null) {
+    return null;
+  }
+  ClientModel client=realm.getClientByClientId(clientId);
+  if (client == null) {
+    return null;
+  }
+  if (client.getRootUrl() == null) {
+    URI targetUri=KeycloakUriBuilder.fromUri(ResolveRelative.resolveRelativeUri(uriInfo.getRequestUri(),client.getRootUrl(),client.getBaseUrl())).build();
+    return Response.temporaryRedirect(targetUri).build();
+  }
+  return Response.temporaryRedirect(URI.create(client.getRootUrl() + client.getBaseUrl())).build();
+}

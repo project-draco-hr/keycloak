@@ -1,12 +1,13 @@
 {
-  themeSettingsPage.changeLoginTheme(Theme.BASE.getName());
+  testRealmLoginPage.setKeycloakThemeCssName(getConstantsProperties().getString("theme-default-css-name"));
+  themeSettingsPage.changeLoginTheme("base");
   themeSettingsPage.saveTheme();
   testRealmAdminConsolePage.navigateTo();
   testRealmLoginPage.waitForKeycloakThemeNotPresent();
   testRealmLoginPage.form().login(testUser);
   testRealmAdminConsolePage.logOut();
   themeSettingsPage.navigateTo();
-  themeSettingsPage.changeLoginTheme(Theme.KEYCLOAK.getName());
+  themeSettingsPage.changeLoginTheme(getConstantsProperties().getString("theme-default-name"));
   themeSettingsPage.saveTheme();
   testRealmAdminConsolePage.navigateTo();
   testRealmLoginPage.waitForKeycloakThemePresent();

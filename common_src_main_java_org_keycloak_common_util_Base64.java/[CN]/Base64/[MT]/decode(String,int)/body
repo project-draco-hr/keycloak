@@ -29,7 +29,12 @@
         bytes=baos.toByteArray();
       }
  catch (      java.io.IOException e) {
-        e.printStackTrace();
+        if (e.getMessage().equals("Unsupported compression method")) {
+          System.out.println("Base64 decoding: Ignoring GZIP header and just returning originally-decoded bytes.");
+        }
+ else {
+          e.printStackTrace();
+        }
       }
  finally {
         try {

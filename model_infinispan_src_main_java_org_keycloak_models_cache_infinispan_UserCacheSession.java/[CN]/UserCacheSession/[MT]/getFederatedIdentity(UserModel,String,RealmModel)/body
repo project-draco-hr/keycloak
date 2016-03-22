@@ -1,3 +1,14 @@
 {
-  return getDelegate().getFederatedIdentity(user,socialProvider,realm);
+  logger.tracev("getFederatedIdentity: {0} {1}",user.getUsername(),socialProvider);
+  String cacheKey=getFederatedIdentityLinksCacheKey(user.getId());
+  if (realmInvalidations.contains(realm.getId()) || invalidations.contains(user.getId()) || invalidations.contains(cacheKey)) {
+    return getDelegate().getFederatedIdentity(user,socialProvider,realm);
+  }
+  Set<FederatedIdentityModel> federatedIdentities=getFederatedIdentities(user,realm);
+  for (  FederatedIdentityModel socialLink : federatedIdentities) {
+    if (socialLink.getIdentityProvider().equals(socialProvider)) {
+      return socialLink;
+    }
+  }
+  return null;
 }

@@ -1,3 +1,8 @@
 {
+  FederatedIdentityModel socialLink=getFederatedIdentity(user,socialProvider,realm);
+  invalidations.add(getFederatedIdentityLinksCacheKey(user.getId()));
+  if (socialLink != null) {
+    invalidations.add(getUserByFederatedIdentityCacheKey(realm.getId(),socialLink));
+  }
   return getDelegate().removeFederatedIdentity(realm,user,socialProvider);
 }

@@ -1,3 +1,18 @@
 {
-  return getDelegate().getFederatedIdentities(user,realm);
+  logger.tracev("getFederatedIdentities: {0}",user.getUsername());
+  String cacheKey=getFederatedIdentityLinksCacheKey(user.getId());
+  if (realmInvalidations.contains(realm.getId()) || invalidations.contains(user.getId()) || invalidations.contains(cacheKey)) {
+    return getDelegate().getFederatedIdentities(user,realm);
+  }
+  CachedFederatedIdentityLinks cachedLinks=cache.get(cacheKey,CachedFederatedIdentityLinks.class);
+  if (cachedLinks == null) {
+    Long loaded=cache.getCurrentRevision(cacheKey);
+    Set<FederatedIdentityModel> federatedIdentities=getDelegate().getFederatedIdentities(user,realm);
+    cachedLinks=new CachedFederatedIdentityLinks(loaded,cacheKey,realm,federatedIdentities);
+    cache.addRevisioned(cachedLinks,startupRevision);
+    return federatedIdentities;
+  }
+ else {
+    return new HashSet<>(cachedLinks.getFederatedIdentities());
+  }
 }

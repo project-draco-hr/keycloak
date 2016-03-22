@@ -2,4 +2,5 @@
   invalidations.add(user.getId());
   if (user.getEmail() != null)   invalidations.add(getUserByEmailCacheKey(realm.getId(),user.getEmail()));
   invalidations.add(getUserByUsernameCacheKey(realm.getId(),user.getUsername()));
+  if (realm.isIdentityFederationEnabled())   invalidations.add(getFederatedIdentityLinksCacheKey(user.getId()));
 }

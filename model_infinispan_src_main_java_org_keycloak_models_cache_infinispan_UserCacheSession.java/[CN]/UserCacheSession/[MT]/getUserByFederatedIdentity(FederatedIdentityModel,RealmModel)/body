@@ -1,3 +1,39 @@
 {
-  return getDelegate().getUserByFederatedIdentity(socialLink,realm);
+  if (socialLink == null)   return null;
+  if (!realm.isIdentityFederationEnabled())   return null;
+  if (realmInvalidations.contains(realm.getId())) {
+    return getDelegate().getUserByFederatedIdentity(socialLink,realm);
+  }
+  String cacheKey=getUserByFederatedIdentityCacheKey(realm.getId(),socialLink);
+  if (invalidations.contains(cacheKey)) {
+    return getDelegate().getUserByFederatedIdentity(socialLink,realm);
+  }
+  UserListQuery query=cache.get(cacheKey,UserListQuery.class);
+  String userId=null;
+  if (query == null) {
+    Long loaded=cache.getCurrentRevision(cacheKey);
+    UserModel model=getDelegate().getUserByFederatedIdentity(socialLink,realm);
+    if (model == null)     return null;
+    userId=model.getId();
+    query=new UserListQuery(loaded,cacheKey,realm,userId);
+    cache.addRevisioned(query,startupRevision);
+    if (invalidations.contains(userId))     return model;
+    if (managedUsers.containsKey(userId))     return managedUsers.get(userId);
+    CachedUser cached=cache.get(userId,CachedUser.class);
+    if (cached == null) {
+      cached=new CachedUser(loaded,realm,model);
+      cache.addRevisioned(cached,startupRevision);
+    }
+    UserAdapter adapter=new UserAdapter(cached,this,session,realm);
+    managedUsers.put(userId,adapter);
+    return adapter;
+  }
+ else {
+    userId=query.getUsers().iterator().next();
+    if (invalidations.contains(userId)) {
+      invalidations.add(cacheKey);
+      return getDelegate().getUserByFederatedIdentity(socialLink,realm);
+    }
+    return getUserById(userId,realm);
+  }
 }

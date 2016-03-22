@@ -1,0 +1,28 @@
+{
+  KeycloakSession session=keycloakRule.startSession();
+  try {
+    RealmModel appRealm=session.realms().getRealmByName("test");
+    UserFederationMapperModel mapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
+    FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.MODE,LDAPGroupMapperMode.LDAP_ONLY.toString());
+    appRealm.updateUserFederationMapper(mapperModel);
+    LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
+    GroupLDAPFederationMapper groupMapper=FederationTestUtils.getGroupMapper(mapperModel,ldapProvider,appRealm);
+    LDAPObject group2=FederationTestUtils.createLDAPGroup(session,appRealm,ldapModel,"group2",descriptionAttrName,"group2 - description");
+    LDAPObject robLdap=ldapProvider.loadLDAPUserByUsername(appRealm,"robkeycloak");
+    LDAPUtils.addMember(ldapProvider,MembershipType.DN,LDAPConstants.MEMBER,group2,robLdap,false);
+    LDAPDn nonExistentDn=LDAPDn.fromString(ldapProvider.getLdapIdentityStore().getConfig().getUsersDn());
+    nonExistentDn.addFirst(robLdap.getRdnAttributeName(),"nonexistent");
+    LDAPObject nonExistentLdapUser=new LDAPObject();
+    nonExistentLdapUser.setDn(nonExistentDn);
+    LDAPUtils.addMember(ldapProvider,MembershipType.DN,LDAPConstants.MEMBER,group2,nonExistentLdapUser,true);
+    groupMapper.syncDataFromFederationProviderToKeycloak();
+    GroupModel kcGroup2=KeycloakModelUtils.findGroupByPath(appRealm,"/group2");
+    List<UserModel> groupUsers=session.users().getGroupMembers(appRealm,kcGroup2,0,5);
+    Assert.assertEquals(1,groupUsers.size());
+    UserModel rob=groupUsers.get(0);
+    Assert.assertEquals("robkeycloak",rob.getUsername());
+  }
+  finally {
+    keycloakRule.stopSession(session,false);
+  }
+}

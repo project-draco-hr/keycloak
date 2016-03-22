@@ -1,0 +1,13 @@
+{
+  if (realm.isIdentityFederationEnabled()) {
+    Set<FederatedIdentityModel> federatedIdentities=getFederatedIdentities(user,realm);
+    for (    FederatedIdentityModel socialLink : federatedIdentities) {
+      String fedIdentityCacheKey=getUserByFederatedIdentityCacheKey(realm.getId(),socialLink);
+      invalidations.add(fedIdentityCacheKey);
+    }
+    invalidations.add(getFederatedIdentityLinksCacheKey(user.getId()));
+  }
+  invalidations.add(user.getId());
+  if (user.getEmail() != null)   invalidations.add(getUserByEmailCacheKey(realm.getId(),user.getEmail()));
+  invalidations.add(getUserByUsernameCacheKey(realm.getId(),user.getUsername()));
+}

@@ -1,0 +1,11 @@
+{
+  String lineSep=System.getProperty("line.separator");
+  StringBuilder builder=new StringBuilder(lineSep).append(stats.toString()).append(lineSep);
+  builder.append(lineSep).append("Queries statistics: ").append(lineSep).append(lineSep);
+  for (  String query : stats.getQueries()) {
+    QueryStatistics queryStats=stats.getQueryStatistics(query);
+    builder.append(query).append(lineSep).append("executionCount=" + queryStats.getExecutionCount()).append(lineSep).append("executionAvgTime=" + queryStats.getExecutionAvgTime()).append(" ms").append(lineSep).append(lineSep);
+    builder.append(lineSep);
+  }
+  logger.infof(builder.toString());
+}

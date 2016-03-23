@@ -82,9 +82,16 @@ synchronized (this) {
             }
             logger.trace("Database update completed");
           }
+          int globalStatsInterval=config.getInt("globalStatsInterval",-1);
+          if (globalStatsInterval != -1) {
+            properties.put("hibernate.generate_statistics",true);
+          }
           logger.trace("Creating EntityManagerFactory");
           emf=Persistence.createEntityManagerFactory(unitName,properties);
           logger.trace("EntityManagerFactory created");
+          if (globalStatsInterval != -1) {
+            startGlobalStats(session,globalStatsInterval);
+          }
         }
  catch (        Exception e) {
           if (connection != null) {

@@ -1,0 +1,9 @@
+{
+  builder.append("Important queries statistics: ").append(lineSep).append(lineSep);
+  for (  String query : stats.getQueries()) {
+    QueryStatistics queryStats=stats.getQueryStatistics(query);
+    if (queryStats.getExecutionCount() > LIMIT || (queryStats.getExecutionCount() * queryStats.getExecutionAvgTime() > LIMIT)) {
+      builder.append(query).append(lineSep).append("executionCount=" + queryStats.getExecutionCount()).append(lineSep).append("executionAvgTime=" + queryStats.getExecutionAvgTime()).append(" ms").append(lineSep).append(lineSep).append(lineSep);
+    }
+  }
+}

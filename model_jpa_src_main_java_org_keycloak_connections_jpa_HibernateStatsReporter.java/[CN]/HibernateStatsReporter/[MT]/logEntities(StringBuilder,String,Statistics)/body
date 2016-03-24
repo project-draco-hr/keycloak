@@ -1,0 +1,10 @@
+{
+  builder.append("Important entities statistics: ").append(lineSep);
+  for (  String entity : stats.getEntityNames()) {
+    EntityStatistics entityStats=stats.getEntityStatistics(entity);
+    if (entityStats.getInsertCount() > LIMIT || entityStats.getDeleteCount() > LIMIT || entityStats.getUpdateCount() > LIMIT || entityStats.getLoadCount() > LIMIT || entityStats.getFetchCount() > LIMIT) {
+      builder.append(entity + " - ").append("inserted: " + entityStats.getInsertCount()).append(", updated: " + entityStats.getUpdateCount()).append(", removed: " + entityStats.getDeleteCount()).append(", loaded: " + entityStats.getLoadCount()).append(", fetched: " + entityStats.getFetchCount()).append(lineSep);
+    }
+  }
+  builder.append(lineSep);
+}

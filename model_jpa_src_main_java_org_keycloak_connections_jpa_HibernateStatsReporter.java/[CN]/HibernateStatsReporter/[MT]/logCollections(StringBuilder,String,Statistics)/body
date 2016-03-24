@@ -1,0 +1,10 @@
+{
+  builder.append("Important collections statistics: ").append(lineSep);
+  for (  String col : stats.getCollectionRoleNames()) {
+    CollectionStatistics collectionStats=stats.getCollectionStatistics(col);
+    if (collectionStats.getRecreateCount() > LIMIT || collectionStats.getUpdateCount() > LIMIT || collectionStats.getRemoveCount() > LIMIT || collectionStats.getLoadCount() > LIMIT || collectionStats.getFetchCount() > LIMIT) {
+      builder.append(col + " - ").append("recreated: " + collectionStats.getRecreateCount()).append(", updated: " + collectionStats.getUpdateCount()).append(", removed: " + collectionStats.getRemoveCount()).append(", loaded: " + collectionStats.getLoadCount()).append(", fetched: " + collectionStats.getFetchCount()).append(lineSep);
+    }
+  }
+  builder.append(lineSep);
+}

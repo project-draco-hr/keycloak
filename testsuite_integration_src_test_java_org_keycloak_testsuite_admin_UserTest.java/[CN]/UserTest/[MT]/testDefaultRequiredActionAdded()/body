@@ -1,0 +1,12 @@
+{
+  RequiredActionProviderRepresentation updatePasswordReqAction=realm.flows().getRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.toString());
+  updatePasswordReqAction.setDefaultAction(true);
+  realm.flows().updateRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.toString(),updatePasswordReqAction);
+  String userId=createUser("user1","user1@localhost");
+  UserRepresentation userRep=realm.users().get(userId).toRepresentation();
+  Assert.assertEquals(1,userRep.getRequiredActions().size());
+  Assert.assertEquals(UserModel.RequiredAction.UPDATE_PASSWORD.toString(),userRep.getRequiredActions().get(0));
+  updatePasswordReqAction=realm.flows().getRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.toString());
+  updatePasswordReqAction.setDefaultAction(true);
+  realm.flows().updateRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.toString(),updatePasswordReqAction);
+}

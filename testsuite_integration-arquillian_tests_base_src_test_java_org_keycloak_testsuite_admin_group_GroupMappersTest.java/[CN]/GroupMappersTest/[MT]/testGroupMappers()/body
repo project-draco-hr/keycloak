@@ -1,14 +1,5 @@
 {
-  keycloakRule.update(new KeycloakRule.KeycloakSetup(){
-    @Override public void config(    RealmManager manager,    RealmModel adminstrationRealm,    RealmModel appRealm){
-      ClientModel app=appRealm.getClientByClientId("test-app");
-      app.addProtocolMapper(GroupMembershipMapper.create("groups","groups",false,null,true,true));
-      app.addProtocolMapper(UserAttributeMapper.createClaimMapper("topAttribute","topAttribute","topAttribute",ProviderConfigProperty.STRING_TYPE,false,null,true,true,false));
-      app.addProtocolMapper(UserAttributeMapper.createClaimMapper("level2Attribute","level2Attribute","level2Attribute",ProviderConfigProperty.STRING_TYPE,false,null,true,true,false));
-    }
-  }
-,"test");
-  RealmResource realm=keycloak.realms().realm("test");
+  RealmResource realm=adminClient.realms().realm("test");
 {
     UserRepresentation user=realm.users().search("topGroupUser",-1,-1).get(0);
     AccessToken token=login(user.getUsername(),"test-app","password",user.getId());

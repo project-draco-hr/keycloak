@@ -1,0 +1,13 @@
+{
+  AccessTokenResponse tokenResponse=oauthClient.getToken("test",clientId,clientSecret,login,"password");
+  String accessToken=tokenResponse.getToken();
+  String refreshToken=tokenResponse.getRefreshToken();
+  AccessToken accessTokenRepresentation=RSATokenVerifier.verifyToken(accessToken,events.getRealmPublicKey(),AuthServerTestEnricher.getAuthServerContextRoot() + "/auth/realms/test");
+  JWSInput jws=new JWSInput(refreshToken);
+  if (!RSAProvider.verify(jws,events.getRealmPublicKey())) {
+    throw new RuntimeException("Invalid refresh token");
+  }
+  RefreshToken refreshTokenRepresentation=jws.readJsonContent(RefreshToken.class);
+  events.expectLogin().client(clientId).user(userId).session(tokenResponse.getSessionState()).detail(Details.GRANT_TYPE,OAuth2Constants.PASSWORD).detail(Details.TOKEN_ID,accessTokenRepresentation.getId()).detail(Details.REFRESH_TOKEN_ID,refreshTokenRepresentation.getId()).detail(Details.USERNAME,login).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).assertEvent();
+  return accessTokenRepresentation;
+}

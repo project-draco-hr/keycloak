@@ -1,11 +1,22 @@
 {
   String attribute=mapperModel.getConfig().get(USER_ATTRIBUTE);
-  Object value=getAttribute(mapperModel,context);
-  String current=user.getFirstAttribute(attribute);
-  if (value != null && !value.equals(current)) {
-    user.setSingleAttribute(attribute,value.toString());
+  String value=getAttribute(mapperModel,context);
+  if (attribute.equalsIgnoreCase("email")) {
+    user.setEmail(value);
   }
- else   if (value == null) {
-    user.removeAttribute(attribute);
+ else   if (attribute.equalsIgnoreCase("firstName")) {
+    user.setFirstName(value);
+  }
+ else   if (attribute.equalsIgnoreCase("lastName")) {
+    user.setLastName(value);
+  }
+ else {
+    String current=user.getFirstAttribute(attribute);
+    if (value != null && !value.equals(current)) {
+      user.setSingleAttribute(attribute,value.toString());
+    }
+ else     if (value == null) {
+      user.removeAttribute(attribute);
+    }
   }
 }

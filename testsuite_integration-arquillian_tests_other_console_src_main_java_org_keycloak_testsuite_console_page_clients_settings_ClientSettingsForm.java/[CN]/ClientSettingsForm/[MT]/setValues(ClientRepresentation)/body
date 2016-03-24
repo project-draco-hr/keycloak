@@ -1,0 +1,25 @@
+{
+  super.setValues(client);
+  setName(client.getName());
+  setEnabled(client.isEnabled());
+  setConsentRequired(client.isConsentRequired());
+  setBaseUrl(client.getBaseUrl());
+  if (OIDC.equals(client.getProtocol())) {
+    setAccessType(client);
+    if (!client.isBearerOnly()) {
+      setStandardFlowEnabled(client.isStandardFlowEnabled());
+      setDirectAccessGrantsEnabled(client.isDirectAccessGrantsEnabled());
+      if (client.isPublicClient()) {
+        setImplicitFlowEnabled(client.isImplicitFlowEnabled());
+      }
+ else {
+        setServiceAccountsEnabled(client.isServiceAccountsEnabled());
+      }
+      if (client.isStandardFlowEnabled() || client.isImplicitFlowEnabled()) {
+        setRedirectUris(client.getRedirectUris());
+      }
+    }
+    setAdminUrl(client.getAdminUrl());
+    setWebOrigins(client.getWebOrigins());
+  }
+}

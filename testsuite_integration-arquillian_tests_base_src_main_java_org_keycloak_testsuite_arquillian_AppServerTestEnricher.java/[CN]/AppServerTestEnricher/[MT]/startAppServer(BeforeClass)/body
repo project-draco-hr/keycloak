@@ -1,7 +1,8 @@
 {
-  if (testContext.isAdapterTest()) {
+  if (testContext.isAdapterTest() && !testContext.isRelativeAdapterTest()) {
     ContainerController controller=containerConrollerInstance.get();
     if (!controller.isStarted(testContext.getAppServerInfo().getQualifier())) {
+      log.info("Starting app server: " + testContext.getAppServerInfo().getQualifier());
       controller.start(testContext.getAppServerInfo().getQualifier());
     }
   }

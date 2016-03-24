@@ -4,39 +4,29 @@
     containers.add(new ContainerInfo(c));
   }
   suiteContext=new SuiteContext(containers);
-  String authServerQualifier=getAuthServerQualifier();
-  String migratedAuthServerQualifier=getMigratedAuthServerQualifier();
-  if (authServerQualifier.startsWith("auth-server-")) {
-    boolean authServerCluster=authServerQualifier.endsWith("-cluster");
-    String authServerType=authServerQualifier.replaceAll("auth-server-","").replaceAll("-cluster","");
-    log.info("authServerType:" + authServerType);
-    String authServerFrontend=authServerCluster ? "auth-server-" + authServerType + "-balancer" : authServerQualifier;
-    String authServerBackend="auth-server-" + authServerType + "-backend";
-    int backends=0;
-    for (    ContainerInfo container : suiteContext.getContainers()) {
-      if (container.getQualifier().equals(authServerFrontend)) {
-        updateWithAuthServerInfo(container);
-        suiteContext.setAuthServerInfo(container);
-      }
-      if (container.getQualifier().startsWith(authServerBackend)) {
-        updateWithAuthServerInfo(container,++backends);
-        suiteContext.getAuthServerBackendsInfo().add(container);
-      }
+  String authServerFrontend=AUTH_SERVER_CLUSTER ? "auth-server-balancer-wildfly" : AUTH_SERVER_CONTAINER;
+  String authServerBackend=AUTH_SERVER_CONTAINER + "-backend";
+  int backends=0;
+  for (  ContainerInfo container : suiteContext.getContainers()) {
+    if (container.getQualifier().equals(authServerFrontend)) {
+      updateWithAuthServerInfo(container);
+      suiteContext.setAuthServerInfo(container);
     }
-    if (suiteContext.getAuthServerInfo() == null) {
-      throw new RuntimeException(String.format("No auth server activated. A container matching '%s' needs to be enabled in arquillian.xml.",authServerFrontend));
-    }
-    if (authServerCluster && suiteContext.getAuthServerBackendsInfo().isEmpty()) {
-      throw new RuntimeException(String.format("No cluster backend nodes activated. Containers matching '%sN' need to be enabled in arquillian.xml.",authServerBackend));
+    if (AUTH_SERVER_CLUSTER && container.getQualifier().startsWith(authServerBackend)) {
+      updateWithAuthServerInfo(container,++backends);
+      suiteContext.getAuthServerBackendsInfo().add(container);
     }
   }
- else {
-    throw new IllegalArgumentException(String.format("Value of %s should start with 'auth-server-' prefix.",AUTH_SERVER_CONTAINER_PROPERTY));
+  if (suiteContext.getAuthServerInfo() == null) {
+    throw new RuntimeException(String.format("No auth server container matching '%s' found in arquillian.xml.",authServerFrontend));
   }
-  if (migratedAuthServerQualifier != null) {
-    if (migratedAuthServerQualifier.startsWith("migrated-auth-server-")) {
+  if (AUTH_SERVER_CLUSTER && suiteContext.getAuthServerBackendsInfo().isEmpty()) {
+    throw new RuntimeException(String.format("No auth server container matching '%sN' found in arquillian.xml.",authServerBackend));
+  }
+  if (MIGRATED_AUTH_SERVER_CONTAINER != null) {
+    if (MIGRATED_AUTH_SERVER_CONTAINER.startsWith("migrated-auth-server-")) {
       for (      ContainerInfo container : suiteContext.getContainers()) {
-        if (container.getQualifier().equals(migratedAuthServerQualifier)) {
+        if (container.getQualifier().equals(MIGRATED_AUTH_SERVER_CONTAINER)) {
           updateWithAuthServerInfo(container);
           suiteContext.setMigratedAuthServerInfo(container);
         }
@@ -46,7 +36,7 @@
       throw new IllegalArgumentException(String.format("Value of %s should start with 'migrated-auth-server-' prefix.",MIGRATED_AUTH_SERVER_CONTAINER_PROPERTY));
     }
     if (suiteContext.getMigratedAuthServerInfo() == null) {
-      throw new RuntimeException(String.format("Migration test was enabled but no auth server from which to migrate was activated. " + "A container matching '%s' needs to be enabled in arquillian.xml.",migratedAuthServerQualifier));
+      throw new RuntimeException(String.format("Migration test was enabled but no auth server from which to migrate was activated. " + "A container matching '%s' needs to be enabled in arquillian.xml.",MIGRATED_AUTH_SERVER_CONTAINER));
     }
   }
   suiteContextProducer.set(suiteContext);

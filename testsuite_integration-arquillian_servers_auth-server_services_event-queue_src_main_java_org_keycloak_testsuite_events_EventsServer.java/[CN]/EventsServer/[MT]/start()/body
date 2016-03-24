@@ -1,0 +1,22 @@
+{
+  PathHandler root=new PathHandler();
+  this.server=Undertow.builder().addHttpListener(port,"localhost").setHandler(root).build();
+  this.server.start();
+  ServletContainer container=Factory.newInstance();
+  DeploymentInfo di=new DeploymentInfo();
+  di.setClassLoader(getClass().getClassLoader());
+  di.setContextPath(rootPath);
+  di.setDeploymentName("testing-event-queue");
+  FilterInfo filter=Servlets.filter("EventsFilter",AssertEventsServletFilter.class);
+  di.addFilter(filter);
+  di.addFilterUrlMapping("EventsFilter","/event-queue",DispatcherType.REQUEST);
+  DeploymentManager manager=container.addDeployment(di);
+  manager.deploy();
+  try {
+    root.addPrefixPath(rootPath,manager.start());
+  }
+ catch (  ServletException e) {
+    throw new RuntimeException(e);
+  }
+  log.info("Started EventsServer on port: " + port);
+}

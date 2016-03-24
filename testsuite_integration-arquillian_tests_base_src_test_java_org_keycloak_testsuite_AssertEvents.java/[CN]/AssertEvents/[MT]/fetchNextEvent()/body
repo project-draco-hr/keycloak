@@ -1,0 +1,22 @@
+{
+  CloseableHttpClient httpclient=HttpClients.createDefault();
+  try {
+    HttpPost post=new HttpPost(defaultEventsQueueUri + "/event-queue");
+    CloseableHttpResponse response=httpclient.execute(post);
+    if (response.getStatusLine().getStatusCode() != 200) {
+      throw new RuntimeException("Failed to retrieve event from " + post.getURI() + ": "+ response.getStatusLine().toString()+ " / "+ IOUtils.toString(response.getEntity().getContent()));
+    }
+    return JsonSerialization.readValue(response.getEntity().getContent(),EventRepresentation.class);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+ finally {
+    try {
+      httpclient.close();
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  ClientRepresentation c=createOidcClientRep(CONFIDENTIAL,"inconsistent_client");
+  c.setPublicClient(true);
+  c.setBearerOnly(true);
+  Response r=clientsResource().create(c);
+  r.close();
+  clientSettingsPage.setId(getCreatedId(r));
+  c=clientResource(clientSettingsPage.getId()).toRepresentation();
+  assertTrue(c.isBearerOnly());
+  assertTrue(c.isPublicClient());
+}

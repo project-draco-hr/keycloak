@@ -1,6 +1,7 @@
 {
   ContainerRegistry reg=new Registry(injector.get());
   ServiceLoader serviceLoader=loader.get();
+  log.info("arquillian.xml: " + System.getProperty("arquillian.xml"));
   @SuppressWarnings("rawtypes") Collection<DeployableContainer> containers=serviceLoader.all(DeployableContainer.class);
   if (containers.isEmpty()) {
     throw new IllegalStateException("There are not any container adapters on the classpath");
@@ -8,7 +9,7 @@
   for (  ContainerDef container : event.getContainers()) {
     if (isCreatingContainer(container,containers)) {
       if (isEnabled(container)) {
-        checkMultipleEnabledContainers(container);
+        log.info("Registering container: " + container.getContainerName());
         reg.create(container,serviceLoader);
       }
  else {
@@ -20,6 +21,7 @@
     for (    ContainerDef container : group.getGroupContainers()) {
       if (isCreatingContainer(container,containers)) {
         if (isEnabled(container)) {
+          log.info("Registering container: " + container.getContainerName());
           reg.create(container,serviceLoader);
         }
  else {

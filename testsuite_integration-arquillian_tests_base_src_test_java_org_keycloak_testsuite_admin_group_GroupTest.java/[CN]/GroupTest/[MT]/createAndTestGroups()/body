@@ -31,6 +31,18 @@
   level2Group.setName("level2");
   response=realm.groups().group(topGroup.getId()).subGroup(level2Group);
   response.close();
+  URI location=response.getLocation();
+  final String level2Id=ApiUtil.getCreatedId(response);
+  final GroupRepresentation level2GroupById=realm.groups().group(level2Id).toRepresentation();
+  Assert.assertEquals(level2Id,level2GroupById.getId());
+  Assert.assertEquals(level2Group.getName(),level2GroupById.getName());
+  URLAssert.assertGetURL(location,adminClient.tokenManager().getAccessTokenString(),new URLAssert.AssertJSONResponseHandler(){
+    @Override protected void assertResponseBody(    String body) throws IOException {
+      GroupRepresentation level2=JsonSerialization.readValue(body,GroupRepresentation.class);
+      Assert.assertEquals(level2Id,level2.getId());
+    }
+  }
+);
   level2Group=realm.getGroupByPath("/top/level2");
   Assert.assertNotNull(level2Group);
   roles.clear();

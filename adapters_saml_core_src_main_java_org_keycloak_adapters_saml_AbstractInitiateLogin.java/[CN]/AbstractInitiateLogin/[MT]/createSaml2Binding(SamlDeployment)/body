@@ -1,0 +1,16 @@
+{
+  BaseSAML2BindingBuilder binding=new BaseSAML2BindingBuilder();
+  if (deployment.getIDP().getSingleSignOnService().signRequest()) {
+    binding.signatureAlgorithm(deployment.getSignatureAlgorithm());
+    KeyPair keypair=deployment.getSigningKeyPair();
+    if (keypair == null) {
+      throw new RuntimeException("Signing keys not configured");
+    }
+    if (deployment.getSignatureCanonicalizationMethod() != null) {
+      binding.canonicalizationMethod(deployment.getSignatureCanonicalizationMethod());
+    }
+    binding.signWith(keypair);
+    binding.signDocument();
+  }
+  return binding;
+}

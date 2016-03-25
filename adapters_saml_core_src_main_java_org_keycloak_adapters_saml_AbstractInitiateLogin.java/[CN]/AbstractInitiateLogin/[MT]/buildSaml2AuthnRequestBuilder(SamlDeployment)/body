@@ -1,0 +1,19 @@
+{
+  String issuerURL=deployment.getEntityID();
+  String nameIDPolicyFormat=deployment.getNameIDPolicyFormat();
+  if (nameIDPolicyFormat == null) {
+    nameIDPolicyFormat=JBossSAMLURIConstants.NAMEID_FORMAT_PERSISTENT.get();
+  }
+  SAML2AuthnRequestBuilder authnRequestBuilder=new SAML2AuthnRequestBuilder().destination(deployment.getIDP().getSingleSignOnService().getRequestBindingUrl()).issuer(issuerURL).forceAuthn(deployment.isForceAuthentication()).isPassive(deployment.isIsPassive()).nameIdPolicy(SAML2NameIDPolicyBuilder.format(nameIDPolicyFormat));
+  if (deployment.getIDP().getSingleSignOnService().getResponseBinding() != null) {
+    String protocolBinding=JBossSAMLURIConstants.SAML_HTTP_REDIRECT_BINDING.get();
+    if (deployment.getIDP().getSingleSignOnService().getResponseBinding() == SamlDeployment.Binding.POST) {
+      protocolBinding=JBossSAMLURIConstants.SAML_HTTP_POST_BINDING.get();
+    }
+    authnRequestBuilder.protocolBinding(protocolBinding);
+  }
+  if (deployment.getAssertionConsumerServiceUrl() != null) {
+    authnRequestBuilder.assertionConsumerUrl(deployment.getAssertionConsumerServiceUrl());
+  }
+  return authnRequestBuilder;
+}

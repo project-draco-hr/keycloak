@@ -1,0 +1,9 @@
+{
+  String resourcePath="/keycloak-saml/sp-metadata-email-nameid.xml";
+  Keycloak keycloak=Keycloak.getInstance("http://localhost:8081/auth","master","admin","admin",Constants.ADMIN_CLI_CLIENT_ID,null);
+  RealmResource admin=keycloak.realm("demo");
+  admin.toRepresentation();
+  ClientRepresentation clientRep=admin.convertClientDescription(IOUtils.toString(SamlAdapterTestStrategy.class.getResourceAsStream(resourcePath)));
+  assertEquals("email",clientRep.getAttributes().get("saml_name_id_format"));
+  keycloak.close();
+}

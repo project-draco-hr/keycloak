@@ -1,4 +1,8 @@
 {
   this.config=config;
-  this.client=client;
+  ResteasyWebTarget target=client.target(config.getServerUrl());
+  if (!config.isPublicClient()) {
+    target.register(new BasicAuthFilter(config.getClientId(),config.getClientSecret()));
+  }
+  tokenService=target.proxy(TokenService.class);
 }

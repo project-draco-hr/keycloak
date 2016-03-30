@@ -1,7 +1,10 @@
 {
-  Form form=new Form().param("grant_type","password").param("username",config.getUsername()).param("password",config.getPassword());
+  Form form=new Form().param(GRANT_TYPE,accessTokenGrantType);
+  if (PASSWORD.equals(accessTokenGrantType)) {
+    form.param("username",config.getUsername()).param("password",config.getPassword());
+  }
   if (config.isPublicClient()) {
-    form.param("client_id",config.getClientId());
+    form.param(CLIENT_ID,config.getClientId());
   }
   int requestTime=Time.currentTime();
 synchronized (this) {

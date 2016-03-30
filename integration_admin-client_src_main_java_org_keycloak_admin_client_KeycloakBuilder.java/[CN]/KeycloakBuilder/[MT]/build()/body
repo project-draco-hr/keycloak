@@ -5,14 +5,21 @@
   if (realm == null) {
     throw new IllegalStateException("realm required");
   }
-  if (username == null) {
-    throw new IllegalStateException("username required");
+  if (PASSWORD.equals(grantType)) {
+    if (username == null) {
+      throw new IllegalStateException("username required");
+    }
+    if (password == null) {
+      throw new IllegalStateException("password required");
+    }
   }
-  if (password == null) {
-    throw new IllegalStateException("password required");
+ else   if (CLIENT_CREDENTIALS.equals(grantType)) {
+    if (clientSecret == null) {
+      throw new IllegalStateException("clientSecret required with grant_type=client_credentials");
+    }
   }
   if (clientId == null) {
     throw new IllegalStateException("clientId required");
   }
-  return new Keycloak(serverUrl,realm,username,password,clientId,clientSecret,resteasyClient);
+  return new Keycloak(serverUrl,realm,username,password,clientId,clientSecret,grantType,resteasyClient);
 }

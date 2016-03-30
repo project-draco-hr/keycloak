@@ -1,11 +1,20 @@
 {
+  log.infof("Reading users after create is %s",READ_USER_AFTER_CREATE ? "ENABLED" : "DISABLED");
   users=new LinkedList<>();
   for (int i=0; i < COUNT; i++) {
     users.add(createUserRep("user" + i));
   }
   realmTimer.reset("create realm before test");
-  RealmRepresentation realm=new RealmRepresentation();
-  realm.setRealm(REALM);
-  realmsResouce().create(realm);
+  createRealm(REALM);
+  if (CREATE_OBJECTS) {
+    if (realmResource().getDefaultGroups().size() == 0) {
+      log.infof("Creating default groups 'group1' and 'group2'.");
+      setDefaultGroup("group1");
+      setDefaultGroup("group2");
+      RequiredActionProviderRepresentation updatePassword=realmResource().flows().getRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.toString());
+      updatePassword.setDefaultAction(true);
+      realmResource().flows().updateRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.toString(),updatePassword);
+    }
+  }
   refreshToken();
 }

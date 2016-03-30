@@ -14,7 +14,18 @@
   FederatedIdentityModel federatedIdentityModel=federatedIdentities.iterator().next();
   assertEquals(getProviderId(),federatedIdentityModel.getIdentityProvider());
   assertEquals(federatedUser.getUsername(),federatedIdentityModel.getUserName());
-  driver.navigate().to("http://localhost:8081/test-app/logout");
+  if (logoutTimeOffset > 0) {
+    Time.setOffset(logoutTimeOffset);
+  }
+  try {
+    driver.navigate().to("http://localhost:8081/test-app/logout");
+  }
+  finally {
+    Time.setOffset(0);
+  }
+  String afterLogoutUrl=driver.getCurrentUrl();
+  String afterLogoutPageSource=driver.getPageSource();
+  System.out.println("afterLogoutUrl: " + afterLogoutUrl);
   driver.navigate().to("http://localhost:8081/test-app");
   assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/auth"));
   return federatedUser;

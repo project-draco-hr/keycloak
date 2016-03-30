@@ -1,0 +1,18 @@
+{
+  long exp=Long.parseLong(userSession.getNote(FEDERATED_TOKEN_EXPIRATION));
+  int currentTime=Time.currentTime();
+  if (exp > 0 && currentTime > exp) {
+    String response=refreshToken(session,userSession);
+    AccessTokenResponse tokenResponse=null;
+    try {
+      tokenResponse=JsonSerialization.readValue(response,AccessTokenResponse.class);
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+    return tokenResponse.getIdToken();
+  }
+ else {
+    return userSession.getNote(FEDERATED_ID_TOKEN);
+  }
+}

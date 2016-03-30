@@ -1,0 +1,27 @@
+{
+  auth.requireAny();
+  List<ClientRepresentation> rep=new ArrayList<>();
+  if (clientId == null) {
+    List<ClientModel> clientModels=realm.getClients();
+    boolean view=auth.hasView();
+    for (    ClientModel clientModel : clientModels) {
+      if (view) {
+        rep.add(ModelToRepresentation.toRepresentation(clientModel));
+      }
+ else {
+        ClientRepresentation client=new ClientRepresentation();
+        client.setId(clientModel.getId());
+        client.setClientId(clientModel.getClientId());
+        client.setDescription(clientModel.getDescription());
+        rep.add(client);
+      }
+    }
+  }
+ else {
+    ClientModel client=realm.getClientByClientId(clientId);
+    if (client != null) {
+      rep.add(ModelToRepresentation.toRepresentation(client));
+    }
+  }
+  return rep;
+}

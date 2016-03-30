@@ -15,14 +15,17 @@
   realm.setEnabledEventTypes(Arrays.asList("REVOKE_GRANT","LOGIN"));
   testRealmResource().update(realm);
   jsConsoleExamplePage.navigateTo();
+  jsConsoleExamplePage.init();
   jsConsoleExamplePage.logIn();
   testRealmLoginPage.form().login("user","password");
   assertTrue(oAuthGrantPage.isCurrent());
   oAuthGrantPage.accept();
-  assertTrue(driver.getPageSource().contains("Init Success (Authenticated)"));
+  jsConsoleExamplePage.init();
+  assertTrue(jsConsoleExamplePage.getOutputText().contains("Init Success (Authenticated)"));
   applicationsPage.navigateTo();
   applicationsPage.revokeGrantForApplication("js-console");
   jsConsoleExamplePage.navigateTo();
+  jsConsoleExamplePage.init();
   jsConsoleExamplePage.logIn();
   assertTrue(oAuthGrantPage.isCurrent());
   loginEventsPage.navigateTo();
@@ -34,7 +37,7 @@
   assertEquals(1,resultList.size());
   resultList.get(0).findElement(By.xpath(".//td[text()='REVOKE_GRANT']"));
   resultList.get(0).findElement(By.xpath(".//td[text()='Client']/../td[text()='account']"));
-  resultList.get(0).findElement(By.xpath(".//td[text()='IP Address']/../td[text()='127.0.0.1']"));
+  resultList.get(0).findElement(By.xpath(".//td[text()='IP Address']/../td[text()='127.0.0.1' or text()='0:0:0:0:0:0:0:1']"));
   resultList.get(0).findElement(By.xpath(".//td[text()='revoked_client']/../td[text()='js-console']"));
   loginEventsPage.table().reset();
   loginEventsPage.table().filterForm().addEventType("LOGIN");
@@ -43,7 +46,7 @@
   assertEquals(1,resultList.size());
   resultList.get(0).findElement(By.xpath(".//td[text()='LOGIN']"));
   resultList.get(0).findElement(By.xpath(".//td[text()='Client']/../td[text()='js-console']"));
-  resultList.get(0).findElement(By.xpath(".//td[text()='IP Address']/../td[text()='127.0.0.1']"));
+  resultList.get(0).findElement(By.xpath(".//td[text()='IP Address']/../td[text()='127.0.0.1' or text()='0:0:0:0:0:0:0:1']"));
   resultList.get(0).findElement(By.xpath(".//td[text()='username']/../td[text()='user']"));
   resultList.get(0).findElement(By.xpath(".//td[text()='consent']/../td[text()='consent_granted']"));
 }

@@ -2,6 +2,7 @@
   jsConsoleExamplePage.navigateTo();
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
   pause(1000);
+  jsConsoleExamplePage.init();
   jsConsoleExamplePage.logIn();
   testRealmLoginPage.form().login("user","invalid-password");
   assertCurrentUrlDoesntStartWith(jsConsoleExamplePage);
@@ -9,10 +10,12 @@
   assertCurrentUrlDoesntStartWith(jsConsoleExamplePage);
   testRealmLoginPage.form().login("user","password");
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
-  assertTrue(driver.getPageSource().contains("Init Success (Authenticated)"));
-  assertTrue(driver.getPageSource().contains("Auth Success"));
+  jsConsoleExamplePage.init();
+  assertTrue(jsConsoleExamplePage.getOutputText().contains("Init Success (Authenticated)"));
+  assertTrue(jsConsoleExamplePage.getEventsText().contains("Auth Success"));
   pause(1000);
   jsConsoleExamplePage.logOut();
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
-  assertTrue(driver.getPageSource().contains("Init Success (Not Authenticated)"));
+  jsConsoleExamplePage.init();
+  assertTrue(jsConsoleExamplePage.getOutputText().contains("Init Success (Not Authenticated)"));
 }

@@ -1,0 +1,14 @@
+{
+  jsConsoleExamplePage.navigateTo();
+  jsConsoleExamplePage.setFlow("implicit");
+  jsConsoleExamplePage.init();
+  jsConsoleExamplePage.logIn();
+  assertTrue(driver.getPageSource().contains("Implicit flow is disabled for the client"));
+  setImplicitFlowFroClient();
+  jsConsoleExamplePage.navigateTo();
+  jsConsoleExamplePage.init();
+  jsConsoleExamplePage.logIn();
+  assertTrue(driver.getPageSource().contains("Standard flow is disabled for the client"));
+  logInAndInit("implicit");
+  assertTrue(jsConsoleExamplePage.getOutputText().contains("Init Success (Authenticated)"));
+}

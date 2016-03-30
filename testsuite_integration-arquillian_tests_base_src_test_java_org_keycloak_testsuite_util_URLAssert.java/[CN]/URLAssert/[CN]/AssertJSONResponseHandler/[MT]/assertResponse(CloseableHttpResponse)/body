@@ -1,0 +1,23 @@
+{
+  HttpEntity entity=response.getEntity();
+  Header contentType=entity.getContentType();
+  Assert.assertEquals("application/json",contentType.getValue());
+  char[] buf=new char[8192];
+  StringWriter out=new StringWriter();
+  Reader in=new InputStreamReader(entity.getContent(),Charset.forName("utf-8"));
+  int rc=0;
+  try {
+    while ((rc=in.read(buf)) != -1) {
+      out.write(buf,0,rc);
+    }
+  }
+  finally {
+    try {
+      in.close();
+    }
+ catch (    Exception ignored) {
+    }
+    out.close();
+  }
+  assertResponseBody(out.toString());
+}

@@ -1,0 +1,25 @@
+{
+  if (expected.getError() != null && !expected.getType().toString().endsWith("_ERROR")) {
+    expected.setType(expected.getType() + "_ERROR");
+  }
+  Assert.assertEquals(expected.getType(),actual.getType());
+  Assert.assertEquals(expected.getRealmId(),actual.getRealmId());
+  Assert.assertEquals(expected.getClientId(),actual.getClientId());
+  Assert.assertEquals(expected.getError(),actual.getError());
+  Assert.assertEquals(expected.getIpAddress(),actual.getIpAddress());
+  Assert.assertThat(actual.getUserId(),userId);
+  Assert.assertThat(actual.getSessionId(),sessionId);
+  if (details == null || details.isEmpty()) {
+  }
+ else {
+    Assert.assertNotNull(actual.getDetails());
+    for (    Map.Entry<String,Matcher<String>> d : details.entrySet()) {
+      String actualValue=actual.getDetails().get(d.getKey());
+      if (!actual.getDetails().containsKey(d.getKey())) {
+        Assert.fail(d.getKey() + " missing");
+      }
+      Assert.assertThat("Unexpected value for " + d.getKey(),actualValue,d.getValue());
+    }
+  }
+  return actual;
+}

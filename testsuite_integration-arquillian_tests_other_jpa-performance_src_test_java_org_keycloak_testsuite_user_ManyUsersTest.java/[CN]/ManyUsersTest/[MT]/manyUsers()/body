@@ -6,7 +6,14 @@
   int i=0;
   for (  UserRepresentation user : users) {
     refreshTokenIfMinValidityExpired();
-    createUser(realmResource().users(),user);
+    UserRepresentation createdUser=createUser(realmResource().users(),user);
+    if (READ_USER_AFTER_CREATE) {
+      UserRepresentation returned=realmResource().users().get(createdUser.getId()).toRepresentation();
+      Assert.assertEquals(returned.getId(),createdUser.getId());
+    }
+    if (CREATE_SOCIAL_LINKS) {
+      List<FederatedIdentityRepresentation> fedIdentities=realmResource().users().get(createdUser.getId()).getFederatedIdentity();
+    }
     if (++i % BATCH == 0) {
       usersTimer.reset();
       log.info("Created users: " + i + " / "+ users.size());

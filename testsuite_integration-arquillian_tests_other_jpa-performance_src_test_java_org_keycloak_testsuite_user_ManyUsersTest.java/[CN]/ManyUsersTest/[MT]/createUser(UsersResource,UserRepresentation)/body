@@ -1,0 +1,20 @@
+{
+  if (CREATE_OBJECTS) {
+    Map<String,Object> attrs=new HashMap<>();
+    attrs.put("attr1",Collections.singletonList("val1"));
+    attrs.put("attr2",Collections.singletonList("val2"));
+    user.setAttributes(attrs);
+  }
+  UserRepresentation userRep=super.createUser(users,user);
+  if (CREATE_OBJECTS) {
+    CredentialRepresentation password=new CredentialRepresentation();
+    password.setType(CredentialRepresentation.PASSWORD);
+    password.setValue("password");
+    password.setTemporary(false);
+    users.get(userRep.getId()).resetPassword(password);
+  }
+  if (CREATE_SOCIAL_LINKS) {
+    createSocialLink("facebook",users,userRep.getId());
+  }
+  return userRep;
+}

@@ -1,0 +1,16 @@
+{
+  BasicDBList orArgs=new BasicDBList();
+  orArgs.add(new BasicDBObject("type",UserCredentialModel.PASSWORD));
+  orArgs.add(new BasicDBObject("type",UserCredentialModel.PASSWORD_HISTORY));
+  BasicDBObject elemMatch=new BasicDBObject("$or",orArgs);
+  elemMatch.put("algorithm",HmacOTP.HMAC_SHA1);
+  BasicDBObject query=new BasicDBObject("credentials",new BasicDBObject("$elemMatch",elemMatch));
+  BasicDBObject update=new BasicDBObject("$set",new BasicDBObject("credentials.$.algorithm",Pbkdf2PasswordHashProvider.ID));
+  DBCollection users=db.getCollection("users");
+  int countModified=1;
+  while (countModified > 0) {
+    WriteResult wr=users.update(query,update,false,true);
+    countModified=wr.getN();
+    log.debugf("%d credentials modified in current iteration during upgrade to 1.8",countModified);
+  }
+}

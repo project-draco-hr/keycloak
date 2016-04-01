@@ -1,10 +1,11 @@
 {
-  newClient=createClientRep("oidc-bearer-only",OIDC);
+  newClient=createClientRep("oidc-confidetial",OIDC);
   createClient(newClient);
-  clientSettingsPage.form().setAccessType(BEARER_ONLY);
-  clientSettingsPage.form().save();
-  newClient.setBearerOnly(true);
+  newClient.setRedirectUris(TEST_REDIRECT_URIs);
   newClient.setPublicClient(false);
+  clientSettingsPage.form().setAccessType(CONFIDENTIAL);
+  clientSettingsPage.form().setRedirectUris(TEST_REDIRECT_URIs);
+  clientSettingsPage.form().save();
   ClientRepresentation found=findClientByClientId(newClient.getClientId());
   assertNotNull("Client " + newClient.getClientId() + " was not found.",found);
   assertClientSettingsEqual(newClient,found);

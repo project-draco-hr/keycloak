@@ -1,6 +1,10 @@
 {
   KeycloakSession session=keycloakRule.startSession();
   try {
+    LDAPConfig config=FederationTestUtils.getLdapProvider(session,ldapModel).getLdapIdentityStore().getConfig();
+    if (config.isActiveDirectory()) {
+      return;
+    }
     RealmModel appRealm=session.realms().getRealmByName("test");
     UserFederationMapperModel mapperModel=appRealm.getUserFederationMapperByName(ldapModel.getId(),"groupsMapper");
     FederationTestUtils.updateGroupMapperConfigOptions(mapperModel,GroupMapperConfig.MODE,LDAPGroupMapperMode.LDAP_ONLY.toString());
@@ -8,10 +12,10 @@
     LDAPFederationProvider ldapProvider=FederationTestUtils.getLdapProvider(session,ldapModel);
     GroupLDAPFederationMapper groupMapper=FederationTestUtils.getGroupMapper(mapperModel,ldapProvider,appRealm);
     LDAPObject group2=FederationTestUtils.createLDAPGroup(session,appRealm,ldapModel,"group2",descriptionAttrName,"group2 - description");
-    LDAPObject robLdap=ldapProvider.loadLDAPUserByUsername(appRealm,"robkeycloak");
-    LDAPUtils.addMember(ldapProvider,MembershipType.DN,LDAPConstants.MEMBER,group2,robLdap,false);
+    LDAPObject jamesLdap=ldapProvider.loadLDAPUserByUsername(appRealm,"jameskeycloak");
+    LDAPUtils.addMember(ldapProvider,MembershipType.DN,LDAPConstants.MEMBER,group2,jamesLdap,false);
     LDAPDn nonExistentDn=LDAPDn.fromString(ldapProvider.getLdapIdentityStore().getConfig().getUsersDn());
-    nonExistentDn.addFirst(robLdap.getRdnAttributeName(),"nonexistent");
+    nonExistentDn.addFirst(jamesLdap.getRdnAttributeName(),"nonexistent");
     LDAPObject nonExistentLdapUser=new LDAPObject();
     nonExistentLdapUser.setDn(nonExistentDn);
     LDAPUtils.addMember(ldapProvider,MembershipType.DN,LDAPConstants.MEMBER,group2,nonExistentLdapUser,true);
@@ -20,7 +24,7 @@
     List<UserModel> groupUsers=session.users().getGroupMembers(appRealm,kcGroup2,0,5);
     Assert.assertEquals(1,groupUsers.size());
     UserModel rob=groupUsers.get(0);
-    Assert.assertEquals("robkeycloak",rob.getUsername());
+    Assert.assertEquals("jameskeycloak",rob.getUsername());
   }
   finally {
     keycloakRule.stopSession(session,false);

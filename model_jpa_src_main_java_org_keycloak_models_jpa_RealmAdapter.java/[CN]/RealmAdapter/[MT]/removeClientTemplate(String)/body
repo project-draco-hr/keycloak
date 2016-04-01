@@ -2,6 +2,9 @@
   if (id == null)   return false;
   ClientTemplateModel client=getClientTemplateById(id);
   if (client == null)   return false;
+  if (KeycloakModelUtils.isClientTemplateUsed(this,client)) {
+    throw new ModelException("Cannot remove client template, it is currently in use");
+  }
   ClientTemplateEntity clientEntity=null;
   Iterator<ClientTemplateEntity> it=realm.getClientTemplates().iterator();
   while (it.hasNext()) {

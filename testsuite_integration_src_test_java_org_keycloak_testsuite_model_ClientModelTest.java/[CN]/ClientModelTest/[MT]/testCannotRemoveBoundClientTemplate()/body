@@ -1,0 +1,16 @@
+{
+  ClientModel client=realm.addClient("templatized");
+  ClientTemplateModel template=realm.addClientTemplate("template");
+  client.setClientTemplate(template);
+  commit();
+  realm=realmManager.getRealmByName("original");
+  try {
+    realm.removeClientTemplate(template.getId());
+    Assert.fail();
+  }
+ catch (  ModelException e) {
+  }
+  realm.removeClient(client.getId());
+  realm.removeClientTemplate(template.getId());
+  commit();
+}

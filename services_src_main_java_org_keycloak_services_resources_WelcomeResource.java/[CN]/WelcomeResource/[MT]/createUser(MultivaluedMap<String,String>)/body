@@ -8,6 +8,8 @@
       logger.rejectedNonLocalAttemptToCreateInitialUser(session.getContext().getConnection().getRemoteAddr());
       throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
+    String stateChecker=formData.getFirst("stateChecker");
+    csrfCheck(stateChecker);
     String username=formData.getFirst("username");
     String password=formData.getFirst("password");
     String passwordConfirmation=formData.getFirst("passwordConfirmation");

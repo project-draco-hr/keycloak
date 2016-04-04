@@ -1,0 +1,14 @@
+{
+  log.debug("Validating database");
+  boolean changeLogExists=db.collectionExists(CHANGE_LOG_COLLECTION);
+  DBCollection changeLog=db.getCollection(CHANGE_LOG_COLLECTION);
+  List<String> executed=getExecuted(db,changeLogExists,changeLog);
+  List<Update> updatesToRun=getUpdatesToRun(executed);
+  if (!updatesToRun.isEmpty()) {
+    String errorMessage=String.format("Failed to validate Mongo database schema. Schema needs updating database from %s to %s. Please change databaseSchema to 'update'",executed.get(executed.size() - 1),updatesToRun.get(updatesToRun.size() - 1).getId());
+    throw new RuntimeException(errorMessage);
+  }
+ else {
+    log.debug("Validation passed. Database is up to date");
+  }
+}

@@ -1,0 +1,17 @@
+{
+  Set<String> newInvalidations=new HashSet<>();
+  cache.roleInvalidation(roleId,newInvalidations);
+  invalidations.addAll(newInvalidations);
+  for (  String id : newInvalidations) {
+    ClientAdapter adapter=managedApplications.get(id);
+    if (adapter != null) {
+      adapter.invalidate();
+      continue;
+    }
+    GroupAdapter group=managedGroups.get(id);
+    if (group != null) {
+      group.invalidate();
+      continue;
+    }
+  }
+}

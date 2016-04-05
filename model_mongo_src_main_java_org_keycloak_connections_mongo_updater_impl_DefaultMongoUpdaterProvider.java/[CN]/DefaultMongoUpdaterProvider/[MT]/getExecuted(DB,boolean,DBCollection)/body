@@ -1,0 +1,16 @@
+{
+  boolean realmExists=db.collectionExists("realms");
+  List<String> executed=new LinkedList<>();
+  if (!changeLogExists && realmExists) {
+    Update1_0_0_Final u=new Update1_0_0_Final();
+    executed.add(u.getId());
+    createLog(changeLog,u,1);
+  }
+ else   if (changeLogExists) {
+    DBCursor cursor=changeLog.find().sort(new BasicDBObject("orderExecuted",1));
+    while (cursor.hasNext()) {
+      executed.add((String)cursor.next().get("_id"));
+    }
+  }
+  return executed;
+}

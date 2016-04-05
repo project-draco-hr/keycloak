@@ -1,0 +1,15 @@
+{
+  try {
+    List<Update> updatesToRun=new LinkedList<>();
+    for (    Class<? extends Update> updateClass : updates) {
+      Update u=updateClass.newInstance();
+      if (!executed.contains(u.getId())) {
+        updatesToRun.add(u);
+      }
+    }
+    return updatesToRun;
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

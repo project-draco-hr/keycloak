@@ -1,0 +1,18 @@
+{
+  RoleModel role=realm.addRole("clientRole");
+  String roleId=role.getId();
+  ClientModel scoped=realm.addClient("scoped");
+  String idOfClient=scoped.getId();
+  scoped.setFullScopeAllowed(false);
+  scoped.addScopeMapping(role);
+  commit();
+  realm=session.realms().getRealmByName("original");
+  scoped=realm.getClientByClientId("scoped");
+  role=session.realms().getRoleById(roleId,realm);
+  realm.removeRole(role);
+  commit();
+  realm=session.realms().getRealmByName("original");
+  scoped=realm.getClientByClientId("scoped");
+  Set<RoleModel> scopeMappings=scoped.getScopeMappings();
+  Assert.assertEquals(0,scopeMappings.size());
+}

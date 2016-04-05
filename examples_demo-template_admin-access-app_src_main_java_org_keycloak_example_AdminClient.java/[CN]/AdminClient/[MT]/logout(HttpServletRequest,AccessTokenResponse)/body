@@ -1,7 +1,7 @@
 {
   HttpClient client=new DefaultHttpClient();
   try {
-    HttpPost post=new HttpPost(KeycloakUriBuilder.fromUri(getBaseUrl(request) + "/auth").path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).build("demo"));
+    HttpPost post=new HttpPost(KeycloakUriBuilder.fromUri(UriUtils.getOrigin(request.getRequestURL().toString()) + "/auth").path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).build("demo"));
     List<NameValuePair> formparams=new ArrayList<NameValuePair>();
     formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN,res.getRefreshToken()));
     formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,"admin-client"));

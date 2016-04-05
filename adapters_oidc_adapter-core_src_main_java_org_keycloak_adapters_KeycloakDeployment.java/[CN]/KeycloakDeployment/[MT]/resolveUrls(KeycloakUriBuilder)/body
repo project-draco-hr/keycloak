@@ -1,7 +1,10 @@
 {
   if (log.isDebugEnabled()) {
-    log.debug("resolveNonBrowserUrls");
+    log.debug("resolveUrls");
   }
+  String login=authUrlBuilder.clone().path(ServiceUrlConstants.AUTH_PATH).build(getRealm()).toString();
+  authUrl=KeycloakUriBuilder.fromUri(login);
+  realmInfoUrl=authUrlBuilder.clone().path(ServiceUrlConstants.REALM_INFO_PATH).build(getRealm()).toString();
   tokenUrl=authUrlBuilder.clone().path(ServiceUrlConstants.TOKEN_PATH).build(getRealm()).toString();
   logoutUrl=KeycloakUriBuilder.fromUri(authUrlBuilder.clone().path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).build(getRealm()).toString());
   accountUrl=authUrlBuilder.clone().path(ServiceUrlConstants.ACCOUNT_SERVICE_PATH).build(getRealm()).toString();

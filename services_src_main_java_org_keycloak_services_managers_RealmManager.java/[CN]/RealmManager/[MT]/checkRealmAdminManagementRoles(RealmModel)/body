@@ -1,0 +1,14 @@
+{
+  if (realm.getName().equals(Config.getAdminRealm())) {
+    return;
+  }
+  String realmAdminClientId=getRealmAdminClientId(realm);
+  ClientModel realmAdminClient=realm.getClientByClientId(realmAdminClientId);
+  RoleModel adminRole=realmAdminClient.getRole(AdminRoles.REALM_ADMIN);
+  for (  String r : AdminRoles.ALL_REALM_ROLES) {
+    RoleModel found=realmAdminClient.getRole(r);
+    if (found == null) {
+      addAndSetAdminRole(r,realmAdminClient,adminRole);
+    }
+  }
+}

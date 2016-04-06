@@ -2,7 +2,6 @@
   if (realm.getName().equals(Config.getAdminRealm())) {
     return;
   }
-  ClientManager clientManager=new ClientManager(new RealmManager(session));
   String realmAdminClientId=getRealmAdminClientId(realm);
   ClientModel realmAdminClient=realm.getClientByClientId(realmAdminClientId);
   if (realmAdminClient == null) {
@@ -15,9 +14,6 @@
   realmAdminClient.setBearerOnly(true);
   realmAdminClient.setFullScopeAllowed(false);
   for (  String r : AdminRoles.ALL_REALM_ROLES) {
-    RoleModel role=realmAdminClient.addRole(r);
-    role.setDescription("${role_" + r + "}");
-    role.setScopeParamRequired(false);
-    adminRole.addCompositeRole(role);
+    addAndSetAdminRole(r,realmAdminClient,adminRole);
   }
 }

@@ -1,0 +1,10 @@
+{
+  ClientModel adminConsole=realm.getClientByClientId(Constants.ADMIN_CONSOLE_CLIENT_ID);
+  ProtocolMapperModel localeMapper=adminConsole.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,OIDCLoginProtocolFactory.LOCALE);
+  if (localeMapper == null) {
+    localeMapper=ProtocolMapperUtils.findLocaleMapper(session);
+    if (localeMapper != null) {
+      adminConsole.addProtocolMapper(localeMapper);
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  ExportImportConfig.setProvider(SingleFileExportProviderFactory.PROVIDER_ID);
+  URL url=LegacyImportTest.class.getResource("/exportimport-test/kc11-exported-realm.json");
+  String targetFilePath=new File(url.getFile()).getAbsolutePath();
+  ExportImportConfig.setFile(targetFilePath);
+  ExportImportConfig.setAction(ExportImportConfig.ACTION_IMPORT);
+  restartServer();
+  ClientResource foo11AdminConsoleClient=adminClient.realm("foo11").clients().get("a9ca4217-74a8-4658-92c8-c2f9ed48a474");
+  assertLocaleMapperPresent(foo11AdminConsoleClient);
+  ClientResource masterAdminConsoleClient=adminClient.realm(Config.getAdminRealm()).clients().get("22ed594d-8c21-43f0-a080-c8879a411f94");
+  assertLocaleMapperPresent(masterAdminConsoleClient);
+  ClientResource foo11RealmManagementClient=adminClient.realm("foo11").clients().get("c7a9cf59-feeb-44a4-a467-e008e157efa2");
+  List<RoleRepresentation> roles=foo11RealmManagementClient.roles().list();
+  assertRolesAvailable(roles);
+  Set<RoleRepresentation> realmAdminComposites=foo11RealmManagementClient.roles().get(AdminRoles.REALM_ADMIN).getChildren();
+  assertRolesAvailable(realmAdminComposites);
+  ClientResource foo11MasterAdminClient=adminClient.realm(Config.getAdminRealm()).clients().get("c9c3bd5f-b69d-4640-8b27-45d4f3866a36");
+  roles=foo11MasterAdminClient.roles().list();
+  assertRolesAvailable(roles);
+  Set<RoleRepresentation> masterAdminComposites=adminClient.realm(Config.getAdminRealm()).roles().get(AdminRoles.ADMIN).getChildren();
+  assertRolesAvailable(masterAdminComposites);
+}

@@ -1,0 +1,21 @@
+{
+  try {
+    String data=JsonSerialization.writeValueAsString(Collections.singletonMap("offset",String.valueOf(offset)));
+    URI uri=KeycloakUriBuilder.fromUri(suiteContext.getAuthServerInfo().getContextRoot().toURI()).path("/auth/realms/master/time-offset").build();
+    HttpURLConnection connection=(HttpURLConnection)uri.toURL().openConnection();
+    connection.setDoOutput(true);
+    connection.setRequestMethod("PUT");
+    connection.setRequestProperty("Content-Type","application/json");
+    connection.setRequestProperty("Content-Length",String.valueOf(data.length()));
+    OutputStream os=connection.getOutputStream();
+    os.write(data.getBytes());
+    os.close();
+    InputStream is=connection.getInputStream();
+    String response=IOUtils.toString(is);
+    is.close();
+    return response;
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

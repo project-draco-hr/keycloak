@@ -1,0 +1,92 @@
+{
+  LOG.debug(String.format("Starting login-logout scenario #%s",getRepeatCounter()));
+  context.getCookieStore().clear();
+  String pageContent;
+  final HttpGet getSecuredPageRequest=new HttpGet(securedUrl);
+  LOG.trace(String.format("Accessing secured URL: %s",getSecuredPageRequest));
+  LOG.trace(getSecuredPageRequest);
+  timer.reset();
+  try (CloseableHttpResponse r=client.execute(getSecuredPageRequest,context)){
+    assertEquals(HTTP_OK,r.getStatusLine().getStatusCode());
+    logRedirects();
+    assertEquals(1,context.getRedirectLocations().size());
+    assertTrue(getLastRedirect().toASCIIString().startsWith(loginPageUrl));
+    pageContent=EntityUtils.toString(r.getEntity());
+  }
+ catch (  SocketException ex) {
+    throw new OperationTimeoutException(ACCESS_REQUEST_TIME,ex);
+  }
+catch (  SocketTimeoutException ex) {
+    throw new OperationTimeoutException(ACCESS_REQUEST_TIME,ex.bytesTransferred,ex);
+  }
+  metrics.addValue(ACCESS_REQUEST_TIME,timer.getElapsedTime());
+  final HttpPost loginRequest=new HttpPost(getLoginUrlFromPage(pageContent));
+  List<NameValuePair> credentials=new ArrayList<>();
+  credentials.add(new BasicNameValuePair("username",username));
+  credentials.add(new BasicNameValuePair("password",password));
+  loginRequest.setEntity(new UrlEncodedFormEntity(credentials));
+  LOG.trace("Logging in");
+  LOG.trace(loginRequest);
+  timer.reset();
+  try (CloseableHttpResponse r=client.execute(loginRequest,context)){
+    assertEquals(HTTP_OK,r.getStatusLine().getStatusCode());
+    logRedirects();
+    assertEquals(2,context.getRedirectLocations().size());
+    assertTrue(getLastRedirect().toASCIIString().equals(securedUrl));
+  }
+ catch (  SocketException ex) {
+    throw new OperationTimeoutException(LOGIN_REQUEST_TIME,ex);
+  }
+catch (  SocketTimeoutException ex) {
+    throw new OperationTimeoutException(LOGIN_REQUEST_TIME,ex.bytesTransferred,ex);
+  }
+  metrics.addValue(LOGIN_REQUEST_TIME,timer.getElapsedTime());
+  LOG.trace("Verifying login");
+  LOG.trace(getSecuredPageRequest);
+  timer.reset();
+  try (CloseableHttpResponse r=client.execute(getSecuredPageRequest,context)){
+    assertEquals(HTTP_OK,r.getStatusLine().getStatusCode());
+    logRedirects();
+    assertEquals(0,context.getRedirectLocations().size());
+  }
+ catch (  SocketException ex) {
+    throw new OperationTimeoutException(LOGIN_VERIFY_REQUEST_TIME,ex);
+  }
+catch (  SocketTimeoutException ex) {
+    throw new OperationTimeoutException(LOGIN_VERIFY_REQUEST_TIME,ex.bytesTransferred,ex);
+  }
+  metrics.addValue(LOGIN_VERIFY_REQUEST_TIME,timer.getElapsedTime());
+  final HttpGet logoutRequest=new HttpGet(logoutUrl);
+  LOG.trace("Logging out");
+  LOG.trace(logoutRequest);
+  timer.reset();
+  try (CloseableHttpResponse r=client.execute(logoutRequest,context)){
+    assertEquals(HTTP_OK,r.getStatusLine().getStatusCode());
+    logRedirects();
+    assertEquals(0,context.getRedirectLocations().size());
+  }
+ catch (  SocketException ex) {
+    throw new OperationTimeoutException(LOGOUT_REQUEST_TIME,ex);
+  }
+catch (  SocketTimeoutException ex) {
+    throw new OperationTimeoutException(LOGOUT_REQUEST_TIME,ex.bytesTransferred,ex);
+  }
+  metrics.addValue(LOGOUT_REQUEST_TIME,timer.getElapsedTime());
+  LOG.trace("Verifying logout");
+  LOG.trace(getSecuredPageRequest);
+  timer.reset();
+  try (CloseableHttpResponse r=client.execute(getSecuredPageRequest,context)){
+    assertEquals(HTTP_OK,r.getStatusLine().getStatusCode());
+    logRedirects();
+    assertEquals(1,context.getRedirectLocations().size());
+    assertTrue(getLastRedirect().toASCIIString().startsWith(loginPageUrl));
+  }
+ catch (  SocketException ex) {
+    throw new OperationTimeoutException(LOGOUT_VERIFY_REQUEST_TIME,ex);
+  }
+catch (  SocketTimeoutException ex) {
+    throw new OperationTimeoutException(LOGOUT_VERIFY_REQUEST_TIME,ex.bytesTransferred,ex);
+  }
+  metrics.addValue(LOGOUT_VERIFY_REQUEST_TIME,timer.getElapsedTime());
+  LOG.trace("Logged out");
+}

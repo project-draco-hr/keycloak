@@ -1,0 +1,8 @@
+{
+  PoolingHttpClientConnectionManager connectionManager=new PoolingHttpClientConnectionManager();
+  connectionManager.setMaxTotal(Math.max(1,MAX_THREADS / 10));
+  connectionManager.setDefaultMaxPerRoute(connectionManager.getMaxTotal());
+  connectionManager.setValidateAfterInactivity(10000);
+  connectionManager.setDefaultSocketConfig(getDefaultSocketConfig());
+  client=HttpClients.custom().setConnectionManager(connectionManager).setDefaultCookieStore(new BasicCookieStore()).setDefaultRequestConfig(getDefaultRequestConfig()).setRedirectStrategy(new CustomRedirectStrategy()).build();
+}

@@ -1,0 +1,16 @@
+{
+  if (loadIncrease < 0) {
+    throw new IllegalArgumentException("Cannot increase load by a negative number (" + loadIncrease + ").");
+  }
+  if (!isThereEnoughThreadsForNextIteration(loadIncrease)) {
+    throw new IllegalArgumentException("Cannot increase load beyond threadpool capacity (" + MAX_THREADS + ").");
+  }
+  if (loadIncrease > 0) {
+    LOG.info(String.format("Increasing load from %s to %s.",currentLoad,currentLoad + loadIncrease));
+    for (int t=0; t < loadIncrease; t++) {
+      executorService.submit(newRunnable());
+      currentLoad++;
+      pauseWithErrorChecking(1000 / LOAD_INCREASE_RATE);
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  LOG.info("Measuring performance");
+  LOG.info("Iteration: " + (resultsList.size() + 1));
+  LOG.info("Duration: " + MEASUREMENT_DURATION + " s");
+  LOG.info("Load: " + currentLoad);
+  metrics.reset();
+  pauseWithErrorChecking(MEASUREMENT_DURATION * 1000);
+  resultsList.add(metrics.computeMetrics());
+  timeoutResultsList.add(timeouts.computeMetrics());
+  getLatestResults().logResults();
+  LOG.info("Timeouts: " + getLatestTimeoutResults());
+}

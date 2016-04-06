@@ -1,0 +1,13 @@
+{
+  try {
+    performanceScenario();
+  }
+ catch (  OperationTimeoutException ex) {
+    timeouts.addValue(ex.getMetric(),ex.getValue());
+    LOG.debug(String.format("Operatin %s timed out. Cause: %s.",ex.getMetric(),ex.getCause()));
+  }
+catch (  AssertionError|Exception ex) {
+    setError(ex);
+    throw new RuntimeException(ex);
+  }
+}

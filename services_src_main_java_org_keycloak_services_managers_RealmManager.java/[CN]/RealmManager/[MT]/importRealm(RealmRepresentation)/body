@@ -13,13 +13,11 @@
   if (!hasRealmAdminManagementClient(rep))   setupRealmAdminManagement(realm);
   if (!hasAccountManagementClient(rep))   setupAccountManagement(realm);
   boolean postponeImpersonationSetup=false;
-  if (!hasImpersonationServiceClient(rep)) {
-    if (hasRealmAdminManagementClient(rep)) {
-      postponeImpersonationSetup=true;
-    }
+  if (hasRealmAdminManagementClient(rep)) {
+    postponeImpersonationSetup=true;
+  }
  else {
-      setupImpersonationService(realm);
-    }
+    setupImpersonationService(realm);
   }
   if (!hasBrokerClient(rep))   setupBrokerService(realm);
   if (!hasAdminConsoleClient(rep))   setupAdminConsole(realm);
@@ -34,9 +32,12 @@
   }
   if (!hasRealmRole(rep,Constants.OFFLINE_ACCESS_ROLE))   setupOfflineTokens(realm);
   RepresentationToModel.importRealm(session,rep,realm);
+  setupAdminConsoleLocaleMapper(realm);
   if (postponeMasterClientSetup) {
     setupMasterAdminManagement(realm);
   }
+  checkMasterAdminManagementRoles(realm);
+  checkRealmAdminManagementRoles(realm);
   if (postponeImpersonationSetup) {
     setupImpersonationService(realm);
   }

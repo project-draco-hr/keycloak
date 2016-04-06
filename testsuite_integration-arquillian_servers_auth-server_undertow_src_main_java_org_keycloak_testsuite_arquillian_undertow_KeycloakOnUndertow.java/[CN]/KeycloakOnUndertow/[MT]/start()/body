@@ -5,6 +5,9 @@
     undertow=new UndertowJaxrsServer();
   }
   undertow.start(Undertow.builder().addHttpListener(configuration.getBindHttpPort(),configuration.getBindAddress()).setWorkerThreads(configuration.getWorkerThreads()).setIoThreads(configuration.getWorkerThreads() / 8));
-  undertow.deploy(createAuthServerDeploymentInfo());
+  DeploymentInfo di=createAuthServerDeploymentInfo();
+  undertow.deploy(di);
+  ResteasyDeployment deployment=(ResteasyDeployment)di.getServletContextAttributes().get(ResteasyDeployment.class.getName());
+  sessionFactory=((KeycloakApplication)deployment.getApplication()).getSessionFactory();
   log.info("Auth server started in " + (System.currentTimeMillis() - start) + " ms\n");
 }

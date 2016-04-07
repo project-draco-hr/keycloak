@@ -1,11 +1,11 @@
 {
-  if (!isAuthenticated()) {
-    event.error(Errors.NOT_ALLOWED);
-    throw new UnauthorizedException();
-  }
+  init();
   if (isBearerToken()) {
     if (hasRole(AdminRoles.MANAGE_CLIENTS,AdminRoles.CREATE_CLIENT)) {
       return;
+    }
+ else {
+      throw forbidden();
     }
   }
  else   if (isInitialAccessToken()) {
@@ -15,6 +15,5 @@
       }
     }
   }
-  event.error(Errors.NOT_ALLOWED);
-  throw new ForbiddenException();
+  throw unauthorized();
 }

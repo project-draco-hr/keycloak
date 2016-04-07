@@ -1,20 +1,21 @@
 {
   if (client.isPublicClient()) {
-    return;
+    return true;
   }
   AuthenticationProcessor processor=AuthorizeClientUtil.getAuthenticationProcessor(session,event);
   Response response=processor.authenticateClient();
   if (response != null) {
     event.client(client.getClientId()).error(Errors.NOT_ALLOWED);
-    throw new ForbiddenException();
+    throw unauthorized();
   }
   ClientModel authClient=processor.getClient();
   if (client == null) {
     event.client(client.getClientId()).error(Errors.NOT_ALLOWED);
-    throw new ForbiddenException();
+    throw unauthorized();
   }
   if (!authClient.getClientId().equals(client.getClientId())) {
     event.client(client.getClientId()).error(Errors.NOT_ALLOWED);
-    throw new ForbiddenException();
+    throw unauthorized();
   }
+  return true;
 }

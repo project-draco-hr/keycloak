@@ -1,10 +1,12 @@
 {
   authManageClients();
   try {
-    updateClient();
-    fail("Expected 403");
+    ClientRepresentation client=new ClientRepresentation();
+    client.setClientId("invalid");
+    reg.update(client);
+    fail("Expected 404");
   }
  catch (  ClientRegistrationException e) {
-    assertEquals(403,((HttpErrorException)e.getCause()).getStatusLine().getStatusCode());
+    assertEquals(404,((HttpErrorException)e.getCause()).getStatusLine().getStatusCode());
   }
 }

@@ -9,11 +9,14 @@
   if (!split[0].equalsIgnoreCase("bearer")) {
     return;
   }
-  jwt=ClientRegistrationTokenUtils.parseToken(realm,uri,split[1]);
+  jwt=ClientRegistrationTokenUtils.verifyToken(realm,uri,split[1]);
+  if (jwt == null) {
+    throw unauthorized();
+  }
   if (isInitialAccessToken()) {
     initialAccessModel=session.sessions().getClientInitialAccessModel(session.getContext().getRealm(),jwt.getId());
     if (initialAccessModel == null) {
-      throw new ForbiddenException();
+      throw unauthorized();
     }
   }
 }

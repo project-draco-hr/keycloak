@@ -1,13 +1,8 @@
 {
-  ResteasyWebTarget target=client.target(config.getServerUrl());
   Form form=new Form().param("grant_type","refresh_token").param("refresh_token",currentToken.getRefreshToken());
   if (config.isPublicClient()) {
     form.param("client_id",config.getClientId());
   }
- else {
-    target.register(new BasicAuthFilter(config.getClientId(),config.getClientSecret()));
-  }
-  TokenService tokenService=target.proxy(TokenService.class);
   try {
     int requestTime=Time.currentTime();
     currentToken=tokenService.refreshToken(config.getRealm(),form.asMap());

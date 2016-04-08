@@ -1,0 +1,11 @@
+{
+  Map<String,String> config=new HashMap<>();
+  String port=System.getProperty("auth.server.http.port","8180");
+  config.put(FORCE_OTP_FOR_HTTP_HEADER,"Host: localhost:" + port);
+  config.put(DEFAULT_OTP_OUTCOME,SKIP);
+  setConditionalOTPForm(config);
+  testRealmAccountManagementPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  testRealmLoginPage.form().totpForm().waitForTotpInputFieldPresent();
+  assertCurrentUrlStartsWith(testLoginOneTimeCodePage);
+}

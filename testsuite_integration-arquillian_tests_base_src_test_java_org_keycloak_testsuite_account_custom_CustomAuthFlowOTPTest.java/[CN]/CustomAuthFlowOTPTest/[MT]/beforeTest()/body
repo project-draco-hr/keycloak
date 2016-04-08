@@ -1,0 +1,17 @@
+{
+  super.beforeTest();
+  List<String> requiredActions=new ArrayList<>();
+  requiredActions.add(CONFIGURE_TOTP.name());
+  testUser.setRequiredActions(requiredActions);
+  testRealmResource().users().get(testUser.getId()).update(testUser);
+  testRealmAccountManagementPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  testRealmLoginPage.form().totpForm().waitForTotpInputFieldPresent();
+  String totpSecret=testRealmLoginPage.form().totpForm().getTotpSecret();
+  testRealmLoginPage.form().totpForm().setTotp(totp.generateTOTP(totpSecret));
+  testRealmLoginPage.form().totpForm().submit();
+  testRealmAccountManagementPage.signOut();
+  testUser=testRealmResource().users().get(testUser.getId()).toRepresentation();
+  Users.setPasswordFor(testUser,PASSWORD);
+  assertTrue(testUser.getRequiredActions().isEmpty());
+}

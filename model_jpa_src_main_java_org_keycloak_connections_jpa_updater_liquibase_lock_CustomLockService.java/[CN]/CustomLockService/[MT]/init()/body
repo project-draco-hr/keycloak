@@ -11,8 +11,8 @@
     }
  catch (    DatabaseException de) {
       log.warn("Failed to create lock table. Maybe other transaction created in the meantime. Retrying...");
-      if (log.isDebugEnabled()) {
-        log.debug(de.getMessage(),de);
+      if (log.isTraceEnabled()) {
+        log.trace(de.getMessage(),de);
       }
       database.rollback();
       throw new LockRetryException(de);
@@ -38,8 +38,8 @@
     }
  catch (    DatabaseException de) {
       log.warn("Failed to insert first record to the lock table. Maybe other transaction inserted in the meantime. Retrying...");
-      if (log.isDebugEnabled()) {
-        log.debug(de.getMessage(),de);
+      if (log.isTraceEnabled()) {
+        log.trace(de.getMessage(),de);
       }
       database.rollback();
       throw new LockRetryException(de);

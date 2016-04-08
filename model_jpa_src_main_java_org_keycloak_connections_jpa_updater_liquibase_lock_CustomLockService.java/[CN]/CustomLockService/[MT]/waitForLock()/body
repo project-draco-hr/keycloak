@@ -2,29 +2,24 @@
   boolean locked=false;
   long startTime=Time.toMillis(Time.currentTime());
   long timeToGiveUp=startTime + (getChangeLogLockWaitTime());
-  while (!locked && Time.toMillis(Time.currentTime()) < timeToGiveUp) {
+  boolean nextAttempt=true;
+  while (nextAttempt) {
     locked=acquireLock();
     if (!locked) {
       int remainingTime=((int)(timeToGiveUp / 1000)) - Time.currentTime();
-      log.debugf("Waiting for changelog lock... Remaining time: %d seconds",remainingTime);
-      try {
-        Thread.sleep(getChangeLogLockRecheckTime());
+      if (remainingTime > 0) {
+        log.debugf("Will try to acquire log another time. Remaining time: %d seconds",remainingTime);
       }
- catch (      InterruptedException e) {
-        e.printStackTrace();
+ else {
+        nextAttempt=false;
       }
+    }
+ else {
+      nextAttempt=false;
     }
   }
   if (!locked) {
-    DatabaseChangeLogLock[] locks=listLocks();
-    String lockedBy;
-    if (locks.length > 0) {
-      DatabaseChangeLogLock lock=locks[0];
-      lockedBy=lock.getLockedBy() + " since " + DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT).format(lock.getLockGranted());
-    }
- else {
-      lockedBy="UNKNOWN";
-    }
-    throw new LockException("Could not acquire change log lock.  Currently locked by " + lockedBy);
+    int timeout=((int)(getChangeLogLockWaitTime() / 1000));
+    throw new IllegalStateException("Could not acquire change log lock within specified timeout " + timeout + " seconds.  Currently locked by other transaction");
   }
 }

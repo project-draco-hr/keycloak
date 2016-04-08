@@ -5,14 +5,15 @@
       this.maxAttempts=DEFAULT_MAX_ATTEMPTS;
       return;
     }
- catch (    LockException le) {
-      if (le.getCause() != null && le.getCause() instanceof LockRetryException) {
-        restart();
-        maxAttempts--;
-      }
- else {
-        throw new IllegalStateException("Failed to retrieve lock",le);
-      }
+ catch (    LockRetryException le) {
+      safeRollbackConnection();
+      restart();
+      maxAttempts--;
+    }
+catch (    RuntimeException re) {
+      safeRollbackConnection();
+      safeCloseConnection();
+      throw re;
     }
   }
 }

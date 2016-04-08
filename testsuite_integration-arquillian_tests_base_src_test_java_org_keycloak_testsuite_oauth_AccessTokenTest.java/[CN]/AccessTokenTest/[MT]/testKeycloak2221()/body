@@ -1,0 +1,31 @@
+{
+  Client client=javax.ws.rs.client.ClientBuilder.newClient();
+  UriBuilder builder=UriBuilder.fromUri(AUTH_SERVER_ROOT);
+  URI grantUri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
+  WebTarget grantTarget=client.target(grantUri);
+  ClientResource clientResource;
+{
+    clientResource=findClientByClientId(adminClient.realm("test"),"test-app");
+    clientResource.getProtocolMappers().createMapper(createRoleNameMapper("rename-role","user","realm-user"));
+    clientResource.getProtocolMappers().createMapper(createRoleNameMapper("rename-role2","admin","the-admin"));
+  }
+{
+    Response response=executeGrantRequest(grantTarget,"no-permissions","password");
+    assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    AccessToken accessToken=getAccessToken(tokenResponse);
+    assertEquals(accessToken.getRealmAccess().getRoles().size(),1);
+    assertTrue(accessToken.getRealmAccess().getRoles().contains("realm-user"));
+    response.close();
+  }
+{
+    ClientResource app=findClientByClientId(adminClient.realm("test"),"test-app");
+    ClientRepresentation clientRepresentation=app.toRepresentation();
+    for (    ProtocolMapperRepresentation protocolRep : clientRepresentation.getProtocolMappers()) {
+      if (protocolRep.getName().startsWith("rename-role")) {
+        clientResource.getProtocolMappers().delete(protocolRep.getId());
+      }
+    }
+  }
+  events.clear();
+}

@@ -1,0 +1,153 @@
+{
+  Client client=javax.ws.rs.client.ClientBuilder.newClient();
+  UriBuilder builder=UriBuilder.fromUri(AUTH_SERVER_ROOT);
+  URI grantUri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
+  WebTarget grantTarget=client.target(grantUri);
+{
+{
+      RealmResource realmsResource=adminClient.realm("test");
+      RealmRepresentation realmRepresentation=realmsResource.toRepresentation();
+      realmRepresentation.setSslRequired(SslRequired.ALL.toString());
+      realmsResource.update(realmRepresentation);
+    }
+    Response response=executeGrantAccessTokenRequest(grantTarget);
+    assertEquals(403,response.getStatus());
+    response.close();
+{
+      RealmResource realmsResource=realmsResouce().realm("test");
+      RealmRepresentation realmRepresentation=realmsResource.toRepresentation();
+      realmRepresentation.setSslRequired(SslRequired.EXTERNAL.toString());
+      realmsResource.update(realmRepresentation);
+    }
+  }
+{
+    String header=BasicAuthHelper.createHeader("test-app","password");
+    Form form=new Form();
+    form.param(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD);
+    form.param("password","password");
+    Response response=grantTarget.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
+    assertEquals(401,response.getStatus());
+    response.close();
+  }
+{
+    String header=BasicAuthHelper.createHeader("test-app","password");
+    Form form=new Form();
+    form.param(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD);
+    form.param("username","test-user@localhost");
+    Response response=grantTarget.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
+    assertEquals(401,response.getStatus());
+    response.close();
+  }
+{
+    String header=BasicAuthHelper.createHeader("test-app","password");
+    Form form=new Form();
+    form.param(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD);
+    form.param("username","test-user@localhost");
+    form.param("password","invalid");
+    Response response=grantTarget.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
+    assertEquals(401,response.getStatus());
+    response.close();
+  }
+{
+    String header=BasicAuthHelper.createHeader("test-app","password");
+    Form form=new Form();
+    form.param(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD);
+    form.param("username","test-user@localhost");
+    Response response=grantTarget.request().header(HttpHeaders.AUTHORIZATION,header).post(Entity.form(form));
+    assertEquals(401,response.getStatus());
+    response.close();
+  }
+{
+{
+      ClientResource clientResource=findClientByClientId(adminClient.realm("test"),"test-app");
+      ClientRepresentation clientRepresentation=clientResource.toRepresentation();
+      clientRepresentation.setBearerOnly(true);
+      clientResource.update(clientRepresentation);
+    }
+    Response response=executeGrantAccessTokenRequest(grantTarget);
+    assertEquals(400,response.getStatus());
+    response.close();
+{
+      ClientResource clientResource=findClientByClientId(adminClient.realm("test"),"test-app");
+      ClientRepresentation clientRepresentation=clientResource.toRepresentation();
+      clientRepresentation.setBearerOnly(false);
+      clientResource.update(clientRepresentation);
+    }
+  }
+{
+{
+      RealmResource realmsResource=realmsResouce().realm("test");
+      RealmRepresentation realmRepresentation=realmsResource.toRepresentation();
+      realmRepresentation.setEnabled(false);
+      realmsResource.update(realmRepresentation);
+    }
+    Response response=executeGrantAccessTokenRequest(grantTarget);
+    assertEquals(403,response.getStatus());
+    response.close();
+{
+      RealmResource realmsResource=realmsResouce().realm("test");
+      RealmRepresentation realmRepresentation=realmsResource.toRepresentation();
+      realmRepresentation.setEnabled(true);
+      realmsResource.update(realmRepresentation);
+    }
+  }
+{
+{
+      ClientResource clientResource=findClientByClientId(adminClient.realm("test"),"test-app");
+      ClientRepresentation clientRepresentation=clientResource.toRepresentation();
+      clientRepresentation.setEnabled(false);
+      clientResource.update(clientRepresentation);
+    }
+    Response response=executeGrantAccessTokenRequest(grantTarget);
+    assertEquals(400,response.getStatus());
+    response.close();
+{
+      ClientResource clientResource=findClientByClientId(adminClient.realm("test"),"test-app");
+      ClientRepresentation clientRepresentation=clientResource.toRepresentation();
+      clientRepresentation.setEnabled(true);
+      clientResource.update(clientRepresentation);
+    }
+  }
+{
+{
+      UserResource userResource=findUserByUsernameId(adminClient.realm("test"),"test-user@localhost");
+      UserRepresentation userRepresentation=userResource.toRepresentation();
+      userRepresentation.getRequiredActions().add(UserModel.RequiredAction.UPDATE_PASSWORD.toString());
+      userResource.update(userRepresentation);
+    }
+    Response response=executeGrantAccessTokenRequest(grantTarget);
+    assertEquals(400,response.getStatus());
+    response.close();
+{
+      UserResource userResource=findUserByUsernameId(adminClient.realm("test"),"test-user@localhost");
+      UserRepresentation userRepresentation=userResource.toRepresentation();
+      userRepresentation.getRequiredActions().remove(UserModel.RequiredAction.UPDATE_PASSWORD.toString());
+      userResource.update(userRepresentation);
+    }
+  }
+{
+{
+      UserResource userResource=findUserByUsernameId(adminClient.realm("test"),"test-user@localhost");
+      UserRepresentation userRepresentation=userResource.toRepresentation();
+      userRepresentation.setEnabled(false);
+      userResource.update(userRepresentation);
+    }
+    Response response=executeGrantAccessTokenRequest(grantTarget);
+    assertEquals(400,response.getStatus());
+    response.close();
+{
+      UserResource userResource=findUserByUsernameId(adminClient.realm("test"),"test-user@localhost");
+      UserRepresentation userRepresentation=userResource.toRepresentation();
+      userRepresentation.setEnabled(true);
+      userResource.update(userRepresentation);
+    }
+  }
+{
+    Response response=executeGrantAccessTokenRequest(grantTarget);
+    assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    response.close();
+  }
+  client.close();
+  events.clear();
+}

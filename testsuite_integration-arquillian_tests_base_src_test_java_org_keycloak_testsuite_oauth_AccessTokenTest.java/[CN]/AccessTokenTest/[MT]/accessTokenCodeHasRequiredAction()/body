@@ -1,0 +1,11 @@
+{
+  UserResource user=findUserByUsernameId(adminClient.realm("test"),"test-user@localhost");
+  UserManager.realm(adminClient.realm("test")).user(user).addRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE.toString());
+  oauth.doLogin("test-user@localhost","password");
+  String code=driver.getPageSource().split("code=")[1].split("&")[0].split("\"")[0];
+  OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
+  Assert.assertEquals(400,response.getStatusCode());
+  EventRepresentation event=events.poll();
+  assertNotNull(event.getDetails().get(Details.CODE_ID));
+  UserManager.realm(adminClient.realm("test")).user(user).removeRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE.toString());
+}

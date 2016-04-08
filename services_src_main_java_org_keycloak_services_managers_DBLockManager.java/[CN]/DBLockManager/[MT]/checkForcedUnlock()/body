@@ -1,0 +1,12 @@
+{
+  if (Boolean.getBoolean("keycloak.dblock.forceUnlock")) {
+    DBLockProvider lock=getDBLock();
+    if (lock.supportsForcedUnlock()) {
+      logger.forcedReleaseDBLock();
+      lock.releaseLock();
+    }
+ else {
+      throw new IllegalStateException("Forced unlock requested, but provider " + lock + " doesn't support it");
+    }
+  }
+}

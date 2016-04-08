@@ -13,9 +13,10 @@
   classes.add(KeycloakTransactionCommitter.class);
   singletons.add(new ObjectMapperResolver(Boolean.parseBoolean(System.getProperty("keycloak.jsonPrettyPrint","false"))));
   ExportImportManager exportImportManager;
-  DBLockManager dbLockManager=new DBLockManager();
-  dbLockManager.checkForcedUnlock(sessionFactory);
-  dbLockManager.waitForLock(sessionFactory);
+  DBLockManager dbLockManager=new DBLockManager(sessionFactory.create());
+  dbLockManager.checkForcedUnlock();
+  DBLockProvider dbLock=dbLockManager.getDBLock();
+  dbLock.waitForLock();
   try {
     migrateModel();
     KeycloakSession session=sessionFactory.create();
@@ -50,7 +51,7 @@
     importAddUser();
   }
   finally {
-    dbLockManager.releaseLock(sessionFactory);
+    dbLock.releaseLock();
   }
   if (exportImportManager.isRunExport()) {
     exportImportManager.runExport();

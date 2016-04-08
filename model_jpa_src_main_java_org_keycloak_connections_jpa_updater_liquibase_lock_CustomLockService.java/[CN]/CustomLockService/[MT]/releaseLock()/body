@@ -1,0 +1,24 @@
+{
+  try {
+    if (hasChangeLogLock) {
+      log.debug("Going to release database lock");
+      database.commit();
+    }
+ else {
+      log.warn("Attempt to release lock, which is not owned by current transaction");
+    }
+  }
+ catch (  Exception e) {
+    log.error("Database error during release lock",e);
+  }
+ finally {
+    try {
+      hasChangeLogLock=false;
+      database.setCanCacheLiquibaseTableInfo(false);
+      database.rollback();
+    }
+ catch (    DatabaseException e) {
+      ;
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  try {
+    String keyUri=realm.getOTPPolicy().getKeyURI(realm,user,totpSecret);
+    int width=246;
+    int height=246;
+    QRCodeWriter writer=new QRCodeWriter();
+    final BitMatrix bitMatrix=writer.encode(keyUri,BarcodeFormat.QR_CODE,width,height);
+    ByteArrayOutputStream bos=new ByteArrayOutputStream();
+    MatrixToImageWriter.writeToStream(bitMatrix,"png",bos);
+    bos.close();
+    return Base64.encodeBytes(bos.toByteArray());
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

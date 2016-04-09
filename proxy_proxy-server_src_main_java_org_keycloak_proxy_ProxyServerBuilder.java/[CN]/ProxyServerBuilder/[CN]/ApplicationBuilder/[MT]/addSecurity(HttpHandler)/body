@@ -29,5 +29,7 @@
   }
 ;
   handler=new UndertowPreAuthActionsHandler(deploymentContext,userSessionManagement,sessionManager,handler);
-  return new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE,identityManager,handler);
+  handler=new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE,identityManager,handler);
+  if (proxyAddressForwarding)   handler=new ProxyPeerAddressHandler(handler);
+  return handler;
 }

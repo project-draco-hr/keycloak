@@ -1,9 +1,5 @@
 {
-  accountFederatedIdentityPage.realm("realm-with-broker");
-  accountFederatedIdentityPage.open();
-  assertTrue(driver.getTitle().equals("Log in to realm-with-broker"));
-  loginPage.login("pedroigor","password");
-  assertTrue(accountFederatedIdentityPage.isCurrent());
+  loginToAccountManagement("pedroigor");
   accountFederatedIdentityPage.clickAddProvider(getProviderId());
   assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8082/auth/"));
   this.loginPage.login("test-user","password");
@@ -12,7 +8,7 @@
     grantPage.assertCurrent();
     grantPage.cancel();
     accountFederatedIdentityPage.assertCurrent();
-    Assert.assertEquals("The page expired. Please try one more time",accountFederatedIdentityPage.getError());
+    Assert.assertEquals("The page expired. Please try one more time.",accountFederatedIdentityPage.getError());
     accountFederatedIdentityPage.clickAddProvider(getProviderId());
     assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8082/auth/"));
     this.loginPage.login("test-user","password");
@@ -20,12 +16,12 @@
     grantPage.assertCurrent();
     grantPage.accept();
     accountFederatedIdentityPage.assertCurrent();
-    Assert.assertEquals("The page expired. Please try one more time",accountFederatedIdentityPage.getError());
+    Assert.assertEquals("The page expired. Please try one more time.",accountFederatedIdentityPage.getError());
   }
   finally {
     Time.setOffset(0);
-    RealmResource brokeredRealm=keycloak2.realm("realm-with-oidc-identity-provider");
-    List<UserRepresentation> users=brokeredRealm.users().search("test-user",0,1);
-    brokeredRealm.users().get(users.get(0).getId()).revokeConsent("broker-app");
   }
+  RealmResource brokeredRealm=keycloak2.realm("realm-with-oidc-identity-provider");
+  List<UserRepresentation> users=brokeredRealm.users().search("test-user",0,1);
+  brokeredRealm.users().get(users.get(0).getId()).revokeConsent("broker-app");
 }

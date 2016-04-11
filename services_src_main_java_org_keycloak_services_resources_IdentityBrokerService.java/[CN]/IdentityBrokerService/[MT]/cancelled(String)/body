@@ -4,5 +4,9 @@
     return parsedCode.response;
   }
   ClientSessionCode clientCode=parsedCode.clientSessionCode;
+  Response accountManagementFailedLinking=checkAccountManagementFailedLinking(clientCode.getClientSession(),Messages.CONSENT_DENIED);
+  if (accountManagementFailedLinking != null) {
+    return accountManagementFailedLinking;
+  }
   return browserAuthentication(clientCode.getClientSession(),null);
 }

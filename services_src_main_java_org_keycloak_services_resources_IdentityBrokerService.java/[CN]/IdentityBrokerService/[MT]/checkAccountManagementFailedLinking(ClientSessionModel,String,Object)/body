@@ -1,0 +1,12 @@
+{
+  if (clientSession.getUserSession() != null && clientSession.getClient() != null && clientSession.getClient().getClientId().equals(ACCOUNT_MANAGEMENT_CLIENT_ID)) {
+    this.event.event(EventType.FEDERATED_IDENTITY_LINK);
+    UserModel user=clientSession.getUserSession().getUser();
+    this.event.user(user);
+    this.event.detail(Details.USERNAME,user.getUsername());
+    return redirectToAccountErrorPage(clientSession,error,parameters);
+  }
+ else {
+    return null;
+  }
+}

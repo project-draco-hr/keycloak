@@ -1,6 +1,9 @@
 {
-  ClientSessionCode clientCode=parseClientSessionCode(code);
-  ClientSessionModel clientSession=clientCode.getClientSession();
+  ParsedCodeContext parsedCode=parseClientSessionCode(code);
+  if (parsedCode.response != null) {
+    return parsedCode.response;
+  }
+  ClientSessionModel clientSession=parsedCode.clientSessionCode.getClientSession();
   try {
     this.event.detail(Details.CODE_ID,clientSession.getId()).removeDetail("auth_method");
     SerializedBrokeredIdentityContext serializedCtx=SerializedBrokeredIdentityContext.readFromClientSession(clientSession,AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE);

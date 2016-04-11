@@ -1,0 +1,14 @@
+{
+  loginIDP("test-user");
+  Time.setOffset(60);
+  try {
+    grantPage.assertCurrent();
+    grantPage.cancel();
+    errorPage.assertCurrent();
+    errorPage.clickBackToApplication();
+    assertTrue(this.driver.getCurrentUrl().startsWith("http://localhost:8081/auth/realms/realm-with-broker/protocol/openid-connect/auth"));
+  }
+  finally {
+    Time.setOffset(0);
+  }
+}

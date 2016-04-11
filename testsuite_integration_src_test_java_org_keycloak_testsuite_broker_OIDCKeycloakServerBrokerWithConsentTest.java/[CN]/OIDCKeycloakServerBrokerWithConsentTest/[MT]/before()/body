@@ -1,0 +1,17 @@
+{
+  keycloak1=Keycloak.getInstance("http://localhost:8081/auth","master","admin","admin",org.keycloak.models.Constants.ADMIN_CLI_CLIENT_ID);
+  keycloak2=Keycloak.getInstance("http://localhost:8082/auth","master","admin","admin",org.keycloak.models.Constants.ADMIN_CLI_CLIENT_ID);
+  RealmResource brokeredRealm=keycloak2.realm("realm-with-oidc-identity-provider");
+  List<ClientRepresentation> clients=brokeredRealm.clients().findByClientId("broker-app");
+  Assert.assertEquals(1,clients.size());
+  ClientRepresentation brokerApp=clients.get(0);
+  brokerApp.setConsentRequired(true);
+  brokeredRealm.clients().get(brokerApp.getId()).update(brokerApp);
+  RealmResource realmWithBroker=keycloak1.realm("realm-with-broker");
+  RealmRepresentation realmRep=realmWithBroker.toRepresentation();
+  realmRep.setAccessCodeLifespanLogin(30);
+  ;
+  realmRep.setAccessCodeLifespan(30);
+  realmRep.setAccessCodeLifespanUserAction(30);
+  realmWithBroker.update(realmRep);
+}

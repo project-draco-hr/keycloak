@@ -12,7 +12,8 @@
       this.session.getContext().setClient(client);
       if (!clientCode.isValid(AUTHENTICATE.name(),ClientSessionCode.ActionType.LOGIN)) {
         logger.debugf("Authorization code is not valid. Client session ID: %s, Client session's action: %s",clientSession.getId(),clientSession.getAction());
-        Response staleCodeError=redirectToErrorPage(Messages.STALE_CODE);
+        Response accountManagementFailedLinking=checkAccountManagementFailedLinking(clientCode.getClientSession(),Messages.STALE_CODE_ACCOUNT);
+        Response staleCodeError=(accountManagementFailedLinking != null) ? accountManagementFailedLinking : redirectToErrorPage(Messages.STALE_CODE);
         return ParsedCodeContext.response(staleCodeError);
       }
       if (isDebugEnabled()) {

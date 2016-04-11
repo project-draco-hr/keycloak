@@ -1,0 +1,23 @@
+{
+  loginIDP("test-user");
+  Time.setOffset(60);
+  try {
+    brokerServerRule.stopSession(this.session,true);
+    this.session=brokerServerRule.startSession();
+    session.sessions().removeExpired(getRealm());
+    brokerServerRule.stopSession(this.session,true);
+    this.session=brokerServerRule.startSession();
+    grantPage.assertCurrent();
+    grantPage.cancel();
+    errorPage.assertCurrent();
+    try {
+      errorPage.clickBackToApplication();
+      fail("Not expected to have link backToApplication available");
+    }
+ catch (    NoSuchElementException nsee) {
+    }
+  }
+  finally {
+    Time.setOffset(0);
+  }
+}

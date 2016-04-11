@@ -1,6 +1,9 @@
 {
-  ClientSessionCode clientCode=parseClientSessionCode(code);
-  ClientSessionModel clientSession=clientCode.getClientSession();
+  ParsedCodeContext parsedCode=parseClientSessionCode(code);
+  if (parsedCode.response != null) {
+    return parsedCode.response;
+  }
+  ClientSessionModel clientSession=parsedCode.clientSessionCode.getClientSession();
   try {
     SerializedBrokeredIdentityContext serializedCtx=SerializedBrokeredIdentityContext.readFromClientSession(clientSession,PostBrokerLoginConstants.PBL_BROKERED_IDENTITY_CONTEXT);
     if (serializedCtx == null) {

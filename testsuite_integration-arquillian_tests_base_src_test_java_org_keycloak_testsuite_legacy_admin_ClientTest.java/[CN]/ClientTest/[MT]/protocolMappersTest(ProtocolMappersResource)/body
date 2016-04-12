@@ -1,0 +1,42 @@
+{
+  List<ProtocolMapperRepresentation> protocolMappers=mappersResource.getMappers();
+  String emailMapperId=null;
+  String usernameMapperId=null;
+  String fooMapperId=null;
+  for (  ProtocolMapperRepresentation mapper : protocolMappers) {
+    if (mapper.getName().equals(OIDCLoginProtocolFactory.EMAIL)) {
+      emailMapperId=mapper.getId();
+    }
+ else     if (mapper.getName().equals(OIDCLoginProtocolFactory.USERNAME)) {
+      usernameMapperId=mapper.getId();
+    }
+ else     if (mapper.getName().equals("foo")) {
+      fooMapperId=mapper.getId();
+    }
+  }
+  assertNotNull(emailMapperId);
+  assertNotNull(usernameMapperId);
+  assertNull(fooMapperId);
+  ProtocolMapperRepresentation fooMapper=new ProtocolMapperRepresentation();
+  fooMapper.setName("foo");
+  fooMapper.setProtocol("fooProtocol");
+  fooMapper.setProtocolMapper("fooMapper");
+  fooMapper.setConsentRequired(true);
+  Response response=mappersResource.createMapper(fooMapper);
+  String location=response.getLocation().toString();
+  fooMapperId=location.substring(location.lastIndexOf("/") + 1);
+  response.close();
+  fooMapper=mappersResource.getMapperById(fooMapperId);
+  assertEquals(fooMapper.getName(),"foo");
+  fooMapper.setProtocolMapper("foo-mapper-updated");
+  mappersResource.update(fooMapperId,fooMapper);
+  fooMapper=mappersResource.getMapperById(fooMapperId);
+  assertEquals(fooMapper.getProtocolMapper(),"foo-mapper-updated");
+  mappersResource.delete(fooMapperId);
+  try {
+    mappersResource.getMapperById(fooMapperId);
+    fail("Not expected to find deleted mapper");
+  }
+ catch (  NotFoundException nfe) {
+  }
+}

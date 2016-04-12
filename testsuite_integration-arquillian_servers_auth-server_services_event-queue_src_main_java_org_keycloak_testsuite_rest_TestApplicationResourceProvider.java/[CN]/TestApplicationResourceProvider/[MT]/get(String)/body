@@ -1,0 +1,15 @@
+{
+  String title="APP_REQUEST";
+  if (action.equals("auth")) {
+    title="AUTH_RESPONSE";
+  }
+ else   if (action.equals("logout")) {
+    title="LOGOUT_REQUEST";
+  }
+  StringBuilder sb=new StringBuilder();
+  sb.append("<html><head><title>" + title + "</title></head><body>");
+  UriBuilder base=UriBuilder.fromUri("http://localhost:8180/auth");
+  sb.append("<a href=\"" + RealmsResource.accountUrl(base).build("test").toString() + "\" id=\"account\">account</a>");
+  sb.append("</body></html>");
+  return sb.toString();
+}

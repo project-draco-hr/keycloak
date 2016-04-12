@@ -1,4 +1,5 @@
 {
+  Transport transport=null;
   try {
     String address=user.getEmail();
     Map<String,String> config=realm.getSmtpConfig();
@@ -44,7 +45,7 @@
     msg.setContent(multipart);
     msg.saveChanges();
     msg.setSentDate(new Date());
-    Transport transport=session.getTransport("smtp");
+    transport=session.getTransport("smtp");
     if (auth) {
       transport.connect(config.get("user"),config.get("password"));
     }
@@ -56,5 +57,15 @@
  catch (  Exception e) {
     logger.failedToSendEmail(e);
     throw new EmailException(e);
+  }
+ finally {
+    if (transport != null) {
+      try {
+        transport.close();
+      }
+ catch (      MessagingException e) {
+        logger.warn("Failed to close transport",e);
+      }
+    }
   }
 }

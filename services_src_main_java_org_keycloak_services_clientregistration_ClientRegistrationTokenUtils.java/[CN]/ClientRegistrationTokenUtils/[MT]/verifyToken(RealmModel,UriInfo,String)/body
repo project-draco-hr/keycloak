@@ -1,0 +1,29 @@
+{
+  JWSInput input;
+  try {
+    input=new JWSInput(token);
+  }
+ catch (  JWSInputException e) {
+    return null;
+  }
+  if (!RSAProvider.verify(input,realm.getPublicKey())) {
+    return null;
+  }
+  JsonWebToken jwt;
+  try {
+    jwt=input.readJsonContent(JsonWebToken.class);
+  }
+ catch (  JWSInputException e) {
+    return null;
+  }
+  if (!getIssuer(realm,uri).equals(jwt.getIssuer())) {
+    return null;
+  }
+  if (!jwt.isActive()) {
+    return null;
+  }
+  if (!(TokenUtil.TOKEN_TYPE_BEARER.equals(jwt.getType()) || TYPE_INITIAL_ACCESS_TOKEN.equals(jwt.getType()) || TYPE_REGISTRATION_ACCESS_TOKEN.equals(jwt.getType()))) {
+    return null;
+  }
+  return jwt;
+}

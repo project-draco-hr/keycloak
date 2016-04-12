@@ -1,12 +1,10 @@
 {
-  ClientSessionCode clientCode=null;
   IdentityProviderModel identityProviderConfig=context.getIdpConfig();
-  try {
-    clientCode=parseClientSessionCode(context.getCode());
+  ParsedCodeContext parsedCode=parseClientSessionCode(context.getCode());
+  if (parsedCode.response != null) {
+    return parsedCode.response;
   }
- catch (  Exception e) {
-    return redirectToErrorPage(Messages.IDENTITY_PROVIDER_AUTHENTICATION_FAILED,e,identityProviderConfig.getProviderId());
-  }
+  ClientSessionCode clientCode=parsedCode.clientSessionCode;
   String providerId=identityProviderConfig.getAlias();
   if (!identityProviderConfig.isStoreToken()) {
     if (isDebugEnabled()) {
@@ -55,6 +53,10 @@
     return Response.status(302).location(redirect).build();
   }
  else {
+    Response response=validateUser(federatedUser,realmModel);
+    if (response != null) {
+      return response;
+    }
     updateFederatedIdentity(context,federatedUser);
     clientSession.setAuthenticatedUser(federatedUser);
     return finishOrRedirectToPostBrokerLogin(clientSession,context,false);

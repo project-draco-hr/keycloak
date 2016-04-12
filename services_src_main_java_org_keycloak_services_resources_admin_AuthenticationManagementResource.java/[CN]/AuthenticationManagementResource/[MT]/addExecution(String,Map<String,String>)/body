@@ -8,7 +8,13 @@
     throw new BadRequestException("It is illegal to add execution to a built in flow");
   }
   String provider=data.get("provider");
-  ProviderFactory f=session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,provider);
+  ProviderFactory f;
+  if (parentFlow.getProviderId().equals(AuthenticationFlow.CLIENT_FLOW)) {
+    f=session.getKeycloakSessionFactory().getProviderFactory(ClientAuthenticator.class,provider);
+  }
+ else {
+    f=session.getKeycloakSessionFactory().getProviderFactory(Authenticator.class,provider);
+  }
   if (f == null) {
     throw new BadRequestException("No authentication provider found for id: " + provider);
   }

@@ -1,5 +1,6 @@
 {
   ServiceLocator sl=ServiceLocator.getInstance();
+  sl.setResourceAccessor(new ClassLoaderResourceAccessor(getClass().getClassLoader()));
   if (!System.getProperties().containsKey("liquibase.scan.packages")) {
     if (sl.getPackages().remove("liquibase.core")) {
       sl.addPackageToScan("liquibase.core.xml");
@@ -12,8 +13,12 @@
     }
     sl.getPackages().remove("liquibase.ext");
     sl.getPackages().remove("liquibase.sdk");
+    String lockPackageName=DummyLockService.class.getPackage().getName();
+    logger.debugf("Added package %s to liquibase",lockPackageName);
+    sl.addPackageToScan(lockPackageName);
   }
   LogFactory.setInstance(new LogWrapper());
   DatabaseFactory.getInstance().register(new PostgresPlusDatabase());
   SqlGeneratorFactory.getInstance().register(new CustomInsertLockRecordGenerator());
+  SqlGeneratorFactory.getInstance().register(new CustomLockDatabaseChangeLogGenerator());
 }

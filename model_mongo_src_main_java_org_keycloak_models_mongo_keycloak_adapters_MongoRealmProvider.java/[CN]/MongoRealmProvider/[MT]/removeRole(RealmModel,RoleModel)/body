@@ -1,4 +1,8 @@
 {
   session.users().preRemove(realm,role);
+  RoleContainerModel container=role.getContainer();
+  if (container.getDefaultRoles().contains(role.getName())) {
+    container.removeDefaultRoles(role.getName());
+  }
   return getMongoStore().removeEntity(MongoRoleEntity.class,role.getId(),invocationContext);
 }

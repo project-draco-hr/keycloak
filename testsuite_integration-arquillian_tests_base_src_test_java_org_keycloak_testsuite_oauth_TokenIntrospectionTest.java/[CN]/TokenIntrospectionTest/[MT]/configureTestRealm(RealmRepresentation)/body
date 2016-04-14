@@ -1,0 +1,20 @@
+{
+  ClientRepresentation confApp=KeycloakModelUtils.createClient(testRealm,"confidential-cli");
+  confApp.setSecret("secret1");
+  confApp.setServiceAccountsEnabled(Boolean.TRUE);
+  ClientRepresentation pubApp=KeycloakModelUtils.createClient(testRealm,"public-cli");
+  pubApp.setPublicClient(Boolean.TRUE);
+  UserRepresentation user=new UserRepresentation();
+  user.setUsername("no-permissions");
+  CredentialRepresentation credential=new CredentialRepresentation();
+  credential.setType("password");
+  credential.setValue("password");
+  List<CredentialRepresentation> creds=new ArrayList<>();
+  creds.add(credential);
+  user.setCredentials(creds);
+  user.setEnabled(Boolean.TRUE);
+  List<String> realmRoles=new ArrayList<>();
+  realmRoles.add("user");
+  user.setRealmRoles(realmRoles);
+  testRealm.getUsers().add(user);
+}

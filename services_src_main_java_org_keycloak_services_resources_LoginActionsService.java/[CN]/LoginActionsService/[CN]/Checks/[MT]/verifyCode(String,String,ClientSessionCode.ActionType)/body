@@ -3,12 +3,13 @@
     return false;
   }
   if (!clientCode.isValidAction(requiredAction)) {
-    if (ClientSessionModel.Action.REQUIRED_ACTIONS.name().equals(clientCode.getClientSession().getAction())) {
+    ClientSessionModel clientSession=clientCode.getClientSession();
+    if (ClientSessionModel.Action.REQUIRED_ACTIONS.name().equals(clientSession.getAction())) {
       response=redirectToRequiredActions(code);
       return false;
     }
- else {
-      invalidAction();
+ else     if (clientSession.getUserSession() != null && clientSession.getUserSession().getState() == UserSessionModel.State.LOGGED_IN) {
+      response=session.getProvider(LoginFormsProvider.class).setSuccess(Messages.ALREADY_LOGGED_IN).createInfoPage();
       return false;
     }
   }

@@ -1,0 +1,15 @@
+{
+  Map<String,String> config=new HashMap<>();
+  config.put(SKIP_OTP_ROLE,"otp_role");
+  config.put(DEFAULT_OTP_OUTCOME,FORCE);
+  setConditionalOTPForm(config);
+  RoleRepresentation role=new RoleRepresentation("otp_role","",false);
+  testRealmResource().roles().create(role);
+  role=testRealmResource().roles().get("otp_role").toRepresentation();
+  List<RoleRepresentation> realmRoles=new ArrayList<>();
+  realmRoles.add(role);
+  testRealmResource().users().get(testUser.getId()).roles().realmLevel().add(realmRoles);
+  testRealmAccountManagementPage.navigateTo();
+  testRealmLoginPage.form().login(testUser);
+  assertCurrentUrlStartsWith(testRealmAccountManagementPage);
+}

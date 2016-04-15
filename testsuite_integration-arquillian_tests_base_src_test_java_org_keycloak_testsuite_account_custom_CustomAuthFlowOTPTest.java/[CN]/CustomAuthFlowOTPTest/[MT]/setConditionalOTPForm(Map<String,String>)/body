@@ -1,0 +1,31 @@
+{
+  String flowAlias="ConditionalOTPFlow";
+  String provider="auth-conditional-otp-form";
+  AuthenticationFlowRepresentation flow=new AuthenticationFlowRepresentation();
+  flow.setAlias(flowAlias);
+  flow.setDescription("");
+  flow.setProviderId("basic-flow");
+  flow.setTopLevel(true);
+  flow.setBuiltIn(false);
+  Response response=getAuthMgmtResource().createFlow(flow);
+  Assert.assertEquals(flowAlias + " create success",201,response.getStatus());
+  response.close();
+  Map<String,String> data=new HashMap<>();
+  data.put("provider","auth-username-password-form");
+  getAuthMgmtResource().addExecution(flowAlias,data);
+  updateRequirement(flowAlias,"auth-username-password-form",Requirement.REQUIRED);
+  data.clear();
+  data.put("provider",provider);
+  getAuthMgmtResource().addExecution(flowAlias,data);
+  updateRequirement(flowAlias,provider,Requirement.REQUIRED);
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  realm.setBrowserFlow(flowAlias);
+  testRealmResource().update(realm);
+  String executionId=getExecution(flowAlias,provider).getId();
+  AuthenticatorConfigRepresentation authConfig=new AuthenticatorConfigRepresentation();
+  authConfig.setAlias("Config alias");
+  authConfig.setConfig(config);
+  response=getAuthMgmtResource().newExecutionConfig(executionId,authConfig);
+  Assert.assertEquals("new execution success",201,response.getStatus());
+  response.close();
+}

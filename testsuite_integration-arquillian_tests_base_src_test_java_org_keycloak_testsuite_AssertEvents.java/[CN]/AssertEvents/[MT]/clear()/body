@@ -1,3 +1,21 @@
 {
-  realmResource.clearEvents();
+  CloseableHttpClient httpclient=HttpClients.createDefault();
+  try {
+    HttpPost post=new HttpPost(defaultEventsQueueUri + "/clear-event-queue");
+    CloseableHttpResponse response=httpclient.execute(post);
+    if (response.getStatusLine().getStatusCode() != 200) {
+      throw new RuntimeException("Failed to clear events from " + post.getURI() + ": "+ response.getStatusLine().toString());
+    }
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+ finally {
+    try {
+      httpclient.close();
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

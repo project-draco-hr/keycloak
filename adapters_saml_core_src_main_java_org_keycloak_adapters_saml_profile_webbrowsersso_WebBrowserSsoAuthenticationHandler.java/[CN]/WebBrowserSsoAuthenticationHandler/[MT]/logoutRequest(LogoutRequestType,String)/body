@@ -12,8 +12,8 @@
   builder.issuer(issuerURL);
   BaseSAML2BindingBuilder binding=new BaseSAML2BindingBuilder().relayState(relayState);
   if (deployment.getIDP().getSingleLogoutService().signResponse()) {
-    binding.signatureAlgorithm(deployment.getSignatureAlgorithm()).signWith(deployment.getSigningKeyPair()).signDocument();
     if (deployment.getSignatureCanonicalizationMethod() != null)     binding.canonicalizationMethod(deployment.getSignatureCanonicalizationMethod());
+    binding.signatureAlgorithm(deployment.getSignatureAlgorithm()).signWith(deployment.getSigningKeyPair()).signDocument();
   }
   try {
     SamlUtil.sendSaml(false,facade,deployment.getIDP().getSingleLogoutService().getResponseBindingUrl(),binding,builder.buildDocument(),deployment.getIDP().getSingleLogoutService().getResponseBinding());

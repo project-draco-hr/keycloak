@@ -1,0 +1,17 @@
+{
+  try {
+    UserRepresentation user=ApiUtil.findUserByUsername(testRealmResource(),expectedUsername);
+    Assert.assertNotNull(user);
+    Assert.assertEquals(expectedEmail,user.getEmail());
+    Assert.assertEquals(expectedFirstname,user.getFirstName());
+    Assert.assertEquals(expectedLastname,user.getLastName());
+    if (updateProfileActionExpected) {
+      Assert.assertEquals(UserModel.RequiredAction.UPDATE_PROFILE.toString(),user.getRequiredActions().iterator().next());
+    }
+ else {
+      Assert.assertTrue(user.getRequiredActions().isEmpty());
+    }
+  }
+  finally {
+  }
+}

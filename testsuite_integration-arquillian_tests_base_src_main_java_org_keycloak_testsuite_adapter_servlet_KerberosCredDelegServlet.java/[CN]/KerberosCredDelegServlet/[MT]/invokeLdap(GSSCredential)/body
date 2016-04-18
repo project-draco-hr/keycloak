@@ -1,0 +1,19 @@
+{
+  Hashtable env=new Hashtable(11);
+  env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
+  env.put(Context.PROVIDER_URL,"ldap://localhost:10389");
+  if (gssCredential != null) {
+    env.put(Context.SECURITY_AUTHENTICATION,"GSSAPI");
+    env.put(Sasl.CREDENTIALS,gssCredential);
+  }
+  DirContext ctx=new InitialDirContext(env);
+  try {
+    Attributes attrs=ctx.getAttributes("uid=hnelson,ou=People,dc=keycloak,dc=org");
+    String cn=(String)attrs.get("cn").get();
+    String sn=(String)attrs.get("sn").get();
+    return cn + " " + sn;
+  }
+  finally {
+    ctx.close();
+  }
+}

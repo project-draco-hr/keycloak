@@ -1,0 +1,14 @@
+{
+  KerberosUsernamePasswordAuthenticator authenticator=new KerberosUsernamePasswordAuthenticator(kerberosConfig);
+  try {
+    Subject clientSubject=authenticator.authenticateSubject(username,password);
+    ByteArrayHolder holder=Subject.doAs(clientSubject,new ClientAcceptSecContext(input,oid,authServer));
+    return holder.bytes;
+  }
+ catch (  Exception le) {
+    throw new RuntimeException(le);
+  }
+ finally {
+    authenticator.logoutSubject();
+  }
+}

@@ -1,0 +1,26 @@
+{
+  updateProviderEditMode(UserFederationProvider.EditMode.READ_ONLY);
+  changePasswordPage.navigateTo();
+  testRealmLoginPage.isCurrent();
+  testRealmLoginPage.form().login("jduke","theduke");
+  changePasswordPage.isCurrent();
+  changePasswordPage.changePasswords("theduke-invalid","newPass","newPass");
+  Assert.assertTrue(driver.getPageSource().contains("Invalid existing password."));
+  changePasswordPage.changePasswords("theduke","newPass","newPass");
+  Assert.assertTrue(driver.getPageSource().contains("You can't update your password as your account is read only"));
+  updateProviderEditMode(UserFederationProvider.EditMode.UNSYNCED);
+  changePasswordPage.changePasswords("theduke","newPass","newPass");
+  Assert.assertTrue(driver.getPageSource().contains("Your password has been updated."));
+  changePasswordPage.logOut();
+  testRealmLoginPage.form().login("jduke","theduke");
+  testRealmLoginPage.isCurrent();
+  testRealmLoginPage.form().login("jduke","newPass");
+  changePasswordPage.isCurrent();
+  changePasswordPage.logOut();
+  events.clear();
+  Response spnegoResponse=spnegoLogin("jduke","theduke");
+  Assert.assertEquals(302,spnegoResponse.getStatus());
+  UserRepresentation user=ApiUtil.findUserByUsername(testRealmResource(),"jduke");
+  events.expectLogin().client("kerberos-app").user(user != null ? user.getId() : null).detail(Details.REDIRECT_URI,kerberosPortal.toString()).detail(Details.USERNAME,"jduke").assertEvent();
+  spnegoResponse.close();
+}

@@ -1,0 +1,29 @@
+{
+  updateProviderEditMode(UserFederationProvider.EditMode.WRITABLE);
+  changePasswordPage.navigateTo();
+  loginPage.isCurrent();
+  loginPage.form().login("jduke","theduke");
+  changePasswordPage.isCurrent();
+  changePasswordPage.changePasswords("theduke","newPass","newPass");
+  Assert.assertTrue(driver.getPageSource().contains("Your password has been updated."));
+  changePasswordPage.logOut();
+  loginPage.form().login("jduke","theduke");
+  loginPage.isCurrent();
+  loginPage.form().login("jduke","newPass");
+  changePasswordPage.isCurrent();
+  changePasswordPage.logOut();
+  events.clear();
+  Response spnegoResponse=spnegoLogin("jduke","newPass");
+  Assert.assertEquals(302,spnegoResponse.getStatus());
+  UserRepresentation user=ApiUtil.findUserByUsername(testRealmResource(),"jduke");
+  events.expectLogin().client("kerberos-app").user(user != null ? user.getId() : null).detail(Details.REDIRECT_URI,kerberosPortal.toString()).detail(Details.USERNAME,"jduke").assertEvent();
+  changePasswordPage.navigateTo();
+  ;
+  loginPage.form().login("jduke","newPass");
+  changePasswordPage.isCurrent();
+  changePasswordPage.changePasswords("newPass","theduke","theduke");
+  Assert.assertTrue(driver.getPageSource().contains("Your password has been updated."));
+  changePasswordPage.logOut();
+  spnegoResponse.close();
+  events.clear();
+}

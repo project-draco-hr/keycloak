@@ -1,0 +1,15 @@
+{
+  Map<String,String> ldapConfig=getConfig();
+  UserFederationProviderRepresentation userFederationProviderRepresentation=new UserFederationProviderRepresentation();
+  userFederationProviderRepresentation.setProviderName(LDAPFederationProviderFactory.PROVIDER_NAME);
+  userFederationProviderRepresentation.setConfig(ldapConfig);
+  userFederationProviderRepresentation.setPriority(0);
+  userFederationProviderRepresentation.setDisplayName("kerberos-ldap");
+  userFederationProviderRepresentation.setFullSyncPeriod(-1);
+  userFederationProviderRepresentation.setChangedSyncPeriod(-1);
+  userFederationProviderRepresentation.setLastSync(0);
+  RealmRepresentation realmRepresentation=testRealmResource().toRepresentation();
+  realmRepresentation.setUserFederationProviders(Arrays.asList(userFederationProviderRepresentation));
+  realmRepresentation.setEventsEnabled(true);
+  testRealmResource().update(realmRepresentation);
+}

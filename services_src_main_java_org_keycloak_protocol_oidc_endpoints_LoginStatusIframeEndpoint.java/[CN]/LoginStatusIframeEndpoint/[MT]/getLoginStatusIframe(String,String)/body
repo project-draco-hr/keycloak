@@ -31,27 +31,14 @@
   if (!valid) {
     throw new WebApplicationException(Response.Status.BAD_REQUEST);
   }
-  ThemeProvider themeProvider=session.getProvider(ThemeProvider.class,"extending");
-  Theme theme;
-  try {
-    theme=themeProvider.getTheme(realm.getLoginTheme(),Theme.Type.LOGIN);
-  }
- catch (  IOException e) {
-    logger.error("Failed to create theme",e);
-    return Response.serverError().build();
-  }
   try {
     String file=StreamUtil.readString(is);
     file=file.replace("ORIGIN",origin);
-    Response.ResponseBuilder response=Response.ok(file);
-    String p3pValue=theme.getProperties().getProperty("sessionIframeP3P");
-    if (!Validation.isBlank(p3pValue)) {
-      response.header("P3P",p3pValue);
-    }
+    P3PHelper.addP3PHeader(session);
     CacheControl cacheControl=new CacheControl();
     cacheControl.setNoTransform(false);
     cacheControl.setMaxAge(Config.scope("theme").getInt("staticMaxAge",-1));
-    return response.cacheControl(cacheControl).build();
+    return Response.ok(file).cacheControl(cacheControl).build();
   }
  catch (  IOException e) {
     throw new WebApplicationException(e,Response.Status.BAD_REQUEST);

@@ -1,0 +1,17 @@
+{
+  KeycloakContext ctx=session.getContext();
+  if (ctx.getRequestHeaders() != null && ctx.getRequestHeaders().getCookies().containsKey(LOCALE_COOKIE)) {
+    String localeString=ctx.getRequestHeaders().getCookies().get(LOCALE_COOKIE).getValue();
+    Locale locale=findLocale(ctx.getRealm().getSupportedLocales(),localeString);
+    if (locale != null) {
+      return locale;
+    }
+  }
+  String locale=ctx.getRealm().getDefaultLocale();
+  if (locale != null) {
+    return Locale.forLanguageTag(locale);
+  }
+ else {
+    return Locale.ENGLISH;
+  }
+}

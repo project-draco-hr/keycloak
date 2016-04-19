@@ -1,0 +1,14 @@
+{
+  if (!publicKeys.containsKey(realm)) {
+    String publicKeyPem=adminClient.realms().realm(realm).toRepresentation().getPublicKey();
+    PublicKey publicKey=null;
+    try {
+      publicKey=PemUtils.decodePublicKey(publicKeyPem);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+    publicKeys.put(realm,publicKey);
+  }
+  return publicKeys.get(realm);
+}

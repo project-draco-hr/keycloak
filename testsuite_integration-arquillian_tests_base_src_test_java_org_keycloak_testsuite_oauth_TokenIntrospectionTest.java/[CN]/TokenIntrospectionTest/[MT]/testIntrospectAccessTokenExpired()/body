@@ -1,10 +1,10 @@
 {
-  oauth.doLogin("test-user@localhost","password");
-  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
-  AccessTokenResponse accessTokenResponse=oauth.doAccessTokenRequest(code,"password");
+  oauthClient.doLogin("test-user@localhost","password");
+  String code=oauthClient.getCurrentQuery().get(OAuth2Constants.CODE);
+  AccessTokenResponse accessTokenResponse=oauthClient.doAccessTokenRequest(code,"password");
   try {
-    Time.setOffset(adminClient.realm(oauth.getRealm()).toRepresentation().getAccessTokenLifespan() + 1);
-    String tokenResponse=oauth.introspectAccessTokenWithClientCredential("confidential-cli","secret1",accessTokenResponse.getAccessToken());
+    Time.setOffset(adminClient.realm(oauthClient.getRealm()).toRepresentation().getAccessTokenLifespan() + 1);
+    String tokenResponse=oauthClient.introspectAccessTokenWithClientCredential("confidential-cli","secret1",accessTokenResponse.getAccessToken());
     TokenMetadataRepresentation rep=JsonSerialization.readValue(tokenResponse,TokenMetadataRepresentation.class);
     assertFalse(rep.isActive());
     assertNull(rep.getUserName());

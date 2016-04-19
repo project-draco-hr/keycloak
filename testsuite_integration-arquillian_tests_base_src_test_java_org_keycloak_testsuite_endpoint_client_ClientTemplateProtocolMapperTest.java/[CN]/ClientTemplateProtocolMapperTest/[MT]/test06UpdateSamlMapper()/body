@@ -1,0 +1,12 @@
+{
+  ProtocolMapperRepresentation rep=makeSamlMapper("saml-role-name-mapper2");
+  Response resp=samlMappersRsc.createMapper(rep);
+  resp.close();
+  String createdId=ApiUtil.getCreatedId(resp);
+  rep.getConfig().put("role","account.manage-account");
+  rep.setId(createdId);
+  rep.setConsentRequired(false);
+  samlMappersRsc.update(createdId,rep);
+  ProtocolMapperRepresentation updated=samlMappersRsc.getMapperById(createdId);
+  assertEqualMappers(rep,updated);
+}

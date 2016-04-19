@@ -1,0 +1,17 @@
+{
+  increaseLoadBy(WARMUP_LOAD);
+  warmup();
+  for (int i=0; i < MAX_ITERATIONS; i++) {
+    int loadIncrease=(i == 0) ? INITIAL_LOAD - WARMUP_LOAD : LOAD_INCREASE;
+    increaseLoadBy(loadIncrease);
+    measurePerformance();
+    if (!isThereEnoughThreadsForNextIteration(LOAD_INCREASE)) {
+      LOG.warn("Threadpool capacity reached. Stopping the test.");
+      break;
+    }
+    if (!isLatestResultsWithinLimits()) {
+      LOG.warn("The latest measurement surpassed expected limit. Stopping the test.");
+      break;
+    }
+  }
+}

@@ -6,14 +6,13 @@
   ClientTemplateRepresentation templateRep=new ClientTemplateRepresentation();
   templateRep.setName("bar-template");
   templateRep.setFullScopeAllowed(false);
-  Response resp=testRealmResource().clientTemplates().create(templateRep);
-  resp.close();
-  String clientTemplateId=ApiUtil.getCreatedId(resp);
-  testRealmResource().clientTemplates().get(clientTemplateId).getScopeMappings().realmLevel().add(Collections.singletonList(roleRep));
-  List<RoleRepresentation> roleReps=testRealmResource().clientTemplates().get(clientTemplateId).getScopeMappings().realmLevel().listAll();
+  String templateId=createTemplate(templateRep);
+  clientTemplates().get(templateId).getScopeMappings().realmLevel().add(Collections.singletonList(roleRep));
+  List<RoleRepresentation> roleReps=clientTemplates().get(templateId).getScopeMappings().realmLevel().listAll();
   Assert.assertEquals(1,roleReps.size());
   Assert.assertEquals("foo-role",roleReps.get(0).getName());
   testRealmResource().roles().deleteRole("foo-role");
-  roleReps=testRealmResource().clientTemplates().get(clientTemplateId).getScopeMappings().realmLevel().listAll();
+  roleReps=clientTemplates().get(templateId).getScopeMappings().realmLevel().listAll();
   Assert.assertEquals(0,roleReps.size());
+  clientTemplates().get(templateId).remove();
 }

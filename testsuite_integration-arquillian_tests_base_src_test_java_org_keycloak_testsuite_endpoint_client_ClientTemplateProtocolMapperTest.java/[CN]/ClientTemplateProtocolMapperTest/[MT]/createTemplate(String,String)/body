@@ -1,0 +1,11 @@
+{
+  ClientTemplateRepresentation rep=new ClientTemplateRepresentation();
+  rep.setName(templateName);
+  rep.setFullScopeAllowed(false);
+  rep.setProtocol(protocol);
+  Response resp=clientTemplates().create(rep);
+  Assert.assertEquals(201,resp.getStatus());
+  resp.close();
+  String clientTemplateId=ApiUtil.getCreatedId(resp);
+  return clientTemplates().get(clientTemplateId);
+}

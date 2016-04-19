@@ -1,0 +1,12 @@
+{
+  ClientTemplateRepresentation templateRep=new ClientTemplateRepresentation();
+  templateRep.setName("template1");
+  String templateId=createTemplate(templateRep);
+  templateRep=new ClientTemplateRepresentation();
+  templateRep.setName("template1");
+  Response response=clientTemplates().create(templateRep);
+  assertEquals(409,response.getStatus());
+  ErrorRepresentation error=response.readEntity(ErrorRepresentation.class);
+  Assert.assertEquals("Client Template template1 already exists",error.getErrorMessage());
+  clientTemplates().get(templateId).remove();
+}

@@ -1,0 +1,30 @@
+{
+  String path=request.getURI();
+  String[] urlTokens=path.split("/");
+  if (urlTokens.length < 4) {
+    throw new IllegalStateException("Not able to determine the web-context to load the correspondent keycloak.json file");
+  }
+  String webContext=urlTokens[3];
+  KeycloakDeployment deployment=cache.get(webContext);
+  if (null == deployment) {
+    String keycloakConfig=(String)System.getProperties().get("keycloak.config");
+    if (keycloakConfig == null || "".equals(keycloakConfig.trim())) {
+      String karafEtc=(String)System.getProperties().get("karaf.etc");
+      if (karafEtc == null || "".equals(karafEtc.trim())) {
+        throw new IllegalStateException("Neither \"keycloak.config\" nor \"karaf.etc\" java properties are set. Please set one of them.");
+      }
+      keycloakConfig=karafEtc;
+    }
+    String absolutePath=keycloakConfig + File.separator + webContext+ "-keycloak.json";
+    InputStream is=null;
+    try {
+      is=new FileInputStream(absolutePath);
+    }
+ catch (    FileNotFoundException e) {
+      throw new IllegalStateException("Not able to find the file " + absolutePath);
+    }
+    deployment=KeycloakDeploymentBuilder.build(is);
+    cache.put(webContext,deployment);
+  }
+  return deployment;
+}

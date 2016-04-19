@@ -1,0 +1,8 @@
+{
+  RealmRepresentation rep=new RealmRepresentation();
+  rep.setRealm("new-realm");
+  adminClient.realms().create(rep);
+  Assert.assertNames(adminClient.realms().findAll(),"master",AuthRealm.TEST,REALM_NAME,"new-realm");
+  adminClient.realms().realm("new-realm").remove();
+  Assert.assertNames(adminClient.realms().findAll(),"master",AuthRealm.TEST,REALM_NAME);
+}

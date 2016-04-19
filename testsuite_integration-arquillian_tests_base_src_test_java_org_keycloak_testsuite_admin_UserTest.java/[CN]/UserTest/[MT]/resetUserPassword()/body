@@ -1,0 +1,13 @@
+{
+  String userId=createUser("user1","user1@localhost");
+  CredentialRepresentation cred=new CredentialRepresentation();
+  cred.setType(CredentialRepresentation.PASSWORD);
+  cred.setValue("password");
+  cred.setTemporary(false);
+  realm.users().get(userId).resetPassword(cred);
+  String accountUrl=RealmsResource.accountUrl(UriBuilder.fromUri(getAuthServerRoot())).build(REALM_NAME).toString();
+  driver.navigate().to(accountUrl);
+  assertEquals("Log in to admin-client-test",driver.getTitle());
+  loginPage.login("user1","password");
+  assertEquals("Keycloak Account Management",driver.getTitle());
+}

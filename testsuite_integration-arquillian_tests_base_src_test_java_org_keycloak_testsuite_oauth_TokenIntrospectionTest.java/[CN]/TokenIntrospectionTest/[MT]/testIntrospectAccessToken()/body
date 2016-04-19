@@ -1,9 +1,9 @@
 {
-  oauth.doLogin("test-user@localhost","password");
-  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  oauthClient.doLogin("test-user@localhost","password");
+  String code=oauthClient.getCurrentQuery().get(OAuth2Constants.CODE);
   EventRepresentation loginEvent=events.expectLogin().assertEvent();
-  AccessTokenResponse accessTokenResponse=oauth.doAccessTokenRequest(code,"password");
-  String tokenResponse=oauth.introspectAccessTokenWithClientCredential("confidential-cli","secret1",accessTokenResponse.getAccessToken());
+  AccessTokenResponse accessTokenResponse=oauthClient.doAccessTokenRequest(code,"password");
+  String tokenResponse=oauthClient.introspectAccessTokenWithClientCredential("confidential-cli","secret1",accessTokenResponse.getAccessToken());
   TokenMetadataRepresentation rep=JsonSerialization.readValue(tokenResponse,TokenMetadataRepresentation.class);
   assertTrue(rep.isActive());
   assertEquals("test-user@localhost",rep.getUserName());

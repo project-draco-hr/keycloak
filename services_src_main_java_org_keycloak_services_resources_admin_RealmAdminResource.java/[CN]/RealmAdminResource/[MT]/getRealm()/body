@@ -6,6 +6,11 @@
     auth.requireAny();
     RealmRepresentation rep=new RealmRepresentation();
     rep.setRealm(realm.getName());
+    if (auth.init(Resource.IDENTITY_PROVIDER).hasView()) {
+      RealmRepresentation r=ModelToRepresentation.toRepresentation(realm,false);
+      rep.setIdentityProviders(r.getIdentityProviders());
+      rep.setIdentityProviderMappers(r.getIdentityProviderMappers());
+    }
     return rep;
   }
 }

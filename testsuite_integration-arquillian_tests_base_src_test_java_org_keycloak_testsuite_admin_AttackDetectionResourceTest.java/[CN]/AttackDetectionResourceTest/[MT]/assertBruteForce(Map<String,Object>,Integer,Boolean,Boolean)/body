@@ -1,0 +1,14 @@
+{
+  assertEquals(4,status.size());
+  assertEquals(expectedNumFailures,status.get("numFailures"));
+  assertEquals(expectedDisabled,status.get("disabled"));
+  if (expectedFailure) {
+    assertEquals("127.0.0.1",status.get("lastIPFailure"));
+    Long lastFailure=(Long)status.get("lastFailure");
+    assertTrue(lastFailure < (System.currentTimeMillis() + 1) && lastFailure > (System.currentTimeMillis() - 10000));
+  }
+ else {
+    assertEquals("n/a",status.get("lastIPFailure"));
+    assertEquals("0",status.get("lastFailure").toString());
+  }
+}

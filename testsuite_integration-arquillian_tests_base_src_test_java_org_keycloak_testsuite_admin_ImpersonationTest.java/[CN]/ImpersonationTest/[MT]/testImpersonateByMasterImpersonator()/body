@@ -1,0 +1,14 @@
+{
+  Response response=adminClient.realm("master").users().create(UserBuilder.create().username("master-impersonator").build());
+  String userId=ApiUtil.getCreatedId(response);
+  response.close();
+  UserResource user=adminClient.realm("master").users().get(userId);
+  user.resetPassword(CredentialBuilder.create().password("password").build());
+  ClientResource testRealmClient=ApiUtil.findClientResourceByClientId(adminClient.realm("master"),"test-realm");
+  List<RoleRepresentation> roles=new LinkedList<>();
+  roles.add(ApiUtil.findClientRoleByName(testRealmClient,AdminRoles.VIEW_USERS).toRepresentation());
+  roles.add(ApiUtil.findClientRoleByName(testRealmClient,ImpersonationConstants.IMPERSONATION_ROLE).toRepresentation());
+  user.roles().clientLevel(testRealmClient.toRepresentation().getId()).add(roles);
+  testSuccessfulImpersonation("master-impersonator",Config.getAdminRealm());
+  adminClient.realm("master").users().get(userId).remove();
+}

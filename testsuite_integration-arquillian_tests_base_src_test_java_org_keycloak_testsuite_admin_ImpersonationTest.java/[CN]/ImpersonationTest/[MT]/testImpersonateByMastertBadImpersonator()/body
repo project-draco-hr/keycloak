@@ -1,0 +1,8 @@
+{
+  Response response=adminClient.realm("master").users().create(UserBuilder.create().username("master-bad-impersonator").build());
+  String userId=ApiUtil.getCreatedId(response);
+  response.close();
+  adminClient.realm("master").users().get(userId).resetPassword(CredentialBuilder.create().password("password").build());
+  testForbiddenImpersonation("master-bad-impersonator",Config.getAdminRealm());
+  adminClient.realm("master").users().get(userId).remove();
+}

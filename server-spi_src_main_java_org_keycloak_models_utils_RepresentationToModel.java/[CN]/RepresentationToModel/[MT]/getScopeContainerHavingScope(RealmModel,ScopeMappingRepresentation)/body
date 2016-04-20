@@ -1,0 +1,19 @@
+{
+  if (scope.getClient() != null) {
+    ClientModel client=realm.getClientByClientId(scope.getClient());
+    if (client == null) {
+      throw new RuntimeException("Unknown client specification in scope mappings: " + scope.getClient());
+    }
+    return client;
+  }
+ else   if (scope.getClientTemplate() != null) {
+    ClientTemplateModel clientTemplate=KeycloakModelUtils.getClientTemplateByName(realm,scope.getClientTemplate());
+    if (clientTemplate == null) {
+      throw new RuntimeException("Unknown clientTemplate specification in scope mappings: " + scope.getClientTemplate());
+    }
+    return clientTemplate;
+  }
+ else {
+    throw new RuntimeException("Either client or clientTemplate needs to be specified in scope mappings");
+  }
+}

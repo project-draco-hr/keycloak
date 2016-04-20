@@ -1,0 +1,26 @@
+{
+  Response response=authMgmtResource.createFlow(newFlow("registration2","RegistrationFlow2","basic-flow",true,false));
+  try {
+    Assert.assertEquals("createFlow success",201,response.getStatus());
+  }
+  finally {
+    response.close();
+  }
+  Map<String,String> data=new HashMap<>();
+  data.put("alias","registrationForm2");
+  data.put("type","form-flow");
+  data.put("description","registrationForm2 flow");
+  data.put("provider","registration-page-form");
+  authMgmtResource.addExecutionFlow("registration2",data);
+  Map<String,String> data2=new HashMap<>();
+  data2.put("provider","registration-profile-action");
+  try {
+    authMgmtResource.addExecution("registration2",data2);
+    Assert.fail("Not expected to add execution of type 'registration-profile-action' under top flow");
+  }
+ catch (  BadRequestException bre) {
+    String errorMessage=bre.getResponse().readEntity(String.class);
+    Assert.assertEquals("No authentication provider found for id: registration-profile-action",errorMessage);
+  }
+  authMgmtResource.addExecution("registrationForm2",data2);
+}

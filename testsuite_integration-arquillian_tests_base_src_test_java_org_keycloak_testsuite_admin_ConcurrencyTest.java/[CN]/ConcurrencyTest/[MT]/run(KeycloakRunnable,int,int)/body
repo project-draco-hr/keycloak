@@ -11,9 +11,11 @@
           if (lock != null) {
             lock.lock();
           }
+          Keycloak keycloak=Keycloak.getInstance(getAuthServerRoot().toString(),"master","admin","admin",org.keycloak.models.Constants.ADMIN_CLI_CLIENT_ID);
+          RealmResource realm=keycloak.realm(REALM_NAME);
           for (int i=0; i < numIterationsPerThread && latch.getCount() > 0; i++) {
             log.infov("thread {0}, iteration {1}",threadNum,i);
-            runnable.run(threadNum,i);
+            runnable.run(keycloak,realm,threadNum,i);
           }
           latch.countDown();
         }

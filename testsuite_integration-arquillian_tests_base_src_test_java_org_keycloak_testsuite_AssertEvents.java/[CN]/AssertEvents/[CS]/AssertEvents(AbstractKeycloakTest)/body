@@ -4,5 +4,9 @@
   realmRep=realmResource.toRepresentation();
   String pubKeyString=realmRep.getPublicKey();
   realmPublicKey=PemUtils.decodePublicKey(pubKeyString);
-  defaultEventsQueueUri=getAuthServerEventsQueueUri();
+  UserRepresentation defaultUser=getUser(DEFAULT_USERNAME);
+  if (defaultUser == null) {
+    throw new RuntimeException("Default user does not exist: " + DEFAULT_USERNAME + ". Make sure to add it to your test realm.");
+  }
+  testingResource=context.testingClient.testing();
 }

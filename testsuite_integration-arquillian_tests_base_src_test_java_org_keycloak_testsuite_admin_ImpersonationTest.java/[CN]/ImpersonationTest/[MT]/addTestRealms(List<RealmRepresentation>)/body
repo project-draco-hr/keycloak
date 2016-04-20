@@ -1,0 +1,10 @@
+{
+  RealmBuilder realm=RealmBuilder.create().name("test").testEventListener();
+  realm.client(ClientBuilder.create().clientId("myclient").publicClient().directAccessGrants());
+  impersonatedUserId=KeycloakModelUtils.generateId();
+  realm.user(UserBuilder.create().id(impersonatedUserId).username("test-user@localhost"));
+  realm.user(UserBuilder.create().username("realm-admin").password("password").role(Constants.REALM_MANAGEMENT_CLIENT_ID,AdminRoles.REALM_ADMIN));
+  realm.user(UserBuilder.create().username("impersonator").password("password").role(Constants.REALM_MANAGEMENT_CLIENT_ID,ImpersonationConstants.IMPERSONATION_ROLE).role(Constants.REALM_MANAGEMENT_CLIENT_ID,AdminRoles.VIEW_USERS));
+  realm.user(UserBuilder.create().username("bad-impersonator").password("password").role(Constants.REALM_MANAGEMENT_CLIENT_ID,AdminRoles.MANAGE_USERS));
+  testRealms.add(realm.build());
+}

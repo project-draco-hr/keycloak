@@ -1,0 +1,22 @@
+{
+  return new TypeSafeMatcher<String>(){
+    private String userId;
+    @Override protected boolean matchesSafely(    String item){
+      return item.equals(getUserId());
+    }
+    @Override public void describeTo(    Description description){
+      description.appendText(getUserId());
+    }
+    private String getUserId(){
+      if (userId == null) {
+        UserRepresentation user=getUser(DEFAULT_USERNAME);
+        if (user == null) {
+          throw new RuntimeException("Default user does not exist: " + DEFAULT_USERNAME + ". Make sure to add it to your test realm.");
+        }
+        userId=user.getId();
+      }
+      return userId;
+    }
+  }
+;
+}

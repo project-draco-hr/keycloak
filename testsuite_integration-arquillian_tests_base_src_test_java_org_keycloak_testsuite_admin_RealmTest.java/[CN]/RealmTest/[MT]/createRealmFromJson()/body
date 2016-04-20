@@ -1,0 +1,7 @@
+{
+  RealmRepresentation rep=loadJson(getClass().getResourceAsStream("/admin-test/testrealm.json"),RealmRepresentation.class);
+  adminClient.realms().create(rep);
+  RealmRepresentation created=adminClient.realms().realm("admin-test-1").toRepresentation();
+  assertRealm(rep,created);
+  adminClient.realms().realm("admin-test-1").remove();
+}

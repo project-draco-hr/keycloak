@@ -1,0 +1,21 @@
+{
+  RealmRepresentation rep=new RealmRepresentation();
+  rep.setId("old");
+  rep.setRealm("old");
+  try {
+    adminClient.realms().create(rep);
+    rep.setRealm("new");
+    adminClient.realm("old").update(rep);
+    Assert.assertEquals(0,adminClient.realm("master").clients().findByClientId("old-realm").size());
+    Assert.assertEquals(1,adminClient.realm("master").clients().findByClientId("new-realm").size());
+    ClientRepresentation adminConsoleClient=adminClient.realm("new").clients().findByClientId(Constants.ADMIN_CONSOLE_CLIENT_ID).get(0);
+    assertEquals("/auth/admin/new/console/index.html",adminConsoleClient.getBaseUrl());
+    assertEquals("/auth/admin/new/console/*",adminConsoleClient.getRedirectUris().get(0));
+    ClientRepresentation accountClient=adminClient.realm("new").clients().findByClientId(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID).get(0);
+    assertEquals("/auth/realms/new/account",accountClient.getBaseUrl());
+    assertEquals("/auth/realms/new/account/*",accountClient.getRedirectUris().get(0));
+  }
+  finally {
+    adminClient.realms().realm(rep.getRealm()).remove();
+  }
+}

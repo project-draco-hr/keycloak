@@ -1,0 +1,22 @@
+{
+  return new TypeSafeMatcher<String>(){
+    private String realmId;
+    @Override protected boolean matchesSafely(    String item){
+      return item.equals(getRealmId());
+    }
+    @Override public void describeTo(    Description description){
+      description.appendText(getRealmId());
+    }
+    private String getRealmId(){
+      if (realmId == null) {
+        RealmRepresentation realm=context.adminClient.realm(DEFAULT_REALM).toRepresentation();
+        if (realm == null) {
+          throw new RuntimeException("Default user does not exist: " + DEFAULT_USERNAME + ". Make sure to add it to your test realm.");
+        }
+        realmId=realm.getId();
+      }
+      return realmId;
+    }
+  }
+;
+}

@@ -1,13 +1,13 @@
 {
-  oauthClient.doLogin("test-user@localhost","password");
-  String code=oauthClient.getCurrentQuery().get(OAuth2Constants.CODE);
-  AccessTokenResponse accessTokenResponse=oauthClient.doAccessTokenRequest(code,"password");
+  oauth.doLogin("test-user@localhost","password");
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  AccessTokenResponse accessTokenResponse=oauth.doAccessTokenRequest(code,"password");
   EventRepresentation loginEvent=events.expectLogin().assertEvent();
   UserRepresentation userRep=new UserRepresentation();
   try {
     userRep.setEnabled(false);
-    adminClient.realm(oauthClient.getRealm()).users().get(loginEvent.getUserId()).update(userRep);
-    String tokenResponse=oauthClient.introspectAccessTokenWithClientCredential("confidential-cli","secret1",accessTokenResponse.getAccessToken());
+    adminClient.realm(oauth.getRealm()).users().get(loginEvent.getUserId()).update(userRep);
+    String tokenResponse=oauth.introspectAccessTokenWithClientCredential("confidential-cli","secret1",accessTokenResponse.getAccessToken());
     TokenMetadataRepresentation rep=JsonSerialization.readValue(tokenResponse,TokenMetadataRepresentation.class);
     assertFalse(rep.isActive());
     assertNull(rep.getUserName());
@@ -17,6 +17,6 @@
   }
   finally {
     userRep.setEnabled(true);
-    adminClient.realm(oauthClient.getRealm()).users().get(loginEvent.getUserId()).update(userRep);
+    adminClient.realm(oauth.getRealm()).users().get(loginEvent.getUserId()).update(userRep);
   }
 }

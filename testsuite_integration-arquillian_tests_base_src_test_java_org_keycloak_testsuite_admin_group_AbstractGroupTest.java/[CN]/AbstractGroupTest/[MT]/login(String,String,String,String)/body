@@ -2,9 +2,10 @@
   AccessTokenResponse tokenResponse=deleteMeOAuthClient.getToken("test",clientId,clientSecret,login,"password");
   String accessToken=tokenResponse.getToken();
   String refreshToken=tokenResponse.getRefreshToken();
-  AccessToken accessTokenRepresentation=RSATokenVerifier.verifyToken(accessToken,events.getRealmPublicKey(),AuthServerTestEnricher.getAuthServerContextRoot() + "/auth/realms/test");
+  PublicKey publicKey=PemUtils.decodePublicKey(adminClient.realm("test").toRepresentation().getPublicKey());
+  AccessToken accessTokenRepresentation=RSATokenVerifier.verifyToken(accessToken,publicKey,AuthServerTestEnricher.getAuthServerContextRoot() + "/auth/realms/test");
   JWSInput jws=new JWSInput(refreshToken);
-  if (!RSAProvider.verify(jws,events.getRealmPublicKey())) {
+  if (!RSAProvider.verify(jws,publicKey)) {
     throw new RuntimeException("Invalid refresh token");
   }
   RefreshToken refreshTokenRepresentation=jws.readJsonContent(RefreshToken.class);

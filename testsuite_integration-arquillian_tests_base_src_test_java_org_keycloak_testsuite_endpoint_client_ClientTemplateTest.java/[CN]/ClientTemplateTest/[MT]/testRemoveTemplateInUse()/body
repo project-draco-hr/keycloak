@@ -1,0 +1,22 @@
+{
+  ClientTemplateRepresentation templateRep=new ClientTemplateRepresentation();
+  templateRep.setName("foo-template");
+  templateRep.setFullScopeAllowed(false);
+  String templateId=createTemplate(templateRep);
+  ClientRepresentation clientRep=new ClientRepresentation();
+  clientRep.setClientId("bar-client");
+  clientRep.setName("bar-client");
+  clientRep.setRootUrl("foo");
+  clientRep.setProtocol("openid-connect");
+  clientRep.setClientTemplate("foo-template");
+  String clientDbId=createClient(clientRep);
+  try {
+    clientTemplates().get(templateId).remove();
+  }
+ catch (  BadRequestException bre) {
+    ErrorRepresentation error=bre.getResponse().readEntity(ErrorRepresentation.class);
+    Assert.assertEquals("Cannot remove client template, it is currently in use",error.getErrorMessage());
+  }
+  testRealmResource().clients().get(clientDbId).remove();
+  clientTemplates().get(templateId).remove();
+}

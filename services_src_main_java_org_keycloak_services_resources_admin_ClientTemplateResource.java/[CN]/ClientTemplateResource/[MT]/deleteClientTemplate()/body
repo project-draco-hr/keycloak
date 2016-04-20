@@ -1,5 +1,11 @@
 {
   auth.requireManage();
-  realm.removeClientTemplate(template.getId());
-  adminEvent.operation(OperationType.DELETE).resourcePath(uriInfo).success();
+  try {
+    realm.removeClientTemplate(template.getId());
+    adminEvent.operation(OperationType.DELETE).resourcePath(uriInfo).success();
+    return Response.noContent().build();
+  }
+ catch (  ModelException me) {
+    return ErrorResponse.error(me.getMessage(),Response.Status.BAD_REQUEST);
+  }
 }

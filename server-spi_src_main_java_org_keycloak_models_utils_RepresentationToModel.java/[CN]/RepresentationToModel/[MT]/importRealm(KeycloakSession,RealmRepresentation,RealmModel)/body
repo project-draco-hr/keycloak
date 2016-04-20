@@ -120,16 +120,13 @@
   }
   if (rep.getScopeMappings() != null) {
     for (    ScopeMappingRepresentation scope : rep.getScopeMappings()) {
-      ClientModel client=newRealm.getClientByClientId(scope.getClient());
-      if (client == null) {
-        throw new RuntimeException("Unknown client specification in realm scope mappings");
-      }
+      ScopeContainerModel scopeContainer=getScopeContainerHavingScope(newRealm,scope);
       for (      String roleString : scope.getRoles()) {
         RoleModel role=newRealm.getRole(roleString.trim());
         if (role == null) {
           role=newRealm.addRole(roleString.trim());
         }
-        client.addScopeMapping(role);
+        scopeContainer.addScopeMapping(role);
       }
     }
   }

@@ -1,8 +1,8 @@
 {
-  oauthClient.doLogin("test-user@localhost","password");
-  String code=oauthClient.getCurrentQuery().get(OAuth2Constants.CODE);
-  AccessTokenResponse accessTokenResponse=oauthClient.doAccessTokenRequest(code,"password");
-  String tokenResponse=oauthClient.introspectAccessTokenWithClientCredential("public-cli","it_doesnt_matter",accessTokenResponse.getAccessToken());
+  oauth.doLogin("test-user@localhost","password");
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  AccessTokenResponse accessTokenResponse=oauth.doAccessTokenRequest(code,"password");
+  String tokenResponse=oauth.introspectAccessTokenWithClientCredential("public-cli","it_doesnt_matter",accessTokenResponse.getAccessToken());
   assertEquals("{\"error_description\":\"Client not allowed.\",\"error\":\"invalid_request\"}",tokenResponse);
   events.clear();
 }

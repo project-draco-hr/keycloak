@@ -1,0 +1,25 @@
+{
+  UserFederationProviderRepresentation ldapRep=UserFederationProviderBuilder.create().displayName("ldap1").providerName("ldap").priority(1).configProperty(LDAPConstants.CUSTOM_USER_SEARCH_FILTER,"dc=something").build();
+  Response resp=userFederation().create(ldapRep);
+  Assert.assertEquals(400,resp.getStatus());
+  resp.close();
+  ldapRep.getConfig().put(LDAPConstants.CUSTOM_USER_SEARCH_FILTER,"(dc=something");
+  resp=userFederation().create(ldapRep);
+  Assert.assertEquals(400,resp.getStatus());
+  resp.close();
+  ldapRep.getConfig().put(LDAPConstants.CUSTOM_USER_SEARCH_FILTER,"dc=something)");
+  resp=userFederation().create(ldapRep);
+  Assert.assertEquals(400,resp.getStatus());
+  resp.close();
+  Assert.assertTrue(userFederation().getProviderInstances().isEmpty());
+  ldapRep.getConfig().put(LDAPConstants.CUSTOM_USER_SEARCH_FILTER,"(dc=something)");
+  String id1=createUserFederationProvider(ldapRep);
+  UserFederationProviderRepresentation ldapRep2=UserFederationProviderBuilder.create().displayName("ldap2").providerName("ldap").priority(2).configProperty(LDAPConstants.BIND_DN,"cn=manager").configProperty(LDAPConstants.BIND_CREDENTIAL,"password").build();
+  String id2=createUserFederationProvider(ldapRep2);
+  List<UserFederationProviderRepresentation> providerInstances=userFederation().getProviderInstances();
+  Assert.assertEquals(providerInstances.size(),2);
+  assertFederationProvider(providerInstances.get(0),id1,"ldap1","ldap",1,-1,-1,-1,LDAPConstants.CUSTOM_USER_SEARCH_FILTER,"(dc=something)");
+  assertFederationProvider(providerInstances.get(1),id2,"ldap2","ldap",2,-1,-1,-1,LDAPConstants.BIND_DN,"cn=manager",LDAPConstants.BIND_CREDENTIAL,"password");
+  userFederation().get(id1).remove();
+  userFederation().get(id2).remove();
+}

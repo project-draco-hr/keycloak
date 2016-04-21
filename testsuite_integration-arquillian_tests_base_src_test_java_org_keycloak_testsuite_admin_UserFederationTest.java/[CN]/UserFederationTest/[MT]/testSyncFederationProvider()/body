@@ -1,0 +1,23 @@
+{
+  UserFederationProviderRepresentation dummyRep1=UserFederationProviderBuilder.create().providerName("dummy").build();
+  String id1=createUserFederationProvider(dummyRep1);
+  try {
+    userFederation().get(id1).syncUsers("unknown");
+    Assert.fail("Not expected to sync with unknown action");
+  }
+ catch (  NotFoundException nfe) {
+    nfe.getResponse().close();
+  }
+  Assert.assertEquals(-1,userFederation().get(id1).toRepresentation().getLastSync());
+  UserFederationSyncResultRepresentation syncResult=userFederation().get(id1).syncUsers("triggerFullSync");
+  Assert.assertEquals("0 imported users, 0 updated users",syncResult.getStatus());
+  int fullSyncTime=userFederation().get(id1).toRepresentation().getLastSync();
+  Assert.assertTrue(fullSyncTime > 0);
+  setTimeOffset(50);
+  syncResult=userFederation().get(id1).syncUsers("triggerChangedUsersSync");
+  Assert.assertEquals("0 imported users, 0 updated users",syncResult.getStatus());
+  int changedSyncTime=userFederation().get(id1).toRepresentation().getLastSync();
+  Assert.assertTrue(fullSyncTime + 50 <= changedSyncTime);
+  resetTimeOffset();
+  userFederation().get(id1).remove();
+}

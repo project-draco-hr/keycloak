@@ -13,11 +13,11 @@
   response.close();
   realm.users().get(userAId).joinGroup(groupId);
   List<UserRepresentation> members=realm.groups().group(groupId).members(0,10);
-  org.keycloak.testsuite.Assert.assertNames(members,"user-a");
+  assertNames(members,"user-a");
   realm.users().get(userBId).joinGroup(groupId);
   members=realm.groups().group(groupId).members(0,10);
-  org.keycloak.testsuite.Assert.assertNames(members,"user-a","user-b");
+  assertNames(members,"user-a","user-b");
   realm.users().get(userAId).leaveGroup(groupId);
   members=realm.groups().group(groupId).members(0,10);
-  org.keycloak.testsuite.Assert.assertNames(members,"user-b");
+  assertNames(members,"user-b");
 }

@@ -1,0 +1,14 @@
+{
+  UserFederationProviderRepresentation dummyRep1=UserFederationProviderBuilder.create().providerName("dummy").displayName("").priority(2).fullSyncPeriod(1000).changedSyncPeriod(500).lastSync(123).build();
+  String id1=createUserFederationProvider(dummyRep1);
+  UserFederationProviderRepresentation dummyRep2=UserFederationProviderBuilder.create().providerName("dummy").displayName("dn1").priority(1).configProperty("prop1","prop1Val").configProperty("prop2","true").build();
+  String id2=createUserFederationProvider(dummyRep2);
+  assertFederationProvider(userFederation().get(id1).toRepresentation(),id1,id1,"dummy",2,1000,500,123);
+  assertFederationProvider(userFederation().get(id2).toRepresentation(),id2,"dn1","dummy",1,-1,-1,-1,"prop1","prop1Val","prop2","true");
+  List<UserFederationProviderRepresentation> providerInstances=userFederation().getProviderInstances();
+  Assert.assertEquals(providerInstances.size(),2);
+  assertFederationProvider(providerInstances.get(0),id2,"dn1","dummy",1,-1,-1,-1,"prop1","prop1Val","prop2","true");
+  assertFederationProvider(providerInstances.get(1),id1,id1,"dummy",2,1000,500,123);
+  userFederation().get(id1).remove();
+  userFederation().get(id2).remove();
+}

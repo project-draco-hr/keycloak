@@ -2,10 +2,7 @@
   List<FlowExecutions> result=new LinkedList<>();
   List<AuthenticationFlowRepresentation> flows=authMgmtResource.getFlows();
   for (  AuthenticationFlowRepresentation flow : flows) {
-    Response executions=authMgmtResource.getExecutions(flow.getAlias());
-    List<AuthenticationExecutionInfoRepresentation> executionReps=executions.readEntity(new GenericType<List<AuthenticationExecutionInfoRepresentation>>(){
-    }
-);
+    List<AuthenticationExecutionInfoRepresentation> executionReps=authMgmtResource.getExecutions(flow.getAlias());
     for (    AuthenticationExecutionInfoRepresentation exec : executionReps) {
       String configId=exec.getAuthenticationConfig();
       if (configId != null && !configs.containsKey(configId)) {

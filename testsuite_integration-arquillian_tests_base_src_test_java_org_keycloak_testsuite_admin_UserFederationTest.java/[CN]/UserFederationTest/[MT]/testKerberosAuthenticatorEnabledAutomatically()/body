@@ -1,0 +1,17 @@
+{
+  AuthenticationExecutionInfoRepresentation kerberosExecution=findKerberosExecution();
+  Assert.assertEquals(kerberosExecution.getRequirement(),AuthenticationExecutionModel.Requirement.DISABLED.toString());
+  UserFederationProviderRepresentation ldapRep=UserFederationProviderBuilder.create().displayName("ldap2").providerName("ldap").priority(2).configProperty(KerberosConstants.ALLOW_KERBEROS_AUTHENTICATION,"true").build();
+  String id=createUserFederationProvider(ldapRep);
+  kerberosExecution=findKerberosExecution();
+  Assert.assertEquals(kerberosExecution.getRequirement(),AuthenticationExecutionModel.Requirement.ALTERNATIVE.toString());
+  kerberosExecution.setRequirement(AuthenticationExecutionModel.Requirement.DISABLED.toString());
+  realm.flows().updateExecutions("browser",kerberosExecution);
+  ldapRep=userFederation().get(id).toRepresentation();
+  userFederation().get(id).update(ldapRep);
+  kerberosExecution=findKerberosExecution();
+  Assert.assertEquals(kerberosExecution.getRequirement(),AuthenticationExecutionModel.Requirement.ALTERNATIVE.toString());
+  kerberosExecution.setRequirement(AuthenticationExecutionModel.Requirement.DISABLED.toString());
+  realm.flows().updateExecutions("browser",kerberosExecution);
+  userFederation().get(id).remove();
+}

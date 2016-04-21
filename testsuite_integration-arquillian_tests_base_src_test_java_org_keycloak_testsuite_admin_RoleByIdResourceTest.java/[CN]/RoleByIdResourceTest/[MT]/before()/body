@@ -1,0 +1,14 @@
+{
+  adminClient.realm(REALM_NAME).roles().create(RoleBuilder.create().name("role-a").description("Role A").build());
+  adminClient.realm(REALM_NAME).roles().create(RoleBuilder.create().name("role-b").description("Role B").build());
+  Response response=adminClient.realm(REALM_NAME).clients().create(ClientBuilder.create().clientId("client-a").build());
+  clientUuid=ApiUtil.getCreatedId(response);
+  adminClient.realm(REALM_NAME).clients().get(clientUuid).roles().create(RoleBuilder.create().name("role-c").description("Role C").build());
+  for (  RoleRepresentation r : adminClient.realm(REALM_NAME).roles().list()) {
+    ids.put(r.getName(),r.getId());
+  }
+  for (  RoleRepresentation r : adminClient.realm(REALM_NAME).clients().get(clientUuid).roles().list()) {
+    ids.put(r.getName(),r.getId());
+  }
+  resource=adminClient.realm(REALM_NAME).rolesById();
+}

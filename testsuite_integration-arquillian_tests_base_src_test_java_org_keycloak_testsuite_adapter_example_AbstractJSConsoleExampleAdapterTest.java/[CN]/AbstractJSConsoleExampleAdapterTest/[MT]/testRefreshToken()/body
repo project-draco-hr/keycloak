@@ -3,12 +3,12 @@
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
   jsConsoleExamplePage.init();
   jsConsoleExamplePage.refreshToken();
-  assertTrue(jsConsoleExamplePage.getOutputText().contains("Failed to refresh token"));
+  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("Failed to refresh token");
   jsConsoleExamplePage.logIn();
   testRealmLoginPage.form().login("user","password");
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
   jsConsoleExamplePage.init();
-  assertTrue(jsConsoleExamplePage.getEventsText().contains("Auth Success"));
+  waitUntilElement(jsConsoleExamplePage.getEventsElement()).text().contains("Auth Success");
   jsConsoleExamplePage.refreshToken();
-  assertTrue(jsConsoleExamplePage.getEventsText().contains("Auth Refresh Success"));
+  waitUntilElement(jsConsoleExamplePage.getEventsElement()).text().contains("Auth Refresh Success");
 }

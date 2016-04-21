@@ -3,15 +3,15 @@
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
   jsConsoleExamplePage.init();
   jsConsoleExamplePage.refreshToken();
-  assertTrue(jsConsoleExamplePage.getOutputText().contains("Failed to refresh token"));
+  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("Failed to refresh token");
   jsConsoleExamplePage.logIn();
   testRealmLoginPage.form().login("user","password");
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
   jsConsoleExamplePage.init();
-  assertTrue(jsConsoleExamplePage.getEventsText().contains("Auth Success"));
+  waitUntilElement(jsConsoleExamplePage.getEventsElement()).text().contains("Auth Success");
   jsConsoleExamplePage.refreshTokenIfUnder30s();
-  assertTrue(jsConsoleExamplePage.getOutputText().contains("Token not refreshed, valid for"));
+  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("Token not refreshed, valid for");
   pause((TOKEN_LIFESPAN_LEEWAY + 2) * 1000);
   jsConsoleExamplePage.refreshTokenIfUnder30s();
-  assertTrue(jsConsoleExamplePage.getEventsText().contains("Auth Refresh Success"));
+  waitUntilElement(jsConsoleExamplePage.getEventsElement()).text().contains("Auth Refresh Success");
 }

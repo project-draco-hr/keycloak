@@ -3,13 +3,12 @@
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
   jsConsoleExamplePage.init();
   jsConsoleExamplePage.getProfile();
-  pause(500);
-  assertTrue(jsConsoleExamplePage.getOutputText().contains("Failed to load profile"));
+  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("Failed to load profile");
   jsConsoleExamplePage.logIn();
   testRealmLoginPage.form().login("user","password");
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
   jsConsoleExamplePage.init();
-  assertTrue(jsConsoleExamplePage.getEventsText().contains("Auth Success"));
+  waitUntilElement(jsConsoleExamplePage.getEventsElement()).text().contains("Auth Success");
   jsConsoleExamplePage.getProfile();
-  assertTrue(jsConsoleExamplePage.getOutputText().contains("\"username\": \"user\""));
+  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("\"username\": \"user\"");
 }

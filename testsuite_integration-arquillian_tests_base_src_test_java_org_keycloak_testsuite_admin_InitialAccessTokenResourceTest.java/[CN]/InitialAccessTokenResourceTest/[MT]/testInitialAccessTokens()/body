@@ -1,0 +1,21 @@
+{
+  ClientInitialAccessCreatePresentation rep=new ClientInitialAccessCreatePresentation();
+  rep.setCount(2);
+  rep.setExpiration(100);
+  int time=Time.currentTime();
+  ClientInitialAccessPresentation response=resource.create(rep);
+  assertNotNull(response.getId());
+  assertEquals(new Integer(2),response.getCount());
+  assertEquals(new Integer(2),response.getRemainingCount());
+  assertEquals(new Integer(100),response.getExpiration());
+  assertTrue(time <= response.getTimestamp() && response.getTimestamp() <= Time.currentTime());
+  assertNotNull(response.getToken());
+  rep.setCount(3);
+  resource.create(rep);
+  rep.setCount(4);
+  resource.create(rep);
+  List<ClientInitialAccessPresentation> list=resource.list();
+  assertEquals(3,list.size());
+  assertEquals(9,list.get(0).getCount() + list.get(1).getCount() + list.get(2).getCount());
+  assertNull(list.get(0).getToken());
+}

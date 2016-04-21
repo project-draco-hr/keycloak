@@ -24,33 +24,15 @@
   }
   params.put("provider","idp-review-profile");
   authMgmtResource.addExecution("Copy of browser",params);
-  response=authMgmtResource.getExecutions("Copy of browser");
-  AuthenticationExecutionInfoRepresentation exec;
-  AuthenticationExecutionInfoRepresentation authCookieExec;
-  try {
-    List<AuthenticationExecutionInfoRepresentation> executionReps=response.readEntity(new GenericType<List<AuthenticationExecutionInfoRepresentation>>(){
-    }
-);
-    exec=findExecutionByProvider("idp-review-profile",executionReps);
-    Assert.assertNotNull("idp-review-profile added",exec);
-    authCookieExec=findExecutionByProvider("auth-cookie",executionReps);
-  }
-  finally {
-    response.close();
-  }
+  List<AuthenticationExecutionInfoRepresentation> executionReps=authMgmtResource.getExecutions("Copy of browser");
+  AuthenticationExecutionInfoRepresentation exec=findExecutionByProvider("idp-review-profile",executionReps);
+  Assert.assertNotNull("idp-review-profile added",exec);
+  AuthenticationExecutionInfoRepresentation authCookieExec=findExecutionByProvider("auth-cookie",executionReps);
   compareExecution(newExecInfo("Review Profile","idp-review-profile",true,0,3,DISABLED,null,new String[]{REQUIRED,DISABLED}),exec);
   authMgmtResource.removeExecution(exec.getId());
-  response=authMgmtResource.getExecutions("Copy of browser");
-  try {
-    List<AuthenticationExecutionInfoRepresentation> executionReps=response.readEntity(new GenericType<List<AuthenticationExecutionInfoRepresentation>>(){
-    }
-);
-    exec=findExecutionByProvider("idp-review-profile",executionReps);
-    Assert.assertNull("idp-review-profile removed",exec);
-  }
-  finally {
-    response.close();
-  }
+  executionReps=authMgmtResource.getExecutions("Copy of browser");
+  exec=findExecutionByProvider("idp-review-profile",executionReps);
+  Assert.assertNull("idp-review-profile removed",exec);
   authMgmtResource.removeExecution(authCookieExec.getId());
   AuthenticationExecutionRepresentation rep=new AuthenticationExecutionRepresentation();
   rep.setPriority(10);
@@ -73,17 +55,8 @@
   finally {
     response.close();
   }
-  List<AuthenticationExecutionInfoRepresentation> executions;
-  response=authMgmtResource.getExecutions("Copy of browser");
-  try {
-    executions=response.readEntity(new GenericType<List<AuthenticationExecutionInfoRepresentation>>(){
-    }
-);
-    exec=findExecutionByProvider("auth-cookie",executions);
-    Assert.assertNotNull("auth-cookie added",exec);
-  }
-  finally {
-    response.close();
-  }
+  List<AuthenticationExecutionInfoRepresentation> executions=authMgmtResource.getExecutions("Copy of browser");
+  exec=findExecutionByProvider("auth-cookie",executions);
+  Assert.assertNotNull("auth-cookie added",exec);
   compareExecution(newExecInfo("Cookie","auth-cookie",false,0,2,OPTIONAL,null,new String[]{ALTERNATIVE,DISABLED}),exec);
 }

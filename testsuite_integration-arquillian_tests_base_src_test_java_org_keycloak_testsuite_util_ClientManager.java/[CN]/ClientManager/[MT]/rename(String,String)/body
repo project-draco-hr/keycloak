@@ -1,0 +1,9 @@
+{
+  List<ClientRepresentation> client=realm.clients().findByClientId(oldName);
+  if (!client.isEmpty()) {
+    ClientResource clientResource=realm.clients().get(client.get(0).getId());
+    ClientRepresentation app=clientResource.toRepresentation();
+    app.setClientId(newName);
+    clientResource.update(app);
+  }
+}

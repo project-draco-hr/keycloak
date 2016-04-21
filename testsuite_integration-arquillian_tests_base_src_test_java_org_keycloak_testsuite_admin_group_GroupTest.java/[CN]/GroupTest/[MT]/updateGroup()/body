@@ -1,0 +1,29 @@
+{
+  RealmResource realm=adminClient.realms().realm("test");
+  GroupRepresentation group=new GroupRepresentation();
+  group.setName("group");
+  Map<String,List<String>> attrs=new HashMap<>();
+  attrs.put("attr1",Collections.singletonList("attrval1"));
+  attrs.put("attr2",Collections.singletonList("attrval2"));
+  group.setAttributes(attrs);
+  Response response=realm.groups().add(group);
+  response.close();
+  group=realm.getGroupByPath("/group");
+  Assert.assertNotNull(group);
+  assertEquals("group",group.getName());
+  assertEquals(2,group.getAttributes().size());
+  assertEquals(1,group.getAttributes().get("attr1").size());
+  assertEquals("attrval1",group.getAttributes().get("attr1").get(0));
+  assertEquals(1,group.getAttributes().get("attr2").size());
+  assertEquals("attrval2",group.getAttributes().get("attr2").get(0));
+  group.setName("group-new");
+  group.getAttributes().remove("attr1");
+  group.getAttributes().get("attr2").add("attrval2-2");
+  group.getAttributes().put("attr3",Collections.singletonList("attrval2"));
+  realm.groups().group(group.getId()).update(group);
+  group=realm.getGroupByPath("/group-new");
+  assertEquals("group-new",group.getName());
+  assertEquals(2,group.getAttributes().size());
+  assertEquals(2,group.getAttributes().get("attr2").size());
+  assertEquals(1,group.getAttributes().get("attr3").size());
+}

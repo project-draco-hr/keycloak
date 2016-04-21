@@ -1,0 +1,13 @@
+{
+  try {
+    loginPage.open();
+    Time.setOffset(5000);
+    testingClient.testing().removeExpired("test");
+    loginPage.login("login@test.com","password");
+    loginPage.assertCurrent();
+    events.expectLogin().user((String)null).session((String)null).error("expired_code").clearDetails().detail(Details.RESTART_AFTER_TIMEOUT,"true").client((String)null).assertEvent();
+  }
+  finally {
+    Time.setOffset(0);
+  }
+}

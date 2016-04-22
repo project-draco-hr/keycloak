@@ -1,0 +1,12 @@
+{
+  Response response=realm.testLDAPConnection("unknown","ldap://localhost:10389","foo","bar","false");
+  assertStatus(response,400);
+  response=realm.testLDAPConnection(LDAPConnectionTestManager.TEST_CONNECTION,"ldap://localhostt:10389","foo","bar","false");
+  assertStatus(response,400);
+  response=realm.testLDAPConnection(LDAPConnectionTestManager.TEST_CONNECTION,"ldap://localhost:10389","foo","bar","false");
+  assertStatus(response,204);
+  response=realm.testLDAPConnection(LDAPConnectionTestManager.TEST_AUTHENTICATION,"ldap://localhost:10389","foo","bar","false");
+  assertStatus(response,400);
+  response=realm.testLDAPConnection(LDAPConnectionTestManager.TEST_AUTHENTICATION,"ldap://localhost:10389","uid=admin,ou=system","secret","false");
+  assertStatus(response,204);
+}

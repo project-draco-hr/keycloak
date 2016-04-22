@@ -1,0 +1,23 @@
+{
+  Map<String,UserFederationMapperTypeRepresentation> mapperTypes=realm.userFederation().get(dummyProviderId).getMapperTypes();
+  Assert.assertEquals(1,mapperTypes.size());
+  Assert.assertEquals("Dummy",mapperTypes.get("dummy-mapper").getName());
+  mapperTypes=ldapProviderResource().getMapperTypes();
+  Assert.assertTrue(mapperTypes.keySet().containsAll(Arrays.asList("user-attribute-ldap-mapper","full-name-ldap-mapper","role-ldap-mapper")));
+  UserFederationMapperTypeRepresentation attrMapper=mapperTypes.get("user-attribute-ldap-mapper");
+  Assert.assertEquals("User Attribute",attrMapper.getName());
+  Assert.assertFalse(attrMapper.getSyncConfig().isFedToKeycloakSyncSupported());
+  Assert.assertFalse(attrMapper.getSyncConfig().isKeycloakToFedSyncSupported());
+  Set<String> propNames=getConfigPropertyNames(attrMapper);
+  Assert.assertTrue(propNames.containsAll(Arrays.asList("user.model.attribute","ldap.attribute","read.only")));
+  Assert.assertEquals("false",attrMapper.getDefaultConfig().get("always.read.value.from.ldap"));
+  UserFederationMapperTypeRepresentation roleMapper=mapperTypes.get("role-ldap-mapper");
+  Assert.assertEquals("Role mappings",roleMapper.getName());
+  Assert.assertTrue(roleMapper.getSyncConfig().isFedToKeycloakSyncSupported());
+  Assert.assertTrue(roleMapper.getSyncConfig().isKeycloakToFedSyncSupported());
+  Assert.assertEquals("sync-ldap-roles-to-keycloak",roleMapper.getSyncConfig().getFedToKeycloakSyncMessage());
+  Assert.assertEquals("sync-keycloak-roles-to-ldap",roleMapper.getSyncConfig().getKeycloakToFedSyncMessage());
+  propNames=getConfigPropertyNames(roleMapper);
+  Assert.assertTrue(propNames.containsAll(Arrays.asList("roles.dn","role.name.ldap.attribute","role.object.classes")));
+  Assert.assertEquals("cn",roleMapper.getDefaultConfig().get("role.name.ldap.attribute"));
+}

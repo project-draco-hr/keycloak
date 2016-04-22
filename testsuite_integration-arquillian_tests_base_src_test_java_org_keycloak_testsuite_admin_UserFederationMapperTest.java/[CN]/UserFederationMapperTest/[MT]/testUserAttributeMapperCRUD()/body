@@ -1,0 +1,36 @@
+{
+  UserFederationMapperRepresentation attrMapper=createMapperRep("email-mapper",UserAttributeLDAPFederationMapperFactory.PROVIDER_ID);
+  Response response=ldapProviderResource().addMapper(attrMapper);
+  Assert.assertEquals(400,response.getStatus());
+  response.close();
+  attrMapper.getConfig().put(UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,"email");
+  response=ldapProviderResource().addMapper(attrMapper);
+  Assert.assertEquals(400,response.getStatus());
+  response.close();
+  attrMapper.getConfig().put(UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail");
+  String mapperId=createMapper(attrMapper);
+  UserFederationMapperRepresentation mapperRep=ldapProviderResource().getMapperById(mapperId);
+  assertMapper(mapperRep,mapperId,"email-mapper",UserAttributeLDAPFederationMapperFactory.PROVIDER_ID,UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,"email",UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail");
+  mapperRep.getConfig().put(UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail-updated");
+  mapperRep.getConfig().remove(UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE);
+  try {
+    ldapProviderResource().updateMapper(mapperId,mapperRep);
+    Assert.fail("Not expected update to success");
+  }
+ catch (  BadRequestException bre) {
+  }
+  mapperRep=ldapProviderResource().getMapperById(mapperId);
+  assertMapper(mapperRep,mapperId,"email-mapper",UserAttributeLDAPFederationMapperFactory.PROVIDER_ID,UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,"email",UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail");
+  mapperRep.getConfig().put(UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,"email-updated");
+  mapperRep.getConfig().put(UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail-updated");
+  ldapProviderResource().updateMapper(mapperId,mapperRep);
+  mapperRep=ldapProviderResource().getMapperById(mapperId);
+  assertMapper(mapperRep,mapperId,"email-mapper",UserAttributeLDAPFederationMapperFactory.PROVIDER_ID,UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,"email-updated",UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail-updated");
+  ldapProviderResource().removeMapper(mapperId);
+  try {
+    ldapProviderResource().getMapperById(mapperId);
+    Assert.fail("Not expected find to success as mapper was removed");
+  }
+ catch (  NotFoundException nfe) {
+  }
+}

@@ -1,0 +1,10 @@
+{
+  UserFederationProviderRepresentation ldapRep=UserFederationProviderBuilder.create().displayName("ldap-1").providerName("ldap").priority(1).build();
+  Response resp=realm.userFederation().create(ldapRep);
+  this.ldapProviderId=ApiUtil.getCreatedId(resp);
+  resp.close();
+  UserFederationProviderRepresentation dummyRep=UserFederationProviderBuilder.create().displayName("dummy-1").providerName("dummy").priority(2).build();
+  resp=realm.userFederation().create(dummyRep);
+  this.dummyProviderId=ApiUtil.getCreatedId(resp);
+  resp.close();
+}

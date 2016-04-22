@@ -1,0 +1,9 @@
+{
+  ClientManager.realm(adminClient.realm("test")).clientId("resource-owner").directAccessGrant(false);
+  oauth.clientId("resource-owner");
+  OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("secret","test-user@localhost","password");
+  assertEquals(400,response.getStatusCode());
+  assertEquals("invalid_grant",response.getError());
+  events.expectLogin().client("resource-owner").session((String)null).clearDetails().error(Errors.NOT_ALLOWED).user((String)null).assertEvent();
+  ClientManager.realm(adminClient.realm("test")).clientId("resource-owner").directAccessGrant(true);
+}

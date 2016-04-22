@@ -1,10 +1,25 @@
 {
+  InputStream is;
+  try {
+    if (connectionPropertiesLocation.startsWith(GenericConstants.PROTOCOL_CLASSPATH)) {
+      String classPathLocation=connectionPropertiesLocation.replace(GenericConstants.PROTOCOL_CLASSPATH,"");
+      log.info("Reading LDAP configuration from classpath from: " + classPathLocation);
+      is=LDAPTestConfiguration.class.getClassLoader().getResourceAsStream(classPathLocation);
+    }
+ else {
+      String file=getResource(connectionPropertiesLocation);
+      log.info("Reading LDAP configuration from: " + connectionPropertiesLocation);
+      is=new FileInputStream(file);
+    }
+  }
+ catch (  IOException ioe) {
+    throw new RuntimeException(ioe);
+  }
   PropertiesConfiguration p;
   try {
-    log.info("Reading LDAP configuration from: " + connectionPropertiesLocation);
     p=new PropertiesConfiguration();
     p.setDelimiterParsingDisabled(true);
-    p.load(connectionPropertiesLocation);
+    p.load(is);
   }
  catch (  Exception e) {
     throw new RuntimeException(e);

@@ -1,0 +1,18 @@
+{
+  setupTestAppAndUser();
+  oauth.doLogin("testuser","password");
+  AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get(OAuth2Constants.CODE),"secret");
+  assertEquals(200,tokenResponse.getStatusCode());
+  EventRepresentation event=events.poll();
+  assertNotNull(event);
+  realm.deleteSession(event.getSessionId());
+  try {
+    realm.deleteSession(event.getSessionId());
+    fail("Expected 404");
+  }
+ catch (  NotFoundException e) {
+  }
+  tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"secret");
+  assertEquals(400,tokenResponse.getStatusCode());
+  assertEquals("Session not active",tokenResponse.getErrorDescription());
+}

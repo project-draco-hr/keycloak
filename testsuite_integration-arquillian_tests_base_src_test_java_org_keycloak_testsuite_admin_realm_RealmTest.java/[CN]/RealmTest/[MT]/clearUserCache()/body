@@ -1,0 +1,11 @@
+{
+  UserRepresentation user=new UserRepresentation();
+  user.setUsername("clearcacheuser");
+  Response response=realm.users().create(user);
+  String userId=ApiUtil.getCreatedId(response);
+  response.close();
+  realm.users().get(userId).toRepresentation();
+  assertTrue(testingClient.testing().isCached("users",userId));
+  adminClient.realm("master").clearUserCache();
+  assertFalse(testingClient.testing().isCached("users",userId));
+}

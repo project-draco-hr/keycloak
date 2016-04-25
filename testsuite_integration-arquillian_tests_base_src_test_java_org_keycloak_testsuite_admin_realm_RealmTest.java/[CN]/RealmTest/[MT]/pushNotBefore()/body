@@ -1,0 +1,13 @@
+{
+  setupTestAppAndUser();
+  int time=Time.currentTime() - 60;
+  RealmRepresentation rep=realm.toRepresentation();
+  rep.setNotBefore(time);
+  realm.update(rep);
+  GlobalRequestResult globalRequestResult=realm.pushRevocation();
+  assertEquals(1,globalRequestResult.getSuccessRequests().size());
+  assertEquals("http://localhost:8180/auth/realms/master/app/admin",globalRequestResult.getSuccessRequests().get(0));
+  assertNull(globalRequestResult.getFailedRequests());
+  PushNotBeforeAction adminPushNotBefore=testingClient.testApp().getAdminPushNotBefore();
+  assertEquals(time,adminPushNotBefore.getNotBefore());
+}

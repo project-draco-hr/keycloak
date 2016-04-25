@@ -1,0 +1,18 @@
+{
+  realm.update(RealmBuilder.edit(realm.toRepresentation()).testEventListener().build());
+  testingClient.testApp().clearAdminActions();
+  String redirectUri=oauth.getRedirectUri().replace("/master/","/" + REALM_NAME + "/");
+  ClientRepresentation client=new ClientRepresentation();
+  client.setClientId("test-app");
+  client.setAdminUrl(suiteContext.getAuthServerInfo().getContextRoot() + "/auth/realms/master/app/admin");
+  client.setRedirectUris(Collections.singletonList(redirectUri));
+  client.setSecret("secret");
+  realm.clients().create(client);
+  oauth.realm(REALM_NAME);
+  oauth.redirectUri(redirectUri);
+  Response response=realm.users().create(UserBuilder.create().username("testuser").build());
+  String userId=ApiUtil.getCreatedId(response);
+  response.close();
+  realm.users().get(userId).resetPassword(CredentialBuilder.create().password("password").build());
+  testingClient.testApp().clearAdminActions();
+}

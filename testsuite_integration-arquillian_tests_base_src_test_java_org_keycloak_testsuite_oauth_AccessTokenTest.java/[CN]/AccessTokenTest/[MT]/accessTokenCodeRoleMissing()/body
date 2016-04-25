@@ -1,0 +1,18 @@
+{
+  RealmResource realmResource=adminClient.realm("test");
+  RoleRepresentation role=RoleBuilder.create().name("tmp-role").build();
+  realmResource.roles().create(role);
+  UserResource user=findUserByUsernameId(realmResource,"test-user@localhost");
+  UserManager.realm(realmResource).user(user).assignRoles(role.getName());
+  oauth.doLogin("test-user@localhost","password");
+  EventRepresentation loginEvent=events.expectLogin().assertEvent();
+  loginEvent.getDetails().get(Details.CODE_ID);
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  realmResource.roles().deleteRole("tmp-role");
+  OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
+  Assert.assertEquals(200,response.getStatusCode());
+  AccessToken token=oauth.verifyToken(response.getAccessToken());
+  Assert.assertEquals(1,token.getRealmAccess().getRoles().size());
+  assertTrue(token.getRealmAccess().isUserInRole("user"));
+  events.clear();
+}

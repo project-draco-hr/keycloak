@@ -1,12 +1,13 @@
 {
-  Cookie cookie=headers.getCookies().get(KEYCLOAK_STATE_CHECKER);
-  if (cookie != null) {
-    stateChecker=cookie.getValue();
+  String stateChecker=getCsrfCookie();
+  if (stateChecker != null) {
+    return stateChecker;
   }
  else {
     stateChecker=KeycloakModelUtils.generateSecret();
     String cookiePath=uriInfo.getPath();
     boolean secureOnly=uriInfo.getRequestUri().getScheme().equalsIgnoreCase("https");
     CookieHelper.addCookie(KEYCLOAK_STATE_CHECKER,stateChecker,cookiePath,null,null,-1,secureOnly,true);
+    return stateChecker;
   }
 }

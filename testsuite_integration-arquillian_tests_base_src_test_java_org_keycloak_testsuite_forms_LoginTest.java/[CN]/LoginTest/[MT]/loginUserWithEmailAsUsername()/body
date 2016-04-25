@@ -1,0 +1,9 @@
+{
+  UserRepresentation rep=UserBuilder.create().enabled(true).id("foo").email("foo").username("login@test.com").password("password").build();
+  adminClient.realm(userId).users().create(rep);
+  loginPage.open();
+  loginPage.login("login@test.com","password");
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  Assert.assertNotNull(oauth.getCurrentQuery().get(OAuth2Constants.CODE));
+  events.expectLogin().user(userId).detail(Details.USERNAME,"login@test.com").assertEvent();
+}

@@ -1,0 +1,13 @@
+{
+  setupTestAppAndUser();
+  List<Map<String,String>> sessionStats=realm.getClientSessionStats();
+  assertTrue(sessionStats.isEmpty());
+  System.out.println(sessionStats.size());
+  oauth.doLogin("testuser","password");
+  AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get(OAuth2Constants.CODE),"secret");
+  assertEquals(200,tokenResponse.getStatusCode());
+  sessionStats=realm.getClientSessionStats();
+  assertEquals(1,sessionStats.size());
+  assertEquals("test-app",sessionStats.get(0).get("clientId"));
+  assertEquals("1",sessionStats.get(0).get("active"));
+}

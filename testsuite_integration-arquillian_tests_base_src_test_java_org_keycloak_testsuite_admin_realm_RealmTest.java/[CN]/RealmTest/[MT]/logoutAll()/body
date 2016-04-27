@@ -1,0 +1,13 @@
+{
+  setupTestAppAndUser();
+  Response response=realm.users().create(UserBuilder.create().username("user").build());
+  String userId=ApiUtil.getCreatedId(response);
+  response.close();
+  realm.users().get(userId).resetPassword(CredentialBuilder.create().password("password").build());
+  oauth.doLogin("user","password");
+  GlobalRequestResult globalRequestResult=realm.logoutAll();
+  assertEquals(1,globalRequestResult.getSuccessRequests().size());
+  assertEquals("http://localhost:8180/auth/realms/master/app/admin",globalRequestResult.getSuccessRequests().get(0));
+  assertNull(globalRequestResult.getFailedRequests());
+  assertNotNull(testingClient.testApp().getAdminLogoutAction());
+}

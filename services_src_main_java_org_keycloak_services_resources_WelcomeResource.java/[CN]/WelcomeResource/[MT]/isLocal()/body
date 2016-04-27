@@ -1,7 +1,11 @@
 {
   try {
-    InetAddress inetAddress=InetAddress.getByName(session.getContext().getConnection().getRemoteAddr());
-    return inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress();
+    ClientConnection clientConnection=session.getContext().getConnection();
+    InetAddress remoteInetAddress=InetAddress.getByName(clientConnection.getRemoteAddr());
+    InetAddress localInetAddress=InetAddress.getByName(clientConnection.getLocalAddr());
+    String xForwardedFor=headers.getHeaderString("X-Forwarded-For");
+    logger.debugf("Checking WelcomePage. Remote address: %s, Local address: %s, X-Forwarded-For header: %s",remoteInetAddress.toString(),localInetAddress.toString(),xForwardedFor);
+    return isLocalAddress(remoteInetAddress) && isLocalAddress(localInetAddress) && xForwardedFor == null;
   }
  catch (  UnknownHostException e) {
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

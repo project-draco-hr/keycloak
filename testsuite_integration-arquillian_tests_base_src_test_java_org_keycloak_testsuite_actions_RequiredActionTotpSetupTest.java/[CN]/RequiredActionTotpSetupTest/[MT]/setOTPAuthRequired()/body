@@ -1,0 +1,9 @@
+{
+  for (  AuthenticationExecutionInfoRepresentation execution : adminClient.realm("test").flows().getExecutions("browser")) {
+    String providerId=execution.getProviderId();
+    if ("auth-otp-form".equals(providerId)) {
+      execution.setRequirement(AuthenticationExecutionModel.Requirement.REQUIRED.name());
+      adminClient.realm("test").flows().updateExecutions("browser",execution);
+    }
+  }
+}

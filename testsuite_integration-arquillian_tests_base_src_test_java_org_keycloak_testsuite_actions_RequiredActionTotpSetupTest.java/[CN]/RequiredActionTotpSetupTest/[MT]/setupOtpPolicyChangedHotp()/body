@@ -1,0 +1,35 @@
+{
+  RealmRepresentation realmRep=adminClient.realm("test").toRepresentation();
+  RealmBuilder.edit(realmRep).otpLookAheadWindow(0).otpDigits(6).otpPeriod(30).otpType(UserCredentialModel.HOTP).otpAlgorithm(HmacOTP.HMAC_SHA1).otpInitialCounter(0);
+  adminClient.realm("test").update(realmRep);
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  totpPage.assertCurrent();
+  String totpSecret=totpPage.getTotpSecret();
+  HmacOTP otpgen=new HmacOTP(6,HmacOTP.HMAC_SHA1,1);
+  totpPage.configure(otpgen.generateHOTP(totpSecret,0));
+  String uri=driver.getCurrentUrl();
+  String sessionId=events.expectRequiredAction(EventType.UPDATE_TOTP).assertEvent().getSessionId();
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  EventRepresentation loginEvent=events.expectLogin().session(sessionId).assertEvent();
+  oauth.openLogout();
+  events.expectLogout(loginEvent.getSessionId()).assertEvent();
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  String token=otpgen.generateHOTP(totpSecret,1);
+  loginTotpPage.login(token);
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  events.expectLogin().assertEvent();
+  oauth.openLogout();
+  events.expectLogout(null).session(AssertEvents.isUUID()).assertEvent();
+  realmRep=adminClient.realm("test").toRepresentation();
+  RealmBuilder.edit(realmRep).otpLookAheadWindow(5).otpDigits(6).otpPeriod(30).otpType(UserCredentialModel.HOTP).otpAlgorithm(HmacOTP.HMAC_SHA1).otpInitialCounter(0);
+  adminClient.realm("test").update(realmRep);
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  token=otpgen.generateHOTP(totpSecret,4);
+  loginTotpPage.assertCurrent();
+  loginTotpPage.login(token);
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  events.expectLogin().assertEvent();
+}

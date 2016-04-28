@@ -1,0 +1,24 @@
+{
+  RealmRepresentation realmRep=adminClient.realm("test").toRepresentation();
+  RealmBuilder.edit(realmRep).otpLookAheadWindow(1).otpDigits(8).otpPeriod(30).otpType(UserCredentialModel.TOTP).otpAlgorithm(HmacOTP.HMAC_SHA1).otpInitialCounter(0);
+  adminClient.realm("test").update(realmRep);
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  totpPage.assertCurrent();
+  String totpSecret=totpPage.getTotpSecret();
+  TimeBasedOTP timeBased=new TimeBasedOTP(HmacOTP.HMAC_SHA1,8,30,1);
+  totpPage.configure(timeBased.generateTOTP(totpSecret));
+  String sessionId=events.expectRequiredAction(EventType.UPDATE_TOTP).assertEvent().getSessionId();
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  EventRepresentation loginEvent=events.expectLogin().session(sessionId).assertEvent();
+  oauth.openLogout();
+  events.expectLogout(loginEvent.getSessionId()).assertEvent();
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  String src=driver.getPageSource();
+  String token=timeBased.generateTOTP(totpSecret);
+  Assert.assertEquals(8,token.length());
+  loginTotpPage.login(token);
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  events.expectLogin().assertEvent();
+}

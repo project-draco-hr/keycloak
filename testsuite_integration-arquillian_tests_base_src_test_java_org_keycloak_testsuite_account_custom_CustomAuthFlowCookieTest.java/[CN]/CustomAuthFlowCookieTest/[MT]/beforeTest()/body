@@ -1,4 +1,11 @@
 {
   super.beforeTest();
-  testRealmAdminConsolePage.setAdminRealm(TEST);
+  ClientRepresentation testApp=new ClientRepresentation();
+  testApp.setClientId("test-app");
+  testApp.setEnabled(true);
+  testApp.setBaseUrl(APP_ROOT);
+  testApp.setRedirectUris(Arrays.asList(new String[]{APP_ROOT + "/*"}));
+  testApp.setAdminUrl(APP_ROOT + "/logout");
+  testApp.setSecret("password");
+  assertEquals(201,testRealmResource().clients().create(testApp).getStatus());
 }

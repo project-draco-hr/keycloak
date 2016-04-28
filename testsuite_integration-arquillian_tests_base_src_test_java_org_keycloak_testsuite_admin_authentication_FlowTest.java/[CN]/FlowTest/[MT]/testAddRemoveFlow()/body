@@ -16,6 +16,13 @@
   finally {
     response.close();
   }
+  response=authMgmtResource.createFlow(newFlow(null,"Browser flow","basic-flow",true,false));
+  try {
+    Assert.assertEquals("createFlow using the alias of existing flow should fail",409,response.getStatus());
+  }
+  finally {
+    response.close();
+  }
   AuthenticationFlowRepresentation newFlow=newFlow("browser-2","Browser flow","basic-flow",true,false);
   response=authMgmtResource.createFlow(newFlow);
   try {
@@ -28,6 +35,12 @@
   AuthenticationFlowRepresentation found=findFlowByAlias("browser-2",flows);
   Assert.assertNotNull("created flow visible in parent",found);
   compareFlows(newFlow,found);
+  try {
+    authMgmtResource.getFlow("id-123-notExistent");
+    Assert.fail("Not expected to find unexistent flow");
+  }
+ catch (  NotFoundException nfe) {
+  }
   AuthenticationFlowRepresentation found2=authMgmtResource.getFlow(found.getId());
   Assert.assertNotNull("created flow visible directly",found2);
   compareFlows(newFlow,found2);
@@ -42,6 +55,14 @@
   }
  catch (  Exception expected) {
   }
+  try {
+    data.put("alias","browser");
+    authMgmtResource.addExecutionFlow("browser-2",data);
+    Assert.fail("addExecutionFlow should have failed as browser flow already exists");
+  }
+ catch (  Exception expected) {
+  }
+  data.put("alias","SomeFlow");
   authMgmtResource.addExecutionFlow("browser-2",data);
   flows=authMgmtResource.getFlows();
   found2=findFlowByAlias("browser-2",flows);
@@ -61,4 +82,10 @@
   flows=authMgmtResource.getFlows();
   found=findFlowByAlias("browser-2",flows);
   Assert.assertNull("flow deleted",found);
+  try {
+    authMgmtResource.deleteFlow("id-123-notExistent");
+    Assert.fail("Not expected to delete flow, which doesn't exists");
+  }
+ catch (  NotFoundException nfe) {
+  }
 }

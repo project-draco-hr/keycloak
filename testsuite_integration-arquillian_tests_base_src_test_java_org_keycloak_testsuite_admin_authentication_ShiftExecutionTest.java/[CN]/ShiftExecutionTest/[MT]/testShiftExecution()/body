@@ -11,12 +11,24 @@
   List<AuthenticationExecutionInfoRepresentation> executions=authMgmtResource.getExecutions("Copy of browser");
   AuthenticationExecutionInfoRepresentation last=executions.get(executions.size() - 1);
   AuthenticationExecutionInfoRepresentation oneButLast=executions.get(executions.size() - 2);
+  try {
+    authMgmtResource.raisePriority("not-existent");
+    Assert.fail("Not expected to raise priority of not existent flow");
+  }
+ catch (  NotFoundException nfe) {
+  }
   authMgmtResource.raisePriority(last.getId());
   List<AuthenticationExecutionInfoRepresentation> executions2=authMgmtResource.getExecutions("Copy of browser");
   AuthenticationExecutionInfoRepresentation last2=executions2.get(executions.size() - 1);
   AuthenticationExecutionInfoRepresentation oneButLast2=executions2.get(executions.size() - 2);
   Assert.assertEquals("Execution shifted up - N",last.getId(),oneButLast2.getId());
   Assert.assertEquals("Execution shifted up - N-1",oneButLast.getId(),last2.getId());
+  try {
+    authMgmtResource.lowerPriority("not-existent");
+    Assert.fail("Not expected to raise priority of not existent flow");
+  }
+ catch (  NotFoundException nfe) {
+  }
   authMgmtResource.lowerPriority(oneButLast2.getId());
   executions2=authMgmtResource.getExecutions("Copy of browser");
   last2=executions2.get(executions.size() - 1);

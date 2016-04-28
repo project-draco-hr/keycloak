@@ -8,5 +8,8 @@
   if (group == null) {
     throw new NotFoundException("Group not found");
   }
-  if (!user.isMemberOf(group))   user.joinGroup(group);
+  if (!user.isMemberOf(group)) {
+    user.joinGroup(group);
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo).success();
+  }
 }

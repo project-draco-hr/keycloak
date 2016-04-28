@@ -5,13 +5,13 @@
   String codeId=loginEvent.getDetails().get(Details.CODE_ID);
   loginEvent.getSessionId();
   String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
-  Time.setOffset(2);
+  setTimeOffset(2);
   OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(400,response.getStatusCode());
+  setTimeOffset(0);
   AssertEvents.ExpectedEvent expectedEvent=events.expectCodeToToken(codeId,null);
   expectedEvent.error("invalid_code").removeDetail(Details.TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_TYPE).user((String)null);
   expectedEvent.assertEvent();
   events.clear();
   RealmManager.realm(adminClient.realm("test")).accessCodeLifeSpan(60);
-  Time.setOffset(0);
 }

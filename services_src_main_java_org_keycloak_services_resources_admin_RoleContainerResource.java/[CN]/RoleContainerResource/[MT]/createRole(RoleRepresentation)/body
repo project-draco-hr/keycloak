@@ -1,5 +1,11 @@
 {
   auth.requireManage();
+  if (roleContainer == null) {
+    throw new NotFoundException("Could not find client");
+  }
+  if (rep.getName() == null) {
+    throw new BadRequestException();
+  }
   try {
     RoleModel role=roleContainer.addRole(rep.getName());
     role.setDescription(rep.getDescription());

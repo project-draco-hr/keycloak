@@ -1,5 +1,8 @@
 {
-  auth.requireManage();
+  auth.init(Resource.CLIENT).requireManage();
+  if (realm == null) {
+    throw new NotFoundException("Realm not found.");
+  }
   for (  ProviderFactory<ClientDescriptionConverter> factory : session.getKeycloakSessionFactory().getProviderFactories(ClientDescriptionConverter.class)) {
     if (((ClientDescriptionConverterFactory)factory).isSupported(description)) {
       return factory.create(session).convertToInternal(description);

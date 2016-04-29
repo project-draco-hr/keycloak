@@ -1,0 +1,23 @@
+{
+  String viewRole=getViewRole(resource);
+  String manageRole=getManageRole(resource);
+  String differentViewRole=getDifferentViewRole(resource);
+  String differentManageRole=getDifferentManageRole(resource);
+  invoke(invocation,clients.get("master-none"),false);
+  invoke(invocation,clients.get("master-admin"),true);
+  invoke(invocation,clients.get("master-" + viewRole),!manage);
+  invoke(invocation,clients.get("master-" + manageRole),true);
+  if (!skipDifferentRole) {
+    invoke(invocation,clients.get("master-" + differentViewRole),false);
+    invoke(invocation,clients.get("master-" + differentManageRole),false);
+  }
+  invoke(invocation,clients.get("none"),false);
+  invoke(invocation,clients.get(AdminRoles.REALM_ADMIN),true);
+  invoke(invocation,clients.get(viewRole),!manage);
+  invoke(invocation,clients.get(manageRole),true);
+  if (!skipDifferentRole) {
+    invoke(invocation,clients.get(differentViewRole),false);
+    invoke(invocation,clients.get(differentManageRole),false);
+  }
+  invoke(invocation,clients.get("REALM2"),false);
+}

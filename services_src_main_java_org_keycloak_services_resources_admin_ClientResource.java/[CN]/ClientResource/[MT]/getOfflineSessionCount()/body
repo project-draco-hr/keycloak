@@ -1,5 +1,8 @@
 {
   auth.requireView();
+  if (client == null) {
+    throw new NotFoundException("Could not find client");
+  }
   Map<String,Long> map=new HashMap<>();
   map.put("count",session.sessions().getOfflineSessionsCount(client.getRealm(),client));
   return map;

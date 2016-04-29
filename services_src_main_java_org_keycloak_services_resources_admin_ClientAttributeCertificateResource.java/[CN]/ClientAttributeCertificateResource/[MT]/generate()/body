@@ -1,5 +1,8 @@
 {
   auth.requireManage();
+  if (client == null) {
+    throw new NotFoundException("Could not find client");
+  }
   CertificateRepresentation info=KeycloakModelUtils.generateKeyPairCertificate(client.getClientId());
   client.setAttribute(privateAttribute,info.getPrivateKey());
   client.setAttribute(certificateAttribute,info.getCertificate());

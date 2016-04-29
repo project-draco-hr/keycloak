@@ -1,5 +1,8 @@
 {
   auth.requireView();
+  if (scopeContainer == null) {
+    throw new NotFoundException("Could not find client");
+  }
   Set<RoleModel> mappings=KeycloakModelUtils.getClientScopeMappings(scopedClient,scopeContainer);
   List<RoleRepresentation> mapRep=new ArrayList<RoleRepresentation>();
   for (  RoleModel roleModel : mappings) {

@@ -1,5 +1,8 @@
 {
   auth.requireManage();
+  if (client == null) {
+    throw new NotFoundException("Could not find client");
+  }
   new ClientManager(new RealmManager(session)).removeClient(realm,client);
   adminEvent.operation(OperationType.DELETE).resourcePath(uriInfo).success();
 }

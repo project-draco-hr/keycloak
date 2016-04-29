@@ -1,0 +1,27 @@
+{
+  int statusCode;
+  try {
+    AtomicReference<Response> responseReference=new AtomicReference<>();
+    invocation.invoke(client.realm(REALM_NAME),responseReference);
+    Response response=responseReference.get();
+    if (response != null) {
+      statusCode=response.getStatus();
+    }
+ else {
+      statusCode=200;
+    }
+  }
+ catch (  ClientErrorException e) {
+    statusCode=e.getResponse().getStatus();
+  }
+  if (expectSuccess) {
+    if (!(statusCode == 200 || statusCode == 201 || statusCode == 204 || statusCode == 404 || statusCode == 409 || statusCode == 400)) {
+      fail("Expected permitted, but was " + statusCode);
+    }
+  }
+ else {
+    if (statusCode != 403) {
+      fail("Expected 403, but was " + statusCode);
+    }
+  }
+}

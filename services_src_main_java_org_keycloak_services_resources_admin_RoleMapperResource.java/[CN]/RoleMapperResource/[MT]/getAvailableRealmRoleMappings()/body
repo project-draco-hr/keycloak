@@ -1,5 +1,8 @@
 {
   auth.requireView();
+  if (roleMapper == null) {
+    throw new NotFoundException("User not found");
+  }
   Set<RoleModel> available=realm.getRoles();
   return ClientRoleMappingsResource.getAvailableRoles(roleMapper,available);
 }

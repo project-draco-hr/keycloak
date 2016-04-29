@@ -1,5 +1,8 @@
 {
   auth.requireManage();
+  if (identityProviderModel == null) {
+    throw new javax.ws.rs.NotFoundException();
+  }
   IdentityProviderMapperModel model=RepresentationToModel.toModel(mapper);
   model=realm.addIdentityProviderMapper(model);
   adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,model.getId()).representation(mapper).success();

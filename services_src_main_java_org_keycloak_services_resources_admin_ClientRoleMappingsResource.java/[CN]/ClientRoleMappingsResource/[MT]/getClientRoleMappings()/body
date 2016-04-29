@@ -1,5 +1,8 @@
 {
   auth.requireView();
+  if (user == null || client == null) {
+    throw new NotFoundException("Not found");
+  }
   Set<RoleModel> mappings=user.getClientRoleMappings(client);
   List<RoleRepresentation> mapRep=new ArrayList<RoleRepresentation>();
   for (  RoleModel roleModel : mappings) {

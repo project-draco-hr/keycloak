@@ -1,5 +1,8 @@
 {
   this.auth.requireView();
+  if (identityProviderModel == null) {
+    throw new javax.ws.rs.NotFoundException();
+  }
   KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
   Map<String,IdentityProviderMapperTypeRepresentation> types=new HashMap<>();
   List<ProviderFactory> factories=sessionFactory.getProviderFactories(IdentityProviderMapper.class);

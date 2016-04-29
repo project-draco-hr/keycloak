@@ -1,0 +1,22 @@
+{
+  super.beforeAbstractKeycloakTest();
+  clients.put("master-admin",adminClient);
+  RealmResource master=adminClient.realm("master");
+{
+    Response response=master.users().create(UserBuilder.create().username("permissions-test-master-none").build());
+    String userId=ApiUtil.getCreatedId(response);
+    response.close();
+    master.users().get(userId).resetPassword(CredentialBuilder.create().password("password").build());
+    clients.put("master-none",Keycloak.getInstance(AuthServerTestEnricher.getAuthServerContextRoot() + "/auth","master","permissions-test-master-none","password",Constants.ADMIN_CLI_CLIENT_ID));
+  }
+  for (  String role : AdminRoles.ALL_REALM_ROLES) {
+    Response response=master.users().create(UserBuilder.create().username("permissions-test-master-" + role).build());
+    String userId=ApiUtil.getCreatedId(response);
+    response.close();
+    master.users().get(userId).resetPassword(CredentialBuilder.create().password("password").build());
+    String clientId=master.clients().findByClientId(REALM_NAME + "-realm").get(0).getId();
+    RoleRepresentation roleRep=master.clients().get(clientId).roles().get(role).toRepresentation();
+    master.users().get(userId).roles().clientLevel(clientId).add(Collections.singletonList(roleRep));
+    clients.put("master-" + role,Keycloak.getInstance(AuthServerTestEnricher.getAuthServerContextRoot() + "/auth","master","permissions-test-master-" + role,"password",Constants.ADMIN_CLI_CLIENT_ID));
+  }
+}

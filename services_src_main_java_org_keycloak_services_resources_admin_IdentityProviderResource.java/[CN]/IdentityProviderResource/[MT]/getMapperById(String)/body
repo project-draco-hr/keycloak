@@ -1,5 +1,8 @@
 {
   auth.requireView();
+  if (identityProviderModel == null) {
+    throw new javax.ws.rs.NotFoundException();
+  }
   IdentityProviderMapperModel model=realm.getIdentityProviderMapperById(id);
   if (model == null)   throw new NotFoundException("Model not found");
   return ModelToRepresentation.toRepresentation(model);

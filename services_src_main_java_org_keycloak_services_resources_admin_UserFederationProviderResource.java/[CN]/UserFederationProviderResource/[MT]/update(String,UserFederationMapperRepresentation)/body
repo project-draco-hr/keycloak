@@ -1,5 +1,8 @@
 {
   auth.requireManage();
+  if (federationProviderModel == null) {
+    throw new NotFoundException("Could not find federation provider");
+  }
   UserFederationMapperModel model=realm.getUserFederationMapperById(id);
   if (model == null)   throw new NotFoundException("Model not found");
   model=RepresentationToModel.toModel(realm,rep);

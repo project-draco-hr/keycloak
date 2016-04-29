@@ -1,5 +1,8 @@
 {
   auth.requireManage();
+  if (roleMapper == null) {
+    throw new NotFoundException("User not found");
+  }
   logger.debugv("** addRealmRoleMappings: {0}",roles);
   for (  RoleRepresentation role : roles) {
     RoleModel roleModel=realm.getRole(role.getName());

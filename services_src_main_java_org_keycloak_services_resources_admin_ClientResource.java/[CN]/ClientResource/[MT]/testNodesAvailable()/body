@@ -1,5 +1,8 @@
 {
   auth.requireManage();
+  if (client == null) {
+    throw new NotFoundException("Could not find client");
+  }
   logger.debug("Test availability of cluster nodes");
   adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).success();
   return new ResourceAdminManager(session).testNodesAvailability(uriInfo.getRequestUri(),realm,client);

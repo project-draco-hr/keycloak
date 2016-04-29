@@ -1,6 +1,9 @@
 {
+  this.auth.requireManage();
+  if (identityProviderModel == null) {
+    throw new javax.ws.rs.NotFoundException();
+  }
   try {
-    this.auth.requireManage();
     updateIdpFromRep(providerRep,realm,session);
     adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(providerRep).success();
     return Response.noContent().build();

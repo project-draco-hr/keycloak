@@ -1,5 +1,8 @@
 {
   this.auth.requireView();
+  if (identityProviderModel == null) {
+    throw new javax.ws.rs.NotFoundException();
+  }
   List<IdentityProviderMapperRepresentation> mappers=new LinkedList<>();
   for (  IdentityProviderMapperModel model : realm.getIdentityProviderMappersByAlias(identityProviderModel.getAlias())) {
     mappers.add(ModelToRepresentation.toRepresentation(model));

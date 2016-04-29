@@ -1,5 +1,8 @@
 {
   auth.requireManage();
+  if (client == null) {
+    throw new NotFoundException("Could not find client");
+  }
   CertificateRepresentation info=getCertFromRequest(uriInfo,input);
   if (info.getPrivateKey() != null) {
     client.setAttribute(privateAttribute,info.getPrivateKey());

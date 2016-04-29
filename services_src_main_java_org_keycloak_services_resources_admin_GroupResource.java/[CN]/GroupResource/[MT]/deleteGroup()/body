@@ -1,5 +1,8 @@
 {
   this.auth.requireManage();
+  if (group == null) {
+    throw new NotFoundException("Could not find group by id");
+  }
   realm.removeGroup(group);
   adminEvent.operation(OperationType.DELETE).resourcePath(uriInfo).success();
 }

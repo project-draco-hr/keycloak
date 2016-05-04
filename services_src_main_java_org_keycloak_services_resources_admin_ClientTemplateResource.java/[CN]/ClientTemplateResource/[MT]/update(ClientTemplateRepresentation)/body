@@ -1,5 +1,8 @@
 {
   auth.requireManage();
+  if (template == null) {
+    throw new NotFoundException("Could not find client template");
+  }
   try {
     RepresentationToModel.updateClientTemplate(rep,template);
     adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();

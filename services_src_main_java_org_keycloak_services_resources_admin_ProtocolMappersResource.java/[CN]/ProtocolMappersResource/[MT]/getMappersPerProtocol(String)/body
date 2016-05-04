@@ -1,5 +1,8 @@
 {
   auth.requireAny();
+  if (client == null) {
+    throw new NotFoundException("Could not find client");
+  }
   List<ProtocolMapperRepresentation> mappers=new LinkedList<ProtocolMapperRepresentation>();
   for (  ProtocolMapperModel mapper : client.getProtocolMappers()) {
     if (mapper.getProtocol().equals(protocol))     mappers.add(ModelToRepresentation.toRepresentation(mapper));

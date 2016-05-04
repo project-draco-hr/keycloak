@@ -1,6 +1,9 @@
 {
+  this.auth.requireView();
+  if (identityProviderModel == null) {
+    throw new javax.ws.rs.NotFoundException();
+  }
   try {
-    this.auth.requireView();
     IdentityProviderFactory factory=getIdentityProviderFactory();
     return factory.create(identityProviderModel).export(uriInfo,realm,format);
   }

@@ -1,5 +1,8 @@
 {
   auth.requireManage();
+  if (federationProviderModel == null) {
+    throw new NotFoundException("Could not find federation provider");
+  }
   realm.removeUserFederationProvider(this.federationProviderModel);
   new UsersSyncManager().notifyToRefreshPeriodicSync(session,realm,this.federationProviderModel,true);
   adminEvent.operation(OperationType.DELETE).resourcePath(uriInfo).success();

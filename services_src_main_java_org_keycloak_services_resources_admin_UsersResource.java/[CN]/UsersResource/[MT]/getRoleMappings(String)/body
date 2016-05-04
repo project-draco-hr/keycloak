@@ -1,9 +1,6 @@
 {
-  UserModel user=session.users().getUserById(id,realm);
-  if (user == null) {
-    throw new NotFoundException("User not found");
-  }
   auth.init(RealmAuth.Resource.USER);
+  UserModel user=session.users().getUserById(id,realm);
   RoleMapperResource resource=new RoleMapperResource(realm,auth,user,adminEvent);
   ResteasyProviderFactory.getInstance().injectProperties(resource);
   return resource;

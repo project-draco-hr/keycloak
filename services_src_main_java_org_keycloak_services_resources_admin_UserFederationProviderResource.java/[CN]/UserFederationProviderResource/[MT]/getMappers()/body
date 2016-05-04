@@ -1,5 +1,8 @@
 {
   auth.requireView();
+  if (federationProviderModel == null) {
+    throw new NotFoundException("Could not find federation provider");
+  }
   List<UserFederationMapperRepresentation> mappers=new LinkedList<>();
   for (  UserFederationMapperModel model : realm.getUserFederationMappersByFederationProvider(this.federationProviderModel.getId())) {
     mappers.add(ModelToRepresentation.toRepresentation(realm,model));

@@ -1,5 +1,8 @@
 {
   auth.requireView();
+  if (client == null) {
+    throw new NotFoundException("Could not find client");
+  }
   ClientInstallationProvider provider=session.getProvider(ClientInstallationProvider.class,providerId);
   if (provider == null)   throw new NotFoundException("Unknown Provider");
   return provider.generateInstallation(session,realm,client,keycloak.getBaseUri(uriInfo));

@@ -1,0 +1,17 @@
+{
+  UpdatableStatistic updatableStatistic=get(statistic);
+  if (updatableStatistic == null) {
+switch (STATISTIC_TYPE) {
+case DataHoldingUpdatableStatistic.STATISTIC_TYPE_PROPERTY_VALUE:
+      updatableStatistic=new DataHoldingUpdatableStatistic();
+    break;
+case MovingUpdatableStatistic.STATISTIC_TYPE_PROPERTY_VALUE:
+  updatableStatistic=new DataHoldingUpdatableStatistic();
+break;
+default :
+throw new IllegalStateException(String.format("Unknown statistic type: '%s'. Supported values: %s | %s",STATISTIC_TYPE,DataHoldingUpdatableStatistic.STATISTIC_TYPE_PROPERTY_VALUE,MovingUpdatableStatistic.STATISTIC_TYPE_PROPERTY_VALUE));
+}
+put(statistic,updatableStatistic);
+}
+return updatableStatistic;
+}

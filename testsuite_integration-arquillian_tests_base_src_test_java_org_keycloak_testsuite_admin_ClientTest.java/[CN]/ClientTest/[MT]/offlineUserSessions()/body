@@ -1,0 +1,28 @@
+{
+  String redirectUri=oauth.getRedirectUri().replace("/master/","/" + REALM_NAME + "/");
+  ClientRepresentation client=new ClientRepresentation();
+  client.setClientId("test-app");
+  client.setAdminUrl(suiteContext.getAuthServerInfo().getContextRoot() + "/auth/realms/master/app/admin");
+  client.setRedirectUris(Collections.singletonList(redirectUri));
+  client.setSecret("secret");
+  Response response=realm.clients().create(client);
+  String id=ApiUtil.getCreatedId(response);
+  response.close();
+  response=realm.users().create(UserBuilder.create().username("testuser").build());
+  String userId=ApiUtil.getCreatedId(response);
+  response.close();
+  realm.users().get(userId).resetPassword(CredentialBuilder.create().password("password").build());
+  Map<String,Long> offlineSessionCount=realm.clients().get(id).getOfflineSessionCount();
+  assertEquals(new Long(0),offlineSessionCount.get("count"));
+  oauth.realm(REALM_NAME);
+  oauth.redirectUri(redirectUri);
+  oauth.scope(OAuth2Constants.OFFLINE_ACCESS);
+  oauth.doLogin("testuser","password");
+  AccessTokenResponse accessTokenResponse=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get("code"),"secret");
+  assertEquals(200,accessTokenResponse.getStatusCode());
+  offlineSessionCount=realm.clients().get(id).getOfflineSessionCount();
+  assertEquals(new Long(1),offlineSessionCount.get("count"));
+  List<UserSessionRepresentation> offlineUserSessions=realm.clients().get(id).getOfflineUserSessions(0,100);
+  assertEquals(1,offlineUserSessions.size());
+  assertEquals("testuser",offlineUserSessions.get(0).getUsername());
+}

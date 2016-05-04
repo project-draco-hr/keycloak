@@ -1,7 +1,7 @@
 {
   jsConsoleExamplePage.navigateTo();
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
-  pause(1000);
+  waitUntilElement(jsConsoleExamplePage.getInitButtonElement()).is().present();
   jsConsoleExamplePage.init();
   jsConsoleExamplePage.logIn();
   testRealmLoginPage.form().login("user","invalid-password");
@@ -11,11 +11,10 @@
   testRealmLoginPage.form().login("user","password");
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
   jsConsoleExamplePage.init();
-  assertTrue(jsConsoleExamplePage.getOutputText().contains("Init Success (Authenticated)"));
-  assertTrue(jsConsoleExamplePage.getEventsText().contains("Auth Success"));
-  pause(1000);
+  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("Init Success (Authenticated)");
+  waitUntilElement(jsConsoleExamplePage.getEventsElement()).text().contains("Auth Success");
   jsConsoleExamplePage.logOut();
   assertCurrentUrlStartsWith(jsConsoleExamplePage);
   jsConsoleExamplePage.init();
-  assertTrue(jsConsoleExamplePage.getOutputText().contains("Init Success (Not Authenticated)"));
+  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("Init Success (Not Authenticated)");
 }

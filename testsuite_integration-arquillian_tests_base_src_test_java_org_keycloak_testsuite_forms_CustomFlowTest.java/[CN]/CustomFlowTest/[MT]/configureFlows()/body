@@ -1,0 +1,26 @@
+{
+  userId=findUser("login-test").getId();
+  AuthenticationFlowRepresentation flow=FlowBuilder.create().alias("dummy").description("dummy pass through flow").providerId("basic-flow").topLevel(true).builtIn(false).build();
+  testRealm().flows().createFlow(flow);
+  RealmRepresentation realm=testRealm().toRepresentation();
+  realm.setBrowserFlow(flow.getAlias());
+  realm.setDirectGrantFlow(flow.getAlias());
+  testRealm().update(realm);
+  flow=findFlowByAlias(flow.getAlias());
+  AuthenticationExecutionRepresentation execution=ExecutionBuilder.create().parentFlow(flow.getId()).requirement(AuthenticationExecutionModel.Requirement.REQUIRED.toString()).authenticator(PassThroughAuthenticator.PROVIDER_ID).priority(10).authenticatorFlow(false).build();
+  testRealm().flows().addExecution(execution);
+  flow=FlowBuilder.create().alias("dummy registration").description("dummy pass through registration").providerId("basic-flow").topLevel(true).builtIn(false).build();
+  testRealm().flows().createFlow(flow);
+  setRegistrationFlow(flow);
+  flow=findFlowByAlias(flow.getAlias());
+  execution=ExecutionBuilder.create().parentFlow(flow.getId()).requirement(AuthenticationExecutionModel.Requirement.REQUIRED.toString()).authenticator(PassThroughRegistration.PROVIDER_ID).priority(10).authenticatorFlow(false).build();
+  testRealm().flows().addExecution(execution);
+  AuthenticationFlowRepresentation clientFlow=FlowBuilder.create().alias("client-dummy").description("dummy pass through flow").providerId(AuthenticationFlow.CLIENT_FLOW).topLevel(true).builtIn(false).build();
+  testRealm().flows().createFlow(clientFlow);
+  realm=testRealm().toRepresentation();
+  realm.setClientAuthenticationFlow(clientFlow.getAlias());
+  testRealm().update(realm);
+  clientFlow=findFlowByAlias(clientFlow.getAlias());
+  execution=ExecutionBuilder.create().parentFlow(clientFlow.getId()).requirement(AuthenticationExecutionModel.Requirement.REQUIRED.toString()).authenticator(PassThroughClientAuthenticator.PROVIDER_ID).priority(10).authenticatorFlow(false).build();
+  testRealm().flows().addExecution(execution);
+}

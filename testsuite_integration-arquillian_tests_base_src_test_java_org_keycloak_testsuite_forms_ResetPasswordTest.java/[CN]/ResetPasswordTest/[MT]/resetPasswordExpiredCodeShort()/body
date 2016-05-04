@@ -1,0 +1,27 @@
+{
+  final AtomicInteger originalValue=new AtomicInteger();
+  RealmRepresentation realmRep=testRealm().toRepresentation();
+  originalValue.set(realmRep.getAccessCodeLifespan());
+  realmRep.setAccessCodeLifespanUserAction(60);
+  testRealm().update(realmRep);
+  try {
+    loginPage.open();
+    loginPage.resetPassword();
+    resetPasswordPage.assertCurrent();
+    resetPasswordPage.changePassword("login-test");
+    loginPage.assertCurrent();
+    assertEquals("You should receive an email shortly with further instructions.",loginPage.getSuccessMessage());
+    events.expectRequiredAction(EventType.SEND_RESET_PASSWORD).session((String)null).user(userId).detail(Details.USERNAME,"login-test").detail(Details.EMAIL,"login@test.com").assertEvent();
+    assertEquals(1,greenMail.getReceivedMessages().length);
+    MimeMessage message=greenMail.getReceivedMessages()[0];
+    String changePasswordUrl=getPasswordResetEmailLink(message);
+    setTimeOffset(70);
+    driver.navigate().to(changePasswordUrl.trim());
+    loginPage.assertCurrent();
+    assertEquals("You took too long to login. Login process starting from beginning.",loginPage.getError());
+    events.expectRequiredAction(EventType.RESET_PASSWORD).error("expired_code").client("test-app").user((String)null).session((String)null).clearDetails().assertEvent();
+  }
+  finally {
+    setTimeOffset(0);
+  }
+}

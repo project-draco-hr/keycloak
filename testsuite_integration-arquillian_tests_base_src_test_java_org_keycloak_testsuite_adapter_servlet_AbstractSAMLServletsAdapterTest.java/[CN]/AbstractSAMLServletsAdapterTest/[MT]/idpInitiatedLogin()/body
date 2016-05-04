@@ -3,9 +3,7 @@
   samlidpInitiatedLogin.setUrlName("employee2");
   samlidpInitiatedLogin.navigateTo();
   samlidpInitiatedLogin.form().login(bburkeUser);
-  employee2ServletPage.navigateTo();
-  assertTrue(driver.getPageSource().contains("principal=bburke"));
-  salesPostSigServletPage.navigateTo();
-  assertTrue(driver.getPageSource().contains("principal=bburke"));
+  waitUntilElement(By.xpath("//body")).text().contains("principal=bburke");
+  assertSuccessfullyLoggedIn(salesPostSigServletPage);
   employee2ServletPage.logout();
 }

@@ -14,14 +14,5 @@
   Response response=testRealmResource().clients().create(clientRep);
   assertEquals(201,response.getStatus());
   response.close();
-  salesMetadataServletPage.navigateTo();
-  testRealmSAMLPostLoginPage.form().login(bburkeUser);
-  assertTrue(driver.getPageSource().contains("principal=bburke"));
-  salesMetadataServletPage.logout();
-  salesMetadataServletPage.navigateTo();
-  assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
-  testRealmSAMLPostLoginPage.form().login("unauthorized","password");
-  assertFalse(driver.getPageSource().contains("principal="));
-  assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("Status 403"));
-  salesMetadataServletPage.logout();
+  testSuccessfulAndUnauthorizedLogin(salesMetadataServletPage,testRealmSAMLPostLoginPage);
 }

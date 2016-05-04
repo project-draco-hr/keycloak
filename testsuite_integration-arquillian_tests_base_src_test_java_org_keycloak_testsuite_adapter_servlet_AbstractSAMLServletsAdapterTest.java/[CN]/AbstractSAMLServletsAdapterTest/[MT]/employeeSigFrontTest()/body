@@ -1,12 +1,3 @@
 {
-  employeeSigFrontServletPage.navigateTo();
-  testRealmSAMLRedirectLoginPage.form().login(bburkeUser);
-  assertTrue(driver.getPageSource().contains("principal=bburke"));
-  employeeSigFrontServletPage.logout();
-  employeeSigFrontServletPage.navigateTo();
-  assertCurrentUrlStartsWith(testRealmSAMLRedirectLoginPage);
-  testRealmSAMLRedirectLoginPage.form().login("unauthorized","password");
-  assertFalse(driver.getPageSource().contains("principal="));
-  assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("Status 403"));
-  employeeSigFrontServletPage.logout();
+  testSuccessfulAndUnauthorizedLogin(employeeSigFrontServletPage,testRealmSAMLRedirectLoginPage);
 }

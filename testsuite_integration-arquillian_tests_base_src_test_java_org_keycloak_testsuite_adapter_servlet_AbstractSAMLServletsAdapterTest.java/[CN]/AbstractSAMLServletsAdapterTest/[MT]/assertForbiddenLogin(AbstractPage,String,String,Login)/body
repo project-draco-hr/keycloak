@@ -1,6 +1,7 @@
 {
-  badRealmSalesPostSigServletPage.navigateTo();
-  testRealmSAMLRedirectLoginPage.form().login(bburkeUser);
+  page.navigateTo();
+  assertCurrentUrlStartsWith(loginPage);
+  loginPage.form().login(username,password);
   waitUntilElement(By.xpath("//body")).text().not().contains("principal=");
   assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("Status 403"));
 }

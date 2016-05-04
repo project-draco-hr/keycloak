@@ -3,10 +3,8 @@
   samlidpInitiatedLogin.setUrlName("employee2");
   samlidpInitiatedLogin.navigateTo();
   samlidpInitiatedLogin.form().login("unauthorized","password");
-  assertFalse(driver.getPageSource().contains("principal="));
+  waitUntilElement(By.xpath("//body")).text().not().contains("bburke");
   assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("Status 403"));
-  employee2ServletPage.navigateTo();
-  assertFalse(driver.getPageSource().contains("principal="));
-  assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("Status 403"));
+  assertForbidden(employee2ServletPage);
   employee2ServletPage.logout();
 }

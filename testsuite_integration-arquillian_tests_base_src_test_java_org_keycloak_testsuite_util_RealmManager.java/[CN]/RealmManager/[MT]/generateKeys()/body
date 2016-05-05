@@ -1,0 +1,24 @@
+{
+  RealmRepresentation rep=realm.toRepresentation();
+  KeyPair keyPair;
+  try {
+    KeyPairGenerator generator=KeyPairGenerator.getInstance("RSA");
+    generator.initialize(2048);
+    keyPair=generator.generateKeyPair();
+  }
+ catch (  NoSuchAlgorithmException e) {
+    throw new RuntimeException(e);
+  }
+  rep.setPrivateKey(Base64.encodeBytes(keyPair.getPrivate().getEncoded()));
+  rep.setPublicKey(Base64.encodeBytes(keyPair.getPublic().getEncoded()));
+  X509Certificate certificate;
+  try {
+    certificate=CertificateUtils.generateV1SelfSignedCertificate(keyPair,rep.getId());
+    rep.setCertificate(Base64.encodeBytes(certificate.getEncoded()));
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  rep.setCodeSecret(org.keycloak.models.utils.KeycloakModelUtils.generateCodeSecret());
+  realm.update(rep);
+}

@@ -1,6 +1,8 @@
 {
-  IdentityProviderRepresentation newIdentityProvider=create("remove-identity-provider","saml","Remove Identity Provider");
-  realm.identityProviders().create(newIdentityProvider);
+  IdentityProviderRepresentation newIdentityProvider=create("remove-identity-provider","saml");
+  Response response=realm.identityProviders().create(newIdentityProvider);
+  Assert.assertNotNull(ApiUtil.getCreatedId(response));
+  response.close();
   IdentityProviderResource identityProviderResource=realm.identityProviders().get("update-identity-provider");
   assertNotNull(identityProviderResource);
   IdentityProviderRepresentation representation=identityProviderResource.toRepresentation();

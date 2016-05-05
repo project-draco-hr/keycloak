@@ -1,8 +1,10 @@
 {
-  IdentityProviderRepresentation newIdentityProvider=create("update-identity-provider","oidc","Update Identity Provider");
+  IdentityProviderRepresentation newIdentityProvider=create("update-identity-provider","oidc");
   newIdentityProvider.getConfig().put("clientId","clientId");
   newIdentityProvider.getConfig().put("clientSecret","clientSecret");
-  realm.identityProviders().create(newIdentityProvider);
+  Response response=realm.identityProviders().create(newIdentityProvider);
+  Assert.assertNotNull(ApiUtil.getCreatedId(response));
+  response.close();
   IdentityProviderResource identityProviderResource=realm.identityProviders().get("update-identity-provider");
   assertNotNull(identityProviderResource);
   IdentityProviderRepresentation representation=identityProviderResource.toRepresentation();

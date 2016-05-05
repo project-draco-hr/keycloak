@@ -1,0 +1,14 @@
+{
+  RealmResource appRealm=adminClient.realm("test");
+  UserResource testUser=findUserByUsernameId(appRealm,"test-user@localhost");
+  RoleRepresentation offlineAccess=findRealmRoleByName(adminClient.realm("test"),Constants.OFFLINE_ACCESS_ROLE).toRepresentation();
+  appRealm.roles().create(RoleBuilder.create().name("composite").build());
+  RoleResource roleResource=appRealm.roles().get("composite");
+  roleResource.addComposites(Collections.singletonList(offlineAccess));
+  testUser.roles().realmLevel().remove(Collections.singletonList(offlineAccess));
+  testUser.roles().realmLevel().add(Collections.singletonList(roleResource.toRepresentation()));
+  offlineTokenDirectGrantFlow();
+  testUser.roles().realmLevel().remove(Collections.singletonList(appRealm.roles().get("composite").toRepresentation()));
+  appRealm.roles().get("composite").remove();
+  testUser.roles().realmLevel().add(Collections.singletonList(offlineAccess));
+}

@@ -1,0 +1,11 @@
+{
+  RealmRepresentation realmRepresentation=loadJson(getClass().getResourceAsStream("/testrealm.json"),RealmRepresentation.class);
+  RealmBuilder realm=RealmBuilder.edit(realmRepresentation).accessTokenLifespan(10).ssoSessionIdleTimeout(30).testEventListener();
+  offlineClientAppUri=APP_ROOT + "/offline-client";
+  ClientRepresentation app=ClientBuilder.create().clientId("offline-client").id(KeycloakModelUtils.generateId()).adminUrl(offlineClientAppUri).redirectUris(offlineClientAppUri).directAccessGrants().serviceAccountsEnabled(true).secret("secret1").build();
+  realm.client(app);
+  serviceAccountUserId=KeycloakModelUtils.generateId();
+  UserRepresentation serviceAccountUser=UserBuilder.create().id(serviceAccountUserId).addRoles("user","offline_access").role("test-app","customer-user").username(ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX + app.getClientId()).serviceAccountId(app.getClientId()).build();
+  realm.user(serviceAccountUser);
+  testRealms.add(realm.build());
+}

@@ -1,0 +1,29 @@
+{
+  String timeOffsetParam=req.getParameter("timeOffset");
+  if (timeOffsetParam != null && !timeOffsetParam.isEmpty()) {
+    Time.setOffset(Integer.parseInt(timeOffsetParam));
+  }
+  if (req.getRequestURI().endsWith("logout")) {
+    UriBuilder redirectUriBuilder=UriBuilder.fromUri(OFFLINE_CLIENT_APP_URI);
+    if (req.getParameter(OAuth2Constants.SCOPE) != null) {
+      redirectUriBuilder.queryParam(OAuth2Constants.SCOPE,req.getParameter(OAuth2Constants.SCOPE));
+    }
+    String redirectUri=redirectUriBuilder.build().toString();
+    String serverLogoutRedirect=UriBuilder.fromUri(ADAPTER_ROOT_URL + "/auth/realms/test/protocol/openid-connect/logout").queryParam("redirect_uri",redirectUri).build().toString();
+    resp.sendRedirect(serverLogoutRedirect);
+    return;
+  }
+  StringBuilder response=new StringBuilder("<html><head><title>Offline token servlet</title></head><body><pre>");
+  RefreshableKeycloakSecurityContext ctx=(RefreshableKeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
+  String accessTokenPretty=JsonSerialization.writeValueAsPrettyString(ctx.getToken());
+  RefreshToken refreshToken;
+  try {
+    refreshToken=new JWSInput(ctx.getRefreshToken()).readJsonContent(RefreshToken.class);
+  }
+ catch (  JWSInputException e) {
+    throw new IOException(e);
+  }
+  String refreshTokenPretty=JsonSerialization.writeValueAsPrettyString(refreshToken);
+  response=response.append("<span id=\"accessToken\">" + accessTokenPretty + "</span>").append("<span id=\"refreshToken\">" + refreshTokenPretty + "</span>").append("</pre></body></html>");
+  resp.getWriter().println(response.toString());
+}

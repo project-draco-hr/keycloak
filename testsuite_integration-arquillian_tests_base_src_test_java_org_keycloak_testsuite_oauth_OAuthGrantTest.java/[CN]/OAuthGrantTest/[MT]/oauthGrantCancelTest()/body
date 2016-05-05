@@ -1,5 +1,5 @@
 {
-  oauth.clientId("third-party");
+  oauth.clientId(THIRD_PARTY_APP);
   oauth.doLoginGrant("test-user@localhost","password");
   grantPage.assertCurrent();
   Assert.assertTrue(driver.getPageSource().contains(ROLE_USER));
@@ -7,5 +7,5 @@
   grantPage.cancel();
   Assert.assertTrue(oauth.getCurrentQuery().containsKey(OAuth2Constants.ERROR));
   assertEquals("access_denied",oauth.getCurrentQuery().get(OAuth2Constants.ERROR));
-  events.expectLogin().client("third-party").error("rejected_by_user").removeDetail(Details.CONSENT).assertEvent();
+  events.expectLogin().client(THIRD_PARTY_APP).error("rejected_by_user").removeDetail(Details.CONSENT).assertEvent();
 }

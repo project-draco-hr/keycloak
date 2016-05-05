@@ -1,12 +1,12 @@
 {
-  oauth.clientId("third-party");
+  oauth.clientId(THIRD_PARTY_APP);
   oauth.doLoginGrant("test-user@localhost","password");
   grantPage.assertCurrent();
   Assert.assertTrue(driver.getPageSource().contains(ROLE_USER));
   Assert.assertTrue(driver.getPageSource().contains(ROLE_CUSTOMER));
   grantPage.accept();
   Assert.assertTrue(oauth.getCurrentQuery().containsKey(OAuth2Constants.CODE));
-  Event loginEvent=events.expectLogin().client("third-party").detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
+  EventRepresentation loginEvent=events.expectLogin().client(THIRD_PARTY_APP).detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
   String codeId=loginEvent.getDetails().get(Details.CODE_ID);
   String sessionId=loginEvent.getSessionId();
   OAuthClient.AccessTokenResponse accessToken=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get(OAuth2Constants.CODE),"password");
@@ -21,10 +21,10 @@
   assertEquals(1,resourceAccess.size());
   assertEquals(1,resourceAccess.get("test-app").getRoles().size());
   Assert.assertTrue(resourceAccess.get("test-app").isUserInRole("customer-user"));
-  events.expectCodeToToken(codeId,loginEvent.getSessionId()).client("third-party").assertEvent();
+  events.expectCodeToToken(codeId,loginEvent.getSessionId()).client(THIRD_PARTY_APP).assertEvent();
   accountAppsPage.open();
   assertEquals(1,driver.findElements(By.id("revoke-third-party")).size());
-  accountAppsPage.revokeGrant("third-party");
-  events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,"third-party").assertEvent();
+  accountAppsPage.revokeGrant(THIRD_PARTY_APP);
+  events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,THIRD_PARTY_APP).assertEvent();
   assertEquals(0,driver.findElements(By.id("revoke-third-party")).size());
 }

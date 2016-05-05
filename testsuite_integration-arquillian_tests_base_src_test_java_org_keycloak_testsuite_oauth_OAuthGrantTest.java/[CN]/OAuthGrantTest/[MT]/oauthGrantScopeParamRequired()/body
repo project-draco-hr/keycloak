@@ -1,0 +1,31 @@
+{
+  RealmResource appRealm=adminClient.realm(REALM_NAME);
+  ClientResource thirdParty=findClientByClientId(appRealm,THIRD_PARTY_APP);
+  thirdParty.roles().create(RoleBuilder.create().id("bar-role").name("bar-role").scopeParamRequired(true).build());
+  RoleRepresentation barAppRole=thirdParty.roles().get("bar-role").toRepresentation();
+  appRealm.roles().create(RoleBuilder.create().id("foo-role").name("foo-role").scopeParamRequired(true).build());
+  RoleRepresentation fooRole=appRealm.roles().get("foo-role").toRepresentation();
+  ClientManager.realm(appRealm).clientId(THIRD_PARTY_APP).addScopeMapping(fooRole);
+  UserResource testUser=findUserByUsernameId(appRealm,"test-user@localhost");
+  testUser.roles().clientLevel(thirdParty.toRepresentation().getId()).add(Collections.singletonList(barAppRole));
+  testUser.roles().realmLevel().add(Collections.singletonList(fooRole));
+  oauth.clientId(THIRD_PARTY_APP);
+  oauth.doLoginGrant("test-user@localhost","password");
+  grantPage.assertCurrent();
+  Assert.assertFalse(driver.getPageSource().contains("foo-role"));
+  Assert.assertFalse(driver.getPageSource().contains("bar-role"));
+  grantPage.cancel();
+  events.expectLogin().client(THIRD_PARTY_APP).error("rejected_by_user").removeDetail(Details.CONSENT).assertEvent();
+  oauth.scope("foo-role third-party/bar-role");
+  oauth.doLoginGrant("test-user@localhost","password");
+  grantPage.assertCurrent();
+  Assert.assertTrue(driver.getPageSource().contains("foo-role"));
+  Assert.assertTrue(driver.getPageSource().contains("bar-role"));
+  grantPage.accept();
+  events.expectLogin().client(THIRD_PARTY_APP).detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
+  accountAppsPage.open();
+  accountAppsPage.revokeGrant(THIRD_PARTY_APP);
+  events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,THIRD_PARTY_APP).assertEvent();
+  appRealm.roles().deleteRole(fooRole.getName());
+  thirdParty.roles().deleteRole(barAppRole.getName());
+}

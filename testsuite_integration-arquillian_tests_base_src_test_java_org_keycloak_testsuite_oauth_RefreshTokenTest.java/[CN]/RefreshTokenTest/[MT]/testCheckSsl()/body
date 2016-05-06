@@ -1,0 +1,45 @@
+{
+  Client client=ClientBuilder.newClient();
+  UriBuilder builder=UriBuilder.fromUri(AUTH_SERVER_ROOT);
+  URI grantUri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
+  WebTarget grantTarget=client.target(grantUri);
+  builder=UriBuilder.fromUri(AUTH_SERVER_ROOT);
+  URI uri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
+  WebTarget refreshTarget=client.target(uri);
+  String refreshToken=null;
+{
+    Response response=executeGrantAccessTokenRequest(grantTarget);
+    assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    refreshToken=tokenResponse.getRefreshToken();
+    response.close();
+  }
+{
+    Response response=executeRefreshToken(refreshTarget,refreshToken);
+    assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    refreshToken=tokenResponse.getRefreshToken();
+    response.close();
+  }
+{
+    RealmResource realmResource=adminClient.realm("test");
+{
+      RealmManager.realm(realmResource).sslRequired(SslRequired.ALL.toString());
+    }
+    Response response=executeRefreshToken(refreshTarget,refreshToken);
+    assertEquals(403,response.getStatus());
+    response.close();
+{
+      RealmManager.realm(realmResource).sslRequired(SslRequired.EXTERNAL.toString());
+    }
+  }
+{
+    Response response=executeRefreshToken(refreshTarget,refreshToken);
+    assertEquals(200,response.getStatus());
+    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
+    refreshToken=tokenResponse.getRefreshToken();
+    response.close();
+  }
+  client.close();
+  events.clear();
+}

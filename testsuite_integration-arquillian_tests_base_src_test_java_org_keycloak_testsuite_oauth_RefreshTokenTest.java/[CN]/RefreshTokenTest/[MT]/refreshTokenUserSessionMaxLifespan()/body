@@ -1,0 +1,21 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  EventRepresentation loginEvent=events.expectLogin().assertEvent();
+  String sessionId=loginEvent.getSessionId();
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
+  events.poll();
+  String refreshId=oauth.verifyRefreshToken(tokenResponse.getRefreshToken()).getId();
+  RealmResource realmResource=adminClient.realm("test");
+  Integer maxLifespan=realmResource.toRepresentation().getSsoSessionMaxLifespan();
+  RealmManager.realm(realmResource).ssoSessionMaxLifespan(1);
+  Time.setOffset(1);
+  tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
+  assertEquals(400,tokenResponse.getStatusCode());
+  assertNull(tokenResponse.getAccessToken());
+  assertNull(tokenResponse.getRefreshToken());
+  RealmManager.realm(realmResource).ssoSessionMaxLifespan(maxLifespan);
+  events.expectRefresh(refreshId,sessionId).error(Errors.INVALID_TOKEN);
+  events.clear();
+  Time.setOffset(0);
+}

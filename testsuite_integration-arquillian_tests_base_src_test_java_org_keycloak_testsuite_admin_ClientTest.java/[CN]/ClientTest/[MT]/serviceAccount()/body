@@ -1,0 +1,6 @@
+{
+  Response response=realm.clients().create(ClientBuilder.create().clientId("serviceClient").serviceAccount().build());
+  String id=ApiUtil.getCreatedId(response);
+  UserRepresentation userRep=realm.clients().get(id).getServiceAccountUser();
+  assertEquals("service-account-serviceclient",userRep.getUsername());
+}

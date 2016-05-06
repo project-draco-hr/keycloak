@@ -1,0 +1,16 @@
+{
+  IdentityProviderRepresentation idp=createIdentityProvider(IDP_SAML_ALIAS,IDP_SAML_PROVIDER_ID);
+  idp.setTrustEmail(true);
+  idp.setAddReadTokenRoleOnCreate(true);
+  idp.setStoreToken(true);
+  Map<String,String> config=idp.getConfig();
+  config.put("singleSignOnServiceUrl",getAuthRoot() + "/auth/realms/" + REALM_PROV_NAME+ "/protocol/saml");
+  config.put("singleLogoutServiceUrl",getAuthRoot() + "/auth/realms/" + REALM_PROV_NAME+ "/protocol/saml");
+  config.put("nameIDPolicyFormat","urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress");
+  config.put("forceAuthn","true");
+  config.put("postBindingResponse","true");
+  config.put("postBindingAuthnRequest","true");
+  config.put("validateSignature","false");
+  config.put("wantAuthnRequestsSigned","false");
+  return idp;
+}

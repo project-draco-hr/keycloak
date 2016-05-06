@@ -1,0 +1,13 @@
+{
+  Dictionary properties=null;
+  ServiceReference reference=bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
+  ConfigurationAdmin admin=(ConfigurationAdmin)bundleContext.getService(reference);
+  try {
+    Configuration configuration=admin.getConfiguration("org.apache.cxf.osgi");
+    properties=configuration.getProperties();
+  }
+ catch (  Exception e) {
+    log.warn("Unable to obtain cxf osgi configadmin reference.",e);
+  }
+  return properties;
+}

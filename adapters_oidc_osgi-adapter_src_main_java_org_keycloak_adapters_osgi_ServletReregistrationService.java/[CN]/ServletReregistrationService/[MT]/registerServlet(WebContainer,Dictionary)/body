@@ -1,0 +1,47 @@
+{
+  HttpContext httpContext=webContainer.createDefaultHttpContext();
+  ServiceReference destinationServiceServiceReference=bundleContext.getServiceReference("org.apache.cxf.transport.http.DestinationRegistry");
+  DestinationRegistry destinationRegistry=(DestinationRegistry)bundleContext.getService(destinationServiceServiceReference);
+  Servlet servlet=new CXFNonSpringServlet(destinationRegistry,false);
+  try {
+    if (properties == null) {
+      properties=new Properties();
+    }
+    Properties sprops=new Properties();
+    sprops.put("init-prefix",getProp(properties,CXF_SERVLET_PREFIX + "init-prefix",""));
+    sprops.put("servlet-name",getProp(properties,CXF_SERVLET_PREFIX + "name","cxf-osgi-transport-servlet"));
+    sprops.put("hide-service-list-page",getProp(properties,CXF_SERVLET_PREFIX + "hide-service-list-page","false"));
+    sprops.put("disable-address-updates",getProp(properties,CXF_SERVLET_PREFIX + "disable-address-updates","true"));
+    sprops.put("base-address",getProp(properties,CXF_SERVLET_PREFIX + "base-address",""));
+    sprops.put("service-list-path",getProp(properties,CXF_SERVLET_PREFIX + "service-list-path",""));
+    sprops.put("static-resources-list",getProp(properties,CXF_SERVLET_PREFIX + "static-resources-list",""));
+    sprops.put("redirects-list",getProp(properties,CXF_SERVLET_PREFIX + "redirects-list",""));
+    sprops.put("redirect-servlet-name",getProp(properties,CXF_SERVLET_PREFIX + "redirect-servlet-name",""));
+    sprops.put("redirect-servlet-path",getProp(properties,CXF_SERVLET_PREFIX + "redirect-servlet-path",""));
+    sprops.put("service-list-all-contexts",getProp(properties,CXF_SERVLET_PREFIX + "service-list-all-contexts",""));
+    sprops.put("service-list-page-authenticate",getProp(properties,CXF_SERVLET_PREFIX + "service-list-page-authenticate","false"));
+    sprops.put("service-list-page-authenticate-realm",getProp(properties,CXF_SERVLET_PREFIX + "service-list-page-authenticate-realm","karaf"));
+    sprops.put("use-x-forwarded-headers",getProp(properties,CXF_SERVLET_PREFIX + "use-x-forwarded-headers","false"));
+    if (Boolean.valueOf(getProp(properties,CXF_SERVLET_PREFIX + "support.extra.properties","true").toString())) {
+      Enumeration keys=properties.keys();
+      while (keys.hasMoreElements()) {
+        String nextKey=keys.nextElement().toString();
+        if (!nextKey.startsWith(CXF_SERVLET_PREFIX)) {
+          sprops.put(nextKey,properties.get(nextKey));
+        }
+      }
+    }
+    Hashtable<String,Object> servletInitParams=new Hashtable<String,Object>();
+    Enumeration keys=sprops.keys();
+    while (keys.hasMoreElements()) {
+      String propName=(String)keys.nextElement();
+      if (!FILTERED_PROPERTIES.contains(propName)) {
+        servletInitParams.put(propName,sprops.getProperty(propName));
+      }
+    }
+    webContainer.registerServlet(alias,servlet,servletInitParams,httpContext);
+  }
+ catch (  Exception e) {
+    log.error("Can't register servlet in web container",e);
+  }
+}

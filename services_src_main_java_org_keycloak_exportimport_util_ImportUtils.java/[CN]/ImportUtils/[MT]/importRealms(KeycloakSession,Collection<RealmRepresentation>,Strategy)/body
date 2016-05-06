@@ -1,12 +1,23 @@
 {
+  boolean masterImported=false;
   for (  RealmRepresentation realm : realms) {
     if (Config.getAdminRealm().equals(realm.getRealm())) {
-      importRealm(session,realm,strategy);
+      if (importRealm(session,realm,strategy)) {
+        masterImported=true;
+      }
     }
   }
   for (  RealmRepresentation realm : realms) {
     if (!Config.getAdminRealm().equals(realm.getRealm())) {
       importRealm(session,realm,strategy);
+    }
+  }
+  if (masterImported) {
+    for (    RealmModel realm : session.realms().getRealms()) {
+      if (realm.getMasterAdminClient() == null) {
+        logger.infof("Re-created management client in master realm for realm '%s'",realm.getName());
+        new RealmManager(session).setupMasterAdminManagement(realm);
+      }
     }
   }
 }

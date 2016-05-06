@@ -2,5 +2,7 @@
   UserAdapter mongoUser=getUserById(federatedUser.getId(),realm);
   MongoUserEntity userEntity=mongoUser.getUser();
   FederatedIdentityEntity federatedIdentityEntity=findFederatedIdentityLink(userEntity,federatedIdentityModel.getIdentityProvider());
+  userEntity.getFederatedIdentities().remove(federatedIdentityEntity);
   federatedIdentityEntity.setToken(federatedIdentityModel.getToken());
+  getMongoStore().pushItemToList(userEntity,"federatedIdentities",federatedIdentityEntity,true,invocationContext);
 }

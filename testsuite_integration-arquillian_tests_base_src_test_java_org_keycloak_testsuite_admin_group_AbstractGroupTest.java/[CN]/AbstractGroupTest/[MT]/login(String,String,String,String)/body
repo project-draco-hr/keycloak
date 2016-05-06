@@ -1,6 +1,6 @@
 {
-  AccessTokenResponse tokenResponse=deleteMeOAuthClient.getToken("test",clientId,clientSecret,login,"password");
-  String accessToken=tokenResponse.getToken();
+  AccessTokenResponse tokenResponse=oauth.doGrantAccessTokenRequest("test",login,"password",null,clientId,clientSecret);
+  String accessToken=tokenResponse.getAccessToken();
   String refreshToken=tokenResponse.getRefreshToken();
   PublicKey publicKey=PemUtils.decodePublicKey(adminClient.realm("test").toRepresentation().getPublicKey());
   AccessToken accessTokenRepresentation=RSATokenVerifier.verifyToken(accessToken,publicKey,AuthServerTestEnricher.getAuthServerContextRoot() + "/auth/realms/test");
@@ -9,6 +9,6 @@
     throw new RuntimeException("Invalid refresh token");
   }
   RefreshToken refreshTokenRepresentation=jws.readJsonContent(RefreshToken.class);
-  events.expectLogin().client(clientId).user(userId).session(tokenResponse.getSessionState()).detail(Details.GRANT_TYPE,OAuth2Constants.PASSWORD).detail(Details.TOKEN_ID,accessTokenRepresentation.getId()).detail(Details.REFRESH_TOKEN_ID,refreshTokenRepresentation.getId()).detail(Details.USERNAME,login).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).assertEvent();
+  events.expectLogin().client(clientId).user(userId).detail(Details.GRANT_TYPE,OAuth2Constants.PASSWORD).detail(Details.TOKEN_ID,accessTokenRepresentation.getId()).detail(Details.REFRESH_TOKEN_ID,refreshTokenRepresentation.getId()).detail(Details.USERNAME,login).removeDetail(Details.CODE_ID).removeDetail(Details.REDIRECT_URI).removeDetail(Details.CONSENT).assertEvent();
   return accessTokenRepresentation;
 }

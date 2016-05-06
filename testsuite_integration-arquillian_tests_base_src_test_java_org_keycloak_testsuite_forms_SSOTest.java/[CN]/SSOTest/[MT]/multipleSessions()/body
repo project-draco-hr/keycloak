@@ -1,0 +1,33 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  Assert.assertNotNull(oauth.getCurrentQuery().get(OAuth2Constants.CODE));
+  EventRepresentation login1=events.expectLogin().assertEvent();
+  try {
+    OAuthClient oauth2=new OAuthClient();
+    oauth2.setDriver(driver2);
+    oauth2.setAdminClient(adminClient);
+    oauth2.state("mystate");
+    oauth2.doLogin("test-user@localhost","password");
+    EventRepresentation login2=events.expectLogin().assertEvent();
+    Assert.assertEquals(RequestType.AUTH_RESPONSE,RequestType.valueOf(driver2.getTitle()));
+    Assert.assertNotNull(oauth2.getCurrentQuery().get(OAuth2Constants.CODE));
+    assertNotEquals(login1.getSessionId(),login2.getSessionId());
+    oauth.openLogout();
+    events.expectLogout(login1.getSessionId()).assertEvent();
+    oauth.openLoginForm();
+    assertTrue(loginPage.isCurrent());
+    oauth2.openLoginForm();
+    events.expectLogin().session(login2.getSessionId()).removeDetail(Details.USERNAME).assertEvent();
+    Assert.assertEquals(RequestType.AUTH_RESPONSE,RequestType.valueOf(driver2.getTitle()));
+    Assert.assertNotNull(oauth2.getCurrentQuery().get(OAuth2Constants.CODE));
+    oauth2.openLogout();
+    events.expectLogout(login2.getSessionId()).assertEvent();
+    oauth2.openLoginForm();
+    assertTrue(driver2.getTitle().equals("Log in to test"));
+  }
+  finally {
+    driver2.close();
+  }
+}

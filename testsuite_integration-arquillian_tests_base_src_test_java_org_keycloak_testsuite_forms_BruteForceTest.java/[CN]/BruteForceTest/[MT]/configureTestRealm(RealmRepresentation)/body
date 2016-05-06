@@ -1,0 +1,11 @@
+{
+  UserRepresentation user=findUserInRealmRep(testRealm,"test-user@localhost");
+  CredentialRepresentation credRep=new CredentialRepresentation();
+  credRep.setType(CredentialRepresentation.TOTP);
+  credRep.setValue("totpSecret");
+  user.getCredentials().add(credRep);
+  user.setTotp(Boolean.TRUE);
+  testRealm.setBruteForceProtected(true);
+  testRealm.setFailureFactor(2);
+  findClientInRealmRep(testRealm,"test-app").setDirectAccessGrantsEnabled(true);
+}

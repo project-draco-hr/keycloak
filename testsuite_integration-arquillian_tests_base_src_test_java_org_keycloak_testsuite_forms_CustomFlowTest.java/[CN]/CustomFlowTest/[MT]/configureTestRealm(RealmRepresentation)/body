@@ -1,0 +1,9 @@
+{
+  UserRepresentation user=UserBuilder.create().username("login-test").email("login@test.com").enabled(true).build();
+  testRealm.getUsers().add(user);
+  ClientRepresentation dummyClient=ClientBuilder.create().clientId("dummy-client").name("dummy-client").authenticatorType(PassThroughClientAuthenticator.PROVIDER_ID).directAccessGrants().build();
+  testRealm.getClients().add(dummyClient);
+  ClientRepresentation testApp=findClientInRealmRep(testRealm,"test-app");
+  testApp.setClientAuthenticatorType(PassThroughClientAuthenticator.PROVIDER_ID);
+  testApp.setDirectAccessGrantsEnabled(true);
+}

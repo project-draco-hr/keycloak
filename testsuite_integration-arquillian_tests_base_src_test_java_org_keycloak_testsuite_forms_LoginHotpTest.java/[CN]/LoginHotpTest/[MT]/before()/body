@@ -1,0 +1,14 @@
+{
+  RealmRepresentation testRealm=testRealm().toRepresentation();
+  testRealm.setOtpPolicyType(UserCredentialModel.HOTP);
+  testRealm.setOtpPolicyLookAheadWindow(2);
+  testRealm().update(testRealm);
+  policy=new OTPPolicy();
+  policy.setAlgorithm(testRealm.getOtpPolicyAlgorithm());
+  policy.setDigits(testRealm.getOtpPolicyDigits());
+  policy.setInitialCounter(testRealm.getOtpPolicyInitialCounter());
+  policy.setLookAheadWindow(testRealm.getOtpPolicyLookAheadWindow());
+  policy.setPeriod(testRealm.getOtpPolicyLookAheadWindow());
+  policy.setType(testRealm.getOtpPolicyType());
+  otp=new HmacOTP(policy.getDigits(),policy.getAlgorithm(),policy.getLookAheadWindow());
+}

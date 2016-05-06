@@ -1,0 +1,8 @@
+{
+  AuthenticationFlowRepresentation flow=FlowBuilder.create().alias("dummy registration").description("dummy pass through registration").providerId("basic-flow").topLevel(true).builtIn(false).build();
+  testRealm().flows().createFlow(flow);
+  setRegistrationFlow(flow);
+  flow=findFlowByAlias(flow.getAlias());
+  AuthenticationExecutionRepresentation execution=ExecutionBuilder.create().parentFlow(flow.getId()).requirement(AuthenticationExecutionModel.Requirement.REQUIRED.toString()).authenticator(PassThroughRegistration.PROVIDER_ID).priority(10).authenticatorFlow(false).build();
+  testRealm().flows().addExecution(execution);
+}

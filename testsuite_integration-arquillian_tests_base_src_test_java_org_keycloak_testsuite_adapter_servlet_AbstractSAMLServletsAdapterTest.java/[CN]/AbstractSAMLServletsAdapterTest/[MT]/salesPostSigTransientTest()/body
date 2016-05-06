@@ -1,13 +1,9 @@
 {
   salesPostSigTransientServletPage.navigateTo();
   testRealmSAMLPostLoginPage.form().login(bburkeUser);
-  assertFalse(driver.getPageSource().contains("bburke"));
-  assertTrue(driver.getPageSource().contains("principal=G-"));
+  waitUntilElement(By.xpath("//body")).text().not().contains("bburke");
+  waitUntilElement(By.xpath("//body")).text().contains("principal=G-");
   salesPostSigTransientServletPage.logout();
-  salesPostSigTransientServletPage.navigateTo();
-  assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
-  testRealmSAMLPostLoginPage.form().login("unauthorized","password");
-  assertFalse(driver.getPageSource().contains("principal="));
-  assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("Status 403"));
+  assertForbiddenLogin(salesPostSigTransientServletPage,"unauthorized","password",testRealmSAMLPostLoginPage);
   salesPostSigTransientServletPage.logout();
 }

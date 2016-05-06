@@ -7,6 +7,12 @@
   }
  catch (  BadRequestException expected) {
   }
+  try {
+    authMgmtResource.addExecution("not-existent",params);
+    Assert.fail("add execution to not-existent flow should fail");
+  }
+ catch (  BadRequestException expected) {
+  }
   params.put("newName","Copy of browser");
   Response response=authMgmtResource.copy("browser",params);
   try {
@@ -41,6 +47,23 @@
   response=authMgmtResource.addExecution(rep);
   try {
     Assert.assertEquals("added execution missing parent flow",400,response.getStatus());
+  }
+  finally {
+    response.close();
+  }
+  rep.setParentFlow("not-existent-id");
+  response=authMgmtResource.addExecution(rep);
+  try {
+    Assert.assertEquals("added execution missing parent flow",400,response.getStatus());
+  }
+  finally {
+    response.close();
+  }
+  AuthenticationFlowRepresentation browserFlow=findFlowByAlias("browser",authMgmtResource.getFlows());
+  rep.setParentFlow(browserFlow.getId());
+  response=authMgmtResource.addExecution(rep);
+  try {
+    Assert.assertEquals("added execution to builtin flow",400,response.getStatus());
   }
   finally {
     response.close();

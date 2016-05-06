@@ -1,0 +1,18 @@
+{
+  AuthenticatorConfigRepresentation cfg=newConfig("foo",IdpCreateUserIfUniqueAuthenticatorFactory.REQUIRE_PASSWORD_UPDATE_AFTER_REGISTRATION,"true");
+  String cfgId=createConfig(executionId,cfg);
+  AuthenticatorConfigRepresentation cfgRep=authMgmtResource.getAuthenticatorConfig(cfgId);
+  try {
+    authMgmtResource.updateAuthenticatorConfig("not-existent",cfgRep);
+    Assert.fail("Config didn't found");
+  }
+ catch (  NotFoundException nfe) {
+  }
+  cfgRep=authMgmtResource.getAuthenticatorConfig(cfgId);
+  assertConfig(cfgRep,cfgId,"foo",IdpCreateUserIfUniqueAuthenticatorFactory.REQUIRE_PASSWORD_UPDATE_AFTER_REGISTRATION,"true");
+  cfgRep.setAlias("foo2");
+  cfgRep.getConfig().put("configKey2","configValue2");
+  authMgmtResource.updateAuthenticatorConfig(cfgRep.getId(),cfgRep);
+  cfgRep=authMgmtResource.getAuthenticatorConfig(cfgRep.getId());
+  assertConfig(cfgRep,cfgId,"foo2",IdpCreateUserIfUniqueAuthenticatorFactory.REQUIRE_PASSWORD_UPDATE_AFTER_REGISTRATION,"true","configKey2","configValue2");
+}

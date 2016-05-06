@@ -1,0 +1,22 @@
+{
+  AuthenticatorConfigRepresentation cfg=newConfig("foo",IdpCreateUserIfUniqueAuthenticatorFactory.REQUIRE_PASSWORD_UPDATE_AFTER_REGISTRATION,"true");
+  String cfgId=createConfig(executionId,cfg);
+  AuthenticatorConfigRepresentation cfgRep=authMgmtResource.getAuthenticatorConfig(cfgId);
+  AuthenticationExecutionInfoRepresentation execution=findExecutionByProvider(IdpCreateUserIfUniqueAuthenticatorFactory.PROVIDER_ID,authMgmtResource.getExecutions("firstBrokerLogin2"));
+  Assert.assertEquals(cfgRep.getId(),execution.getAuthenticationConfig());
+  try {
+    authMgmtResource.removeAuthenticatorConfig("not-existent");
+    Assert.fail("Config didn't found");
+  }
+ catch (  NotFoundException nfe) {
+  }
+  authMgmtResource.removeAuthenticatorConfig(cfgRep.getId());
+  try {
+    authMgmtResource.getAuthenticatorConfig(cfgRep.getId());
+    Assert.fail("Not expected to find config");
+  }
+ catch (  NotFoundException nfe) {
+  }
+  execution=findExecutionByProvider(IdpCreateUserIfUniqueAuthenticatorFactory.PROVIDER_ID,authMgmtResource.getExecutions("firstBrokerLogin2"));
+  Assert.assertNull(execution.getAuthenticationConfig());
+}

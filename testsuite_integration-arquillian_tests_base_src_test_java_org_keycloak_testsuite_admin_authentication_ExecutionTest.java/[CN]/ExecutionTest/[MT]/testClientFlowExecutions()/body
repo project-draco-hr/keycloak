@@ -1,0 +1,45 @@
+{
+  AuthenticationFlowRepresentation clientFlow=newFlow("new-client-flow","desc",AuthenticationFlow.CLIENT_FLOW,true,false);
+  Response response=authMgmtResource.createFlow(clientFlow);
+  Assert.assertEquals(201,response.getStatus());
+  response.close();
+  Map<String,String> executionData=new HashMap<>();
+  executionData.put("provider",ClientIdAndSecretAuthenticator.PROVIDER_ID);
+  authMgmtResource.addExecution("new-client-flow",executionData);
+  try {
+    authMgmtResource.getExecutions("not-existent");
+    Assert.fail("Not expected to find executions");
+  }
+ catch (  NotFoundException nfe) {
+  }
+  List<AuthenticationExecutionInfoRepresentation> executions=authMgmtResource.getExecutions("new-client-flow");
+  AuthenticationExecutionInfoRepresentation executionRep=findExecutionByProvider(ClientIdAndSecretAuthenticator.PROVIDER_ID,executions);
+  Assert.assertNotNull(executionRep);
+  try {
+    authMgmtResource.updateExecutions("not-existent",executionRep);
+    Assert.fail("Not expected to update execution with not-existent flow");
+  }
+ catch (  NotFoundException nfe) {
+  }
+  try {
+    AuthenticationExecutionInfoRepresentation executionRep2=new AuthenticationExecutionInfoRepresentation();
+    executionRep2.setId("not-existent");
+    authMgmtResource.updateExecutions("new-client-flow",executionRep2);
+    Assert.fail("Not expected to update not-existent execution");
+  }
+ catch (  NotFoundException nfe) {
+  }
+  executionRep.setRequirement(ALTERNATIVE);
+  authMgmtResource.updateExecutions("new-client-flow",executionRep);
+  executionRep=findExecutionByProvider(ClientIdAndSecretAuthenticator.PROVIDER_ID,authMgmtResource.getExecutions("new-client-flow"));
+  Assert.assertEquals(ALTERNATIVE,executionRep.getRequirement());
+  try {
+    authMgmtResource.removeExecution("not-existent");
+    Assert.fail("Didn't expect to find execution");
+  }
+ catch (  NotFoundException nfe) {
+  }
+  authMgmtResource.removeExecution(executionRep.getId());
+  AuthenticationFlowRepresentation rep=findFlowByAlias("new-client-flow",authMgmtResource.getFlows());
+  authMgmtResource.deleteFlow(rep.getId());
+}

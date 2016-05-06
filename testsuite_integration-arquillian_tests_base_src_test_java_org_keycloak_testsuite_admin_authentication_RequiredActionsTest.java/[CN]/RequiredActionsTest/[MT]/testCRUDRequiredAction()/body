@@ -1,0 +1,32 @@
+{
+  List<RequiredActionProviderSimpleRepresentation> result=authMgmtResource.getUnregisteredRequiredActions();
+  Assert.assertEquals(1,result.size());
+  RequiredActionProviderSimpleRepresentation action=result.get(0);
+  Assert.assertEquals(DummyRequiredActionFactory.PROVIDER_ID,action.getProviderId());
+  Assert.assertEquals("Dummy Action",action.getName());
+  authMgmtResource.registerRequiredAction(action);
+  try {
+    authMgmtResource.getRequiredAction("not-existent");
+    Assert.fail("Didn't expect to find requiredAction of alias 'not-existent'");
+  }
+ catch (  NotFoundException nfe) {
+  }
+  RequiredActionProviderRepresentation rep=authMgmtResource.getRequiredAction(DummyRequiredActionFactory.PROVIDER_ID);
+  compareRequiredAction(rep,newRequiredAction(DummyRequiredActionFactory.PROVIDER_ID,"Dummy Action",true,false,Collections.emptyMap()));
+  try {
+    authMgmtResource.updateRequiredAction("not-existent",rep);
+    Assert.fail("Not expected to update not-existent requiredAction");
+  }
+ catch (  NotFoundException nfe) {
+  }
+  rep.setDefaultAction(true);
+  authMgmtResource.updateRequiredAction(DummyRequiredActionFactory.PROVIDER_ID,rep);
+  compareRequiredAction(rep,newRequiredAction(DummyRequiredActionFactory.PROVIDER_ID,"Dummy Action",true,true,Collections.emptyMap()));
+  try {
+    authMgmtResource.removeRequiredAction("not-existent");
+    Assert.fail("Not expected to remove not-existent requiredAction");
+  }
+ catch (  NotFoundException nfe) {
+  }
+  authMgmtResource.removeRequiredAction(DummyRequiredActionFactory.PROVIDER_ID);
+}

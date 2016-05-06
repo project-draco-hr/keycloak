@@ -1,0 +1,17 @@
+{
+  List<AuthenticationExecutionInfoRepresentation> executions=authMgmtResource.getExecutions("browser");
+  AuthenticationExecutionInfoRepresentation last=executions.get(executions.size() - 1);
+  AuthenticationExecutionInfoRepresentation oneButLast=executions.get(executions.size() - 2);
+  try {
+    authMgmtResource.raisePriority(last.getId());
+    Assert.fail("Not expected to raise priority of builtin flow");
+  }
+ catch (  BadRequestException nfe) {
+  }
+  try {
+    authMgmtResource.lowerPriority(oneButLast.getId());
+    Assert.fail("Not expected to lower priority of builtin flow");
+  }
+ catch (  BadRequestException nfe) {
+  }
+}

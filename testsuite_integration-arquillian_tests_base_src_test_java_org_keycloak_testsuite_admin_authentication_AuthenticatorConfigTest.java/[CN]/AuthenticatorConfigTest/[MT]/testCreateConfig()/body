@@ -1,0 +1,10 @@
+{
+  AuthenticatorConfigRepresentation cfg=newConfig("foo",IdpCreateUserIfUniqueAuthenticatorFactory.REQUIRE_PASSWORD_UPDATE_AFTER_REGISTRATION,"true");
+  Response response=authMgmtResource.newExecutionConfig("exec-id-doesnt-exists",cfg);
+  Assert.assertEquals(404,response.getStatus());
+  response.close();
+  String cfgId=createConfig(executionId,cfg);
+  AuthenticatorConfigRepresentation cfgRep=authMgmtResource.getAuthenticatorConfig(cfgId);
+  assertConfig(cfgRep,cfgId,"foo",IdpCreateUserIfUniqueAuthenticatorFactory.REQUIRE_PASSWORD_UPDATE_AFTER_REGISTRATION,"true");
+  authMgmtResource.removeAuthenticatorConfig(cfgId);
+}

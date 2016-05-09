@@ -1,2 +1,144 @@
 {
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      clients.get("master-none").realms().findAll();
+    }
+  }
+,clients.get("none"),false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      clients.get("none").realms().findAll();
+    }
+  }
+,clients.get("none"),false);
+  Assert.assertNames(clients.get("master-admin").realms().findAll(),"master",REALM_NAME,"realm2");
+  Assert.assertNames(clients.get(AdminRoles.REALM_ADMIN).realms().findAll(),REALM_NAME);
+  Assert.assertNames(clients.get("REALM2").realms().findAll(),"realm2");
+  List<RealmRepresentation> realms=clients.get(AdminRoles.VIEW_USERS).realms().findAll();
+  Assert.assertNames(realms,REALM_NAME);
+  assertGettersEmpty(realms.get(0));
+  realms=clients.get(AdminRoles.VIEW_REALM).realms().findAll();
+  Assert.assertNames(realms,REALM_NAME);
+  assertNotNull(realms.get(0).getAccessTokenLifespan());
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      clients.get("master-admin").realms().create(RealmBuilder.create().name("master").build());
+    }
+  }
+,adminClient,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      clients.get("master-" + AdminRoles.MANAGE_USERS).realms().create(RealmBuilder.create().name("master").build());
+    }
+  }
+,adminClient,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      clients.get(AdminRoles.REALM_ADMIN).realms().create(RealmBuilder.create().name("master").build());
+    }
+  }
+,adminClient,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.toRepresentation();
+    }
+  }
+,Resource.REALM,false,true);
+  assertGettersEmpty(clients.get(AdminRoles.VIEW_USERS).realm(REALM_NAME).toRepresentation());
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.update(new RealmRepresentation());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.pushRevocation();
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.deleteSession("nosuch");
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.getClientSessionStats();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.getDefaultGroups();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.addDefaultGroup("nosuch");
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.removeDefaultGroup("nosuch");
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.getGroupByPath("nosuch");
+    }
+  }
+,Resource.REALM,false);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.testLDAPConnection("nosuch","nosuch","nosuch","nosuch","nosuch"));
+    }
+  }
+,Resource.REALM,true);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.partialImport(new PartialImportRepresentation()));
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clearRealmCache();
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clearUserCache();
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      clients.get("master-admin").realms().realm("nosuch").remove();
+    }
+  }
+,adminClient,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      clients.get("REALM2").realms().realm(REALM_NAME).remove();
+    }
+  }
+,adminClient,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      clients.get(AdminRoles.MANAGE_USERS).realms().realm(REALM_NAME).remove();
+    }
+  }
+,adminClient,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      clients.get(AdminRoles.REALM_ADMIN).realms().realm(REALM_NAME).remove();
+    }
+  }
+,adminClient,true);
 }

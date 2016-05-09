@@ -1,2 +1,110 @@
 {
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().groups();
+    }
+  }
+,Resource.USER,false);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.groups().add(new GroupRepresentation()));
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").toRepresentation();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").update(new GroupRepresentation());
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").remove();
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").members(0,100);
+    }
+  }
+,Resource.USER,false);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.groups().group("nosuch").subGroup(new GroupRepresentation()));
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().getAll();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().realmLevel().listAll();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().realmLevel().listEffective();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().realmLevel().listAvailable();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().realmLevel().add(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().realmLevel().remove(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().clientLevel("nosuch").listAll();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().clientLevel("nosuch").listEffective();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().clientLevel("nosuch").listAvailable();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().clientLevel("nosuch").add(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.groups().group("nosuch").roles().clientLevel("nosuch").remove(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.USER,true);
 }

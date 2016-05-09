@@ -1,2 +1,23 @@
 {
+  driver.navigate().to(getAuthRoot() + "/auth/realms/" + consumerRealmName()+ "/account");
+  log.debug("Clicking social " + getIDPAlias());
+  accountLoginPage.clickSocial(getIDPAlias());
+  Assert.assertTrue("Driver should be on the provider realm page right now",driver.getCurrentUrl().contains("/auth/realms/" + providerRealmName() + "/"));
+  log.debug("Logging in");
+  accountLoginPage.login(getUserLogin(),getUserPassword());
+  Assert.assertTrue("We must be on update user profile page right now",updateAccountInformationPage.isCurrent());
+  Assert.assertTrue("We must be on correct realm right now",driver.getCurrentUrl().contains("/auth/realms/" + consumerRealmName() + "/"));
+  log.debug("Updating info on updateAccount page");
+  updateAccountInformationPage.updateAccountInformation("Firstname","Lastname");
+  UsersResource consumerUsers=adminClient.realm(consumerRealmName()).users();
+  Assert.assertTrue("There must be at least one user",consumerUsers.count() > 0);
+  List<UserRepresentation> users=consumerUsers.search("",0,5);
+  boolean isUserFound=false;
+  for (  UserRepresentation user : users) {
+    if (user.getUsername().equals(getUserLogin()) && user.getEmail().equals(getUserEmail())) {
+      isUserFound=true;
+      break;
+    }
+  }
+  Assert.assertTrue("There must be user " + getUserLogin() + " in realm "+ consumerRealmName(),isUserFound);
 }

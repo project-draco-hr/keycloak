@@ -1,2 +1,185 @@
 {
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getFormProviders();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getAuthenticatorProviders();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getClientAuthenticatorProviders();
+    }
+  }
+,Resource.REALM,false,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getFormActionProviders();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getFlows();
+    }
+  }
+,Resource.REALM,false,true);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.flows().createFlow(new AuthenticationFlowRepresentation()));
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getFlow("nosuch");
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().deleteFlow("nosuch");
+    }
+  }
+,Resource.REALM,true);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.flows().copy("nosuch",Collections.<String,String>emptyMap()));
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().addExecutionFlow("nosuch",Collections.<String,String>emptyMap());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().addExecution("nosuch",Collections.<String,String>emptyMap());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getExecutions("nosuch");
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().updateExecutions("nosuch",new AuthenticationExecutionInfoRepresentation());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      AuthenticationExecutionRepresentation rep=new AuthenticationExecutionRepresentation();
+      rep.setAuthenticator("auth-cookie");
+      rep.setRequirement("OPTIONAL");
+      response.set(realm.flows().addExecution(rep));
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().raisePriority("nosuch");
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().lowerPriority("nosuch");
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().removeExecution("nosuch");
+    }
+  }
+,Resource.REALM,true);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.flows().newExecutionConfig("nosuch",new AuthenticatorConfigRepresentation()));
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getAuthenticatorConfig("nosuch");
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getUnregisteredRequiredActions();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().registerRequiredAction(new RequiredActionProviderSimpleRepresentation());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getRequiredActions();
+    }
+  }
+,Resource.REALM,false,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getRequiredAction("nosuch");
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().removeRequiredAction("nosuch");
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().updateRequiredAction("nosuch",new RequiredActionProviderRepresentation());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getAuthenticatorConfigDescription("nosuch");
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getPerClientConfigDescription();
+    }
+  }
+,Resource.REALM,false,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().getAuthenticatorConfig("nosuch");
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().removeAuthenticatorConfig("nosuch");
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.flows().updateAuthenticatorConfig("nosuch",new AuthenticatorConfigRepresentation());
+    }
+  }
+,Resource.REALM,true);
 }

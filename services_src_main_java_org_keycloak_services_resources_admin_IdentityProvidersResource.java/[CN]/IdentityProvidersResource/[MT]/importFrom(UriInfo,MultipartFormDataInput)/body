@@ -1,6 +1,9 @@
 {
   this.auth.requireManage();
   Map<String,List<InputPart>> formDataMap=input.getFormDataMap();
+  if (!(formDataMap.containsKey("providerId") && formDataMap.containsKey("file"))) {
+    throw new BadRequestException();
+  }
   String providerId=formDataMap.get("providerId").get(0).getBodyAsString();
   InputPart file=formDataMap.get("file").get(0);
   InputStream inputStream=file.getBody(InputStream.class,null);

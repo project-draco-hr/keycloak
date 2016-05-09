@@ -1,2 +1,80 @@
 {
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.identityProviders().findAll();
+    }
+  }
+,Resource.IDENTITY_PROVIDER,false);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.identityProviders().create(IdentityProviderBuilder.create().providerId("nosuch").alias("foo").build()));
+    }
+  }
+,Resource.IDENTITY_PROVIDER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.identityProviders().get("nosuch").toRepresentation();
+    }
+  }
+,Resource.IDENTITY_PROVIDER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.identityProviders().get("nosuch").update(new IdentityProviderRepresentation());
+    }
+  }
+,Resource.IDENTITY_PROVIDER,true);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.identityProviders().get("nosuch").export("saml"));
+    }
+  }
+,Resource.IDENTITY_PROVIDER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.identityProviders().get("nosuch").remove();
+    }
+  }
+,Resource.IDENTITY_PROVIDER,true);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.identityProviders().get("nosuch").addMapper(new IdentityProviderMapperRepresentation()));
+    }
+  }
+,Resource.IDENTITY_PROVIDER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.identityProviders().get("nosuch").delete("nosuch");
+    }
+  }
+,Resource.IDENTITY_PROVIDER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.identityProviders().get("nosuch").getMappers();
+    }
+  }
+,Resource.IDENTITY_PROVIDER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.identityProviders().get("nosuch").getMapperById("nosuch");
+    }
+  }
+,Resource.IDENTITY_PROVIDER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.identityProviders().get("nosuch").getMapperTypes();
+    }
+  }
+,Resource.IDENTITY_PROVIDER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.identityProviders().importFrom(Collections.<String,Object>emptyMap());
+    }
+  }
+,Resource.IDENTITY_PROVIDER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.identityProviders().importFrom(new MultipartFormDataOutput());
+    }
+  }
+,Resource.IDENTITY_PROVIDER,true);
 }

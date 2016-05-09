@@ -1,2 +1,68 @@
 {
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().list();
+    }
+  }
+,Resource.REALM,false,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().get("nosuch").toRepresentation();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().get("nosuch").update(new RoleRepresentation());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().create(new RoleRepresentation());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().deleteRole("nosuch");
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().get("nosuch").getRoleComposites();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().get("nosuch").addComposites(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().get("nosuch").deleteComposites(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().get("nosuch").getRoleComposites();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().get("nosuch").getRealmRoleComposites();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.roles().get("nosuch").getClientRoleComposites("nosuch");
+    }
+  }
+,Resource.REALM,false);
 }

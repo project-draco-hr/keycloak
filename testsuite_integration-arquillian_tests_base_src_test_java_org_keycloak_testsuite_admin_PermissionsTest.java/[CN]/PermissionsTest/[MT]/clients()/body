@@ -1,2 +1,292 @@
 {
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().findAll();
+    }
+  }
+,Resource.CLIENT,false,true);
+  List<ClientRepresentation> l=clients.get(AdminRoles.VIEW_USERS).realm(REALM_NAME).clients().findAll();
+  assertGettersEmpty(l.get(0));
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.convertClientDescription("blahblah");
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.clients().create(ClientBuilder.create().clientId("foo").build()));
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").toRepresentation();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getInstallationProvider("nosuch");
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").update(new ClientRepresentation());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").remove();
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").generateNewSecret();
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").regenerateRegistrationAccessToken();
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getSecret();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getServiceAccountUser();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").pushRevocation();
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getApplicationSessionCount();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getUserSessions(0,100);
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getOfflineSessionCount();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getOfflineUserSessions(0,100);
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").registerNode(Collections.<String,String>emptyMap());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").unregisterNode("nosuch");
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").testNodesAvailable();
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getCertficateResource("nosuch").generate();
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getCertficateResource("nosuch").generateAndGetKeystore(new KeyStoreConfig());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getCertficateResource("nosuch").getKeyInfo();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getCertficateResource("nosuch").getKeystore(new KeyStoreConfig());
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getCertficateResource("nosuch").uploadJks(new MultipartFormDataOutput());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getCertficateResource("nosuch").uploadJksCertificate(new MultipartFormDataOutput());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getProtocolMappers().createMapper(Collections.EMPTY_LIST);
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.clients().get("nosuch").getProtocolMappers().createMapper(new ProtocolMapperRepresentation()));
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getProtocolMappers().getMapperById("nosuch");
+    }
+  }
+,Resource.CLIENT,false,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getProtocolMappers().getMappers();
+    }
+  }
+,Resource.CLIENT,false,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getProtocolMappers().getMappersPerProtocol("nosuch");
+    }
+  }
+,Resource.CLIENT,false,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getProtocolMappers().update("nosuch",new ProtocolMapperRepresentation());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getProtocolMappers().delete("nosuch");
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getScopeMappings().getAll();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getScopeMappings().realmLevel().listAll();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getScopeMappings().realmLevel().listEffective();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getScopeMappings().realmLevel().listAvailable();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getScopeMappings().realmLevel().add(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").getScopeMappings().realmLevel().remove(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").roles().list();
+    }
+  }
+,Resource.CLIENT,false,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").roles().create(new RoleRepresentation());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").roles().get("nosuch").toRepresentation();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").roles().deleteRole("nosuch");
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").roles().get("nosuch").update(new RoleRepresentation());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").roles().get("nosuch").addComposites(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").roles().get("nosuch").deleteComposites(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.CLIENT,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").roles().get("nosuch").getRoleComposites();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").roles().get("nosuch").getRealmRoleComposites();
+    }
+  }
+,Resource.CLIENT,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.clients().get("nosuch").roles().get("nosuch").getClientRoleComposites("nosuch");
+    }
+  }
+,Resource.CLIENT,false);
 }

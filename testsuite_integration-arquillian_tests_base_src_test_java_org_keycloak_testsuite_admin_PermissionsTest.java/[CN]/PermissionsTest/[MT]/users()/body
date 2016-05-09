@@ -1,2 +1,200 @@
 {
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").toRepresentation();
+    }
+  }
+,Resource.USER,false);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.users().create(UserBuilder.create().username("testuser").build()));
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").update(UserBuilder.create().enabled(true).build());
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().search("foo",0,1);
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().count();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").getUserSessions();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").getOfflineSessions("nosuch");
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").getFederatedIdentity();
+    }
+  }
+,Resource.USER,false);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.users().get("nosuch").addFederatedIdentity("nosuch",FederatedIdentityBuilder.create().identityProvider("nosuch").userId("nosuch").userName("nosuch").build()));
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").removeFederatedIdentity("nosuch");
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").getConsents();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").revokeConsent("testclient");
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").logout();
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").remove();
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").resetPassword(CredentialBuilder.create().password("password").build());
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").removeTotp();
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").resetPasswordEmail();
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").executeActionsEmail(Collections.<String>emptyList());
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").sendVerifyEmail();
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").groups();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").leaveGroup("nosuch");
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").joinGroup("nosuch");
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().getAll();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().realmLevel().listAll();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().realmLevel().listAvailable();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().realmLevel().listEffective();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().realmLevel().add(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().realmLevel().remove(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().clientLevel("nosuch").listAll();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().clientLevel("nosuch").listAvailable();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().clientLevel("nosuch").listEffective();
+    }
+  }
+,Resource.USER,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().clientLevel("nosuch").add(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.USER,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.users().get("nosuch").roles().clientLevel("nosuch").remove(Collections.<RoleRepresentation>emptyList());
+    }
+  }
+,Resource.USER,true);
 }

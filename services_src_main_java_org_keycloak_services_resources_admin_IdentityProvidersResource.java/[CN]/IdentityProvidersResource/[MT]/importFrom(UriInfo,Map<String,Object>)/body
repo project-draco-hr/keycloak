@@ -1,5 +1,8 @@
 {
   this.auth.requireManage();
+  if (!(data.containsKey("providerId") && data.containsKey("fromUrl"))) {
+    throw new BadRequestException();
+  }
   String providerId=data.get("providerId").toString();
   String from=data.get("fromUrl").toString();
   InputStream inputStream=session.getProvider(HttpClientProvider.class).get(from);

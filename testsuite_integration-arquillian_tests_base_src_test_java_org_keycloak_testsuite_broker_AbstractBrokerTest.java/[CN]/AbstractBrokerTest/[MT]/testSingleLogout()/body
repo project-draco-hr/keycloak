@@ -1,0 +1,12 @@
+{
+  log.debug("Testing single log out");
+  driver.navigate().to(getAuthRoot() + "/auth/realms/" + providerRealmName()+ "/account");
+  Assert.assertTrue("Should be logged in the account page",driver.getTitle().endsWith("Account Management"));
+  driver.navigate().to(getAuthRoot() + "/auth/realms/" + providerRealmName()+ "/protocol/"+ "openid-connect"+ "/logout");
+  driver.navigate().to(getAuthRoot() + "/auth/realms/" + providerRealmName()+ "/account");
+  Assert.assertTrue("Should be on login page",driver.getTitle().startsWith("Log in to"));
+  Assert.assertTrue("Should be on " + providerRealmName() + " realm",driver.getCurrentUrl().contains("/auth/realms/" + providerRealmName()));
+  driver.navigate().to(getAuthRoot() + "/auth/realms/" + consumerRealmName()+ "/account");
+  Assert.assertTrue("Should be on login page",driver.getTitle().startsWith("Log in to"));
+  Assert.assertTrue("Should be on " + consumerRealmName() + " realm",driver.getCurrentUrl().contains("/auth/realms/" + consumerRealmName()));
+}

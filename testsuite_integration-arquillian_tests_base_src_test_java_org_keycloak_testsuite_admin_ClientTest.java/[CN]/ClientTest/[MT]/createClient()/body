@@ -6,6 +6,7 @@
   Response response=realm.clients().create(rep);
   response.close();
   String id=ApiUtil.getCreatedId(response);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientResourcePath(id),rep);
   rep.setId(id);
   return rep;
 }

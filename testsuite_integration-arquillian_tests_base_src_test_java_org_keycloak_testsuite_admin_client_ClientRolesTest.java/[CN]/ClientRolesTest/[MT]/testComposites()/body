@@ -1,13 +1,18 @@
 {
   rolesRsc.create(makeRole("role-a"));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,Matchers.startsWith(AdminEventPaths.clientRolesResourcePath(clientDbId)));
   assertFalse(rolesRsc.get("role-a").toRepresentation().isComposite());
   assertEquals(0,rolesRsc.get("role-a").getRoleComposites().size());
   rolesRsc.create(makeRole("role-b"));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,Matchers.startsWith(AdminEventPaths.clientRolesResourcePath(clientDbId)));
   testRealmResource().roles().create(makeRole("role-c"));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,Matchers.startsWith(AdminEventPaths.rolesResourcePath()));
   List<RoleRepresentation> l=new LinkedList<>();
   l.add(rolesRsc.get("role-b").toRepresentation());
   l.add(testRealmResource().roles().get("role-c").toRepresentation());
   rolesRsc.get("role-a").addComposites(l);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,Matchers.startsWith(AdminEventPaths.clientRoleResourceCompositesPath(clientDbId,"role-a")));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,Matchers.startsWith(AdminEventPaths.clientRoleResourceCompositesPath(clientDbId,"role-a")));
   Set<RoleRepresentation> composites=rolesRsc.get("role-a").getRoleComposites();
   assertTrue(rolesRsc.get("role-a").toRepresentation().isComposite());
   Assert.assertNames(composites,"role-b","role-c");
@@ -16,6 +21,7 @@
   Set<RoleRepresentation> clientComposites=rolesRsc.get("role-a").getClientRoleComposites(clientRsc.toRepresentation().getId());
   Assert.assertNames(clientComposites,"role-b");
   rolesRsc.get("role-a").deleteComposites(l);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.clientRoleResourceCompositesPath(clientDbId,"role-a"));
   assertFalse(rolesRsc.get("role-a").toRepresentation().isComposite());
   assertEquals(0,rolesRsc.get("role-a").getRoleComposites().size());
 }

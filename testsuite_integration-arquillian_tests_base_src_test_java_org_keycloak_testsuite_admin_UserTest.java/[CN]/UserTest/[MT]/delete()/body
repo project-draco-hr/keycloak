@@ -1,5 +1,7 @@
 {
-  Response response=realm.users().delete(createUser());
+  String userId=createUser();
+  Response response=realm.users().delete(userId);
   assertEquals(204,response.getStatus());
   response.close();
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.userResourcePath(userId));
 }

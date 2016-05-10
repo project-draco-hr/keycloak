@@ -3,6 +3,13 @@
   Response resp=samlMappersRsc.createMapper(rep);
   resp.close();
   String createdId=ApiUtil.getCreatedId(resp);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientProtocolMapperPath(samlClientId,createdId),rep);
   samlMappersRsc.delete(createdId);
-  samlMappersRsc.getMapperById(createdId);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.clientProtocolMapperPath(samlClientId,createdId));
+  try {
+    samlMappersRsc.getMapperById(createdId);
+    Assert.fail("Not expected to find mapper");
+  }
+ catch (  NotFoundException nfe) {
+  }
 }

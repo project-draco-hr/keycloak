@@ -1,5 +1,7 @@
 {
   rolesRsc.create(makeRole("role2"));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,Matchers.startsWith(AdminEventPaths.clientRolesResourcePath(clientDbId)));
   rolesRsc.deleteRole("role2");
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.clientRoleResourcePath(clientDbId,"role2"));
   assertFalse(hasRole(rolesRsc,"role2"));
 }

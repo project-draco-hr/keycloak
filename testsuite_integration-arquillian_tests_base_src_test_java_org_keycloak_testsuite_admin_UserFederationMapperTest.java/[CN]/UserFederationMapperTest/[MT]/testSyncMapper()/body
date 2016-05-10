@@ -3,15 +3,17 @@
   dummyMapperRep.setName("some-dummy");
   dummyMapperRep.setFederationMapperType(DummyUserFederationMapper.PROVIDER_NAME);
   dummyMapperRep.setFederationProviderDisplayName("dummy-1");
-  String mapperId=createMapper(dummyMapperRep);
+  String mapperId=createMapper(dummyProviderId,dummyMapperRep);
   try {
-    realm.userFederation().get(dummyProviderId).syncMapperData(mapperId,"unknown");
+    ldapProviderResource().syncMapperData(mapperId,"unknown");
     Assert.fail("Not expected to pass");
   }
  catch (  NotFoundException nfe) {
   }
-  UserFederationSyncResultRepresentation result=realm.userFederation().get(dummyProviderId).syncMapperData(mapperId,"fedToKeycloak");
+  UserFederationSyncResultRepresentation result=ldapProviderResource().syncMapperData(mapperId,"fedToKeycloak");
   Assert.assertEquals("dummyFedToKeycloakSuccess mapper=some-dummy",result.getStatus());
-  result=realm.userFederation().get(dummyProviderId).syncMapperData(mapperId,"keycloakToFed");
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationMapperResourcePath(ldapProviderId,mapperId) + "/sync");
+  result=ldapProviderResource().syncMapperData(mapperId,"keycloakToFed");
   Assert.assertEquals("dummyKeycloakToFedSuccess mapper=some-dummy",result.getStatus());
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationMapperResourcePath(ldapProviderId,mapperId) + "/sync");
 }

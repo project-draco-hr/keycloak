@@ -1,0 +1,12 @@
+{
+  RealmBuilder realm=RealmBuilder.create().name("test").testEventListener();
+  client1Uuid=KeycloakModelUtils.generateId();
+  realm.client(ClientBuilder.create().id(client1Uuid).clientId("client1").publicClient().directAccessGrants());
+  admin1Id=KeycloakModelUtils.generateId();
+  realm.user(UserBuilder.create().id(admin1Id).username("admin1").password("password").role(Constants.REALM_MANAGEMENT_CLIENT_ID,AdminRoles.REALM_ADMIN));
+  admin2Id=KeycloakModelUtils.generateId();
+  realm.user(UserBuilder.create().id(admin2Id).username("admin2").password("password").role(Constants.REALM_MANAGEMENT_CLIENT_ID,AdminRoles.REALM_ADMIN));
+  appUserId=KeycloakModelUtils.generateId();
+  realm.user(UserBuilder.create().id(appUserId).username("app-user").password("password"));
+  testRealms.add(realm.build());
+}

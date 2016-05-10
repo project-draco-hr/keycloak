@@ -10,13 +10,15 @@
   Assert.assertEquals(-1,userFederation().get(id1).toRepresentation().getLastSync());
   UserFederationSyncResultRepresentation syncResult=userFederation().get(id1).syncUsers("triggerFullSync");
   Assert.assertEquals("0 imported users, 0 updated users",syncResult.getStatus());
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationResourcePath(id1) + "/sync");
   int fullSyncTime=userFederation().get(id1).toRepresentation().getLastSync();
   Assert.assertTrue(fullSyncTime > 0);
   setTimeOffset(50);
   syncResult=userFederation().get(id1).syncUsers("triggerChangedUsersSync");
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationResourcePath(id1) + "/sync");
   Assert.assertEquals("0 imported users, 0 updated users",syncResult.getStatus());
   int changedSyncTime=userFederation().get(id1).toRepresentation().getLastSync();
   Assert.assertTrue(fullSyncTime + 50 <= changedSyncTime);
   resetTimeOffset();
-  userFederation().get(id1).remove();
+  removeUserFederationProvider(id1);
 }

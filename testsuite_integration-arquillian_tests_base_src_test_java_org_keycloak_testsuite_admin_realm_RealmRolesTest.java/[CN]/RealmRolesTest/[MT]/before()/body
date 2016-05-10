@@ -1,9 +1,13 @@
 {
-  adminClient.realm(REALM_NAME).roles().create(RoleBuilder.create().name("role-a").description("Role A").build());
-  adminClient.realm(REALM_NAME).roles().create(RoleBuilder.create().name("role-b").description("Role B").build());
-  Response response=adminClient.realm(REALM_NAME).clients().create(ClientBuilder.create().clientId("client-a").build());
+  RoleRepresentation roleA=RoleBuilder.create().name("role-a").description("Role A").build();
+  RoleRepresentation roleB=RoleBuilder.create().name("role-b").description("Role B").build();
+  adminClient.realm(REALM_NAME).roles().create(roleA);
+  adminClient.realm(REALM_NAME).roles().create(roleB);
+  ClientRepresentation clientRep=ClientBuilder.create().clientId("client-a").build();
+  Response response=adminClient.realm(REALM_NAME).clients().create(clientRep);
   clientUuid=ApiUtil.getCreatedId(response);
-  adminClient.realm(REALM_NAME).clients().get(clientUuid).roles().create(RoleBuilder.create().name("role-c").description("Role C").build());
+  RoleRepresentation roleC=RoleBuilder.create().name("role-c").description("Role C").build();
+  adminClient.realm(REALM_NAME).clients().get(clientUuid).roles().create(roleC);
   for (  RoleRepresentation r : adminClient.realm(REALM_NAME).roles().list()) {
     ids.put(r.getName(),r.getId());
   }
@@ -11,4 +15,8 @@
     ids.put(r.getName(),r.getId());
   }
   resource=adminClient.realm(REALM_NAME).roles();
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.roleResourcePath(ids.get("role-a")),roleA);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.roleResourcePath(ids.get("role-b")),roleB);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientResourcePath(clientUuid),clientRep);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientRoleResourcePath(clientUuid,ids.get("role-c")),roleC);
 }

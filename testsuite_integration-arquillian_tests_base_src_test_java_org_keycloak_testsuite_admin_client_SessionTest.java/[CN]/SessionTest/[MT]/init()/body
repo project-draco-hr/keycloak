@@ -1,4 +1,8 @@
 {
-  if (!testUserCreated)   createTestUserWithAdminClient();
+  if (!testUserCreated) {
+    createTestUserWithAdminClient();
+    assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.userResourcePath(testUser.getId()));
+    assertAdminEvents.assertEvent(getRealmId(),OperationType.ACTION,AdminEventPaths.userResetPasswordPath(testUser.getId()));
+  }
   testUserCreated=true;
 }

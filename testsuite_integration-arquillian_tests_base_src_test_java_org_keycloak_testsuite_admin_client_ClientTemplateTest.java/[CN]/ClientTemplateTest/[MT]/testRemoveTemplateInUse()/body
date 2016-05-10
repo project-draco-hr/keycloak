@@ -16,7 +16,8 @@
  catch (  BadRequestException bre) {
     ErrorRepresentation error=bre.getResponse().readEntity(ErrorRepresentation.class);
     Assert.assertEquals("Cannot remove client template, it is currently in use",error.getErrorMessage());
+    assertAdminEvents.assertEmpty();
   }
-  testRealmResource().clients().get(clientDbId).remove();
-  clientTemplates().get(templateId).remove();
+  removeClient(clientDbId);
+  removeTemplate(templateId);
 }

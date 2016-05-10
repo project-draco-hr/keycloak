@@ -8,7 +8,7 @@
   Assert.assertEquals(400,response.getStatus());
   response.close();
   attrMapper.getConfig().put(UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail");
-  String mapperId=createMapper(attrMapper);
+  String mapperId=createMapper(ldapProviderId,attrMapper);
   UserFederationMapperRepresentation mapperRep=ldapProviderResource().getMapperById(mapperId);
   assertMapper(mapperRep,mapperId,"email-mapper",UserAttributeLDAPFederationMapperFactory.PROVIDER_ID,UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,"email",UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail");
   mapperRep.getConfig().put(UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail-updated");
@@ -24,9 +24,11 @@
   mapperRep.getConfig().put(UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,"email-updated");
   mapperRep.getConfig().put(UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail-updated");
   ldapProviderResource().updateMapper(mapperId,mapperRep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.userFederationMapperResourcePath(ldapProviderId,mapperId),mapperRep);
   mapperRep=ldapProviderResource().getMapperById(mapperId);
   assertMapper(mapperRep,mapperId,"email-mapper",UserAttributeLDAPFederationMapperFactory.PROVIDER_ID,UserAttributeLDAPFederationMapper.USER_MODEL_ATTRIBUTE,"email-updated",UserAttributeLDAPFederationMapper.LDAP_ATTRIBUTE,"mail-updated");
   ldapProviderResource().removeMapper(mapperId);
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.userFederationMapperResourcePath(ldapProviderId,mapperId));
   try {
     ldapProviderResource().getMapperById(mapperId);
     Assert.fail("Not expected find to success as mapper was removed");

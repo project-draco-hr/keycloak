@@ -5,4 +5,8 @@
   assertNull(oldToken);
   assertNotNull(newToken);
   assertNull(accountClient.toRepresentation().getRegistrationAccessToken());
+  ClientRepresentation testedRep=new ClientRepresentation();
+  testedRep.setClientId(rep.getClientId());
+  testedRep.setRegistrationAccessToken(newToken);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.ACTION,AdminEventPaths.clientRegenerateRegistrationAccessTokenPath(accountClientDbId),testedRep);
 }

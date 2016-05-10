@@ -1,0 +1,20 @@
+{
+  testClient(MASTER,ADMIN,ADMIN,Constants.ADMIN_CLI_CLIENT_ID,MASTER,masterAdminCliUuid,masterAdminUserId);
+  testClient(MASTER,"admin2","password",Constants.ADMIN_CLI_CLIENT_ID,MASTER,masterAdminCliUuid,masterAdminUser2Id);
+  testClient("test","admin1","password",Constants.ADMIN_CLI_CLIENT_ID,realmUuid,adminCliUuid,admin1Id);
+  testClient("test","admin2","password",Constants.ADMIN_CLI_CLIENT_ID,realmUuid,adminCliUuid,admin2Id);
+  testClient("test","admin1","password","client1",realmUuid,client1Uuid,admin1Id);
+  testClient("test","admin2","password","client1",realmUuid,client1Uuid,admin2Id);
+  try {
+    testClient("test","admin1","password","client1",realmUuid,adminCliUuid,admin1Id);
+    Assert.fail("Not expected to pass");
+  }
+ catch (  ComparisonFailure expected) {
+  }
+  try {
+    testClient("test","admin1","password","client1",realmUuid,client1Uuid,admin2Id);
+    Assert.fail("Not expected to pass");
+  }
+ catch (  ComparisonFailure expected) {
+  }
+}

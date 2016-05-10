@@ -1,12 +1,15 @@
 {
   RoleRepresentation role=new RoleRepresentation("test","test",false);
   realm.roles().create(role);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,Matchers.startsWith(AdminEventPaths.rolesResourcePath()));
   assertNotNull(realm.roles().get("test").toRepresentation());
   RealmRepresentation rep=realm.toRepresentation();
   rep.setDefaultRoles(new LinkedList<String>());
   rep.getDefaultRoles().add("test");
   realm.update(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
   realm.roles().deleteRole("test");
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.roleResourcePath("test"));
   try {
     realm.roles().get("testsadfsadf").toRepresentation();
     fail("Expected NotFoundException");

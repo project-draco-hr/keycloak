@@ -1,12 +1,16 @@
 {
-  IdentityProviderRepresentation newIdentityProvider=create("remove-identity-provider","saml");
-  Response response=realm.identityProviders().create(newIdentityProvider);
-  Assert.assertNotNull(ApiUtil.getCreatedId(response));
-  response.close();
-  IdentityProviderResource identityProviderResource=realm.identityProviders().get("update-identity-provider");
+  IdentityProviderRepresentation newIdentityProvider=createRep("remove-identity-provider","saml");
+  create(newIdentityProvider);
+  IdentityProviderResource identityProviderResource=realm.identityProviders().get("remove-identity-provider");
   assertNotNull(identityProviderResource);
   IdentityProviderRepresentation representation=identityProviderResource.toRepresentation();
   assertNotNull(representation);
   identityProviderResource.remove();
-  realm.identityProviders().get("update-identity-provider");
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.identityProviderPath("remove-identity-provider"));
+  try {
+    realm.identityProviders().get("remove-identity-provider").toRepresentation();
+    Assert.fail("Not expected to found");
+  }
+ catch (  NotFoundException nfe) {
+  }
 }

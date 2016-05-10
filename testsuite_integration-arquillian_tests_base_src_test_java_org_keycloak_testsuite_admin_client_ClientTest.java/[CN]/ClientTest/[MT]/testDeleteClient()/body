@@ -1,7 +1,8 @@
 {
-  createOidcClient("deleteMe");
+  String clientDbId=createOidcClient("deleteMe");
   ClientResource clientRsc=findClientResource("deleteMe");
   assertNotNull(clientRsc);
   clientRsc.remove();
   assertNull(findClientResource("deleteMe"));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.clientResourcePath(clientDbId));
 }

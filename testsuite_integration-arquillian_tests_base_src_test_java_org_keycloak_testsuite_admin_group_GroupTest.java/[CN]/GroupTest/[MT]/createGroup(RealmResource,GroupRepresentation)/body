@@ -1,0 +1,8 @@
+{
+  Response response=realm.groups().add(group);
+  String groupId=ApiUtil.getCreatedId(response);
+  response.close();
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupsPath(),group);
+  group.setId(groupId);
+  return group;
+}

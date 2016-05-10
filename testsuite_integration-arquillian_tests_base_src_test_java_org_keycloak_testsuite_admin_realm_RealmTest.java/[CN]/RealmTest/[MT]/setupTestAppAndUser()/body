@@ -1,5 +1,4 @@
 {
-  realm.update(RealmBuilder.edit(realm.toRepresentation()).testEventListener().build());
   testingClient.testApp().clearAdminActions();
   String redirectUri=oauth.getRedirectUri().replace("/master/","/" + REALM_NAME + "/");
   ClientRepresentation client=new ClientRepresentation();
@@ -7,12 +6,18 @@
   client.setAdminUrl(suiteContext.getAuthServerInfo().getContextRoot() + "/auth/realms/master/app/admin");
   client.setRedirectUris(Collections.singletonList(redirectUri));
   client.setSecret("secret");
-  realm.clients().create(client);
+  Response resp=realm.clients().create(client);
+  String clientDbId=ApiUtil.getCreatedId(resp);
+  resp.close();
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientResourcePath(clientDbId),client);
   oauth.realm(REALM_NAME);
   oauth.redirectUri(redirectUri);
-  Response response=realm.users().create(UserBuilder.create().username("testuser").build());
+  UserRepresentation userRep=UserBuilder.create().username("testuser").build();
+  Response response=realm.users().create(userRep);
   String userId=ApiUtil.getCreatedId(response);
   response.close();
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.userResourcePath(userId),userRep);
   realm.users().get(userId).resetPassword(CredentialBuilder.create().password("password").build());
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userResetPasswordPath(userId));
   testingClient.testApp().clearAdminActions();
 }

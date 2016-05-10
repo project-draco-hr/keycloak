@@ -8,4 +8,8 @@
   assertNotNull(updatedClient);
   assertEquals("updateMe",updatedClient.getClientId());
   assertEquals("iWasUpdated",updatedClient.getName());
+  ClientRepresentation expectedClientRep=new ClientRepresentation();
+  expectedClientRep.setClientId("updateMe");
+  expectedClientRep.setName("iWasUpdated");
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.UPDATE,AdminEventPaths.clientResourcePath(clientRep.getId()),expectedClientRep);
 }

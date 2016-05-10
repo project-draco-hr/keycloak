@@ -6,8 +6,7 @@
   attrs.put("attr1",Collections.singletonList("attrval1"));
   attrs.put("attr2",Collections.singletonList("attrval2"));
   group.setAttributes(attrs);
-  Response response=realm.groups().add(group);
-  response.close();
+  createGroup(realm,group);
   group=realm.getGroupByPath("/group");
   Assert.assertNotNull(group);
   assertEquals("group",group.getName());
@@ -21,6 +20,7 @@
   group.getAttributes().get("attr2").add("attrval2-2");
   group.getAttributes().put("attr3",Collections.singletonList("attrval2"));
   realm.groups().group(group.getId()).update(group);
+  assertAdminEvents.assertEvent("test",OperationType.UPDATE,AdminEventPaths.groupPath(group.getId()),group);
   group=realm.getGroupByPath("/group-new");
   assertEquals("group-new",group.getName());
   assertEquals(2,group.getAttributes().size());

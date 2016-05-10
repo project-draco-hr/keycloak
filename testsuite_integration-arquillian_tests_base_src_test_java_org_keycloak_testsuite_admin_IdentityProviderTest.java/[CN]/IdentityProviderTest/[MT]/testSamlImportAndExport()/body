@@ -7,9 +7,7 @@
   form.addFormData("file",body,MediaType.APPLICATION_XML_TYPE,"saml-idp-metadata.xml");
   Map<String,String> result=realm.identityProviders().importFrom(form);
   assertSamlImport(result);
-  Response response=realm.identityProviders().create(create("saml","saml",result));
-  Assert.assertNotNull(ApiUtil.getCreatedId(response));
-  response.close();
+  create(createRep("saml","saml",result));
   IdentityProviderResource provider=realm.identityProviders().get("saml");
   IdentityProviderRepresentation rep=provider.toRepresentation();
   assertCreatedSamlIdp(rep);
@@ -17,7 +15,7 @@
   Assert.assertNotNull("identityProviders not null",providers);
   Assert.assertEquals("identityProviders instance count",1,providers.size());
   assertEqual(rep,providers.get(0));
-  response=realm.identityProviders().get("saml").export("xml");
+  Response response=realm.identityProviders().get("saml").export("xml");
   Assert.assertEquals(200,response.getStatus());
   body=response.readEntity(String.class);
   response.close();

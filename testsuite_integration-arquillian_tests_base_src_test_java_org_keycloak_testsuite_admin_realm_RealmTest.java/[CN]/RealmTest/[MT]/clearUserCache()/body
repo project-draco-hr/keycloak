@@ -4,8 +4,10 @@
   Response response=realm.users().create(user);
   String userId=ApiUtil.getCreatedId(response);
   response.close();
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.userResourcePath(userId),user);
   realm.users().get(userId).toRepresentation();
   assertTrue(testingClient.testing().isCached("users",userId));
-  adminClient.realm("master").clearUserCache();
+  realm.clearUserCache();
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,"clear-user-cache");
   assertFalse(testingClient.testing().isCached("users",userId));
 }

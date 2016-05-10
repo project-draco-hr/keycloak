@@ -2,9 +2,11 @@
   RealmRepresentation rep=new RealmRepresentation();
   rep.setCertificate(CERTIFICATE);
   realm.update(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
   assertEquals(CERTIFICATE,rep.getCertificate());
   String certificate=IOUtils.toString(getClass().getResourceAsStream("/keys/certificate.pem"));
   rep.setCertificate(certificate);
   realm.update(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
   assertEquals(certificate,rep.getCertificate());
 }

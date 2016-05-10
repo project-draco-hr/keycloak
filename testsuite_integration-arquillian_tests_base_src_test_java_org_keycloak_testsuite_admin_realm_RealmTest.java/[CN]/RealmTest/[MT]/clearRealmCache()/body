@@ -1,6 +1,7 @@
 {
   RealmRepresentation realmRep=realm.toRepresentation();
   assertTrue(testingClient.testing().isCached("realms",realmRep.getId()));
-  adminClient.realm("master").clearRealmCache();
+  realm.clearRealmCache();
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,"clear-realm-cache");
   assertFalse(testingClient.testing().isCached("realms",realmRep.getId()));
 }

@@ -1,0 +1,6 @@
+{
+  assertEquals(200,response.getStatusCode());
+  AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
+  RefreshToken refreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
+  events.expectClientLogin().client(clientId).user(userId).session(accessToken.getSessionState()).detail(Details.TOKEN_ID,accessToken.getId()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).detail(Details.USERNAME,userName).detail(Details.CLIENT_AUTH_METHOD,JWTClientAuthenticator.PROVIDER_ID).assertEvent();
+}

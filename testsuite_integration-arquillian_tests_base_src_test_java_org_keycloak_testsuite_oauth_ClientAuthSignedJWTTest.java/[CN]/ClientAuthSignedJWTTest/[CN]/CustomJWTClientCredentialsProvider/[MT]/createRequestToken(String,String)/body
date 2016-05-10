@@ -1,0 +1,12 @@
+{
+  JsonWebToken reqToken=new JsonWebToken();
+  if (isClaimEnabled("id"))   reqToken.id(AdapterUtils.generateId());
+  if (isClaimEnabled("issuer"))   reqToken.issuer(clientId);
+  if (isClaimEnabled("subject"))   reqToken.subject(clientId);
+  if (isClaimEnabled("audience"))   reqToken.audience(realmInfoUrl);
+  int now=Time.currentTime();
+  if (isClaimEnabled("issuedAt"))   reqToken.issuedAt(now);
+  if (isClaimEnabled("expiration"))   reqToken.expiration(now + getTokenTimeout());
+  if (isClaimEnabled("notBefore"))   reqToken.notBefore(now);
+  return reqToken;
+}

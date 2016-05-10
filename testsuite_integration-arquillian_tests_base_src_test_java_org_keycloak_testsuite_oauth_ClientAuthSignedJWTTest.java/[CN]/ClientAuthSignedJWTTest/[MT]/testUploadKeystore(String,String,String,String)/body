@@ -1,0 +1,33 @@
+{
+  ClientRepresentation client=getClient(testRealm.getRealm(),app3.getId()).toRepresentation();
+  final String certOld=client.getAttributes().get(JWTClientAuthenticator.CERTIFICATE_ATTR);
+  URL fileUrl=(getClass().getClassLoader().getResource(filePath));
+  if (fileUrl == null) {
+    throw new IOException("File not found: " + filePath);
+  }
+  File keystoreFile=new File(fileUrl.getFile());
+  ContentType keystoreContentType=ContentType.create(Files.probeContentType(keystoreFile.toPath()));
+  OAuthClient.AccessTokenResponse accessTokenResponse=oauth.doGrantAccessTokenRequest(AuthRealm.MASTER,AuthRealm.ADMIN,AuthRealm.ADMIN,null,"admin-cli",null);
+  assertEquals(200,accessTokenResponse.getStatusCode());
+  final String url=suiteContext.getAuthServerInfo().getContextRoot() + "/auth/admin/realms/" + testRealm.getRealm()+ "/clients/"+ client.getId()+ "/certificates/jwt.credential/upload-certificate";
+  FileBody fileBody=new FileBody(keystoreFile,keystoreContentType);
+  HttpEntity entity=MultipartEntityBuilder.create().addPart("file",fileBody).addTextBody("keystoreFormat",keystoreFormat).addTextBody("keyAlias",keyAlias).addTextBody("storePassword",storePassword).addTextBody("keyPassword","undefined").build();
+  HttpPost httpRequest=new HttpPost(url);
+  httpRequest.setHeader(HttpHeaders.AUTHORIZATION,"Bearer " + accessTokenResponse.getAccessToken());
+  httpRequest.setEntity(entity);
+  HttpClient httpClient=HttpClients.createDefault();
+  HttpResponse httpResponse=httpClient.execute(httpRequest);
+  assertEquals(200,httpResponse.getStatusLine().getStatusCode());
+  client=getClient(testRealm.getRealm(),client.getId()).toRepresentation();
+  String pem;
+  if (!keystoreFormat.equals(CERTIFICATE_PEM)) {
+    InputStream keystoreIs=new FileInputStream(keystoreFile);
+    KeyStore keyStore=getKeystore(keystoreIs,storePassword,keystoreFormat);
+    keystoreIs.close();
+    pem=KeycloakModelUtils.getPemFromCertificate((X509Certificate)keyStore.getCertificate(keyAlias));
+  }
+ else {
+    pem=new String(Files.readAllBytes(keystoreFile.toPath()));
+  }
+  assertCertificate(client,certOld,pem);
+}

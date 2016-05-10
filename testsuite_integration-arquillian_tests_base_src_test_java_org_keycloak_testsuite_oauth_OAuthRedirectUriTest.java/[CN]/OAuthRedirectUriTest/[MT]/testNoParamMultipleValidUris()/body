@@ -1,0 +1,12 @@
+{
+  ClientManager.realm(adminClient.realm("test")).clientId("test-app").addRedirectUris("http://localhost:8180/app2");
+  try {
+    oauth.redirectUri(null);
+    oauth.openLoginForm();
+    Assert.assertTrue(errorPage.isCurrent());
+    Assert.assertEquals("Invalid parameter: redirect_uri",errorPage.getError());
+  }
+  finally {
+    ClientManager.realm(adminClient.realm("test")).clientId("test-app").removeRedirectUris("http://localhost:8180/app2");
+  }
+}

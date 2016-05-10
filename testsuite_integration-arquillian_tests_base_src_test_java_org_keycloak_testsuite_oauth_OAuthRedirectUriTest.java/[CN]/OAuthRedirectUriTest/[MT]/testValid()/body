@@ -1,0 +1,9 @@
+{
+  oauth.redirectUri(APP_ROOT + "/auth");
+  OAuthClient.AuthorizationCodeResponse response=oauth.doLogin("test-user@localhost","password");
+  Assert.assertNotNull(response.getCode());
+  URL url=new URL(driver.getCurrentUrl());
+  Assert.assertTrue(url.toString().startsWith(APP_ROOT));
+  Assert.assertTrue(url.getQuery().contains("code="));
+  Assert.assertTrue(url.getQuery().contains("state="));
+}

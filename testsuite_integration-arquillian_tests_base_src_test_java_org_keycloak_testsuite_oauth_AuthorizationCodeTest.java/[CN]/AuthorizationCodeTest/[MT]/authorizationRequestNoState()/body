@@ -1,11 +1,11 @@
 {
   oauth.state(null);
-  AuthorizationCodeResponse response=oauth.doLogin("test-user@localhost","password");
+  OAuthClient.AuthorizationCodeResponse response=oauth.doLogin("test-user@localhost","password");
   Assert.assertTrue(response.isRedirected());
   Assert.assertNotNull(response.getCode());
   Assert.assertNull(response.getState());
   Assert.assertNull(response.getError());
-  keycloakRule.verifyCode(response.getCode());
+  testingClient.testing().verifyCode("test",response.getCode());
   String codeId=events.expectLogin().assertEvent().getDetails().get(Details.CODE_ID);
   assertCode(codeId,response.getCode());
 }

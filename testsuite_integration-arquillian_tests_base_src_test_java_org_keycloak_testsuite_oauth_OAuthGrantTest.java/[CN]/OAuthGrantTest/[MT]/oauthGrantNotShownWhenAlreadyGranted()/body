@@ -1,21 +1,21 @@
 {
-  oauth.clientId("third-party");
+  oauth.clientId(THIRD_PARTY_APP);
   oauth.doLoginGrant("test-user@localhost","password");
   grantPage.assertCurrent();
   grantPage.accept();
-  events.expectLogin().client("third-party").detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
+  events.expectLogin().client(THIRD_PARTY_APP).detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
   accountAppsPage.open();
-  AccountApplicationsPage.AppEntry thirdPartyEntry=accountAppsPage.getApplications().get("third-party");
+  AccountApplicationsPage.AppEntry thirdPartyEntry=accountAppsPage.getApplications().get(THIRD_PARTY_APP);
   Assert.assertTrue(thirdPartyEntry.getRolesGranted().contains(ROLE_USER));
   Assert.assertTrue(thirdPartyEntry.getRolesGranted().contains("Have Customer User privileges in test-app"));
   Assert.assertTrue(thirdPartyEntry.getProtocolMappersGranted().contains("Full name"));
   Assert.assertTrue(thirdPartyEntry.getProtocolMappersGranted().contains("Email"));
   oauth.openLoginForm();
   appPage.assertCurrent();
-  events.expectLogin().detail(Details.AUTH_METHOD,OIDCLoginProtocol.LOGIN_PROTOCOL).detail(Details.CONSENT,Details.CONSENT_VALUE_PERSISTED_CONSENT).removeDetail(Details.USERNAME).client("third-party").assertEvent();
+  events.expectLogin().detail(Details.AUTH_METHOD,OIDCLoginProtocol.LOGIN_PROTOCOL).detail(Details.CONSENT,Details.CONSENT_VALUE_PERSISTED_CONSENT).removeDetail(Details.USERNAME).client(THIRD_PARTY_APP).assertEvent();
   accountAppsPage.open();
-  accountAppsPage.revokeGrant("third-party");
-  events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,"third-party").assertEvent();
+  accountAppsPage.revokeGrant(THIRD_PARTY_APP);
+  events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,THIRD_PARTY_APP).assertEvent();
   oauth.openLoginForm();
   grantPage.assertCurrent();
   Assert.assertTrue(driver.getPageSource().contains(ROLE_USER));

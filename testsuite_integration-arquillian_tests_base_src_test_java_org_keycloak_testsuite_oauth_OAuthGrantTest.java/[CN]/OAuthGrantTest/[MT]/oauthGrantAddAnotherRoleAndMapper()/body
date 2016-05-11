@@ -1,0 +1,35 @@
+{
+  oauth.clientId(THIRD_PARTY_APP);
+  oauth.doLoginGrant("test-user@localhost","password");
+  oauth.scope(OAuth2Constants.GRANT_TYPE);
+  ProtocolMapperRepresentation protocolMapper=ProtocolMapperUtil.createClaimMapper(KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME,KerberosConstants.GSS_DELEGATION_CREDENTIAL,KerberosConstants.GSS_DELEGATION_CREDENTIAL,"String",true,KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME,true,false);
+  RealmResource appRealm=adminClient.realm(REALM_NAME);
+  appRealm.roles().create(RoleBuilder.create().name("new-role").build());
+  RoleRepresentation newRole=appRealm.roles().get("new-role").toRepresentation();
+  ClientManager.realm(adminClient.realm(REALM_NAME)).clientId(THIRD_PARTY_APP).addProtocolMapper(protocolMapper).addScopeMapping(newRole);
+  UserResource userResource=findUserByUsernameId(appRealm,"test-user@localhost");
+  userResource.roles().realmLevel().add(Collections.singletonList(newRole));
+  grantPage.assertCurrent();
+  grantPage.accept();
+  events.expectLogin().client(THIRD_PARTY_APP).detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
+  accountAppsPage.open();
+  AccountApplicationsPage.AppEntry appEntry=accountAppsPage.getApplications().get(THIRD_PARTY_APP);
+  Assert.assertFalse(appEntry.getRolesGranted().contains("new-role"));
+  Assert.assertFalse(appEntry.getProtocolMappersGranted().contains(KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME));
+  oauth.openLoginForm();
+  grantPage.assertCurrent();
+  Assert.assertFalse(driver.getPageSource().contains(ROLE_USER));
+  Assert.assertFalse(driver.getPageSource().contains("Full name"));
+  Assert.assertTrue(driver.getPageSource().contains("new-role"));
+  Assert.assertTrue(driver.getPageSource().contains(KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME));
+  grantPage.accept();
+  events.expectLogin().client(THIRD_PARTY_APP).detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
+  accountAppsPage.open();
+  appEntry=accountAppsPage.getApplications().get(THIRD_PARTY_APP);
+  Assert.assertTrue(appEntry.getRolesGranted().contains("new-role"));
+  Assert.assertTrue(appEntry.getProtocolMappersGranted().contains(KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME));
+  accountAppsPage.revokeGrant(THIRD_PARTY_APP);
+  events.expect(EventType.REVOKE_GRANT).client("account").detail(Details.REVOKED_CLIENT,THIRD_PARTY_APP).assertEvent();
+  ClientManager.realm(adminClient.realm(REALM_NAME)).clientId(THIRD_PARTY_APP).removeProtocolMapper(KerberosConstants.GSS_DELEGATION_CREDENTIAL_DISPLAY_NAME).removeScopeMapping(newRole);
+  appRealm.roles().deleteRole("new-role");
+}

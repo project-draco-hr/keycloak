@@ -9,7 +9,7 @@
     OAuthClient.AccessTokenResponse response1=oauth.doAccessTokenRequest(code,"password");
     RefreshToken refreshToken1=oauth.verifyRefreshToken(response1.getRefreshToken());
     events.expectCodeToToken(codeId,sessionId).assertEvent();
-    Time.setOffset(2);
+    setTimeOffset(2);
     OAuthClient.AccessTokenResponse response2=oauth.doRefreshTokenRequest(response1.getRefreshToken(),"password");
     RefreshToken refreshToken2=oauth.verifyRefreshToken(response2.getRefreshToken());
     assertEquals(200,response2.getStatusCode());
@@ -21,7 +21,7 @@
     events.expectRefresh(refreshToken2.getId(),sessionId).assertEvent();
   }
   finally {
-    Time.setOffset(0);
+    setTimeOffset(0);
     RealmManager.realm(adminClient.realm("test")).revokeRefreshToken(false);
   }
 }

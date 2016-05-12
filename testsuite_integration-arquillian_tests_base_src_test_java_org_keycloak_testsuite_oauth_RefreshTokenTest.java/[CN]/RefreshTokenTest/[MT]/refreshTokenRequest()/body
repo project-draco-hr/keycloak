@@ -11,11 +11,11 @@
   EventRepresentation tokenEvent=events.expectCodeToToken(codeId,sessionId).assertEvent();
   Assert.assertNotNull(refreshTokenString);
   assertEquals("bearer",tokenResponse.getTokenType());
-  Assert.assertThat(token.getExpiration() - Time.currentTime(),allOf(greaterThanOrEqualTo(200),lessThanOrEqualTo(350)));
-  int actual=refreshToken.getExpiration() - Time.currentTime();
+  Assert.assertThat(token.getExpiration() - getCurrentTime(),allOf(greaterThanOrEqualTo(200),lessThanOrEqualTo(350)));
+  int actual=refreshToken.getExpiration() - getCurrentTime();
   Assert.assertThat(actual,allOf(greaterThanOrEqualTo(1799),lessThanOrEqualTo(1800)));
   assertEquals(sessionId,refreshToken.getSessionState());
-  Time.setOffset(2);
+  setTimeOffset(2);
   OAuthClient.AccessTokenResponse response=oauth.doRefreshTokenRequest(refreshTokenString,"password");
   AccessToken refreshedToken=oauth.verifyToken(response.getAccessToken());
   RefreshToken refreshedRefreshToken=oauth.verifyRefreshToken(response.getRefreshToken());
@@ -23,7 +23,7 @@
   assertEquals(sessionId,refreshedToken.getSessionState());
   assertEquals(sessionId,refreshedRefreshToken.getSessionState());
   Assert.assertThat(response.getExpiresIn(),allOf(greaterThanOrEqualTo(250),lessThanOrEqualTo(300)));
-  Assert.assertThat(refreshedToken.getExpiration() - Time.currentTime(),allOf(greaterThanOrEqualTo(250),lessThanOrEqualTo(300)));
+  Assert.assertThat(refreshedToken.getExpiration() - getCurrentTime(),allOf(greaterThanOrEqualTo(250),lessThanOrEqualTo(300)));
   Assert.assertThat(refreshedToken.getExpiration() - token.getExpiration(),allOf(greaterThanOrEqualTo(1),lessThanOrEqualTo(10)));
   Assert.assertThat(refreshedRefreshToken.getExpiration() - refreshToken.getExpiration(),allOf(greaterThanOrEqualTo(1),lessThanOrEqualTo(10)));
   Assert.assertNotEquals(token.getId(),refreshedToken.getId());
@@ -38,5 +38,5 @@
   EventRepresentation refreshEvent=events.expectRefresh(tokenEvent.getDetails().get(Details.REFRESH_TOKEN_ID),sessionId).assertEvent();
   Assert.assertNotEquals(tokenEvent.getDetails().get(Details.TOKEN_ID),refreshEvent.getDetails().get(Details.TOKEN_ID));
   Assert.assertNotEquals(tokenEvent.getDetails().get(Details.REFRESH_TOKEN_ID),refreshEvent.getDetails().get(Details.UPDATED_REFRESH_TOKEN_ID));
-  Time.setOffset(0);
+  setTimeOffset(0);
 }

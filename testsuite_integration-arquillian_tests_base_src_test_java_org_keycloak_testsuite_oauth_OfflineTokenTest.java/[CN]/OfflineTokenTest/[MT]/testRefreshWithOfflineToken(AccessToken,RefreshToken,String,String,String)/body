@@ -1,5 +1,5 @@
 {
-  Time.setOffset(99999);
+  setTimeOffset(99999);
   Assert.assertFalse(oldToken.isActive());
   Assert.assertTrue(offlineToken.isActive());
   testingClient.testing().removeExpired("test");
@@ -18,6 +18,6 @@
   Assert.assertTrue(refreshedToken.getResourceAccess("test-app").isUserInRole("customer-user"));
   EventRepresentation refreshEvent=events.expectRefresh(offlineToken.getId(),sessionId).client("offline-client").user(userId).removeDetail(Details.UPDATED_REFRESH_TOKEN_ID).detail(Details.REFRESH_TOKEN_TYPE,TokenUtil.TOKEN_TYPE_OFFLINE).assertEvent();
   Assert.assertNotEquals(oldToken.getId(),refreshEvent.getDetails().get(Details.TOKEN_ID));
-  Time.setOffset(0);
+  setTimeOffset(0);
   return newRefreshToken;
 }

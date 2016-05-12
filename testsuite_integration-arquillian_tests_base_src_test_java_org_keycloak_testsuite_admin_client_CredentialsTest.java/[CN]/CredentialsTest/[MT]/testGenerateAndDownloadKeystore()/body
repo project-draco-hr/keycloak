@@ -1,0 +1,19 @@
+{
+  ClientAttributeCertificateResource certRsc=accountClient.getCertficateResource("jwt.credential");
+  CertificateRepresentation firstcert=certRsc.generate();
+  KeyStoreConfig config=new KeyStoreConfig();
+  config.setFormat("JKS");
+  config.setKeyAlias("alias");
+  config.setKeyPassword("keyPass");
+  config.setStorePassword("storePass");
+  byte[] result=certRsc.generateAndGetKeystore(config);
+  KeyStore keyStore=KeyStore.getInstance("JKS");
+  keyStore.load(new ByteArrayInputStream(result),"storePass".toCharArray());
+  Key key=keyStore.getKey("alias","keyPass".toCharArray());
+  Certificate cert=keyStore.getCertificate("alias");
+  assertTrue("Certificat is X509",cert instanceof X509Certificate);
+  String keyPem=KeycloakModelUtils.getPemFromKey(key);
+  String certPem=KeycloakModelUtils.getPemFromCertificate((X509Certificate)cert);
+  assertNotEquals("new key generated",firstcert.getPrivateKey(),keyPem);
+  assertNotEquals("new cert generated",firstcert.getCertificate(),certPem);
+}

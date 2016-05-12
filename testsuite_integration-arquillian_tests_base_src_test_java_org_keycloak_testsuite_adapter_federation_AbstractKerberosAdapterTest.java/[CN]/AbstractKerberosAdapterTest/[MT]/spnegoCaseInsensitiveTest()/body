@@ -1,5 +1,5 @@
 {
-  Response spnegoResponse=spnegoLogin("MyDuke","theduke");
+  Response spnegoResponse=spnegoLogin(ldapTestConfiguration.isCaseSensitiveLogin() ? "MyDuke" : "myduke","theduke");
   Assert.assertEquals(302,spnegoResponse.getStatus());
   List<UserRepresentation> users=testRealmResource().users().search("myduke",0,1);
   String userId=users.get(0).getId();

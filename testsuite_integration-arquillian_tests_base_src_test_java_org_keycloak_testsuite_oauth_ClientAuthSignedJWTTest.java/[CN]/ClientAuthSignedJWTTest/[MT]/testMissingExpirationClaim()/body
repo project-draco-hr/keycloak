@@ -1,0 +1,8 @@
+{
+  OAuthClient.AccessTokenResponse response=testMissingClaim("expiration");
+  assertSuccess(response,app1.getClientId(),serviceAccountUser.getId(),serviceAccountUser.getUsername());
+  response=testMissingClaim(-11,"expiration");
+  assertError(response,app1.getClientId(),"unauthorized_client",Errors.INVALID_CLIENT_CREDENTIALS);
+  response=testMissingClaim("expiration","issuedAt");
+  assertError(response,app1.getClientId(),"unauthorized_client",Errors.INVALID_CLIENT_CREDENTIALS);
+}

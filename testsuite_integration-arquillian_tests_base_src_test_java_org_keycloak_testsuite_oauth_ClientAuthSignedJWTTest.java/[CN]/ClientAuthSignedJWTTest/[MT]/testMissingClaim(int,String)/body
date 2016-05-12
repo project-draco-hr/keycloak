@@ -1,0 +1,12 @@
+{
+  CustomJWTClientCredentialsProvider jwtProvider=new CustomJWTClientCredentialsProvider();
+  jwtProvider.setPrivateKey(getClient1PrivateKey());
+  jwtProvider.setTokenTimeout(10);
+  for (  String claim : claims) {
+    jwtProvider.enableClaim(claim,false);
+  }
+  Time.setOffset(tokenTimeOffset);
+  String jwt=jwtProvider.createSignedRequestToken(app1.getClientId(),getRealmInfoUrl());
+  Time.setOffset(0);
+  return doClientCredentialsGrantRequest(jwt);
+}

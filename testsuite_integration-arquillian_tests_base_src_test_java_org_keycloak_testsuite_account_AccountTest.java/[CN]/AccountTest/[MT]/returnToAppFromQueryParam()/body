@@ -1,0 +1,21 @@
+{
+  driver.navigate().to(profilePage.getPath() + "?referrer=test-app");
+  loginPage.login("test-user@localhost","password");
+  Assert.assertTrue(profilePage.isCurrent());
+  profilePage.backToApplication();
+  Assert.assertTrue(appPage.isCurrent());
+  driver.navigate().to(profilePage.getPath() + "?referrer=test-app&referrer_uri=http://localhost:8180/auth/realms/master/app/auth?test");
+  Assert.assertTrue(profilePage.isCurrent());
+  profilePage.backToApplication();
+  Assert.assertTrue(appPage.isCurrent());
+  Assert.assertEquals(appPage.baseUrl + "?test",driver.getCurrentUrl());
+  driver.navigate().to(profilePage.getPath() + "?referrer=test-app");
+  Assert.assertTrue(profilePage.isCurrent());
+  driver.findElement(By.linkText("Authenticator")).click();
+  Assert.assertTrue(totpPage.isCurrent());
+  driver.findElement(By.linkText("Account")).click();
+  Assert.assertTrue(profilePage.isCurrent());
+  profilePage.backToApplication();
+  Assert.assertTrue(appPage.isCurrent());
+  events.clear();
+}

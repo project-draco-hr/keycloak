@@ -1,0 +1,12 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  String token=oauth.doAccessTokenRequest(code,"password").getAccessToken();
+  driver.navigate().to("http://invalid.localtest.me:8180");
+  try {
+    doGetProfileJs(token);
+    fail("Expected failure");
+  }
+ catch (  Throwable t) {
+  }
+}

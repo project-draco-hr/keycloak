@@ -1,5 +1,7 @@
 {
   Response resp=testRealmResource().clients().create(clientRep);
   resp.close();
-  return ApiUtil.getCreatedId(resp);
+  String id=ApiUtil.getCreatedId(resp);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientResourcePath(id),clientRep);
+  return id;
 }

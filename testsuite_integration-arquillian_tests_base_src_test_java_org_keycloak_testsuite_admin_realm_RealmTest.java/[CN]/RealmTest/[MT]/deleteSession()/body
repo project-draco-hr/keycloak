@@ -6,11 +6,13 @@
   EventRepresentation event=events.poll();
   assertNotNull(event);
   realm.deleteSession(event.getSessionId());
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.deleteSessionPath(event.getSessionId()));
   try {
     realm.deleteSession(event.getSessionId());
     fail("Expected 404");
   }
  catch (  NotFoundException e) {
+    assertAdminEvents.assertEmpty();
   }
   tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"secret");
   assertEquals(400,tokenResponse.getStatusCode());

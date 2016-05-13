@@ -5,6 +5,7 @@
   cred.setValue("password");
   cred.setTemporary(false);
   realm.users().get(userId).resetPassword(cred);
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userResetPasswordPath(userId));
   String accountUrl=RealmsResource.accountUrl(UriBuilder.fromUri(getAuthServerRoot())).build(REALM_NAME).toString();
   driver.navigate().to(accountUrl);
   assertEquals("Log in to admin-client-test",driver.getTitle());

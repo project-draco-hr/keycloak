@@ -3,6 +3,13 @@
   Response resp=oidcMappersRsc.createMapper(rep);
   resp.close();
   String createdId=ApiUtil.getCreatedId(resp);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientProtocolMapperPath(oidcClientId,createdId),rep);
   oidcMappersRsc.delete(createdId);
-  oidcMappersRsc.getMapperById(createdId);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.clientProtocolMapperPath(oidcClientId,createdId));
+  try {
+    oidcMappersRsc.getMapperById(createdId);
+    Assert.fail("Not expected to find mapper");
+  }
+ catch (  NotFoundException nfe) {
+  }
 }

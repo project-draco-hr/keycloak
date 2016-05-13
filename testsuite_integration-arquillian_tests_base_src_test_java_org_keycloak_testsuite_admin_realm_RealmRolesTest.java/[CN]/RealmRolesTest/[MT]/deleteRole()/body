@@ -1,6 +1,7 @@
 {
   assertNotNull(resource.get("role-a"));
   resource.deleteRole("role-a");
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.roleResourcePath("role-a"));
   try {
     resource.get("role-a").toRepresentation();
     fail("Expected 404");

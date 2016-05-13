@@ -3,9 +3,7 @@
   user1.setUsername("user1");
   user1.singleAttribute("attr1","value1user1");
   user1.singleAttribute("attr2","value2user1");
-  Response response=realm.users().create(user1);
-  String user1Id=ApiUtil.getCreatedId(response);
-  response.close();
+  String user1Id=createUser(user1);
   UserRepresentation user2=new UserRepresentation();
   user2.setUsername("user2");
   user2.singleAttribute("attr1","value1user2");
@@ -13,9 +11,7 @@
   vals.add("value2user2");
   vals.add("value2user2_2");
   user2.getAttributesAsListValues().put("attr2",vals);
-  response=realm.users().create(user2);
-  String user2Id=ApiUtil.getCreatedId(response);
-  response.close();
+  String user2Id=createUser(user2);
   user1=realm.users().get(user1Id).toRepresentation();
   assertEquals(2,user1.getAttributesAsListValues().size());
   assertAttributeValue("value1user1",user1.getAttributesAsListValues().get("attr1"));
@@ -28,20 +24,20 @@
   assertTrue(vals.contains("value2user2") && vals.contains("value2user2_2"));
   user1.singleAttribute("attr1","value3user1");
   user1.singleAttribute("attr3","value4user1");
-  realm.users().get(user1Id).update(user1);
+  updateUser(realm.users().get(user1Id),user1);
   user1=realm.users().get(user1Id).toRepresentation();
   assertEquals(3,user1.getAttributesAsListValues().size());
   assertAttributeValue("value3user1",user1.getAttributesAsListValues().get("attr1"));
   assertAttributeValue("value2user1",user1.getAttributesAsListValues().get("attr2"));
   assertAttributeValue("value4user1",user1.getAttributesAsListValues().get("attr3"));
   user1.getAttributes().remove("attr1");
-  realm.users().get(user1Id).update(user1);
+  updateUser(realm.users().get(user1Id),user1);
   user1=realm.users().get(user1Id).toRepresentation();
   assertEquals(2,user1.getAttributesAsListValues().size());
   assertAttributeValue("value2user1",user1.getAttributesAsListValues().get("attr2"));
   assertAttributeValue("value4user1",user1.getAttributesAsListValues().get("attr3"));
   user1.getAttributes().clear();
-  realm.users().get(user1Id).update(user1);
+  updateUser(realm.users().get(user1Id),user1);
   user1=realm.users().get(user1Id).toRepresentation();
   assertNull(user1.getAttributes());
 }

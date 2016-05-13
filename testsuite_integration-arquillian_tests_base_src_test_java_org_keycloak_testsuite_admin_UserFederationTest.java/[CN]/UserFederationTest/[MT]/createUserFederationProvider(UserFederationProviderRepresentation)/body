@@ -2,5 +2,7 @@
   Response resp=userFederation().create(rep);
   Assert.assertEquals(201,resp.getStatus());
   resp.close();
-  return ApiUtil.getCreatedId(resp);
+  String federationProviderId=ApiUtil.getCreatedId(resp);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.userFederationCreateResourcePath(),rep);
+  return federationProviderId;
 }

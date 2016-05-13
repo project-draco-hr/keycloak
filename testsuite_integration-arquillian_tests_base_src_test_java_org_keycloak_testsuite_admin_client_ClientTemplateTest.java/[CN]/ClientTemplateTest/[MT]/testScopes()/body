@@ -1,13 +1,8 @@
 {
-  RoleRepresentation roleRep1=new RoleRepresentation();
-  roleRep1.setName("role1");
-  testRealmResource().roles().create(roleRep1);
-  roleRep1=testRealmResource().roles().get("role1").toRepresentation();
-  RoleRepresentation roleRep2=roleRep2=new RoleRepresentation();
-  roleRep2.setName("role2");
-  testRealmResource().roles().create(roleRep2);
-  roleRep2=testRealmResource().roles().get("role2").toRepresentation();
+  RoleRepresentation roleRep1=createRealmRole("role1");
+  RoleRepresentation roleRep2=createRealmRole("role2");
   testRealmResource().roles().get("role1").addComposites(Collections.singletonList(roleRep2));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,Matchers.startsWith(AdminEventPaths.roleResourceCompositesPath("role1")));
   ClientTemplateRepresentation templateRep=new ClientTemplateRepresentation();
   templateRep.setName("bar-template");
   templateRep.setFullScopeAllowed(false);
@@ -16,7 +11,9 @@
   RoleRepresentation viewAccountRoleRep=testRealmResource().clients().get(accountMgmtId).roles().get(AccountRoles.VIEW_PROFILE).toRepresentation();
   RoleMappingResource scopesResource=clientTemplates().get(templateId).getScopeMappings();
   scopesResource.realmLevel().add(Collections.singletonList(roleRep1));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientTemplateScopeMappingsRealmLevelPath(templateId) + "/" + roleRep1.getId());
   scopesResource.clientLevel(accountMgmtId).add(Collections.singletonList(viewAccountRoleRep));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientTemplateScopeMappingsClientLevelPath(templateId,accountMgmtId) + "/" + viewAccountRoleRep.getId());
   List<RoleRepresentation> allRealm=scopesResource.realmLevel().listAll();
   List<RoleRepresentation> availableRealm=scopesResource.realmLevel().listAvailable();
   List<RoleRepresentation> effectiveRealm=scopesResource.realmLevel().listEffective();
@@ -29,7 +26,9 @@
   assertRolesPresent(mappingsRep.getRealmMappings(),"role1");
   assertRolesPresent(mappingsRep.getClientMappings().get(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID).getMappings(),AccountRoles.VIEW_PROFILE);
   scopesResource.realmLevel().remove(Collections.singletonList(roleRep1));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.clientTemplateScopeMappingsRealmLevelPath(templateId) + "/" + roleRep1.getId());
   scopesResource.clientLevel(accountMgmtId).remove(Collections.singletonList(viewAccountRoleRep));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.clientTemplateScopeMappingsClientLevelPath(templateId,accountMgmtId) + "/" + viewAccountRoleRep.getId());
   allRealm=scopesResource.realmLevel().listAll();
   availableRealm=scopesResource.realmLevel().listAvailable();
   effectiveRealm=scopesResource.realmLevel().listEffective();
@@ -38,5 +37,5 @@
   assertRolesPresent(availableRealm,"role1","role2");
   assertRolesNotPresent(effectiveRealm,"role1","role2");
   assertRolesNotPresent(accountRoles,AccountRoles.VIEW_PROFILE);
-  clientTemplates().get(templateId).remove();
+  removeTemplate(templateId);
 }

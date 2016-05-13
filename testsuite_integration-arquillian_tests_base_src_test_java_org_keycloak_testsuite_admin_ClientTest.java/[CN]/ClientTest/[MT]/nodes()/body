@@ -1,22 +1,19 @@
 {
   testingClient.testApp().clearAdminActions();
-  String redirectUri=oauth.getRedirectUri().replace("/master/","/" + REALM_NAME + "/");
-  ClientRepresentation client=new ClientRepresentation();
-  client.setClientId("test-app");
-  client.setAdminUrl(suiteContext.getAuthServerInfo().getContextRoot() + "/auth/realms/master/app/admin");
-  client.setRedirectUris(Collections.singletonList(redirectUri));
-  client.setSecret("secret");
-  Response response=realm.clients().create(client);
-  String id=ApiUtil.getCreatedId(response);
-  response.close();
+  ClientRepresentation client=createAppClient();
+  String id=client.getId();
   realm.clients().get(id).registerNode(Collections.singletonMap("node",suiteContext.getAuthServerInfo().getContextRoot().getHost()));
   realm.clients().get(id).registerNode(Collections.singletonMap("node","invalid"));
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.clientNodesPath(id));
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.clientNodesPath(id));
   GlobalRequestResult result=realm.clients().get(id).testNodesAvailable();
   assertEquals(1,result.getSuccessRequests().size());
   assertEquals(1,result.getFailedRequests().size());
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.clientTestNodesAvailablePath(id));
   TestAvailabilityAction testAvailable=testingClient.testApp().getTestAvailable();
   assertEquals("test-app",testAvailable.getResource());
   assertEquals(2,realm.clients().get(id).toRepresentation().getRegisteredNodes().size());
   realm.clients().get(id).unregisterNode("invalid");
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.clientNodePath(id,"invalid"));
   assertEquals(1,realm.clients().get(id).toRepresentation().getRegisteredNodes().size());
 }

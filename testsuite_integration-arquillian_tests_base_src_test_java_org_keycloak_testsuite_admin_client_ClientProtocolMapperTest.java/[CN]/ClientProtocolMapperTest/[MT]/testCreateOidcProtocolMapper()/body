@@ -4,9 +4,10 @@
   int totalOidcMappers=oidcMappersRsc.getMappersPerProtocol("openid-connect").size();
   Response resp=oidcMappersRsc.createMapper(rep);
   resp.close();
+  String createdId=ApiUtil.getCreatedId(resp);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientProtocolMapperPath(oidcClientId,createdId),rep);
   assertEquals(totalMappers + 1,oidcMappersRsc.getMappers().size());
   assertEquals(totalOidcMappers + 1,oidcMappersRsc.getMappersPerProtocol("openid-connect").size());
-  String createdId=ApiUtil.getCreatedId(resp);
   ProtocolMapperRepresentation created=oidcMappersRsc.getMapperById(createdId);
   assertEqualMappers(rep,created);
 }

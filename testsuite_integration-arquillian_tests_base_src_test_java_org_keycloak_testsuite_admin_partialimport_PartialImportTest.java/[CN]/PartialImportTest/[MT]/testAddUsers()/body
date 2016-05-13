@@ -1,12 +1,24 @@
 {
+  assertAdminEvents.clear();
   setFail();
   addUsers();
   PartialImportResults results=doImport();
   assertEquals(NUM_ENTITIES,results.getAdded());
+  Set<String> userIds=new HashSet<>();
+  for (int i=0; i < NUM_ENTITIES; i++) {
+    AdminEventRepresentation adminEvent=assertAdminEvents.poll();
+    Assert.assertEquals(realmId,adminEvent.getRealmId());
+    Assert.assertEquals(OperationType.CREATE.name(),adminEvent.getOperationType());
+    Assert.assertTrue(adminEvent.getResourcePath().startsWith("users/"));
+    String userId=adminEvent.getResourcePath().substring(6);
+    userIds.add(userId);
+  }
+  assertAdminEvents.assertEmpty();
   for (  PartialImportResult result : results.getResults()) {
     String id=result.getId();
     UserResource userRsc=testRealmResource().users().get(id);
     UserRepresentation user=userRsc.toRepresentation();
     assertTrue(user.getUsername().startsWith(USER_PREFIX));
+    Assert.assertTrue(userIds.contains(id));
   }
 }

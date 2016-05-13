@@ -4,6 +4,7 @@
   rep.setExpiration(100);
   int time=Time.currentTime();
   ClientInitialAccessPresentation response=resource.create(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientInitialAccessPath(response.getId()),rep);
   assertNotNull(response.getId());
   assertEquals(new Integer(2),response.getCount());
   assertEquals(new Integer(2),response.getRemainingCount());
@@ -11,9 +12,11 @@
   assertTrue(time <= response.getTimestamp() && response.getTimestamp() <= Time.currentTime());
   assertNotNull(response.getToken());
   rep.setCount(3);
-  resource.create(rep);
+  response=resource.create(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientInitialAccessPath(response.getId()),rep);
   rep.setCount(4);
-  resource.create(rep);
+  response=resource.create(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientInitialAccessPath(response.getId()),rep);
   List<ClientInitialAccessPresentation> list=resource.list();
   assertEquals(3,list.size());
   assertEquals(9,list.get(0).getCount() + list.get(1).getCount() + list.get(2).getCount());

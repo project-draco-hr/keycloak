@@ -1,8 +1,6 @@
 {
-  Response response=realm.identityProviders().create(create("keycloak-oidc","keycloak-oidc"));
-  Assert.assertNotNull(ApiUtil.getCreatedId(response));
-  response.close();
-  response=realm.identityProviders().get("keycloak-oidc").export("json");
+  create(createRep("keycloak-oidc","keycloak-oidc"));
+  Response response=realm.identityProviders().get("keycloak-oidc").export("json");
   Assert.assertEquals("status",204,response.getStatus());
   String body=response.readEntity(String.class);
   Assert.assertNull("body",body);

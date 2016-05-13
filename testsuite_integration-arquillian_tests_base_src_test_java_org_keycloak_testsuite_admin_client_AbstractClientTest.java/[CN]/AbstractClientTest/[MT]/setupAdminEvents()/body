@@ -1,0 +1,7 @@
+{
+  RealmRepresentation realm=testRealmResource().toRepresentation();
+  if (realm.getEventsListeners() == null || !realm.getEventsListeners().contains(EventsListenerProviderFactory.PROVIDER_ID)) {
+    realm=RealmBuilder.edit(testRealmResource().toRepresentation()).testEventListener().build();
+    testRealmResource().update(realm);
+  }
+}

@@ -1,0 +1,7 @@
+{
+  RoleRepresentation roleRep=new RoleRepresentation();
+  roleRep.setName(roleName);
+  testRealmResource().roles().create(roleRep);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,Matchers.startsWith(AdminEventPaths.rolesResourcePath()));
+  return testRealmResource().roles().get(roleName).toRepresentation();
+}

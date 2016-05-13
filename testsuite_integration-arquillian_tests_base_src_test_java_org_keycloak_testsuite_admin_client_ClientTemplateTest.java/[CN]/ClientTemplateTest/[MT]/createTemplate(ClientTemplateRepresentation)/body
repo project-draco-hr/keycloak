@@ -2,5 +2,7 @@
   Response resp=clientTemplates().create(templateRep);
   Assert.assertEquals(201,resp.getStatus());
   resp.close();
-  return ApiUtil.getCreatedId(resp);
+  String templateId=ApiUtil.getCreatedId(resp);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientTemplateResourcePath(templateId),templateRep);
+  return templateId;
 }

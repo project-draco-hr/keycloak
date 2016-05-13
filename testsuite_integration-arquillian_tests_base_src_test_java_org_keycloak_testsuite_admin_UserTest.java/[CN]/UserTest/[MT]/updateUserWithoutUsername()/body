@@ -5,9 +5,11 @@
   UserRepresentation rep=new UserRepresentation();
   rep.setFirstName("Firstname");
   user.update(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.userResourcePath(id),rep);
   rep=new UserRepresentation();
   rep.setLastName("Lastname");
   user.update(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.userResourcePath(id),rep);
   rep=realm.users().get(id).toRepresentation();
   assertEquals("user1",rep.getUsername());
   assertEquals("user1@localhost",rep.getEmail());

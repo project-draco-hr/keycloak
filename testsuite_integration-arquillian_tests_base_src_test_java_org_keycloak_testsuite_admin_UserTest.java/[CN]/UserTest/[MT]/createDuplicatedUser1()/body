@@ -4,6 +4,7 @@
   user.setUsername("user1");
   Response response=realm.users().create(user);
   assertEquals(409,response.getStatus());
+  assertAdminEvents.assertEmpty();
   ErrorRepresentation error=response.readEntity(ErrorRepresentation.class);
   Assert.assertEquals("User exists with same username",error.getErrorMessage());
   response.close();

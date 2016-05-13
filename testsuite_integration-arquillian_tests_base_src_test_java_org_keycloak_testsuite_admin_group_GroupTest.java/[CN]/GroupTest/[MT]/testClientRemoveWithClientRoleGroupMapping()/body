@@ -6,17 +6,21 @@
   client.setProtocol("openid-connect");
   Response response=realm.clients().create(client);
   response.close();
+  String clientUuid=ApiUtil.getCreatedId(response);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.clientResourcePath(clientUuid),client);
   client=realm.clients().findByClientId("foo").get(0);
   RoleRepresentation role=new RoleRepresentation();
   role.setName("foo-role");
   realm.clients().get(client.getId()).roles().create(role);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,Matchers.startsWith(AdminEventPaths.clientRolesResourcePath(clientUuid)),role);
   role=realm.clients().get(client.getId()).roles().get("foo-role").toRepresentation();
   GroupRepresentation group=new GroupRepresentation();
   group.setName("2716");
-  realm.groups().add(group).close();
-  group=realm.getGroupByPath("/2716");
+  group=createGroup(realm,group);
   List<RoleRepresentation> list=new LinkedList<>();
   list.add(role);
   realm.groups().group(group.getId()).roles().clientLevel(client.getId()).add(list);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientUuid));
   realm.clients().get(client.getId()).remove();
+  assertAdminEvents.assertEvent("test",OperationType.DELETE,AdminEventPaths.clientResourcePath(clientUuid));
 }

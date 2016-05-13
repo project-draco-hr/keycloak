@@ -1,0 +1,8 @@
+{
+  Response response=realm.userFederation().get(userFederationProviderId).addMapper(mapper);
+  Assert.assertEquals(201,response.getStatus());
+  response.close();
+  String mapperId=ApiUtil.getCreatedId(response);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.userFederationMapperResourcePath(userFederationProviderId,mapperId),mapper);
+  return mapperId;
+}

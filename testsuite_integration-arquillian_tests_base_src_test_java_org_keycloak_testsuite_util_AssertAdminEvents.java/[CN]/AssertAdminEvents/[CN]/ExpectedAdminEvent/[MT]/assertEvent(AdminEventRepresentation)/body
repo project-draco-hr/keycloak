@@ -1,0 +1,39 @@
+{
+  Assert.assertEquals(expected.getRealmId(),actual.getRealmId());
+  Assert.assertEquals(expected.getOperationType(),actual.getOperationType());
+  Assert.assertThat(actual.getResourcePath(),resourcePath);
+  Assert.assertTrue(ObjectUtil.isEqualOrBothNull(expected.getError(),actual.getError()));
+  AuthDetailsRepresentation expectedAuth=expected.getAuthDetails();
+  if (expectedAuth == null) {
+    expectedAuth=defaultAuthDetails();
+  }
+  AuthDetailsRepresentation actualAuth=actual.getAuthDetails();
+  Assert.assertEquals(expectedAuth.getRealmId(),actualAuth.getRealmId());
+  Assert.assertEquals(expectedAuth.getUserId(),actualAuth.getUserId());
+  if (expectedAuth.getClientId() != null) {
+    Assert.assertEquals(expectedAuth.getClientId(),actualAuth.getClientId());
+  }
+  if (expectedRep != null) {
+    if (actual.getRepresentation() == null) {
+      Assert.fail("Expected representation " + expectedRep + " but no representation was available on actual event");
+    }
+ else {
+      try {
+        Object actualRep=JsonSerialization.readValue(actual.getRepresentation(),expectedRep.getClass());
+        for (        Method method : Reflections.getAllDeclaredMethods(expectedRep.getClass())) {
+          if (method.getName().startsWith("get") || method.getName().startsWith("is")) {
+            Object expectedValue=Reflections.invokeMethod(method,expectedRep);
+            if (expectedValue != null) {
+              Object actualValue=Reflections.invokeMethod(method,actualRep);
+              Assert.assertEquals("Property " + method.getName() + " of representation not equal.",expectedValue,actualValue);
+            }
+          }
+        }
+      }
+ catch (      IOException ioe) {
+        throw new RuntimeException(ioe);
+      }
+    }
+  }
+  return actual;
+}

@@ -8,6 +8,7 @@
     fail("Expected BadRequestException");
   }
  catch (  BadRequestException e) {
+    assertAdminEvents.assertEmpty();
   }
   rep.setPrivateKey(PRIVATE_KEY);
   rep.setPublicKey("INVALID");
@@ -16,10 +17,12 @@
     fail("Expected BadRequestException");
   }
  catch (  BadRequestException e) {
+    assertAdminEvents.assertEmpty();
   }
   Assert.assertEquals(originalPublicKey,realm.toRepresentation().getPublicKey());
   rep.setPublicKey(PUBLIC_KEY);
   realm.update(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
   assertEquals(PUBLIC_KEY,rep.getPublicKey());
   String privateKey2048=StreamUtil.readString(getClass().getResourceAsStream("/keys/private2048.pem"));
   String publicKey2048=StreamUtil.readString(getClass().getResourceAsStream("/keys/public2048.pem"));
@@ -29,15 +32,18 @@
     fail("Expected BadRequestException");
   }
  catch (  BadRequestException e) {
+    assertAdminEvents.assertEmpty();
   }
   Assert.assertEquals(PUBLIC_KEY,realm.toRepresentation().getPublicKey());
   rep.setPublicKey(publicKey2048);
   realm.update(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
   Assert.assertEquals(publicKey2048,realm.toRepresentation().getPublicKey());
   String privateKey4096=StreamUtil.readString(getClass().getResourceAsStream("/keys/private4096.pem"));
   String publicKey4096=StreamUtil.readString(getClass().getResourceAsStream("/keys/public4096.pem"));
   rep.setPrivateKey(privateKey4096);
   rep.setPublicKey(publicKey4096);
   realm.update(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
   Assert.assertEquals(publicKey4096,realm.toRepresentation().getPublicKey());
 }

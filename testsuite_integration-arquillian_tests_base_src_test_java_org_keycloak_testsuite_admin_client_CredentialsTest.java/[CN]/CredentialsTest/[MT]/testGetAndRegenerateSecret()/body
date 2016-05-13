@@ -1,6 +1,9 @@
 {
   CredentialRepresentation oldCredential=accountClient.getSecret();
   CredentialRepresentation newCredential=accountClient.generateNewSecret();
+  CredentialRepresentation secretRep=new CredentialRepresentation();
+  secretRep.setType(CredentialRepresentation.SECRET);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.ACTION,AdminEventPaths.clientGenerateSecretPath(accountClientDbId),secretRep);
   assertNotNull(oldCredential);
   assertNotNull(newCredential);
   assertNotEquals(newCredential.getValue(),oldCredential.getValue());

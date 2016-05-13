@@ -1,0 +1,26 @@
+{
+  List<ProtocolMapperRepresentation> oldMappers=resource.getMappersPerProtocol(protocolName);
+  List<ProtocolMapperRepresentation> builtins=builtinMappers.get(protocolName);
+  List<ProtocolMapperRepresentation> mappersToAdd=mappersToAdd(oldMappers,builtins);
+  resource.createMapper(mappersToAdd);
+  AdminEventRepresentation adminEvent=assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,adminEventPath + "/add-models");
+  try {
+    List<ProtocolMapperRepresentation> eventMappers=JsonSerialization.readValue(new ByteArrayInputStream(adminEvent.getRepresentation().getBytes()),new TypeReference<List<ProtocolMapperRepresentation>>(){
+    }
+);
+    Assert.assertEquals(eventMappers.size(),mappersToAdd.size());
+    for (int i=0; i < mappersToAdd.size(); i++) {
+      ProtocolMapperRepresentation repExpected=mappersToAdd.get(i);
+      ProtocolMapperRepresentation repActual=eventMappers.get(i);
+      assertEqualMappers(repExpected,repActual);
+    }
+  }
+ catch (  IOException ioe) {
+    throw new RuntimeException(ioe);
+  }
+  List<ProtocolMapperRepresentation> newMappers=resource.getMappersPerProtocol(protocolName);
+  assertEquals(oldMappers.size() + mappersToAdd.size(),newMappers.size());
+  for (  ProtocolMapperRepresentation rep : mappersToAdd) {
+    assertTrue(containsMapper(newMappers,rep));
+  }
+}

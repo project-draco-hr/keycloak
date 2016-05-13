@@ -1,17 +1,9 @@
 {
   testingClient.testApp().clearAdminActions();
-  String redirectUri=oauth.getRedirectUri().replace("/master/","/" + REALM_NAME + "/");
-  ClientRepresentation client=new ClientRepresentation();
-  client.setClientId("test-app");
-  client.setAdminUrl(suiteContext.getAuthServerInfo().getContextRoot() + "/auth/realms/master/app/admin");
-  client.setRedirectUris(Collections.singletonList(redirectUri));
-  client.setSecret("secret");
-  int notBefore=Time.currentTime() - 60;
-  client.setNotBefore(notBefore);
-  Response response=realm.clients().create(client);
-  String id=ApiUtil.getCreatedId(response);
-  response.close();
+  ClientRepresentation client=createAppClient();
+  String id=client.getId();
   realm.clients().get(id).pushRevocation();
   PushNotBeforeAction pushNotBefore=testingClient.testApp().getAdminPushNotBefore();
-  assertEquals(notBefore,pushNotBefore.getNotBefore());
+  assertEquals(client.getNotBefore().intValue(),pushNotBefore.getNotBefore());
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.clientPushRevocationPath(id));
 }

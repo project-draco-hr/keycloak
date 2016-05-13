@@ -5,10 +5,12 @@
   newClient.setClientId(client.getClientId());
   newClient.setBaseUrl("http://baseurl");
   realm.clients().get(client.getId()).update(newClient);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.clientResourcePath(client.getId()),newClient);
   ClientRepresentation storedClient=realm.clients().get(client.getId()).toRepresentation();
   assertClient(client,storedClient);
   newClient.setSecret("new-secret");
   realm.clients().get(client.getId()).update(newClient);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.clientResourcePath(client.getId()),newClient);
   storedClient=realm.clients().get(client.getId()).toRepresentation();
   assertClient(client,storedClient);
 }

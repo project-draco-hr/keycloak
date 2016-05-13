@@ -15,10 +15,12 @@
   assertFederationProvider(userFederation().get(id).toRepresentation(),id,id,"ldap",2,-1,-1,-1,LDAPConstants.BIND_DN,"cn=manager",LDAPConstants.BIND_CREDENTIAL,"password");
   ldapRep.getConfig().put(LDAPConstants.CUSTOM_USER_SEARCH_FILTER,"(dc=something2)");
   userFederation().get(id).update(ldapRep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.userFederationResourcePath(id),ldapRep);
   ldapRep=userFederation().get(id).toRepresentation();
   assertFederationProvider(ldapRep,id,id,"ldap",2,-1,-1,-1,LDAPConstants.BIND_DN,"cn=manager-updated",LDAPConstants.BIND_CREDENTIAL,"password",LDAPConstants.CUSTOM_USER_SEARCH_FILTER,"(dc=something2)");
   ldapRep.setDisplayName("ldap2");
   userFederation().get(id).update(ldapRep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.userFederationResourcePath(id),ldapRep);
   assertFederationProvider(userFederation().get(id).toRepresentation(),id,"ldap2","ldap",2,-1,-1,-1,LDAPConstants.BIND_DN,"cn=manager-updated",LDAPConstants.BIND_CREDENTIAL,"password",LDAPConstants.CUSTOM_USER_SEARCH_FILTER,"(dc=something2)");
-  userFederation().get(id).remove();
+  removeUserFederationProvider(id);
 }

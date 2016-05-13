@@ -3,10 +3,12 @@
   Response resp=oidcMappersRsc.createMapper(rep);
   resp.close();
   String createdId=ApiUtil.getCreatedId(resp);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientProtocolMapperPath(oidcClientId,createdId),rep);
   rep.getConfig().put("role","myotherrole");
   rep.setId(createdId);
   rep.setConsentRequired(false);
   oidcMappersRsc.update(createdId,rep);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.UPDATE,AdminEventPaths.clientProtocolMapperPath(oidcClientId,createdId),rep);
   ProtocolMapperRepresentation updated=oidcMappersRsc.getMapperById(createdId);
   assertEqualMappers(rep,updated);
 }

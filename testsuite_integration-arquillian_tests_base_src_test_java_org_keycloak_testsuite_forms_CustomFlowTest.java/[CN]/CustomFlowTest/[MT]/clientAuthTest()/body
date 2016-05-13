@@ -1,10 +1,14 @@
 {
-  PassThroughClientAuthenticator.clientId="dummy-client";
-  PassThroughAuthenticator.username="login-test";
+  AuthenticatorState state=new AuthenticatorState();
+  state.setClientId("dummy-client");
+  state.setUsername("login-test");
+  testingClient.testing().updateAuthenticator(state);
   grantAccessToken("dummy-client","login-test");
-  PassThroughClientAuthenticator.clientId="test-app";
+  state.setClientId("test-app");
+  testingClient.testing().updateAuthenticator(state);
   grantAccessToken("test-app","login-test");
-  PassThroughClientAuthenticator.clientId="unknown";
+  state.setClientId("unknown");
+  testingClient.testing().updateAuthenticator(state);
   OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("password","test-user","password");
   assertEquals(400,response.getStatusCode());
   assertEquals("unauthorized_client",response.getError());

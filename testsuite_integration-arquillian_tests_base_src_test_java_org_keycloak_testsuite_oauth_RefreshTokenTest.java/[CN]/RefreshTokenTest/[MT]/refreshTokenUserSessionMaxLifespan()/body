@@ -9,7 +9,7 @@
   RealmResource realmResource=adminClient.realm("test");
   Integer maxLifespan=realmResource.toRepresentation().getSsoSessionMaxLifespan();
   RealmManager.realm(realmResource).ssoSessionMaxLifespan(1);
-  Time.setOffset(1);
+  setTimeOffset(1);
   tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
   assertEquals(400,tokenResponse.getStatusCode());
   assertNull(tokenResponse.getAccessToken());
@@ -17,5 +17,5 @@
   RealmManager.realm(realmResource).ssoSessionMaxLifespan(maxLifespan);
   events.expectRefresh(refreshId,sessionId).error(Errors.INVALID_TOKEN);
   events.clear();
-  Time.setOffset(0);
+  setTimeOffset(0);
 }

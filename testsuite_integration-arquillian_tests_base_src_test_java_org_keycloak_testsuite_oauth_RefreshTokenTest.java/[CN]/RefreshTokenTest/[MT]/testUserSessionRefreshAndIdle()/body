@@ -7,26 +7,24 @@
   events.poll();
   String refreshId=oauth.verifyRefreshToken(tokenResponse.getRefreshToken()).getId();
   int last=testingClient.testing().getLastSessionRefresh("test",sessionId);
-  ;
-  Time.setOffset(2);
+  setTimeOffset(2);
   tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
   AccessToken refreshedToken=oauth.verifyToken(tokenResponse.getAccessToken());
   RefreshToken refreshedRefreshToken=oauth.verifyRefreshToken(tokenResponse.getRefreshToken());
   assertEquals(200,tokenResponse.getStatusCode());
   int next=testingClient.testing().getLastSessionRefresh("test",sessionId);
-  ;
   Assert.assertNotEquals(last,next);
   RealmResource realmResource=adminClient.realm("test");
   int lastAccessTokenLifespan=realmResource.toRepresentation().getAccessTokenLifespan();
   RealmManager.realm(realmResource).accessTokenLifespan(100000);
-  Time.setOffset(4);
+  setTimeOffset(4);
   tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
   next=testingClient.testing().getLastSessionRefresh("test",sessionId);
   Assert.assertThat(next,allOf(greaterThan(last),lessThan(last + 50)));
   int originalIdle=realmResource.toRepresentation().getSsoSessionIdleTimeout();
   RealmManager.realm(realmResource).ssoSessionIdleTimeout(1);
   events.clear();
-  Time.setOffset(6);
+  setTimeOffset(6);
   tokenResponse=oauth.doRefreshTokenRequest(tokenResponse.getRefreshToken(),"password");
   assertEquals(400,tokenResponse.getStatusCode());
   assertNull(tokenResponse.getAccessToken());
@@ -34,5 +32,5 @@
   events.expectRefresh(refreshId,sessionId).error(Errors.INVALID_TOKEN);
   RealmManager.realm(realmResource).ssoSessionIdleTimeout(originalIdle).accessTokenLifespan(lastAccessTokenLifespan);
   events.clear();
-  Time.setOffset(0);
+  setTimeOffset(0);
 }

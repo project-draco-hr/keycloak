@@ -1,0 +1,13 @@
+{
+  SslMailServer.startWithSsl(this.getClass().getClassLoader().getResource(SslMailServer.PRIVATE_KEY).getFile());
+  accountManagement.navigateTo();
+  testRealmLoginPage.form().login(user.getUsername(),"password");
+  assertEquals("You need to verify your email address to activate your account.",testRealmVerifyEmailPage.getFeedbackText());
+  String verifyEmailUrl=assertEmailAndGetUrl(MailServerConfiguration.FROM,user.getEmail(),"Someone has created a Test account with this email address.",true);
+  log.info("navigating to url from email: " + verifyEmailUrl);
+  driver.navigate().to(verifyEmailUrl);
+  assertCurrentUrlStartsWith(accountManagement);
+  accountManagement.signOut();
+  testRealmLoginPage.form().login(user);
+  assertCurrentUrlStartsWith(accountManagement);
+}

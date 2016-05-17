@@ -1,0 +1,8 @@
+{
+  ClientResource appRoleApplication=ApiUtil.findClientByClientId(testRealm(),"APP_ROLE_APPLICATION");
+  RoleResource appRole1=appRoleApplication.roles().get("APP_ROLE_1");
+  RoleBuilder realmAppCompositeRole=RoleBuilder.create().name("REALM_APP_COMPOSITE_ROLE");
+  testRealm().roles().create(realmAppCompositeRole.build());
+  String id=testRealm().roles().get("REALM_APP_COMPOSITE_ROLE").toRepresentation().getId();
+  testRealm().rolesById().addComposites(id,Collections.singletonList(appRole1.toRepresentation()));
+}

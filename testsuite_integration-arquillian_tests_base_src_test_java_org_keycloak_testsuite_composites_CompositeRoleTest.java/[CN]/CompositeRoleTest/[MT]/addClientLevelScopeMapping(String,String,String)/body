@@ -1,0 +1,6 @@
+{
+  ClientResource targetClient=ApiUtil.findClientByClientId(testRealm(),targetClientId);
+  ClientResource sourceClient=ApiUtil.findClientByClientId(testRealm(),sourceClientId);
+  RoleRepresentation role=sourceClient.roles().get(roleName).toRepresentation();
+  targetClient.getScopeMappings().clientLevel(sourceClient.toRepresentation().getId()).add(Collections.singletonList(role));
+}

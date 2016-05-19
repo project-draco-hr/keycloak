@@ -1,20 +1,21 @@
 {
-  String servletUri=UriBuilder.fromUri(OFFLINE_CLIENT_APP_URI).queryParam(OAuth2Constants.SCOPE,OAuth2Constants.OFFLINE_ACCESS).build().toString();
-  oauth.doLogin("test-user@localhost","password");
+  String servletUri=UriBuilder.fromUri(offlineTokenPage.toString()).queryParam(OAuth2Constants.SCOPE,OAuth2Constants.OFFLINE_ACCESS).build().toString();
   driver.navigate().to(servletUri);
-  Assert.assertTrue(driver.getCurrentUrl().startsWith(OFFLINE_CLIENT_APP_URI));
-  Assert.assertEquals(offlineToken.getRefreshToken().getType(),TokenUtil.TOKEN_TYPE_OFFLINE);
-  Assert.assertEquals(offlineToken.getRefreshToken().getExpiration(),0);
-  String accessTokenId=offlineToken.getAccessToken().getId();
-  String refreshTokenId=offlineToken.getRefreshToken().getId();
-  setAdapterTimeOffset(9999);
-  Assert.assertTrue(driver.getCurrentUrl().startsWith(OFFLINE_CLIENT_APP_URI));
-  Assert.assertNotEquals(offlineToken.getRefreshToken().getId(),refreshTokenId);
-  Assert.assertNotEquals(offlineToken.getAccessToken().getId(),accessTokenId);
-  driver.navigate().to(OFFLINE_CLIENT_APP_URI + "/logout");
+  waitUntilElement(By.tagName("body")).is().visible();
+  loginPage.login("test-user@localhost","password");
+  assertCurrentUrlStartsWith(offlineTokenPage);
+  Assert.assertEquals(offlineTokenPage.getRefreshToken().getType(),TokenUtil.TOKEN_TYPE_OFFLINE);
+  Assert.assertEquals(offlineTokenPage.getRefreshToken().getExpiration(),0);
+  String accessTokenId=offlineTokenPage.getAccessToken().getId();
+  String refreshTokenId=offlineTokenPage.getRefreshToken().getId();
+  setAdapterAndServerTimeOffset(9999);
+  assertCurrentUrlStartsWith(offlineTokenPage);
+  Assert.assertNotEquals(offlineTokenPage.getRefreshToken().getId(),refreshTokenId);
+  Assert.assertNotEquals(offlineTokenPage.getAccessToken().getId(),accessTokenId);
+  offlineTokenPage.logout();
   loginPage.assertCurrent();
-  driver.navigate().to(OFFLINE_CLIENT_APP_URI);
+  offlineTokenPage.navigateTo();
   loginPage.assertCurrent();
-  setAdapterTimeOffset(0);
+  setAdapterAndServerTimeOffset(0);
   events.clear();
 }

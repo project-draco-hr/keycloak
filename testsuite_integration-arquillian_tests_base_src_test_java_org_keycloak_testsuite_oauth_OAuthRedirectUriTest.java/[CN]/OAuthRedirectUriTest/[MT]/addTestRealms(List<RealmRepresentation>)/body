@@ -1,0 +1,17 @@
+{
+  RealmRepresentation realmRepresentation=loadJson(getClass().getResourceAsStream("/testrealm.json"),RealmRepresentation.class);
+  RealmBuilder realm=RealmBuilder.edit(realmRepresentation).testEventListener();
+  ClientBuilder installedApp=ClientBuilder.create().id("test-installed").name("test-installed").redirectUris(Constants.INSTALLED_APP_URN,Constants.INSTALLED_APP_URL).secret("password");
+  realm.client(installedApp);
+  ClientBuilder installedApp2=ClientBuilder.create().id("test-installed2").name("test-installed2").redirectUris(Constants.INSTALLED_APP_URL + "/myapp").secret("password");
+  realm.client(installedApp2);
+  ClientBuilder installedApp3=ClientBuilder.create().id("test-wildcard").name("test-wildcard").redirectUris("http://example.com/foo/*","http://with-dash.example.com/foo/*","http://localhost:8180/foo/*").secret("password");
+  realm.client(installedApp3);
+  ClientBuilder installedApp4=ClientBuilder.create().id("test-dash").name("test-dash").redirectUris("http://with-dash.example.com","http://with-dash.example.com/foo").secret("password");
+  realm.client(installedApp4);
+  ClientBuilder installedApp5=ClientBuilder.create().id("test-root-url").name("test-root-url").rootUrl("http://with-dash.example.com").redirectUris("/foo").secret("password");
+  realm.client(installedApp5);
+  ClientBuilder installedApp6=ClientBuilder.create().id("test-relative-url").name("test-relative-url").rootUrl("").redirectUris("/foo").secret("password");
+  realm.client(installedApp6);
+  testRealms.add(realm.build());
+}

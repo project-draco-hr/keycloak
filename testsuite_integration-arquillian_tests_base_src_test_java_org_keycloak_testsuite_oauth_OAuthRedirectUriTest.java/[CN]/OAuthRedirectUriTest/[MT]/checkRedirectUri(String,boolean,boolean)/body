@@ -1,0 +1,25 @@
+{
+  oauth.redirectUri(redirectUri);
+  oauth.openLoginForm();
+  if (expectValid) {
+    Assert.assertTrue(loginPage.isCurrent());
+  }
+ else {
+    Assert.assertTrue(errorPage.isCurrent());
+    Assert.assertEquals("Invalid parameter: redirect_uri",errorPage.getError());
+  }
+  if (expectValid) {
+    Assert.assertTrue(loginPage.isCurrent());
+    if (checkCodeToToken) {
+      oauth.doLogin("test-user@localhost","password");
+      if (driver.findElements(By.name("login")).size() != 0) {
+        driver.findElement(By.name("login")).click();
+      }
+      String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+      Assert.assertNotNull(code);
+      OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
+      Assert.assertEquals("Expected success, but got error: " + tokenResponse.getError(),200,tokenResponse.getStatusCode());
+      oauth.doLogout(tokenResponse.getRefreshToken(),"password");
+    }
+  }
+}

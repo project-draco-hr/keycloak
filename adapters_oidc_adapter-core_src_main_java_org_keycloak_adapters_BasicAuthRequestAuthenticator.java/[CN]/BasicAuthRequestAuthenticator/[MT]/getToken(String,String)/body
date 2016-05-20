@@ -13,6 +13,7 @@
   int status=response.getStatusLine().getStatusCode();
   HttpEntity entity=response.getEntity();
   if (status != 200) {
+    EntityUtils.consumeQuietly(entity);
     throw new java.io.IOException("Bad status: " + status);
   }
   if (entity == null) {

@@ -1,0 +1,9 @@
+{
+  RealmManager realmManager=new RealmManager(session);
+  RealmModel realm=realmManager.getRealmByName(realmName);
+  if (realm == null) {
+    throw new NotFoundException("Realm not found");
+  }
+  session.sessions().removeUserSessions(realm);
+  return Response.ok().build();
+}

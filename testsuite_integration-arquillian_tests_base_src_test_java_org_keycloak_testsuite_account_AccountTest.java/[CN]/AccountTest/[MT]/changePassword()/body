@@ -1,0 +1,24 @@
+{
+  changePasswordPage.open();
+  loginPage.login("test-user@localhost","password");
+  EventRepresentation event=events.expectLogin().client("account").detail(Details.REDIRECT_URI,ACCOUNT_REDIRECT + "?path=password").assertEvent();
+  String sessionId=event.getSessionId();
+  String userId=event.getUserId();
+  changePasswordPage.changePassword("","new-password","new-password");
+  Assert.assertEquals("Please specify password.",profilePage.getError());
+  changePasswordPage.changePassword("password","new-password","new-password2");
+  Assert.assertEquals("Password confirmation doesn't match.",profilePage.getError());
+  changePasswordPage.changePassword("password","new-password","new-password");
+  Assert.assertEquals("Your password has been updated.",profilePage.getSuccess());
+  events.expectAccount(EventType.UPDATE_PASSWORD).assertEvent();
+  changePasswordPage.logout();
+  events.expectLogout(sessionId).detail(Details.REDIRECT_URI,changePasswordPage.getPath()).assertEvent();
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  Assert.assertEquals("Invalid username or password.",loginPage.getError());
+  events.expectLogin().session((String)null).error("invalid_user_credentials").removeDetail(Details.CONSENT).assertEvent();
+  loginPage.open();
+  loginPage.login("test-user@localhost","new-password");
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  events.expectLogin().assertEvent();
+}

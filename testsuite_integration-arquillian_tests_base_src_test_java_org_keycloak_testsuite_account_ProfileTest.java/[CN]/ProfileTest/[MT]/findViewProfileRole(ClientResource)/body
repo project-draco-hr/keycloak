@@ -1,0 +1,9 @@
+{
+  RoleMappingResource scopeMappings=accountApp.getScopeMappings();
+  RoleScopeResource clientLevelMappings=scopeMappings.clientLevel(accountApp.toRepresentation().getId());
+  List<RoleRepresentation> accountRoleList=clientLevelMappings.listEffective();
+  for (  RoleRepresentation role : accountRoleList) {
+    if (role.getName().equals(AccountRoles.VIEW_PROFILE))     return role;
+  }
+  return null;
+}

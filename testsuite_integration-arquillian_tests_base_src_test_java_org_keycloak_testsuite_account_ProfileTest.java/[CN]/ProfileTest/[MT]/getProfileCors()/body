@@ -1,0 +1,8 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  String token=oauth.doAccessTokenRequest(code,"password").getAccessToken();
+  driver.navigate().to("http://localtest.me:8180/app");
+  String[] response=doGetProfileJs(token);
+  assertEquals("200",response[0]);
+}

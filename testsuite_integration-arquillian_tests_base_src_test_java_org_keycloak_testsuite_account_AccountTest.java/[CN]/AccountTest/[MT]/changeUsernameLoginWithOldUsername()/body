@@ -1,0 +1,15 @@
+{
+  addUser("change-username","change-username@localhost");
+  setEditUsernameAllowed();
+  profilePage.open();
+  loginPage.login("change-username","password");
+  profilePage.updateUsername("change-username-updated");
+  Assert.assertEquals("Your account has been updated.",profilePage.getSuccess());
+  profilePage.logout();
+  profilePage.open();
+  Assert.assertTrue(loginPage.isCurrent());
+  loginPage.login("change-username","password");
+  Assert.assertTrue(loginPage.isCurrent());
+  Assert.assertEquals("Invalid username or password.",loginPage.getError());
+  loginPage.login("change-username-updated","password");
+}

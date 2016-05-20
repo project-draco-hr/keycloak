@@ -1,0 +1,10 @@
+{
+  String accountClientId=org.keycloak.models.Constants.ACCOUNT_MANAGEMENT_CLIENT_ID;
+  ClientResource accountApp=ApiUtil.findClientByClientId(testRealm(),accountClientId);
+  RoleRepresentation role=findViewProfileRole(accountApp);
+  String accountAppId=accountApp.toRepresentation().getId();
+  ClientResource app=ApiUtil.findClientByClientId(testRealm(),"test-app");
+  app.getScopeMappings().clientLevel(accountAppId).add(Collections.singletonList(role));
+  ClientResource thirdParty=ApiUtil.findClientByClientId(testRealm(),"third-party");
+  thirdParty.getScopeMappings().clientLevel(accountAppId).add(Collections.singletonList(role));
+}

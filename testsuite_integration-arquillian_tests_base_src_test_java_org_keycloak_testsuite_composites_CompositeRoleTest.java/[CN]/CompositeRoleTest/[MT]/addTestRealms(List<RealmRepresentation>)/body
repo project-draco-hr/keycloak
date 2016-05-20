@@ -1,0 +1,26 @@
+{
+  RealmBuilder realmBuilder=RealmBuilder.create().name("test").publicKey("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCrVrCuTtArbgaZzL1hvh0xtL5mc7o0NqPVnYXkLvgcwiC3BjLGw1tGEGoJaXDuSaRllobm53JBhjx33UNv+5z/UMG4kytBWxheNVKnL6GgqlNabMaFfPLPCF8kAgKnsi79NMo+n6KnSY8YeUmec/p2vjO2NjsSAVcWEQMVhJ31LwIDAQAB").privateKey("MIICXAIBAAKBgQCrVrCuTtArbgaZzL1hvh0xtL5mc7o0NqPVnYXkLvgcwiC3BjLGw1tGEGoJaXDuSaRllobm53JBhjx33UNv+5z/UMG4kytBWxheNVKnL6GgqlNabMaFfPLPCF8kAgKnsi79NMo+n6KnSY8YeUmec/p2vjO2NjsSAVcWEQMVhJ31LwIDAQABAoGAfmO8gVhyBxdqlxmIuglbz8bcjQbhXJLR2EoS8ngTXmN1bo2L90M0mUKSdc7qF10LgETBzqL8jYlQIbt+e6TH8fcEpKCjUlyq0Mf/vVbfZSNaVycY13nTzo27iPyWQHK5NLuJzn1xvxxrUeXI6A2WFpGEBLbHjwpx5WQG9A+2scECQQDvdn9NE75HPTVPxBqsEd2z10TKkl9CZxu10Qby3iQQmWLEJ9LNmy3acvKrE3gMiYNWb6xHPKiIqOR1as7L24aTAkEAtyvQOlCvr5kAjVqrEKXalj0Tzewjweuxc0pskvArTI2Oo070h65GpoIKLc9jf+UA69cRtquwP93aZKtW06U8dQJAF2Y44ks/mK5+eyDqik3koCI08qaC8HYq2wVl7G2QkJ6sbAaILtcvD92ToOvyGyeE0flvmDZxMYlvaZnaQ0lcSQJBAKZU6umJi3/xeEbkJqMfeLclD27XGEFoPeNrmdx0q10Azp4NfJAY+Z8KRyQCR2BEG+oNitBOZ+YXF9KCpH3cdmECQHEigJhYg+ykOvr1aiZUMFT72HU0jnmQe2FVekuG+LJUt2Tm7GtMjTFoGpf0JwrVuZN39fOYAlo+nTixgeW7X8Y=").ssoSessionIdleTimeout(3000).accessTokenLifespan(10000).ssoSessionMaxLifespan(10000).accessCodeLifespanUserAction(1000).accessCodeLifespan(1000).sslRequired(SslRequired.EXTERNAL.toString());
+  RoleRepresentation realmRole1=RoleBuilder.create().name("REALM_ROLE_1").build();
+  RoleRepresentation realmComposite1=RoleBuilder.create().name("REALM_COMPOSITE_1").composite().realmComposite(realmRole1).build();
+  RolesBuilder roles=RolesBuilder.create().realmRole(realmRole1).realmRole(RoleBuilder.create().name("REALM_ROLE_2").build()).realmRole(RoleBuilder.create().name("REALM_ROLE_3").build()).realmRole(realmComposite1);
+  realmBuilder.roles(roles);
+  UserBuilder realmCompositeUser=UserBuilder.create().username("REALM_COMPOSITE_1_USER").enabled(true).password("password").addRoles(realmComposite1.getName());
+  realmBuilder.user(realmCompositeUser);
+  UserBuilder realmRole1User=UserBuilder.create().username("REALM_ROLE_1_USER").enabled(true).password("password").addRoles(realmRole1.getName());
+  realmBuilder.user(realmRole1User);
+  ClientBuilder realmComposite1Application=ClientBuilder.create().clientId("REALM_COMPOSITE_1_APPLICATION").name("REALM_COMPOSITE_1_APPLICATION").fullScopeEnabled(Boolean.FALSE).redirectUris("http://localhost:8180/auth/realms/master/app/*").baseUrl("http://localhost:8180/auth/realms/master/app/auth").adminUrl("http://localhost:8180/auth/realms/master/app/logout").secret("password");
+  realmBuilder.client(realmComposite1Application);
+  ClientBuilder realmRole1Application=ClientBuilder.create().clientId("REALM_ROLE_1_APPLICATION").name("REALM_ROLE_1_APPLICATION").fullScopeEnabled(Boolean.FALSE).redirectUris("http://localhost:8180/auth/realms/master/app/*").baseUrl("http://localhost:8180/auth/realms/master/app/auth").adminUrl("http://localhost:8180/auth/realms/master/app/logout").secret("password");
+  realmBuilder.client(realmRole1Application);
+  ClientBuilder appRoleApplication=ClientBuilder.create().clientId("APP_ROLE_APPLICATION").name("APP_ROLE_APPLICATION").fullScopeEnabled(Boolean.FALSE).redirectUris("http://localhost:8180/auth/realms/master/app/*").baseUrl("http://localhost:8180/auth/realms/master/app/auth").adminUrl("http://localhost:8180/auth/realms/master/app/logout").defaultRoles("APP_ROLE_1","APP_ROLE_2").secret("password");
+  realmBuilder.client(appRoleApplication);
+  UserBuilder realmAppCompositeUser=UserBuilder.create().username("REALM_APP_COMPOSITE_USER").password("password");
+  realmBuilder.user(realmAppCompositeUser);
+  UserBuilder realmAppRoleUser=UserBuilder.create().username("REALM_APP_ROLE_USER").password("password").addRoles("APP_ROLE_2");
+  realmBuilder.user(realmAppRoleUser);
+  ClientBuilder appCompositeApplication=ClientBuilder.create().clientId("APP_COMPOSITE_APPLICATION").name("APP_COMPOSITE_APPLICATION").fullScopeEnabled(Boolean.FALSE).defaultRoles("APP_COMPOSITE_ROLE").redirectUris("http://localhost:8180/auth/realms/master/app/*").baseUrl("http://localhost:8180/auth/realms/master/app/auth").adminUrl("http://localhost:8180/auth/realms/master/app/logout").secret("password");
+  realmBuilder.client(appCompositeApplication);
+  UserBuilder appCompositeUser=UserBuilder.create().username("APP_COMPOSITE_USER").password("password").addRoles("REALM_COMPOSITE_1");
+  realmBuilder.user(appCompositeUser);
+  testRealms.add(realmBuilder.build());
+}

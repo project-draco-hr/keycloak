@@ -1,0 +1,12 @@
+{
+  ClientResource appCompositeApplication=ApiUtil.findClientByClientId(testRealm(),"APP_COMPOSITE_APPLICATION");
+  RoleResource appCompositeRole=appCompositeApplication.roles().get("APP_COMPOSITE_ROLE");
+  List<RoleRepresentation> toAdd=new LinkedList<>();
+  toAdd.add(testRealm().roles().get("REALM_ROLE_1").toRepresentation());
+  toAdd.add(testRealm().roles().get("REALM_ROLE_2").toRepresentation());
+  toAdd.add(testRealm().roles().get("REALM_ROLE_3").toRepresentation());
+  ClientResource appRolesApplication=ApiUtil.findClientByClientId(testRealm(),"APP_ROLE_APPLICATION");
+  RoleRepresentation appRole1=appRolesApplication.roles().get("APP_ROLE_1").toRepresentation();
+  toAdd.add(appRole1);
+  appCompositeRole.addComposites(toAdd);
+}

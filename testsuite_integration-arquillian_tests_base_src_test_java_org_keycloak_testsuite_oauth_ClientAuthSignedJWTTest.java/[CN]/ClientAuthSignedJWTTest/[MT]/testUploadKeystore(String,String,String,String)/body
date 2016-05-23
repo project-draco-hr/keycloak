@@ -6,11 +6,10 @@
     throw new IOException("File not found: " + filePath);
   }
   File keystoreFile=new File(fileUrl.getFile());
-  ContentType keystoreContentType=ContentType.create(Files.probeContentType(keystoreFile.toPath()));
   OAuthClient.AccessTokenResponse accessTokenResponse=oauth.doGrantAccessTokenRequest(AuthRealm.MASTER,AuthRealm.ADMIN,AuthRealm.ADMIN,null,"admin-cli",null);
   assertEquals(200,accessTokenResponse.getStatusCode());
   final String url=suiteContext.getAuthServerInfo().getContextRoot() + "/auth/admin/realms/" + testRealm.getRealm()+ "/clients/"+ client.getId()+ "/certificates/jwt.credential/upload-certificate";
-  FileBody fileBody=new FileBody(keystoreFile,keystoreContentType);
+  FileBody fileBody=new FileBody(keystoreFile);
   HttpEntity entity=MultipartEntityBuilder.create().addPart("file",fileBody).addTextBody("keystoreFormat",keystoreFormat).addTextBody("keyAlias",keyAlias).addTextBody("storePassword",storePassword).addTextBody("keyPassword","undefined").build();
   HttpPost httpRequest=new HttpPost(url);
   httpRequest.setHeader(HttpHeaders.AUTHORIZATION,"Bearer " + accessTokenResponse.getAccessToken());

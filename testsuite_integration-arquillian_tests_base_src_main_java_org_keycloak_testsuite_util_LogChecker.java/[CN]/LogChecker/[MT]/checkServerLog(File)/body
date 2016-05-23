@@ -1,18 +1,18 @@
 {
   log.info(String.format("Checking server log: '%s'",logFile.getAbsolutePath()));
   String[] logContent=FileUtils.readFileToString(logFile).split("\n");
-  for (  String log : logContent) {
-    boolean containsError=log.contains("ERROR") || log.contains("SEVERE") || log.contains("Exception ");
+  for (  String logText : logContent) {
+    boolean containsError=logText.contains("ERROR") || logText.contains("SEVERE") || logText.contains("Exception ");
     if (containsError) {
       boolean ignore=false;
       for (      String i : IGNORED) {
-        if (log.matches(i)) {
+        if (logText.matches(i)) {
           ignore=true;
           break;
         }
       }
       if (!ignore) {
-        throw new RuntimeException(String.format("Server log file contains ERROR: '%s'",log));
+        throw new RuntimeException(String.format("Server log file contains ERROR: '%s'",logText));
       }
     }
   }

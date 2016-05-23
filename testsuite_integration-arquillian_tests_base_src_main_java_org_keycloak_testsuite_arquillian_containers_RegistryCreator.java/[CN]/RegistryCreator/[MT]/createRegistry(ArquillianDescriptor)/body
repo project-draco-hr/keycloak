@@ -6,29 +6,9 @@
   if (containers.isEmpty()) {
     throw new IllegalStateException("There are not any container adapters on the classpath");
   }
-  for (  ContainerDef container : event.getContainers()) {
-    if (isCreatingContainer(container,containers)) {
-      if (isEnabled(container)) {
-        log.info("Registering container: " + container.getContainerName());
-        reg.create(container,serviceLoader);
-      }
- else {
-        log.info("Container is disabled: " + container.getContainerName());
-      }
-    }
-  }
+  createRegistry(event.getContainers(),containers,reg,serviceLoader);
   for (  GroupDef group : event.getGroups()) {
-    for (    ContainerDef container : group.getGroupContainers()) {
-      if (isCreatingContainer(container,containers)) {
-        if (isEnabled(container)) {
-          log.info("Registering container: " + container.getContainerName());
-          reg.create(container,serviceLoader);
-        }
- else {
-          log.info("Container is disabled: " + container.getContainerName());
-        }
-      }
-    }
+    createRegistry(group.getGroupContainers(),containers,reg,serviceLoader);
   }
   registry.set(reg);
 }

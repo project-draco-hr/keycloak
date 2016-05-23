@@ -1,0 +1,14 @@
+{
+  for (  Container container : containers) {
+    String adapterImplClassValue=container.getContainerConfiguration().getContainerProperties().get(ADAPTER_IMPL_CONFIG_STRING);
+    if (isServiceLoaderClassAssignableFromAdapterImplClass(loader,adapterImplClassValue.trim())) {
+      try {
+        return addContainer((Container)injector.inject(new ContainerImpl(definition.getContainerName(),(DeployableContainer)loader.onlyOne(DeployableContainer.class),definition)));
+      }
+ catch (      Exception ex) {
+        throw new ContainerCreationException("Could not create Container " + definition.getContainerName(),ex);
+      }
+    }
+  }
+  return null;
+}

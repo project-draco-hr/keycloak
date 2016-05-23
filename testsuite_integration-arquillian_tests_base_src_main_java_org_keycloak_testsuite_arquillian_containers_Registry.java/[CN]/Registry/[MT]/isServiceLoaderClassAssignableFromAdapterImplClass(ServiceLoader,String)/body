@@ -1,0 +1,14 @@
+{
+  if (adapterImplClassValue == null && loader == null) {
+    return false;
+  }
+  if (isClassPresent(adapterImplClassValue)) {
+    Class<?> aClass=loadClass(adapterImplClassValue);
+    String loaderClassName=loader.getClass().getName();
+    if (loaderClassName.contains("$")) {
+      loaderClassName=loaderClassName.substring(0,loaderClassName.indexOf("$"));
+    }
+    return loadClass(loaderClassName).isAssignableFrom(aClass);
+  }
+  return false;
+}

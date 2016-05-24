@@ -16,6 +16,7 @@
   }
   forUpdate.setConfig(Collections.<String,String>emptyMap());
   authMgmtResource.updateRequiredAction(forUpdate.getAlias(),forUpdate);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.UPDATE,AdminEventPaths.authRequiredActionPath(forUpdate.getAlias()));
   result=authMgmtResource.getRequiredActions();
   RequiredActionProviderRepresentation updated=findRequiredActionByAlias(forUpdate.getAlias(),result);
   Assert.assertNotNull("Required Action still there",updated);

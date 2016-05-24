@@ -17,5 +17,7 @@
   copy.setTopLevel(flow.isTopLevel());
   copy=realm.addAuthenticationFlow(copy);
   copy(newName,flow,copy);
+  data.put("id",copy.getId());
+  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo).representation(data).success();
   return Response.status(201).build();
 }

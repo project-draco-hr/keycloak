@@ -20,12 +20,25 @@
  else {
       try {
         Object actualRep=JsonSerialization.readValue(actual.getRepresentation(),expectedRep.getClass());
-        for (        Method method : Reflections.getAllDeclaredMethods(expectedRep.getClass())) {
-          if (method.getName().startsWith("get") || method.getName().startsWith("is")) {
-            Object expectedValue=Reflections.invokeMethod(method,expectedRep);
+        if (expectedRep instanceof Map) {
+          Map<?,?> expectedRepMap=(Map)expectedRep;
+          Map<?,?> actualRepMap=(Map)actualRep;
+          for (          Map.Entry entry : expectedRepMap.entrySet()) {
+            Object expectedValue=entry.getValue();
             if (expectedValue != null) {
-              Object actualValue=Reflections.invokeMethod(method,actualRep);
-              Assert.assertEquals("Property " + method.getName() + " of representation not equal.",expectedValue,actualValue);
+              Object actualValue=actualRepMap.get(entry.getKey());
+              Assert.assertEquals("Map item with key '" + entry.getKey() + "' not equal.",expectedValue,actualValue);
+            }
+          }
+        }
+ else {
+          for (          Method method : Reflections.getAllDeclaredMethods(expectedRep.getClass())) {
+            if (method.getName().startsWith("get") || method.getName().startsWith("is")) {
+              Object expectedValue=Reflections.invokeMethod(method,expectedRep);
+              if (expectedValue != null) {
+                Object actualValue=Reflections.invokeMethod(method,actualRep);
+                Assert.assertEquals("Property method '" + method.getName() + "' of representation not equal.",expectedValue,actualValue);
+              }
             }
           }
         }

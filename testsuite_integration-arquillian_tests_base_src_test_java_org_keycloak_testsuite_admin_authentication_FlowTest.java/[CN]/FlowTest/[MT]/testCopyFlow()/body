@@ -18,6 +18,7 @@
   }
   params.put("newName","Copy of browser");
   response=authMgmtResource.copy("browser",params);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authCopyFlowPath("browser"),params);
   try {
     Assert.assertEquals("Copy flow",201,response.getStatus());
   }

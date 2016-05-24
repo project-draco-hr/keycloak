@@ -7,4 +7,5 @@
   AuthenticatorConfigRepresentation cfgRep=authMgmtResource.getAuthenticatorConfig(cfgId);
   assertConfig(cfgRep,cfgId,"foo",IdpCreateUserIfUniqueAuthenticatorFactory.REQUIRE_PASSWORD_UPDATE_AFTER_REGISTRATION,"true");
   authMgmtResource.removeAuthenticatorConfig(cfgId);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authExecutionConfigPath(cfgId));
 }

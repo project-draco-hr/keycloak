@@ -12,6 +12,7 @@
   if (kerberosCredsAdded) {
     logger.addedKerberosToRealmCredentials();
   }
-  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo).representation(rep).success();
+  rep.setId(model.getId());
+  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
   return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
 }

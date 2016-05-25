@@ -12,8 +12,11 @@
   }
   UserFederationSyncResultRepresentation result=ldapProviderResource().syncMapperData(mapperId,"fedToKeycloak");
   Assert.assertEquals("dummyFedToKeycloakSuccess mapper=some-dummy",result.getStatus());
-  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationMapperResourcePath(ldapProviderId,mapperId) + "/sync");
+  Map<String,Object> eventRep=new HashMap<>();
+  eventRep.put("action","fedToKeycloak");
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationMapperResourcePath(ldapProviderId,mapperId) + "/sync",eventRep);
   result=ldapProviderResource().syncMapperData(mapperId,"keycloakToFed");
   Assert.assertEquals("dummyKeycloakToFedSuccess mapper=some-dummy",result.getStatus());
+  eventRep.put("action","keycloakToFed");
   assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationMapperResourcePath(ldapProviderId,mapperId) + "/sync");
 }

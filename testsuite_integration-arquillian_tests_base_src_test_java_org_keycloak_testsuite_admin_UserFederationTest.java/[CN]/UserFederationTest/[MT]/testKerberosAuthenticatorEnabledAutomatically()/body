@@ -7,6 +7,7 @@
   Assert.assertEquals(kerberosExecution.getRequirement(),AuthenticationExecutionModel.Requirement.ALTERNATIVE.toString());
   kerberosExecution.setRequirement(AuthenticationExecutionModel.Requirement.DISABLED.toString());
   realm.flows().updateExecutions("browser",kerberosExecution);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.authUpdateExecutionPath("browser"),kerberosExecution);
   ldapRep=userFederation().get(id).toRepresentation();
   userFederation().get(id).update(ldapRep);
   assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.userFederationResourcePath(id),ldapRep);
@@ -14,5 +15,6 @@
   Assert.assertEquals(kerberosExecution.getRequirement(),AuthenticationExecutionModel.Requirement.ALTERNATIVE.toString());
   kerberosExecution.setRequirement(AuthenticationExecutionModel.Requirement.DISABLED.toString());
   realm.flows().updateExecutions("browser",kerberosExecution);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.authUpdateExecutionPath("browser"),kerberosExecution);
   removeUserFederationProvider(id);
 }

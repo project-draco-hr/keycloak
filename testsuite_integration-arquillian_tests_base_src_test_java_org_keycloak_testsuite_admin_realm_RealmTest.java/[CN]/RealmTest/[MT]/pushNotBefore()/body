@@ -6,7 +6,7 @@
   realm.update(rep);
   assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
   GlobalRequestResult globalRequestResult=realm.pushRevocation();
-  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,"push-revocation");
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,"push-revocation",globalRequestResult);
   assertEquals(1,globalRequestResult.getSuccessRequests().size());
   assertEquals("http://localhost:8180/auth/realms/master/app/admin",globalRequestResult.getSuccessRequests().get(0));
   assertNull(globalRequestResult.getFailedRequests());

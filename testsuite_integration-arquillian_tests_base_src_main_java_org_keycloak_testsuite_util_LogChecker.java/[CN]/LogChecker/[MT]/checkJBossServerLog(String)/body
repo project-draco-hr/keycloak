@@ -1,3 +1,12 @@
 {
-  checkServerLog(new File(jbossHome + "/standalone/log/server.log"));
+  boolean domain=System.getProperty("auth.server.config.property.name","standalone").contains("domain");
+  if (domain) {
+    checkServerLog(new File(jbossHome + "/domain/log/process-controller.log"));
+    checkServerLog(new File(jbossHome + "/domain/log/host-controller.log"));
+    checkServerLog(new File(jbossHome + "/domain/servers/load-balancer/log/server.log"));
+    checkServerLog(new File(jbossHome + "/domain/servers/server-one/log/server.log"));
+  }
+ else {
+    checkServerLog(new File(jbossHome + "/standalone/log/server.log"));
+  }
 }

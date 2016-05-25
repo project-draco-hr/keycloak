@@ -12,7 +12,7 @@
   RoleRepresentation role=new RoleRepresentation();
   role.setName("foo-role");
   realm.clients().get(client.getId()).roles().create(role);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,Matchers.startsWith(AdminEventPaths.clientRolesResourcePath(clientUuid)),role);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.clientRoleResourcePath(clientUuid,"foo-role"),role);
   role=realm.clients().get(client.getId()).roles().get("foo-role").toRepresentation();
   GroupRepresentation group=new GroupRepresentation();
   group.setName("2716");
@@ -20,7 +20,7 @@
   List<RoleRepresentation> list=new LinkedList<>();
   list.add(role);
   realm.groups().group(group.getId()).roles().clientLevel(client.getId()).add(list);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientUuid));
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientUuid),list);
   realm.clients().get(client.getId()).remove();
   assertAdminEvents.assertEvent("test",OperationType.DELETE,AdminEventPaths.clientResourcePath(clientUuid));
 }

@@ -3,7 +3,7 @@
   String id=rep.getId();
   RoleRepresentation role=new RoleRepresentation("test","test",false);
   realm.clients().get(id).roles().create(role);
-  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,Matchers.startsWith(AdminEventPaths.clientRolesResourcePath(id)),role);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientRoleResourcePath(id,"test"),role);
   ClientRepresentation foundClientRep=realm.clients().get(id).toRepresentation();
   foundClientRep.setDefaultRoles(new String[]{"test"});
   realm.clients().get(id).update(foundClientRep);

@@ -5,12 +5,14 @@
   }
   if (roles == null) {
     Set<RoleModel> roleModels=user.getClientRoleMappings(client);
+    roles=new LinkedList<>();
     for (    RoleModel roleModel : roleModels) {
-      if (!(roleModel.getContainer() instanceof ClientModel)) {
+      if (roleModel.getContainer() instanceof ClientModel) {
         ClientModel client=(ClientModel)roleModel.getContainer();
         if (!client.getId().equals(this.client.getId()))         continue;
       }
       user.deleteRoleMapping(roleModel);
+      roles.add(ModelToRepresentation.toRepresentation(roleModel));
     }
   }
  else {

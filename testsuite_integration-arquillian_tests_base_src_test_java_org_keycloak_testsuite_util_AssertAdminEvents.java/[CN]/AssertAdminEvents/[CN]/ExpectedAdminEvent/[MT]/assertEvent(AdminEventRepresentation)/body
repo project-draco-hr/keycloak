@@ -19,8 +19,23 @@
     }
  else {
       try {
-        Object actualRep=JsonSerialization.readValue(actual.getRepresentation(),expectedRep.getClass());
-        if (expectedRep instanceof Map) {
+        if (expectedRep instanceof List) {
+          List<RoleRepresentation> expectedRoles=(List<RoleRepresentation>)expectedRep;
+          List<RoleRepresentation> actualRoles=JsonSerialization.readValue(new ByteArrayInputStream(actual.getRepresentation().getBytes()),new TypeReference<List<RoleRepresentation>>(){
+          }
+);
+          Map<String,String> expectedRolesMap=new HashMap<>();
+          for (          RoleRepresentation role : expectedRoles) {
+            expectedRolesMap.put(role.getId(),role.getName());
+          }
+          Map<String,String> actualRolesMap=new HashMap<>();
+          for (          RoleRepresentation role : actualRoles) {
+            actualRolesMap.put(role.getId(),role.getName());
+          }
+          Assert.assertEquals(expectedRolesMap,actualRolesMap);
+        }
+ else         if (expectedRep instanceof Map) {
+          Object actualRep=JsonSerialization.readValue(actual.getRepresentation(),Map.class);
           Map<?,?> expectedRepMap=(Map)expectedRep;
           Map<?,?> actualRepMap=(Map)actualRep;
           for (          Map.Entry entry : expectedRepMap.entrySet()) {
@@ -32,6 +47,7 @@
           }
         }
  else {
+          Object actualRep=JsonSerialization.readValue(actual.getRepresentation(),expectedRep.getClass());
           for (          Method method : Reflections.getAllDeclaredMethods(expectedRep.getClass())) {
             if (method.getName().startsWith("get") || method.getName().startsWith("is")) {
               Object expectedValue=Reflections.invokeMethod(method,expectedRep);

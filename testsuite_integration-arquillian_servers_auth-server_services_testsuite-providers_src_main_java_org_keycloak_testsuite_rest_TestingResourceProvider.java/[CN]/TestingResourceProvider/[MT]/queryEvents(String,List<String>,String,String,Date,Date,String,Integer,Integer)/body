@@ -1,0 +1,36 @@
+{
+  EventStoreProvider eventStore=session.getProvider(EventStoreProvider.class);
+  EventQuery query=eventStore.createQuery();
+  if (realmId != null) {
+    query.realm(realmId);
+  }
+  if (client != null) {
+    query.client(client);
+  }
+  if (types != null & !types.isEmpty()) {
+    EventType[] t=new EventType[types.size()];
+    for (int i=0; i < t.length; i++) {
+      t[i]=EventType.valueOf(types.get(i));
+    }
+    query.type(t);
+  }
+  if (user != null) {
+    query.user(user);
+  }
+  if (dateFrom != null) {
+    query.fromDate(dateFrom);
+  }
+  if (dateTo != null) {
+    query.toDate(dateTo);
+  }
+  if (ipAddress != null) {
+    query.ipAddress(ipAddress);
+  }
+  if (firstResult != null) {
+    query.firstResult(firstResult);
+  }
+  if (maxResults != null) {
+    query.maxResults(maxResults);
+  }
+  return toEventListRep(query.getResultList());
+}

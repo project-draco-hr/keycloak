@@ -1,0 +1,43 @@
+{
+  EventStoreProvider eventStore=session.getProvider(EventStoreProvider.class);
+  AdminEventQuery query=eventStore.createAdminQuery();
+  if (realmId != null) {
+    query.realm(realmId);
+  }
+  ;
+  if (authRealm != null) {
+    query.authRealm(authRealm);
+  }
+  if (authClient != null) {
+    query.authClient(authClient);
+  }
+  if (authUser != null) {
+    query.authUser(authUser);
+  }
+  if (authIpAddress != null) {
+    query.authIpAddress(authIpAddress);
+  }
+  if (resourcePath != null) {
+    query.resourcePath(resourcePath);
+  }
+  if (operationTypes != null && !operationTypes.isEmpty()) {
+    OperationType[] t=new OperationType[operationTypes.size()];
+    for (int i=0; i < t.length; i++) {
+      t[i]=OperationType.valueOf(operationTypes.get(i));
+    }
+    query.operation(t);
+  }
+  if (dateFrom != null) {
+    query.fromTime(dateFrom);
+  }
+  if (dateTo != null) {
+    query.toTime(dateTo);
+  }
+  if (firstResult != null) {
+    query.firstResult(firstResult);
+  }
+  if (maxResults != null) {
+    query.maxResults(maxResults);
+  }
+  return toAdminEventRep(query.getResultList());
+}

@@ -5,6 +5,7 @@
   Assert.assertEquals(DummyRequiredActionFactory.PROVIDER_ID,action.getProviderId());
   Assert.assertEquals("Dummy Action",action.getName());
   authMgmtResource.registerRequiredAction(action);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authMgmtBasePath() + "/register-required-action",action);
   try {
     authMgmtResource.getRequiredAction("not-existent");
     Assert.fail("Didn't expect to find requiredAction of alias 'not-existent'");
@@ -21,6 +22,7 @@
   }
   rep.setDefaultAction(true);
   authMgmtResource.updateRequiredAction(DummyRequiredActionFactory.PROVIDER_ID,rep);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.UPDATE,AdminEventPaths.authRequiredActionPath(rep.getAlias()),rep);
   compareRequiredAction(rep,newRequiredAction(DummyRequiredActionFactory.PROVIDER_ID,"Dummy Action",true,true,Collections.emptyMap()));
   try {
     authMgmtResource.removeRequiredAction("not-existent");
@@ -29,4 +31,5 @@
  catch (  NotFoundException nfe) {
   }
   authMgmtResource.removeRequiredAction(DummyRequiredActionFactory.PROVIDER_ID);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authRequiredActionPath(rep.getAlias()));
 }

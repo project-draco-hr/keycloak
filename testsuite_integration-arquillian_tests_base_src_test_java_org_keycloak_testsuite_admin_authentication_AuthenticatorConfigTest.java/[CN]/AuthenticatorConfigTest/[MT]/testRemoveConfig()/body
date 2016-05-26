@@ -10,7 +10,8 @@
   }
  catch (  NotFoundException nfe) {
   }
-  authMgmtResource.removeAuthenticatorConfig(cfgRep.getId());
+  authMgmtResource.removeAuthenticatorConfig(cfgId);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authExecutionConfigPath(cfgId));
   try {
     authMgmtResource.getAuthenticatorConfig(cfgRep.getId());
     Assert.fail("Not expected to find config");

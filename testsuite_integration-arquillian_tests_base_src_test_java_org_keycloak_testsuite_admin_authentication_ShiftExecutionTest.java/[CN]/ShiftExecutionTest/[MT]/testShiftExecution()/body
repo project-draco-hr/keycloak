@@ -2,6 +2,7 @@
   HashMap<String,String> params=new HashMap<>();
   params.put("newName","Copy of browser");
   Response response=authMgmtResource.copy("browser",params);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authCopyFlowPath("browser"),params);
   try {
     Assert.assertEquals("Copy flow",201,response.getStatus());
   }
@@ -18,6 +19,7 @@
  catch (  NotFoundException nfe) {
   }
   authMgmtResource.raisePriority(last.getId());
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.UPDATE,AdminEventPaths.authRaiseExecutionPath(last.getId()));
   List<AuthenticationExecutionInfoRepresentation> executions2=authMgmtResource.getExecutions("Copy of browser");
   AuthenticationExecutionInfoRepresentation last2=executions2.get(executions.size() - 1);
   AuthenticationExecutionInfoRepresentation oneButLast2=executions2.get(executions.size() - 2);
@@ -30,6 +32,7 @@
  catch (  NotFoundException nfe) {
   }
   authMgmtResource.lowerPriority(oneButLast2.getId());
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.UPDATE,AdminEventPaths.authLowerExecutionPath(oneButLast2.getId()));
   executions2=authMgmtResource.getExecutions("Copy of browser");
   last2=executions2.get(executions.size() - 1);
   oneButLast2=executions2.get(executions.size() - 2);

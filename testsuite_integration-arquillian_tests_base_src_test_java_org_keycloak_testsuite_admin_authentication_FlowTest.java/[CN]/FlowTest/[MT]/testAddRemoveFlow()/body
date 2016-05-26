@@ -24,13 +24,7 @@
     response.close();
   }
   AuthenticationFlowRepresentation newFlow=newFlow("browser-2","Browser flow","basic-flow",true,false);
-  response=authMgmtResource.createFlow(newFlow);
-  try {
-    Assert.assertEquals("createFlow success",201,response.getStatus());
-  }
-  finally {
-    response.close();
-  }
+  createFlow(newFlow);
   flows=authMgmtResource.getFlows();
   AuthenticationFlowRepresentation found=findFlowByAlias("browser-2",flows);
   Assert.assertNotNull("created flow visible in parent",found);
@@ -64,6 +58,7 @@
   }
   data.put("alias","SomeFlow");
   authMgmtResource.addExecutionFlow("browser-2",data);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authAddExecutionFlowPath("browser-2"),data);
   flows=authMgmtResource.getFlows();
   found2=findFlowByAlias("browser-2",flows);
   Assert.assertNotNull("created flow visible in parent",found2);
@@ -79,6 +74,7 @@
   expected.setPriority(0);
   compareExecution(expected,execs.get(0));
   authMgmtResource.deleteFlow(found.getId());
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authFlowPath(found.getId()));
   flows=authMgmtResource.getFlows();
   found=findFlowByAlias("browser-2",flows);
   Assert.assertNull("flow deleted",found);

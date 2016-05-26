@@ -1,6 +1,7 @@
 {
   auth.init(RealmAuth.Resource.USER).requireManage();
   session.sessions().removeUserSessions(realm);
-  adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).success();
-  return new ResourceAdminManager(session).logoutAll(uriInfo.getRequestUri(),realm);
+  GlobalRequestResult result=new ResourceAdminManager(session).logoutAll(uriInfo.getRequestUri(),realm);
+  adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).representation(result).success();
+  return result;
 }

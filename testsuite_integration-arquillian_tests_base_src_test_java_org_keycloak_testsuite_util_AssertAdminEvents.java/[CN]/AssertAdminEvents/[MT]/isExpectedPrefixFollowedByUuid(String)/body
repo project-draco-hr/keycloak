@@ -1,0 +1,12 @@
+{
+  return new TypeSafeMatcher<String>(){
+    @Override protected boolean matchesSafely(    String item){
+      int expectedLength=prefix.length() + 1 + org.keycloak.models.utils.KeycloakModelUtils.generateId().length();
+      return item.startsWith(prefix) && expectedLength == item.length();
+    }
+    @Override public void describeTo(    Description description){
+      description.appendText("resourcePath in the format like \"" + prefix + "/<UUID>\"");
+    }
+  }
+;
+}

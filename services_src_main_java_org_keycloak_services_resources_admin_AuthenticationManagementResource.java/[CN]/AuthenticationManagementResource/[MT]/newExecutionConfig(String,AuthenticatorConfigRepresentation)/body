@@ -9,5 +9,7 @@
   config=realm.addAuthenticatorConfig(config);
   model.setAuthenticatorConfig(config.getId());
   realm.updateAuthenticatorExecution(model);
+  json.setId(config.getId());
+  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo).representation(json).success();
   return Response.created(uriInfo.getAbsolutePathBuilder().path(config.getId()).build()).build();
 }

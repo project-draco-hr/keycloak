@@ -1,10 +1,10 @@
 {
-  Response response=authMgmtResource.createFlow(newFlow("firstBrokerLogin2","firstBrokerLogin2","basic-flow",true,false));
-  Assert.assertEquals(201,response.getStatus());
-  response.close();
+  AuthenticationFlowRepresentation flowRep=newFlow("firstBrokerLogin2","firstBrokerLogin2","basic-flow",true,false);
+  createFlow(flowRep);
   HashMap<String,String> params=new HashMap<>();
   params.put("provider",IdpCreateUserIfUniqueAuthenticatorFactory.PROVIDER_ID);
   authMgmtResource.addExecution("firstBrokerLogin2",params);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authAddExecutionPath("firstBrokerLogin2"),params);
   List<AuthenticationExecutionInfoRepresentation> executionReps=authMgmtResource.getExecutions("firstBrokerLogin2");
   AuthenticationExecutionInfoRepresentation exec=findExecutionByProvider(IdpCreateUserIfUniqueAuthenticatorFactory.PROVIDER_ID,executionReps);
   Assert.assertNotNull(exec);

@@ -6,6 +6,8 @@
   if (realm.getFlowByAlias(flow.getAlias()) != null) {
     return ErrorResponse.exists("Flow " + flow.getAlias() + " already exists");
   }
-  realm.addAuthenticationFlow(RepresentationToModel.toModel(flow));
+  AuthenticationFlowModel createdModel=realm.addAuthenticationFlow(RepresentationToModel.toModel(flow));
+  flow.setId(createdModel.getId());
+  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,createdModel.getId()).representation(flow).success();
   return Response.status(201).build();
 }

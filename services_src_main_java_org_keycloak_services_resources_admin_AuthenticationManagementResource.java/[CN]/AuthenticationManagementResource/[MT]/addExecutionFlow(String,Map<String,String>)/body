@@ -24,5 +24,7 @@
   execution.setAuthenticatorFlow(true);
   execution.setAuthenticator(provider);
   execution.setPriority(getNextPriority(parentFlow));
-  realm.addAuthenticatorExecution(execution);
+  execution=realm.addAuthenticatorExecution(execution);
+  data.put("id",execution.getId());
+  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo).representation(data).success();
 }

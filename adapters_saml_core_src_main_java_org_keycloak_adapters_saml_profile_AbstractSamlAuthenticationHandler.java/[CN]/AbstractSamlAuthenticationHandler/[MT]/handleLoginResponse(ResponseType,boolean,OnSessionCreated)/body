@@ -21,6 +21,30 @@
     }
 ;
   }
+  if (deployment.getIDP().getSingleSignOnService().validateAssertionSignature()) {
+    try {
+      validateSamlSignature(new SAMLDocumentHolder(AssertionUtil.asDocument(assertion)),postBinding,GeneralConstants.SAML_RESPONSE_KEY);
+    }
+ catch (    VerificationException e) {
+      log.error("Failed to verify saml assertion signature",e);
+      challenge=new AuthChallenge(){
+        @Override public boolean challenge(        HttpFacade exchange){
+          SamlAuthenticationError error=new SamlAuthenticationError(SamlAuthenticationError.Reason.INVALID_SIGNATURE);
+          exchange.getRequest().setError(error);
+          exchange.getResponse().sendError(403);
+          return true;
+        }
+        @Override public int getResponseCode(){
+          return 403;
+        }
+      }
+;
+      return AuthOutcome.FAILED;
+    }
+catch (    ProcessingException e) {
+      e.printStackTrace();
+    }
+  }
   SubjectType subject=assertion.getSubject();
   SubjectType.STSubType subType=subject.getSubType();
   NameIDType subjectNameID=(NameIDType)subType.getBaseID();

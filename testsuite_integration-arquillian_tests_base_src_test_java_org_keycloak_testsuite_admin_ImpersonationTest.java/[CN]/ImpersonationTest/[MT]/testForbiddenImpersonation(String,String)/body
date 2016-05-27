@@ -1,7 +1,12 @@
 {
-  Client client=createClient(admin,adminRealm);
-  WebTarget impersonate=createImpersonateTarget(client);
-  Response response=impersonate.request().post(null);
-  response.close();
-  client.close();
+  Keycloak client=createAdminClient(adminRealm,establishClientId(adminRealm),admin);
+  try {
+    client.realms().realm("test").users().get(impersonatedUserId).impersonate();
+  }
+ catch (  ClientErrorException e) {
+    Assert.assertTrue(e.getMessage().indexOf("403 Forbidden") != -1);
+  }
+ finally {
+    client.close();
+  }
 }

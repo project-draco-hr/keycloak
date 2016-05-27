@@ -1,0 +1,12 @@
+{
+  String clientId=establishClientId(realm);
+  Keycloak client=createAdminClient(realm,clientId,username);
+  client.tokenManager().grantToken();
+  if (!AuthRealm.MASTER.equals(realm)) {
+    EventRepresentation e=events.poll();
+    Assert.assertEquals("Event type",EventType.LOGIN.toString(),e.getType());
+    Assert.assertEquals("Client ID",clientId,e.getClientId());
+    Assert.assertEquals("Username",username,e.getDetails().get("username"));
+  }
+  return client;
+}

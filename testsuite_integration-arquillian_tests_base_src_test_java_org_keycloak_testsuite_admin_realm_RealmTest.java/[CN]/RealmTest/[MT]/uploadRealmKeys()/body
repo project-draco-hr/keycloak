@@ -35,6 +35,17 @@
     assertAdminEvents.assertEmpty();
   }
   Assert.assertEquals(PUBLIC_KEY,realm.toRepresentation().getPublicKey());
+  rep.setPrivateKey("{}{}{}{}{}{}324re9gvj0r");
+  rep.setPublicKey("{}{}{}{}{}{}324re9gvj0r");
+  try {
+    realm.update(rep);
+    fail("Expected BadRequestException");
+  }
+ catch (  BadRequestException e) {
+    assertAdminEvents.assertEmpty();
+  }
+  Assert.assertEquals(PUBLIC_KEY,realm.toRepresentation().getPublicKey());
+  rep.setPrivateKey(privateKey2048);
   rep.setPublicKey(publicKey2048);
   realm.update(rep);
   assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);

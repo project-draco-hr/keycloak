@@ -1,5 +1,8 @@
 {
   executorService.shutdown();
   LOG.info("Waiting for threadpool termination.");
-  executorService.awaitTermination(10,TimeUnit.SECONDS);
+  executorService.awaitTermination(THREADPOOL_TERMINATION_TIMEOUT,TimeUnit.SECONDS);
+  pause(ADDITIONAL_SLEEP_AFTER * 1000);
+  LOG.info("Logging out all sessions.");
+  testRealmResource().logoutAll();
 }

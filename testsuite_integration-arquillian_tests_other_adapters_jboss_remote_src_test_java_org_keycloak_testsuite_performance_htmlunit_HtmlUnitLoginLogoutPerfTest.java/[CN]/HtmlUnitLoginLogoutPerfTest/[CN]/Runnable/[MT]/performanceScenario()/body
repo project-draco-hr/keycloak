@@ -1,5 +1,5 @@
 {
-  LOG.debug(String.format("Starting login-logout scenario #%s",getRepeatCounter()));
+  LOG.trace(String.format("Starting login-logout scenario #%s",getLoopCounter()));
   driver.manage().deleteAllCookies();
   LOG.trace(String.format("Accessing secured URL: %s",securedUrl));
   try {
@@ -10,7 +10,7 @@
  catch (  TimeoutException ex) {
     throw new OperationTimeoutException(ACCESS_REQUEST_TIME,ex);
   }
-  metrics.addValue(ACCESS_REQUEST_TIME,timer.getElapsedTime());
+  statistics.addValue(ACCESS_REQUEST_TIME,timer.getElapsedTime());
   LOG.trace("Logging in");
   try {
     driver.findElement(By.id("username")).clear();
@@ -24,7 +24,7 @@
  catch (  TimeoutException ex) {
     throw new OperationTimeoutException(LOGIN_REQUEST_TIME,ex);
   }
-  metrics.addValue(LOGIN_REQUEST_TIME,timer.getElapsedTime());
+  statistics.addValue(LOGIN_REQUEST_TIME,timer.getElapsedTime());
   LOG.trace("Verifying login");
   try {
     timer.reset();
@@ -34,7 +34,7 @@
  catch (  TimeoutException ex) {
     throw new OperationTimeoutException(LOGIN_VERIFY_REQUEST_TIME,ex);
   }
-  metrics.addValue(LOGIN_VERIFY_REQUEST_TIME,timer.getElapsedTime());
+  statistics.addValue(LOGIN_VERIFY_REQUEST_TIME,timer.getElapsedTime());
   LOG.trace("Logging out");
   try {
     timer.reset();
@@ -44,7 +44,7 @@
  catch (  TimeoutException ex) {
     throw new OperationTimeoutException(LOGOUT_REQUEST_TIME,ex);
   }
-  metrics.addValue(LOGOUT_REQUEST_TIME,timer.getElapsedTime());
+  statistics.addValue(LOGOUT_REQUEST_TIME,timer.getElapsedTime());
   LOG.trace("Verifying logout");
   try {
     timer.reset();
@@ -54,6 +54,6 @@
  catch (  TimeoutException ex) {
     throw new OperationTimeoutException(LOGOUT_VERIFY_REQUEST_TIME,ex);
   }
-  metrics.addValue(LOGOUT_VERIFY_REQUEST_TIME,timer.getElapsedTime());
+  statistics.addValue(LOGOUT_VERIFY_REQUEST_TIME,timer.getElapsedTime());
   LOG.trace("Logged out");
 }

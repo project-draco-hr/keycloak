@@ -1,0 +1,15 @@
+{
+  try {
+    scenarioTimer.reset();
+    performanceScenario();
+    statistics.addValue(SCENARIO_TIME,scenarioTimer.getElapsedTime());
+  }
+ catch (  OperationTimeoutException ex) {
+    timeoutStatistics.addValue(ex.getStatistic(),ex.getValue());
+    LOG.debug(String.format("Operation %s timed out. Cause: %s.",ex.getStatistic(),ex.getCause()));
+  }
+catch (  AssertionError|Exception ex) {
+    setError(ex);
+    throw new RuntimeException(ex);
+  }
+}

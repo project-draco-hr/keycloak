@@ -6,7 +6,7 @@
     throw new IllegalArgumentException("Cannot increase load beyond threadpool capacity (" + MAX_THREADS + ").");
   }
   if (loadIncrease > 0) {
-    LOG.info(String.format("Increasing load from %s to %s.",currentLoad,currentLoad + loadIncrease));
+    LOG.info(String.format("Increasing load from %s to %s at +%s clients/s.",currentLoad,currentLoad + loadIncrease,LOAD_INCREASE_RATE));
     for (int t=0; t < loadIncrease; t++) {
       executorService.submit(newRunnable());
       currentLoad++;

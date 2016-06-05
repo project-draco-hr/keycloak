@@ -22,4 +22,10 @@
     }
     return ErrorResponse.exists("User exists with same username or email");
   }
+catch (  ModelException me) {
+    if (session.getTransaction().isActive()) {
+      session.getTransaction().setRollbackOnly();
+    }
+    return ErrorResponse.exists("Could not create user");
+  }
 }

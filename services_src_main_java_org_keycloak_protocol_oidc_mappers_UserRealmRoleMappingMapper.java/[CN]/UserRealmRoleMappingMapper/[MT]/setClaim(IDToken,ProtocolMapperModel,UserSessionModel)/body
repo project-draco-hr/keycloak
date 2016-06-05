@@ -1,0 +1,6 @@
+{
+  UserModel user=userSession.getUser();
+  String rolePrefix=mappingModel.getConfig().get(ProtocolMapperUtils.USER_MODEL_REALM_ROLE_MAPPING_ROLE_PREFIX);
+  Set<String> realmRoleNames=flattenRoleModelToRoleNames(user.getRoleMappings(),rolePrefix);
+  OIDCAttributeMapperHelper.mapClaim(token,mappingModel,realmRoleNames);
+}

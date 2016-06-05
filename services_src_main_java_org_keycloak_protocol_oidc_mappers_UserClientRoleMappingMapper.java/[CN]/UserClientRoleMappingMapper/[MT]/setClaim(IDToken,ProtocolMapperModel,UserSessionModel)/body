@@ -1,0 +1,11 @@
+{
+  UserModel user=userSession.getUser();
+  String clientId=mappingModel.getConfig().get(ProtocolMapperUtils.USER_MODEL_CLIENT_ROLE_MAPPING_CLIENT_ID);
+  if (clientId != null) {
+    ClientModel clientModel=userSession.getRealm().getClientByClientId(clientId.trim());
+    Set<RoleModel> clientRoleMappings=user.getClientRoleMappings(clientModel);
+    String rolePrefix=mappingModel.getConfig().get(ProtocolMapperUtils.USER_MODEL_CLIENT_ROLE_MAPPING_ROLE_PREFIX);
+    Set<String> clientRoleNames=flattenRoleModelToRoleNames(clientRoleMappings,rolePrefix);
+    OIDCAttributeMapperHelper.mapClaim(token,mappingModel,clientRoleNames);
+  }
+}

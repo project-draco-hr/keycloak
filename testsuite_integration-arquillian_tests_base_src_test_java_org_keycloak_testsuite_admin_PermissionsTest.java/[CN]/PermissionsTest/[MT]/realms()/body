@@ -20,6 +20,12 @@
   realms=clients.get(AdminRoles.VIEW_REALM).realms().findAll();
   Assert.assertNames(realms,REALM_NAME);
   assertNotNull(realms.get(0).getAccessTokenLifespan());
+  realms=clients.get("master-" + AdminRoles.VIEW_USERS).realms().findAll();
+  Assert.assertNames(realms,REALM_NAME);
+  assertGettersEmpty(realms.get(0));
+  realms=clients.get("master-" + AdminRoles.VIEW_REALM).realms().findAll();
+  Assert.assertNames(realms,REALM_NAME);
+  assertNotNull(realms.get(0).getAccessTokenLifespan());
   invoke(new Invocation(){
     public void invoke(    RealmResource realm){
       clients.get("master-admin").realms().create(RealmBuilder.create().name("master").build());

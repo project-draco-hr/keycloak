@@ -6,9 +6,10 @@
   data.put("lastFailure",0);
   data.put("lastIPFailure","n/a");
   if (!realm.isBruteForceProtected())   return data;
-  UsernameLoginFailureModel model=session.sessions().getUserLoginFailure(realm,username.toLowerCase());
+  UserModel user=session.users().getUserById(userId,realm);
+  UserLoginFailureModel model=session.sessions().getUserLoginFailure(realm,userId);
   if (model == null)   return data;
-  if (session.getProvider(BruteForceProtector.class).isTemporarilyDisabled(session,realm,username)) {
+  if (session.getProvider(BruteForceProtector.class).isTemporarilyDisabled(session,realm,user)) {
     data.put("disabled",true);
   }
   data.put("numFailures",model.getNumFailures());

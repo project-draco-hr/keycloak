@@ -4,7 +4,10 @@
     if (username == null) {
     }
  else {
-      getBruteForceProtector().failedLogin(realm,username,connection);
+      UserModel user=KeycloakModelUtils.findUserByNameOrEmail(session,realm,username);
+      if (user != null) {
+        getBruteForceProtector().failedLogin(realm,user,connection);
+      }
     }
   }
 }

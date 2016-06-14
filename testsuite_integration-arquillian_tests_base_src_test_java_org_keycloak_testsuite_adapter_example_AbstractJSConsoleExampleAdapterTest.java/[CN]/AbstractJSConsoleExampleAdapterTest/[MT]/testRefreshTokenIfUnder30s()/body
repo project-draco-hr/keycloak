@@ -1,17 +1,17 @@
 {
-  jsConsoleExamplePage.navigateTo();
-  assertCurrentUrlStartsWith(jsConsoleExamplePage);
-  jsConsoleExamplePage.init();
-  jsConsoleExamplePage.refreshToken();
-  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("Failed to refresh token");
-  jsConsoleExamplePage.logIn();
+  jsConsoleTestAppPage.navigateTo();
+  assertCurrentUrlStartsWith(jsConsoleTestAppPage);
+  jsConsoleTestAppPage.init();
+  jsConsoleTestAppPage.refreshToken();
+  waitUntilElement(jsConsoleTestAppPage.getOutputElement()).text().contains("Failed to refresh token");
+  jsConsoleTestAppPage.logIn();
   testRealmLoginPage.form().login("user","password");
-  assertCurrentUrlStartsWith(jsConsoleExamplePage);
-  jsConsoleExamplePage.init();
-  waitUntilElement(jsConsoleExamplePage.getEventsElement()).text().contains("Auth Success");
-  jsConsoleExamplePage.refreshTokenIfUnder30s();
-  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("Token not refreshed, valid for");
+  assertCurrentUrlStartsWith(jsConsoleTestAppPage);
+  jsConsoleTestAppPage.init();
+  waitUntilElement(jsConsoleTestAppPage.getEventsElement()).text().contains("Auth Success");
+  jsConsoleTestAppPage.refreshTokenIfUnder30s();
+  waitUntilElement(jsConsoleTestAppPage.getOutputElement()).text().contains("Token not refreshed, valid for");
   pause((TOKEN_LIFESPAN_LEEWAY + 2) * 1000);
-  jsConsoleExamplePage.refreshTokenIfUnder30s();
-  waitUntilElement(jsConsoleExamplePage.getEventsElement()).text().contains("Auth Refresh Success");
+  jsConsoleTestAppPage.refreshTokenIfUnder30s();
+  waitUntilElement(jsConsoleTestAppPage.getEventsElement()).text().contains("Auth Refresh Success");
 }

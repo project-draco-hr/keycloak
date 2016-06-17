@@ -1,0 +1,10 @@
+{
+  jsConsoleTestAppPage.navigateTo();
+  jsConsoleTestAppPage.setOnLoad("login-required");
+  jsConsoleTestAppPage.init();
+  assertCurrentUrlStartsWith(testRealmLoginPage);
+  testRealmLoginPage.form().login("user","password");
+  waitUntilElement(jsConsoleTestAppPage.getInitButtonElement()).is().present();
+  jsConsoleTestAppPage.init();
+  waitUntilElement(jsConsoleTestAppPage.getOutputElement()).text().contains("Init Success (Authenticated)");
+}

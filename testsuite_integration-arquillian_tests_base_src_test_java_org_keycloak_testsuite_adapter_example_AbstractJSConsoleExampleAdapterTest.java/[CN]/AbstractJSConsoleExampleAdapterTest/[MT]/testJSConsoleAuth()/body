@@ -1,20 +1,21 @@
 {
-  jsConsoleExamplePage.navigateTo();
-  assertCurrentUrlStartsWith(jsConsoleExamplePage);
-  waitUntilElement(jsConsoleExamplePage.getInitButtonElement()).is().present();
-  jsConsoleExamplePage.init();
-  jsConsoleExamplePage.logIn();
+  jsConsoleTestAppPage.navigateTo();
+  assertCurrentUrlStartsWith(jsConsoleTestAppPage);
+  waitUntilElement(jsConsoleTestAppPage.getInitButtonElement()).is().present();
+  jsConsoleTestAppPage.init();
+  jsConsoleTestAppPage.logIn();
   testRealmLoginPage.form().login("user","invalid-password");
-  assertCurrentUrlDoesntStartWith(jsConsoleExamplePage);
+  assertCurrentUrlDoesntStartWith(jsConsoleTestAppPage);
   testRealmLoginPage.form().login("invalid-user","password");
-  assertCurrentUrlDoesntStartWith(jsConsoleExamplePage);
+  assertCurrentUrlDoesntStartWith(jsConsoleTestAppPage);
   testRealmLoginPage.form().login("user","password");
-  assertCurrentUrlStartsWith(jsConsoleExamplePage);
-  jsConsoleExamplePage.init();
-  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("Init Success (Authenticated)");
-  waitUntilElement(jsConsoleExamplePage.getEventsElement()).text().contains("Auth Success");
-  jsConsoleExamplePage.logOut();
-  assertCurrentUrlStartsWith(jsConsoleExamplePage);
-  jsConsoleExamplePage.init();
-  waitUntilElement(jsConsoleExamplePage.getOutputElement()).text().contains("Init Success (Not Authenticated)");
+  assertCurrentUrlStartsWith(jsConsoleTestAppPage);
+  jsConsoleTestAppPage.init();
+  waitUntilElement(jsConsoleTestAppPage.getOutputElement()).text().contains("Init Success (Authenticated)");
+  waitUntilElement(jsConsoleTestAppPage.getEventsElement()).text().contains("Auth Success");
+  jsConsoleTestAppPage.logOut();
+  assertCurrentUrlStartsWith(jsConsoleTestAppPage);
+  waitUntilElement(jsConsoleTestAppPage.getInitButtonElement()).is().present();
+  jsConsoleTestAppPage.init();
+  waitUntilElement(jsConsoleTestAppPage.getOutputElement()).text().contains("Init Success (Not Authenticated)");
 }

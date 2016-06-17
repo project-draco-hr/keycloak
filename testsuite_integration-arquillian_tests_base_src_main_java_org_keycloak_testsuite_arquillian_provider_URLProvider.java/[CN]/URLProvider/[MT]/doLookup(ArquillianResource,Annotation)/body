@@ -26,7 +26,8 @@
         for (        Annotation a : qualifiers) {
           if (OperateOnDeployment.class.isAssignableFrom(a.annotationType())) {
             String port=appServerSslRequired ? System.getProperty("app.server.https.port","8643") : System.getProperty("app.server.http.port","8280");
-            url=new URL(fixedUrl.toExternalForm().replace("8080",port) + "/" + ((OperateOnDeployment)a).value());
+            String protocol=appServerSslRequired ? "https" : "http";
+            url=new URL(fixedUrl.toExternalForm().replace("8080",port).replace("http",protocol) + ((OperateOnDeployment)a).value());
           }
         }
       }

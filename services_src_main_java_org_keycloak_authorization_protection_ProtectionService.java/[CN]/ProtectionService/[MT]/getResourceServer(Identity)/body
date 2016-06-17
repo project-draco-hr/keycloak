@@ -1,0 +1,12 @@
+{
+  RealmModel realm=this.authorization.getKeycloakSession().getContext().getRealm();
+  ClientModel clientApplication=realm.getClientById(identity.getId());
+  if (clientApplication == null) {
+    throw new ErrorResponseException("invalid_clientId","Client application with id [" + identity.getId() + "] does not exist in realm ["+ realm.getName()+ "]",Status.BAD_REQUEST);
+  }
+  ResourceServer resourceServer=this.authorization.getStoreFactory().getResourceServerStore().findByClient(identity.getId());
+  if (resourceServer == null) {
+    throw new ErrorResponseException("invalid_clientId","Client application [" + clientApplication.getClientId() + "] is not registered as resource server.",Status.FORBIDDEN);
+  }
+  return resourceServer;
+}

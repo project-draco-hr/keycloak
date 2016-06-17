@@ -1,0 +1,36 @@
+{
+  String scopes=policy.getConfig().get("scopes");
+  if (scopes != null) {
+    String[] scopeIds;
+    try {
+      scopeIds=new ObjectMapper().readValue(scopes,String[].class);
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+    StoreFactory storeFactory=authorization.getStoreFactory();
+    PolicyStore policyStore=storeFactory.getPolicyStore();
+    for (    String scopeId : scopeIds) {
+      boolean hasScope=false;
+      for (      Scope scopeModel : new HashSet<Scope>(policy.getScopes())) {
+        if (scopeModel.getId().equals(scopeId)) {
+          hasScope=true;
+        }
+      }
+      if (!hasScope) {
+        policy.addScope(storeFactory.getScopeStore().findById(scopeId));
+      }
+    }
+    for (    Scope scopeModel : new HashSet<Scope>(policy.getScopes())) {
+      boolean hasScope=false;
+      for (      String scopeId : scopeIds) {
+        if (scopeModel.getId().equals(scopeId)) {
+          hasScope=true;
+        }
+      }
+      if (!hasScope) {
+        policy.removeScope(scopeModel);
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  ScriptEngineManager manager=new ScriptEngineManager();
+  ScriptEngine engine=manager.getEngineByName("nashorn");
+  engine.put("$evaluation",evaluation);
+  try {
+    engine.eval(policy.getConfig().get("code"));
+  }
+ catch (  ScriptException e) {
+    throw new RuntimeException("Error evaluating JS Policy [" + policy.getName() + "].",e);
+  }
+}

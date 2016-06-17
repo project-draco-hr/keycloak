@@ -1,0 +1,11 @@
+{
+  AuthzClient authzClient=AuthzClient.create();
+  String eat=getEntitlementAPIToken(authzClient);
+  EntitlementRequest request=new EntitlementRequest();
+  PermissionRequest permission=new PermissionRequest();
+  permission.setResourceSetName("Hello World Resource");
+  request.addPermission(permission);
+  EntitlementResponse response=authzClient.entitlement(eat).get("hello-world-authz-service",request);
+  String rpt=response.getRpt();
+  System.out.println("You got a RPT: " + rpt);
+}

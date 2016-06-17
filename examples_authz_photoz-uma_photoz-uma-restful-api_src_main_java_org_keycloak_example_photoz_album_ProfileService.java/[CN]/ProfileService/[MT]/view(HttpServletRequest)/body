@@ -1,0 +1,5 @@
+{
+  Principal userPrincipal=request.getUserPrincipal();
+  List albums=this.entityManager.createQuery("from Album where userId = '" + userPrincipal.getName() + "'").getResultList();
+  return Response.ok(new Profile(userPrincipal.getName(),albums.size())).build();
+}

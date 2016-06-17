@@ -1,0 +1,12 @@
+{
+  this.auth.requireManage();
+  scope.setId(id);
+  StoreFactory storeFactory=authorization.getStoreFactory();
+  Scope model=storeFactory.getScopeStore().findById(scope.getId());
+  if (model == null) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+  model.setName(scope.getName());
+  model.setIconUri(scope.getIconUri());
+  return Response.noContent().build();
+}

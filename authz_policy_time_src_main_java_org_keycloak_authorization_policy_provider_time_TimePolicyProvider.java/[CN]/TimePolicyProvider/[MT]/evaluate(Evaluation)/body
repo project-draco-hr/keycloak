@@ -1,0 +1,22 @@
+{
+  try {
+    String notBefore=this.policy.getConfig().get("nbf");
+    if (notBefore != null) {
+      if (this.currentDate.before(this.dateFormat.parse(format(notBefore)))) {
+        evaluation.deny();
+        return;
+      }
+    }
+    String notOnOrAfter=this.policy.getConfig().get("noa");
+    if (notOnOrAfter != null) {
+      if (this.currentDate.after(this.dateFormat.parse(format(notOnOrAfter)))) {
+        evaluation.deny();
+        return;
+      }
+    }
+    evaluation.grant();
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Could not evaluate time-based policy [" + this.policy.getName() + "].",e);
+  }
+}

@@ -1,0 +1,37 @@
+{
+  Request request=httpFacade.getRequest();
+  PolicyEnforcerConfig enforcerConfig=getEnforcerConfig();
+  String accessDeniedPath=enforcerConfig.getAccessDeniedPath();
+  if (accessDeniedPath != null) {
+    if (request.getURI().contains(accessDeniedPath)) {
+      return true;
+    }
+  }
+  AccessToken.Authorization authorization=accessToken.getAuthorization();
+  if (authorization == null) {
+    return false;
+  }
+  List<Permission> permissions=authorization.getPermissions();
+  for (  Permission permission : permissions) {
+    Set<String> allowedScopes=permission.getScopes();
+    if (permission.getResourceSetId() != null) {
+      if (permission.getResourceSetId().equals(actualPathConfig.getId())) {
+        if (((allowedScopes == null || allowedScopes.isEmpty()) && requiredScopes.isEmpty()) || allowedScopes.containsAll(requiredScopes)) {
+          LOGGER.debugf("Authorization GRANTED for path [%s]. Permissions [%s].",actualPathConfig,permissions);
+          if (request.getMethod().equalsIgnoreCase("DELETE") && actualPathConfig.isInstance()) {
+            this.paths.remove(actualPathConfig);
+          }
+          return true;
+        }
+      }
+    }
+ else {
+      if ((allowedScopes.isEmpty() && requiredScopes.isEmpty()) || allowedScopes.containsAll(requiredScopes)) {
+        LOGGER.debugf("Authorization GRANTED for path [%s]. Permissions [%s].",actualPathConfig,permissions);
+        return true;
+      }
+    }
+  }
+  LOGGER.debugf("Authorization FAILED for path [%s]. No enough permissions [%s].",actualPathConfig,permissions);
+  return false;
+}

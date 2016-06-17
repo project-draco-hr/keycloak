@@ -1,0 +1,12 @@
+{
+  String cacheKeyForScope=getCacheKeyForScope(id);
+  List<CachedScope> cached=this.cache.get(cacheKeyForScope);
+  if (cached == null) {
+    Scope scope=getDelegate().findById(id);
+    if (scope != null) {
+      return createAdapter(updateScopeCache(scope));
+    }
+    return null;
+  }
+  return createAdapter(cached.get(0));
+}

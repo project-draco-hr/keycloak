@@ -1,0 +1,22 @@
+{
+  Configuration configuration=new Configuration();
+  if (authzServerUri.endsWith("/")) {
+    authzServerUri=authzServerUri.substring(0,authzServerUri.lastIndexOf("/"));
+  }
+  configuration.setVersion(UMA_VERSION);
+  configuration.setIssuer(URI.create(authzServerUri));
+  configuration.setPatProfiles(DEFAULT_TOKEN_PROFILES);
+  configuration.setAatProfiles(DEFAULT_TOKEN_PROFILES);
+  configuration.setRptProfiles(DEFAULT_TOKEN_PROFILES);
+  configuration.setPatGrantTypes(DEFAULT_GRANT_TYPES_SUPPORTED);
+  configuration.setAatGrantTypes(DEFAULT_GRANT_TYPES_SUPPORTED);
+  configuration.setTokenEndpoint(tokenEndpoint);
+  configuration.setAuthorizationEndpoint(authorizationEndpoint);
+  configuration.setResourceSetRegistrationEndpoint(URI.create(authzServerUri + "/authz/protection/resource_set"));
+  configuration.setPermissionRegistrationEndpoint(URI.create(authzServerUri + "/authz/protection/permission"));
+  configuration.setRptEndpoint(URI.create(authzServerUri + "/authz/authorize"));
+  configuration.setRealmPublicKey(publicKeyPem);
+  configuration.setServerUrl(URI.create(authzServerUri));
+  configuration.setRealm(realm);
+  return configuration;
+}

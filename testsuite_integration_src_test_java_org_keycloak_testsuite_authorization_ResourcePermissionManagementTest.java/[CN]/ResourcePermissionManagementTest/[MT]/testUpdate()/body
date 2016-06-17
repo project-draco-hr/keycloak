@@ -1,0 +1,13 @@
+{
+  PolicyRepresentation permission=createAlbumResourceTypePermission();
+  Map<String,String> config=permission.getConfig();
+  config.put("applyPolicies",JsonSerialization.writeValueAsString(new String[]{this.anyUserPolicy.getId()}));
+  permission.setConfig(config);
+  newPermissionRequest(permission.getId()).put(Entity.entity(permission,MediaType.APPLICATION_JSON_TYPE));
+  HashSet<String> roles=new HashSet<>();
+  roles.add("admin");
+  Map<String,DefaultEvaluation> evaluationsAdminRole=performEvaluation(Arrays.asList(new ResourcePermission(albumResource,Collections.emptyList(),resourceServer)),createAccessToken(roles),createClientConnection("127.0.0.1"));
+  assertEquals(1,evaluationsAdminRole.size());
+  assertTrue(evaluationsAdminRole.containsKey(this.anyUserPolicy.getId()));
+  assertEquals(Effect.DENY,evaluationsAdminRole.get(this.anyUserPolicy.getId()).getEffect());
+}

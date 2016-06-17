@@ -1,0 +1,6 @@
+{
+  Query query=getEntityManager().createQuery("select p from PolicyEntity p inner join p.scopes s where p.resourceServer.id = :serverId and s.id in (:scopeIds) and p.resources is empty group by p.id order by p.name");
+  query.setParameter("serverId",resourceServerId);
+  query.setParameter("scopeIds",scopeIds);
+  return query.getResultList();
+}

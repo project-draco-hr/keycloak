@@ -1,0 +1,16 @@
+{
+  String groupId=associatedPolicy.getConfig().get("mavenArtifactGroupId");
+  String artifactId=associatedPolicy.getConfig().get("mavenArtifactId");
+  String version=associatedPolicy.getConfig().get("mavenArtifactVersion");
+  String scannerPeriod=associatedPolicy.getConfig().get("scannerPeriod");
+  String scannerPeriodUnit=associatedPolicy.getConfig().get("scannerPeriodUnit");
+  this.sessionName=associatedPolicy.getConfig().get("sessionName");
+  this.kc=ks.newKieContainer(ks.newReleaseId(groupId,artifactId,version));
+  this.kcs=ks.newKieScanner(this.kc);
+  this.kcs.start(toMillis(scannerPeriod,scannerPeriodUnit));
+  KieSession session=this.kc.newKieSession(this.sessionName);
+  if (session == null) {
+    throw new RuntimeException("Could not obtain session with name [" + this.sessionName + "].");
+  }
+  session.dispose();
+}

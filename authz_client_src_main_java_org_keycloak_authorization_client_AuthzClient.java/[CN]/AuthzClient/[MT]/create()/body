@@ -1,0 +1,12 @@
+{
+  InputStream configStream=Thread.currentThread().getContextClassLoader().getResourceAsStream("keycloak.json");
+  if (configStream == null) {
+    throw new RuntimeException("Could not find any keycloak.json file in classpath.");
+  }
+  try {
+    return create(JsonSerialization.readValue(configStream,Configuration.class));
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Could not parse configuration.",e);
+  }
+}

@@ -1,0 +1,24 @@
+{
+  for (  Scope scope : toUpdate) {
+    boolean hasScope=false;
+    for (    Scope existingScope : this.scopes) {
+      if (existingScope.equals(scope)) {
+        hasScope=true;
+      }
+    }
+    if (!hasScope) {
+      this.scopes.add((ScopeEntity)scope);
+    }
+  }
+  for (  Scope scopeModel : new HashSet<Scope>(this.scopes)) {
+    boolean hasScope=false;
+    for (    Scope scope : toUpdate) {
+      if (scopeModel.equals(scope)) {
+        hasScope=true;
+      }
+    }
+    if (!hasScope) {
+      this.scopes.remove(scopeModel);
+    }
+  }
+}

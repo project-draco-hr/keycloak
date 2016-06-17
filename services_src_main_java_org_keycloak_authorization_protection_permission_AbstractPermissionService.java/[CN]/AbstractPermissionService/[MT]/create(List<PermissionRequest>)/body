@@ -1,0 +1,7 @@
+{
+  if (request == null) {
+    throw new ErrorResponseException("invalid_permission_request","Invalid permission request.",Response.Status.BAD_REQUEST);
+  }
+  List<ResourceRepresentation> resource=verifyRequestedResource(request);
+  return Response.status(Response.Status.CREATED).entity(new PermissionResponse(createPermissionTicket(resource))).build();
+}

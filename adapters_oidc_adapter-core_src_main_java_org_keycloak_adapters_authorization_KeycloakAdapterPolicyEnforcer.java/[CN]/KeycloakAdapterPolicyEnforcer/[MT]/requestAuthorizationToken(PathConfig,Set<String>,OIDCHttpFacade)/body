@@ -1,0 +1,31 @@
+{
+  try {
+    String accessToken=httpFacade.getSecurityContext().getTokenString();
+    AuthzClient authzClient=getAuthzClient();
+    KeycloakDeployment deployment=getPolicyEnforcer().getDeployment();
+    if (getEnforcerConfig().getUmaProtocolConfig() != null) {
+      LOGGER.debug("Obtaining authorization for  authenticated user.");
+      PermissionRequest permissionRequest=new PermissionRequest();
+      permissionRequest.setResourceSetId(pathConfig.getId());
+      permissionRequest.setScopes(requiredScopes);
+      PermissionResponse permissionResponse=authzClient.protection().permission().forResource(permissionRequest);
+      AuthorizationRequest authzRequest=new AuthorizationRequest(permissionResponse.getTicket());
+      AuthorizationResponse authzResponse=authzClient.authorization(accessToken).authorize(authzRequest);
+      if (authzResponse != null) {
+        return RSATokenVerifier.verifyToken(authzResponse.getRpt(),deployment.getRealmKey(),deployment.getRealmInfoUrl());
+      }
+      return null;
+    }
+ else {
+      LOGGER.debug("Obtaining entitlements for authenticated user.");
+      EntitlementResponse authzResponse=authzClient.entitlement(accessToken).getAll(authzClient.getConfiguration().getClientId());
+      return RSATokenVerifier.verifyToken(authzResponse.getRpt(),deployment.getRealmKey(),deployment.getRealmInfoUrl());
+    }
+  }
+ catch (  AuthorizationDeniedException e) {
+    return null;
+  }
+catch (  Exception e) {
+    throw new RuntimeException("Unexpected error during authorization request.",e);
+  }
+}

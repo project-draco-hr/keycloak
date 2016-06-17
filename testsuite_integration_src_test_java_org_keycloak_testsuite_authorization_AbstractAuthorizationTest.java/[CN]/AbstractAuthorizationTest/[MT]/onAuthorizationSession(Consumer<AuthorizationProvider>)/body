@@ -1,0 +1,18 @@
+{
+  KeycloakSession keycloakSession=startKeycloakSession();
+  KeycloakTransactionManager transaction=keycloakSession.getTransaction();
+  try {
+    AuthorizationProvider authorizationProvider=keycloakSession.getProvider(AuthorizationProvider.class);
+    consumer.accept(authorizationProvider);
+    transaction.commit();
+  }
+ catch (  Exception e) {
+    transaction.rollback();
+    throw new RuntimeException(e);
+  }
+ finally {
+    if (keycloakSession != null) {
+      keycloakSession.close();
+    }
+  }
+}

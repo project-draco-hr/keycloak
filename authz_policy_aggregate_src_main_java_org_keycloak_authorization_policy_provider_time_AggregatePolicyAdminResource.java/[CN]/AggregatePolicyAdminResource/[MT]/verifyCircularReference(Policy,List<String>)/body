@@ -1,0 +1,12 @@
+{
+  if (!policy.getType().equals("aggregate")) {
+    return;
+  }
+  if (ids.contains(policy.getId())) {
+    throw new RuntimeException("Circular reference found [" + policy.getName() + "].");
+  }
+  ids.add(policy.getId());
+  for (  Policy associated : policy.getAssociatedPolicies()) {
+    verifyCircularReference(associated,ids);
+  }
+}

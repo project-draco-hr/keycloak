@@ -1,0 +1,19 @@
+{
+  ScopeRepresentation scope=new ScopeRepresentation();
+  scope.setId(model.getId());
+  scope.setName(model.getName());
+  scope.setIconUri(model.getIconUri());
+  scope.setPolicies(new ArrayList<>());
+  Set<Policy> policies=new HashSet<>();
+  policies.addAll(authorizationProvider.getStoreFactory().getPolicyStore().findByScopeIds(Arrays.asList(model.getId()),model.getResourceServer().getId()));
+  for (  Policy policyModel : policies) {
+    PolicyRepresentation policy=new PolicyRepresentation();
+    policy.setId(policyModel.getId());
+    policy.setName(policyModel.getName());
+    policy.setType(policyModel.getType());
+    if (!scope.getPolicies().contains(policy)) {
+      scope.getPolicies().add(policy);
+    }
+  }
+  return scope;
+}

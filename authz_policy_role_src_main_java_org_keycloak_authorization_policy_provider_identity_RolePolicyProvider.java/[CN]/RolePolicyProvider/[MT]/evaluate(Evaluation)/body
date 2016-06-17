@@ -1,0 +1,14 @@
+{
+  EvaluationContext context=evaluation.getContext();
+  String[] roleIds=getRoles(this.policy);
+  if (roleIds.length > 0) {
+    Identity identity=context.getIdentity();
+    for (    String roleId : roleIds) {
+      RoleModel role=getCurrentRealm().getRoleById(roleId);
+      if (role != null && identity.hasRole(role.getName())) {
+        evaluation.grant();
+        break;
+      }
+    }
+  }
+}

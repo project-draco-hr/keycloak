@@ -1,0 +1,17 @@
+{
+  ResourceRepresentation newResource=new ResourceRepresentation();
+  newResource.setName("New Resource");
+  newResource.setType("Resource Type");
+  newResource.setIconUri("Resource Icon URI");
+  newResource.setUri("Resource URI");
+  Response response=newResourceRequest().post(Entity.entity(newResource,MediaType.APPLICATION_JSON_TYPE));
+  assertEquals(Status.CREATED.getStatusCode(),response.getStatus());
+  ResourceRepresentation resource=response.readEntity(ResourceRepresentation.class);
+  response=newResourceRequest(resource.getId()).get();
+  assertEquals(Status.OK.getStatusCode(),response.getStatus());
+  resource=response.readEntity(ResourceRepresentation.class);
+  assertEquals("New Resource",resource.getName());
+  assertEquals("Resource Type",resource.getType());
+  assertEquals("Resource Icon URI",resource.getIconUri());
+  assertEquals("Resource URI",resource.getUri());
+}

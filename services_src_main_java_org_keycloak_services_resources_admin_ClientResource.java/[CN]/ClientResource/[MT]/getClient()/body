@@ -3,5 +3,7 @@
   if (client == null) {
     throw new NotFoundException("Could not find client");
   }
-  return ModelToRepresentation.toRepresentation(client);
+  ClientRepresentation representation=ModelToRepresentation.toRepresentation(client);
+  representation.setAuthorizationServicesEnabled(authorization().isEnabled());
+  return representation;
 }

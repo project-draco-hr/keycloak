@@ -1,6 +1,18 @@
 {
-  RealmModel realm=getRealm(id);
+  final RealmModel realm=getRealm(id);
   if (realm == null)   return false;
   session.users().preRemove(realm);
-  return getMongoStore().removeEntity(MongoRealmEntity.class,id,invocationContext);
+  boolean removed=getMongoStore().removeEntity(MongoRealmEntity.class,id,invocationContext);
+  if (removed) {
+    session.getKeycloakSessionFactory().publish(new RealmModel.RealmRemovedEvent(){
+      @Override public RealmModel getRealm(){
+        return realm;
+      }
+      @Override public KeycloakSession getKeycloakSession(){
+        return session;
+      }
+    }
+);
+  }
+  return removed;
 }

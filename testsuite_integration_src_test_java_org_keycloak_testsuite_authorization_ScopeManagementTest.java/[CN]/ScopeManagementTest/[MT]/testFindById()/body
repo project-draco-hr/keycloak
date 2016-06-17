@@ -1,0 +1,13 @@
+{
+  ScopeRepresentation newScope=new ScopeRepresentation();
+  newScope.setName("New Scope");
+  newScope.setIconUri("Icon URI");
+  Response response=newScopeRequest().post(Entity.entity(newScope,MediaType.APPLICATION_JSON_TYPE));
+  assertEquals(Status.CREATED.getStatusCode(),response.getStatus());
+  ScopeRepresentation scope=response.readEntity(ScopeRepresentation.class);
+  response=newScopeRequest(scope.getId()).get();
+  assertEquals(Status.OK.getStatusCode(),response.getStatus());
+  scope=response.readEntity(ScopeRepresentation.class);
+  assertEquals("New Scope",scope.getName());
+  assertEquals("Icon URI",scope.getIconUri());
+}

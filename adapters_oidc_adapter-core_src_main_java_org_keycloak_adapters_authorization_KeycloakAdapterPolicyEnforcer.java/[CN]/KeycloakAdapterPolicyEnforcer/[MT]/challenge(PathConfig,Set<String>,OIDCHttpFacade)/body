@@ -1,0 +1,12 @@
+{
+  String accessDeniedPath=getEnforcerConfig().getAccessDeniedPath();
+  HttpFacade.Response response=facade.getResponse();
+  if (accessDeniedPath != null) {
+    response.setStatus(302);
+    response.setHeader("Location",accessDeniedPath);
+  }
+ else {
+    response.sendError(403);
+  }
+  return true;
+}

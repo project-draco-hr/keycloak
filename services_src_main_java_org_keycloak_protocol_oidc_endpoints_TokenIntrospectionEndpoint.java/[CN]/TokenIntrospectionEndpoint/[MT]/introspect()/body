@@ -6,29 +6,25 @@
   MultivaluedMap<String,String> formParams=request.getDecodedFormParameters();
   String tokenTypeHint=formParams.getFirst(PARAM_TOKEN_TYPE_HINT);
   if (tokenTypeHint == null) {
-    tokenTypeHint=TOKEN_TYPE_ACCESS_TOKEN;
+    tokenTypeHint=AccessTokenIntrospectionProviderFactory.ACCESS_TOKEN_TYPE;
   }
   String token=formParams.getFirst(PARAM_TOKEN);
   if (token == null) {
     throw throwErrorResponseException(Errors.INVALID_REQUEST,"Token not provided.",Status.BAD_REQUEST);
   }
-  try {
-    AccessToken toIntrospect=toAccessToken(tokenTypeHint,token);
-    ObjectNode tokenMetadata;
-    boolean active=tokenManager.isTokenValid(session,realm,toIntrospect);
-    if (active) {
-      tokenMetadata=JsonSerialization.createObjectNode(toIntrospect);
-      tokenMetadata.put("client_id",toIntrospect.getIssuedFor());
-      tokenMetadata.put("username",toIntrospect.getPreferredUsername());
-    }
- else {
-      tokenMetadata=JsonSerialization.createObjectNode();
-    }
-    tokenMetadata.put("active",active);
-    this.event.success();
-    return Response.ok(JsonSerialization.writeValueAsBytes(tokenMetadata)).build();
+  TokenIntrospectionProvider provider=this.session.getProvider(TokenIntrospectionProvider.class,tokenTypeHint);
+  if (provider == null) {
+    throw throwErrorResponseException(Errors.INVALID_REQUEST,"Unsupported token type [" + tokenTypeHint + "].",Status.BAD_REQUEST);
   }
- catch (  Exception e) {
+  try {
+    Response response=provider.introspect(token);
+    this.event.success();
+    return response;
+  }
+ catch (  ErrorResponseException ere) {
+    throw ere;
+  }
+catch (  Exception e) {
     throw throwErrorResponseException(Errors.INVALID_REQUEST,"Failed to introspect token.",Status.BAD_REQUEST);
   }
 }

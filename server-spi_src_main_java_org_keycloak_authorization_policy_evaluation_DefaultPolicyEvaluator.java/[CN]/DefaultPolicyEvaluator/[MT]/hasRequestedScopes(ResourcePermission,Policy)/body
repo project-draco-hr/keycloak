@@ -1,0 +1,22 @@
+{
+  if (permission.getScopes().isEmpty()) {
+    return true;
+  }
+  if (policy.getScopes().isEmpty()) {
+    return true;
+  }
+  boolean hasScope=true;
+  for (  Scope givenScope : policy.getScopes()) {
+    boolean hasGivenScope=false;
+    for (    Scope scope : permission.getScopes()) {
+      if (givenScope.getId().equals(scope.getId())) {
+        hasGivenScope=true;
+        break;
+      }
+    }
+    if (!hasGivenScope) {
+      return false;
+    }
+  }
+  return hasScope;
+}

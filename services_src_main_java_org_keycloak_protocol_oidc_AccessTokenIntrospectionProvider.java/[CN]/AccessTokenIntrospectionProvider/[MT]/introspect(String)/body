@@ -1,0 +1,21 @@
+{
+  try {
+    AccessToken toIntrospect=toAccessToken(token);
+    RealmModel realm=this.session.getContext().getRealm();
+    ObjectNode tokenMetadata;
+    boolean active=tokenManager.isTokenValid(session,realm,toIntrospect);
+    if (active) {
+      tokenMetadata=JsonSerialization.createObjectNode(toIntrospect);
+      tokenMetadata.put("client_id",toIntrospect.getIssuedFor());
+      tokenMetadata.put("username",toIntrospect.getPreferredUsername());
+    }
+ else {
+      tokenMetadata=JsonSerialization.createObjectNode();
+    }
+    tokenMetadata.put("active",active);
+    return Response.ok(JsonSerialization.writeValueAsBytes(tokenMetadata)).type(MediaType.APPLICATION_JSON_TYPE).build();
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Error creating token introspection response.",e);
+  }
+}

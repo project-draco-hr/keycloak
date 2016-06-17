@@ -1,0 +1,82 @@
+{
+  PolicyRepresentation rep=Models.toRepresentation(policy,authorization);
+  rep.setId(null);
+  rep.setDependentPolicies(null);
+  Map<String,String> config=rep.getConfig();
+  String roles=config.get("roles");
+  if (roles != null && !roles.isEmpty()) {
+    roles=roles.replace("[","");
+    roles=roles.replace("]","");
+    if (!roles.isEmpty()) {
+      String roleNames="";
+      for (      String role : roles.split(",")) {
+        if (!roleNames.isEmpty()) {
+          roleNames=roleNames + ",";
+        }
+        role=role.replace("\"","");
+        roleNames=roleNames + "\"" + getRealm().getRoleById(role).getName()+ "\"";
+      }
+      config.put("roles","[" + roleNames + "]");
+    }
+  }
+  String users=config.get("users");
+  if (users != null) {
+    users=users.replace("[","");
+    users=users.replace("]","");
+    if (!users.isEmpty()) {
+      String userNames="";
+      for (      String user : users.split(",")) {
+        if (!userNames.isEmpty()) {
+          userNames=userNames + ",";
+        }
+        user=user.replace("\"","");
+        userNames=userNames + "\"" + this.authorization.getKeycloakSession().users().getUserById(user,getRealm()).getUsername()+ "\"";
+      }
+      config.put("users","[" + userNames + "]");
+    }
+  }
+  String scopes=config.get("scopes");
+  if (scopes != null && !scopes.isEmpty()) {
+    scopes=scopes.replace("[","");
+    scopes=scopes.replace("]","");
+    if (!scopes.isEmpty()) {
+      String scopeNames="";
+      for (      String scope : scopes.split(",")) {
+        if (!scopeNames.isEmpty()) {
+          scopeNames=scopeNames + ",";
+        }
+        scope=scope.replace("\"","");
+        scopeNames=scopeNames + "\"" + storeFactory.getScopeStore().findById(scope).getName()+ "\"";
+      }
+      config.put("scopes","[" + scopeNames + "]");
+    }
+  }
+  String policyResources=config.get("resources");
+  if (policyResources != null && !policyResources.isEmpty()) {
+    policyResources=policyResources.replace("[","");
+    policyResources=policyResources.replace("]","");
+    if (!policyResources.isEmpty()) {
+      String resourceNames="";
+      for (      String resource : policyResources.split(",")) {
+        if (!resourceNames.isEmpty()) {
+          resourceNames=resourceNames + ",";
+        }
+        resource=resource.replace("\"","");
+        resourceNames=resourceNames + "\"" + storeFactory.getResourceStore().findById(resource).getName()+ "\"";
+      }
+      config.put("resources","[" + resourceNames + "]");
+    }
+  }
+  String policyNames="";
+  Set<Policy> associatedPolicies=policy.getAssociatedPolicies();
+  if (!associatedPolicies.isEmpty()) {
+    for (    Policy associatedPolicy : associatedPolicies) {
+      if (!policyNames.isEmpty()) {
+        policyNames=policyNames + ",";
+      }
+      policyNames=policyNames + "\"" + associatedPolicy.getName()+ "\"";
+    }
+    config.put("applyPolicies","[" + policyNames + "]");
+  }
+  return rep;
+}

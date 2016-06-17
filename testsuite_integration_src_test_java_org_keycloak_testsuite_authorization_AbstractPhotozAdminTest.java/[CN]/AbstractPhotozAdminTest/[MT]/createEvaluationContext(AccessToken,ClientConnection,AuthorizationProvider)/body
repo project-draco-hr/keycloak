@@ -1,0 +1,8 @@
+{
+  KeycloakSession keycloakSession=authorizationProvider.getKeycloakSession();
+  keycloakSession.getContext().setConnection(clientConnection);
+  keycloakSession.getContext().setClient(getClientByClientId("photoz-html5-client"));
+  ResteasyProviderFactory.pushContext(HttpHeaders.class,createHttpHeaders());
+  KeycloakIdentity identity=new KeycloakIdentity(accessToken,keycloakSession);
+  return new KeycloakEvaluationContext(identity,keycloakSession);
+}

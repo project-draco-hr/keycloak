@@ -1,0 +1,8 @@
+{
+  HttpFacade.Response response=facade.getResponse();
+  AuthzClient authzClient=getAuthzClient();
+  String clientId=authzClient.getConfiguration().getClientId();
+  String authorizationServerUri=authzClient.getServerConfiguration().getIssuer().toString() + "/authz/entitlement";
+  response.setStatus(401);
+  response.setHeader("WWW-Authenticate","KC_ETT realm=\"" + clientId + "\",as_uri=\""+ authorizationServerUri+ "\"");
+}

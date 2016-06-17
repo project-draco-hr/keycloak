@@ -1,0 +1,22 @@
+{
+  if (originalConfig.hasPattern()) {
+    String pathInfo=URI.create(request.getURI()).getPath().substring(1);
+    String path=pathInfo.substring(pathInfo.indexOf('/'),pathInfo.length());
+    ProtectedResource resource=this.authzClient.protection().resource();
+    Set<String> search=resource.findByFilter("uri=" + path);
+    if (!search.isEmpty()) {
+      ResourceRepresentation targetResource=resource.findById(search.iterator().next()).getResourceDescription();
+      PathConfig config=new PathConfig();
+      config.setId(targetResource.getId());
+      config.setName(targetResource.getName());
+      config.setType(targetResource.getType());
+      config.setPath(targetResource.getUri());
+      config.setScopes(originalConfig.getScopes());
+      config.setMethods(originalConfig.getMethods());
+      config.setInstance(true);
+      this.paths.add(config);
+      return config;
+    }
+  }
+  return originalConfig;
+}

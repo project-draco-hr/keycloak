@@ -1,0 +1,16 @@
+{
+  AuthzClient authzClient=AuthzClient.create();
+  ResourceRepresentation newResource=new ResourceRepresentation();
+  newResource.setName("New Resource");
+  newResource.setType("urn:hello-world-authz:resources:example");
+  newResource.addScope(new ScopeRepresentation("urn:hello-world-authz:scopes:view"));
+  ProtectedResource resourceClient=authzClient.protection().resource();
+  Set<String> existingResource=resourceClient.findByFilter("name=" + newResource.getName());
+  if (!existingResource.isEmpty()) {
+    resourceClient.delete(existingResource.iterator().next());
+  }
+  RegistrationResponse response=resourceClient.create(newResource);
+  String resourceId=response.getId();
+  ResourceRepresentation resource=resourceClient.findById(resourceId).getResourceDescription();
+  System.out.println(resource);
+}

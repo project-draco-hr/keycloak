@@ -1,0 +1,13 @@
+{
+  List<Policy> policies=new ArrayList<>();
+  Query query=getEntityManager().createQuery("from PolicyEntity where resourceServer.id = :serverId");
+  query.setParameter("serverId",resourceServerId);
+  List<Policy> models=query.getResultList();
+  for (  Policy policy : models) {
+    String defaultType=policy.getConfig().get("defaultResourceType");
+    if (defaultType != null && defaultType.equals(resourceType) && policy.getResources().isEmpty()) {
+      policies.add(policy);
+    }
+  }
+  return policies;
+}

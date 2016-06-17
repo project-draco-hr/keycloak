@@ -1,0 +1,26 @@
+{
+  representation.setId(id);
+  StoreFactory storeFactory=authorization.getStoreFactory();
+  Policy policy=storeFactory.getPolicyStore().findById(representation.getId());
+  if (policy == null) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+  policy.setName(representation.getName());
+  policy.setDescription(representation.getDescription());
+  policy.setConfig(representation.getConfig());
+  policy.setDecisionStrategy(representation.getDecisionStrategy());
+  policy.setLogic(representation.getLogic());
+  updateResources(policy,authorization);
+  updateAssociatedPolicies(policy);
+  updateScopes(policy,authorization);
+  PolicyProviderAdminService resource=getPolicyProviderAdminResource(policy.getType(),authorization);
+  if (resource != null) {
+    try {
+      resource.onUpdate(policy);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+  return Response.status(Status.CREATED).build();
+}

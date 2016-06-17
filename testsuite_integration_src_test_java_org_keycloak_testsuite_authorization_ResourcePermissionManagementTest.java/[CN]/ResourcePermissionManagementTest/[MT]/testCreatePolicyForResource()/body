@@ -1,0 +1,37 @@
+{
+  PolicyRepresentation newPermission=new PolicyRepresentation();
+  newPermission.setName("Multiple Resource Policy");
+  newPermission.setType("resource");
+  HashedMap config=new HashedMap();
+  config.put("resources",JsonSerialization.writeValueAsString(new String[]{this.albumResource.getId(),this.adminResource.getId()}));
+  config.put("applyPolicies",JsonSerialization.writeValueAsString(new String[]{this.onlyFromSpecificAddressPolicy.getId()}));
+  newPermission.setConfig(config);
+  Response response=newPermissionRequest().post(Entity.entity(newPermission,MediaType.APPLICATION_JSON_TYPE));
+  assertEquals(Status.CREATED.getStatusCode(),response.getStatus());
+  List<ResourcePermission> permissions=new ArrayList<>();
+  permissions.add(new ResourcePermission(this.albumResource,Collections.emptyList(),this.resourceServer));
+  Map<String,DefaultEvaluation> evaluations=performEvaluation(permissions,createAccessToken(Collections.emptySet()),createClientConnection("127.0.0.1"));
+  assertEquals(1,evaluations.size());
+  assertTrue(evaluations.containsKey(this.onlyFromSpecificAddressPolicy.getId()));
+  assertEquals(Effect.PERMIT,evaluations.get(this.onlyFromSpecificAddressPolicy.getId()).getEffect());
+  permissions=new ArrayList<>();
+  permissions.add(new ResourcePermission(this.adminResource,Collections.emptyList(),this.resourceServer));
+  evaluations=performEvaluation(permissions,createAccessToken(Collections.emptySet()),createClientConnection("127.0.0.1"));
+  assertEquals(1,evaluations.size());
+  assertTrue(evaluations.containsKey(this.onlyFromSpecificAddressPolicy.getId()));
+  assertEquals(Effect.PERMIT,evaluations.get(this.onlyFromSpecificAddressPolicy.getId()).getEffect());
+  permissions=new ArrayList<>();
+  permissions.add(new ResourcePermission(this.adminResource,Collections.emptyList(),this.resourceServer));
+  permissions.add(new ResourcePermission(this.albumResource,Collections.emptyList(),this.resourceServer));
+  evaluations=performEvaluation(permissions,createAccessToken(Collections.emptySet()),createClientConnection("127.0.0.1"));
+  assertEquals(1,evaluations.size());
+  assertTrue(evaluations.containsKey(this.onlyFromSpecificAddressPolicy.getId()));
+  assertEquals(Effect.PERMIT,evaluations.get(this.onlyFromSpecificAddressPolicy.getId()).getEffect());
+  permissions=new ArrayList<>();
+  permissions.add(new ResourcePermission(this.adminResource,Collections.emptyList(),this.resourceServer));
+  permissions.add(new ResourcePermission(this.albumResource,Collections.emptyList(),this.resourceServer));
+  evaluations=performEvaluation(permissions,createAccessToken(Collections.emptySet()),createClientConnection("127.0.0.10"));
+  assertEquals(1,evaluations.size());
+  assertTrue(evaluations.containsKey(this.onlyFromSpecificAddressPolicy.getId()));
+  assertEquals(Effect.DENY,evaluations.get(this.onlyFromSpecificAddressPolicy.getId()).getEffect());
+}

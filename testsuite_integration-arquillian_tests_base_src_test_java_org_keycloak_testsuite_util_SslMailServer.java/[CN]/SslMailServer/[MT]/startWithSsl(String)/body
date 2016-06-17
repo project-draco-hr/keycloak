@@ -1,0 +1,40 @@
+{
+  InputStream keyStoreIS=null;
+  try {
+    keyStoreIS=new FileInputStream(privateKey);
+    char[] keyStorePassphrase="secret".toCharArray();
+    KeyStore ksKeys=null;
+    ksKeys=KeyStore.getInstance("JKS");
+    ksKeys.load(keyStoreIS,keyStorePassphrase);
+    KeyManagerFactory kmf=KeyManagerFactory.getInstance("SunX509");
+    kmf.init(ksKeys,keyStorePassphrase);
+    InputStream trustStoreIS=new FileInputStream(String.valueOf(MailServer.class.getClassLoader().getResource(TRUSTED_CERTIFICATE).getFile()));
+    char[] trustStorePassphrase="secret".toCharArray();
+    KeyStore ksTrust=KeyStore.getInstance("JKS");
+    ksTrust.load(trustStoreIS,trustStorePassphrase);
+    TrustManagerFactory tmf=TrustManagerFactory.getInstance("SunX509");
+    tmf.init(ksTrust);
+    final SSLContext sslContext=SSLContext.getInstance("TLS");
+    sslContext.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
+    smtpServer=new SMTPServer(messageHandlerFactory){
+      @Override public SSLSocket createSSLSocket(      Socket socket) throws IOException {
+        InetSocketAddress remoteAddress=(InetSocketAddress)socket.getRemoteSocketAddress();
+        SSLSocketFactory sf=sslContext.getSocketFactory();
+        SSLSocket s=(SSLSocket)(sf.createSocket(socket,remoteAddress.getHostName(),socket.getPort(),true));
+        s.setUseClientMode(false);
+        s.setEnabledProtocols(s.getSupportedProtocols());
+        s.setEnabledCipherSuites(s.getSupportedCipherSuites());
+        return s;
+      }
+    }
+;
+  }
+ catch (  KeyStoreException|IOException|NoSuchAlgorithmException|UnrecoverableKeyException|KeyManagementException|CertificateException e) {
+    throw new RuntimeException(e);
+  }
+  smtpServer.setHostName(HOST);
+  smtpServer.setPort(Integer.parseInt(PORT_SSL));
+  smtpServer.setEnableTLS(true);
+  smtpServer.start();
+  log.info("Started mail server (" + smtpServer.getHostName() + ":"+ smtpServer.getPort()+ ")");
+}

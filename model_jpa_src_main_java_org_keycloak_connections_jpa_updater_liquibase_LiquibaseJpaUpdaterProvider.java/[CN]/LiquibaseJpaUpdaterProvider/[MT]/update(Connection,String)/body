@@ -2,26 +2,17 @@
   logger.debug("Starting database update");
   ThreadLocalSessionContext.setCurrentSession(session);
   try {
-    Liquibase liquibase=getLiquibase(connection,defaultSchema);
-    List<ChangeSet> changeSets=liquibase.listUnrunChangeSets((Contexts)null);
-    if (!changeSets.isEmpty()) {
-      if (changeSets.get(0).getId().equals(FIRST_VERSION)) {
-        logger.info("Initializing database schema");
+    Liquibase liquibase=getLiquibaseForKeycloakUpdate(connection,defaultSchema);
+    updateChangeSet(liquibase,liquibase.getChangeLogFile());
+    Set<JpaEntityProvider> jpaProviders=session.getAllProviders(JpaEntityProvider.class);
+    for (    JpaEntityProvider jpaProvider : jpaProviders) {
+      String customChangelog=jpaProvider.getChangelogLocation();
+      if (customChangelog != null) {
+        String factoryId=jpaProvider.getFactoryId();
+        String changelogTableName=JpaUtils.getCustomChangelogTableName(factoryId);
+        liquibase=getLiquibaseForCustomProviderUpdate(connection,defaultSchema,customChangelog,jpaProvider.getClass().getClassLoader(),changelogTableName);
+        updateChangeSet(liquibase,liquibase.getChangeLogFile());
       }
- else {
-        if (logger.isDebugEnabled()) {
-          List<RanChangeSet> ranChangeSets=liquibase.getDatabase().getRanChangeSetList();
-          logger.debugv("Updating database from {0} to {1}",ranChangeSets.get(ranChangeSets.size() - 1).getId(),changeSets.get(changeSets.size() - 1).getId());
-        }
- else {
-          logger.infov("Updating database");
-        }
-      }
-      liquibase.update((Contexts)null);
-      logger.debug("Completed database update");
-    }
- else {
-      logger.debug("Database is up to date");
     }
   }
  catch (  Exception e) {

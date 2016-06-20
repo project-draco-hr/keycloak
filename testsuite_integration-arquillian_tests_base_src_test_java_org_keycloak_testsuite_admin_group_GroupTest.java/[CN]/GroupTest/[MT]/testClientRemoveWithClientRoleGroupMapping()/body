@@ -7,12 +7,12 @@
   Response response=realm.clients().create(client);
   response.close();
   String clientUuid=ApiUtil.getCreatedId(response);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.clientResourcePath(clientUuid),client);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.clientResourcePath(clientUuid),client,ResourceType.CLIENT);
   client=realm.clients().findByClientId("foo").get(0);
   RoleRepresentation role=new RoleRepresentation();
   role.setName("foo-role");
   realm.clients().get(client.getId()).roles().create(role);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.clientRoleResourcePath(clientUuid,"foo-role"),role);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.clientRoleResourcePath(clientUuid,"foo-role"),role,ResourceType.CLIENT_ROLE);
   role=realm.clients().get(client.getId()).roles().get("foo-role").toRepresentation();
   GroupRepresentation group=new GroupRepresentation();
   group.setName("2716");
@@ -20,7 +20,7 @@
   List<RoleRepresentation> list=new LinkedList<>();
   list.add(role);
   realm.groups().group(group.getId()).roles().clientLevel(client.getId()).add(list);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientUuid),list);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientUuid),list,ResourceType.CLIENT_ROLE);
   realm.clients().get(client.getId()).remove();
-  assertAdminEvents.assertEvent("test",OperationType.DELETE,AdminEventPaths.clientResourcePath(clientUuid));
+  assertAdminEvents.assertEvent("test",OperationType.DELETE,AdminEventPaths.clientResourcePath(clientUuid),ResourceType.CLIENT);
 }

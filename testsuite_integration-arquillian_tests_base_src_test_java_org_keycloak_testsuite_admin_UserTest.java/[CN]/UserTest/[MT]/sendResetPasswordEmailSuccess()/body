@@ -8,7 +8,7 @@
   List<String> actions=new LinkedList<>();
   actions.add(UserModel.RequiredAction.UPDATE_PASSWORD.name());
   user.executeActionsEmail("account",actions);
-  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userResourcePath(id) + "/execute-actions-email");
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userResourcePath(id) + "/execute-actions-email",ResourceType.USER);
   Assert.assertEquals(1,greenMail.getReceivedMessages().length);
   MimeMessage message=greenMail.getReceivedMessages()[0];
   String link=MailUtils.getPasswordResetEmailLink(message);

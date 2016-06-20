@@ -9,5 +9,11 @@
     throw new NotFoundException("Could not find role");
   }
   deleteRole(role);
+  if (role.isClientRole()) {
+    adminEvent.resource(ResourceType.CLIENT_ROLE);
+  }
+ else {
+    adminEvent.resource(ResourceType.REALM_ROLE);
+  }
   adminEvent.operation(OperationType.DELETE).resourcePath(uriInfo).success();
 }

@@ -3,13 +3,13 @@
   String id=rep.getId();
   RoleRepresentation role=new RoleRepresentation("test","test",false);
   realm.clients().get(id).roles().create(role);
-  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientRoleResourcePath(id,"test"),role);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientRoleResourcePath(id,"test"),role,ResourceType.CLIENT_ROLE);
   ClientRepresentation foundClientRep=realm.clients().get(id).toRepresentation();
   foundClientRep.setDefaultRoles(new String[]{"test"});
   realm.clients().get(id).update(foundClientRep);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.clientResourcePath(id),rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.clientResourcePath(id),rep,ResourceType.CLIENT_ROLE);
   assertArrayEquals(new String[]{"test"},realm.clients().get(id).toRepresentation().getDefaultRoles());
   realm.clients().get(id).roles().deleteRole("test");
-  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.clientRoleResourcePath(id,"test"));
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.clientRoleResourcePath(id,"test"),ResourceType.CLIENT_ROLE);
   assertNull(realm.clients().get(id).toRepresentation().getDefaultRoles());
 }

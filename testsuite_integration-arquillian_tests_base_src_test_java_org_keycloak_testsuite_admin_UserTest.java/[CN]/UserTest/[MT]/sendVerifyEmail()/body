@@ -37,7 +37,7 @@
     Assert.assertEquals("invalidClientId not enabled",error.getErrorMessage());
   }
   user.sendVerifyEmail();
-  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userResourcePath(id) + "/send-verify-email");
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userResourcePath(id) + "/send-verify-email",ResourceType.USER);
   Assert.assertEquals(1,greenMail.getReceivedMessages().length);
   String link=MailUtils.getPasswordResetEmailLink(greenMail.getReceivedMessages()[0]);
   driver.navigate().to(link);

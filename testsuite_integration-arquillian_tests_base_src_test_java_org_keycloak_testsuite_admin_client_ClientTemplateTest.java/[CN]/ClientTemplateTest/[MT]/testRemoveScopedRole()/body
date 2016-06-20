@@ -5,12 +5,12 @@
   templateRep.setFullScopeAllowed(false);
   String templateId=createTemplate(templateRep);
   clientTemplates().get(templateId).getScopeMappings().realmLevel().add(Collections.singletonList(roleRep));
-  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientTemplateScopeMappingsRealmLevelPath(templateId),Collections.singletonList(roleRep));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientTemplateScopeMappingsRealmLevelPath(templateId),Collections.singletonList(roleRep),ResourceType.CLIENT_TEMPLATE);
   List<RoleRepresentation> roleReps=clientTemplates().get(templateId).getScopeMappings().realmLevel().listAll();
   Assert.assertEquals(1,roleReps.size());
   Assert.assertEquals("foo-role",roleReps.get(0).getName());
   testRealmResource().roles().deleteRole("foo-role");
-  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.roleResourcePath("foo-role"));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.roleResourcePath("foo-role"),ResourceType.REALM_ROLE);
   roleReps=clientTemplates().get(templateId).getScopeMappings().realmLevel().listAll();
   Assert.assertEquals(0,roleReps.size());
   removeTemplate(templateId);

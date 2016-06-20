@@ -9,15 +9,15 @@
   Response resp=realm.clients().create(client);
   String clientDbId=ApiUtil.getCreatedId(resp);
   resp.close();
-  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientResourcePath(clientDbId),client);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientResourcePath(clientDbId),client,ResourceType.CLIENT);
   oauth.realm(REALM_NAME);
   oauth.redirectUri(redirectUri);
   UserRepresentation userRep=UserBuilder.create().username("testuser").build();
   Response response=realm.users().create(userRep);
   String userId=ApiUtil.getCreatedId(response);
   response.close();
-  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.userResourcePath(userId),userRep);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.userResourcePath(userId),userRep,ResourceType.USER);
   realm.users().get(userId).resetPassword(CredentialBuilder.create().password("password").build());
-  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userResetPasswordPath(userId));
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userResetPasswordPath(userId),ResourceType.USER);
   testingClient.testApp().clearAdminActions();
 }

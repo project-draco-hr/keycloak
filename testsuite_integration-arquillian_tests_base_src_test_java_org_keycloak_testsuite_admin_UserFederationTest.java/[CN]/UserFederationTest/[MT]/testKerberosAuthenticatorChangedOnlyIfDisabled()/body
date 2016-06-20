@@ -2,18 +2,18 @@
   AuthenticationExecutionInfoRepresentation kerberosExecution=findKerberosExecution();
   kerberosExecution.setRequirement(AuthenticationExecutionModel.Requirement.REQUIRED.toString());
   realm.flows().updateExecutions("browser",kerberosExecution);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.authUpdateExecutionPath("browser"),kerberosExecution);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.authUpdateExecutionPath("browser"),kerberosExecution,ResourceType.AUTH_EXECUTION);
   UserFederationProviderRepresentation ldapRep=UserFederationProviderBuilder.create().displayName("ldap2").providerName("ldap").priority(2).configProperty(KerberosConstants.ALLOW_KERBEROS_AUTHENTICATION,"true").build();
   String id=createUserFederationProvider(ldapRep);
   kerberosExecution=findKerberosExecution();
   Assert.assertEquals(kerberosExecution.getRequirement(),AuthenticationExecutionModel.Requirement.REQUIRED.toString());
   ldapRep=userFederation().get(id).toRepresentation();
   userFederation().get(id).update(ldapRep);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.userFederationResourcePath(id),ldapRep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.userFederationResourcePath(id),ldapRep,ResourceType.REALM);
   kerberosExecution=findKerberosExecution();
   Assert.assertEquals(kerberosExecution.getRequirement(),AuthenticationExecutionModel.Requirement.REQUIRED.toString());
   kerberosExecution.setRequirement(AuthenticationExecutionModel.Requirement.DISABLED.toString());
   realm.flows().updateExecutions("browser",kerberosExecution);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.authUpdateExecutionPath("browser"),kerberosExecution);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.authUpdateExecutionPath("browser"),kerberosExecution,ResourceType.REALM);
   removeUserFederationProvider(id);
 }

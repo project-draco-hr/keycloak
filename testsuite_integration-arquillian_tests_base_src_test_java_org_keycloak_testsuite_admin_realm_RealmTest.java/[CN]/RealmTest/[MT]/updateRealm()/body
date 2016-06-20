@@ -7,7 +7,7 @@
   rep.setRegistrationEmailAsUsername(true);
   rep.setEditUsernameAllowed(true);
   realm.update(rep);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep,ResourceType.REALM);
   rep=realm.toRepresentation();
   assertEquals(123,rep.getSsoSessionIdleTimeout().intValue());
   assertEquals(12,rep.getSsoSessionMaxLifespan().intValue());
@@ -19,7 +19,7 @@
   rep.setRegistrationEmailAsUsername(false);
   rep.setEditUsernameAllowed(false);
   realm.update(rep);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep,ResourceType.REALM);
   rep=realm.toRepresentation();
   assertEquals(Boolean.FALSE,rep.isRegistrationAllowed());
   assertEquals(Boolean.FALSE,rep.isRegistrationEmailAsUsername());

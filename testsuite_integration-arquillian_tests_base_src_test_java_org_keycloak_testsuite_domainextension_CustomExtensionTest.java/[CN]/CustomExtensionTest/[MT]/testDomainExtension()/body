@@ -1,0 +1,11 @@
+{
+  companyResource().createCompany("foo",buildCompany("foo-company"));
+  companyResource().createCompany("foo",buildCompany("bar-company"));
+  companyResource().createCompany("master",buildCompany("master-company"));
+  List<CompanyRepresentation> fooCompanies=companyResource().getCompanies("foo");
+  List<CompanyRepresentation> masterCompanies=companyResource().getCompanies("master");
+  assertCompanyNames(fooCompanies,"foo-company","bar-company");
+  assertCompanyNames(masterCompanies,"master-company");
+  companyResource().deleteAllCompanies("foo");
+  companyResource().deleteAllCompanies("master");
+}

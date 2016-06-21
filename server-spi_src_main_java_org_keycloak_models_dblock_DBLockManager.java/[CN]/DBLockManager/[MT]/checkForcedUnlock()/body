@@ -2,7 +2,7 @@
   if (Boolean.getBoolean("keycloak.dblock.forceUnlock")) {
     DBLockProvider lock=getDBLock();
     if (lock.supportsForcedUnlock()) {
-      logger.forcedReleaseDBLock();
+      logger.warn("Forced release of DB lock at startup requested by System property. Make sure to not use this in production environment! And especially when more cluster nodes are started concurrently.");
       lock.releaseLock();
     }
  else {

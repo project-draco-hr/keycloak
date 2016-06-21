@@ -1,0 +1,14 @@
+{
+  PolicyRepresentation defaultPermission=new PolicyRepresentation();
+  defaultPermission.setName("Default Permission");
+  defaultPermission.setType("resource");
+  defaultPermission.setDescription("A permission that applies to the default resource type");
+  defaultPermission.setDecisionStrategy(Policy.DecisionStrategy.UNANIMOUS);
+  defaultPermission.setLogic(Policy.Logic.POSITIVE);
+  HashMap<String,String> defaultPermissionConfig=new HashMap<>();
+  defaultPermissionConfig.put("default","true");
+  defaultPermissionConfig.put("defaultResourceType",resource.getType());
+  defaultPermissionConfig.put("applyPolicies","[\"" + policy.getName() + "\"]");
+  defaultPermission.setConfig(defaultPermissionConfig);
+  getPolicyResource().create(defaultPermission);
+}

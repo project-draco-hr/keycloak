@@ -14,7 +14,7 @@
           roleNames=roleNames + ",";
         }
         role=role.replace("\"","");
-        roleNames=roleNames + "\"" + getRealm().getRoleById(role).getName()+ "\"";
+        roleNames=roleNames + "\"" + this.realm.getRoleById(role).getName()+ "\"";
       }
       config.put("roles","[" + roleNames + "]");
     }
@@ -24,13 +24,14 @@
     users=users.replace("[","");
     users=users.replace("]","");
     if (!users.isEmpty()) {
+      UserFederationManager userManager=this.session.users();
       String userNames="";
       for (      String user : users.split(",")) {
         if (!userNames.isEmpty()) {
           userNames=userNames + ",";
         }
         user=user.replace("\"","");
-        userNames=userNames + "\"" + this.authorization.getKeycloakSession().users().getUserById(user,getRealm()).getUsername()+ "\"";
+        userNames=userNames + "\"" + userManager.getUserById(user,this.realm).getUsername()+ "\"";
       }
       config.put("users","[" + userNames + "]");
     }
@@ -40,13 +41,14 @@
     scopes=scopes.replace("[","");
     scopes=scopes.replace("]","");
     if (!scopes.isEmpty()) {
+      ScopeStore scopeStore=storeFactory.getScopeStore();
       String scopeNames="";
       for (      String scope : scopes.split(",")) {
         if (!scopeNames.isEmpty()) {
           scopeNames=scopeNames + ",";
         }
         scope=scope.replace("\"","");
-        scopeNames=scopeNames + "\"" + storeFactory.getScopeStore().findById(scope).getName()+ "\"";
+        scopeNames=scopeNames + "\"" + scopeStore.findById(scope).getName()+ "\"";
       }
       config.put("scopes","[" + scopeNames + "]");
     }
@@ -56,13 +58,14 @@
     policyResources=policyResources.replace("[","");
     policyResources=policyResources.replace("]","");
     if (!policyResources.isEmpty()) {
+      ResourceStore resourceStore=storeFactory.getResourceStore();
       String resourceNames="";
       for (      String resource : policyResources.split(",")) {
         if (!resourceNames.isEmpty()) {
           resourceNames=resourceNames + ",";
         }
         resource=resource.replace("\"","");
-        resourceNames=resourceNames + "\"" + storeFactory.getResourceStore().findById(resource).getName()+ "\"";
+        resourceNames=resourceNames + "\"" + resourceStore.findById(resource).getName()+ "\"";
       }
       config.put("resources","[" + resourceNames + "]");
     }

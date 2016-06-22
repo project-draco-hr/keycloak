@@ -15,7 +15,7 @@
   for (  Permission permission : permissions) {
     Set<String> allowedScopes=permission.getScopes();
     if (permission.getResourceSetId() != null) {
-      if (permission.getResourceSetId().equals(actualPathConfig.getId())) {
+      if (isResourcePermission(actualPathConfig,permission)) {
         if (((allowedScopes == null || allowedScopes.isEmpty()) && requiredScopes.isEmpty()) || allowedScopes.containsAll(requiredScopes)) {
           LOGGER.debugf("Authorization GRANTED for path [%s]. Permissions [%s].",actualPathConfig,permissions);
           if (request.getMethod().equalsIgnoreCase("DELETE") && actualPathConfig.isInstance()) {

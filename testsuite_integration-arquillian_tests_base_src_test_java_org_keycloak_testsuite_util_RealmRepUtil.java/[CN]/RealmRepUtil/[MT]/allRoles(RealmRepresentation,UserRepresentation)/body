@@ -1,0 +1,12 @@
+{
+  Set<RoleRepresentation> allRoles=new HashSet<>();
+  for (  String roleName : user.getRealmRoles()) {
+    allRoles.add(findRealmRole(realm,roleName));
+  }
+  for (  String clientId : user.getClientRoles().keySet()) {
+    for (    String roleName : user.getClientRoles().get(clientId)) {
+      allRoles.add(findClientRole(realm,clientId,roleName));
+    }
+  }
+  return allRoles;
+}

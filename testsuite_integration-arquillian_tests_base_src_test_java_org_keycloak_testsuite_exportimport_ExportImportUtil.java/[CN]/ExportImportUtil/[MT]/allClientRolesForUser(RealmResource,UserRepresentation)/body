@@ -1,0 +1,9 @@
+{
+  UserResource userRsc=realmRsc.users().get(user.getId());
+  List<RoleRepresentation> roles=new LinkedList<>();
+  for (  String client : userRsc.roles().getAll().getClientMappings().keySet()) {
+    List<RoleRepresentation> clientRoles=userRsc.roles().getAll().getClientMappings().get(client).getMappings();
+    if (clientRoles != null)     roles.addAll(clientRoles);
+  }
+  return roles;
+}

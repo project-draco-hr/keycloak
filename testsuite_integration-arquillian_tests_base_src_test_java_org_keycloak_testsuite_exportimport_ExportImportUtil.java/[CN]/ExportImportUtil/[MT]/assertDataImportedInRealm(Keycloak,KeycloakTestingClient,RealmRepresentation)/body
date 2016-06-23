@@ -6,12 +6,14 @@
   Assert.assertEquals(1,creds.size());
   String cred=(String)creds.iterator().next();
   Assert.assertEquals("password",cred);
-  Assert.assertEquals(3,realm.getDefaultRoles().size());
+  Assert.assertEquals(4,realm.getDefaultRoles().size());
   Assert.assertNotNull(RealmRepUtil.findDefaultRole(realm,"foo"));
   Assert.assertNotNull(RealmRepUtil.findDefaultRole(realm,"bar"));
   RealmResource realmRsc=adminClient.realm(realm.getRealm());
   UserRepresentation user=findByUsername(realmRsc,"loginclient");
   Assert.assertNotNull(user);
+  UserResource userRsc=realmRsc.users().get(user.getId());
+  Assert.assertEquals(0,userRsc.getFederatedIdentity().size());
   List<ClientRepresentation> resources=realmRsc.clients().findAll();
   Assert.assertEquals(8,resources.size());
   ClientRepresentation application=ApiUtil.findClientByClientId(realmRsc,"Application").toRepresentation();

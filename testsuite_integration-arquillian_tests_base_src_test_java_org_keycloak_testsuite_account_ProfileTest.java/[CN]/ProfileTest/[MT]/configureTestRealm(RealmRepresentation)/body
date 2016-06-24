@@ -1,5 +1,5 @@
 {
-  UserRepresentation user=findUserInRealmRep(testRealm,"test-user@localhost");
+  UserRepresentation user=RealmRepUtil.findUser(testRealm,"test-user@localhost");
   user.setFirstName("First");
   user.setLastName("Last");
   Map<String,Object> attributes=user.getAttributes();
@@ -11,5 +11,5 @@
   attributes.put("key2","value2");
   UserRepresentation user2=UserBuilder.create().enabled(true).username("test-user-no-access@localhost").password("password").build();
   RealmBuilder.edit(testRealm).user(user2);
-  ClientBuilder.edit(findClientInRealmRep(testRealm,"test-app")).addWebOrigin("http://localtest.me:8180");
+  ClientBuilder.edit(RealmRepUtil.findClientByClientId(testRealm,"test-app")).addWebOrigin("http://localtest.me:8180");
 }

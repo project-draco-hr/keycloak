@@ -1,7 +1,7 @@
 {
   String uri="/album/" + album.getId();
   try {
-    ProtectionResource protection=AuthzClient.create().protection();
+    ProtectionResource protection=getAuthzClient().protection();
     Set<String> search=protection.resource().findByFilter("uri=" + uri);
     if (search.isEmpty()) {
       throw new RuntimeException("Could not find protected resource with URI [" + uri + "]");

@@ -1,0 +1,10 @@
+{
+  List<T> list=new LinkedList<>();
+  for (  StorageProviderModel model : getStorageProviders(realm)) {
+    StorageProviderFactory factory=(StorageProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(StorageProvider.class,model.getProviderName());
+    if (factory.supports(type)) {
+      list.add(type.cast(factory.getInstance(session,model)));
+    }
+  }
+  return list;
+}

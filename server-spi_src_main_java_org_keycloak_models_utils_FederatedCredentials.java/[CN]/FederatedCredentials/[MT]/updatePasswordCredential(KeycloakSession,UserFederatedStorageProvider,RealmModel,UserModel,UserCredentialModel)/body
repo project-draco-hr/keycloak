@@ -1,0 +1,51 @@
+{
+  UserCredentialValueModel fedCred=getCredentialByType(provider,realm,user,cred.getType());
+  if (fedCred == null) {
+    UserCredentialValueModel newCred=PasswordHashManager.encode(session,realm,cred.getValue());
+    newCred.setCreatedDate(Time.toMillis(Time.currentTime()));
+    newCred.setType(cred.getType());
+    newCred.setDevice(cred.getDevice());
+    provider.updateCredential(realm,user,newCred);
+  }
+ else {
+    int expiredPasswordsPolicyValue=-1;
+    PasswordPolicy policy=realm.getPasswordPolicy();
+    if (policy != null) {
+      expiredPasswordsPolicyValue=policy.getExpiredPasswords();
+    }
+    if (expiredPasswordsPolicyValue != -1) {
+      fedCred.setType(UserCredentialModel.PASSWORD_HISTORY);
+      LinkedList<UserCredentialValueModel> credentialEntities=getCredentialsByType(provider,realm,user,UserCredentialModel.PASSWORD_HISTORY);
+      if (credentialEntities.size() > expiredPasswordsPolicyValue - 1) {
+        Collections.sort(credentialEntities,new Comparator<UserCredentialValueModel>(){
+          @Override public int compare(          UserCredentialValueModel o1,          UserCredentialValueModel o2){
+            if (o1.getCreatedDate().equals(o2.getCreatedDate()))             return 0;
+            return o1.getCreatedDate() < o2.getCreatedDate() ? -1 : 1;
+          }
+        }
+);
+        while (credentialEntities.size() > expiredPasswordsPolicyValue - 1) {
+          UserCredentialValueModel model=credentialEntities.removeFirst();
+          provider.removeCredential(realm,user,model);
+        }
+      }
+      provider.updateCredential(realm,user,fedCred);
+      fedCred=PasswordHashManager.encode(session,realm,cred.getValue());
+      fedCred.setCreatedDate(Time.toMillis(Time.currentTime()));
+      fedCred.setType(cred.getType());
+      fedCred.setDevice(cred.getDevice());
+      provider.updateCredential(realm,user,fedCred);
+    }
+ else {
+      for (      UserCredentialValueModel model : getCredentialsByType(provider,realm,user,UserCredentialModel.PASSWORD_HISTORY)) {
+        provider.removeCredential(realm,user,model);
+      }
+      UserCredentialValueModel newCred=PasswordHashManager.encode(session,realm,cred.getValue());
+      newCred.setCreatedDate(Time.toMillis(Time.currentTime()));
+      newCred.setType(cred.getType());
+      newCred.setDevice(cred.getDevice());
+      newCred.setId(fedCred.getId());
+      provider.updateCredential(realm,user,newCred);
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  TypedQuery<FederatedUserRoleMappingEntity> query=em.createNamedQuery("feduserRoleMappings",FederatedUserRoleMappingEntity.class);
+  query.setParameter("userId",user.getId());
+  List<FederatedUserRoleMappingEntity> results=query.getResultList();
+  for (  FederatedUserRoleMappingEntity entity : results) {
+    if (entity.getRoleId().equals(role.getId()))     em.remove(entity);
+  }
+  em.flush();
+}

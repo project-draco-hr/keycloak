@@ -1,0 +1,8 @@
+{
+  String username=ServiceAccountConstants.SERVICE_ACCOUNT_USER_PREFIX + client.getClientId();
+  UserModel user=getUserByUsername(username,client.getRealm());
+  if (user != null && user.getServiceAccountClientLink() != null && user.getServiceAccountClientLink().equals(client.getId())) {
+    return user;
+  }
+  return getDelegate().getServiceAccount(client);
+}

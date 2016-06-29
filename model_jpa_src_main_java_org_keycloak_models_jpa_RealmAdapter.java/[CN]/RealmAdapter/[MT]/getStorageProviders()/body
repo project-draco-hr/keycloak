@@ -1,0 +1,19 @@
+{
+  List<StorageProviderEntity> entities=realm.getStorageProviders();
+  if (entities.isEmpty())   return Collections.EMPTY_LIST;
+  List<StorageProviderEntity> copy=new LinkedList<>();
+  for (  StorageProviderEntity entity : entities) {
+    copy.add(entity);
+  }
+  Collections.sort(copy,new Comparator<StorageProviderEntity>(){
+    @Override public int compare(    StorageProviderEntity o1,    StorageProviderEntity o2){
+      return o1.getPriority() - o2.getPriority();
+    }
+  }
+);
+  List<StorageProviderModel> result=new LinkedList<>();
+  for (  StorageProviderEntity entity : copy) {
+    result.add(toModel(entity));
+  }
+  return Collections.unmodifiableList(result);
+}

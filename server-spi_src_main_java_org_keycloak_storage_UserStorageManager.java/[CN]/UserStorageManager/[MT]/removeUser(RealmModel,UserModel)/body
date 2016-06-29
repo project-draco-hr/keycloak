@@ -1,0 +1,11 @@
+{
+  StorageId storageId=new StorageId(user.getId());
+  if (storageId.getProviderId() == null) {
+    return localStorage().removeUser(realm,user);
+  }
+  UserUpdateProvider registry=(UserUpdateProvider)getStorageProvider(realm,storageId.getProviderId());
+  if (registry == null) {
+    throw new ModelException("Could not resolve StorageProvider: " + storageId.getProviderId());
+  }
+  return registry.removeUser(realm,user);
+}

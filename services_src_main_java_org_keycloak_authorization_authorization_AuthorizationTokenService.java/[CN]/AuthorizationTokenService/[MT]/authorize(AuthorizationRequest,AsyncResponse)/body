@@ -1,0 +1,27 @@
+{
+  KeycloakEvaluationContext evaluationContext=new KeycloakEvaluationContext(this.authorization.getKeycloakSession());
+  KeycloakIdentity identity=(KeycloakIdentity)evaluationContext.getIdentity();
+  if (!identity.hasRole("uma_authorization")) {
+    throw new ErrorResponseException(OAuthErrorException.INVALID_SCOPE,"Requires uma_authorization scope.",Status.FORBIDDEN);
+  }
+  if (authorizationRequest == null) {
+    throw new ErrorResponseException(OAuthErrorException.INVALID_REQUEST,"Invalid authorization request.",Status.BAD_REQUEST);
+  }
+  PermissionTicket ticket=verifyPermissionTicket(authorizationRequest);
+  authorization.evaluators().from(createPermissions(ticket,authorizationRequest,authorization),evaluationContext).evaluate(new DecisionResultCollector(){
+    @Override public void onComplete(    List<Result> results){
+      List<Permission> entitlements=Permissions.allPermits(results);
+      if (entitlements.isEmpty()) {
+        asyncResponse.resume(Cors.add(httpRequest,Response.status(Status.FORBIDDEN).entity(new ErrorResponseException("not_authorized","Authorization denied.",Status.FORBIDDEN))).allowedOrigins(identity.getAccessToken()).exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build());
+      }
+ else {
+        AuthorizationResponse response=new AuthorizationResponse(createRequestingPartyToken(entitlements,identity.getAccessToken()));
+        asyncResponse.resume(Cors.add(httpRequest,Response.status(Status.CREATED).entity(response)).allowedOrigins(identity.getAccessToken()).allowedMethods("POST").exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build());
+      }
+    }
+    @Override public void onError(    Throwable cause){
+      asyncResponse.resume(cause);
+    }
+  }
+);
+}

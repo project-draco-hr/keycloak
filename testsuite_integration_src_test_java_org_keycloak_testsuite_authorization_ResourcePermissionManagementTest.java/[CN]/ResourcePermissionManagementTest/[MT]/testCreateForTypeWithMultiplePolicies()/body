@@ -1,0 +1,25 @@
+{
+  createAlbumResourceTypePermission();
+  HashSet<String> roles=new HashSet<>();
+  roles.add("admin");
+  Map<String,DefaultEvaluation> evaluationsAdminRole=performEvaluation(Arrays.asList(new ResourcePermission(albumResource,Collections.emptyList(),resourceServer)),createAccessToken(roles),createClientConnection("127.0.0.1"));
+  assertEquals(2,evaluationsAdminRole.size());
+  assertTrue(evaluationsAdminRole.containsKey(this.administrationPolicy.getId()));
+  assertTrue(evaluationsAdminRole.containsKey(this.anyUserPolicy.getId()));
+  assertEquals(Effect.DENY,evaluationsAdminRole.get(this.anyUserPolicy.getId()).getEffect());
+  assertEquals(Effect.PERMIT,evaluationsAdminRole.get(this.administrationPolicy.getId()).getEffect());
+  evaluationsAdminRole=performEvaluation(Arrays.asList(new ResourcePermission(albumResource,Collections.emptyList(),resourceServer)),createAccessToken(roles),createClientConnection("127.0.0.10"));
+  assertEquals(2,evaluationsAdminRole.size());
+  assertTrue(evaluationsAdminRole.containsKey(this.administrationPolicy.getId()));
+  assertTrue(evaluationsAdminRole.containsKey(this.anyUserPolicy.getId()));
+  assertEquals(Effect.DENY,evaluationsAdminRole.get(this.anyUserPolicy.getId()).getEffect());
+  assertEquals(Effect.DENY,evaluationsAdminRole.get(this.administrationPolicy.getId()).getEffect());
+  roles.clear();
+  roles.add("user");
+  Map<String,DefaultEvaluation> evaluationsUserRole=performEvaluation(Arrays.asList(new ResourcePermission(albumResource,Collections.emptyList(),resourceServer)),createAccessToken(roles),createClientConnection("127.0.0.1"));
+  assertEquals(2,evaluationsUserRole.size());
+  assertTrue(evaluationsUserRole.containsKey(this.administrationPolicy.getId()));
+  assertTrue(evaluationsUserRole.containsKey(this.anyUserPolicy.getId()));
+  assertEquals(Effect.PERMIT,evaluationsUserRole.get(this.anyUserPolicy.getId()).getEffect());
+  assertEquals(Effect.DENY,evaluationsUserRole.get(this.administrationPolicy.getId()).getEffect());
+}

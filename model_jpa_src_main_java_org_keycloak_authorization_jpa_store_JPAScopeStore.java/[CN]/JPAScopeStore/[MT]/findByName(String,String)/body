@@ -1,0 +1,11 @@
+{
+  try {
+    Query query=entityManager.createQuery("select s from ScopeEntity s inner join s.resourceServer rs where rs.id = :resourceServerId and name = :name");
+    query.setParameter("name",name);
+    query.setParameter("resourceServerId",resourceServerId);
+    return (Scope)query.getSingleResult();
+  }
+ catch (  NoResultException nre) {
+    return null;
+  }
+}

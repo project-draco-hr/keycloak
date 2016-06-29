@@ -1,5 +1,5 @@
 {
-  UserRepresentation user=findUserInRealmRep(testRealm,"test-user@localhost");
+  UserRepresentation user=RealmRepUtil.findUser(testRealm,"test-user@localhost");
   CredentialRepresentation credRep=new CredentialRepresentation();
   credRep.setType(CredentialRepresentation.TOTP);
   credRep.setValue("totpSecret");
@@ -7,5 +7,6 @@
   user.setTotp(Boolean.TRUE);
   testRealm.setBruteForceProtected(true);
   testRealm.setFailureFactor(2);
-  findClientInRealmRep(testRealm,"test-app").setDirectAccessGrantsEnabled(true);
+  RealmRepUtil.findClientByClientId(testRealm,"test-app").setDirectAccessGrantsEnabled(true);
+  testRealm.getUsers().add(UserBuilder.create().username("user2").email("user2@localhost").password("password").build());
 }

@@ -1,8 +1,7 @@
 {
   serverStartupTimestamp=System.currentTimeMillis();
   ProviderManager pm=new ProviderManager(getClass().getClassLoader(),Config.scope().getArray("providers"));
-  ServiceLoader<Spi> load=ServiceLoader.load(Spi.class,getClass().getClassLoader());
-  loadSPIs(pm,load);
+  loadSPIs(pm,pm.loadSpis());
   for (  Map<String,ProviderFactory> factories : factoriesMap.values()) {
     for (    ProviderFactory factory : factories.values()) {
       factory.postInit(this);

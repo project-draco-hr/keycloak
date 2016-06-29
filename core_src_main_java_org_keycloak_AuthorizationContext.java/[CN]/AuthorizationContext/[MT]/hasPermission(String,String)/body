@@ -1,0 +1,14 @@
+{
+  for (  Permission permission : authzToken.getAuthorization().getPermissions()) {
+    for (    PathConfig pathHolder : this.paths) {
+      if (pathHolder.getName().equals(resourceName)) {
+        if (pathHolder.getId().equals(permission.getResourceSetId())) {
+          if (permission.getScopes().contains(scopeName)) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
+}

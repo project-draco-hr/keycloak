@@ -1,0 +1,12 @@
+{
+  LOGGER.info("Querying the server for all resources associated with this application.");
+  List<PathConfig> paths=new ArrayList<>();
+  for (  String id : protectedResource.findAll()) {
+    RegistrationResponse response=protectedResource.findById(id);
+    ResourceRepresentation resourceDescription=response.getResourceDescription();
+    if (resourceDescription.getUri() != null) {
+      paths.add(createPathConfig(resourceDescription));
+    }
+  }
+  return paths;
+}

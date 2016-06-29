@@ -1,0 +1,14 @@
+{
+  try {
+    return this.http.<EntitlementResponse>post("/authz/entitlement/" + resourceServerId).authorizationBearer(this.eat).json(JsonSerialization.writeValueAsBytes(request)).response().json(EntitlementResponse.class).execute();
+  }
+ catch (  HttpResponseException e) {
+    if (403 == e.getStatusCode()) {
+      throw new AuthorizationDeniedException(e);
+    }
+    throw new RuntimeException("Failed to obtain entitlements.",e);
+  }
+catch (  Exception e) {
+    throw new RuntimeException("Failed to obtain entitlements.",e);
+  }
+}

@@ -1,0 +1,17 @@
+{
+  PolicyEnforcer policyEnforcer=this.deployment.getPolicyEnforcer();
+  if (policyEnforcer == null) {
+    log.debugv("Policy enforcement is disabled.");
+    return true;
+  }
+  try {
+    OIDCHttpFacade facade=(OIDCHttpFacade)this.facade;
+    AuthorizationContext authorizationContext=policyEnforcer.enforce(facade);
+    RefreshableKeycloakSecurityContext session=(RefreshableKeycloakSecurityContext)facade.getSecurityContext();
+    session.setAuthorizationContext(authorizationContext);
+    return authorizationContext.isGranted();
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Failed to enforce policy decisions.",e);
+  }
+}

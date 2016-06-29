@@ -1,0 +1,12 @@
+{
+  Map<String,Spi> spiMap=new HashMap<>();
+  for (  ProviderLoader loader : loaders) {
+    List<Spi> spis=loader.loadSpis();
+    if (spis != null) {
+      for (      Spi spi : spis) {
+        spiMap.put(spi.getName(),spi);
+      }
+    }
+  }
+  return new LinkedList<>(spiMap.values());
+}

@@ -1,0 +1,10 @@
+{
+  Database database=DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+  if (defaultSchema != null) {
+    database.setDefaultSchemaName(defaultSchema);
+  }
+  ResourceAccessor resourceAccessor=new ClassLoaderResourceAccessor(classloader);
+  database.setDatabaseChangeLogTableName(changelogTableName);
+  logger.debugf("Using changelog file %s and changelogTableName %s",changelogLocation,database.getDatabaseChangeLogTableName());
+  return new Liquibase(changelogLocation,resourceAccessor,database);
+}

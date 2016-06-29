@@ -1,0 +1,9 @@
+{
+  KeycloakIdentity identity=createIdentity();
+  if (!identity.hasRole("uma_protection")) {
+    throw new ErrorResponseException(OAuthErrorException.INVALID_SCOPE,"Requires uma_protection scope.",Status.FORBIDDEN);
+  }
+  PermissionService resource=new PermissionService(identity,getResourceServer(identity),this.authorization);
+  ResteasyProviderFactory.getInstance().injectProperties(resource);
+  return resource;
+}

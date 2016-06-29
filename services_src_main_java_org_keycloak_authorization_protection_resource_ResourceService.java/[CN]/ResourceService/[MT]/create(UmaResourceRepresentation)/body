@@ -1,0 +1,9 @@
+{
+  checkResourceServerSettings();
+  ResourceRepresentation resource=toResourceRepresentation(umaResource);
+  Response response=this.resourceManager.create(resource);
+  if (response.getEntity() instanceof ResourceRepresentation) {
+    return Response.status(Status.CREATED).entity(toUmaRepresentation((ResourceRepresentation)response.getEntity())).build();
+  }
+  return response;
+}

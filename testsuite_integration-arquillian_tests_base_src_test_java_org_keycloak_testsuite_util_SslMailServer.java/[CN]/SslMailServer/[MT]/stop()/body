@@ -1,0 +1,15 @@
+{
+  if (smtpServer != null) {
+    log.info("Stopping mail server (" + smtpServer.getHostName() + ":"+ smtpServer.getPort()+ ")");
+    Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler(){
+      @Override public void uncaughtException(      Thread t,      Throwable e){
+        if (!(e.getCause() instanceof SocketException && e.getStackTrace()[0].getClassName().equals("org.subethamail.smtp.server.Session"))) {
+          log.error("Exception in thread \"" + t.getName() + "\" ");
+          log.error(e.getMessage(),e);
+        }
+      }
+    }
+);
+    smtpServer.stop();
+  }
+}

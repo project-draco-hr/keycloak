@@ -1,0 +1,15 @@
+{
+  UserModel clientUser=null;
+  if (this.accessToken.getClientSession() != null) {
+    ClientSessionModel clientSession=this.keycloakSession.sessions().getClientSession(this.accessToken.getClientSession());
+    clientUser=this.keycloakSession.users().getUserByServiceAccountClient(clientSession.getClient());
+  }
+ else   if (this.accessToken.getIssuedFor() != null) {
+    ClientModel clientModel=this.keycloakSession.realms().getClientById(this.accessToken.getIssuedFor(),this.realm);
+    clientUser=this.keycloakSession.users().getUserByServiceAccountClient(clientModel);
+  }
+  if (clientUser == null) {
+    return false;
+  }
+  return this.accessToken.getSubject().equals(clientUser.getId());
+}

@@ -1,0 +1,11 @@
+{
+  Album album=this.entityManager.find(Album.class,Long.valueOf(id));
+  try {
+    deleteProtectedResource(album);
+    this.entityManager.remove(album);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Could not delete album.",e);
+  }
+  return Response.ok().build();
+}

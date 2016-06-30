@@ -1,0 +1,9 @@
+{
+  ResourceRepresentation newResource=new ResourceRepresentation();
+  newResource.setName(name);
+  ResourcesResource resources=getClientResource().authorization().resources();
+  Response response=resources.create(newResource);
+  assertEquals(Response.Status.CREATED.getStatusCode(),response.getStatus());
+  ResourceRepresentation stored=response.readEntity(ResourceRepresentation.class);
+  return resources.resource(stored.getId());
+}

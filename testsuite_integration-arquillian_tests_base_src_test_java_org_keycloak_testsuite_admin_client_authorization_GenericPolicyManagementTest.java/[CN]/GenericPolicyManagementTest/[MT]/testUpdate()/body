@@ -1,0 +1,34 @@
+{
+  PolicyResource policyResource=createTestingPolicy();
+  PolicyRepresentation resource=policyResource.toRepresentation();
+  resource.setName("changed");
+  resource.setLogic(Logic.NEGATIVE);
+  resource.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
+  resource.getConfig().put("configA","changed configuration for A");
+  resource.getConfig().remove("configB");
+  resource.getConfig().put("configC","changed configuration for C");
+  policyResource.update(resource);
+  resource=policyResource.toRepresentation();
+  assertEquals("changed",resource.getName());
+  assertEquals(Logic.NEGATIVE,resource.getLogic());
+  assertEquals(DecisionStrategy.AFFIRMATIVE,resource.getDecisionStrategy());
+  assertEquals("changed configuration for A",resource.getConfig().get("configA"));
+  assertNull(resource.getConfig().get("configB"));
+  assertEquals("changed configuration for C",resource.getConfig().get("configC"));
+  Map<String,String> config=resource.getConfig();
+  config.put("applyPolicies",buildConfigOption(findPolicyByName("Test Associated C").getId()));
+  config.put("resources",buildConfigOption(findResourceByName("Test Resource B").getId()));
+  config.put("scopes",buildConfigOption(findScopeByName("Test Scope A").getId()));
+  policyResource.update(resource);
+  resource=policyResource.toRepresentation();
+  config=resource.getConfig();
+  assertAssociatedPolicy("Test Associated C",resource);
+  assertFalse(config.get("applyPolicies").contains(findPolicyByName("Test Associated A").getId()));
+  assertFalse(config.get("applyPolicies").contains(findPolicyByName("Test Associated B").getId()));
+  assertAssociatedResource("Test Resource B",resource);
+  assertFalse(config.get("resources").contains(findResourceByName("Test Resource A").getId()));
+  assertFalse(config.get("resources").contains(findResourceByName("Test Resource C").getId()));
+  assertAssociatedScope("Test Scope A",resource);
+  assertFalse(config.get("scopes").contains(findScopeByName("Test Scope B").getId()));
+  assertFalse(config.get("scopes").contains(findScopeByName("Test Scope C").getId()));
+}

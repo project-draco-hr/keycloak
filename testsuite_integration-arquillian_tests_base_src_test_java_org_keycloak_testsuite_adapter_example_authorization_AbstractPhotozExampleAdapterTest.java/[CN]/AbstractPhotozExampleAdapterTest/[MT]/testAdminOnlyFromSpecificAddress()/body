@@ -1,0 +1,21 @@
+{
+  try {
+    this.deployer.deploy(RESOURCE_SERVER_ID);
+    this.clientPage.login("admin","admin");
+    this.clientPage.navigateToAdminAlbum();
+    assertFalse(this.clientPage.wasDenied());
+    for (    PolicyRepresentation policy : getAuthorizationResource().policies().policies()) {
+      if ("Only From a Specific Client Address".equals(policy.getName())) {
+        String code=policy.getConfig().get("code");
+        policy.getConfig().put("code",code.replaceAll("127.0.0.1","127.3.3.3"));
+        getAuthorizationResource().policies().policy(policy.getId()).update(policy);
+      }
+    }
+    this.clientPage.login("admin","admin");
+    this.clientPage.navigateToAdminAlbum();
+    assertTrue(this.clientPage.wasDenied());
+  }
+  finally {
+    this.deployer.undeploy(RESOURCE_SERVER_ID);
+  }
+}

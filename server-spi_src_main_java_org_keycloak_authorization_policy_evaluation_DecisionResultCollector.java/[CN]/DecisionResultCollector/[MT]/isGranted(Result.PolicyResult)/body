@@ -9,17 +9,17 @@
     }
   }
   Policy policy=policyResult.getPolicy();
-  Policy.DecisionStrategy decisionStrategy=policy.getDecisionStrategy();
+  DecisionStrategy decisionStrategy=policy.getDecisionStrategy();
   if (decisionStrategy == null) {
-    decisionStrategy=Policy.DecisionStrategy.UNANIMOUS;
+    decisionStrategy=DecisionStrategy.UNANIMOUS;
   }
-  if (Policy.DecisionStrategy.AFFIRMATIVE.equals(decisionStrategy) && grantCount > 0) {
+  if (DecisionStrategy.AFFIRMATIVE.equals(decisionStrategy) && grantCount > 0) {
     return true;
   }
- else   if (Policy.DecisionStrategy.UNANIMOUS.equals(decisionStrategy) && denyCount == 0) {
+ else   if (DecisionStrategy.UNANIMOUS.equals(decisionStrategy) && denyCount == 0) {
     return true;
   }
- else   if (Policy.DecisionStrategy.CONSENSUS.equals(decisionStrategy)) {
+ else   if (DecisionStrategy.CONSENSUS.equals(decisionStrategy)) {
     if (grantCount > denyCount) {
       return true;
     }

@@ -1,0 +1,10 @@
+{
+  ScopeRepresentation newScope=new ScopeRepresentation();
+  newScope.setName(name);
+  newScope.setIconUri(iconUri);
+  ResourceScopesResource resources=getClientResource().authorization().scopes();
+  Response response=resources.create(newScope);
+  assertEquals(Response.Status.CREATED.getStatusCode(),response.getStatus());
+  ScopeRepresentation stored=response.readEntity(ScopeRepresentation.class);
+  return resources.scope(stored.getId());
+}

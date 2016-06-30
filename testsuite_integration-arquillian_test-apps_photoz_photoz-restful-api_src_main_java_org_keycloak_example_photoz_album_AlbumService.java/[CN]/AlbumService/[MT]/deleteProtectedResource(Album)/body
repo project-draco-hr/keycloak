@@ -1,0 +1,14 @@
+{
+  String uri="/album/" + album.getId();
+  try {
+    ProtectionResource protection=getAuthzClient().protection();
+    Set<String> search=protection.resource().findByFilter("uri=" + uri);
+    if (search.isEmpty()) {
+      throw new RuntimeException("Could not find protected resource with URI [" + uri + "]");
+    }
+    protection.resource().delete(search.iterator().next());
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Could not search protected resource.",e);
+  }
+}

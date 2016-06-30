@@ -1,0 +1,12 @@
+{
+  ResourceRepresentation newResource=new ResourceRepresentation();
+  newResource.setName("Test Resource");
+  newResource.setUri("/test/*");
+  newResource.setType("test-resource");
+  newResource.setIconUri("icon-test-resource");
+  ResourcesResource resources=getClientResource().authorization().resources();
+  Response response=resources.create(newResource);
+  assertEquals(Response.Status.CREATED.getStatusCode(),response.getStatus());
+  ResourceRepresentation stored=response.readEntity(ResourceRepresentation.class);
+  return resources.resource(stored.getId());
+}

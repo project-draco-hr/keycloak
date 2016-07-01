@@ -1,0 +1,15 @@
+{
+  String accessToken=getAccessToken();
+  Client client=ClientBuilder.newClient();
+  try {
+    Response response=client.target(APP_SERVER_BASE_URL + "/customer-db").request().get();
+    Assert.assertEquals(401,response.getStatus());
+    response.close();
+    response=client.target(APP_SERVER_BASE_URL + "/customer-db").queryParam("access_token",accessToken).request().get();
+    Assert.assertEquals(200,response.getStatus());
+    response.close();
+  }
+  finally {
+    client.close();
+  }
+}

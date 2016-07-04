@@ -5,7 +5,10 @@
   Properties m=new Properties();
   URL url=classLoader.getResource(this.messageRoot + baseBundlename + "_"+ locale.toString()+ ".properties");
   if (url != null) {
-    m.load(url.openStream());
-  }
+    Charset encoding=PropertiesUtil.detectEncoding(url.openStream());
+    try (Reader reader=new InputStreamReader(url.openStream(),encoding)){
+      m.load(reader);
+    }
+   }
   return m;
 }

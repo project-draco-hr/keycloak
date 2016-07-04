@@ -5,8 +5,11 @@
   this.properties=new Properties();
   File propertiesFile=new File(themeDir,"theme.properties");
   if (propertiesFile.isFile()) {
-    properties.load(new FileInputStream(propertiesFile));
-    parentName=properties.getProperty("parent");
+    Charset encoding=PropertiesUtil.detectEncoding(new FileInputStream(propertiesFile));
+    try (Reader reader=new InputStreamReader(new FileInputStream(propertiesFile),encoding)){
+      properties.load(reader);
+    }
+     parentName=properties.getProperty("parent");
     importName=properties.getProperty("import");
   }
   resourcesDir=new File(themeDir,"resources");

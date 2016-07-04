@@ -1,0 +1,18 @@
+{
+  try (BufferedReader br=new BufferedReader(new InputStreamReader(in,DEFAULT_ENCODING))){
+    String firstLine=br.readLine();
+    if (firstLine != null) {
+      Matcher matcher=DETECT_ENCODING_PATTERN.matcher(firstLine);
+      if (matcher.find()) {
+        String encoding=matcher.group(1);
+        if (Charset.isSupported(encoding)) {
+          return Charset.forName(encoding);
+        }
+ else {
+          logger.warnv("Unsupported encoding: {0}",encoding);
+        }
+      }
+    }
+  }
+   return DEFAULT_ENCODING;
+}

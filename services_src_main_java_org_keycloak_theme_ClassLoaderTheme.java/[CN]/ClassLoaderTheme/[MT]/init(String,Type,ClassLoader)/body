@@ -9,8 +9,11 @@
   this.properties=new Properties();
   URL p=classLoader.getResource(themeRoot + "theme.properties");
   if (p != null) {
-    properties.load(p.openStream());
-    this.parentName=properties.getProperty("parent");
+    Charset encoding=PropertiesUtil.detectEncoding(p.openStream());
+    try (Reader reader=new InputStreamReader(p.openStream(),encoding)){
+      properties.load(reader);
+    }
+     this.parentName=properties.getProperty("parent");
     this.importName=properties.getProperty("import");
   }
  else {

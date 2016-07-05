@@ -2,6 +2,14 @@
   try {
     cacheManager=(EmbeddedCacheManager)new InitialContext().lookup(cacheContainerLookup);
     containerManaged=true;
+    cacheManager.defineConfiguration(InfinispanConnectionProvider.REALM_REVISIONS_CACHE_NAME,getRevisionCacheConfig(true,InfinispanConnectionProvider.REALM_REVISIONS_CACHE_DEFAULT_MAX));
+    cacheManager.getCache(InfinispanConnectionProvider.REALM_CACHE_NAME,true);
+    long maxEntries=cacheManager.getCache(InfinispanConnectionProvider.USER_CACHE_NAME).getCacheConfiguration().eviction().maxEntries();
+    if (maxEntries <= 0) {
+      maxEntries=InfinispanConnectionProvider.USER_REVISIONS_CACHE_DEFAULT_MAX;
+    }
+    cacheManager.defineConfiguration(InfinispanConnectionProvider.USER_REVISIONS_CACHE_NAME,getRevisionCacheConfig(true,maxEntries));
+    cacheManager.getCache(InfinispanConnectionProvider.USER_REVISIONS_CACHE_NAME,true);
     logger.debugv("Using container managed Infinispan cache container, lookup={1}",cacheContainerLookup);
   }
  catch (  Exception e) {

@@ -1,0 +1,10 @@
+{
+  ConfigurationBuilder cb=new ConfigurationBuilder();
+  cb.invocationBatching().enable().transaction().transactionMode(TransactionMode.TRANSACTIONAL);
+  if (!managed) {
+    cb.transaction().transactionManagerLookup(new DummyTransactionManagerLookup());
+  }
+  cb.transaction().lockingMode(LockingMode.PESSIMISTIC);
+  cb.eviction().strategy(EvictionStrategy.LRU).type(EvictionType.COUNT).size(maxEntries);
+  return cb.build();
+}

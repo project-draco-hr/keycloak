@@ -1,0 +1,8 @@
+{
+  HttpHeaders headers=request.getHttpHeaders();
+  String accessToken=this.appAuthManager.extractAuthorizationHeaderToken(headers);
+  if (accessToken == null) {
+    accessToken=request.getDecodedFormParameters().getFirst("access_token");
+  }
+  return issueUserInfo(accessToken);
+}

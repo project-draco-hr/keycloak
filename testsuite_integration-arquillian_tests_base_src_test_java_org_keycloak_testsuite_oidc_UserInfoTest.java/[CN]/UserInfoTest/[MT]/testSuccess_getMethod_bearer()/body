@@ -2,10 +2,8 @@
   Client client=ClientBuilder.newClient();
   try {
     AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(client);
-    testingClient.testing().removeUserSessions("test");
     Response response=executeUserInfoRequest_getMethod(client,accessTokenResponse.getToken());
-    assertEquals(Status.FORBIDDEN.getStatusCode(),response.getStatus());
-    response.close();
+    testSuccessfulUserInfoResponse(response);
   }
   finally {
     client.close();

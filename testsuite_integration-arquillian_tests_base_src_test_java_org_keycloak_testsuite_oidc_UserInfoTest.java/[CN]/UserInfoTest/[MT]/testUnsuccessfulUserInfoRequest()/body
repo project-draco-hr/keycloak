@@ -1,5 +1,11 @@
 {
-  Response response=executeUserInfoRequest("bad");
-  response.close();
-  assertEquals(Status.FORBIDDEN.getStatusCode(),response.getStatus());
+  Client client=ClientBuilder.newClient();
+  try {
+    Response response=executeUserInfoRequest_getMethod(client,"bad");
+    response.close();
+    assertEquals(Status.FORBIDDEN.getStatusCode(),response.getStatus());
+  }
+  finally {
+    client.close();
+  }
 }

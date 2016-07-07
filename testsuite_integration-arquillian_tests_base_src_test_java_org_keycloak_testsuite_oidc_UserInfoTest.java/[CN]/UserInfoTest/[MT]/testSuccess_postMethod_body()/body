@@ -1,0 +1,14 @@
+{
+  Client client=ClientBuilder.newClient();
+  try {
+    AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(client);
+    Form form=new Form();
+    form.param("access_token",accessTokenResponse.getToken());
+    WebTarget userInfoTarget=getUserInfoWebTarget(client);
+    Response response=userInfoTarget.request().post(Entity.form(form));
+    testSuccessfulUserInfoResponse(response);
+  }
+  finally {
+    client.close();
+  }
+}

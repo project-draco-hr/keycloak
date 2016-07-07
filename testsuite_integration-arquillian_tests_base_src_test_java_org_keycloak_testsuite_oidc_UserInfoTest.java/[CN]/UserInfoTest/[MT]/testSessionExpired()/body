@@ -1,12 +1,13 @@
 {
   Client client=ClientBuilder.newClient();
-  UriBuilder builder=UriBuilder.fromUri(AUTH_SERVER_ROOT);
-  URI grantUri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
-  WebTarget grantTarget=client.target(grantUri);
-  AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(grantTarget);
-  testingClient.testing().removeUserSessions("test");
-  Response response=executeUserInfoRequest(accessTokenResponse.getToken());
-  assertEquals(Status.FORBIDDEN.getStatusCode(),response.getStatus());
-  response.close();
-  client.close();
+  try {
+    AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(client);
+    testingClient.testing().removeUserSessions("test");
+    Response response=executeUserInfoRequest_getMethod(client,accessTokenResponse.getToken());
+    assertEquals(Status.FORBIDDEN.getStatusCode(),response.getStatus());
+    response.close();
+  }
+  finally {
+    client.close();
+  }
 }

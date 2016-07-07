@@ -2,7 +2,5 @@
   UriBuilder builder=UriBuilder.fromUri(AUTH_SERVER_ROOT);
   UriBuilder uriBuilder=OIDCLoginProtocolService.tokenServiceBaseUrl(builder);
   URI userInfoUri=uriBuilder.path(OIDCLoginProtocolService.class,"issueUserInfo").build("test");
-  Client client=ClientBuilder.newClient();
-  WebTarget userInfoTarget=client.target(userInfoUri);
-  return userInfoTarget.request().header(HttpHeaders.AUTHORIZATION,"bearer " + accessToken).get();
+  return client.target(userInfoUri);
 }

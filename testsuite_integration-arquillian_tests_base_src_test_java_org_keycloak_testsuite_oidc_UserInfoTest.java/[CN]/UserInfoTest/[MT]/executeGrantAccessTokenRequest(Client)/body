@@ -1,4 +1,7 @@
 {
+  UriBuilder builder=UriBuilder.fromUri(AUTH_SERVER_ROOT);
+  URI grantUri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
+  WebTarget grantTarget=client.target(grantUri);
   String header=BasicAuthHelper.createHeader("test-app","password");
   Form form=new Form();
   form.param(OAuth2Constants.GRANT_TYPE,OAuth2Constants.PASSWORD).param("username","test-user@localhost").param("password","password");

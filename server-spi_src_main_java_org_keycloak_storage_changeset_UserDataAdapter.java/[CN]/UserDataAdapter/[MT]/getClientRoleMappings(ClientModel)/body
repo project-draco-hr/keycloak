@@ -1,0 +1,14 @@
+{
+  Set<RoleModel> roleMappings=getRoleMappings();
+  Set<RoleModel> roles=new HashSet<RoleModel>();
+  for (  RoleModel role : roleMappings) {
+    RoleContainerModel container=role.getContainer();
+    if (container instanceof ClientModel) {
+      ClientModel appModel=(ClientModel)container;
+      if (appModel.getId().equals(app.getId())) {
+        roles.add(role);
+      }
+    }
+  }
+  return roles;
+}

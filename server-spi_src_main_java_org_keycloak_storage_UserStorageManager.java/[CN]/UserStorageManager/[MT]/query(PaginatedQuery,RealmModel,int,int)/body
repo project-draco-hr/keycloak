@@ -1,0 +1,37 @@
+{
+  List<UserModel> results=new LinkedList<UserModel>();
+  if (maxResults == 0)   return results;
+  List<UserQueryProvider> storageProviders=getStorageProviders(realm,UserQueryProvider.class);
+  LinkedList<UserQueryProvider> providers=new LinkedList<>();
+  if (providers.isEmpty()) {
+    return pagedQuery.query(localStorage(),firstResult,maxResults);
+  }
+  providers.add(localStorage());
+  providers.addAll(storageProviders);
+  int leftToRead=maxResults;
+  int leftToFirstResult=firstResult;
+  Iterator<UserQueryProvider> it=providers.iterator();
+  while (it.hasNext() && leftToRead != 0) {
+    UserQueryProvider provider=it.next();
+    boolean exhausted=false;
+    int index=0;
+    if (leftToFirstResult > 0) {
+      do {
+        int toRead=Math.min(50,leftToFirstResult);
+        List<UserModel> tmp=pagedQuery.query(provider,index,toRead);
+        leftToFirstResult-=tmp.size();
+        index+=tmp.size();
+        if (tmp.size() < toRead) {
+          exhausted=true;
+          break;
+        }
+      }
+ while (leftToFirstResult > 0);
+    }
+    if (exhausted)     continue;
+    List<UserModel> tmp=pagedQuery.query(provider,index,leftToRead);
+    results.addAll(tmp);
+    if (leftToRead > 0)     leftToRead-=tmp.size();
+  }
+  return results;
+}

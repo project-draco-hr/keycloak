@@ -5,7 +5,7 @@
     throw new NotFoundException("User not found");
   }
   ClientModel client=realm.getClientByClientId(clientId);
-  boolean revokedConsent=user.revokeConsentForClient(client.getId());
+  boolean revokedConsent=session.users().revokeConsentForClient(realm,user,client.getId());
   boolean revokedOfflineToken=new UserSessionManager(session).revokeOfflineToken(user,client);
   if (revokedConsent) {
     AuthenticationManager.backchannelUserFromClient(session,realm,user,client,uriInfo,headers);

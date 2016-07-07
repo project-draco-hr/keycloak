@@ -1,0 +1,18 @@
+{
+  KeycloakModelUtils.ensureUniqueDisplayName(model.getDisplayName(),model,getStorageProviders());
+  Iterator<StorageProviderEntity> it=realm.getStorageProviders().iterator();
+  while (it.hasNext()) {
+    StorageProviderEntity entity=it.next();
+    if (entity.getId().equals(model.getId())) {
+      String displayName=model.getDisplayName();
+      if (displayName != null) {
+        entity.setDisplayName(model.getDisplayName());
+      }
+      entity.setConfig(model.getConfig());
+      entity.setPriority(model.getPriority());
+      entity.setProviderName(model.getProviderName());
+      entity.setPriority(model.getPriority());
+      break;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  TypedQuery<FederatedUserConsentEntity> query=em.createNamedQuery("userFederatedConsentsByUser",FederatedUserConsentEntity.class);
+  query.setParameter("userId",user.getId());
+  List<FederatedUserConsentEntity> results=query.getResultList();
+  List<UserConsentModel> consents=new ArrayList<UserConsentModel>();
+  for (  FederatedUserConsentEntity entity : results) {
+    UserConsentModel model=toConsentModel(realm,entity);
+    consents.add(model);
+  }
+  return consents;
+}

@@ -1,0 +1,9 @@
+{
+  if (isMemberOf(realm,user,group))   return;
+  FederatedUserGroupMembershipEntity entity=new FederatedUserGroupMembershipEntity();
+  entity.setUserId(user.getId());
+  entity.setStorageProviderId(StorageId.resolveProviderId(user));
+  entity.setGroupId(group.getId());
+  entity.setRealmId(realm.getId());
+  em.persist(entity);
+}

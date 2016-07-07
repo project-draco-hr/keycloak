@@ -1,0 +1,10 @@
+{
+  String sessionId=loginEvent.getSessionId();
+  String codeId=loginEvent.getDetails().get(Details.CODE_ID);
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
+  Assert.assertEquals(200,response.getStatusCode());
+  IDToken idToken=oauth.verifyIDToken(response.getIdToken());
+  events.expectCodeToToken(codeId,sessionId).assertEvent();
+  return idToken;
+}

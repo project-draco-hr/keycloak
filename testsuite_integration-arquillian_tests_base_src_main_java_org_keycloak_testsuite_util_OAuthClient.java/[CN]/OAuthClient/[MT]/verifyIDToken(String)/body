@@ -1,0 +1,10 @@
+{
+  try {
+    IDToken idToken=RSATokenVerifier.verifyToken(token,getRealmPublicKey(realm),baseUrl + "/realms/" + realm,true,false);
+    Assert.assertEquals(TokenUtil.TOKEN_TYPE_ID,idToken.getType());
+    return idToken;
+  }
+ catch (  VerificationException e) {
+    throw new RuntimeException("Failed to verify token",e);
+  }
+}

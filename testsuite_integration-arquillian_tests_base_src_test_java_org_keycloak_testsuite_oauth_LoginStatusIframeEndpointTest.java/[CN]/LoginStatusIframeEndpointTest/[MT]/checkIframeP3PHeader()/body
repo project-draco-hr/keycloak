@@ -2,7 +2,8 @@
   CookieStore cookieStore=new BasicCookieStore();
   CloseableHttpClient client=HttpClients.custom().setDefaultCookieStore(cookieStore).build();
   try {
-    HttpGet get=new HttpGet(suiteContext.getAuthServerInfo().getContextRoot() + "/auth/realms/master/protocol/openid-connect/auth?response_type=code&client_id=" + Constants.ADMIN_CONSOLE_CLIENT_ID);
+    String redirectUri=URLEncoder.encode(suiteContext.getAuthServerInfo().getContextRoot() + "/auth/admin/master/console","UTF-8");
+    HttpGet get=new HttpGet(suiteContext.getAuthServerInfo().getContextRoot() + "/auth/realms/master/protocol/openid-connect/auth?response_type=code&client_id=" + Constants.ADMIN_CONSOLE_CLIENT_ID+ "&redirect_uri="+ redirectUri);
     CloseableHttpResponse response=client.execute(get);
     String s=IOUtils.toString(response.getEntity().getContent());
     response.close();

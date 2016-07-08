@@ -1,0 +1,29 @@
+{
+  CloseableHttpClient client=new DefaultHttpClient();
+  try {
+    HttpPost post=new HttpPost(oauth.getAccessTokenUrl());
+    List<NameValuePair> parameters=new LinkedList<NameValuePair>();
+    parameters.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE,OAuth2Constants.AUTHORIZATION_CODE));
+    parameters.add(new BasicNameValuePair(OAuth2Constants.CODE,code));
+    parameters.add(new BasicNameValuePair(OAuth2Constants.REDIRECT_URI,oauth.getRedirectUri()));
+    parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID,oauth.getClientId()));
+    parameters.add(new BasicNameValuePair(OAuth2Constants.CLIENT_SECRET,clientSecret));
+    UrlEncodedFormEntity formEntity;
+    try {
+      formEntity=new UrlEncodedFormEntity(parameters,"UTF-8");
+    }
+ catch (    UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    post.setEntity(formEntity);
+    try {
+      return new OAuthClient.AccessTokenResponse(client.execute(post));
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to retrieve access token",e);
+    }
+  }
+  finally {
+    oauth.closeClient(client);
+  }
+}

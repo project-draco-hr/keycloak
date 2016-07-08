@@ -1,0 +1,16 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  EventRepresentation loginEvent=events.expectLogin().assertEvent();
+  String sessionId=loginEvent.getSessionId();
+  String codeId=loginEvent.getDetails().get(Details.CODE_ID);
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  OAuthClient.AccessTokenResponse response=doAccessTokenRequestPostAuth(code,"password");
+  assertEquals(200,response.getStatusCode());
+  Assert.assertThat(response.getExpiresIn(),allOf(greaterThanOrEqualTo(250),lessThanOrEqualTo(300)));
+  Assert.assertThat(response.getRefreshExpiresIn(),allOf(greaterThanOrEqualTo(1750),lessThanOrEqualTo(1800)));
+  AccessToken token=oauth.verifyToken(response.getAccessToken());
+  EventRepresentation event=events.expectCodeToToken(codeId,sessionId).assertEvent();
+  assertEquals(token.getId(),event.getDetails().get(Details.TOKEN_ID));
+  assertEquals(oauth.verifyRefreshToken(response.getRefreshToken()).getId(),event.getDetails().get(Details.REFRESH_TOKEN_ID));
+  assertEquals(sessionId,token.getSessionState());
+}

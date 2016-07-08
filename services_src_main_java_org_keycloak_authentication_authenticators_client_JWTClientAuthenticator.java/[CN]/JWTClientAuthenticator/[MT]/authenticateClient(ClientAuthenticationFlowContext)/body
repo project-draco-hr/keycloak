@@ -64,6 +64,9 @@
     if (!token.isActive()) {
       throw new RuntimeException("Token is not active");
     }
+    if (token.getExpiration() == 0 && token.getIssuedAt() + 10 < Time.currentTime()) {
+      throw new RuntimeException("Token is not active");
+    }
     context.success();
   }
  catch (  Exception e) {

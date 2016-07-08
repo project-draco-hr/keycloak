@@ -6,12 +6,34 @@
   String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
   OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(200,response.getStatusCode());
-  events.clear();
-  response=oauth.doAccessTokenRequest(code,"password");
-  Assert.assertEquals(400,response.getStatusCode());
-  AssertEvents.ExpectedEvent expectedEvent=events.expectCodeToToken(codeId,null);
-  expectedEvent.error("invalid_code").removeDetail(Details.TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_TYPE).user((String)null);
-  expectedEvent.assertEvent();
-  events.clear();
-  RealmManager.realm(adminClient.realm("test")).accessCodeLifeSpan(60);
+  String accessToken=response.getAccessToken();
+  Client jaxrsClient=javax.ws.rs.client.ClientBuilder.newClient();
+  try {
+    Response userInfoResponse=UserInfoClientUtil.executeUserInfoRequest_getMethod(jaxrsClient,accessToken);
+    UserInfoClientUtil.testSuccessfulUserInfoResponse(userInfoResponse,"test-user@localhost","test-user@localhost");
+    String introspectionResponse=oauth.introspectAccessTokenWithClientCredential("test-app","password",accessToken);
+    ObjectMapper objectMapper=new ObjectMapper();
+    JsonNode jsonNode=objectMapper.readTree(introspectionResponse);
+    Assert.assertEquals(true,jsonNode.get("active").asBoolean());
+    Assert.assertEquals("test-user@localhost",jsonNode.get("email").asText());
+    events.clear();
+    response=oauth.doAccessTokenRequest(code,"password");
+    Assert.assertEquals(400,response.getStatusCode());
+    AssertEvents.ExpectedEvent expectedEvent=events.expectCodeToToken(codeId,null);
+    expectedEvent.error("invalid_code").removeDetail(Details.TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_ID).removeDetail(Details.REFRESH_TOKEN_TYPE).user((String)null);
+    expectedEvent.assertEvent();
+    userInfoResponse=UserInfoClientUtil.executeUserInfoRequest_getMethod(jaxrsClient,accessToken);
+    assertEquals(Response.Status.FORBIDDEN.getStatusCode(),userInfoResponse.getStatus());
+    userInfoResponse.close();
+    introspectionResponse=oauth.introspectAccessTokenWithClientCredential("test-app","password",accessToken);
+    objectMapper=new ObjectMapper();
+    jsonNode=objectMapper.readTree(introspectionResponse);
+    Assert.assertEquals(false,jsonNode.get("active").asBoolean());
+    Assert.assertNull(jsonNode.get("email"));
+    events.clear();
+    RealmManager.realm(adminClient.realm("test")).accessCodeLifeSpan(60);
+  }
+  finally {
+    jaxrsClient.close();
+  }
 }

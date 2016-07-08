@@ -3,7 +3,7 @@
   try {
     AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(client);
     testingClient.testing().removeUserSessions("test");
-    Response response=executeUserInfoRequest_getMethod(client,accessTokenResponse.getToken());
+    Response response=UserInfoClientUtil.executeUserInfoRequest_getMethod(client,accessTokenResponse.getToken());
     assertEquals(Status.FORBIDDEN.getStatusCode(),response.getStatus());
     response.close();
   }

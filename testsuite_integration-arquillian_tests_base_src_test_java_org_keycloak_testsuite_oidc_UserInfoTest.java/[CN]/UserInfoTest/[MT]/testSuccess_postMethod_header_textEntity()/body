@@ -2,7 +2,8 @@
   Client client=ClientBuilder.newClient();
   try {
     AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(client);
-    Response response=executeUserInfoRequest_getMethod(client,accessTokenResponse.getToken());
+    WebTarget userInfoTarget=UserInfoClientUtil.getUserInfoWebTarget(client);
+    Response response=userInfoTarget.request().header(HttpHeaders.AUTHORIZATION,"bearer " + accessTokenResponse.getToken()).post(Entity.text(""));
     testSuccessfulUserInfoResponse(response);
   }
   finally {

@@ -1,10 +1,6 @@
 {
-  Iterator<UserAttributeEntity> it=user.getAttributes().iterator();
-  while (it.hasNext()) {
-    UserAttributeEntity attr=it.next();
-    if (attr.getName().equals(name)) {
-      it.remove();
-      em.remove(attr);
-    }
-  }
+  Query query=em.createNamedQuery("deleteUserAttributesByNameAndUser");
+  query.setParameter("name",name);
+  query.setParameter("userId",user.getId());
+  int numUpdated=query.executeUpdate();
 }

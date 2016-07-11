@@ -15,16 +15,16 @@
         @Override public void run(        KeycloakSession session){
           try {
             transactionsCounter.countDown();
-            System.out.println("transaction1 started");
+            logger.info("transaction1 started");
             transactionsCounter.await();
             RealmModel realm=session.realms().getRealmByName("original");
             ClientModel client=session.realms().getClientByClientId("client",realm);
-            System.out.println("transaction1: Read client finished");
+            logger.info("transaction1: Read client finished");
             readLatch.countDown();
             updateLatch.await();
-            System.out.println("transaction1: Going to read client again");
+            logger.info("transaction1: Going to read client again");
             client=session.realms().getClientByClientId("client",realm);
-            System.out.println("transaction1: secret: " + client.getSecret());
+            logger.info("transaction1: secret: " + client.getSecret());
           }
  catch (          Exception e) {
             throw new RuntimeException(e);
@@ -41,10 +41,10 @@
         @Override public void run(        KeycloakSession session){
           try {
             transactionsCounter.countDown();
-            System.out.println("transaction2 started");
+            logger.info("transaction2 started");
             transactionsCounter.await();
             readLatch.await();
-            System.out.println("transaction2: Going to update client secret");
+            logger.info("transaction2: Going to update client secret");
             RealmModel realm=session.realms().getRealmByName("original");
             ClientModel client=session.realms().getClientByClientId("client",realm);
             client.setSecret("new");
@@ -55,7 +55,7 @@
         }
       }
 );
-      System.out.println("transaction2: commited");
+      logger.info("transaction2: commited");
       updateLatch.countDown();
     }
   }
@@ -64,14 +64,14 @@
   thread2.start();
   thread1.join();
   thread2.join();
-  System.out.println("after thread join");
+  logger.info("after thread join");
   commit();
   session=realmManager.getSession();
   realm=session.realms().getRealmByName("original");
   ClientModel clientFromCache=session.realms().getClientById(clientDBId,realm);
   ClientModel clientFromDB=session.getProvider(RealmProvider.class).getClientById(clientDBId,realm);
-  System.out.println("SECRET FROM DB : " + clientFromDB.getSecret());
-  System.out.println("SECRET FROM CACHE : " + clientFromCache.getSecret());
+  logger.info("SECRET FROM DB : " + clientFromDB.getSecret());
+  logger.info("SECRET FROM CACHE : " + clientFromCache.getSecret());
   Assert.assertEquals("new",clientFromDB.getSecret());
   Assert.assertEquals("new",clientFromCache.getSecret());
 }

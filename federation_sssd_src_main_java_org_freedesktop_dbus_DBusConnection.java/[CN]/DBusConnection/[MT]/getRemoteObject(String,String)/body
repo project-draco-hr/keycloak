@@ -1,0 +1,7 @@
+{
+  if (null == busname)   throw new DBusException(getString("nullBusName"));
+  if (null == objectpath)   throw new DBusException(getString("nullObjectPath"));
+  if ((!busname.matches(BUSNAME_REGEX) && !busname.matches(CONNID_REGEX)) || busname.length() > MAX_NAME_LENGTH)   throw new DBusException(getString("invalidBusName") + busname);
+  if (!objectpath.matches(OBJECT_REGEX) || objectpath.length() > MAX_NAME_LENGTH)   throw new DBusException(getString("invalidObjectPath") + objectpath);
+  return dynamicProxy(busname,objectpath);
+}

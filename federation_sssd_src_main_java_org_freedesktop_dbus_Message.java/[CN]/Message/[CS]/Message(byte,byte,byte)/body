@@ -1,0 +1,14 @@
+{
+  wiredata=new byte[BUFFERINCREMENT][];
+  headers=new HashMap<Byte,Object>();
+  big=(Endian.BIG == endian);
+  bytecounter=0;
+synchronized (Message.class) {
+    serial=++globalserial;
+  }
+  if (Debug.debug)   Debug.print(Debug.DEBUG,"Creating message with serial " + serial);
+  this.type=type;
+  this.flags=flags;
+  preallocate(4);
+  append("yyyy",endian,type,flags,Message.PROTOCOL);
+}

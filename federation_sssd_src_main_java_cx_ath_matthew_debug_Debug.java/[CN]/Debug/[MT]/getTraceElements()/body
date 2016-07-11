@@ -1,0 +1,25 @@
+{
+  String[] data=new String[]{"","",""};
+  try {
+    Method m=Thread.class.getMethod("getStackTrace",new Class[0]);
+    StackTraceElement[] stes=(StackTraceElement[])m.invoke(Thread.currentThread(),new Object[0]);
+    for (    StackTraceElement ste : stes) {
+      if (Debug.class.getName().equals(ste.getClassName()))       continue;
+      if (Thread.class.getName().equals(ste.getClassName()))       continue;
+      if (Method.class.getName().equals(ste.getClassName()))       continue;
+      if (ste.getClassName().startsWith("sun.reflect"))       continue;
+      data[0]=ste.getClassName();
+      data[1]=ste.getMethodName();
+      if (lines)       data[2]=" " + ste.getFileName() + ":"+ ste.getLineNumber();
+      break;
+    }
+  }
+ catch (  NoSuchMethodException NSMe) {
+    if (null != saveclass)     data[0]=saveclass.getName();
+  }
+catch (  IllegalAccessException IAe) {
+  }
+catch (  InvocationTargetException ITe) {
+  }
+  return data;
+}

@@ -1,0 +1,10 @@
+{
+  Class<? extends Object> ac=o.getClass();
+  if (!ac.isArray())   throw new IllegalArgumentException(getString("invalidArray"));
+  Class<? extends Object> cc=ac.getComponentType();
+  Class<? extends Object> ncc=primitiveToWrapper.get(cc);
+  if (null == ncc)   throw new IllegalArgumentException(getString("notPrimitiveType"));
+  T[] ns=(T[])Array.newInstance(ncc,Array.getLength(o));
+  for (int i=0; i < ns.length; i++)   ns[i]=(T)Array.get(o,i);
+  return ns;
+}

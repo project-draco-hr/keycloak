@@ -1,0 +1,88 @@
+{
+  if (null == dbus || "".equals(dbus) || 0 == limit)   return 0;
+  try {
+    int i=0;
+    for (; i < dbus.length() && (-1 == limit || limit > rv.size()); i++) switch (dbus.charAt(i)) {
+case Message.ArgumentType.STRUCT1:
+      int j=i + 1;
+    for (int c=1; c > 0; j++) {
+      if (')' == dbus.charAt(j))       c--;
+ else       if (Message.ArgumentType.STRUCT1 == dbus.charAt(j))       c++;
+    }
+  Vector<Type> contained=new Vector<Type>();
+int c=getJavaType(dbus.substring(i + 1,j - 1),contained,-1);
+rv.add(new DBusStructType(contained.toArray(new Type[0])));
+i=j;
+break;
+case Message.ArgumentType.ARRAY:
+if (Message.ArgumentType.DICT_ENTRY1 == dbus.charAt(i + 1)) {
+contained=new Vector<Type>();
+c=getJavaType(dbus.substring(i + 2),contained,2);
+rv.add(new DBusMapType(contained.get(0),contained.get(1)));
+i+=(c + 2);
+}
+ else {
+contained=new Vector<Type>();
+c=getJavaType(dbus.substring(i + 1),contained,1);
+rv.add(new DBusListType(contained.get(0)));
+i+=c;
+}
+break;
+case Message.ArgumentType.VARIANT:
+rv.add(Variant.class);
+break;
+case Message.ArgumentType.BOOLEAN:
+rv.add(Boolean.class);
+break;
+case Message.ArgumentType.INT16:
+rv.add(Short.class);
+break;
+case Message.ArgumentType.BYTE:
+rv.add(Byte.class);
+break;
+case Message.ArgumentType.OBJECT_PATH:
+rv.add(DBusInterface.class);
+break;
+case Message.ArgumentType.UINT16:
+rv.add(UInt16.class);
+break;
+case Message.ArgumentType.INT32:
+rv.add(Integer.class);
+break;
+case Message.ArgumentType.UINT32:
+rv.add(UInt32.class);
+break;
+case Message.ArgumentType.INT64:
+rv.add(Long.class);
+break;
+case Message.ArgumentType.UINT64:
+rv.add(UInt64.class);
+break;
+case Message.ArgumentType.DOUBLE:
+rv.add(Double.class);
+break;
+case Message.ArgumentType.FLOAT:
+rv.add(Float.class);
+break;
+case Message.ArgumentType.STRING:
+rv.add(String.class);
+break;
+case Message.ArgumentType.SIGNATURE:
+rv.add(Type[].class);
+break;
+case Message.ArgumentType.DICT_ENTRY1:
+rv.add(Map.Entry.class);
+contained=new Vector<Type>();
+c=getJavaType(dbus.substring(i + 1),contained,2);
+i+=c + 1;
+break;
+default :
+throw new DBusException(MessageFormat.format(getString("parseDBusSignatureFailure"),new Object[]{dbus,dbus.charAt(i)}));
+}
+return i;
+}
+ catch (IndexOutOfBoundsException IOOBe) {
+if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug) Debug.print(Debug.ERR,IOOBe);
+throw new DBusException(getString("parseDBusTypeSignatureFailure") + dbus);
+}
+}

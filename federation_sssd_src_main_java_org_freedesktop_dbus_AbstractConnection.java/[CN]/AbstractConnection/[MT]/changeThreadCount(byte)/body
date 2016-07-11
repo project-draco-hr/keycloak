@@ -1,0 +1,19 @@
+{
+synchronized (workers) {
+    if (workers.size() > newcount) {
+      int n=workers.size() - newcount;
+      for (int i=0; i < n; i++) {
+        _workerthread t=workers.removeFirst();
+        t.halt();
+      }
+    }
+ else     if (workers.size() < newcount) {
+      int n=newcount - workers.size();
+      for (int i=0; i < n; i++) {
+        _workerthread t=new _workerthread();
+        t.start();
+        workers.add(t);
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  if (debug) {
+    try {
+      if (null == s)       return true;
+      if (null == prop)       return loglevel <= DEBUG;
+      String d=prop.getProperty(s);
+      if (null == d || "".equals(d))       d=prop.getProperty("ALL");
+      if (null == d)       return loglevel <= ERR;
+      if ("".equals(d))       return loglevel <= ERR;
+      d=d.toLowerCase();
+      if ("true".equals(d))       return true;
+      if ("yes".equals(d))       return true;
+      if ("all".equals(d))       return true;
+      if ("verbose".equals(d))       return loglevel <= VERBOSE;
+      if ("debug".equals(d))       return loglevel <= DEBUG;
+      if ("info".equals(d))       return loglevel <= INFO;
+      if ("warn".equals(d))       return loglevel <= WARN;
+      if ("err".equals(d))       return loglevel <= ERR;
+      if ("crit".equals(d))       return loglevel <= CRIT;
+      int i=Integer.parseInt(d);
+      return i >= loglevel;
+    }
+ catch (    Exception e) {
+      return false;
+    }
+  }
+  return false;
+}

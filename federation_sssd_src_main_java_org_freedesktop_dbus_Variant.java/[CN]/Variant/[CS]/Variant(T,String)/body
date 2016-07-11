@@ -1,0 +1,15 @@
+{
+  if (null == o)   throw new IllegalArgumentException(getString("cannotWrapNullInVariant"));
+  this.sig=sig;
+  try {
+    Vector<Type> ts=new Vector<Type>();
+    Marshalling.getJavaType(sig,ts,1);
+    if (ts.size() != 1)     throw new IllegalArgumentException(getString("cannotWrapNoTypesInVariant") + sig);
+    this.type=ts.get(0);
+  }
+ catch (  DBusException DBe) {
+    if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug)     Debug.print(Debug.ERR,DBe);
+    throw new IllegalArgumentException(MessageFormat.format(getString("cannotWrapUnqualifiedVariant"),new Object[]{sig,DBe.getMessage()}));
+  }
+  this.o=o;
+}

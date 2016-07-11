@@ -1,0 +1,36 @@
+{
+  StringBuffer sb=new StringBuffer();
+switch (command) {
+case COMMAND_AUTH:
+    sb.append("AUTH");
+  break;
+case COMMAND_DATA:
+sb.append("DATA");
+break;
+case COMMAND_REJECTED:
+sb.append("REJECTED");
+break;
+case COMMAND_OK:
+sb.append("OK");
+break;
+case COMMAND_BEGIN:
+sb.append("BEGIN");
+break;
+case COMMAND_CANCEL:
+sb.append("CANCEL");
+break;
+case COMMAND_ERROR:
+sb.append("ERROR");
+break;
+default :
+return;
+}
+for (String s : data) {
+sb.append(' ');
+sb.append(s);
+}
+sb.append('\r');
+sb.append('\n');
+if (Debug.debug) Debug.print(Debug.VERBOSE,"sending: " + sb);
+out.write(sb.toString().getBytes());
+}

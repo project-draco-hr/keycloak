@@ -1,0 +1,11 @@
+{
+  String type="";
+  if (null != c.getEnclosingClass()) {
+    if (null != c.getEnclosingClass().getAnnotation(DBusInterfaceName.class))     type=c.getEnclosingClass().getAnnotation(DBusInterfaceName.class).value();
+ else     type=AbstractConnection.dollar_pattern.matcher(c.getEnclosingClass().getName()).replaceAll(".");
+  }
+ else   throw new DBusException(getString("signalsMustBeMemberOfClass"));
+  DBusSignal s=new internalsig(source,objectpath,type,c.getSimpleName(),sig,parameters,serial);
+  s.c=c;
+  return s;
+}

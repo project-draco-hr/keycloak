@@ -1,0 +1,18 @@
+{
+  int bs=(width - 8) / 4;
+  int i=0;
+  StringBuffer sb=new StringBuffer();
+  do {
+    for (int j=0; j < 6; j++) {
+      sb.append(hexchars[(i << (j * 4) & 0xF00000) >> 20]);
+    }
+    sb.append('\t');
+    sb.append(toHex(buf,i,bs));
+    sb.append(' ');
+    sb.append(toAscii(buf,i,bs));
+    sb.append('\n');
+    i+=bs;
+  }
+ while (i < buf.length);
+  return sb.toString();
+}

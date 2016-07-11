@@ -1,0 +1,10 @@
+{
+  if (null == objectpath || "".equals(objectpath))   throw new DBusException(getString("missingObjectPath"));
+  if (!objectpath.matches(OBJECT_REGEX) || objectpath.length() > MAX_NAME_LENGTH)   throw new DBusException(getString("invalidObjectPath") + objectpath);
+synchronized (exportedObjects) {
+    if (null != exportedObjects.get(objectpath))     throw new DBusException(getString("objectAlreadyExported"));
+    ExportedObject eo=new ExportedObject(object,weakreferences);
+    exportedObjects.put(objectpath,eo);
+    objectTree.add(objectpath,eo,eo.introspectiondata);
+  }
+}

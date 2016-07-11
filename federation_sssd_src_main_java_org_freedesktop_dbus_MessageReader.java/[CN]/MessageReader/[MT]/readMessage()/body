@@ -1,0 +1,142 @@
+{
+  int rv;
+  if (null == buf) {
+    buf=new byte[12];
+    len[0]=0;
+  }
+  if (len[0] < 12) {
+    try {
+      rv=in.read(buf,len[0],12 - len[0]);
+    }
+ catch (    SocketTimeoutException STe) {
+      return null;
+    }
+    if (-1 == rv)     throw new EOFException(getString("transportReturnedEOF"));
+    len[0]+=rv;
+  }
+  if (len[0] == 0)   return null;
+  if (len[0] < 12) {
+    if (Debug.debug)     Debug.print(Debug.DEBUG,"Only got " + len[0] + " of 12 bytes of header");
+    return null;
+  }
+  byte endian=buf[0];
+  byte type=buf[1];
+  byte protover=buf[3];
+  if (protover > Message.PROTOCOL) {
+    buf=null;
+    throw new MessageProtocolVersionException(MessageFormat.format(getString("protocolVersionUnsupported"),new Object[]{protover}));
+  }
+  if (null == tbuf) {
+    tbuf=new byte[4];
+    len[1]=0;
+  }
+  if (len[1] < 4) {
+    try {
+      rv=in.read(tbuf,len[1],4 - len[1]);
+    }
+ catch (    SocketTimeoutException STe) {
+      return null;
+    }
+    if (-1 == rv)     throw new EOFException(getString("transportReturnedEOF"));
+    len[1]+=rv;
+  }
+  if (len[1] < 4) {
+    if (Debug.debug)     Debug.print(Debug.DEBUG,"Only got " + len[1] + " of 4 bytes of header");
+    return null;
+  }
+  int headerlen=0;
+  if (null == header) {
+    headerlen=(int)Message.demarshallint(tbuf,0,endian,4);
+    if (0 != headerlen % 8)     headerlen+=8 - (headerlen % 8);
+  }
+ else   headerlen=header.length - 8;
+  if (null == header) {
+    header=new byte[headerlen + 8];
+    System.arraycopy(tbuf,0,header,0,4);
+    len[2]=0;
+  }
+  if (len[2] < headerlen) {
+    try {
+      rv=in.read(header,8 + len[2],headerlen - len[2]);
+    }
+ catch (    SocketTimeoutException STe) {
+      return null;
+    }
+    if (-1 == rv)     throw new EOFException(getString("transportReturnedEOF"));
+    len[2]+=rv;
+  }
+  if (len[2] < headerlen) {
+    if (Debug.debug)     Debug.print(Debug.DEBUG,"Only got " + len[2] + " of "+ headerlen+ " bytes of header");
+    return null;
+  }
+  int bodylen=0;
+  if (null == body)   bodylen=(int)Message.demarshallint(buf,4,endian,4);
+  if (null == body) {
+    body=new byte[bodylen];
+    len[3]=0;
+  }
+  if (len[3] < body.length) {
+    try {
+      rv=in.read(body,len[3],body.length - len[3]);
+    }
+ catch (    SocketTimeoutException STe) {
+      return null;
+    }
+    if (-1 == rv)     throw new EOFException(getString("transportReturnedEOF"));
+    len[3]+=rv;
+  }
+  if (len[3] < body.length) {
+    if (Debug.debug)     Debug.print(Debug.DEBUG,"Only got " + len[3] + " of "+ body.length+ " bytes of body");
+    return null;
+  }
+  Message m;
+switch (type) {
+case Message.MessageType.METHOD_CALL:
+    m=new MethodCall();
+  break;
+case Message.MessageType.METHOD_RETURN:
+m=new MethodReturn();
+break;
+case Message.MessageType.SIGNAL:
+m=new DBusSignal();
+break;
+case Message.MessageType.ERROR:
+m=new Error();
+break;
+default :
+throw new MessageTypeException(MessageFormat.format(getString("messageTypeUnsupported"),new Object[]{type}));
+}
+if (Debug.debug) {
+Debug.print(Debug.VERBOSE,Hexdump.format(buf));
+Debug.print(Debug.VERBOSE,Hexdump.format(tbuf));
+Debug.print(Debug.VERBOSE,Hexdump.format(header));
+Debug.print(Debug.VERBOSE,Hexdump.format(body));
+}
+try {
+m.populate(buf,header,body);
+}
+ catch (DBusException DBe) {
+if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug) Debug.print(Debug.ERR,DBe);
+buf=null;
+tbuf=null;
+body=null;
+header=null;
+throw DBe;
+}
+catch (RuntimeException Re) {
+if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug) Debug.print(Debug.ERR,Re);
+buf=null;
+tbuf=null;
+body=null;
+header=null;
+throw Re;
+}
+if (Debug.debug) {
+Debug.print(Debug.INFO,"=> " + m);
+}
+buf=null;
+tbuf=null;
+body=null;
+header=null;
+return m;
+}

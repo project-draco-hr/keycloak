@@ -1,0 +1,27 @@
+{
+synchronized (conn) {
+synchronized (_reflock) {
+      if (0 == --_refcount) {
+        if (Debug.debug)         Debug.print(Debug.INFO,"Disconnecting DBusConnection");
+        try {
+          Error err=new Error("org.freedesktop.DBus.Local","org.freedesktop.DBus.Local.disconnected",0,"s",new Object[]{getString("disconnected")});
+synchronized (pendingCalls) {
+            long[] set=pendingCalls.getKeys();
+            for (            long l : set)             if (-1 != l) {
+              MethodCall m=pendingCalls.remove(l);
+              if (null != m)               m.setReply(err);
+            }
+            pendingCalls=null;
+          }
+synchronized (pendingErrors) {
+            pendingErrors.add(err);
+          }
+        }
+ catch (        DBusException DBe) {
+        }
+        conn.remove(addr);
+        super.disconnect();
+      }
+    }
+  }
+}

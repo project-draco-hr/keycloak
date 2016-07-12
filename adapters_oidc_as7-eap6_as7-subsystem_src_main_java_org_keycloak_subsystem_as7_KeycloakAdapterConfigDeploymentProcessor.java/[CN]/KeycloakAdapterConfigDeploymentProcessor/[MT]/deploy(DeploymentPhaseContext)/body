@@ -1,6 +1,5 @@
 {
   DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
-  String deploymentName=deploymentUnit.getName();
   WarMetaData warMetaData=deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
   if (warMetaData == null) {
     return;
@@ -12,21 +11,21 @@
   }
   KeycloakAdapterConfigService service=KeycloakAdapterConfigService.getInstance();
   LoginConfigMetaData loginConfig=webMetaData.getLoginConfig();
-  boolean hasSubsystemConfig=service.isSecureDeployment(deploymentName);
+  boolean hasSubsystemConfig=service.isSecureDeployment(deploymentUnit);
   boolean webRequiresKC=loginConfig != null && "KEYCLOAK".equalsIgnoreCase(loginConfig.getAuthMethod());
   if (hasSubsystemConfig || webRequiresKC) {
-    log.debug("Setting up KEYCLOAK auth method for WAR: " + deploymentName);
+    log.debug("Setting up KEYCLOAK auth method for WAR: " + deploymentUnit.getName());
     if (hasSubsystemConfig) {
-      addJSONData(service.getJSON(deploymentName),warMetaData);
+      addJSONData(service.getJSON(deploymentUnit),warMetaData);
       if (loginConfig != null) {
         loginConfig.setAuthMethod("KEYCLOAK");
-        loginConfig.setRealmName(service.getRealmName(deploymentName));
+        loginConfig.setRealmName(service.getRealmName(deploymentUnit));
       }
  else {
-        log.warn("Failed to set up KEYCLOAK auth method for WAR: " + deploymentName + " (loginConfig == null)");
+        log.warn("Failed to set up KEYCLOAK auth method for WAR: " + deploymentUnit.getName() + " (loginConfig == null)");
       }
     }
     addValve(webMetaData);
-    KeycloakLogger.ROOT_LOGGER.deploymentSecured(deploymentName);
+    KeycloakLogger.ROOT_LOGGER.deploymentSecured(deploymentUnit.getName());
   }
 }

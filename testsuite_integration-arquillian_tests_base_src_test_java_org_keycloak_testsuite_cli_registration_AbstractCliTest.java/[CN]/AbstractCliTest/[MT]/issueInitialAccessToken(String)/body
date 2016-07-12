@@ -1,0 +1,10 @@
+{
+  ClientInitialAccessResource resource=adminClient.realm(realm).clientInitialAccess();
+  ClientInitialAccessCreatePresentation rep=new ClientInitialAccessCreatePresentation();
+  rep.setCount(10);
+  rep.setExpiration(100);
+  ClientInitialAccessPresentation response=resource.create(rep);
+  String token=response.getToken();
+  Assert.assertNotNull("Issued initial access token not null",token);
+  return token;
+}

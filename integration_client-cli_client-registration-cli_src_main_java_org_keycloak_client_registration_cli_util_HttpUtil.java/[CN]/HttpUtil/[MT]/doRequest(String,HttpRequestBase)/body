@@ -1,0 +1,32 @@
+{
+  addAuth(request,authorization);
+  HttpResponse response=getHttpClient().execute(request);
+  InputStream responseStream=null;
+  if (response.getEntity() != null) {
+    responseStream=response.getEntity().getContent();
+  }
+  int code=response.getStatusLine().getStatusCode();
+  if (code >= 200 && code < 300) {
+    return responseStream;
+  }
+ else {
+    Map<String,String> error=null;
+    try {
+      Header header=response.getEntity().getContentType();
+      if (header != null && APPLICATION_JSON.equals(header.getValue())) {
+        error=JsonSerialization.readValue(responseStream,Map.class);
+      }
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to read error response - " + e.getMessage(),e);
+    }
+ finally {
+      responseStream.close();
+    }
+    String message=null;
+    if (error != null) {
+      message=error.get("error_description") + " [" + error.get("error")+ "]";
+    }
+    throw new RuntimeException(message != null ? message : response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase());
+  }
+}

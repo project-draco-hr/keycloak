@@ -1,0 +1,22 @@
+{
+  if (closed) {
+    return -1;
+  }
+  Byte current;
+  try {
+    consumer=Thread.currentThread();
+    while ((current=queue.poll()) == null) {
+      wait();
+      if (closed) {
+        return -1;
+      }
+    }
+  }
+ catch (  InterruptedException e) {
+    throw new InterruptedIOException("Signalled to exit");
+  }
+ finally {
+    consumer=null;
+  }
+  return current;
+}

@@ -1,0 +1,15 @@
+{
+  Charset charset=Charset.forName("utf-8");
+  StringBuilder out=new StringBuilder();
+  byte[] buf=new byte[8192];
+  int rc;
+  try {
+    while ((rc=is.read(buf)) != -1) {
+      out.append(new String(buf,0,rc,charset));
+    }
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Failed to read stream",e);
+  }
+  return out.toString();
+}

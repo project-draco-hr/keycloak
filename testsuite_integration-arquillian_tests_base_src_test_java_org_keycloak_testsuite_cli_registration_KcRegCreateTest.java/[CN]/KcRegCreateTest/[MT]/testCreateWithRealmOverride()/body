@@ -1,0 +1,10 @@
+{
+  FileConfigHandler handler=initCustomConfigFile();
+  try (TempFileResource configFile=new TempFileResource(handler.getConfigFile())){
+    KcRegExec exe=execute("config credentials -x --config '" + configFile.getName() + "' --server "+ serverUrl+ " --realm master --user admin --password admin");
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    String token=issueInitialAccessToken("test");
+    exe=execute("create --config '" + configFile.getName() + "' --server "+ serverUrl+ " --realm test -s clientId=my_first_client -t "+ token);
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+  }
+ }

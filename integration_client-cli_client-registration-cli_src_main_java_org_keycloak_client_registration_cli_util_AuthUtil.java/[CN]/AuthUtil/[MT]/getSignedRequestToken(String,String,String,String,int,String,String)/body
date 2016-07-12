@@ -1,0 +1,14 @@
+{
+  KeyPair keypair=KeystoreUtil.loadKeyPairFromKeystore(keystore,storePass,keyPass,alias,KeystoreUtil.KeystoreFormat.JKS);
+  JsonWebToken reqToken=new JsonWebToken();
+  reqToken.id(UUID.randomUUID().toString());
+  reqToken.issuer(clientId);
+  reqToken.subject(clientId);
+  reqToken.audience(realmInfoUrl);
+  int now=Time.currentTime();
+  reqToken.issuedAt(now);
+  reqToken.expiration(now + sigLifetime);
+  reqToken.notBefore(now);
+  String signedRequestToken=new JWSBuilder().jsonContent(reqToken).rsa256(keypair.getPrivate());
+  return signedRequestToken;
+}

@@ -1,0 +1,24 @@
+{
+  try {
+    List result=new LinkedList();
+    if (!value.startsWith("[")) {
+      throw new RuntimeException("List attribute value has to start with '[' - '" + value + "'");
+    }
+    List parsed=JsonSerialization.readValue(value,List.class);
+    for (    Object item : parsed) {
+      if (itemType.isAssignableFrom(item.getClass())) {
+        result.add(item);
+      }
+ else {
+        result.add(convertValueToType(item,itemType));
+      }
+    }
+    return result;
+  }
+ catch (  JsonParseException e) {
+    throw new RuntimeException("Failed to parse list value: " + e.getMessage(),e);
+  }
+catch (  IOException e) {
+    throw new RuntimeException("Failed to parse list value: " + value,e);
+  }
+}

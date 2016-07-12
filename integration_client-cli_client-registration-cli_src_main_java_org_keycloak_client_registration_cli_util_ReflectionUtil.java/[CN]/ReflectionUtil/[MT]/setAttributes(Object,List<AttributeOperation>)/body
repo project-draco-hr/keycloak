@@ -1,0 +1,194 @@
+{
+  for (  AttributeOperation item : attrs) {
+    AttributeKey attr=item.getKey();
+    Object nested=client;
+    List<AttributeKey.Component> cs=attr.getComponents();
+    for (int i=0; i < cs.size(); i++) {
+      AttributeKey.Component c=cs.get(i);
+      Class type=nested.getClass();
+      Field field=null;
+      if (!isMapType(type)) {
+        Map<String,Field> fields=getAttrFieldsForType(type);
+        if (fields == null) {
+          throw new AttributeException(attr.toString(),"Unexpected condition - unknown type: " + type);
+        }
+        field=fields.get(c.getName());
+        Class parent=type;
+        while (field == null) {
+          parent=parent.getSuperclass();
+          if (parent == Object.class) {
+            throw new AttributeException(attr.toString(),"Unknown attribute '" + c.getName() + "' on "+ client.getClass());
+          }
+          fields=getAttrFieldsForType(parent);
+          field=fields.get(c.getName());
+        }
+      }
+      type=field == null ? type : field.getType();
+      if (isBasicType(type)) {
+        if (i < cs.size() - 1) {
+          throw new AttributeException(attr.toString(),"Attribute is of primitive type, and can't be nested further: " + c);
+        }
+        try {
+          Object val=convertValueToType(item.getValue(),type);
+          field.set(nested,val);
+        }
+ catch (        Exception e) {
+          throw new AttributeException(attr.toString(),"Failed to set attribute " + attr,e);
+        }
+      }
+ else       if (isListType(type)) {
+        if (i < cs.size() - 1) {
+          try {
+            nested=field.get(nested);
+          }
+ catch (          Exception e) {
+            throw new AttributeException(attr.toString(),"Failed to get attribute \"" + c + "\" in "+ attr,e);
+          }
+          if (c.getIndex() >= 0) {
+            List l=(List)nested;
+            if (c.getIndex() >= l.size()) {
+              throw new AttributeException(attr.toString(),"Array index out of bounds for \"" + c + "\" in "+ attr);
+            }
+            nested=l.get(c.getIndex());
+          }
+        }
+ else {
+          Class itype=type;
+          Type gtype=field.getGenericType();
+          if (gtype instanceof ParameterizedType) {
+            Type[] typeArgs=((ParameterizedType)gtype).getActualTypeArguments();
+            if (typeArgs.length >= 1 && typeArgs[0] instanceof Class) {
+              itype=(Class)typeArgs[0];
+            }
+ else {
+              itype=String.class;
+            }
+          }
+          if (c.getIndex() >= 0 || attr.isAppend()) {
+            List target;
+            try {
+              target=(List)field.get(nested);
+            }
+ catch (            Exception e) {
+              throw new AttributeException(attr.toString(),"Failed to get list attribute: " + attr,e);
+            }
+            if (target == null) {
+              target=createNewList(type);
+              try {
+                field.set(nested,target);
+              }
+ catch (              Exception e) {
+                throw new AttributeException(attr.toString(),"Failed to set list attribute " + attr,e);
+              }
+            }
+            if (c.getIndex() >= target.size()) {
+              throw new AttributeException(attr.toString(),"Array index out of bounds for \"" + c + "\" in "+ attr);
+            }
+            if (attr.isAppend()) {
+              try {
+                Object value=convertValueToType(item.getValue(),itype);
+                if (c.getIndex() >= 0) {
+                  target.add(c.getIndex(),value);
+                }
+ else {
+                  target.add(value);
+                }
+              }
+ catch (              Exception e) {
+                throw new AttributeException(attr.toString(),"Failed to set list attribute " + attr,e);
+              }
+            }
+ else {
+              if (item.getType() == AttributeOperation.Type.SET) {
+                try {
+                  Object value=convertValueToType(item.getValue(),itype);
+                  target.set(c.getIndex(),value);
+                }
+ catch (                Exception e) {
+                  throw new AttributeException(attr.toString(),"Failed to set list attribute " + attr,e);
+                }
+              }
+ else {
+                try {
+                  target.remove(c.getIndex());
+                }
+ catch (                Exception e) {
+                  throw new AttributeException(attr.toString(),"Failed to remove list attribute " + attr,e);
+                }
+              }
+            }
+          }
+ else {
+            List value=createNewList(type);
+            ;
+            if (item.getType() == AttributeOperation.Type.SET) {
+              List converted=convertValueToList(item.getValue(),itype);
+              value.addAll(converted);
+            }
+            try {
+              field.set(nested,value);
+            }
+ catch (            Exception e) {
+              throw new AttributeException(attr.toString(),"Failed to set list attribute " + attr,e);
+            }
+          }
+        }
+      }
+ else {
+        if (i < cs.size() - 1) {
+          Object value;
+          if (field == null) {
+            if (isMapType(nested.getClass())) {
+              value=((Map)nested).get(c.getName());
+            }
+ else {
+              throw new RuntimeException("Unexpected condition while processing: " + attr);
+            }
+          }
+ else {
+            try {
+              value=field.get(nested);
+            }
+ catch (            Exception e) {
+              throw new AttributeException(attr.toString(),"Failed to get attribute \"" + c + "\" in "+ attr,e);
+            }
+          }
+          if (value == null) {
+            if (isMapType(nested.getClass())) {
+              throw new RuntimeException("Creating nested object trees not supported");
+            }
+ else {
+              try {
+                value=createNewObject(type);
+                field.set(nested,value);
+              }
+ catch (              Exception e) {
+                throw new AttributeException(attr.toString(),"Failed to set attribute " + attr,e);
+              }
+            }
+          }
+          nested=value;
+        }
+ else {
+          if (isMapType(nested.getClass())) {
+            try {
+              ((Map)nested).put(c.getName(),item.getValue());
+            }
+ catch (            Exception e) {
+              throw new AttributeException(attr.toString(),"Failed to set map key " + attr,e);
+            }
+          }
+ else {
+            try {
+              Object value=convertValueToType(item.getValue(),type);
+              field.set(nested,value);
+            }
+ catch (            Exception e) {
+              throw new AttributeException(attr.toString(),"Failed to set attribute " + attr,e);
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  KcRegExec exe=execute("");
+  Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+  List<String> lines=exe.stdoutLines();
+  Assert.assertTrue("stdout output not empty",lines.size() > 0);
+  Assert.assertEquals("stdout first line","Keycloak Client Registration CLI",lines.get(0));
+  Assert.assertEquals("stdout one but last line","Use '" + KcRegExec.CMD + " help <command>' for more information about a given command.",lines.get(lines.size() - 2));
+  Assert.assertEquals("stdout last line","",lines.get(lines.size() - 1));
+  lines=exe.stderrLines();
+  Assert.assertTrue("stderr output empty",lines.size() == 0);
+}

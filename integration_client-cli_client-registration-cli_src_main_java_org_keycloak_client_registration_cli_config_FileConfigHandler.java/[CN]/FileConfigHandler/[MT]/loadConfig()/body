@@ -1,0 +1,14 @@
+{
+  File file=new File(configFile);
+  if (!file.isFile() || file.length() == 0) {
+    return new ConfigData();
+  }
+  try {
+    try (FileInputStream is=new FileInputStream(configFile)){
+      return JsonSerialization.readValue(is,ConfigData.class);
+    }
+   }
+ catch (  IOException e) {
+    throw new RuntimeException("Failed to load " + configFile,e);
+  }
+}

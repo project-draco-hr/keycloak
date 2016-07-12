@@ -1,0 +1,30 @@
+{
+  FileConfigHandler handler=initCustomConfigFile();
+  try (TempFileResource configFile=new TempFileResource(handler.getConfigFile())){
+    KcRegExec exe=execute("config registration-token --config '" + configFile.getName() + "' ");
+    assertExitCodeAndStreamSizes(exe,1,0,1);
+    Assert.assertEquals("error message","Required option not specified: --server",exe.stderrLines().get(0));
+    exe=execute("config registration-token --config '" + configFile.getName() + "' --server http://localhost:8080/auth");
+    assertExitCodeAndStreamSizes(exe,1,0,1);
+    Assert.assertEquals("error message","Required option not specified: --realm",exe.stderrLines().get(0));
+    exe=execute("config registration-token --config '" + configFile.getName() + "' --server http://localhost:8080/auth --realm test");
+    assertExitCodeAndStreamSizes(exe,1,0,1);
+    Assert.assertEquals("error message","Required option not specified: --client",exe.stderrLines().get(0));
+    exe=execute("config registration-token --config '" + configFile.getName() + "' --server http://localhost:8080/auth --realm test --client my_client NEWTOKEN");
+    assertExitCodeAndStreamSizes(exe,0,0,0);
+    if (runIntermittentlyFailingTests()) {
+      exe=KcRegExec.newBuilder().argsLine("config registration-token --config '" + configFile.getName() + "' --server http://localhost:8080/auth --realm test --client my_client").executeAsync();
+      exe.waitForStdout("Enter Registration Access Token:");
+      exe.sendToStdin("NEWTOKEN" + EOL);
+      exe.waitCompletion();
+      assertExitCodeAndStreamSizes(exe,0,1,0);
+    }
+ else {
+      System.out.println("TEST SKIPPED PARTIALLY - This test currently suffers from intermittent failures. Use -Dtest.intermittent=true to run it in full.");
+    }
+    exe=execute("config registration-token --config '" + configFile.getName() + "' --server http://localhost:8080/auth --realm test --client nonexistent --delete");
+    assertExitCodeAndStreamSizes(exe,0,0,0);
+    exe=execute("config registration-token --config '" + configFile.getName() + "' --server http://localhost:8080/auth --realm test --client my_client --delete");
+    assertExitCodeAndStreamSizes(exe,0,0,0);
+  }
+ }

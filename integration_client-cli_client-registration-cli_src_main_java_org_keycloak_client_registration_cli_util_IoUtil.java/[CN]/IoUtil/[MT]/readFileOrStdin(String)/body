@@ -1,0 +1,18 @@
+{
+  String content;
+  if ("-".equals(file)) {
+    content=readFully(System.in);
+  }
+ else {
+    try (InputStream is=new FileInputStream(file)){
+      content=readFully(is);
+    }
+ catch (    FileNotFoundException e) {
+      throw new RuntimeException("File not found: " + file);
+    }
+catch (    IOException e) {
+      throw new RuntimeException("Failed to read file: " + file,e);
+    }
+  }
+  return content;
+}

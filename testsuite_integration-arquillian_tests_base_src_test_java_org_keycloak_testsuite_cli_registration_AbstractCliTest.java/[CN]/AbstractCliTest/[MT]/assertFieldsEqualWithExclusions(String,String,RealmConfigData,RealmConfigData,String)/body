@@ -1,0 +1,69 @@
+{
+  HashSet<String> exclusions=new HashSet<>(Arrays.asList(excluded));
+  String pfix="";
+  if (server != null || realm != null) {
+    pfix="endpoints." + server + "."+ realm+ ".";
+  }
+  String ekey=pfix + "serverUrl";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.serverUrl(),data2.serverUrl());
+  }
+  ekey=pfix + "realm";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.realm(),data2.realm());
+  }
+  ekey=pfix + "clientId";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.getClientId(),data2.getClientId());
+  }
+  ekey=pfix + "initialToken";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.getInitialToken(),data2.getInitialToken());
+  }
+  ekey=pfix + "token";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.getToken(),data2.getToken());
+  }
+  ekey=pfix + "refreshToken";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.getRefreshToken(),data2.getRefreshToken());
+  }
+  ekey=pfix + "expiresAt";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.getExpiresAt(),data2.getExpiresAt());
+  }
+  ekey=pfix + "refreshExpiresAt";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.getRefreshExpiresAt(),data2.getRefreshExpiresAt());
+  }
+  ekey=pfix + "secret";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.getSecret(),data2.getSecret());
+  }
+  ekey=pfix + "signingToken";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.getSigningToken(),data2.getSigningToken());
+  }
+  ekey=pfix + "sigExpiresAt";
+  if (!exclusions.contains(ekey)) {
+    Assert.assertEquals(ekey,data1.getSigExpiresAt(),data2.getSigExpiresAt());
+  }
+  ekey=pfix + "clients";
+  if (!exclusions.contains(ekey)) {
+    Map<String,String> clients1=data1.getClients();
+    Map<String,String> clients2=data2.getClients();
+    Iterator<Map.Entry<String,String>> cit1=clients1.entrySet().iterator();
+    Iterator<Map.Entry<String,String>> cit2=clients2.entrySet().iterator();
+    while (cit1.hasNext() || cit2.hasNext()) {
+      Map.Entry<String,String> ckey1=cit1.hasNext() ? cit1.next() : null;
+      Map.Entry<String,String> ckey2=cit2.hasNext() ? cit2.next() : null;
+      String ckey=ekey + "." + (ckey1 != null ? ckey1.getKey() : ckey2.getKey());
+      if (!exclusions.contains(ckey)) {
+        Assert.assertNotNull(ckey + " left not null",ckey1);
+        Assert.assertNotNull(ckey + " right not null",ckey2);
+        Assert.assertEquals(ckey,ckey1.getKey(),ckey2.getKey());
+        Assert.assertEquals(ckey + " value",ckey1.getValue(),ckey2.getValue());
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  Charset encoding=PropertiesUtil.detectEncoding(new ByteArrayInputStream("key=value".getBytes()));
+  assertEquals(Charset.forName("ISO-8859-1"),encoding);
+  encoding=PropertiesUtil.detectEncoding(new ByteArrayInputStream("# encoding: unknown\nkey=value".getBytes()));
+  assertEquals(Charset.forName("ISO-8859-1"),encoding);
+  encoding=PropertiesUtil.detectEncoding(new ByteArrayInputStream("\n# encoding: utf-8\nkey=value".getBytes()));
+  assertEquals(Charset.forName("ISO-8859-1"),encoding);
+  encoding=PropertiesUtil.detectEncoding(new ByteArrayInputStream("".getBytes()));
+  assertEquals(Charset.forName("ISO-8859-1"),encoding);
+}

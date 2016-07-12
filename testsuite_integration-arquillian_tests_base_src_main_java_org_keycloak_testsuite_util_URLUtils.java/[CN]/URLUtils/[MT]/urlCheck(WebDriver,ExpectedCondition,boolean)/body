@@ -1,0 +1,17 @@
+{
+  Logger log=Logger.getLogger(URLUtils.class);
+  try {
+    (new WebDriverWait(driver,1,100)).until(condition);
+  }
+ catch (  TimeoutException e) {
+    if (driver instanceof InternetExplorerDriver && !secondTry) {
+      log.info("IE workaround: checking URL failed at first attempt - refreshing the page and trying one more time...");
+      driver.navigate().refresh();
+      urlCheck(driver,condition,true);
+    }
+ else {
+      return false;
+    }
+  }
+  return true;
+}

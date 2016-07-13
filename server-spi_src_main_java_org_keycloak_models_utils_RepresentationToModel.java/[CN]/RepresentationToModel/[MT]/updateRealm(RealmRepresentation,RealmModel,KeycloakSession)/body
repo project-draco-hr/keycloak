@@ -1,0 +1,97 @@
+{
+  if (rep.getRealm() != null) {
+    renameRealm(realm,rep.getRealm());
+  }
+  if (rep.getDisplayName() != null)   realm.setDisplayName(rep.getDisplayName());
+  if (rep.getDisplayNameHtml() != null)   realm.setDisplayNameHtml(rep.getDisplayNameHtml());
+  if (rep.isEnabled() != null)   realm.setEnabled(rep.isEnabled());
+  if (rep.isBruteForceProtected() != null)   realm.setBruteForceProtected(rep.isBruteForceProtected());
+  if (rep.getMaxFailureWaitSeconds() != null)   realm.setMaxFailureWaitSeconds(rep.getMaxFailureWaitSeconds());
+  if (rep.getMinimumQuickLoginWaitSeconds() != null)   realm.setMinimumQuickLoginWaitSeconds(rep.getMinimumQuickLoginWaitSeconds());
+  if (rep.getWaitIncrementSeconds() != null)   realm.setWaitIncrementSeconds(rep.getWaitIncrementSeconds());
+  if (rep.getQuickLoginCheckMilliSeconds() != null)   realm.setQuickLoginCheckMilliSeconds(rep.getQuickLoginCheckMilliSeconds());
+  if (rep.getMaxDeltaTimeSeconds() != null)   realm.setMaxDeltaTimeSeconds(rep.getMaxDeltaTimeSeconds());
+  if (rep.getFailureFactor() != null)   realm.setFailureFactor(rep.getFailureFactor());
+  if (rep.isRegistrationAllowed() != null)   realm.setRegistrationAllowed(rep.isRegistrationAllowed());
+  if (rep.isRegistrationEmailAsUsername() != null)   realm.setRegistrationEmailAsUsername(rep.isRegistrationEmailAsUsername());
+  if (rep.isRememberMe() != null)   realm.setRememberMe(rep.isRememberMe());
+  if (rep.isVerifyEmail() != null)   realm.setVerifyEmail(rep.isVerifyEmail());
+  if (rep.isResetPasswordAllowed() != null)   realm.setResetPasswordAllowed(rep.isResetPasswordAllowed());
+  if (rep.isEditUsernameAllowed() != null)   realm.setEditUsernameAllowed(rep.isEditUsernameAllowed());
+  if (rep.getSslRequired() != null)   realm.setSslRequired(SslRequired.valueOf(rep.getSslRequired().toUpperCase()));
+  if (rep.getAccessCodeLifespan() != null)   realm.setAccessCodeLifespan(rep.getAccessCodeLifespan());
+  if (rep.getAccessCodeLifespanUserAction() != null)   realm.setAccessCodeLifespanUserAction(rep.getAccessCodeLifespanUserAction());
+  if (rep.getAccessCodeLifespanLogin() != null)   realm.setAccessCodeLifespanLogin(rep.getAccessCodeLifespanLogin());
+  if (rep.getNotBefore() != null)   realm.setNotBefore(rep.getNotBefore());
+  if (rep.getRevokeRefreshToken() != null)   realm.setRevokeRefreshToken(rep.getRevokeRefreshToken());
+  if (rep.getAccessTokenLifespan() != null)   realm.setAccessTokenLifespan(rep.getAccessTokenLifespan());
+  if (rep.getAccessTokenLifespanForImplicitFlow() != null)   realm.setAccessTokenLifespanForImplicitFlow(rep.getAccessTokenLifespanForImplicitFlow());
+  if (rep.getSsoSessionIdleTimeout() != null)   realm.setSsoSessionIdleTimeout(rep.getSsoSessionIdleTimeout());
+  if (rep.getSsoSessionMaxLifespan() != null)   realm.setSsoSessionMaxLifespan(rep.getSsoSessionMaxLifespan());
+  if (rep.getOfflineSessionIdleTimeout() != null)   realm.setOfflineSessionIdleTimeout(rep.getOfflineSessionIdleTimeout());
+  if (rep.getRequiredCredentials() != null) {
+    realm.updateRequiredCredentials(rep.getRequiredCredentials());
+  }
+  if (rep.getLoginTheme() != null)   realm.setLoginTheme(rep.getLoginTheme());
+  if (rep.getAccountTheme() != null)   realm.setAccountTheme(rep.getAccountTheme());
+  if (rep.getAdminTheme() != null)   realm.setAdminTheme(rep.getAdminTheme());
+  if (rep.getEmailTheme() != null)   realm.setEmailTheme(rep.getEmailTheme());
+  if (rep.isEventsEnabled() != null)   realm.setEventsEnabled(rep.isEventsEnabled());
+  if (rep.getEventsExpiration() != null)   realm.setEventsExpiration(rep.getEventsExpiration());
+  if (rep.getEventsListeners() != null)   realm.setEventsListeners(new HashSet<>(rep.getEventsListeners()));
+  if (rep.getEnabledEventTypes() != null)   realm.setEnabledEventTypes(new HashSet<>(rep.getEnabledEventTypes()));
+  if (rep.isAdminEventsEnabled() != null)   realm.setAdminEventsEnabled(rep.isAdminEventsEnabled());
+  if (rep.isAdminEventsDetailsEnabled() != null)   realm.setAdminEventsDetailsEnabled(rep.isAdminEventsDetailsEnabled());
+  if (rep.getPasswordPolicy() != null)   realm.setPasswordPolicy(PasswordPolicy.parse(session,rep.getPasswordPolicy()));
+  if (rep.getOtpPolicyType() != null)   realm.setOTPPolicy(toPolicy(rep));
+  if (rep.getDefaultRoles() != null) {
+    realm.updateDefaultRoles(rep.getDefaultRoles().toArray(new String[rep.getDefaultRoles().size()]));
+  }
+  if (rep.getSmtpServer() != null) {
+    realm.setSmtpConfig(new HashMap(rep.getSmtpServer()));
+  }
+  if (rep.getBrowserSecurityHeaders() != null) {
+    realm.setBrowserSecurityHeaders(rep.getBrowserSecurityHeaders());
+  }
+  if (rep.getUserFederationProviders() != null) {
+    List<UserFederationProviderModel> providerModels=convertFederationProviders(rep.getUserFederationProviders());
+    realm.setUserFederationProviders(providerModels);
+  }
+  if ("GENERATE".equals(rep.getPublicKey())) {
+    KeycloakModelUtils.generateRealmKeys(realm);
+  }
+ else {
+    if (rep.getPrivateKey() != null && rep.getPublicKey() != null) {
+      realm.setPrivateKeyPem(rep.getPrivateKey());
+      realm.setPublicKeyPem(rep.getPublicKey());
+      realm.setCodeSecret(KeycloakModelUtils.generateCodeSecret());
+    }
+    if (rep.getCertificate() != null) {
+      realm.setCertificatePem(rep.getCertificate());
+    }
+  }
+  if (rep.isInternationalizationEnabled() != null) {
+    realm.setInternationalizationEnabled(rep.isInternationalizationEnabled());
+  }
+  if (rep.getSupportedLocales() != null) {
+    realm.setSupportedLocales(new HashSet<String>(rep.getSupportedLocales()));
+  }
+  if (rep.getDefaultLocale() != null) {
+    realm.setDefaultLocale(rep.getDefaultLocale());
+  }
+  if (rep.getBrowserFlow() != null) {
+    realm.setBrowserFlow(realm.getFlowByAlias(rep.getBrowserFlow()));
+  }
+  if (rep.getRegistrationFlow() != null) {
+    realm.setRegistrationFlow(realm.getFlowByAlias(rep.getRegistrationFlow()));
+  }
+  if (rep.getDirectGrantFlow() != null) {
+    realm.setDirectGrantFlow(realm.getFlowByAlias(rep.getDirectGrantFlow()));
+  }
+  if (rep.getResetCredentialsFlow() != null) {
+    realm.setResetCredentialsFlow(realm.getFlowByAlias(rep.getResetCredentialsFlow()));
+  }
+  if (rep.getClientAuthenticationFlow() != null) {
+    realm.setClientAuthenticationFlow(realm.getFlowByAlias(rep.getClientAuthenticationFlow()));
+  }
+}

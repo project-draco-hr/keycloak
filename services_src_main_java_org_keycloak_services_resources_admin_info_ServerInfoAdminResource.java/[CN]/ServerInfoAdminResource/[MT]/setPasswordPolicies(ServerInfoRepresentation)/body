@@ -1,0 +1,13 @@
+{
+  info.setPasswordPolicies(new LinkedList<>());
+  for (  ProviderFactory f : session.getKeycloakSessionFactory().getProviderFactories(PasswordPolicyProvider.class)) {
+    PasswordPolicyProviderFactory factory=(PasswordPolicyProviderFactory)f;
+    PasswordPolicyTypeRepresentation rep=new PasswordPolicyTypeRepresentation();
+    rep.setId(factory.getId());
+    rep.setDisplayName(factory.getDisplayName());
+    rep.setConfigType(factory.getConfigType());
+    rep.setDefaultValue(factory.getDefaultConfigValue());
+    rep.setMultipleSupported(factory.isMultiplSupported());
+    info.getPasswordPolicies().add(rep);
+  }
+}

@@ -1,0 +1,10 @@
+{
+  realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"digits"));
+  Assert.assertEquals("invalidPasswordMinDigitsMessage",policyManager.validate("jdoe","abcd").getMessage());
+  Assert.assertArrayEquals(new Object[]{1},policyManager.validate("jdoe","abcd").getParameters());
+  Assert.assertNull(policyManager.validate("jdoe","abcd1"));
+  realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"digits(2)"));
+  Assert.assertEquals("invalidPasswordMinDigitsMessage",policyManager.validate("jdoe","abcd1").getMessage());
+  Assert.assertArrayEquals(new Object[]{2},policyManager.validate("jdoe","abcd1").getParameters());
+  Assert.assertNull(policyManager.validate("jdoe","abcd12"));
+}

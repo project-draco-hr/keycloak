@@ -1,0 +1,31 @@
+{
+  PasswordPolicy policy=null;
+  try {
+    realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"regexPattern"));
+    fail("Expected NullPointerException: Regex Pattern cannot be null.");
+  }
+ catch (  IllegalArgumentException e) {
+  }
+  try {
+    realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"regexPattern(*)"));
+    fail("Expected PatternSyntaxException: Regex Pattern cannot be null.");
+  }
+ catch (  PatternSyntaxException e) {
+  }
+  try {
+    realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"regexPattern(*,**)"));
+    fail("Expected PatternSyntaxException: Regex Pattern cannot be null.");
+  }
+ catch (  PatternSyntaxException e) {
+  }
+  realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"regexPattern(jdoe) and regexPattern(j*d)"));
+  Assert.assertEquals("invalidPasswordRegexPatternMessage",policyManager.validate("jdoe","jdoe").getMessage());
+  realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"regexPattern(j*p) and regexPattern(j*d) and regexPattern(adoe)"));
+  Assert.assertEquals("invalidPasswordRegexPatternMessage",policyManager.validate("jdoe","jdoe").getMessage());
+  realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"regexPattern([a-z][a-z][a-z][a-z][0-9])"));
+  Assert.assertEquals("invalidPasswordRegexPatternMessage",policyManager.validate("jdoe","jdoe").getMessage());
+  realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"regexPattern(jdoe)"));
+  Assert.assertNull(policyManager.validate("jdoe","jdoe"));
+  realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"regexPattern([a-z][a-z][a-z][a-z][0-9])"));
+  Assert.assertNull(policyManager.validate("jdoe","jdoe0"));
+}

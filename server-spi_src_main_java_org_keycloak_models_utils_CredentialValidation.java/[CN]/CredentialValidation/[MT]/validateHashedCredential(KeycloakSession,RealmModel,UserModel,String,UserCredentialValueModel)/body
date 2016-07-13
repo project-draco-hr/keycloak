@@ -4,8 +4,7 @@
   }
   boolean validated=PasswordHashManager.verify(session,realm,unhashedCredValue,credential);
   if (validated) {
-    int iterations=hashIterations(realm);
-    if (iterations > -1 && iterations != credential.getHashIterations()) {
+    if (realm.getPasswordPolicy().getHashIterations() != credential.getHashIterations()) {
       UserCredentialValueModel newCred=PasswordHashManager.encode(session,realm,unhashedCredValue);
       user.updateCredentialDirectly(newCred);
     }

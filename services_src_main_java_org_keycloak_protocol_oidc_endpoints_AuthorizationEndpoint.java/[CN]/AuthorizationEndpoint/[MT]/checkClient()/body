@@ -9,17 +9,13 @@
     event.error(Errors.CLIENT_NOT_FOUND);
     throw new ErrorPageException(session,Messages.CLIENT_NOT_FOUND);
   }
+  if (!client.isEnabled()) {
+    event.error(Errors.CLIENT_DISABLED);
+    throw new ErrorPageException(session,Messages.CLIENT_DISABLED);
+  }
   if (client.isBearerOnly()) {
     event.error(Errors.NOT_ALLOWED);
     throw new ErrorPageException(session,Messages.BEARER_ONLY);
-  }
-  if ((parsedResponseType.hasResponseType(OIDCResponseType.CODE) || parsedResponseType.hasResponseType(OIDCResponseType.NONE)) && !client.isStandardFlowEnabled()) {
-    event.error(Errors.NOT_ALLOWED);
-    throw new ErrorPageException(session,Messages.STANDARD_FLOW_DISABLED);
-  }
-  if (parsedResponseType.isImplicitOrHybridFlow() && !client.isImplicitFlowEnabled()) {
-    event.error(Errors.NOT_ALLOWED);
-    throw new ErrorPageException(session,Messages.IMPLICIT_FLOW_DISABLED);
   }
   session.getContext().setClient(client);
 }

@@ -1,0 +1,13 @@
+{
+  OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("password","test-user@localhost","password");
+  Assert.assertEquals(200,response.getStatusCode());
+  IDToken idToken=oauth.verifyIDToken(response.getIdToken());
+  Client client=ClientBuilder.newClient();
+  try {
+    OIDCConfigurationRepresentation oidcConfig=getOIDCDiscoveryConfiguration(client);
+    Assert.assertEquals(idToken.getIssuer(),oidcConfig.getIssuer());
+  }
+  finally {
+    client.close();
+  }
+}

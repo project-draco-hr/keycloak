@@ -4,8 +4,10 @@
     return ErrorPage.error(session,Messages.ACCOUNT_DISABLED);
   }
   if (realm.isBruteForceProtected()) {
-    event.error(Errors.USER_TEMPORARILY_DISABLED);
-    return ErrorPage.error(session,Messages.ACCOUNT_DISABLED);
+    if (session.getProvider(BruteForceProtector.class).isTemporarilyDisabled(session,realm,user)) {
+      event.error(Errors.USER_TEMPORARILY_DISABLED);
+      return ErrorPage.error(session,Messages.ACCOUNT_DISABLED);
+    }
   }
   return null;
 }

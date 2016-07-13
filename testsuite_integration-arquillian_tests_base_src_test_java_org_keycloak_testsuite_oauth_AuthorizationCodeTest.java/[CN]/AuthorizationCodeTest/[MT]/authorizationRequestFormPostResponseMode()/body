@@ -1,0 +1,13 @@
+{
+  oauth.responseMode(OIDCResponseMode.FORM_POST.toString().toLowerCase());
+  oauth.state("OpenIdConnect.AuthenticationProperties=2302984sdlk");
+  oauth.doLoginGrant("test-user@localhost","password");
+  String sources=driver.getPageSource();
+  System.out.println(sources);
+  String code=driver.findElement(By.id("code")).getText();
+  String state=driver.findElement(By.id("state")).getText();
+  assertEquals("OpenIdConnect.AuthenticationProperties=2302984sdlk",state);
+  testingClient.testing().verifyCode("test",code);
+  String codeId=events.expectLogin().assertEvent().getDetails().get(Details.CODE_ID);
+  assertCode(codeId,code);
+}

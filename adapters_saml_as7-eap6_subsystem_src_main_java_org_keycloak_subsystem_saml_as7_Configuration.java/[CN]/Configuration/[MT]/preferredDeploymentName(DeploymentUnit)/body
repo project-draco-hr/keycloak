@@ -1,0 +1,14 @@
+{
+  String deploymentName=deploymentUnit.getName();
+  WarMetaData warMetaData=deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
+  if (warMetaData == null) {
+    return deploymentName;
+  }
+  JBossWebMetaData webMetaData=warMetaData.getMergedJBossWebMetaData();
+  if (webMetaData == null) {
+    return deploymentName;
+  }
+  String moduleName=webMetaData.getModuleName();
+  if (moduleName != null)   return moduleName + ".war";
+  return deploymentName;
+}

@@ -1,0 +1,24 @@
+{
+  Map<String,Object> policyConfig=new HashMap<>();
+  if (policyString != null && !policyString.trim().isEmpty()) {
+    for (    String policy : policyString.split(" and ")) {
+      policy=policy.trim();
+      String key;
+      String config=null;
+      int i=policy.indexOf('(');
+      if (i == -1) {
+        key=policy.trim();
+      }
+ else {
+        key=policy.substring(0,i).trim();
+        config=policy.substring(i + 1,policy.length() - 1);
+      }
+      PasswordPolicyProvider provider=session.getProvider(PasswordPolicyProvider.class,key);
+      if (provider == null) {
+        throw new IllegalArgumentException("Unsupported policy");
+      }
+      policyConfig.put(key,provider.parseConfig(config));
+    }
+  }
+  return new PasswordPolicy(policyString,policyConfig);
+}

@@ -5,6 +5,10 @@
   OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(code,"password");
   Assert.assertEquals(200,response.getStatusCode());
   IDToken idToken=oauth.verifyIDToken(response.getIdToken());
-  events.expectCodeToToken(codeId,sessionId).assertEvent();
+  Field eventsField=Reflections.findDeclaredField(this.getClass(),"events");
+  if (eventsField != null) {
+    AssertEvents events=Reflections.getFieldValue(eventsField,this,AssertEvents.class);
+    events.expectCodeToToken(codeId,sessionId).assertEvent();
+  }
   return idToken;
 }

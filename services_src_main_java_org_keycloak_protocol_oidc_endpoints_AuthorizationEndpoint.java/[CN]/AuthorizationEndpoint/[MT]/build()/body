@@ -14,9 +14,12 @@
   extractAdditionalReqParams(params);
   checkSsl();
   checkRealm();
-  checkResponseType();
   checkClient();
   checkRedirectUri();
+  Response errorResponse=checkResponseType();
+  if (errorResponse != null) {
+    return errorResponse;
+  }
   createClientSession();
   CacheControlUtil.noBackButtonCacheControlHeader();
 switch (action) {

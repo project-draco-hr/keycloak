@@ -1,0 +1,31 @@
+{
+  KeycloakJettyAuthenticator keycloakJettyAuthenticator=new KeycloakJettyAuthenticator();
+  keycloakJettyAuthenticator.setConfigResolver(new KeycloakSpringBootConfigResolver());
+  List<ConstraintMapping> jettyConstraintMappings=new ArrayList<ConstraintMapping>();
+  for (  KeycloakSpringBootProperties.SecurityConstraint constraintDefinition : keycloakProperties.getSecurityConstraints()) {
+    for (    KeycloakSpringBootProperties.SecurityCollection securityCollectionDefinition : constraintDefinition.getSecurityCollections()) {
+      Constraint jettyConstraint=new Constraint();
+      jettyConstraint.setName(securityCollectionDefinition.getName());
+      jettyConstraint.setAuthenticate(true);
+      if (securityCollectionDefinition.getName() != null) {
+        jettyConstraint.setName(securityCollectionDefinition.getName());
+      }
+      jettyConstraint.setRoles(securityCollectionDefinition.getAuthRoles().toArray(new String[0]));
+      ConstraintMapping jettyConstraintMapping=new ConstraintMapping();
+      if (securityCollectionDefinition.getPatterns().size() > 0) {
+        jettyConstraintMapping.setPathSpec(securityCollectionDefinition.getPatterns().get(0));
+        jettyConstraintMapping.setConstraint(jettyConstraint);
+      }
+      if (securityCollectionDefinition.getMethods().size() > 0) {
+        jettyConstraintMapping.setMethod(securityCollectionDefinition.getMethods().get(0));
+      }
+      jettyConstraintMapping.setMethodOmissions(securityCollectionDefinition.getOmittedMethods().toArray(new String[0]));
+      jettyConstraintMappings.add(jettyConstraintMapping);
+    }
+  }
+  WebAppContext webAppContext=server.getBean(WebAppContext.class);
+  ConstraintSecurityHandler securityHandler=new ConstraintSecurityHandler();
+  securityHandler.setConstraintMappings(jettyConstraintMappings);
+  securityHandler.setAuthenticator(keycloakJettyAuthenticator);
+  webAppContext.setHandler(securityHandler);
+}

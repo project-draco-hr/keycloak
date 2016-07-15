@@ -1,0 +1,10 @@
+{
+  WebDriverWait wait=new WebDriverWait(driver,PAGELOAD_TIMEOUT_MILLIS / 1000);
+  try {
+    wait.until(not(urlContains("redirect_fragment")));
+    wait.until(javaScriptThrowsNoExceptions("if (document.readyState !== 'complete' " + "|| (typeof angular !== 'undefined' && angular.element(document.body).injector().get('$http').pendingRequests.length !== 0)) {" + "throw \"Not ready\";"+ "}"));
+  }
+ catch (  TimeoutException e) {
+    log.warn("waitForPageToLoad time exceeded!");
+  }
+}

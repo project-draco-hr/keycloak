@@ -1,0 +1,9 @@
+{
+  RequiredActionProviderRepresentation rep=adminClient.realm("test").flows().getRequiredAction("terms_and_conditions");
+  rep.setEnabled(false);
+  adminClient.realm("test").flows().updateRequiredAction("terms_and_conditions",rep);
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  assertTrue(appPage.isCurrent());
+  events.expectLogin().assertEvent();
+}

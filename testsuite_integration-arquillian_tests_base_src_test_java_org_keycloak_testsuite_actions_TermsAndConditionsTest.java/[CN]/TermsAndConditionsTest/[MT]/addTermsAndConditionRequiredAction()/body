@@ -2,4 +2,7 @@
   UserRepresentation user=ActionUtil.findUserWithAdminClient(adminClient,"test-user@localhost");
   UserBuilder.edit(user).requiredAction(TermsAndConditions.PROVIDER_ID);
   adminClient.realm("test").users().get(user.getId()).update(user);
+  RequiredActionProviderRepresentation rep=adminClient.realm("test").flows().getRequiredAction("terms_and_conditions");
+  rep.setEnabled(true);
+  adminClient.realm("test").flows().updateRequiredAction("terms_and_conditions",rep);
 }

@@ -23,8 +23,7 @@
   if (idpHint != null && idpHint.length() > 0) {
     redirectUriBuilder.queryParam(AdapterConstants.KC_IDP_HINT,idpHint);
   }
-  if (scope != null && scope.length() > 0) {
-    redirectUriBuilder.queryParam(OAuth2Constants.SCOPE,scope);
-  }
+  scope=TokenUtil.attachOIDCScope(scope);
+  redirectUriBuilder.queryParam(OAuth2Constants.SCOPE,scope);
   return redirectUriBuilder.build().toString();
 }

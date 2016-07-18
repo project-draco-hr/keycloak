@@ -1,12 +1,26 @@
 {
-  if (isTomcatAppServer(testClass.getJavaClass())) {
-    try {
-      String webXmlContent=IOUtils.toString(archive.get(WEBXML_PATH).getAsset().openStream());
+  try {
+    String webXmlContent=IOUtils.toString(archive.get(WEBXML_PATH).getAsset().openStream());
+    if (isTomcatAppServer(testClass.getJavaClass())) {
       webXmlContent=webXmlContent.replace("<auth-method>KEYCLOAK</auth-method>","<auth-method>BASIC</auth-method>");
-      archive.add(new StringAsset((webXmlContent)),WEBXML_PATH);
     }
- catch (    IOException ex) {
-      throw new RuntimeException("Cannot load web.xml from archive.");
+    if (testClass.getJavaClass().isAnnotationPresent(UseServletFilter.class)) {
+      log.info("Adding filter to " + testClass.getAnnotation(UseServletFilter.class).filterClass() + " with mapping "+ testClass.getAnnotation(UseServletFilter.class).filterPattern()+ " for "+ archive.getName());
+      String filter="\n<filter>\n" + "<filter-name>" + testClass.getAnnotation(UseServletFilter.class).filterName() + "</filter-name>\n"+ "<filter-class>"+ testClass.getAnnotation(UseServletFilter.class).filterClass()+ "</filter-class>\n"+ "</filter>\n"+ "\n<filter-mapping>\n"+ "<filter-name>"+ testClass.getAnnotation(UseServletFilter.class).filterName()+ "</filter-name>\n"+ "<url-pattern>"+ testClass.getAnnotation(UseServletFilter.class).filterPattern()+ "</url-pattern>\n";
+      if (!testClass.getAnnotation(UseServletFilter.class).dispatcherType().isEmpty()) {
+        filter+="<dispatcher>" + testClass.getAnnotation(UseServletFilter.class).dispatcherType() + "</dispatcher>\n";
+      }
+      filter+="</filter-mapping>\n";
+      webXmlContent=webXmlContent.replace("</module-name>","</module-name> " + filter);
+      log.info("Adding SAMLFilter dependencies to " + archive.getName());
+      ((WebArchive)archive).addAsLibraries(new SAMLFilterDependency().getDependencies());
+      int start=webXmlContent.indexOf("<security-constraint>");
+      int end=webXmlContent.indexOf("</security-role>") + "</security-role>".length();
+      webXmlContent=webXmlContent.substring(0,start) + webXmlContent.substring(end);
     }
+    archive.add(new StringAsset((webXmlContent)),WEBXML_PATH);
+  }
+ catch (  IOException ex) {
+    throw new RuntimeException("Cannot load web.xml from archive.");
   }
 }

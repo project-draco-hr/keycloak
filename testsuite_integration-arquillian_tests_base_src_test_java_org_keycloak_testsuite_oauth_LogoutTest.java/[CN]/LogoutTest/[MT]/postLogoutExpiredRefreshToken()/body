@@ -1,0 +1,11 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+  oauth.clientSessionState("client-session");
+  OAuthClient.AccessTokenResponse tokenResponse=oauth.doAccessTokenRequest(code,"password");
+  String refreshTokenString=tokenResponse.getRefreshToken();
+  adminClient.realm("test").update(RealmBuilder.create().notBefore(Time.currentTime() + 1).build());
+  HttpResponse response=oauth.doLogout(refreshTokenString,"password");
+  assertEquals(204,response.getStatusLine().getStatusCode());
+  assertNotNull(testingClient.testApp().getAdminLogoutAction());
+}

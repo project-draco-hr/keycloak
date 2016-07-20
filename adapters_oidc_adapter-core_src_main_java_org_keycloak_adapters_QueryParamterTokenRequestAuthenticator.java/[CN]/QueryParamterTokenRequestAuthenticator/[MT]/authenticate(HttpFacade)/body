@@ -1,0 +1,9 @@
+{
+  tokenString=null;
+  tokenString=getAccessTokenFromQueryParamter(exchange);
+  if (tokenString == null || tokenString.trim().isEmpty()) {
+    challenge=challengeResponse(exchange,OIDCAuthenticationError.Reason.NO_QUERY_PARAMETER_ACCESS_TOKEN,null,null);
+    return AuthOutcome.NOT_ATTEMPTED;
+  }
+  return (authenticateToken(exchange,tokenString));
+}

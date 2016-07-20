@@ -18,6 +18,21 @@
     log.debug("Bearer AUTHENTICATED");
     return AuthOutcome.AUTHENTICATED;
   }
+  QueryParamterTokenRequestAuthenticator queryParamAuth=createQueryParamterTokenRequestAuthenticator();
+  if (log.isTraceEnabled()) {
+    log.trace("try query paramter auth");
+  }
+  outcome=queryParamAuth.authenticate(facade);
+  if (outcome == AuthOutcome.FAILED) {
+    challenge=queryParamAuth.getChallenge();
+    log.debug("QueryParamAuth auth FAILED");
+    return AuthOutcome.FAILED;
+  }
+ else   if (outcome == AuthOutcome.AUTHENTICATED) {
+    log.debug("QueryParamAuth AUTHENTICATED");
+    completeAuthentication(queryParamAuth,"KEYCLOAK");
+    return AuthOutcome.AUTHENTICATED;
+  }
   if (deployment.isEnableBasicAuth()) {
     BasicAuthRequestAuthenticator basicAuth=createBasicAuthAuthenticator();
     if (log.isTraceEnabled()) {

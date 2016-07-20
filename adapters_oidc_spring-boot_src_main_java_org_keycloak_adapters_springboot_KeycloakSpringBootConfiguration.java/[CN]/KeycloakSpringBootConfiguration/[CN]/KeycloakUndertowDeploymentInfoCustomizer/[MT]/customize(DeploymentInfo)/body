@@ -1,0 +1,8 @@
+{
+  io.undertow.servlet.api.LoginConfig loginConfig=new io.undertow.servlet.api.LoginConfig(keycloakProperties.getRealm());
+  loginConfig.addFirstAuthMethod("KEYCLOAK");
+  deploymentInfo.setLoginConfig(loginConfig);
+  deploymentInfo.addInitParameter("keycloak.config.resolver",KeycloakSpringBootConfigResolver.class.getName());
+  deploymentInfo.addSecurityConstraints(getSecurityConstraints());
+  deploymentInfo.addServletExtension(new KeycloakServletExtension());
+}

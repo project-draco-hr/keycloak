@@ -1,0 +1,21 @@
+{
+  String tokenUrl=AUTH_SERVER_URL + "/realms/demo/protocol/openid-connect/token";
+  Client client=ClientBuilder.newClient();
+  try {
+    WebTarget webTarget=client.target(tokenUrl);
+    Form form=new Form();
+    form.param("grant_type","password");
+    form.param("client_id","customer-portal-public");
+    form.param("username","bburke@redhat.com");
+    form.param("password","password");
+    Response response=webTarget.request().post(Entity.form(form));
+    Assert.assertEquals(200,response.getStatus());
+    JSONObject jsonObject=new JSONObject(response.readEntity(String.class));
+    System.out.println(jsonObject);
+    response.close();
+    return jsonObject.getString("access_token");
+  }
+  finally {
+    client.close();
+  }
+}

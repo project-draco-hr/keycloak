@@ -1,0 +1,9 @@
+{
+  driver.navigate().to(oauth.getLoginFormUrl() + "&prompt=none");
+  assertFalse(loginPage.isCurrent());
+  assertTrue(appPage.isCurrent());
+  events.assertEmpty();
+  OAuthClient.AuthorizationCodeResponse resp=new OAuthClient.AuthorizationCodeResponse(oauth);
+  Assert.assertNull(resp.getCode());
+  Assert.assertEquals(OAuthErrorException.LOGIN_REQUIRED,resp.getError());
+}

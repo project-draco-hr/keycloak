@@ -4,11 +4,12 @@
     context.attempted();
   }
  else {
-    if (requireReauthentication(authResult.getSession(),context.getClientSession())) {
+    ClientSessionModel clientSession=context.getClientSession();
+    LoginProtocol protocol=context.getSession().getProvider(LoginProtocol.class,clientSession.getAuthMethod());
+    if (protocol.requireReauthentication(authResult.getSession(),clientSession)) {
       context.attempted();
     }
  else {
-      ClientSessionModel clientSession=context.getClientSession();
       clientSession.setNote(AuthenticationManager.SSO_AUTH,"true");
       context.setUser(authResult.getUser());
       context.attachUserSession(authResult.getSession());

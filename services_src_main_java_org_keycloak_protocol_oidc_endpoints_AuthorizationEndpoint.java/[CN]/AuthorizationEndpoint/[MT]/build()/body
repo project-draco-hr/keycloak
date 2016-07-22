@@ -23,6 +23,10 @@
   if (!TokenUtil.isOIDCRequest(scope)) {
     logger.oidcScopeMissing();
   }
+  errorResponse=checkOIDCParams(params);
+  if (errorResponse != null) {
+    return errorResponse;
+  }
   createClientSession();
   CacheControlUtil.noBackButtonCacheControlHeader();
 switch (action) {

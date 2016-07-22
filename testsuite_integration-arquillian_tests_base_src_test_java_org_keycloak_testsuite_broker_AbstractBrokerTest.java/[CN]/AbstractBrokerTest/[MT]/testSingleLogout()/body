@@ -2,14 +2,7 @@
   log.debug("Testing single log out");
   driver.navigate().to(getAccountUrl(providerRealmName()));
   Assert.assertTrue("Should be logged in the account page",driver.getTitle().endsWith("Account Management"));
-  String encodedAccount;
-  try {
-    encodedAccount=URLEncoder.encode(getAccountUrl(providerRealmName()),"UTF-8");
-  }
- catch (  UnsupportedEncodingException e) {
-    encodedAccount=getAccountUrl(providerRealmName());
-  }
-  driver.navigate().to(getAuthRoot() + "/auth/realms/" + providerRealmName()+ "/protocol/"+ "openid-connect"+ "/logout?redirect_uri="+ encodedAccount);
+  driver.navigate().to(getAuthRoot() + "/auth/realms/" + providerRealmName()+ "/protocol/"+ "openid-connect"+ "/logout?redirect_uri="+ encodeUrl(getAccountUrl(providerRealmName())));
   waitForPage("log in to " + providerRealmName());
   Assert.assertTrue("Should be on " + providerRealmName() + " realm",driver.getCurrentUrl().contains("/auth/realms/" + providerRealmName()));
   driver.navigate().to(getAccountUrl(consumerRealmName()));

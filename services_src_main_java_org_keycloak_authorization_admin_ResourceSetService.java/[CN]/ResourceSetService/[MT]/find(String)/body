@@ -1,0 +1,12 @@
+{
+  this.auth.requireView();
+  StoreFactory storeFactory=authorization.getStoreFactory();
+  if (name == null) {
+    return Response.status(Status.BAD_REQUEST).build();
+  }
+  Resource model=storeFactory.getResourceStore().findByName(name,this.resourceServer.getId());
+  if (model == null) {
+    return Response.status(Status.OK).build();
+  }
+  return Response.ok(toRepresentation(model,this.resourceServer,authorization)).build();
+}

@@ -1,0 +1,18 @@
+{
+  securePortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlEquals(securePortal);
+  String pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  int currentTime=Time.currentTime();
+  setAdapterAndServerTimeOffset(10,securePortal.toString());
+  String appUri=tokenMinTTLPage.getUriBuilder().queryParam(OIDCLoginProtocol.PROMPT_PARAM,OIDCLoginProtocol.PROMPT_VALUE_LOGIN).build().toString();
+  URLUtils.navigateToUri(driver,appUri,true);
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  AccessToken token=tokenMinTTLPage.getAccessToken();
+  int authTime=token.getAuthTime();
+  Assert.assertTrue(currentTime + 10 <= authTime);
+  setAdapterAndServerTimeOffset(0,tokenMinTTLPage.toString());
+}

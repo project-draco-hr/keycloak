@@ -1,0 +1,8 @@
+{
+  driver.navigate().to(oauth.getLoginFormUrl() + "&" + OIDCLoginProtocol.LOGIN_HINT_PARAM+ "=test-user%40localhost");
+  loginPage.assertCurrent();
+  Assert.assertEquals("test-user@localhost",loginPage.getUsername());
+  loginPage.login("password");
+  Assert.assertEquals(AppPage.RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  events.expectLogin().detail(Details.USERNAME,"test-user@localhost").assertEvent();
+}

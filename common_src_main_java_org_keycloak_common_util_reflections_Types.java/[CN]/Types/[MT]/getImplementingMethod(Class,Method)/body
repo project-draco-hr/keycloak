@@ -1,0 +1,45 @@
+{
+  Class<?> declaringClass=intfMethod.getDeclaringClass();
+  if (declaringClass.equals(clazz))   return intfMethod;
+  Class[] paramTypes=intfMethod.getParameterTypes();
+  if (declaringClass.getTypeParameters().length > 0 && paramTypes.length > 0) {
+    Type[] intfTypes=findParameterizedTypes(clazz,declaringClass);
+    Map<String,Type> typeVarMap=new HashMap<String,Type>();
+    TypeVariable<? extends Class<?>>[] vars=declaringClass.getTypeParameters();
+    for (int i=0; i < vars.length; i++) {
+      if (intfTypes != null && i < intfTypes.length) {
+        typeVarMap.put(vars[i].getName(),intfTypes[i]);
+      }
+ else {
+        typeVarMap.put(vars[i].getName(),vars[i].getGenericDeclaration());
+      }
+    }
+    Type[] paramGenericTypes=intfMethod.getGenericParameterTypes();
+    paramTypes=new Class[paramTypes.length];
+    for (int i=0; i < paramTypes.length; i++) {
+      if (paramGenericTypes[i] instanceof TypeVariable) {
+        TypeVariable tv=(TypeVariable)paramGenericTypes[i];
+        Type t=typeVarMap.get(tv.getName());
+        if (t == null) {
+          throw new RuntimeException("Unable to resolve type variable");
+        }
+        paramTypes[i]=getRawType(t);
+      }
+ else {
+        paramTypes[i]=getRawType(paramGenericTypes[i]);
+      }
+    }
+  }
+  try {
+    return clazz.getMethod(intfMethod.getName(),paramTypes);
+  }
+ catch (  NoSuchMethodException e) {
+  }
+  try {
+    Method tmp=clazz.getMethod(intfMethod.getName(),intfMethod.getParameterTypes());
+    return tmp;
+  }
+ catch (  NoSuchMethodException e) {
+  }
+  return intfMethod;
+}

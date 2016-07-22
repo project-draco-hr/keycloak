@@ -1,8 +1,21 @@
 {
-  return new AbstractUserAdapter(session,realm,model){
-    @Override public String getUsername(){
-      return username;
+  if (federatedStorageEnabled) {
+    return new AbstractUserAdapterFederatedStorage(session,realm,model){
+      @Override public String getUsername(){
+        return username;
+      }
+      @Override public void setUsername(      String username){
+        throw new RuntimeException("Unsupported");
+      }
     }
-  }
 ;
+  }
+ else {
+    return new AbstractUserAdapter(session,realm,model){
+      @Override public String getUsername(){
+        return username;
+      }
+    }
+;
+  }
 }

@@ -1,0 +1,16 @@
+{
+  if (genericType instanceof ParameterizedType) {
+    ParameterizedType parameterizedType=(ParameterizedType)genericType;
+    Type componentGenericType=parameterizedType.getActualTypeArguments()[0];
+    return getRawType(componentGenericType);
+  }
+ else   if (genericType instanceof GenericArrayType) {
+    final GenericArrayType genericArrayType=(GenericArrayType)genericType;
+    Type componentGenericType=genericArrayType.getGenericComponentType();
+    return getRawType(componentGenericType);
+  }
+ else   if (type.isArray()) {
+    return type.getComponentType();
+  }
+  return null;
+}

@@ -1,0 +1,14 @@
+{
+  if (typeVariable.getGenericDeclaration() instanceof Class<?>) {
+    Class<?> classDeclaringTypeVariable=(Class<?>)typeVariable.getGenericDeclaration();
+    Type[] types=findParameterizedTypes(root,classDeclaringTypeVariable);
+    if (types == null)     return null;
+    for (int i=0; i < types.length; i++) {
+      TypeVariable<?> tv=classDeclaringTypeVariable.getTypeParameters()[i];
+      if (tv.equals(typeVariable)) {
+        return types[i];
+      }
+    }
+  }
+  return null;
+}

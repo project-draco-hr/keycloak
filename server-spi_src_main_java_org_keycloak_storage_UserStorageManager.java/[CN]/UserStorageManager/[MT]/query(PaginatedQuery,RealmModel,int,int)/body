@@ -1,18 +1,19 @@
 {
-  List<UserModel> results=new LinkedList<UserModel>();
-  if (maxResults == 0)   return results;
+  if (maxResults == 0)   return Collections.EMPTY_LIST;
   List<UserQueryProvider> storageProviders=getStorageProviders(realm,UserQueryProvider.class);
-  LinkedList<UserQueryProvider> providers=new LinkedList<>();
-  if (providers.isEmpty()) {
+  if (storageProviders.isEmpty()) {
     return pagedQuery.query(localStorage(),firstResult,maxResults);
   }
+  LinkedList<Object> providers=new LinkedList<>();
+  List<UserModel> results=new LinkedList<UserModel>();
   providers.add(localStorage());
   providers.addAll(storageProviders);
+  providers.add(getFederatedStorage());
   int leftToRead=maxResults;
   int leftToFirstResult=firstResult;
-  Iterator<UserQueryProvider> it=providers.iterator();
+  Iterator<Object> it=providers.iterator();
   while (it.hasNext() && leftToRead != 0) {
-    UserQueryProvider provider=it.next();
+    Object provider=it.next();
     boolean exhausted=false;
     int index=0;
     if (leftToFirstResult > 0) {

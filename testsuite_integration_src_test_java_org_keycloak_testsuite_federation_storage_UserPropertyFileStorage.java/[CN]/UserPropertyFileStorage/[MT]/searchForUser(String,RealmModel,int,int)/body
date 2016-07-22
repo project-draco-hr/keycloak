@@ -1,0 +1,16 @@
+{
+  if (maxResults == 0)   return Collections.EMPTY_LIST;
+  List<UserModel> users=new LinkedList<>();
+  int count=0;
+  for (  Object un : userPasswords.keySet()) {
+    String username=(String)un;
+    if (username.contains(search)) {
+      if (count++ < firstResult) {
+        continue;
+      }
+      users.add(createUser(realm,username));
+      if (users.size() + 1 > maxResults)       break;
+    }
+  }
+  return users;
+}

@@ -1,0 +1,23 @@
+{
+  if (Object.class.equals(root))   return null;
+  Map<String,Type> typeVarMap=populateParameterizedMap(root,rootType);
+  Class<?> superclass=root.getSuperclass();
+  Type genericSuper=root.getGenericSuperclass();
+  if (superclass.equals(searchedForClass)) {
+    return extractTypes(typeVarMap,genericSuper);
+  }
+  if (genericSuper instanceof ParameterizedType) {
+    ParameterizedType intfParam=(ParameterizedType)genericSuper;
+    Type[] types=findClassParameterizedTypes(superclass,intfParam,searchedForClass);
+    if (types != null) {
+      return extractTypeVariables(typeVarMap,types);
+    }
+  }
+ else {
+    Type[] types=findClassParameterizedTypes(superclass,null,searchedForClass);
+    if (types != null) {
+      return types;
+    }
+  }
+  return null;
+}

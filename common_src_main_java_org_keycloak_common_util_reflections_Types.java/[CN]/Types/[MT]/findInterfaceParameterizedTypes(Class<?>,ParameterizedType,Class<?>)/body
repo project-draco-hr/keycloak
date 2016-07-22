@@ -1,0 +1,20 @@
+{
+  Map<String,Type> typeVarMap=populateParameterizedMap(root,rootType);
+  for (int i=0; i < root.getInterfaces().length; i++) {
+    Class<?> sub=root.getInterfaces()[i];
+    Type genericSub=root.getGenericInterfaces()[i];
+    if (sub.equals(searchedForInterface)) {
+      return extractTypes(typeVarMap,genericSub);
+    }
+  }
+  for (int i=0; i < root.getInterfaces().length; i++) {
+    Type genericSub=root.getGenericInterfaces()[i];
+    Class<?> sub=root.getInterfaces()[i];
+    Type[] types=recurseSuperclassForInterface(searchedForInterface,typeVarMap,genericSub,sub);
+    if (types != null)     return types;
+  }
+  if (root.isInterface())   return null;
+  Class<?> superclass=root.getSuperclass();
+  Type genericSuper=root.getGenericSuperclass();
+  return recurseSuperclassForInterface(searchedForInterface,typeVarMap,genericSuper,superclass);
+}

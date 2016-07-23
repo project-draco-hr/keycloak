@@ -1,0 +1,19 @@
+{
+  return new AbstractUserAdapterFederatedStorage(session,realm,model){
+    @Override public String getUsername(){
+      return username;
+    }
+    @Override public void setUsername(    String username){
+      throw new RuntimeException("Unsupported");
+    }
+    @Override public void updateCredential(    UserCredentialModel cred){
+      if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
+        userPasswords.put(username,cred.getValue());
+      }
+ else {
+        super.updateCredential(cred);
+      }
+    }
+  }
+;
+}

@@ -1,0 +1,8 @@
+{
+  String roleName=role.getName();
+  if (role.isClientRole()) {
+    ClientModel clientModel=getCurrentRealm().getClientById(role.getContainerId());
+    return identity.hasClientRole(clientModel.getClientId(),roleName);
+  }
+  return identity.hasRealmRole(roleName);
+}

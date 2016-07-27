@@ -1,11 +1,9 @@
 {
   KeycloakIdentity identity=createIdentity();
-  if (!identity.hasRole("uma_protection")) {
-    throw new ErrorResponseException(OAuthErrorException.INVALID_SCOPE,"Requires uma_protection scope.",Status.FORBIDDEN);
-  }
-  ResourceSetService resourceManager=new ResourceSetService(getResourceServer(identity),this.authorization,null);
+  ResourceServer resourceServer=getResourceServer(identity);
+  ResourceSetService resourceManager=new ResourceSetService(resourceServer,this.authorization,null);
   ResteasyProviderFactory.getInstance().injectProperties(resourceManager);
-  ResourceService resource=new ResourceService(getResourceServer(identity),identity,resourceManager,this.authorization);
+  ResourceService resource=new ResourceService(resourceServer,identity,resourceManager,this.authorization);
   ResteasyProviderFactory.getInstance().injectProperties(resource);
   return resource;
 }

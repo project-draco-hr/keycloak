@@ -14,6 +14,7 @@
   updatePasswordPage.assertCurrent();
   updatePasswordPage.changePassword("invalid","invalid");
   assertEquals("Invalid password: minimum length 8.",resetPasswordPage.getErrorMessage());
+  events.expectRequiredAction(EventType.UPDATE_PASSWORD_ERROR).error(Errors.PASSWORD_REJECTED).user(userId).detail(Details.USERNAME,"login-test").assertEvent().getSessionId();
   updatePasswordPage.changePassword("resetPasswordWithPasswordPolicy","resetPasswordWithPasswordPolicy");
   String sessionId=events.expectRequiredAction(EventType.UPDATE_PASSWORD).user(userId).detail(Details.USERNAME,"login-test").assertEvent().getSessionId();
   assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());

@@ -12,7 +12,9 @@
     @Override public void onComplete(    List<Result> results){
       List<Permission> entitlements=Permissions.allPermits(results);
       if (entitlements.isEmpty()) {
-        asyncResponse.resume(Cors.add(httpRequest,Response.status(Status.FORBIDDEN).entity(new ErrorResponseException("not_authorized","Authorization denied.",Status.FORBIDDEN))).allowedOrigins(identity.getAccessToken()).exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build());
+        HashMap<Object,Object> error=new HashMap<>();
+        error.put(OAuth2Constants.ERROR,"not_authorized");
+        asyncResponse.resume(Cors.add(httpRequest,Response.status(Status.FORBIDDEN).entity(error)).allowedOrigins(identity.getAccessToken()).exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build());
       }
  else {
         AuthorizationResponse response=new AuthorizationResponse(createRequestingPartyToken(entitlements,identity.getAccessToken()));

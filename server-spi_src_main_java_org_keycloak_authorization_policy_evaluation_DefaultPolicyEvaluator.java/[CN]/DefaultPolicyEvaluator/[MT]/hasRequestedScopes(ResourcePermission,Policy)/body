@@ -2,21 +2,38 @@
   if (permission.getScopes().isEmpty()) {
     return true;
   }
-  if (policy.getScopes().isEmpty()) {
-    return true;
-  }
-  boolean hasScope=true;
-  for (  Scope givenScope : policy.getScopes()) {
-    boolean hasGivenScope=false;
-    for (    Scope scope : permission.getScopes()) {
-      if (givenScope.getId().equals(scope.getId())) {
-        hasGivenScope=true;
-        break;
-      }
+  Set<Scope> scopes=new HashSet<>(policy.getScopes());
+  if (scopes.isEmpty()) {
+    Set<Resource> resources=new HashSet<>();
+    resources.addAll(policy.getResources());
+    for (    Resource resource : resources) {
+      scopes.addAll(resource.getScopes());
     }
-    if (!hasGivenScope) {
+    if (!resources.isEmpty() && scopes.isEmpty()) {
       return false;
     }
+    if (scopes.isEmpty()) {
+      Resource resource=permission.getResource();
+      String type=resource.getType();
+      if (type != null) {
+        List<Resource> resourcesByType=authorization.getStoreFactory().getResourceStore().findByType(type);
+        for (        Resource resourceType : resourcesByType) {
+          if (resourceType.getOwner().equals(resource.getResourceServer().getClientId())) {
+            resources.add(resourceType);
+          }
+        }
+      }
+    }
+    for (    Resource resource : resources) {
+      scopes.addAll(resource.getScopes());
+    }
   }
-  return hasScope;
+  for (  Scope givenScope : scopes) {
+    for (    Scope scope : permission.getScopes()) {
+      if (givenScope.getId().equals(scope.getId())) {
+        return true;
+      }
+    }
+  }
+  return false;
 }

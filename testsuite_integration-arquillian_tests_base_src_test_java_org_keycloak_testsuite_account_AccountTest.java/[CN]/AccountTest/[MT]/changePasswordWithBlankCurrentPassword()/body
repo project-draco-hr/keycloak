@@ -1,0 +1,11 @@
+{
+  changePasswordPage.open();
+  loginPage.login("test-user@localhost","password");
+  events.expectLogin().client("account").detail(Details.REDIRECT_URI,ACCOUNT_REDIRECT + "?path=password").assertEvent();
+  changePasswordPage.changePassword("","new","new");
+  Assert.assertEquals("Please specify password.",profilePage.getError());
+  events.expectAccount(EventType.UPDATE_PASSWORD_ERROR).error(Errors.PASSWORD_MISSING).assertEvent();
+  changePasswordPage.changePassword("password","new","new");
+  Assert.assertEquals("Your password has been updated.",profilePage.getSuccess());
+  events.expectAccount(EventType.UPDATE_PASSWORD).assertEvent();
+}

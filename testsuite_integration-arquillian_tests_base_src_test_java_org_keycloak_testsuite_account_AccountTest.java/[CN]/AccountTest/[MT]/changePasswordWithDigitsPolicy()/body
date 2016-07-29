@@ -1,12 +1,12 @@
 {
-  setPasswordPolicy("length(8)");
+  setPasswordPolicy("digits(2)");
   changePasswordPage.open();
   loginPage.login("test-user@localhost","password");
   events.expectLogin().client("account").detail(Details.REDIRECT_URI,ACCOUNT_REDIRECT + "?path=password").assertEvent();
-  changePasswordPage.changePassword("password","1234","1234");
-  Assert.assertEquals("Invalid password: minimum length 8.",profilePage.getError());
+  changePasswordPage.changePassword("password","invalidPassword1","invalidPassword1");
+  Assert.assertEquals("Invalid password: must contain at least 2 numerical digits.",profilePage.getError());
   events.expectAccount(EventType.UPDATE_PASSWORD_ERROR).error(Errors.PASSWORD_REJECTED).assertEvent();
-  changePasswordPage.changePassword("password","12345678","12345678");
+  changePasswordPage.changePassword("password","validPassword12","validPassword12");
   Assert.assertEquals("Your password has been updated.",profilePage.getSuccess());
   events.expectAccount(EventType.UPDATE_PASSWORD).assertEvent();
 }

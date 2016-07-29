@@ -1,0 +1,19 @@
+{
+  try {
+    this.deployer.deploy(RESOURCE_SERVER_ID);
+    login("jdoe","jdoe");
+    assertFalse(wasDenied());
+    assertTrue(hasLink("User Premium"));
+    assertTrue(hasLink("Administration"));
+    assertTrue(hasText("urn:servlet-authz:page:main:actionForUser"));
+    assertTrue(hasText("urn:servlet-authz:page:main:actionForPremiumUser"));
+    assertFalse(hasText("urn:servlet-authz:page:main:actionForAdmin"));
+    navigateToDynamicMenuPage();
+    assertTrue(hasText("Do user thing"));
+    assertTrue(hasText("Do  user premium thing"));
+    assertFalse(hasText("Do administration thing"));
+  }
+  finally {
+    this.deployer.undeploy(RESOURCE_SERVER_ID);
+  }
+}

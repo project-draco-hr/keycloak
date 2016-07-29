@@ -12,6 +12,10 @@
     assertTrue(hasText("Do user thing"));
     assertTrue(hasText("Do  user premium thing"));
     assertFalse(hasText("Do administration thing"));
+    navigateToUserPremiumPage();
+    assertFalse(wasDenied());
+    navigateToAdminPage();
+    assertTrue(wasDenied());
   }
   finally {
     this.deployer.undeploy(RESOURCE_SERVER_ID);

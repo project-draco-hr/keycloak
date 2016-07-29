@@ -1,8 +1,12 @@
 {
-  configureAuthorizationServices();
-  deploy();
-  navigateToResourceServer();
-  login();
-  assertTrue(this.driver.getPageSource().contains("Your permissions are"));
-  assertTrue(this.driver.getPageSource().contains("Default Resource"));
+  try {
+    this.deployer.deploy(RESOURCE_SERVER_ID);
+    configureAuthorizationServices();
+    login();
+    assertTrue(this.driver.getPageSource().contains("Your permissions are"));
+    assertTrue(this.driver.getPageSource().contains("Default Resource"));
+  }
+  finally {
+    this.deployer.undeploy(RESOURCE_SERVER_ID);
+  }
 }

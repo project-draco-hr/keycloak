@@ -1,0 +1,23 @@
+{
+  try {
+    this.deployer.deploy(RESOURCE_SERVER_ID);
+    login("alice","alice");
+    assertFalse(wasDenied());
+    assertTrue(hasLink("User Premium"));
+    assertTrue(hasLink("Administration"));
+    assertTrue(hasText("urn:servlet-authz:page:main:actionForUser"));
+    assertFalse(hasText("urn:servlet-authz:page:main:actionForAdmin"));
+    assertFalse(hasText("urn:servlet-authz:page:main:actionForPremiumUser"));
+    navigateToDynamicMenuPage();
+    assertTrue(hasText("Do user thing"));
+    assertFalse(hasText("Do  user premium thing"));
+    assertFalse(hasText("Do administration thing"));
+    navigateToUserPremiumPage();
+    assertTrue(wasDenied());
+    navigateToAdminPage();
+    assertTrue(wasDenied());
+  }
+  finally {
+    this.deployer.undeploy(RESOURCE_SERVER_ID);
+  }
+}

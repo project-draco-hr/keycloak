@@ -18,8 +18,21 @@
     }
  else {
       LOGGER.debug("Obtaining entitlements for authenticated user.");
-      EntitlementResponse authzResponse=authzClient.entitlement(accessToken).getAll(authzClient.getConfiguration().getClientId());
-      return RSATokenVerifier.verifyToken(authzResponse.getRpt(),deployment.getRealmKey(),deployment.getRealmInfoUrl());
+      AccessToken token=httpFacade.getSecurityContext().getToken();
+      if (token.getAuthorization() == null) {
+        EntitlementResponse authzResponse=authzClient.entitlement(accessToken).getAll(authzClient.getConfiguration().getClientId());
+        return RSATokenVerifier.verifyToken(authzResponse.getRpt(),deployment.getRealmKey(),deployment.getRealmInfoUrl());
+      }
+ else {
+        EntitlementRequest request=new EntitlementRequest();
+        PermissionRequest permissionRequest=new PermissionRequest();
+        permissionRequest.setResourceSetId(pathConfig.getId());
+        permissionRequest.setResourceSetName(pathConfig.getName());
+        permissionRequest.setScopes(new HashSet<>(pathConfig.getScopes()));
+        request.addPermission(permissionRequest);
+        EntitlementResponse authzResponse=authzClient.entitlement(accessToken).get(authzClient.getConfiguration().getClientId(),request);
+        return RSATokenVerifier.verifyToken(authzResponse.getRpt(),deployment.getRealmKey(),deployment.getRealmInfoUrl());
+      }
     }
   }
  catch (  AuthorizationDeniedException e) {

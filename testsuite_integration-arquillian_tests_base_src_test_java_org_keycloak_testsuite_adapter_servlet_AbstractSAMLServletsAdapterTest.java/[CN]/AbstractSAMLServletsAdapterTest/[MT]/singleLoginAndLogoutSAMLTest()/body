@@ -9,8 +9,13 @@
   employeeSigServletPage.navigateTo();
   assertCurrentUrlStartsWith(testRealmSAMLRedirectLoginPage);
   salesPostPassiveServletPage.navigateTo();
-  waitUntilElement(By.xpath("//body")).text().not().contains("principal=");
-  assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("<body></body>") || driver.getPageSource().equals(""));
+  if (forbiddenIfNotAuthenticated) {
+    waitUntilElement(By.xpath("//body")).text().not().contains("principal=");
+    assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("<body></body>") || driver.getPageSource().equals(""));
+  }
+ else {
+    waitUntilElement(By.xpath("//body")).text().contains("principal=null");
+  }
   salesPostSigEmailServletPage.navigateTo();
   assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
 }

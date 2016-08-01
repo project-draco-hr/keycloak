@@ -1,0 +1,7 @@
+{
+  System.out.println("In SendUsername Servlet doPost() check roles is " + (checkRolesFlag || checkRoles));
+  if (httpServletRequest.getUserPrincipal() != null && (checkRolesFlag || checkRoles) && !checkRoles()) {
+    throw new RuntimeException("User: " + httpServletRequest.getUserPrincipal() + " do not have required role");
+  }
+  return Response.ok(getOutput(),MediaType.TEXT_PLAIN).build();
+}

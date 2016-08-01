@@ -14,11 +14,25 @@
     Collections.sort(providerIds);
     Map<String,ProviderRepresentation> providers=new HashMap<>();
     if (providerIds != null) {
+      info.setComponentTypes(new HashMap<>());
       for (      String name : providerIds) {
         ProviderRepresentation provider=new ProviderRepresentation();
         ProviderFactory<?> pi=session.getKeycloakSessionFactory().getProviderFactory(spi.getProviderClass(),name);
         if (ServerInfoAwareProviderFactory.class.isAssignableFrom(pi.getClass())) {
           provider.setOperationalInfo(((ServerInfoAwareProviderFactory)pi).getOperationalInfo());
+        }
+        if (pi instanceof ConfiguredProvider) {
+          ComponentTypeRepresentation rep=new ComponentTypeRepresentation();
+          rep.setId(pi.getId());
+          ConfiguredProvider configured=(ConfiguredProvider)pi;
+          rep.setHelpText(configured.getHelpText());
+          rep.setProperties(ModelToRepresentation.toRepresentation(configured.getConfigProperties()));
+          List<ComponentTypeRepresentation> reps=info.getComponentTypes().get(spi.getProviderClass().getName());
+          if (reps == null) {
+            reps=new LinkedList<>();
+            info.getComponentTypes().put(spi.getProviderClass().getName(),reps);
+          }
+          reps.add(rep);
         }
         providers.put(name,provider);
       }

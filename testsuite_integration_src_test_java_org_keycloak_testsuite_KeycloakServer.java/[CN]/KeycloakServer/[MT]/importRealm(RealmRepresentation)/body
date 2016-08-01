@@ -1,7 +1,7 @@
 {
   KeycloakSession session=sessionFactory.create();
   ;
-  session.getTransaction().begin();
+  session.getTransactionManager().begin();
   try {
     RealmManager manager=new RealmManager(session);
     if (rep.getId() != null && manager.getRealm(rep.getId()) != null) {
@@ -15,7 +15,7 @@
     manager.setContextPath("/auth");
     RealmModel realm=manager.importRealm(rep);
     info("Imported realm " + realm.getName());
-    session.getTransaction().commit();
+    session.getTransactionManager().commit();
   }
   finally {
     session.close();

@@ -1,0 +1,16 @@
+{
+  ComponentModel model=new ComponentModel();
+  model.setId(c.getId());
+  model.setName(c.getName());
+  model.setProviderType(c.getProviderType());
+  model.setProviderId(c.getProviderId());
+  model.setParentId(c.getParentId());
+  MultivaluedHashMap<String,String> config=new MultivaluedHashMap<>();
+  TypedQuery<ComponentConfigEntity> configQuery=em.createNamedQuery("getComponentConfig",ComponentConfigEntity.class).setParameter("component",c);
+  List<ComponentConfigEntity> configResults=configQuery.getResultList();
+  for (  ComponentConfigEntity configEntity : configResults) {
+    config.add(configEntity.getName(),configEntity.getValue());
+  }
+  model.setConfig(config);
+  return model;
+}

@@ -1,0 +1,10 @@
+{
+  TypedQuery<String> query=em.createNamedQuery("getComponentIdsByParent",String.class).setParameter("realm",realm).setParameter("parentId",parentId);
+  List<String> results=query.getResultList();
+  if (results.isEmpty())   return;
+  for (  String id : results) {
+    session.users().preRemove(this,getComponent(id));
+  }
+  em.createNamedQuery("deleteComponentConfigByParent").setParameter("parentId",parentId).executeUpdate();
+  em.createNamedQuery("deleteComponentByParent").setParameter("parentId",parentId).executeUpdate();
+}

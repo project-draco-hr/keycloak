@@ -1,0 +1,12 @@
+{
+  EntityManagerFactory factory=null;
+  try {
+    factory=(EntityManagerFactory)new InitialContext().lookup(entityManagerFactoryJndiName);
+  }
+ catch (  NamingException e) {
+    throw new RuntimeException(e);
+  }
+  EntityManager em=factory.createEntityManager();
+  session.getTransactionManager().enlist(new JpaKeycloakTransaction(em));
+  return em;
+}

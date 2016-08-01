@@ -1,9 +1,9 @@
 {
-  StorageProviderModel model=realm.getStorageProvider(providerId);
+  ComponentModel model=realm.getComponent(componentId);
   if (model == null)   return null;
-  StorageProviderFactory factory=(StorageProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(StorageProvider.class,model.getProviderName());
+  UserStorageProviderFactory factory=(UserStorageProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(UserStorageProvider.class,model.getProviderId());
   if (factory == null) {
-    throw new ModelException("Could not find StorageProviderFactory for: " + model.getProviderName());
+    throw new ModelException("Could not find UserStorageProviderFactory for: " + model.getProviderId());
   }
-  return factory.getInstance(session,model);
+  return getStorageProviderInstance(new UserStorageProviderModel(model),factory);
 }

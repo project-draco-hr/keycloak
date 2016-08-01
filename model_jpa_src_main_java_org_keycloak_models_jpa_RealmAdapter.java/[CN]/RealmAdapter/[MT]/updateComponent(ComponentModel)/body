@@ -1,0 +1,11 @@
+{
+  ComponentEntity c=em.find(ComponentEntity.class,component.getId());
+  if (c == null)   return;
+  c.setName(component.getName());
+  c.setProviderId(component.getProviderId());
+  c.setProviderType(component.getProviderType());
+  c.setParentId(component.getParentId());
+  em.createNamedQuery("deleteComponentConfigByComponent").setParameter("component",c).executeUpdate();
+  em.flush();
+  setConfig(component,c);
+}

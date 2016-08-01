@@ -1,0 +1,11 @@
+{
+  Iterator<ComponentEntity> it=realm.getComponentEntities().iterator();
+  while (it.hasNext()) {
+    ComponentEntity next=it.next();
+    if (next.getParentId().equals(parentId)) {
+      session.users().preRemove(this,entityToModel(next));
+      it.remove();
+    }
+  }
+  updateRealm();
+}

@@ -1,0 +1,9 @@
+{
+  auth.requireManage();
+  ComponentModel model=realm.getComponent(id);
+  if (model == null) {
+    throw new NotFoundException("Could not find component");
+  }
+  adminEvent.operation(OperationType.DELETE).resourcePath(uriInfo,model.getId()).success();
+  realm.removeComponent(model);
+}

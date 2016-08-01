@@ -1,12 +1,12 @@
 {
   KeycloakSession session=sessionFactory.create();
   try {
-    session.getTransaction().begin();
+    session.getTransactionManager().begin();
     MigrationModelManager.migrate(session);
-    session.getTransaction().commit();
+    session.getTransactionManager().commit();
   }
  catch (  Exception e) {
-    session.getTransaction().rollback();
+    session.getTransactionManager().rollback();
     logger.migrationFailure(e);
     throw e;
   }

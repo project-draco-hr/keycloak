@@ -1,0 +1,13 @@
+{
+  for (  String key : model.getConfig().keySet()) {
+    List<String> vals=model.getConfig().get(key);
+    for (    String val : vals) {
+      ComponentConfigEntity config=new ComponentConfigEntity();
+      config.setId(KeycloakModelUtils.generateId());
+      config.setName(key);
+      config.setValue(val);
+      config.setComponent(c);
+      em.persist(config);
+    }
+  }
+}

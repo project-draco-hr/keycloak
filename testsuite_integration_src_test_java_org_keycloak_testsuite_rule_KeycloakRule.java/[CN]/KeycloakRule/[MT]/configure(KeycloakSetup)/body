@@ -1,6 +1,6 @@
 {
   KeycloakSession session=server.getSessionFactory().create();
-  session.getTransaction().begin();
+  session.getTransactionManager().begin();
   try {
     RealmManager manager=new RealmManager(session);
     manager.setContextPath("/auth");
@@ -8,7 +8,7 @@
     RealmModel appRealm=manager.getRealm("test");
     configurer.session=session;
     configurer.config(manager,adminstrationRealm,appRealm);
-    session.getTransaction().commit();
+    session.getTransactionManager().commit();
   }
   finally {
     session.close();

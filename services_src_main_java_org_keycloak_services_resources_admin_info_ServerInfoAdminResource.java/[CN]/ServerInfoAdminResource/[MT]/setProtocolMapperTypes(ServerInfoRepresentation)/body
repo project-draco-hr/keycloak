@@ -14,15 +14,7 @@
     rep.setCategory(mapper.getDisplayCategory());
     rep.setProperties(new LinkedList<ConfigPropertyRepresentation>());
     List<ProviderConfigProperty> configProperties=mapper.getConfigProperties();
-    for (    ProviderConfigProperty prop : configProperties) {
-      ConfigPropertyRepresentation propRep=new ConfigPropertyRepresentation();
-      propRep.setName(prop.getName());
-      propRep.setLabel(prop.getLabel());
-      propRep.setType(prop.getType());
-      propRep.setDefaultValue(prop.getDefaultValue());
-      propRep.setHelpText(prop.getHelpText());
-      rep.getProperties().add(propRep);
-    }
+    rep.setProperties(ModelToRepresentation.toRepresentation(configProperties));
     types.add(rep);
   }
 }

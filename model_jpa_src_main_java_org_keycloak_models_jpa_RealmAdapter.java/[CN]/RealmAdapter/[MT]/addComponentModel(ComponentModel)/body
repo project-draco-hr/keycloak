@@ -1,0 +1,18 @@
+{
+  ComponentEntity c=new ComponentEntity();
+  if (model.getId() == null) {
+    c.setId(KeycloakModelUtils.generateId());
+  }
+ else {
+    c.setId(model.getId());
+  }
+  c.setName(model.getName());
+  c.setParentId(model.getParentId());
+  c.setProviderType(model.getProviderType());
+  c.setProviderId(model.getProviderId());
+  c.setRealm(realm);
+  em.persist(c);
+  setConfig(model,c);
+  model.setId(c.getId());
+  return model;
+}

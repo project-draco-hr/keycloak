@@ -1,7 +1,7 @@
 {
   KeycloakSession session=server.getSessionFactory().create();
   try {
-    session.getTransaction().begin();
+    session.getTransactionManager().begin();
     RealmManager realmManager=new RealmManager(session);
     for (    String realmName : getTestRealms()) {
       RealmModel realm=realmManager.getRealmByName(realmName);
@@ -9,7 +9,7 @@
         realmManager.removeRealm(realm);
       }
     }
-    session.getTransaction().commit();
+    session.getTransactionManager().commit();
   }
   finally {
     session.close();

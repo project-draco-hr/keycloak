@@ -21,8 +21,8 @@
     }
     updateUserFromRep(user,rep,attrsToRemove,realm,session,true);
     adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();
-    if (session.getTransaction().isActive()) {
-      session.getTransaction().commit();
+    if (session.getTransactionManager().isActive()) {
+      session.getTransactionManager().commit();
     }
     return Response.noContent().build();
   }

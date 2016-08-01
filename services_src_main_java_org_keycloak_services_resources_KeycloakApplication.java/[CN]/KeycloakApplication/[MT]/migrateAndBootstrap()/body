@@ -3,7 +3,7 @@
   migrateModel();
   KeycloakSession session=sessionFactory.create();
   try {
-    session.getTransaction().begin();
+    session.getTransactionManager().begin();
     ApplianceBootstrap applianceBootstrap=new ApplianceBootstrap(session);
     exportImportManager=new ExportImportManager(session);
     boolean createMasterRealm=applianceBootstrap.isNewInstall();
@@ -13,11 +13,11 @@
     if (createMasterRealm) {
       applianceBootstrap.createMasterRealm(contextPath);
     }
-    session.getTransaction().commit();
+    session.getTransactionManager().commit();
   }
  catch (  RuntimeException re) {
-    if (session.getTransaction().isActive()) {
-      session.getTransaction().rollback();
+    if (session.getTransactionManager().isActive()) {
+      session.getTransactionManager().rollback();
     }
     throw re;
   }

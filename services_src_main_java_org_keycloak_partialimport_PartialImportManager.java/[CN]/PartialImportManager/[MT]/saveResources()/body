@@ -5,7 +5,7 @@
       partialImport.prepare(rep,realm,session);
     }
  catch (    ErrorResponseException error) {
-      if (session.getTransaction().isActive())       session.getTransaction().setRollbackOnly();
+      if (session.getTransactionManager().isActive())       session.getTransactionManager().setRollbackOnly();
       return error.getResponse();
     }
   }
@@ -15,7 +15,7 @@
       results.addAllResults(partialImport.doImport(rep,realm,session));
     }
  catch (    ErrorResponseException error) {
-      if (session.getTransaction().isActive())       session.getTransaction().setRollbackOnly();
+      if (session.getTransactionManager().isActive())       session.getTransactionManager().setRollbackOnly();
       return error.getResponse();
     }
   }
@@ -29,8 +29,8 @@ case OVERWRITTEN:
 break;
 }
 }
-if (session.getTransaction().isActive()) {
-session.getTransaction().commit();
+if (session.getTransactionManager().isActive()) {
+session.getTransactionManager().commit();
 }
 return Response.ok(results).build();
 }

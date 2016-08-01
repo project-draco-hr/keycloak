@@ -2,7 +2,7 @@
   KeycloakSession session=sessionFactory.create();
   boolean exists=false;
   try {
-    session.getTransaction().begin();
+    session.getTransactionManager().begin();
     try {
       RealmManager manager=new RealmManager(session);
       manager.setContextPath(getContextPath());
@@ -18,10 +18,10 @@
         RealmModel realm=manager.importRealm(rep);
         logger.importedRealm(realm.getName(),from);
       }
-      session.getTransaction().commit();
+      session.getTransactionManager().commit();
     }
  catch (    Throwable t) {
-      session.getTransaction().rollback();
+      session.getTransactionManager().rollback();
       if (!exists) {
         logger.unableToImportRealm(t,rep.getRealm(),from);
       }

@@ -45,7 +45,6 @@
   emailTheme=model.getEmailTheme();
   requiredCredentials=model.getRequiredCredentials();
   userFederationProviders=model.getUserFederationProviders();
-  storageProviders=model.getStorageProviders();
   userFederationMapperSet=model.getUserFederationMappers();
   for (  UserFederationMapperModel mapper : userFederationMapperSet) {
     this.userFederationMappers.add(mapper.getFederationProviderId(),mapper);
@@ -102,4 +101,10 @@
   directGrantFlow=model.getDirectGrantFlow();
   resetCredentialsFlow=model.getResetCredentialsFlow();
   clientAuthenticationFlow=model.getClientAuthenticationFlow();
+  for (  ComponentModel component : model.getComponents()) {
+    componentsByParent.add(component.getParentId() + component.getProviderType(),component);
+  }
+  for (  ComponentModel component : model.getComponents()) {
+    components.put(component.getId(),component);
+  }
 }

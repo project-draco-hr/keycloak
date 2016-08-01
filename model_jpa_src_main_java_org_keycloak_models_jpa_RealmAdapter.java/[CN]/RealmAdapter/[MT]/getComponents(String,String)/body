@@ -1,0 +1,11 @@
+{
+  if (parentId == null)   parentId=getId();
+  TypedQuery<ComponentEntity> query=em.createNamedQuery("getComponentsByParentAndType",ComponentEntity.class).setParameter("realm",realm).setParameter("parentId",parentId).setParameter("providerType",providerType);
+  List<ComponentEntity> results=query.getResultList();
+  List<ComponentModel> rtn=new LinkedList<>();
+  for (  ComponentEntity c : results) {
+    ComponentModel model=entityToModel(c);
+    rtn.add(model);
+  }
+  return rtn;
+}

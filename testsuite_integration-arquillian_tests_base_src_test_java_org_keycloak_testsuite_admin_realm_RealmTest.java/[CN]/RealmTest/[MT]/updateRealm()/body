@@ -24,4 +24,9 @@
   assertEquals(Boolean.FALSE,rep.isRegistrationAllowed());
   assertEquals(Boolean.FALSE,rep.isRegistrationEmailAsUsername());
   assertEquals(Boolean.FALSE,rep.isEditUsernameAllowed());
+  rep.getAttributes().put("foo","bar");
+  realm.update(rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep,ResourceType.REALM);
+  rep=realm.toRepresentation();
+  assertEquals("bar",rep.getAttributes().get("foo"));
 }

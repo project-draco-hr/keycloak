@@ -1,4 +1,14 @@
 {
-  this.cache.remove(getCacheKeyForResource(id));
+  List<CachedResource> removed=this.cache.remove(getCacheKeyForResource(id));
+  if (removed != null) {
+    CachedResource cachedResource=removed.get(0);
+    List<String> byOwner=this.cache.get(getResourceOwnerCacheKey(cachedResource.getOwner()));
+    if (byOwner != null) {
+      byOwner.remove(id);
+      if (byOwner.isEmpty()) {
+        this.cache.remove(getResourceOwnerCacheKey(cachedResource.getOwner()));
+      }
+    }
+  }
   getDelegate().delete(id);
 }

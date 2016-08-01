@@ -1,0 +1,49 @@
+{
+  try {
+    this.deployer.deploy(RESOURCE_SERVER_ID);
+    login("alice","alice");
+    assertFalse(wasDenied());
+    navigateToUserPremiumPage();
+    assertTrue(wasDenied());
+    for (    PolicyRepresentation policy : getAuthorizationResource().policies().policies()) {
+      if ("Premium Resource Permission".equals(policy.getName())) {
+        policy.getConfig().put("applyPolicies","[\"Any User Policy\"]");
+        getAuthorizationResource().policies().policy(policy.getId()).update(policy);
+      }
+    }
+    login("alice","alice");
+    navigateToUserPremiumPage();
+    assertFalse(wasDenied());
+    for (    PolicyRepresentation policy : getAuthorizationResource().policies().policies()) {
+      if ("Premium Resource Permission".equals(policy.getName())) {
+        policy.getConfig().put("applyPolicies","[\"Only Premium User Policy\"]");
+        getAuthorizationResource().policies().policy(policy.getId()).update(policy);
+      }
+    }
+    login("alice","alice");
+    navigateToUserPremiumPage();
+    assertTrue(wasDenied());
+    PolicyRepresentation onlyAlicePolicy=new PolicyRepresentation();
+    onlyAlicePolicy.setName("Temporary Premium Access Policy");
+    onlyAlicePolicy.setType("user");
+    HashMap<String,String> config=new HashMap<>();
+    UsersResource usersResource=realmsResouce().realm(REALM_NAME).users();
+    List<UserRepresentation> users=usersResource.search("alice",null,null,null,null,null);
+    assertFalse(users.isEmpty());
+    config.put("users",JsonSerialization.writeValueAsString(Arrays.asList(users.get(0).getId())));
+    onlyAlicePolicy.setConfig(config);
+    getAuthorizationResource().policies().create(onlyAlicePolicy);
+    for (    PolicyRepresentation policy : getAuthorizationResource().policies().policies()) {
+      if ("Premium Resource Permission".equals(policy.getName())) {
+        policy.getConfig().put("applyPolicies","[\"Temporary Premium Access Policy\"]");
+        getAuthorizationResource().policies().policy(policy.getId()).update(policy);
+      }
+    }
+    login("alice","alice");
+    navigateToUserPremiumPage();
+    assertFalse(wasDenied());
+  }
+  finally {
+    this.deployer.undeploy(RESOURCE_SERVER_ID);
+  }
+}

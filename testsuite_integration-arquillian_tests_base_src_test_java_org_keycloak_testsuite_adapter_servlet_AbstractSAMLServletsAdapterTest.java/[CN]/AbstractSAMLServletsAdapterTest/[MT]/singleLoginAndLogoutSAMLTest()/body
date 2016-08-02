@@ -1,21 +1,18 @@
 {
-  assertSuccessfulLogin(salesPostServletPage,bburkeUser,testRealmSAMLPostLoginPage);
-  assertSuccessfullyLoggedIn(salesPostSigServletPage);
-  assertSuccessfullyLoggedIn(employee2ServletPage);
-  assertSuccessfullyLoggedIn(salesPostEncServletPage);
+  assertSuccessfulLogin(salesPostServletPage,bburkeUser,testRealmSAMLPostLoginPage,"principal=bburke");
+  assertSuccessfullyLoggedIn(salesPostSigServletPage,"principal=bburke");
+  assertSuccessfullyLoggedIn(employee2ServletPage,"principal=bburke");
+  assertSuccessfullyLoggedIn(salesPostEncServletPage,"principal=bburke");
   employeeSigFrontServletPage.logout();
-  employeeSigFrontServletPage.navigateTo();
-  assertCurrentUrlStartsWith(testRealmSAMLRedirectLoginPage);
-  employeeSigServletPage.navigateTo();
-  assertCurrentUrlStartsWith(testRealmSAMLRedirectLoginPage);
+  checkLoggedOut(employeeSigFrontServletPage,testRealmSAMLRedirectLoginPage);
+  checkLoggedOut(employeeSigServletPage,testRealmSAMLRedirectLoginPage);
   salesPostPassiveServletPage.navigateTo();
   if (forbiddenIfNotAuthenticated) {
     waitUntilElement(By.xpath("//body")).text().not().contains("principal=");
-    assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("<body></body>") || driver.getPageSource().equals(""));
+    assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains(FORBIDDEN_TEXT));
   }
  else {
     waitUntilElement(By.xpath("//body")).text().contains("principal=null");
   }
-  salesPostSigEmailServletPage.navigateTo();
-  assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
+  checkLoggedOut(salesPostSigEmailServletPage,testRealmSAMLPostLoginPage);
 }

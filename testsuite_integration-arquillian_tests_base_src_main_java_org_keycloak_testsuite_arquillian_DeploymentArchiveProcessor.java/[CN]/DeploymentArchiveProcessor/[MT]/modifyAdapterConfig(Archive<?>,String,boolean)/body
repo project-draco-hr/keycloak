@@ -24,6 +24,8 @@
         log.error("Can't transform document to String");
         throw new RuntimeException(e);
       }
+      log.info("Adding SAMLFilter dependencies to " + archive.getName());
+      ((WebArchive)archive).addAsLibraries(KeycloakDependenciesResolver.resolveDependencies("org.keycloak:keycloak-saml-servlet-filter-adapter:" + System.getProperty("project.version")));
     }
  else {
       try {

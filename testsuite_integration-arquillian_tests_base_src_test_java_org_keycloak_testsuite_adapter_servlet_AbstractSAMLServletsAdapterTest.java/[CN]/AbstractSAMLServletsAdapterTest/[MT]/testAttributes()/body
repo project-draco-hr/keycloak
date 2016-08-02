@@ -1,0 +1,77 @@
+{
+  ClientResource clientResource=ApiUtil.findClientResourceByClientId(testRealmResource(),"http://localhost:8081/employee2/");
+  ProtocolMappersResource protocolMappersResource=clientResource.getProtocolMappers();
+  Map<String,String> config=new LinkedHashMap<>();
+  config.put("attribute.nameformat","Basic");
+  config.put("user.attribute","topAttribute");
+  config.put("attribute.name","topAttribute");
+  createProtocolMapper(protocolMappersResource,"topAttribute","saml","saml-user-attribute-mapper",config);
+  config=new LinkedHashMap<>();
+  config.put("attribute.nameformat","Basic");
+  config.put("user.attribute","level2Attribute");
+  config.put("attribute.name","level2Attribute");
+  createProtocolMapper(protocolMappersResource,"level2Attribute","saml","saml-user-attribute-mapper",config);
+  config=new LinkedHashMap<>();
+  config.put("attribute.nameformat","Basic");
+  config.put("single","true");
+  config.put("attribute.name","group");
+  createProtocolMapper(protocolMappersResource,"groups","saml","saml-group-membership-mapper",config);
+  setRolesToCheck("manager,user");
+  employee2ServletPage.navigateTo();
+  assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
+  testRealmSAMLPostLoginPage.form().login("level2GroupUser","password");
+  driver.navigate().to(employee2ServletPage.toString() + "/getAttributes");
+  waitUntilElement(By.xpath("//body")).text().contains("topAttribute: true");
+  waitUntilElement(By.xpath("//body")).text().contains("level2Attribute: true");
+  waitUntilElement(By.xpath("//body")).text().contains("attribute email: level2@redhat.com");
+  waitUntilElement(By.xpath("//body")).text().not().contains("group: []");
+  waitUntilElement(By.xpath("//body")).text().not().contains("group: null");
+  waitUntilElement(By.xpath("//body")).text().contains("group: [level2]");
+  employee2ServletPage.logout();
+  checkLoggedOut(employee2ServletPage,testRealmSAMLPostLoginPage);
+  setRolesToCheck("manager,employee,user");
+  employee2ServletPage.navigateTo();
+  assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
+  testRealmSAMLPostLoginPage.form().login(bburkeUser);
+  driver.navigate().to(employee2ServletPage.toString() + "/getAttributes");
+  waitUntilElement(By.xpath("//body")).text().contains("attribute email: bburke@redhat.com");
+  waitUntilElement(By.xpath("//body")).text().contains("friendlyAttribute email: bburke@redhat.com");
+  waitUntilElement(By.xpath("//body")).text().contains("phone: 617");
+  waitUntilElement(By.xpath("//body")).text().contains("friendlyAttribute phone: null");
+  employee2ServletPage.logout();
+  checkLoggedOut(employee2ServletPage,testRealmSAMLPostLoginPage);
+  config=new LinkedHashMap<>();
+  config.put("attribute.value","hard");
+  config.put("attribute.nameformat","Basic");
+  config.put("attribute.name","hardcoded-attribute");
+  createProtocolMapper(protocolMappersResource,"hardcoded-attribute","saml","saml-hardcode-attribute-mapper",config);
+  config=new LinkedHashMap<>();
+  config.put("role","hardcoded-role");
+  createProtocolMapper(protocolMappersResource,"hardcoded-role","saml","saml-hardcode-role-mapper",config);
+  config=new LinkedHashMap<>();
+  config.put("new.role.name","pee-on");
+  config.put("role","http://localhost:8081/employee/.employee");
+  createProtocolMapper(protocolMappersResource,"renamed-employee-role","saml","saml-role-name-mapper",config);
+  for (  ProtocolMapperRepresentation mapper : clientResource.toRepresentation().getProtocolMappers()) {
+    if (mapper.getName().equals("role-list")) {
+      protocolMappersResource.delete(mapper.getId());
+      mapper.setId(null);
+      mapper.getConfig().put(RoleListMapper.SINGLE_ROLE_ATTRIBUTE,"true");
+      mapper.getConfig().put(AttributeStatementHelper.SAML_ATTRIBUTE_NAME,"memberOf");
+      protocolMappersResource.createMapper(mapper);
+    }
+  }
+  setRolesToCheck("pee-on,el-jefe,manager,hardcoded-role");
+  config=new LinkedHashMap<>();
+  config.put("new.role.name","el-jefe");
+  config.put("role","user");
+  createProtocolMapper(protocolMappersResource,"renamed-role","saml","saml-role-name-mapper",config);
+  employee2ServletPage.navigateTo();
+  assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
+  testRealmSAMLPostLoginPage.form().login(bburkeUser);
+  driver.navigate().to(employee2ServletPage.toString() + "/getAttributes");
+  waitUntilElement(By.xpath("//body")).text().contains("hardcoded-attribute: hard");
+  employee2ServletPage.checkRolesEndPoint(false);
+  employee2ServletPage.logout();
+  checkLoggedOut(employee2ServletPage,testRealmSAMLPostLoginPage);
+}

@@ -1,9 +1,10 @@
 {
-  samlidpInitiatedLogin.setAuthRealm(SAMLSERVLETDEMO);
-  samlidpInitiatedLogin.setUrlName("employee2");
-  samlidpInitiatedLogin.navigateTo();
-  samlidpInitiatedLogin.form().login(bburkeUser);
+  samlidpInitiatedLoginPage.setAuthRealm(SAMLSERVLETDEMO);
+  samlidpInitiatedLoginPage.setUrlName("employee2");
+  samlidpInitiatedLoginPage.navigateTo();
+  samlidpInitiatedLoginPage.form().login(bburkeUser);
   waitUntilElement(By.xpath("//body")).text().contains("principal=bburke");
-  assertSuccessfullyLoggedIn(salesPostSigServletPage);
+  assertSuccessfullyLoggedIn(salesPostSigServletPage,"principal=bburke");
   employee2ServletPage.logout();
+  checkLoggedOut(employee2ServletPage,testRealmSAMLPostLoginPage);
 }

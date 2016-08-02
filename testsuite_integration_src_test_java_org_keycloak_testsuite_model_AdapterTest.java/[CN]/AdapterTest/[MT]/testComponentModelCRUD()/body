@@ -1,0 +1,33 @@
+{
+  realmModel=realmManager.createRealm("foo-realm");
+  UserStorageProviderModel model=new UserStorageProviderModel();
+  model.setName("memory");
+  model.setPriority(0);
+  model.setProviderId(UserMapStorageFactory.PROVIDER_ID);
+  model.setParentId(realmModel.getId());
+  ComponentModel createdModel=realmModel.addComponentModel(model);
+  String id=createdModel.getId();
+  Assert.assertNotNull(id);
+  commit();
+  realmModel=realmManager.getRealmByName("foo-realm");
+  ComponentModel foundModel=realmModel.getComponent(id);
+  assertComponentModel(foundModel,id,UserMapStorageFactory.PROVIDER_ID,realmModel.getId(),"memory");
+  List<ComponentModel> components=realmModel.getComponents();
+  Assert.assertEquals(components.size(),1);
+  assertComponentModel(components.get(0),id,UserMapStorageFactory.PROVIDER_ID,realmModel.getId(),"memory");
+  components=realmModel.getComponents(realmModel.getId(),UserStorageProvider.class.getName());
+  Assert.assertEquals(components.size(),1);
+  assertComponentModel(components.get(0),id,UserMapStorageFactory.PROVIDER_ID,realmModel.getId(),"memory");
+  foundModel.getConfig().putSingle("foo","bar");
+  realmModel.updateComponent(foundModel);
+  commit();
+  realmModel=realmManager.getRealmByName("foo-realm");
+  foundModel=realmModel.getComponent(id);
+  assertComponentModel(foundModel,id,UserMapStorageFactory.PROVIDER_ID,realmModel.getId(),"memory");
+  Assert.assertEquals("bar",foundModel.getConfig().getFirst("foo"));
+  realmModel.removeComponent(foundModel);
+  commit();
+  realmModel=realmManager.getRealmByName("foo-realm");
+  foundModel=realmModel.getComponent(id);
+  Assert.assertNull(foundModel);
+}

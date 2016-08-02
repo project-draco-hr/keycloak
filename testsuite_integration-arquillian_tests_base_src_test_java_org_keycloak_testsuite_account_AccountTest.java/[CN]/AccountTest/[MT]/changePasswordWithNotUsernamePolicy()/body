@@ -1,12 +1,12 @@
 {
-  setPasswordPolicy("length(8)");
+  setPasswordPolicy("notUsername(1)");
   changePasswordPage.open();
   loginPage.login("test-user@localhost","password");
   events.expectLogin().client("account").detail(Details.REDIRECT_URI,ACCOUNT_REDIRECT + "?path=password").assertEvent();
-  changePasswordPage.changePassword("password","1234","1234");
-  Assert.assertEquals("Invalid password: minimum length 8.",profilePage.getError());
+  changePasswordPage.changePassword("password","test-user@localhost","test-user@localhost");
+  Assert.assertEquals("Invalid password: must not be equal to the username.",profilePage.getError());
   events.expectAccount(EventType.UPDATE_PASSWORD_ERROR).error(Errors.PASSWORD_REJECTED).assertEvent();
-  changePasswordPage.changePassword("password","12345678","12345678");
+  changePasswordPage.changePassword("password","newPassword","newPassword");
   Assert.assertEquals("Your password has been updated.",profilePage.getSuccess());
   events.expectAccount(EventType.UPDATE_PASSWORD).assertEvent();
 }

@@ -12,7 +12,7 @@
           queue.drainTo(events,TRANSACTION_SIZE);
           Collections.sort(events);
           KeycloakSession session=factory.create();
-          session.getTransaction().begin();
+          session.getTransactionManager().begin();
           try {
             for (            LoginEvent event : events) {
               if (event instanceof FailedLogin) {
@@ -22,10 +22,10 @@
                 run=false;
               }
             }
-            session.getTransaction().commit();
+            session.getTransactionManager().commit();
           }
  catch (          Exception e) {
-            session.getTransaction().rollback();
+            session.getTransactionManager().rollback();
             throw e;
           }
  finally {

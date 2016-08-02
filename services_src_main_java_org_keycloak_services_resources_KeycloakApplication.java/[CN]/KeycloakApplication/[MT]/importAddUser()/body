@@ -18,7 +18,7 @@
         for (        UserRepresentation userRep : realmRep.getUsers()) {
           KeycloakSession session=sessionFactory.create();
           try {
-            session.getTransaction().begin();
+            session.getTransactionManager().begin();
             RealmModel realm=session.realms().getRealmByName(realmRep.getRealm());
             if (realm == null) {
               logger.addUserFailedRealmNotFound(userRep.getUsername(),realmRep.getRealm());
@@ -29,15 +29,15 @@
               RepresentationToModel.createCredentials(userRep,user);
               RepresentationToModel.createRoleMappings(userRep,user,realm);
             }
-            session.getTransaction().commit();
+            session.getTransactionManager().commit();
             logger.addUserSuccess(userRep.getUsername(),realmRep.getRealm());
           }
  catch (          ModelDuplicateException e) {
-            session.getTransaction().rollback();
+            session.getTransactionManager().rollback();
             logger.addUserFailedUserExists(userRep.getUsername(),realmRep.getRealm());
           }
 catch (          Throwable t) {
-            session.getTransaction().rollback();
+            session.getTransactionManager().rollback();
             logger.addUserFailed(t,userRep.getUsername(),realmRep.getRealm());
           }
  finally {

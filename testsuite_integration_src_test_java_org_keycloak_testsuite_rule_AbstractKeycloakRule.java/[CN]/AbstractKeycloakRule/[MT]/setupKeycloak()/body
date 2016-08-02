@@ -1,11 +1,11 @@
 {
   KeycloakSession session=server.getSessionFactory().create();
-  session.getTransaction().begin();
+  session.getTransactionManager().begin();
   try {
     RealmManager manager=new RealmManager(session);
     RealmModel adminstrationRealm=manager.getRealm(Config.getAdminRealm());
     configure(session,manager,adminstrationRealm);
-    session.getTransaction().commit();
+    session.getTransactionManager().commit();
   }
   finally {
     session.close();

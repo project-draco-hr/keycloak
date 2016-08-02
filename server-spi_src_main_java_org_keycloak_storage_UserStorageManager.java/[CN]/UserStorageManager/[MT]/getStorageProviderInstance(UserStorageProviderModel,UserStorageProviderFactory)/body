@@ -1,0 +1,8 @@
+{
+  UserStorageProvider instance=(UserStorageProvider)session.getAttribute(model.getId());
+  if (instance != null)   return instance;
+  instance=factory.create(session,model);
+  session.enlistForClose(instance);
+  session.setAttribute(model.getId(),instance);
+  return instance;
+}

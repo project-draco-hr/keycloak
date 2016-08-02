@@ -6,14 +6,13 @@
   em.refresh(realm);
   final RealmAdapter adapter=new RealmAdapter(session,em,realm);
   session.users().preRemove(adapter);
-  for (  StorageProviderModel provider : adapter.getStorageProviders()) {
-    adapter.removeStorageProvider(provider);
-  }
   realm.getDefaultGroups().clear();
   em.flush();
   int num=em.createNamedQuery("deleteGroupRoleMappingsByRealm").setParameter("realm",realm).executeUpdate();
   num=em.createNamedQuery("deleteGroupAttributesByRealm").setParameter("realm",realm).executeUpdate();
   num=em.createNamedQuery("deleteGroupsByRealm").setParameter("realm",realm).executeUpdate();
+  num=em.createNamedQuery("deleteComponentConfigByRealm").setParameter("realm",realm).executeUpdate();
+  num=em.createNamedQuery("deleteComponentByRealm").setParameter("realm",realm).executeUpdate();
   TypedQuery<String> query=em.createNamedQuery("getClientIdsByRealm",String.class);
   query.setParameter("realm",realm.getId());
   List<String> clients=query.getResultList();

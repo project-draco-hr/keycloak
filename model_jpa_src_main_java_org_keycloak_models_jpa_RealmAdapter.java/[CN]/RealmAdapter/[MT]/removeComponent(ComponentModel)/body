@@ -1,0 +1,7 @@
+{
+  ComponentEntity c=em.find(ComponentEntity.class,component.getId());
+  if (c == null)   return;
+  session.users().preRemove(this,component);
+  em.createNamedQuery("deleteComponentConfigByComponent").setParameter("component",c).executeUpdate();
+  em.remove(c);
+}

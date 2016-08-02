@@ -1,5 +1,5 @@
 {
-  session.getTransaction().begin();
+  session.getTransactionManager().begin();
   ClusterProvider clusterProvider=session.getProvider(ClusterProvider.class);
   String taskKey=task.getClass().getSimpleName();
   ExecutionResult<Void> result=clusterProvider.executeIfNotExecuted(taskKey,intervalSecs,new Callable<Void>(){
@@ -9,7 +9,7 @@
     }
   }
 );
-  session.getTransaction().commit();
+  session.getTransactionManager().commit();
   if (result.isExecuted()) {
     logger.debugf("Executed scheduled task %s",taskKey);
   }

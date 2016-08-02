@@ -35,9 +35,9 @@
   boolean bootstrapAdminUser=false;
   KeycloakSession session=sessionFactory.create();
   try {
-    session.getTransaction().begin();
+    session.getTransactionManager().begin();
     bootstrapAdminUser=new ApplianceBootstrap(session).isNoMasterUser();
-    session.getTransaction().commit();
+    session.getTransactionManager().commit();
   }
   finally {
     session.close();

@@ -1,8 +1,8 @@
 {
-  for (  StorageProviderModel model : getStorageProviders(realm)) {
-    StorageProviderFactory factory=(StorageProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(StorageProvider.class,model.getProviderName());
-    if (Types.supports(type,factory,StorageProviderFactory.class)) {
-      return type.cast(factory.getInstance(session,model));
+  for (  UserStorageProviderModel model : getStorageProviders(realm)) {
+    UserStorageProviderFactory factory=(UserStorageProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(UserStorageProvider.class,model.getProviderId());
+    if (Types.supports(type,factory,UserStorageProviderFactory.class)) {
+      return type.cast(getStorageProviderInstance(model,factory));
     }
   }
   return null;

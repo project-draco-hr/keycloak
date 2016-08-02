@@ -1,0 +1,19 @@
+{
+  UserMapStorage.allocations.set(0);
+  UserMapStorage.closings.set(0);
+  KeycloakSession session=keycloakRule.startSession();
+  RealmModel realm=session.realms().getRealmByName("test");
+  UserModel user=session.users().addUser(realm,"memuser");
+  Assert.assertNotNull(user);
+  user=session.users().getUserByUsername("nonexistent",realm);
+  Assert.assertNull(user);
+  keycloakRule.stopSession(session,true);
+  Assert.assertEquals(1,UserMapStorage.allocations.get());
+  Assert.assertEquals(1,UserMapStorage.closings.get());
+  session=keycloakRule.startSession();
+  realm=session.realms().getRealmByName("test");
+  user=session.users().getUserByUsername("memuser",realm);
+  session.users().removeUser(realm,user);
+  Assert.assertNull(session.users().getUserByUsername("memuser",realm));
+  keycloakRule.stopSession(session,true);
+}

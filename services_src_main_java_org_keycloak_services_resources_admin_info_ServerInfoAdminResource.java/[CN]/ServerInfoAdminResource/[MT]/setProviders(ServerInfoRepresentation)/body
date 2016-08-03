@@ -1,4 +1,5 @@
 {
+  info.setComponentTypes(new HashMap<>());
   LinkedHashMap<String,SpiInfoRepresentation> spiReps=new LinkedHashMap<>();
   List<Spi> spis=new LinkedList<>(session.getKeycloakSessionFactory().getSpis());
   Collections.sort(spis,new Comparator<Spi>(){
@@ -14,7 +15,6 @@
     Collections.sort(providerIds);
     Map<String,ProviderRepresentation> providers=new HashMap<>();
     if (providerIds != null) {
-      info.setComponentTypes(new HashMap<>());
       for (      String name : providerIds) {
         ProviderRepresentation provider=new ProviderRepresentation();
         ProviderFactory<?> pi=session.getKeycloakSessionFactory().getProviderFactory(spi.getProviderClass(),name);

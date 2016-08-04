@@ -1,0 +1,10 @@
+{
+  PersistenceXmlParser parser=new PersistenceXmlParser(new ClassLoaderServiceImpl(ExampleUserStorageProviderFactory.class.getClassLoader()),PersistenceUnitTransactionType.RESOURCE_LOCAL);
+  List<ParsedPersistenceXmlDescriptor> persistenceUnits=parser.doResolve(new HashMap());
+  for (  ParsedPersistenceXmlDescriptor persistenceUnit : persistenceUnits) {
+    if (persistenceUnit.getName().equals(unitName)) {
+      return Bootstrap.getEntityManagerFactoryBuilder(persistenceUnit,new HashMap(),ExampleUserStorageProviderFactory.class.getClassLoader()).build();
+    }
+  }
+  throw new RuntimeException("Persistence unit '" + unitName + "' not found");
+}

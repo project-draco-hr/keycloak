@@ -25,7 +25,7 @@
   List<RoleRepresentation> roles=new LinkedList<>();
   roles.add(topRole);
   realm.groups().group(topGroup.getId()).roles().realmLevel().add(roles);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesRealmRolesPath(topGroup.getId()),roles,ResourceType.GROUP);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesRealmRolesPath(topGroup.getId()),roles,ResourceType.REALM_ROLE_MAPPING);
   GroupRepresentation level2Group=new GroupRepresentation();
   level2Group.setName("level2");
   Response response=realm.groups().group(topGroup.getId()).subGroup(level2Group);
@@ -48,7 +48,7 @@
   roles.clear();
   roles.add(level2Role);
   realm.groups().group(level2Group.getId()).roles().realmLevel().add(roles);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesRealmRolesPath(level2Group.getId()),roles,ResourceType.REALM_ROLE);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesRealmRolesPath(level2Group.getId()),roles,ResourceType.REALM_ROLE_MAPPING);
   GroupRepresentation level3Group=new GroupRepresentation();
   level3Group.setName("level3");
   response=realm.groups().group(level2Group.getId()).subGroup(level3Group);
@@ -59,7 +59,7 @@
   roles.clear();
   roles.add(level3Role);
   realm.groups().group(level3Group.getId()).roles().realmLevel().add(roles);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesRealmRolesPath(level3Group.getId()),roles,ResourceType.REALM_ROLE);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesRealmRolesPath(level3Group.getId()),roles,ResourceType.REALM_ROLE_MAPPING);
   topGroup=realm.getGroupByPath("/top");
   assertEquals(1,topGroup.getRealmRoles().size());
   assertTrue(topGroup.getRealmRoles().contains("topRole"));

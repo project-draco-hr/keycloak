@@ -7,7 +7,7 @@
   ClientRepresentation foundClientRep=realm.clients().get(id).toRepresentation();
   foundClientRep.setDefaultRoles(new String[]{"test"});
   realm.clients().get(id).update(foundClientRep);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.clientResourcePath(id),rep,ResourceType.CLIENT_ROLE);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.clientResourcePath(id),rep,ResourceType.CLIENT);
   assertArrayEquals(new String[]{"test"},realm.clients().get(id).toRepresentation().getDefaultRoles());
   realm.clients().get(id).roles().deleteRole("test");
   assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.clientRoleResourcePath(id,"test"),ResourceType.CLIENT_ROLE);

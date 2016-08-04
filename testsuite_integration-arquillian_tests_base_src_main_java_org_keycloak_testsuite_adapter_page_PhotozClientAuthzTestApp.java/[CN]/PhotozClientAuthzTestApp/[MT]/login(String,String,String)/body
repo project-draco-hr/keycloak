@@ -1,0 +1,17 @@
+{
+  if (scopes.length > 0) {
+    StringBuilder scopesValue=new StringBuilder();
+    for (    String scope : scopes) {
+      if (scopesValue.length() != 0) {
+        scopesValue.append(" ");
+      }
+      scopesValue.append(scope);
+    }
+    URLUtils.navigateToUri(driver,this.driver.getCurrentUrl() + " " + scopesValue,true);
+  }
+  this.loginPage.form().login(username,password);
+  if (this.consentPage.isCurrent()) {
+    consentPage.confirm();
+  }
+  pause(WAIT_AFTER_OPERATION);
+}

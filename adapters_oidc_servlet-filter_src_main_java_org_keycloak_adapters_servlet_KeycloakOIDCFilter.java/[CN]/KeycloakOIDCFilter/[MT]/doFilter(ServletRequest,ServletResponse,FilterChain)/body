@@ -2,6 +2,10 @@
   log.fine("Keycloak OIDC Filter");
   HttpServletRequest request=(HttpServletRequest)req;
   HttpServletResponse response=(HttpServletResponse)res;
+  if (shouldSkip(request)) {
+    chain.doFilter(req,res);
+    return;
+  }
   OIDCServletHttpFacade facade=new OIDCServletHttpFacade(request,response);
   KeycloakDeployment deployment=deploymentContext.resolveDeployment(facade);
   if (deployment == null || !deployment.isConfigured()) {

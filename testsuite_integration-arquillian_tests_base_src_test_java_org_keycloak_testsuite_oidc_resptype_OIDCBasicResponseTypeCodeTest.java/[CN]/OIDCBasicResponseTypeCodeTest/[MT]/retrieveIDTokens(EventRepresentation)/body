@@ -1,0 +1,8 @@
+{
+  Assert.assertEquals(OIDCResponseType.CODE,loginEvent.getDetails().get(Details.RESPONSE_TYPE));
+  OAuthClient.AuthorizationEndpointResponse authzResponse=new OAuthClient.AuthorizationEndpointResponse(oauth,false);
+  Assert.assertNull(authzResponse.getAccessToken());
+  Assert.assertNull(authzResponse.getIdToken());
+  IDToken idToken=sendTokenRequestAndGetIDToken(loginEvent);
+  return Collections.singletonList(idToken);
+}

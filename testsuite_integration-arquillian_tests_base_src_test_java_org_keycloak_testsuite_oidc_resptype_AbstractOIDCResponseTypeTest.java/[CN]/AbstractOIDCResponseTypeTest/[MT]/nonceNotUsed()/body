@@ -1,0 +1,11 @@
+{
+  driver.navigate().to(oauth.getLoginFormUrl());
+  loginPage.assertCurrent();
+  loginPage.login("test-user@localhost","password");
+  Assert.assertEquals(AppPage.RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  EventRepresentation loginEvent=events.expectLogin().detail(Details.USERNAME,"test-user@localhost").assertEvent();
+  List<IDToken> idTokens=retrieveIDTokens(loginEvent);
+  for (  IDToken idToken : idTokens) {
+    Assert.assertNull(idToken.getNonce());
+  }
+}

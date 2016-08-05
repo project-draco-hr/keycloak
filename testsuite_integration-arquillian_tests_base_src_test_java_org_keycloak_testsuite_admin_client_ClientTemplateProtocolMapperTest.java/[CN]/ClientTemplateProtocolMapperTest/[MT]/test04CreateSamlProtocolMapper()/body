@@ -5,7 +5,7 @@
   Response resp=samlMappersRsc.createMapper(rep);
   resp.close();
   String createdId=ApiUtil.getCreatedId(resp);
-  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientTemplateProtocolMapperPath(samlClientTemplateId,createdId),rep);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientTemplateProtocolMapperPath(samlClientTemplateId,createdId),rep,ResourceType.PROTOCOL_MAPPER);
   assertEquals(totalMappers + 1,samlMappersRsc.getMappers().size());
   assertEquals(totalSamlMappers + 1,samlMappersRsc.getMappersPerProtocol("saml").size());
   ProtocolMapperRepresentation created=samlMappersRsc.getMapperById(createdId);

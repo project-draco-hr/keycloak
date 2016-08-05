@@ -22,13 +22,13 @@
   l.add(realm.roles().get("realm-role").toRepresentation());
   l.add(realm.roles().get("realm-composite").toRepresentation());
   roles.realmLevel().add(l);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesRealmRolesPath(group.getId()),l);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesRealmRolesPath(group.getId()),l,ResourceType.REALM_ROLE_MAPPING);
   RoleRepresentation clientRole=realm.clients().get(clientId).roles().get("client-role").toRepresentation();
   RoleRepresentation clientComposite=realm.clients().get(clientId).roles().get("client-composite").toRepresentation();
   roles.clientLevel(clientId).add(Collections.singletonList(clientRole));
   roles.clientLevel(clientId).add(Collections.singletonList(clientComposite));
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientId),Collections.singletonList(clientRole));
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientId),Collections.singletonList(clientComposite));
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientId),Collections.singletonList(clientRole),ResourceType.CLIENT_ROLE_MAPPING);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientId),Collections.singletonList(clientComposite),ResourceType.CLIENT_ROLE_MAPPING);
   assertNames(roles.realmLevel().listAll(),"realm-role","realm-composite");
   assertNames(roles.realmLevel().listAvailable(),"admin","offline_access",Constants.AUTHZ_UMA_AUTHORIZATION,"user");
   assertNames(roles.realmLevel().listEffective(),"realm-role","realm-composite","realm-child");
@@ -41,10 +41,10 @@
   assertNames(all.getClientMappings().get("myclient").getMappings(),"client-role","client-composite");
   RoleRepresentation realmRoleRep=realm.roles().get("realm-role").toRepresentation();
   roles.realmLevel().remove(Collections.singletonList(realmRoleRep));
-  assertAdminEvents.assertEvent("test",OperationType.DELETE,AdminEventPaths.groupRolesRealmRolesPath(group.getId()),Collections.singletonList(realmRoleRep));
+  assertAdminEvents.assertEvent("test",OperationType.DELETE,AdminEventPaths.groupRolesRealmRolesPath(group.getId()),Collections.singletonList(realmRoleRep),ResourceType.REALM_ROLE_MAPPING);
   assertNames(roles.realmLevel().listAll(),"realm-composite");
   RoleRepresentation clientRoleRep=realm.clients().get(clientId).roles().get("client-role").toRepresentation();
   roles.clientLevel(clientId).remove(Collections.singletonList(clientRoleRep));
-  assertAdminEvents.assertEvent("test",OperationType.DELETE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientId),Collections.singletonList(clientRoleRep));
+  assertAdminEvents.assertEvent("test",OperationType.DELETE,AdminEventPaths.groupRolesClientRolesPath(group.getId(),clientId),Collections.singletonList(clientRoleRep),ResourceType.CLIENT_ROLE_MAPPING);
   assertNames(roles.clientLevel(clientId).listAll(),"client-composite");
 }

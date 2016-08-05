@@ -3,7 +3,7 @@
   List<ProtocolMapperRepresentation> builtins=builtinMappers.get(protocolName);
   List<ProtocolMapperRepresentation> mappersToAdd=mappersToAdd(oldMappers,builtins);
   resource.createMapper(mappersToAdd);
-  AdminEventRepresentation adminEvent=assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,adminEventPath + "/add-models");
+  AdminEventRepresentation adminEvent=assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,adminEventPath + "/add-models",ResourceType.PROTOCOL_MAPPER);
   try {
     List<ProtocolMapperRepresentation> eventMappers=JsonSerialization.readValue(new ByteArrayInputStream(adminEvent.getRepresentation().getBytes()),new TypeReference<List<ProtocolMapperRepresentation>>(){
     }

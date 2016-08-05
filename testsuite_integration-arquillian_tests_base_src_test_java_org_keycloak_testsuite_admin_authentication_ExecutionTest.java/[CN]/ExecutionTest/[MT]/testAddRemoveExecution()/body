@@ -15,7 +15,7 @@
   }
   params.put("newName","Copy-of-browser");
   Response response=authMgmtResource.copy("browser",params);
-  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authCopyFlowPath("browser"),params);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authCopyFlowPath("browser"),params,ResourceType.AUTH_FLOW);
   try {
     Assert.assertEquals("Copy flow",201,response.getStatus());
   }
@@ -31,19 +31,19 @@
   }
   params.put("provider","idp-review-profile");
   authMgmtResource.addExecution("Copy-of-browser",params);
-  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authAddExecutionPath("Copy-of-browser"),params);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authAddExecutionPath("Copy-of-browser"),params,ResourceType.AUTH_EXECUTION);
   List<AuthenticationExecutionInfoRepresentation> executionReps=authMgmtResource.getExecutions("Copy-of-browser");
   AuthenticationExecutionInfoRepresentation exec=findExecutionByProvider("idp-review-profile",executionReps);
   Assert.assertNotNull("idp-review-profile added",exec);
   AuthenticationExecutionInfoRepresentation authCookieExec=findExecutionByProvider("auth-cookie",executionReps);
   compareExecution(newExecInfo("Review Profile","idp-review-profile",true,0,3,DISABLED,null,new String[]{REQUIRED,DISABLED}),exec);
   authMgmtResource.removeExecution(exec.getId());
-  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authExecutionPath(exec.getId()));
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authExecutionPath(exec.getId()),ResourceType.AUTH_EXECUTION);
   executionReps=authMgmtResource.getExecutions("Copy-of-browser");
   exec=findExecutionByProvider("idp-review-profile",executionReps);
   Assert.assertNull("idp-review-profile removed",exec);
   authMgmtResource.removeExecution(authCookieExec.getId());
-  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authExecutionPath(authCookieExec.getId()));
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authExecutionPath(authCookieExec.getId()),ResourceType.AUTH_EXECUTION);
   AuthenticationExecutionRepresentation rep=new AuthenticationExecutionRepresentation();
   rep.setPriority(10);
   rep.setAuthenticator("auth-cookie");
@@ -76,7 +76,7 @@
   AuthenticationFlowRepresentation flow=findFlowByAlias("Copy-of-browser",flows);
   rep.setParentFlow(flow.getId());
   response=authMgmtResource.addExecution(rep);
-  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AssertAdminEvents.isExpectedPrefixFollowedByUuid(AdminEventPaths.authMgmtBasePath() + "/executions"),rep);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AssertAdminEvents.isExpectedPrefixFollowedByUuid(AdminEventPaths.authMgmtBasePath() + "/executions"),rep,ResourceType.AUTH_EXECUTION);
   try {
     Assert.assertEquals("added execution",201,response.getStatus());
   }

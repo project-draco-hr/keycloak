@@ -5,7 +5,7 @@
   l.add(RoleBuilder.create().id(ids.get("role-b")).build());
   l.add(RoleBuilder.create().id(ids.get("role-c")).build());
   resource.get("role-a").addComposites(l);
-  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.roleResourceCompositesPath("role-a"),l);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.roleResourceCompositesPath("role-a"),l,ResourceType.REALM_ROLE);
   Set<RoleRepresentation> composites=resource.get("role-a").getRoleComposites();
   assertTrue(resource.get("role-a").toRepresentation().isComposite());
   Assert.assertNames(composites,"role-b","role-c");
@@ -14,7 +14,7 @@
   Set<RoleRepresentation> clientComposites=resource.get("role-a").getClientRoleComposites(clientUuid);
   Assert.assertNames(clientComposites,"role-c");
   resource.get("role-a").deleteComposites(l);
-  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.roleResourceCompositesPath("role-a"),l);
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.roleResourceCompositesPath("role-a"),l,ResourceType.REALM_ROLE);
   assertFalse(resource.get("role-a").toRepresentation().isComposite());
   assertEquals(0,resource.get("role-a").getRoleComposites().size());
 }

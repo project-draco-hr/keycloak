@@ -3,14 +3,14 @@
   rep.setEditUsernameAllowed(true);
   rep.setSupportedLocales(new HashSet<>(Arrays.asList("en","de")));
   realm.update(rep);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep,ResourceType.REALM);
   rep=realm.toRepresentation();
   assertEquals(Boolean.TRUE,rep.isEditUsernameAllowed());
   assertEquals(2,rep.getSupportedLocales().size());
   rep=new RealmRepresentation();
   rep.setEditUsernameAllowed(false);
   realm.update(rep);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep,ResourceType.REALM);
   rep=realm.toRepresentation();
   assertEquals(Boolean.FALSE,rep.isEditUsernameAllowed());
   assertEquals(2,rep.getSupportedLocales().size());

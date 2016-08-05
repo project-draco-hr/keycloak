@@ -26,16 +26,16 @@
   String location=response.getLocation().toString();
   fooMapperId=location.substring(location.lastIndexOf("/") + 1);
   response.close();
-  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientProtocolMapperPath(clientDbId,fooMapperId),fooMapper);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.clientProtocolMapperPath(clientDbId,fooMapperId),fooMapper,ResourceType.PROTOCOL_MAPPER);
   fooMapper=mappersResource.getMapperById(fooMapperId);
   assertEquals(fooMapper.getName(),"foo");
   fooMapper.setProtocolMapper("foo-mapper-updated");
   mappersResource.update(fooMapperId,fooMapper);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.clientProtocolMapperPath(clientDbId,fooMapperId),fooMapper);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.clientProtocolMapperPath(clientDbId,fooMapperId),fooMapper,ResourceType.PROTOCOL_MAPPER);
   fooMapper=mappersResource.getMapperById(fooMapperId);
   assertEquals(fooMapper.getProtocolMapper(),"foo-mapper-updated");
   mappersResource.delete(fooMapperId);
-  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.clientProtocolMapperPath(clientDbId,fooMapperId));
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.clientProtocolMapperPath(clientDbId,fooMapperId),ResourceType.PROTOCOL_MAPPER);
   try {
     mappersResource.getMapperById(fooMapperId);
     fail("Not expected to find deleted mapper");

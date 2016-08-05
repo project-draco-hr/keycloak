@@ -3,12 +3,12 @@
   Response resp=samlMappersRsc.createMapper(rep);
   resp.close();
   String createdId=ApiUtil.getCreatedId(resp);
-  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientProtocolMapperPath(samlClientId,createdId),rep);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientProtocolMapperPath(samlClientId,createdId),rep,ResourceType.PROTOCOL_MAPPER);
   rep.getConfig().put("role","account.manage-account");
   rep.setId(createdId);
   rep.setConsentRequired(false);
   samlMappersRsc.update(createdId,rep);
-  assertAdminEvents.assertEvent(getRealmId(),OperationType.UPDATE,AdminEventPaths.clientProtocolMapperPath(samlClientId,createdId),rep);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.UPDATE,AdminEventPaths.clientProtocolMapperPath(samlClientId,createdId),rep,ResourceType.PROTOCOL_MAPPER);
   ProtocolMapperRepresentation updated=samlMappersRsc.getMapperById(createdId);
   assertEqualMappers(rep,updated);
 }

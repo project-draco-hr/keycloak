@@ -2,7 +2,7 @@
   RequiredActionProviderRepresentation updatePasswordReqAction=realm.flows().getRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.toString());
   updatePasswordReqAction.setDefaultAction(true);
   realm.flows().updateRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.toString(),updatePasswordReqAction);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.authRequiredActionPath(UserModel.RequiredAction.UPDATE_PASSWORD.toString()),updatePasswordReqAction);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.authRequiredActionPath(UserModel.RequiredAction.UPDATE_PASSWORD.toString()),updatePasswordReqAction,ResourceType.REQUIRED_ACTION);
   String userId=createUser("user1","user1@localhost");
   UserRepresentation userRep=realm.users().get(userId).toRepresentation();
   Assert.assertEquals(1,userRep.getRequiredActions().size());
@@ -10,5 +10,5 @@
   updatePasswordReqAction=realm.flows().getRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.toString());
   updatePasswordReqAction.setDefaultAction(true);
   realm.flows().updateRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD.toString(),updatePasswordReqAction);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.authRequiredActionPath(UserModel.RequiredAction.UPDATE_PASSWORD.toString()),updatePasswordReqAction);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.authRequiredActionPath(UserModel.RequiredAction.UPDATE_PASSWORD.toString()),updatePasswordReqAction,ResourceType.REQUIRED_ACTION);
 }

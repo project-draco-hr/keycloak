@@ -3,12 +3,12 @@
   jsConsoleTestAppPage.setFlow("implicit");
   jsConsoleTestAppPage.init();
   jsConsoleTestAppPage.logIn();
-  assertTrue(driver.getPageSource().contains("Implicit flow is disabled for the client"));
-  setImplicitFlowFroClient();
+  assertResponseError("Implicit flow is disabled for the client");
+  setImplicitFlowForClient();
   jsConsoleTestAppPage.navigateTo();
   jsConsoleTestAppPage.init();
   jsConsoleTestAppPage.logIn();
-  assertTrue(driver.getPageSource().contains("Standard flow is disabled for the client"));
+  assertResponseError("Standard flow is disabled for the client");
   logInAndInit("implicit");
   waitUntilElement(jsConsoleTestAppPage.getOutputElement()).text().contains("Init Success (Authenticated)");
 }

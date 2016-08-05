@@ -10,8 +10,9 @@
   log.info("navigating to " + uri);
   driver.navigate().to(uri);
   if (waitForMatch) {
+    String loginUrl="^[^\\?]+/auth/realms/[^/]+/(protocol|login-actions).+$";
     try {
-      (new WebDriverWait(driver,3)).until(urlMatches("^" + Pattern.quote(uri) + ".*$"));
+      (new WebDriverWait(driver,3)).until(or(urlMatches("^" + Pattern.quote(uri) + ".*$"),urlMatches(loginUrl)));
     }
  catch (    TimeoutException e) {
       log.info("new current URL doesn't start with desired URL");

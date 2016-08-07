@@ -6,21 +6,21 @@
   Response response=realm.users().create(UserBuilder.create().username("user-a").build());
   String userAId=ApiUtil.getCreatedId(response);
   response.close();
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.userResourcePath(userAId));
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.userResourcePath(userAId),ResourceType.USER);
   response=realm.users().create(UserBuilder.create().username("user-b").build());
   String userBId=ApiUtil.getCreatedId(response);
   response.close();
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.userResourcePath(userBId));
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.userResourcePath(userBId),ResourceType.USER);
   realm.users().get(userAId).joinGroup(groupId);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.userGroupPath(userAId,groupId),group);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.userGroupPath(userAId,groupId),group,ResourceType.GROUP_MEMBERSHIP);
   List<UserRepresentation> members=realm.groups().group(groupId).members(0,10);
   assertNames(members,"user-a");
   realm.users().get(userBId).joinGroup(groupId);
-  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.userGroupPath(userBId,groupId),group);
+  assertAdminEvents.assertEvent("test",OperationType.CREATE,AdminEventPaths.userGroupPath(userBId,groupId),group,ResourceType.GROUP_MEMBERSHIP);
   members=realm.groups().group(groupId).members(0,10);
   assertNames(members,"user-a","user-b");
   realm.users().get(userAId).leaveGroup(groupId);
-  assertAdminEvents.assertEvent("test",OperationType.DELETE,AdminEventPaths.userGroupPath(userAId,groupId),group);
+  assertAdminEvents.assertEvent("test",OperationType.DELETE,AdminEventPaths.userGroupPath(userAId,groupId),group,ResourceType.GROUP_MEMBERSHIP);
   members=realm.groups().group(groupId).members(0,10);
   assertNames(members,"user-b");
 }

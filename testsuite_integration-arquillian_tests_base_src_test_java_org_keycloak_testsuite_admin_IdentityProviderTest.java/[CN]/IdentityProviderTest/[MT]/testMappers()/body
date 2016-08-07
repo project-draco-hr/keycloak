@@ -12,7 +12,7 @@
   String id=ApiUtil.getCreatedId(response);
   Assert.assertNotNull(id);
   response.close();
-  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.identityProviderMapperPath("google",id),mapper);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.identityProviderMapperPath("google",id),mapper,ResourceType.IDENTITY_PROVIDER_MAPPER);
   List<IdentityProviderMapperRepresentation> mappers=provider.getMappers();
   Assert.assertEquals("mappers count",1,mappers.size());
   Assert.assertEquals("newly created mapper id",id,mappers.get(0).getId());
@@ -23,12 +23,12 @@
   Assert.assertEquals("config retained","offline_access",mapper.getConfig().get("role"));
   mapper.getConfig().put("role","master-realm.manage-realm");
   provider.update(id,mapper);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.identityProviderMapperPath("google",id),mapper);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.identityProviderMapperPath("google",id),mapper,ResourceType.IDENTITY_PROVIDER_MAPPER);
   mapper=provider.getMapperById(id);
   Assert.assertNotNull("mapperById not null",mapper);
   Assert.assertEquals("config changed","master-realm.manage-realm",mapper.getConfig().get("role"));
   provider.delete(id);
-  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.identityProviderMapperPath("google",id));
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.identityProviderMapperPath("google",id),ResourceType.IDENTITY_PROVIDER_MAPPER);
   try {
     provider.getMapperById(id);
     Assert.fail("Should fail with NotFoundException");

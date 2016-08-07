@@ -1,7 +1,7 @@
 {
   try {
     this.deployer.deploy(RESOURCE_SERVER_ID);
-    this.clientPage.login("alice","alice");
+    loginToClientPage("alice","alice");
     assertFalse(this.clientPage.wasDenied());
     UsersResource usersResource=realmsResouce().realm(REALM_NAME).users();
     List<UserRepresentation> users=usersResource.search("alice",null,null,null,null,null);
@@ -15,9 +15,9 @@
     RoleRepresentation roleRepresentation=roleResource.toRepresentation();
     roleRepresentation.setScopeParamRequired(true);
     roleResource.update(roleRepresentation);
-    this.clientPage.login("alice","alice");
+    loginToClientPage("alice","alice");
     assertTrue(this.clientPage.wasDenied());
-    this.clientPage.loginWithScopes("alice","alice",RESOURCE_SERVER_ID + "/manage-albums");
+    loginToClientPage("alice","alice",RESOURCE_SERVER_ID + "/manage-albums");
     assertFalse(this.clientPage.wasDenied());
   }
   finally {

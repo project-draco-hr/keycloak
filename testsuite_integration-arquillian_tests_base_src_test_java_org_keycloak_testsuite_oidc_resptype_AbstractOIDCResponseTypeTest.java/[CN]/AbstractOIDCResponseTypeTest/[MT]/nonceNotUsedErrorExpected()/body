@@ -1,0 +1,10 @@
+{
+  driver.navigate().to(oauth.getLoginFormUrl());
+  assertFalse(loginPage.isCurrent());
+  assertTrue(appPage.isCurrent());
+  OAuthClient.AuthorizationEndpointResponse resp=new OAuthClient.AuthorizationEndpointResponse(oauth);
+  Assert.assertNull(resp.getCode());
+  Assert.assertNull(resp.getIdToken());
+  Assert.assertEquals(OAuthErrorException.INVALID_REQUEST,resp.getError());
+  Assert.assertEquals("Missing parameter: nonce",resp.getErrorDescription());
+}

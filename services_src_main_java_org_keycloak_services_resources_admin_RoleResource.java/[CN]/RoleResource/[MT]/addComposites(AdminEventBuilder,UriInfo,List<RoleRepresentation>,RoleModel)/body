@@ -6,5 +6,11 @@
     }
     role.addCompositeRole(composite);
   }
+  if (role.isClientRole()) {
+    adminEvent.resource(ResourceType.CLIENT_ROLE);
+  }
+ else {
+    adminEvent.resource(ResourceType.REALM_ROLE);
+  }
   adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo).representation(roles).success();
 }

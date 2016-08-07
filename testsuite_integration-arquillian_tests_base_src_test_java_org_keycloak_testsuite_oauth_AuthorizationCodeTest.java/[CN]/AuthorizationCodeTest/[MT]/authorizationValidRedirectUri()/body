@@ -1,7 +1,7 @@
 {
   ClientManager.realm(adminClient.realm("test")).clientId("test-app").addRedirectUris(oauth.getRedirectUri());
   oauth.state("mystate");
-  OAuthClient.AuthorizationCodeResponse response=oauth.doLogin("test-user@localhost","password");
+  OAuthClient.AuthorizationEndpointResponse response=oauth.doLogin("test-user@localhost","password");
   Assert.assertTrue(response.isRedirected());
   Assert.assertNotNull(response.getCode());
   testingClient.testing().verifyCode("test",response.getCode());

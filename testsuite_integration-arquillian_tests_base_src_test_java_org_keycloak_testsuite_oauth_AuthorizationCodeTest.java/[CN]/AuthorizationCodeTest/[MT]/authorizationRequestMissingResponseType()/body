@@ -2,7 +2,7 @@
   oauth.responseType(null);
   UriBuilder b=UriBuilder.fromUri(oauth.getLoginFormUrl());
   driver.navigate().to(b.build().toURL());
-  OAuthClient.AuthorizationCodeResponse errorResponse=new OAuthClient.AuthorizationCodeResponse(oauth);
+  OAuthClient.AuthorizationEndpointResponse errorResponse=new OAuthClient.AuthorizationEndpointResponse(oauth);
   Assert.assertTrue(errorResponse.isRedirected());
   Assert.assertEquals(errorResponse.getError(),OAuthErrorException.INVALID_REQUEST);
   events.expectLogin().error(Errors.INVALID_REQUEST).user((String)null).session((String)null).clearDetails().assertEvent();

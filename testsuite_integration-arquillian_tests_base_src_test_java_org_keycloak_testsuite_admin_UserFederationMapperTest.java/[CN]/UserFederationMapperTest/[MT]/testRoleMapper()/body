@@ -12,7 +12,7 @@
   roleMapper=findMapperByName(mappers,"role-mapper");
   assertMapper(roleMapper,roleMapperId,"role-mapper",RoleLDAPFederationMapperFactory.PROVIDER_ID,RoleMapperConfig.ROLES_DN,"ou=roles,dc=keycloak,dc=org",RoleMapperConfig.MODE,"READ_ONLY",RoleMapperConfig.USE_REALM_ROLES_MAPPING,"true");
   ldapProviderResource().removeMapper(roleMapperId);
-  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.userFederationMapperResourcePath(ldapProviderId,roleMapperId));
+  assertAdminEvents.assertEvent(realmId,OperationType.DELETE,AdminEventPaths.userFederationMapperResourcePath(ldapProviderId,roleMapperId),ResourceType.USER_FEDERATION_MAPPER);
   mappers=ldapProviderResource().getMappers();
   Assert.assertNull(findMapperByName(mappers,"role-mapper"));
 }

@@ -2,7 +2,7 @@
   oauth.responseType("token id_token");
   UriBuilder b=UriBuilder.fromUri(oauth.getLoginFormUrl());
   driver.navigate().to(b.build().toURL());
-  OAuthClient.AuthorizationCodeResponse errorResponse=new OAuthClient.AuthorizationCodeResponse(oauth,true);
+  OAuthClient.AuthorizationEndpointResponse errorResponse=new OAuthClient.AuthorizationEndpointResponse(oauth,true);
   Assert.assertTrue(errorResponse.isRedirected());
   Assert.assertEquals(errorResponse.getError(),OAuthErrorException.UNSUPPORTED_RESPONSE_TYPE);
   Assert.assertEquals(errorResponse.getErrorDescription(),"Client is not allowed to initiate browser login with given response_type. Implicit flow is disabled for the client.");

@@ -1,4 +1,8 @@
 {
+  String skipPatternDefinition=filterConfig.getInitParameter("keycloak.config.skipPattern");
+  if (skipPatternDefinition != null) {
+    skipPattern=Pattern.compile(skipPatternDefinition,Pattern.DOTALL);
+  }
   String configResolverClass=filterConfig.getInitParameter("keycloak.config.resolver");
   if (configResolverClass != null) {
     try {
@@ -28,14 +32,7 @@
       if (pathParam != null)       path=pathParam;
       is=filterConfig.getServletContext().getResourceAsStream(path);
     }
-    KeycloakDeployment kd;
-    if (is == null) {
-      log.fine("No adapter configuration. Keycloak is unconfigured and will deny all requests.");
-      kd=new KeycloakDeployment();
-    }
- else {
-      kd=KeycloakDeploymentBuilder.build(is);
-    }
+    KeycloakDeployment kd=createKeycloakDeploymentFrom(is);
     deploymentContext=new AdapterDeploymentContext(kd);
     log.fine("Keycloak is using a per-deployment configuration.");
   }

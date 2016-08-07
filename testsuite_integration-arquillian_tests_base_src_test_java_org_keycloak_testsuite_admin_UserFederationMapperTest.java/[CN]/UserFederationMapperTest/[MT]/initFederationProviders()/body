@@ -3,10 +3,10 @@
   Response resp=realm.userFederation().create(ldapRep);
   this.ldapProviderId=ApiUtil.getCreatedId(resp);
   resp.close();
-  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.userFederationResourcePath(this.ldapProviderId),ldapRep);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.userFederationResourcePath(this.ldapProviderId),ldapRep,ResourceType.USER_FEDERATION_PROVIDER);
   UserFederationProviderRepresentation dummyRep=UserFederationProviderBuilder.create().displayName("dummy-1").providerName("dummy").priority(2).build();
   resp=realm.userFederation().create(dummyRep);
   this.dummyProviderId=ApiUtil.getCreatedId(resp);
   resp.close();
-  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.userFederationResourcePath(this.dummyProviderId),dummyRep);
+  assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.userFederationResourcePath(this.dummyProviderId),dummyRep,ResourceType.USER_FEDERATION_PROVIDER);
 }

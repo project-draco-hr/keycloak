@@ -1,19 +1,18 @@
 {
-  List<ProviderFactory> factories=cache.get(spi.getName());
-  if (factories == null) {
-    factories=new LinkedList<ProviderFactory>();
+  if (!cache.containsKey(spi.getProviderClass())) {
     IdentityHashMap factoryClasses=new IdentityHashMap();
     for (    ProviderLoader loader : loaders) {
       List<ProviderFactory> f=loader.load(spi);
       if (f != null) {
         for (        ProviderFactory pf : f) {
           if (!factoryClasses.containsKey(pf.getClass())) {
-            factories.add(pf);
+            cache.add(spi.getProviderClass(),pf);
             factoryClasses.put(pf.getClass(),pf);
           }
         }
       }
     }
   }
-  return factories;
+  List<ProviderFactory> rtn=cache.get(spi.getProviderClass());
+  return rtn == null ? Collections.EMPTY_LIST : rtn;
 }

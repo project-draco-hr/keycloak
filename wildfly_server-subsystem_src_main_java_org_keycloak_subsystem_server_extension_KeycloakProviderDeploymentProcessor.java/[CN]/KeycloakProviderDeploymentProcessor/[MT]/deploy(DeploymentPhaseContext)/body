@@ -1,0 +1,14 @@
+{
+  DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
+  KeycloakAdapterConfigService config=KeycloakAdapterConfigService.INSTANCE;
+  String deploymentName=deploymentUnit.getName();
+  if (config.isKeycloakServerDeployment(deploymentName)) {
+    return;
+  }
+  if (!KeycloakProviderDependencyProcessor.isKeycloakProviderDeployment(deploymentUnit))   return;
+  logger.infof("Deploying Keycloak provider: {0}",deploymentUnit.getName());
+  final Module module=deploymentUnit.getAttachment(Attachments.MODULE);
+  ProviderManager pm=new ProviderManager(module.getClassLoader());
+  ProviderManagerRegistry.SINGLETON.deploy(pm);
+  deploymentUnit.putAttachment(ATTACHMENT_KEY,pm);
+}

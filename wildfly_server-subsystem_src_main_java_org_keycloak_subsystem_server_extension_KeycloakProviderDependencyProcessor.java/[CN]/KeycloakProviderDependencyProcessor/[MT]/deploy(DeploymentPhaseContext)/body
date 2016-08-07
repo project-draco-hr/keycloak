@@ -1,0 +1,19 @@
+{
+  DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
+  KeycloakAdapterConfigService config=KeycloakAdapterConfigService.INSTANCE;
+  String deploymentName=deploymentUnit.getName();
+  if (config.isKeycloakServerDeployment(deploymentName)) {
+    return;
+  }
+  if (!isKeycloakProviderDeployment(deploymentUnit))   return;
+  logger.info("FOUND KEYCLOAK PROVIDER DEPLOYMENT!!!!: " + deploymentUnit.getName());
+  final ModuleSpecification moduleSpecification=deploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
+  final ModuleLoader moduleLoader=Module.getBootModuleLoader();
+  moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader,KEYCLOAK_COMMON,false,false,false,false));
+  moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader,KEYCLOAK_CORE,false,false,false,false));
+  moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader,KEYCLOAK_SERVER_SPI,false,false,false,false));
+  moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader,JAXRS,false,false,false,false));
+  moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader,RESTEASY,false,false,false,false));
+  moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader,APACHE,false,false,false,false));
+  moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader,KEYCLOAK_JPA,false,false,false,false));
+}

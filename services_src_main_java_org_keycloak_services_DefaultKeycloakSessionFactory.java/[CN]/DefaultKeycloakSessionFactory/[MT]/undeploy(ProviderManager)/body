@@ -1,0 +1,18 @@
+{
+  Map<Class<? extends Provider>,Map<String,ProviderFactory>> copy=getFactoriesCopy();
+  MultivaluedHashMap<Class<? extends Provider>,ProviderFactory> factories=pm.getLoadedFactories();
+  List<ProviderFactory> undeployed=new LinkedList<>();
+  for (  Map.Entry<Class<? extends Provider>,List<ProviderFactory>> entry : factories.entrySet()) {
+    Map<String,ProviderFactory> registered=copy.get(entry.getKey());
+    for (    ProviderFactory factory : entry.getValue()) {
+      undeployed.add(factory);
+      if (registered != null) {
+        registered.remove(factory.getId());
+      }
+    }
+  }
+  factoriesMap=copy;
+  for (  ProviderFactory factory : undeployed) {
+    factory.close();
+  }
+}

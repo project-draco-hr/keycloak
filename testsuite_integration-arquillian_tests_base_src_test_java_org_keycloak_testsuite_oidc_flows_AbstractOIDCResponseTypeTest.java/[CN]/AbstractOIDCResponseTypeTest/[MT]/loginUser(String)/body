@@ -1,0 +1,10 @@
+{
+  if (nonce != null) {
+    oauth.nonce(nonce);
+  }
+  driver.navigate().to(oauth.getLoginFormUrl());
+  loginPage.assertCurrent();
+  loginPage.login("test-user@localhost","password");
+  Assert.assertEquals(AppPage.RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  return events.expectLogin().detail(Details.USERNAME,"test-user@localhost").assertEvent();
+}

@@ -11,12 +11,14 @@
         continue;
       }
       Config.Scope scope=Config.scope(spi.getName(),provider);
-      factory.init(scope);
-      if (spi.isInternal() && !isInternal(factory)) {
-        logger.spiMayChange(factory.getId(),factory.getClass().getName(),spi.getName());
+      if (scope.getBoolean("enabled",true)) {
+        factory.init(scope);
+        if (spi.isInternal() && !isInternal(factory)) {
+          logger.spiMayChange(factory.getId(),factory.getClass().getName(),spi.getName());
+        }
+        factories.put(factory.getId(),factory);
+        logger.debugv("Loaded SPI {0} (provider = {1})",spi.getName(),provider);
       }
-      factories.put(factory.getId(),factory);
-      logger.debugv("Loaded SPI {0} (provider = {1})",spi.getName(),provider);
     }
  else {
       for (      ProviderFactory factory : pm.load(spi)) {

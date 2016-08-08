@@ -1,5 +1,7 @@
 {
   KeycloakSession session=new DefaultKeycloakSession(this);
-  jta.begin(session);
+  if (tm != null) {
+    session.getTransactionManager().enlist(new JtaTransactionWrapper(tm));
+  }
   return session;
 }

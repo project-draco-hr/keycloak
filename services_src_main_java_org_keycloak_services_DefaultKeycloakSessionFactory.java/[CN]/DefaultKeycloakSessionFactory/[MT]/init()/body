@@ -1,6 +1,5 @@
 {
   serverStartupTimestamp=System.currentTimeMillis();
-  jta=new JtaRegistration();
   ProviderManager pm=new ProviderManager(getClass().getClassLoader(),Config.scope().getArray("providers"));
   spis.addAll(pm.loadSpis());
   factoriesMap=loadFactories(pm);
@@ -23,4 +22,6 @@
     }
   }
   ProviderManagerRegistry.SINGLETON.setDeployer(this);
+  JtaTransactionManagerLookup lookup=(JtaTransactionManagerLookup)getProviderFactory(JtaTransactionManagerLookup.class);
+  if (lookup != null)   tm=lookup.getTransactionManager();
 }

@@ -1,0 +1,24 @@
+{
+  final ResourceRoot resourceRoot=du.getAttachment(Attachments.DEPLOYMENT_ROOT);
+  if (resourceRoot == null) {
+    return false;
+  }
+  final VirtualFile deploymentRoot=resourceRoot.getRoot();
+  if (deploymentRoot == null || !deploymentRoot.exists()) {
+    return false;
+  }
+  VirtualFile services=deploymentRoot.getChild("META-INF/services");
+  if (!services.exists())   return false;
+  try {
+    List<VirtualFile> archives=services.getChildren(new AbstractVirtualFileFilterWithAttributes(){
+      @Override public boolean accepts(      VirtualFile file){
+        return file.getName().startsWith("org.keycloak");
+      }
+    }
+);
+    return !archives.isEmpty();
+  }
+ catch (  IOException e) {
+  }
+  return false;
+}

@@ -1,0 +1,18 @@
+{
+  for (  Spi spi : spis) {
+    String provider=Config.getProvider(spi.getName());
+    if (provider != null) {
+      this.provider.put(spi.getProviderClass(),provider);
+      if (getProviderFactory(spi.getProviderClass(),provider) == null) {
+        throw new RuntimeException("Failed to find provider " + provider + " for "+ spi.getName());
+      }
+    }
+ else {
+      Map<String,ProviderFactory> factories=factoriesMap.get(spi.getProviderClass());
+      if (factories != null && factories.size() == 1) {
+        provider=factories.values().iterator().next().getId();
+        this.provider.put(spi.getProviderClass(),provider);
+      }
+    }
+  }
+}

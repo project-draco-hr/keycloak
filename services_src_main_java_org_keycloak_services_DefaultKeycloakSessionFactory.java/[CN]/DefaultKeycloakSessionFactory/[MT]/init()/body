@@ -1,10 +1,27 @@
 {
   serverStartupTimestamp=System.currentTimeMillis();
   ProviderManager pm=new ProviderManager(getClass().getClassLoader(),Config.scope().getArray("providers"));
-  loadSPIs(pm,pm.loadSpis());
+  spis.addAll(pm.loadSpis());
+  factoriesMap=loadFactories(pm);
+  for (  ProviderManager manager : ProviderManagerRegistry.SINGLETON.getPreBoot()) {
+    Map<Class<? extends Provider>,Map<String,ProviderFactory>> factoryMap=loadFactories(manager);
+    for (    Map.Entry<Class<? extends Provider>,Map<String,ProviderFactory>> entry : factoryMap.entrySet()) {
+      Map<String,ProviderFactory> factories=factoriesMap.get(entry.getKey());
+      if (factories == null) {
+        factoriesMap.put(entry.getKey(),entry.getValue());
+      }
+ else {
+        factories.putAll(entry.getValue());
+      }
+    }
+  }
+  checkProvider();
   for (  Map<String,ProviderFactory> factories : factoriesMap.values()) {
     for (    ProviderFactory factory : factories.values()) {
       factory.postInit(this);
     }
   }
+  ProviderManagerRegistry.SINGLETON.setDeployer(this);
+  JtaTransactionManagerLookup lookup=(JtaTransactionManagerLookup)getProviderFactory(JtaTransactionManagerLookup.class);
+  if (lookup != null)   tm=lookup.getTransactionManager();
 }

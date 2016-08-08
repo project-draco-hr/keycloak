@@ -1,0 +1,11 @@
+{
+  Assert.assertEquals(OIDCResponseType.ID_TOKEN + " " + OIDCResponseType.TOKEN,loginEvent.getDetails().get(Details.RESPONSE_TYPE));
+  OAuthClient.AuthorizationEndpointResponse authzResponse=new OAuthClient.AuthorizationEndpointResponse(oauth,true);
+  Assert.assertNotNull(authzResponse.getAccessToken());
+  String idTokenStr=authzResponse.getIdToken();
+  IDToken idToken=oauth.verifyIDToken(idTokenStr);
+  Assert.assertNotNull(idToken.getAccessTokenHash());
+  Assert.assertEquals(idToken.getAccessTokenHash(),HashProvider.oidcHash(jwsAlgorithm,authzResponse.getAccessToken()));
+  Assert.assertNull(idToken.getCodeHash());
+  return Collections.singletonList(idToken);
+}

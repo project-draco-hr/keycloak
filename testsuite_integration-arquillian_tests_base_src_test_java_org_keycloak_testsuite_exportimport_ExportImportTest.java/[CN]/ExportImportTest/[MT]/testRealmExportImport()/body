@@ -1,6 +1,6 @@
 {
-  ExportImportConfig.setAction(ExportImportConfig.ACTION_EXPORT);
-  ExportImportConfig.setRealmName("test");
+  testingClient.testing().setAction(ExportImportConfig.ACTION_EXPORT);
+  testingClient.testing().setRealmName("test");
   testingClient.testing().runExport();
   adminClient.realm("test").remove();
   Assert.assertEquals(2,adminClient.realms().findAll().size());
@@ -8,7 +8,7 @@
   assertNotAuthenticated("test","user1","password");
   assertNotAuthenticated("test","user2","password");
   assertNotAuthenticated("test","user3","password");
-  ExportImportConfig.setAction(ExportImportConfig.ACTION_IMPORT);
+  testingClient.testing().setAction(ExportImportConfig.ACTION_IMPORT);
   testingClient.testing().runImport();
   Assert.assertEquals(3,adminClient.realms().findAll().size());
   assertAuthenticated("test","test-user@localhost","password");

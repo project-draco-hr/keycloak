@@ -11,6 +11,10 @@
       ClientInitialAccessModel initialAccessModel=auth.getInitialAccessModel();
       initialAccessModel.decreaseRemainingCount();
     }
+    if (auth.isRegistrationHostTrusted()) {
+      ClientRegistrationTrustedHostModel trustedHost=auth.getTrustedHostModel();
+      trustedHost.decreaseRemainingCount();
+    }
     event.client(client.getClientId()).success();
     return client;
   }

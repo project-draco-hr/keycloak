@@ -3,11 +3,12 @@
   UriInfo uri=session.getContext().getUri();
   String authorizationHeader=session.getContext().getRequestHeaders().getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
   if (authorizationHeader == null) {
-    throw unauthorized("Missing Authorization header");
+    trustedHostModel=ClientRegistrationHostUtils.getTrustedHost(session.getContext().getConnection().getRemoteAddr(),session,realm);
+    return;
   }
   String[] split=authorizationHeader.split(" ");
   if (!split[0].equalsIgnoreCase("bearer")) {
-    throw unauthorized("Invalid Authorization header. Expected type: Bearer");
+    return;
   }
   ClientRegistrationTokenUtils.TokenVerification tokenVerification=ClientRegistrationTokenUtils.verifyToken(realm,uri,split[1]);
   if (tokenVerification.getError() != null) {

@@ -1,6 +1,9 @@
 {
   init();
-  if (isBearerToken()) {
+  if (isRegistrationHostTrusted()) {
+    return;
+  }
+ else   if (isBearerToken()) {
     if (hasRole(AdminRoles.MANAGE_CLIENTS,AdminRoles.CREATE_CLIENT)) {
       return;
     }
@@ -15,5 +18,5 @@
       }
     }
   }
-  throw unauthorized("Not authorized to view client. Maybe bad token type.");
+  throw unauthorized("Not authenticated to view client. Host not trusted and Token is missing or invalid.");
 }

@@ -140,6 +140,11 @@
  else {
     newRealm.setBrowserSecurityHeaders(BrowserSecurityHeaders.defaultHeaders);
   }
+  if (rep.getComponents() != null) {
+    MultivaluedHashMap<String,ComponentExportRepresentation> components=rep.getComponents();
+    String parentId=newRealm.getId();
+    importComponents(newRealm,components,parentId);
+  }
   List<UserFederationProviderModel> providerModels=null;
   if (rep.getUserFederationProviders() != null) {
     providerModels=convertFederationProviders(rep.getUserFederationProviders());

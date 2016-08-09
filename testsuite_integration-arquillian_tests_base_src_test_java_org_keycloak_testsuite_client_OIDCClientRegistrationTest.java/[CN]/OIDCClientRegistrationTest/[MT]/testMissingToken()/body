@@ -1,0 +1,16 @@
+{
+  reg.auth(null);
+  OIDCClientRepresentation client=new OIDCClientRepresentation();
+  client.setClientName("RegistrationAccessTokenTest");
+  client.setClientUri("http://root");
+  client.setRedirectUris(Collections.singletonList("http://redirect"));
+  try {
+    reg.oidc().create(client);
+    Assert.fail("Not expected to successfuly register client");
+  }
+ catch (  ClientRegistrationException expected) {
+    HttpErrorException httpEx=(HttpErrorException)expected.getCause();
+    Assert.assertEquals(401,httpEx.getStatusLine().getStatusCode());
+    Assert.assertEquals(OAuthErrorException.INVALID_TOKEN,httpEx.toErrorRepresentation().getError());
+  }
+}

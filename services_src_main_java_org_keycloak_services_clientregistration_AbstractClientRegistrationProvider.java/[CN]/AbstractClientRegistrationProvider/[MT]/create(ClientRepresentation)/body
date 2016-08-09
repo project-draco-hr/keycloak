@@ -4,6 +4,7 @@
   try {
     ClientModel clientModel=RepresentationToModel.createClient(session,session.getContext().getRealm(),client,true);
     client=ModelToRepresentation.toRepresentation(clientModel);
+    client.setSecret(clientModel.getSecret());
     String registrationAccessToken=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,clientModel);
     client.setRegistrationAccessToken(registrationAccessToken);
     if (auth.isInitialAccessToken()) {

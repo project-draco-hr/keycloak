@@ -3,20 +3,21 @@
   UriInfo uri=session.getContext().getUri();
   String authorizationHeader=session.getContext().getRequestHeaders().getRequestHeaders().getFirst(HttpHeaders.AUTHORIZATION);
   if (authorizationHeader == null) {
-    return;
+    throw unauthorized("Missing Authorization header");
   }
   String[] split=authorizationHeader.split(" ");
   if (!split[0].equalsIgnoreCase("bearer")) {
-    return;
+    throw unauthorized("Invalid Authorization header. Expected type: Bearer");
   }
-  jwt=ClientRegistrationTokenUtils.verifyToken(realm,uri,split[1]);
-  if (jwt == null) {
-    throw unauthorized();
+  ClientRegistrationTokenUtils.TokenVerification tokenVerification=ClientRegistrationTokenUtils.verifyToken(realm,uri,split[1]);
+  if (tokenVerification.getError() != null) {
+    throw unauthorized(tokenVerification.getError().getMessage());
   }
+  jwt=tokenVerification.getJwt();
   if (isInitialAccessToken()) {
     initialAccessModel=session.sessions().getClientInitialAccessModel(session.getContext().getRealm(),jwt.getId());
     if (initialAccessModel == null) {
-      throw unauthorized();
+      throw unauthorized("Initial Access Token not found");
     }
   }
 }

@@ -12,17 +12,17 @@
     }
   }
  else   if (isRegistrationAccessToken()) {
-    if (client.getRegistrationToken() != null && client != null && client.getRegistrationToken().equals(jwt.getId())) {
+    if (client.getRegistrationToken() != null && client.getRegistrationToken().equals(jwt.getId())) {
       return;
     }
   }
  else   if (isInitialAccessToken()) {
-    throw unauthorized();
+    throw unauthorized("Not initial access token");
   }
  else {
     if (authenticateClient(client)) {
       return;
     }
   }
-  throw unauthorized();
+  throw unauthorized("Not authorized to view client. Maybe bad token type.");
 }

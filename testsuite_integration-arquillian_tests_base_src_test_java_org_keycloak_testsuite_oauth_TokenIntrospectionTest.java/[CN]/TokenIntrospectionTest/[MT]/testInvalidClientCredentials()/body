@@ -3,5 +3,7 @@
   String code=oauth.getCurrentQuery().get(OAuth2Constants.CODE);
   AccessTokenResponse accessTokenResponse=oauth.doAccessTokenRequest(code,"password");
   String tokenResponse=oauth.introspectAccessTokenWithClientCredential("confidential-cli","bad_credential",accessTokenResponse.getAccessToken());
-  assertEquals("{\"error_description\":\"Authentication failed.\",\"error\":\"invalid_request\"}",tokenResponse);
+  OAuth2ErrorRepresentation errorRep=JsonSerialization.readValue(tokenResponse,OAuth2ErrorRepresentation.class);
+  Assert.assertEquals("Authentication failed.",errorRep.getErrorDescription());
+  Assert.assertEquals(OAuthErrorException.INVALID_REQUEST,errorRep.getError());
 }

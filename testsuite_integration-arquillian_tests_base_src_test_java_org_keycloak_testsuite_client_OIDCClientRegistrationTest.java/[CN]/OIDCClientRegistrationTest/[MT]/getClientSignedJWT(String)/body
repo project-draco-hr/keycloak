@@ -1,0 +1,8 @@
+{
+  String realmInfoUrl=KeycloakUriBuilder.fromUri(getAuthServerRoot()).path(ServiceUrlConstants.REALM_INFO_PATH).build(REALM_NAME).toString();
+  PrivateKey privateKey=KeycloakModelUtils.getPrivateKey(PRIVATE_KEY);
+  JWTClientCredentialsProvider jwtProvider=new JWTClientCredentialsProvider();
+  jwtProvider.setPrivateKey(privateKey);
+  jwtProvider.setTokenTimeout(10);
+  return jwtProvider.createSignedRequestToken(clientId,realmInfoUrl);
+}

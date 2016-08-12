@@ -1,0 +1,48 @@
+{
+  ClientRepresentation client=new ClientRepresentation();
+  client.setClientId(clientOIDC.getClientId());
+  client.setName(clientOIDC.getClientName());
+  client.setRedirectUris(clientOIDC.getRedirectUris());
+  client.setBaseUrl(clientOIDC.getClientUri());
+  List<String> oidcResponseTypes=clientOIDC.getResponseTypes();
+  if (oidcResponseTypes == null || oidcResponseTypes.isEmpty()) {
+    oidcResponseTypes=Collections.singletonList(OIDCResponseType.CODE);
+  }
+  List<String> oidcGrantTypes=clientOIDC.getGrantTypes();
+  try {
+    OIDCResponseType responseType=OIDCResponseType.parse(oidcResponseTypes);
+    client.setStandardFlowEnabled(responseType.hasResponseType(OIDCResponseType.CODE));
+    client.setImplicitFlowEnabled(responseType.isImplicitOrHybridFlow());
+    if (oidcGrantTypes != null) {
+      client.setDirectAccessGrantsEnabled(oidcGrantTypes.contains(OAuth2Constants.PASSWORD));
+      client.setServiceAccountsEnabled(oidcGrantTypes.contains(OAuth2Constants.CLIENT_CREDENTIALS));
+    }
+  }
+ catch (  IllegalArgumentException iae) {
+    throw new ClientRegistrationException(iae.getMessage(),iae);
+  }
+  String authMethod=clientOIDC.getTokenEndpointAuthMethod();
+  ClientAuthenticatorFactory clientAuthFactory;
+  if (authMethod == null) {
+    clientAuthFactory=(ClientAuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(ClientAuthenticator.class,KeycloakModelUtils.getDefaultClientAuthenticatorType());
+  }
+ else {
+    clientAuthFactory=AuthorizeClientUtil.findClientAuthenticatorForOIDCAuthMethod(session,authMethod);
+  }
+  if (clientAuthFactory == null) {
+    throw new ClientRegistrationException("Not found clientAuthenticator for requested token_endpoint_auth_method");
+  }
+  client.setClientAuthenticatorType(clientAuthFactory.getId());
+  if (authMethod != null && authMethod.equals(OIDCLoginProtocol.PRIVATE_KEY_JWT)) {
+    PublicKey publicKey=retrievePublicKey(clientOIDC);
+    if (publicKey == null) {
+      throw new ClientRegistrationException("Didn't find key of supported keyType for use " + JWK.Use.SIG.asString());
+    }
+    String publicKeyPem=KeycloakModelUtils.getPemFromKey(publicKey);
+    if (client.getAttributes() == null) {
+      client.setAttributes(new HashMap<>());
+    }
+    client.getAttributes().put(JWTClientAuthenticator.PUBLIC_KEY_ATTR,publicKeyPem);
+  }
+  return client;
+}

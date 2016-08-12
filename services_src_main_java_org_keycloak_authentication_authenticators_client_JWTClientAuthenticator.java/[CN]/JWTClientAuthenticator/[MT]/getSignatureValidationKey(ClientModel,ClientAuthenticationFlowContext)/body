@@ -1,6 +1,7 @@
 {
-  String encodedCertificate=client.getAttribute(CERTIFICATE_ATTR);
-  String encodedPublicKey=client.getAttribute(PUBLIC_KEY_ATTR);
+  CertificateRepresentation certInfo=CertificateInfoHelper.getCertificateFromClient(client,ATTR_PREFIX);
+  String encodedCertificate=certInfo.getCertificate();
+  String encodedPublicKey=certInfo.getPublicKey();
   if (encodedCertificate == null && encodedPublicKey == null) {
     Response challengeResponse=ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client","Client '" + client.getClientId() + "' doesn't have certificate or publicKey configured");
     context.failure(AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED,challengeResponse);

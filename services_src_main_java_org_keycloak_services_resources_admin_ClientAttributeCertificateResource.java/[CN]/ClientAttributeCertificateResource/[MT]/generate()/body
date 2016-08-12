@@ -4,8 +4,7 @@
     throw new NotFoundException("Could not find client");
   }
   CertificateRepresentation info=KeycloakModelUtils.generateKeyPairCertificate(client.getClientId());
-  client.setAttribute(privateAttribute,info.getPrivateKey());
-  client.setAttribute(certificateAttribute,info.getCertificate());
+  CertificateInfoHelper.updateClientModelCertificateInfo(client,info,attributePrefix);
   adminEvent.operation(OperationType.ACTION).resourcePath(session.getContext().getUri()).representation(info).success();
   return info;
 }

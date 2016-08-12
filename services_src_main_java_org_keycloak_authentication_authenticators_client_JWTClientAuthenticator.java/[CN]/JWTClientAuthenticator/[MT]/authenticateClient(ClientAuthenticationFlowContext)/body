@@ -38,14 +38,10 @@
       context.failure(AuthenticationFlowError.CLIENT_DISABLED,null);
       return;
     }
-    String encodedCertificate=client.getAttribute(CERTIFICATE_ATTR);
-    if (encodedCertificate == null) {
-      Response challengeResponse=ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client","Client '" + clientId + "' doesn't have certificate configured");
-      context.failure(AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED,challengeResponse);
+    PublicKey clientPublicKey=getSignatureValidationKey(client,context);
+    if (clientPublicKey == null) {
       return;
     }
-    X509Certificate clientCert=KeycloakModelUtils.getCertificate(encodedCertificate);
-    PublicKey clientPublicKey=clientCert.getPublicKey();
     boolean signatureValid;
     try {
       signatureValid=RSAProvider.verify(jws,clientPublicKey);

@@ -9,6 +9,14 @@
     info.setCertificate(pem);
     return info;
   }
+ else   if (keystoreFormat.equals("JSON Web Key Set (JWK)")) {
+    InputStream stream=inputParts.get(0).getBody(InputStream.class,null);
+    JSONWebKeySet keySet=JsonSerialization.readValue(stream,JSONWebKeySet.class);
+    PublicKey publicKey=JWKSUtils.getKeyForUse(keySet,JWK.Use.SIG);
+    String publicKeyPem=KeycloakModelUtils.getPemFromKey(publicKey);
+    info.setPublicKey(publicKeyPem);
+    return info;
+  }
   String keyAlias=uploadForm.get("keyAlias").get(0).getBodyAsString();
   List<InputPart> keyPasswordPart=uploadForm.get("keyPassword");
   char[] keyPassword=keyPasswordPart != null ? keyPasswordPart.get(0).getBodyAsString().toCharArray() : null;

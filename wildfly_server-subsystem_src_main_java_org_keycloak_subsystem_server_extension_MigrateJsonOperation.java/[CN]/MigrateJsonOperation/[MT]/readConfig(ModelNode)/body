@@ -1,0 +1,9 @@
+{
+  ModelNode file=operation.get(FILE_ATTRIBUTE.getName());
+  if (file.isDefined() && file.asBytes().length > 0) {
+    return new String(file.asBytes());
+  }
+  String localConfig=localConfig();
+  if (localConfig != null)   return localConfig;
+  throw new IOException("Can not find json file to migrate");
+}

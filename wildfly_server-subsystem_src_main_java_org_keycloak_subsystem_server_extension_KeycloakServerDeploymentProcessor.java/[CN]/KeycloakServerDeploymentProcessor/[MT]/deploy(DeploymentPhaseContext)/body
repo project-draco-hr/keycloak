@@ -1,15 +1,16 @@
 {
   DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
-  KeycloakAdapterConfigService config=KeycloakAdapterConfigService.INSTANCE;
+  KeycloakAdapterConfigService configService=KeycloakAdapterConfigService.INSTANCE;
   String deploymentName=deploymentUnit.getName();
-  if (!config.isKeycloakServerDeployment(deploymentName)) {
+  if (!configService.isKeycloakServerDeployment(deploymentName)) {
     return;
   }
   final EEModuleDescription description=deploymentUnit.getAttachment(org.jboss.as.ee.component.Attachments.EE_MODULE_DESCRIPTION);
-  String webContext=config.getWebContext();
+  String webContext=configService.getWebContext();
   if (webContext == null) {
     throw new DeploymentUnitProcessingException("Can't determine web context/module for Keycloak Server");
   }
   description.setModuleName(webContext);
   addInfinispanCaches(phaseContext);
+  addConfiguration(deploymentUnit,configService);
 }

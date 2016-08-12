@@ -1,0 +1,16 @@
+{
+  String[] attributes=ParseUtils.requireAttributes(reader,"name",ENABLED.getXmlName());
+  String providerName=attributes[0];
+  String enabled=attributes[1];
+  ModelNode addProvider=new ModelNode();
+  addProvider.get(ModelDescriptionConstants.OP).set(ModelDescriptionConstants.ADD);
+  PathAddress addr=PathAddress.pathAddress(PathElement.pathElement(ModelDescriptionConstants.SUBSYSTEM,KeycloakExtension.SUBSYSTEM_NAME),PathElement.pathElement(SpiResourceDefinition.TAG_NAME,spiName),PathElement.pathElement(ProviderResourceDefinition.TAG_NAME,providerName));
+  addProvider.get(ModelDescriptionConstants.OP_ADDR).set(addr.toModelNode());
+  addProvider.get(ENABLED.getName()).set(Boolean.valueOf(enabled));
+  list.add(addProvider);
+  while (nextTag(reader) != END_ELEMENT) {
+    if (reader.getLocalName().equals(PROPERTIES.getXmlName())) {
+      readProperties(PROPERTIES,addProvider,reader);
+    }
+  }
+}

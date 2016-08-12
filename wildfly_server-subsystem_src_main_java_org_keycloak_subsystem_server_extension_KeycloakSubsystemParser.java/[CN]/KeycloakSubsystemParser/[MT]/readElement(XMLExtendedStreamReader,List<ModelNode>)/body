@@ -6,6 +6,21 @@
     if (reader.getLocalName().equals(WEB_CONTEXT.getXmlName())) {
       WEB_CONTEXT.parseAndSetParameter(reader.getElementText(),addKeycloakSub,reader);
     }
+ else     if (reader.getLocalName().equals(PROVIDERS.getXmlName())) {
+      readProviders(reader,addKeycloakSub);
+    }
+ else     if (reader.getLocalName().equals(MASTER_REALM_NAME.getXmlName())) {
+      MASTER_REALM_NAME.parseAndSetParameter(reader.getElementText(),addKeycloakSub,reader);
+    }
+ else     if (reader.getLocalName().equals(SCHEDULED_TASK_INTERVAL.getXmlName())) {
+      SCHEDULED_TASK_INTERVAL.parseAndSetParameter(reader.getElementText(),addKeycloakSub,reader);
+    }
+ else     if (reader.getLocalName().equals(ThemeResourceDefinition.TAG_NAME)) {
+      readTheme(list,reader);
+    }
+ else     if (reader.getLocalName().equals(SpiResourceDefinition.TAG_NAME)) {
+      readSpi(list,reader);
+    }
  else {
       throw new XMLStreamException("Unknown keycloak-server subsystem tag: " + reader.getLocalName());
     }

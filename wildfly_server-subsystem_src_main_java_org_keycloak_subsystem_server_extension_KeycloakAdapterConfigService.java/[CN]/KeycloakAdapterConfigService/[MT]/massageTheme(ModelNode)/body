@@ -1,0 +1,15 @@
+{
+  if (!copy.hasDefined("theme"))   return;
+  if (!copy.get("theme").hasDefined("defaults"))   return;
+  ModelNode themeDefaults=copy.get("theme","defaults");
+  copy.get("theme").set(themeDefaults);
+  if (copy.has("theme","dir")) {
+    ModelNode dir=copy.get("theme","dir");
+    copy.get("theme","folder","dir").set(dir);
+    copy.get("theme").remove("dir");
+  }
+  if (copy.has("theme","modules")) {
+    ModelNode modules=copy.get("theme").remove("modules");
+    copy.get("theme","module","modules").set(modules);
+  }
+}

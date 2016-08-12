@@ -1,0 +1,19 @@
+{
+  if (!context.getModelNode().get(ThemeResourceDefinition.TAG_NAME).isDefined()) {
+    return;
+  }
+  writer.writeStartElement(ThemeResourceDefinition.TAG_NAME);
+  ModelNode themeElements=context.getModelNode().get(ThemeResourceDefinition.TAG_NAME,ThemeResourceDefinition.RESOURCE_NAME);
+  for (  AttributeDefinition def : ThemeResourceDefinition.ALL_ATTRIBUTES) {
+    if (themeElements.hasDefined(def.getName())) {
+      if (def == MODULES) {
+        ModelNode themeContext=context.getModelNode().get("theme","defaults");
+        writeList(writer,themeContext,def,"module");
+      }
+ else {
+        def.marshallAsElement(themeElements,writer);
+      }
+    }
+  }
+  writer.writeEndElement();
+}

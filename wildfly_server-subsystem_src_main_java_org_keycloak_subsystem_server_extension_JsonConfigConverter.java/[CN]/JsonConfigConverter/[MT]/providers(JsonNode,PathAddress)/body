@@ -1,0 +1,14 @@
+{
+  JsonNode targetNode=getNode(root,"providers");
+  ModelNode value=PROVIDERS.getDefaultValue();
+  if (targetNode != null && targetNode.isArray()) {
+    value=new ModelNode();
+    for (    JsonNode node : targetNode) {
+      value.add(node.asText());
+    }
+  }
+  ModelNode op=Util.createOperation(WRITE_ATTRIBUTE_OPERATION,addr);
+  op.get("name").set(PROVIDERS.getName());
+  op.get("value").set(value);
+  return op;
+}

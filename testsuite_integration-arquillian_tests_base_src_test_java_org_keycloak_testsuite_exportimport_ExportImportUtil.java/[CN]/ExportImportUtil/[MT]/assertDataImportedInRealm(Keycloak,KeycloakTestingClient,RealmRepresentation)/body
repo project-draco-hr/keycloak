@@ -15,7 +15,7 @@
   UserResource userRsc=realmRsc.users().get(user.getId());
   Assert.assertEquals(0,userRsc.getFederatedIdentity().size());
   List<ClientRepresentation> resources=realmRsc.clients().findAll();
-  Assert.assertEquals(8,resources.size());
+  Assert.assertEquals(9,resources.size());
   ClientRepresentation application=ApiUtil.findClientByClientId(realmRsc,"Application").toRepresentation();
   ClientRepresentation otherApp=ApiUtil.findClientByClientId(realmRsc,"OtherApp").toRepresentation();
   ClientRepresentation accountApp=ApiUtil.findClientByClientId(realmRsc,Constants.ACCOUNT_MANAGEMENT_CLIENT_ID).toRepresentation();
@@ -24,7 +24,7 @@
   Assert.assertNotNull(otherApp);
   Assert.assertNull(nonExisting);
   List<ClientRepresentation> clients=realmRsc.clients().findAll();
-  Assert.assertEquals(8,clients.size());
+  Assert.assertEquals(9,clients.size());
   Assert.assertTrue(hasClient(clients,application));
   Assert.assertTrue(hasClient(clients,otherApp));
   Assert.assertTrue(hasClient(clients,accountApp));
@@ -228,4 +228,5 @@
   UserRepresentation linked=testingClient.testing().getUserByServiceAccountClient(realm.getRealm(),otherApp.getClientId());
   Assert.assertNotNull(linked);
   Assert.assertEquals("my-service-user",linked.getUsername());
+  assertAuthorizationSettings(realmRsc);
 }

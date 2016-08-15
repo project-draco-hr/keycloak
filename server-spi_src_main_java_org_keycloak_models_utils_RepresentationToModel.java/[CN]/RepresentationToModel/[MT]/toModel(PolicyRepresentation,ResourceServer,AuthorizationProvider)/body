@@ -1,0 +1,31 @@
+{
+  PolicyStore policyStore=authorization.getStoreFactory().getPolicyStore();
+  Policy existing;
+  if (policy.getId() != null) {
+    existing=policyStore.findById(policy.getId());
+  }
+ else {
+    existing=policyStore.findByName(policy.getName(),resourceServer.getId());
+  }
+  if (existing != null) {
+    existing.setName(policy.getName());
+    existing.setDescription(policy.getDescription());
+    existing.setConfig(policy.getConfig());
+    existing.setDecisionStrategy(policy.getDecisionStrategy());
+    existing.setLogic(policy.getLogic());
+    updateResources(existing,authorization);
+    updateAssociatedPolicies(existing,resourceServer,authorization);
+    updateScopes(existing,authorization);
+    return existing;
+  }
+  Policy model=policyStore.create(policy.getName(),policy.getType(),resourceServer);
+  model.setDescription(policy.getDescription());
+  model.setDecisionStrategy(policy.getDecisionStrategy());
+  model.setLogic(policy.getLogic());
+  model.setConfig(policy.getConfig());
+  updateResources(model,authorization);
+  updateAssociatedPolicies(model,resourceServer,authorization);
+  updateScopes(model,authorization);
+  policy.setId(model.getId());
+  return model;
+}

@@ -114,16 +114,5 @@
  else   client.setUseTemplateScope(resourceRep.getClientTemplate() != null);
   if (resourceRep.isUseTemplateMappers() != null)   client.setUseTemplateMappers(resourceRep.isUseTemplateMappers());
  else   client.setUseTemplateMappers(resourceRep.getClientTemplate() != null);
-  boolean createResourceServer=TRUE.equals(resourceRep.getAuthorizationServicesEnabled());
-  if (createResourceServer) {
-    AuthorizationProvider provider=session.getProvider(AuthorizationProvider.class);
-    ResourceServerStore resourceServerStore=provider.getStoreFactory().getResourceServerStore();
-    client.setServiceAccountsEnabled(true);
-    client.setBearerOnly(false);
-    client.setPublicClient(false);
-    ResourceServer resourceServer=resourceServerStore.create(client.getId());
-    resourceServer.setAllowRemoteResourceManagement(true);
-    resourceServer.setPolicyEnforcementMode(PolicyEnforcementMode.ENFORCING);
-  }
   return client;
 }

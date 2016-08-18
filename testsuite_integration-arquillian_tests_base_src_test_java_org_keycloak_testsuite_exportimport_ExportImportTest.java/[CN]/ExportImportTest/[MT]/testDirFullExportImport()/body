@@ -1,0 +1,9 @@
+{
+  testingClient.testing().setProvider(DirExportProviderFactory.PROVIDER_ID);
+  String targetDirPath=testingClient.testing().getExportImportTestDirectory() + File.separator + "dirExport";
+  DirExportProvider.recursiveDeleteDir(new File(targetDirPath));
+  testingClient.testing().setDir(targetDirPath);
+  testingClient.testing().setUsersPerFile(ExportImportConfig.DEFAULT_USERS_PER_FILE);
+  testFullExportImport();
+  Assert.assertEquals(6,new File(targetDirPath).listFiles().length);
+}

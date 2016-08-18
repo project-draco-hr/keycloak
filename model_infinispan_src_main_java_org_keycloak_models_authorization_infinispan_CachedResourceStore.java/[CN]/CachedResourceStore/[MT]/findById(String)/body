@@ -1,0 +1,13 @@
+{
+  String cacheKeyForResource=getCacheKeyForResource(id);
+  List<CachedResource> cached=this.cache.get(cacheKeyForResource);
+  if (cached == null) {
+    Resource resource=getDelegate().findById(id);
+    if (resource != null) {
+      updateCachedIds(getResourceOwnerCacheKey(resource.getOwner()),resource,false);
+      return createAdapter(updateResourceCache(resource));
+    }
+    return null;
+  }
+  return createAdapter(cached.get(0));
+}

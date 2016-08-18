@@ -1,5 +1,5 @@
 {
-  ClientModel client=getClientById(id,realm);
+  final ClientModel client=getClientById(id,realm);
   if (client == null)   return false;
   session.users().preRemove(realm,client);
   for (  RoleModel role : client.getRoles()) {
@@ -8,6 +8,15 @@
   ClientEntity clientEntity=((ClientAdapter)client).getEntity();
   em.createNamedQuery("deleteScopeMappingByClient").setParameter("client",clientEntity).executeUpdate();
   em.flush();
+  session.getKeycloakSessionFactory().publish(new RealmModel.ClientRemovedEvent(){
+    @Override public ClientModel getClient(){
+      return client;
+    }
+    @Override public KeycloakSession getKeycloakSession(){
+      return session;
+    }
+  }
+);
   em.remove(clientEntity);
   try {
     em.flush();

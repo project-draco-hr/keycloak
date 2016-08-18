@@ -4,13 +4,15 @@
       if (configurableEmbeddedServletContainer instanceof TomcatEmbeddedServletContainerFactory) {
         TomcatEmbeddedServletContainerFactory container=(TomcatEmbeddedServletContainerFactory)configurableEmbeddedServletContainer;
         container.addContextValves(new KeycloakAuthenticatorValve());
-        container.addContextCustomizers(getTomcatKeycloakContextCustomizer());
+        container.addContextCustomizers(tomcatKeycloakContextCustomizer());
       }
  else       if (configurableEmbeddedServletContainer instanceof UndertowEmbeddedServletContainerFactory) {
-        throw new IllegalArgumentException("Undertow Keycloak integration is not yet implemented");
+        UndertowEmbeddedServletContainerFactory container=(UndertowEmbeddedServletContainerFactory)configurableEmbeddedServletContainer;
+        container.addDeploymentInfoCustomizers(undertowKeycloakContextCustomizer());
       }
  else       if (configurableEmbeddedServletContainer instanceof JettyEmbeddedServletContainerFactory) {
-        throw new IllegalArgumentException("Jetty Keycloak integration is not yet implemented");
+        JettyEmbeddedServletContainerFactory container=(JettyEmbeddedServletContainerFactory)configurableEmbeddedServletContainer;
+        container.addServerCustomizers(jettyKeycloakServerCustomizer());
       }
     }
   }

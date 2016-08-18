@@ -4,7 +4,7 @@
     RealmModel realm=session.realms().getRealmByName("demo");
     int originalTokenTimeout=realm.getAccessTokenLifespan();
     realm.setAccessTokenLifespan(3);
-    session.getTransaction().commit();
+    session.getTransactionManager().commit();
     session.close();
     String tokenCookie1=loginToCustomerCookiePortal();
     Time.setOffset(4);
@@ -27,7 +27,7 @@
     session=keycloakRule.startSession();
     realm=session.realms().getRealmByName("demo");
     realm.setAccessTokenLifespan(originalTokenTimeout);
-    session.getTransaction().commit();
+    session.getTransactionManager().commit();
     session.close();
   }
   finally {

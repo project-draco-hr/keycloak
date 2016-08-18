@@ -1,0 +1,12 @@
+{
+  ClientResource clientResource=getClientResource();
+  ClientRepresentation resourceServer=getResourceServer();
+  enableAuthorizationServices();
+  ResourceServerRepresentation settings=clientResource.authorization().getSettings();
+  assertEquals(PolicyEnforcerConfig.EnforcementMode.ENFORCING.name(),settings.getPolicyEnforcementMode().name());
+  assertEquals(resourceServer.getId(),settings.getClientId());
+  List<ResourceRepresentation> defaultResources=clientResource.authorization().resources().resources();
+  assertEquals(1,defaultResources.size());
+  List<PolicyRepresentation> defaultPolicies=clientResource.authorization().policies().policies();
+  assertEquals(2,defaultPolicies.size());
+}

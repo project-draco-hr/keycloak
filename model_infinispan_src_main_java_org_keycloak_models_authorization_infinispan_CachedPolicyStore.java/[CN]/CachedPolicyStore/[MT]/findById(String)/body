@@ -1,0 +1,12 @@
+{
+  String cacheKeyForPolicy=getCacheKeyForPolicy(id);
+  List<CachedPolicy> cached=this.cache.get(cacheKeyForPolicy);
+  if (cached == null) {
+    Policy policy=getDelegate().findById(id);
+    if (policy != null) {
+      return createAdapter(updatePolicyCache(policy));
+    }
+    return null;
+  }
+  return createAdapter(cached.get(0));
+}

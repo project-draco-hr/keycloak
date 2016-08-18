@@ -4,8 +4,16 @@
     context.attempted();
   }
  else {
-    context.setUser(authResult.getUser());
-    context.attachUserSession(authResult.getSession());
-    context.success();
+    ClientSessionModel clientSession=context.getClientSession();
+    LoginProtocol protocol=context.getSession().getProvider(LoginProtocol.class,clientSession.getAuthMethod());
+    if (protocol.requireReauthentication(authResult.getSession(),clientSession)) {
+      context.attempted();
+    }
+ else {
+      clientSession.setNote(AuthenticationManager.SSO_AUTH,"true");
+      context.setUser(authResult.getUser());
+      context.attachUserSession(authResult.getSession());
+      context.success();
+    }
   }
 }

@@ -1,0 +1,8 @@
+{
+  auth.requireManage();
+  ComponentModel model=RepresentationToModel.toModel(rep);
+  if (model.getParentId() == null)   model.setParentId(realm.getId());
+  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
+  model=realm.addComponentModel(model);
+  return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
+}

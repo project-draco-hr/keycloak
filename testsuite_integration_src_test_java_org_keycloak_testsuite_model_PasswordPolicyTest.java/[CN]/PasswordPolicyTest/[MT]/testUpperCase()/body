@@ -1,0 +1,10 @@
+{
+  realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"upperCase"));
+  Assert.assertEquals("invalidPasswordMinUpperCaseCharsMessage",policyManager.validate("jdoe","abcd1234").getMessage());
+  Assert.assertArrayEquals(new Object[]{1},policyManager.validate("jdoe","abcd1234").getParameters());
+  Assert.assertNull(policyManager.validate("jdoe","abCd1234"));
+  realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"upperCase(2)"));
+  Assert.assertEquals("invalidPasswordMinUpperCaseCharsMessage",policyManager.validate("jdoe","abCd1234").getMessage());
+  Assert.assertArrayEquals(new Object[]{2},policyManager.validate("jdoe","abCd1234").getParameters());
+  Assert.assertNull(policyManager.validate("jdoe","AbCd1234"));
+}

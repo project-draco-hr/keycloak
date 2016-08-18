@@ -1,0 +1,19 @@
+{
+  Map<String,Object>[] roleIds=getRoles(this.policy);
+  if (roleIds.length > 0) {
+    Identity identity=evaluation.getContext().getIdentity();
+    for (    Map<String,Object> current : roleIds) {
+      RoleModel role=getCurrentRealm().getRoleById((String)current.get("id"));
+      if (role != null) {
+        boolean hasRole=hasRole(identity,role);
+        if (!hasRole && Boolean.valueOf(isRequired(current))) {
+          evaluation.deny();
+          return;
+        }
+ else         if (hasRole) {
+          evaluation.grant();
+        }
+      }
+    }
+  }
+}

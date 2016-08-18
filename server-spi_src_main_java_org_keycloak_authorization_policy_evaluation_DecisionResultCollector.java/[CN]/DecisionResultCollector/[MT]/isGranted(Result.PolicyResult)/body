@@ -1,0 +1,28 @@
+{
+  List<Result.PolicyResult> values=policyResult.getAssociatedPolicies();
+  int grantCount=0;
+  int denyCount=policyResult.getPolicy().getAssociatedPolicies().size();
+  for (  Result.PolicyResult decision : values) {
+    if (decision.getStatus().equals(Effect.PERMIT)) {
+      grantCount++;
+      denyCount--;
+    }
+  }
+  Policy policy=policyResult.getPolicy();
+  DecisionStrategy decisionStrategy=policy.getDecisionStrategy();
+  if (decisionStrategy == null) {
+    decisionStrategy=DecisionStrategy.UNANIMOUS;
+  }
+  if (DecisionStrategy.AFFIRMATIVE.equals(decisionStrategy) && grantCount > 0) {
+    return true;
+  }
+ else   if (DecisionStrategy.UNANIMOUS.equals(decisionStrategy) && denyCount == 0) {
+    return true;
+  }
+ else   if (DecisionStrategy.CONSENSUS.equals(decisionStrategy)) {
+    if (grantCount > denyCount) {
+      return true;
+    }
+  }
+  return false;
+}

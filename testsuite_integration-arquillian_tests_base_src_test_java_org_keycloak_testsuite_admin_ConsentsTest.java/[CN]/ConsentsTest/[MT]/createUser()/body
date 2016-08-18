@@ -1,0 +1,13 @@
+{
+  log.debug("creating user for realm " + providerRealmName());
+  UserRepresentation user=new UserRepresentation();
+  user.setUsername(getUserLogin());
+  user.setEmail(getUserEmail());
+  user.setFirstName(getUserFirstName());
+  user.setLastName(getUserLastName());
+  user.setEmailVerified(true);
+  user.setEnabled(true);
+  RealmResource realmResource=adminClient.realm(providerRealmName());
+  String userId=createUserWithAdminClient(realmResource,user);
+  resetUserPassword(realmResource.users().get(userId),getUserPassword(),false);
+}

@@ -1,0 +1,12 @@
+{
+  String roles=policy.getConfig().get("roles");
+  if (roles != null) {
+    try {
+      return JsonSerialization.readValue(roles.getBytes(),Map[].class);
+    }
+ catch (    IOException e) {
+      throw new RuntimeException("Could not parse roles [" + roles + "] from policy config ["+ policy.getName()+ ".",e);
+    }
+  }
+  return new Map[]{};
+}

@@ -3,7 +3,6 @@
 synchronized (this) {
       if (emf == null) {
         logger.debug("Initializing JPA connections");
-        Connection connection=null;
         Map<String,Object> properties=new HashMap<String,Object>();
         String unitName="keycloak-default";
         String dataSource=config.get("dataSource");
@@ -31,21 +30,25 @@ synchronized (this) {
         if (schema != null) {
           properties.put(JpaUtils.HIBERNATE_DEFAULT_SCHEMA,schema);
         }
-        String databaseSchema=config.get("databaseSchema");
-        if (databaseSchema == null) {
+        String databaseSchema;
+        String databaseSchemaConf=config.get("databaseSchema");
+        if (databaseSchemaConf == null) {
           throw new RuntimeException("Property 'databaseSchema' needs to be specified in the configuration");
         }
-        if (databaseSchema.equals("development-update")) {
+        if (databaseSchemaConf.equals("development-update")) {
           properties.put("hibernate.hbm2ddl.auto","update");
           databaseSchema=null;
         }
- else         if (databaseSchema.equals("development-validate")) {
+ else         if (databaseSchemaConf.equals("development-validate")) {
           properties.put("hibernate.hbm2ddl.auto","validate");
           databaseSchema=null;
         }
+ else {
+          databaseSchema=databaseSchemaConf;
+        }
         properties.put("hibernate.show_sql",config.getBoolean("showSql",false));
         properties.put("hibernate.format_sql",config.getBoolean("formatSql",true));
-        connection=getConnection();
+        Connection connection=getConnection();
         try {
           prepareOperationalInfo(connection);
           String driverDialect=detectDialect(connection);
@@ -58,37 +61,34 @@ synchronized (this) {
             if (updater == null) {
               throw new RuntimeException("Can't update database: JPA updater provider not found");
             }
-            if (databaseSchema.equals("update")) {
-              String currentVersion=null;
-              try {
-                ResultSet resultSet=connection.createStatement().executeQuery(updater.getCurrentVersionSql(schema));
-                if (resultSet.next()) {
-                  currentVersion=resultSet.getString(1);
+            DBLockProvider dbLock=new DBLockManager(session).getDBLock();
+            if (dbLock.hasLock()) {
+              updateOrValidateDB(databaseSchema,connection,updater,schema);
+            }
+ else {
+              logger.trace("Don't have DBLock retrieved before upgrade. Needs to acquire lock first in separate transaction");
+              KeycloakModelUtils.runJobInTransaction(session.getKeycloakSessionFactory(),new KeycloakSessionTask(){
+                @Override public void run(                KeycloakSession lockSession){
+                  DBLockManager dbLockManager=new DBLockManager(lockSession);
+                  DBLockProvider dbLock2=dbLockManager.getDBLock();
+                  dbLock2.waitForLock();
+                  try {
+                    updateOrValidateDB(databaseSchema,connection,updater,schema);
+                  }
+  finally {
+                    dbLock2.releaseLock();
+                  }
                 }
               }
- catch (              SQLException e) {
-              }
-              if (currentVersion == null || !JpaUpdaterProvider.LAST_VERSION.equals(currentVersion)) {
-                updater.update(connection,schema);
-              }
- else {
-                logger.debug("Database is up to date");
-              }
+);
             }
- else             if (databaseSchema.equals("validate")) {
-              updater.validate(connection,schema);
-            }
- else {
-              throw new RuntimeException("Invalid value for databaseSchema: " + databaseSchema);
-            }
-            logger.trace("Database update completed");
           }
           int globalStatsInterval=config.getInt("globalStatsInterval",-1);
           if (globalStatsInterval != -1) {
             properties.put("hibernate.generate_statistics",true);
           }
           logger.trace("Creating EntityManagerFactory");
-          emf=JpaUtils.createEntityManagerFactory(unitName,properties,getClass().getClassLoader());
+          emf=JpaUtils.createEntityManagerFactory(session,unitName,properties,getClass().getClassLoader());
           logger.trace("EntityManagerFactory created");
           if (globalStatsInterval != -1) {
             startGlobalStats(session,globalStatsInterval);

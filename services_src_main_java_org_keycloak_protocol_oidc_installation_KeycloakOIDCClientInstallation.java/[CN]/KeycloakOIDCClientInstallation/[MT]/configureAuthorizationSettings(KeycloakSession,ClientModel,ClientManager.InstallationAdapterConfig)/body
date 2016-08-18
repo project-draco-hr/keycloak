@@ -1,0 +1,15 @@
+{
+  if (new AuthorizationService(session,client,null).isEnabled()) {
+    PolicyEnforcerConfig enforcerConfig=new PolicyEnforcerConfig();
+    enforcerConfig.setEnforcementMode(null);
+    enforcerConfig.setCreateResources(null);
+    enforcerConfig.setOnlineIntrospection(null);
+    rep.setEnforcerConfig(enforcerConfig);
+    Set<RoleModel> clientRoles=client.getRoles();
+    if (clientRoles.size() == 1) {
+      if (clientRoles.iterator().next().getName().equals(Constants.AUTHZ_UMA_PROTECTION)) {
+        rep.setUseResourceRoleMappings(null);
+      }
+    }
+  }
+}

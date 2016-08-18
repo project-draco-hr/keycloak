@@ -1,0 +1,14 @@
+{
+  if (getClientRegistrationTrustedHostModel(realm,hostName) != null) {
+    throw new ModelDuplicateException("Client registration already exists for this realm and hostName");
+  }
+  String id=computeClientRegistrationTrustedHostEntityId(realm,hostName);
+  ClientRegistrationTrustedHostEntity entity=new ClientRegistrationTrustedHostEntity();
+  entity.setId(id);
+  entity.setHostName(hostName);
+  entity.setRealm(realm.getId());
+  entity.setCount(count);
+  entity.setRemainingCount(count);
+  tx.put(sessionCache,id,entity);
+  return wrap(realm,entity);
+}

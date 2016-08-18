@@ -1,0 +1,13 @@
+{
+  RefreshableKeycloakSecurityContext ctx=(RefreshableKeycloakSecurityContext)req.getAttribute(KeycloakSecurityContext.class.getName());
+  String accessTokenPretty=JsonSerialization.writeValueAsPrettyString(ctx.getToken());
+  RefreshToken refreshToken;
+  try {
+    refreshToken=new JWSInput(ctx.getRefreshToken()).readJsonContent(RefreshToken.class);
+  }
+ catch (  JWSInputException e) {
+    throw new IOException(e);
+  }
+  String refreshTokenPretty=JsonSerialization.writeValueAsPrettyString(refreshToken);
+  return new StringBuilder("<span id=\"accessToken\">" + accessTokenPretty + "</span>").append("<span id=\"refreshToken\">" + refreshTokenPretty + "</span>").toString();
+}

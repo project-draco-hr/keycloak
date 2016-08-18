@@ -1,0 +1,12 @@
+{
+  requireManage();
+  resource.setId(id);
+  StoreFactory storeFactory=this.authorization.getStoreFactory();
+  ResourceStore resourceStore=storeFactory.getResourceStore();
+  Resource model=resourceStore.findById(resource.getId());
+  if (model == null) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+  toModel(resource,resourceServer,authorization);
+  return Response.noContent().build();
+}

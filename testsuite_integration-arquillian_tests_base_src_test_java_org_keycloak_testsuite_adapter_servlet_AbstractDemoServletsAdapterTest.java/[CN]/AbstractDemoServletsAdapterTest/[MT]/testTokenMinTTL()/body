@@ -1,0 +1,19 @@
+{
+  tokenMinTTLPage.navigateTo();
+  testRealmLoginPage.form().waitForUsernameInputPresent();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlEquals(tokenMinTTLPage);
+  AccessToken token=tokenMinTTLPage.getAccessToken();
+  int tokenIssued1=token.getIssuedAt();
+  setAdapterAndServerTimeOffset(300,tokenMinTTLPage.toString());
+  token=tokenMinTTLPage.getAccessToken();
+  int tokenIssued2=token.getIssuedAt();
+  Assert.assertEquals(tokenIssued1,tokenIssued2);
+  Assert.assertFalse(token.isExpired());
+  setAdapterAndServerTimeOffset(540,tokenMinTTLPage.toString());
+  token=tokenMinTTLPage.getAccessToken();
+  int tokenIssued3=token.getIssuedAt();
+  Assert.assertTrue(tokenIssued3 > tokenIssued1);
+  setAdapterAndServerTimeOffset(0,tokenMinTTLPage.toString());
+}

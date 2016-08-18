@@ -1,0 +1,24 @@
+{
+  try {
+    configureAuthorizationServices();
+    this.deployer.deploy(RESOURCE_SERVER_ID);
+    login();
+    assertTrue(this.driver.getPageSource().contains("Your permissions are"));
+    assertTrue(this.driver.getPageSource().contains("Default Resource"));
+    boolean hasDefaultPermission=false;
+    boolean hasDefaultPolicy=false;
+    for (    PolicyRepresentation policy : getAuthorizationResource().policies().policies()) {
+      if ("Default Policy".equals(policy.getName())) {
+        hasDefaultPolicy=true;
+      }
+      if ("Default Permission".equals(policy.getName())) {
+        hasDefaultPermission=true;
+      }
+    }
+    assertTrue(hasDefaultPermission);
+    assertTrue(hasDefaultPolicy);
+  }
+  finally {
+    this.deployer.undeploy(RESOURCE_SERVER_ID);
+  }
+}

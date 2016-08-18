@@ -1,0 +1,15 @@
+{
+  oauth.doLogin("test-user@localhost","password");
+  EventRepresentation loginEvent=events.expectLogin().assertEvent();
+  IDToken idToken=sendTokenRequestAndGetIDToken(loginEvent);
+  int authTime=idToken.getAuthTime();
+  int currentTime=Time.currentTime();
+  Assert.assertTrue(authTime <= currentTime && authTime + 3 >= currentTime);
+  setTimeOffset(10);
+  oauth.maxAge("1");
+  oauth.doLogin("test-user@localhost","password");
+  loginEvent=events.expectLogin().assertEvent();
+  idToken=sendTokenRequestAndGetIDToken(loginEvent);
+  int authTimeUpdated=idToken.getAuthTime();
+  Assert.assertTrue(authTime + 10 <= authTimeUpdated);
+}

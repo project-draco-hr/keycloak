@@ -1,0 +1,12 @@
+{
+  Set<GroupModel> set=new HashSet<>();
+  TypedQuery<FederatedUserGroupMembershipEntity> query=em.createNamedQuery("feduserGroupMembership",FederatedUserGroupMembershipEntity.class);
+  query.setParameter("userId",user.getId());
+  List<FederatedUserGroupMembershipEntity> results=query.getResultList();
+  if (results.size() == 0)   return set;
+  for (  FederatedUserGroupMembershipEntity entity : results) {
+    GroupModel group=realm.getGroupById(entity.getGroupId());
+    set.add(group);
+  }
+  return set;
+}

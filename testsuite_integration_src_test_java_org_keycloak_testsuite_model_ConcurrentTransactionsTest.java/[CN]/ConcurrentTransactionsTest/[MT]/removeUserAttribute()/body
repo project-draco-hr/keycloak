@@ -1,0 +1,51 @@
+{
+  RealmModel realm=realmManager.createRealm("original");
+  KeycloakSession session=realmManager.getSession();
+  UserModel user=session.users().addUser(realm,"john");
+  user.setSingleAttribute("foo","val1");
+  final KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
+  commit();
+  AtomicReference<Exception> reference=new AtomicReference<>();
+  final CountDownLatch readAttrLatch=new CountDownLatch(2);
+  Runnable runnable=new Runnable(){
+    @Override public void run(){
+      try {
+        KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+          @Override public void run(          KeycloakSession session){
+            try {
+              RealmModel realm=session.realms().getRealmByName("original");
+              UserModel john=session.users().getUserByUsername("john",realm);
+              String attrVal=john.getFirstAttribute("foo");
+              readAttrLatch.countDown();
+              readAttrLatch.await();
+              john.removeAttribute("foo");
+            }
+ catch (            Exception e) {
+              throw new RuntimeException(e);
+            }
+          }
+        }
+);
+      }
+ catch (      Exception e) {
+        reference.set(e);
+        throw new RuntimeException(e);
+      }
+ finally {
+        readAttrLatch.countDown();
+      }
+    }
+  }
+;
+  Thread thread1=new Thread(runnable);
+  Thread thread2=new Thread(runnable);
+  thread1.start();
+  thread2.start();
+  thread1.join();
+  thread2.join();
+  logger.info("removeUserAttribute: after thread join");
+  commit();
+  if (reference.get() != null) {
+    Assert.fail("Exception happened in some of threads. Details: " + reference.get().getMessage());
+  }
+}

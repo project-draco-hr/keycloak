@@ -1,6 +1,5 @@
 {
   DeploymentUnit deploymentUnit=phaseContext.getDeploymentUnit();
-  String deploymentName=deploymentUnit.getName();
   WarMetaData warMetaData=deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
   if (warMetaData == null) {
     return;
@@ -13,20 +12,20 @@
   LoginConfigMetaData loginConfig=webMetaData.getLoginConfig();
   try {
     boolean webRequiresKC=loginConfig != null && "KEYCLOAK-SAML".equalsIgnoreCase(loginConfig.getAuthMethod());
-    boolean hasSubsystemConfig=Configuration.INSTANCE.isSecureDeployment(deploymentName);
+    boolean hasSubsystemConfig=Configuration.INSTANCE.isSecureDeployment(deploymentUnit);
     if (hasSubsystemConfig || webRequiresKC) {
-      log.debug("Setting up KEYCLOAK-SAML auth method for WAR: " + deploymentName);
+      log.debug("Setting up KEYCLOAK-SAML auth method for WAR: " + deploymentUnit.getName());
       if (hasSubsystemConfig) {
-        addXMLData(getXML(deploymentName),warMetaData);
+        addXMLData(getXML(deploymentUnit),warMetaData);
         if (loginConfig != null) {
           loginConfig.setAuthMethod("KEYCLOAK-SAML");
         }
  else {
-          log.warn("Failed to set up KEYCLOAK-SAML auth method for WAR: " + deploymentName + " (loginConfig == null)");
+          log.warn("Failed to set up KEYCLOAK-SAML auth method for WAR: " + deploymentUnit.getName() + " (loginConfig == null)");
         }
       }
       addValve(webMetaData);
-      KeycloakLogger.ROOT_LOGGER.deploymentSecured(deploymentName);
+      KeycloakLogger.ROOT_LOGGER.deploymentSecured(deploymentUnit.getName());
     }
   }
  catch (  Exception e) {

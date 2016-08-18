@@ -1,0 +1,21 @@
+{
+  if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
+    updatePasswordCredential(session,provider,realm,user,cred);
+  }
+ else   if (UserCredentialModel.isOtp(cred.getType())) {
+    updateOtpCredential(session,provider,realm,user,cred);
+  }
+ else {
+    UserCredentialValueModel fedCred=getCredentialByType(provider,realm,user,cred.getType());
+    if (fedCred == null) {
+      fedCred.setCreatedDate(Time.toMillis(Time.currentTime()));
+      fedCred.setType(cred.getType());
+      fedCred.setDevice(cred.getDevice());
+      fedCred.setValue(cred.getValue());
+    }
+ else {
+      fedCred.setValue(cred.getValue());
+    }
+    provider.updateCredential(realm,user,fedCred);
+  }
+}

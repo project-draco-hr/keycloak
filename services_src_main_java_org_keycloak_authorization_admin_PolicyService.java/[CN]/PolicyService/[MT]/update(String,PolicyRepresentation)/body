@@ -1,0 +1,20 @@
+{
+  this.auth.requireManage();
+  representation.setId(id);
+  StoreFactory storeFactory=authorization.getStoreFactory();
+  Policy policy=storeFactory.getPolicyStore().findById(representation.getId());
+  if (policy == null) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+  policy=toModel(representation,resourceServer,authorization);
+  PolicyProviderAdminService resource=getPolicyProviderAdminResource(policy.getType(),authorization);
+  if (resource != null) {
+    try {
+      resource.onUpdate(policy);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+  return Response.status(Status.CREATED).build();
+}

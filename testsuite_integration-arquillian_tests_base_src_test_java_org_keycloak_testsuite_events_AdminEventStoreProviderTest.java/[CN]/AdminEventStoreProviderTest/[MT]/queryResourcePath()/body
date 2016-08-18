@@ -1,0 +1,16 @@
+{
+  long oldest=System.currentTimeMillis() - 30000;
+  long newest=System.currentTimeMillis() + 30000;
+  testing().onAdminEvent(create("realmId",OperationType.CREATE,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  testing().onAdminEvent(create(newest,"realmId",OperationType.ACTION,"realmId","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  testing().onAdminEvent(create(newest,"realmId",OperationType.ACTION,"realmId","clientId","userId2","127.0.0.1","/admin/realms/master","error"),false);
+  testing().onAdminEvent(create("realmId2",OperationType.CREATE,"realmId2","clientId","userId","127.0.0.1","/admin/realms/master","error"),false);
+  testing().onAdminEvent(create(oldest,"realmId",OperationType.CREATE,"realmId","clientId2","userId","127.0.0.1","/admin/realms/master","error"),false);
+  testing().onAdminEvent(create("realmId",OperationType.CREATE,"realmId","clientId","userId2","127.0.0.1","/admin/realms/master","error"),false);
+  Assert.assertEquals(6,testing().getAdminEvents(null,null,null,null,null,null,"/admin",null,null,null,null).size());
+  Assert.assertEquals(6,testing().getAdminEvents(null,null,null,null,null,null,"/realms",null,null,null,null).size());
+  Assert.assertEquals(6,testing().getAdminEvents(null,null,null,null,null,null,"/master",null,null,null,null).size());
+  Assert.assertEquals(6,testing().getAdminEvents(null,null,null,null,null,null,"/admin/realms",null,null,null,null).size());
+  Assert.assertEquals(6,testing().getAdminEvents(null,null,null,null,null,null,"/realms/master",null,null,null,null).size());
+  Assert.assertEquals(6,testing().getAdminEvents(null,null,null,null,null,null,"/admin/realms/master",null,null,null,null).size());
+}

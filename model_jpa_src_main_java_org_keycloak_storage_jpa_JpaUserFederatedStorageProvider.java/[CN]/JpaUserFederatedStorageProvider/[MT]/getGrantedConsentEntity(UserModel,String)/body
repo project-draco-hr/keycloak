@@ -1,0 +1,15 @@
+{
+  TypedQuery<FederatedUserConsentEntity> query=em.createNamedQuery("userFederatedConsentByUserAndClient",FederatedUserConsentEntity.class);
+  query.setParameter("userId",user.getId());
+  query.setParameter("clientId",clientId);
+  List<FederatedUserConsentEntity> results=query.getResultList();
+  if (results.size() > 1) {
+    throw new ModelException("More results found for user [" + user.getUsername() + "] and client ["+ clientId+ "]");
+  }
+ else   if (results.size() == 1) {
+    return results.get(0);
+  }
+ else {
+    return null;
+  }
+}

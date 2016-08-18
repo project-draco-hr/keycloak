@@ -11,14 +11,7 @@
   em.flush();
   UserAdapter userModel=new UserAdapter(session,realm,em,entity);
   if (addDefaultRoles) {
-    for (    String r : realm.getDefaultRoles()) {
-      userModel.grantRoleImpl(realm.getRole(r));
-    }
-    for (    ClientModel application : realm.getClients()) {
-      for (      String r : application.getDefaultRoles()) {
-        userModel.grantRoleImpl(application.getRole(r));
-      }
-    }
+    DefaultRoles.addDefaultRoles(realm,userModel);
     for (    GroupModel g : realm.getDefaultGroups()) {
       userModel.joinGroupImpl(g);
     }

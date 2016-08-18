@@ -1,0 +1,17 @@
+{
+  for (  Map.Entry entry : this.cache.entrySet()) {
+    String cacheKey=(String)entry.getKey();
+    if (cacheKey.startsWith(RS_ID_CACHE_PREFIX)) {
+      List<ResourceServer> cache=(List<ResourceServer>)entry.getValue();
+      ResourceServer resourceServer=cache.get(0);
+      if (resourceServer.getClientId().equals(id)) {
+        return findById(resourceServer.getId());
+      }
+    }
+  }
+  ResourceServer resourceServer=getDelegate().findByClient(id);
+  if (resourceServer != null) {
+    return findById(updateResourceServerCache(resourceServer).getId());
+  }
+  return null;
+}

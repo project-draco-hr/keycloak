@@ -6,16 +6,16 @@
   Response response=processor.authenticateClient();
   if (response != null) {
     event.client(client.getClientId()).error(Errors.NOT_ALLOWED);
-    throw unauthorized();
+    throw unauthorized("Failed to authenticate client");
   }
   ClientModel authClient=processor.getClient();
-  if (client == null) {
+  if (authClient == null) {
     event.client(client.getClientId()).error(Errors.NOT_ALLOWED);
-    throw unauthorized();
+    throw unauthorized("No client authenticated");
   }
   if (!authClient.getClientId().equals(client.getClientId())) {
     event.client(client.getClientId()).error(Errors.NOT_ALLOWED);
-    throw unauthorized();
+    throw unauthorized("Different client authenticated");
   }
   return true;
 }

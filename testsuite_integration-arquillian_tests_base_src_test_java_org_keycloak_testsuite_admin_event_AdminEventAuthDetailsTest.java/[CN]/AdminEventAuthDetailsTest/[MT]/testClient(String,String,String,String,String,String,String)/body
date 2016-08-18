@@ -3,7 +3,7 @@
   try {
     UserRepresentation rep=UserBuilder.create().id(appUserId).username("app-user").email("foo@email.org").build();
     keycloak.realm("test").users().get(appUserId).update(rep);
-    assertAdminEvents.expect().realmId(realmUuid).operationType(OperationType.UPDATE).resourcePath(AdminEventPaths.userResourcePath(appUserId)).representation(rep).authDetails(expectedRealmId,expectedClientUuid,expectedUserId).assertEvent();
+    assertAdminEvents.expect().realmId(realmUuid).operationType(OperationType.UPDATE).resourcePath(AdminEventPaths.userResourcePath(appUserId)).resourceType(ResourceType.USER).representation(rep).authDetails(expectedRealmId,expectedClientUuid,expectedUserId).assertEvent();
   }
   finally {
     keycloak.close();

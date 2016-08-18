@@ -1,0 +1,8 @@
+{
+  AccessToken accessToken=Tokens.getAccessToken(this.authorization.getKeycloakSession());
+  RealmModel realm=this.authorization.getKeycloakSession().getContext().getRealm();
+  AccessToken.Authorization authorization=new AccessToken.Authorization();
+  authorization.setPermissions(permissions);
+  accessToken.setAuthorization(authorization);
+  return new TokenManager().encodeToken(realm,accessToken);
+}

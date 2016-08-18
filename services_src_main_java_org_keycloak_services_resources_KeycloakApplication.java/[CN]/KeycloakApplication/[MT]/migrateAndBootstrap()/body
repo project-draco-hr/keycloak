@@ -1,0 +1,35 @@
+{
+  ExportImportManager exportImportManager;
+  migrateModel();
+  KeycloakSession session=sessionFactory.create();
+  try {
+    session.getTransactionManager().begin();
+    ApplianceBootstrap applianceBootstrap=new ApplianceBootstrap(session);
+    exportImportManager=new ExportImportManager(session);
+    boolean createMasterRealm=applianceBootstrap.isNewInstall();
+    if (exportImportManager.isRunImport() && exportImportManager.isImportMasterIncluded()) {
+      createMasterRealm=false;
+    }
+    if (createMasterRealm) {
+      applianceBootstrap.createMasterRealm(contextPath);
+    }
+    session.getTransactionManager().commit();
+  }
+ catch (  RuntimeException re) {
+    if (session.getTransactionManager().isActive()) {
+      session.getTransactionManager().rollback();
+    }
+    throw re;
+  }
+ finally {
+    session.close();
+  }
+  if (exportImportManager.isRunImport()) {
+    exportImportManager.runImport();
+  }
+ else {
+    importRealms();
+  }
+  importAddUser();
+  return exportImportManager;
+}

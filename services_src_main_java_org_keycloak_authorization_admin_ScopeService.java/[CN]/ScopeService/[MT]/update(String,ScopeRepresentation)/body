@@ -1,0 +1,11 @@
+{
+  this.auth.requireManage();
+  scope.setId(id);
+  StoreFactory storeFactory=authorization.getStoreFactory();
+  Scope model=storeFactory.getScopeStore().findById(scope.getId());
+  if (model == null) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+  toModel(scope,resourceServer,authorization);
+  return Response.noContent().build();
+}

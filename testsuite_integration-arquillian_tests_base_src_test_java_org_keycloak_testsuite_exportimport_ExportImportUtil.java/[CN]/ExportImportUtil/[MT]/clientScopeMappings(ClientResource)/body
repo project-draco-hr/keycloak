@@ -1,0 +1,10 @@
+{
+  List<RoleRepresentation> clientScopeMappings=new LinkedList<>();
+  Map<String,ClientMappingsRepresentation> clientRoles=client.getScopeMappings().getAll().getClientMappings();
+  if (clientRoles == null)   return clientScopeMappings;
+  for (  String clientKey : clientRoles.keySet()) {
+    List<RoleRepresentation> clientRoleScopeMappings=clientRoles.get(clientKey).getMappings();
+    if (clientRoleScopeMappings != null)     clientScopeMappings.addAll(clientRoleScopeMappings);
+  }
+  return clientScopeMappings;
+}

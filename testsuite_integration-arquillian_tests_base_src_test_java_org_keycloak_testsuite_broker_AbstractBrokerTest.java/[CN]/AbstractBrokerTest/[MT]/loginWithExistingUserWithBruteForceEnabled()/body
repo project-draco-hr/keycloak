@@ -1,0 +1,38 @@
+{
+  adminClient.realm(consumerRealmName()).update(RealmBuilder.create().bruteForceProtected(true).failureFactor(2).build());
+  loginWithExistingUser();
+  driver.navigate().to(getAccountPasswordUrl(consumerRealmName()));
+  accountPasswordPage.changePassword("password","password");
+  driver.navigate().to(getAuthRoot() + "/auth/realms/" + providerRealmName()+ "/protocol/"+ "openid-connect"+ "/logout?redirect_uri="+ encodeUrl(getAccountUrl(providerRealmName())));
+  driver.navigate().to(getAccountUrl(consumerRealmName()));
+  try {
+    waitForPage("log in to");
+  }
+ catch (  TimeoutException e) {
+    log.debug(driver.getTitle());
+    log.debug(driver.getPageSource());
+    Assert.fail("Timeout while waiting for login page");
+  }
+  for (int i=0; i < 3; i++) {
+    try {
+      waitForElementEnabled("login");
+    }
+ catch (    TimeoutException e) {
+      Assert.fail("Timeout while waiting for login element enabled");
+    }
+    accountLoginPage.login(getUserLogin(),"invalid");
+  }
+  assertEquals("Invalid username or password.",accountLoginPage.getError());
+  accountLoginPage.clickSocial(getIDPAlias());
+  try {
+    waitForPage("log in to");
+  }
+ catch (  TimeoutException e) {
+    log.debug(driver.getTitle());
+    log.debug(driver.getPageSource());
+    Assert.fail("Timeout while waiting for login page");
+  }
+  Assert.assertTrue("Driver should be on the provider realm page right now",driver.getCurrentUrl().contains("/auth/realms/" + providerRealmName() + "/"));
+  accountLoginPage.login(getUserLogin(),getUserPassword());
+  assertEquals("Account is disabled, contact admin.",errorPage.getError());
+}

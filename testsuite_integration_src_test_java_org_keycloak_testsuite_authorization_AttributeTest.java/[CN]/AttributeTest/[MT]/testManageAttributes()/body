@@ -1,0 +1,25 @@
+{
+  Map<String,Collection<String>> map=new HashedMap();
+  map.put("integer",asList("1"));
+  map.put("long",asList("" + Long.MAX_VALUE));
+  map.put("string",asList("some string"));
+  map.put("date",asList("12/12/2016"));
+  map.put("ip_network_address",asList("127.0.0.1"));
+  map.put("host_network_address",asList("localhost"));
+  map.put("multi_valued",asList("1","2","3","4"));
+  Attributes attributes=Attributes.from(map);
+  map.keySet().forEach(new Consumer<String>(){
+    @Override public void accept(    String name){
+      assertTrue(attributes.exists(name));
+    }
+  }
+);
+  assertFalse(attributes.exists("not_found"));
+  assertTrue(attributes.containsValue("integer","1"));
+  assertTrue(attributes.containsValue("multi_valued","3"));
+  assertEquals(1,attributes.getValue("multi_valued").asInt(0));
+  assertEquals(4,attributes.getValue("multi_valued").asInt(3));
+  assertEquals(new SimpleDateFormat("dd/MM/yyyy").parse("12/12/2016"),attributes.getValue("date").asDate(0,"dd/MM/yyyy"));
+  assertEquals(InetAddress.getLoopbackAddress(),attributes.getValue("ip_network_address").asInetAddress(0));
+  assertEquals(InetAddress.getLoopbackAddress(),attributes.getValue("host_network_address").asInetAddress(0));
+}

@@ -1,0 +1,30 @@
+{
+  Logger log=Logger.getLogger(URLUtils.class);
+  log.info("starting navigation");
+  if (driver instanceof InternetExplorerDriver && driver.getCurrentUrl().equals(uri)) {
+    log.info("IE workaround: target URL equals current URL - refreshing the page");
+    driver.navigate().refresh();
+  }
+  WaitUtils.waitForPageToLoad(driver);
+  log.info("current URL:  " + driver.getCurrentUrl());
+  log.info("navigating to " + uri);
+  driver.navigate().to(uri);
+  if (waitForMatch) {
+    String loginUrl="^[^\\?]+/auth/realms/[^/]+/(protocol|login-actions).+$";
+    try {
+      (new WebDriverWait(driver,3)).until(or(urlMatches("^" + Pattern.quote(uri) + ".*$"),urlMatches(loginUrl)));
+    }
+ catch (    TimeoutException e) {
+      log.info("new current URL doesn't start with desired URL");
+    }
+  }
+  WaitUtils.waitForPageToLoad(driver);
+  log.info("new current URL:  " + driver.getCurrentUrl());
+  if (enableIEWorkaround && driver instanceof InternetExplorerDriver && (driver.getCurrentUrl().matches("^[^#]+/#state=[^#/&]+&code=[^#/&]+$") || driver.getCurrentUrl().matches("^.+/auth/admin/[^/]+/console/$"))) {
+    log.info("IE workaround: reloading the page after deleting the cookies...");
+    navigateToUri(driver,uri,waitForMatch,false);
+  }
+ else {
+    log.info("navigation complete");
+  }
+}

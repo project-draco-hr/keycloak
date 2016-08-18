@@ -12,13 +12,13 @@
   Assert.assertEquals("0 imported users, 0 updated users",syncResult.getStatus());
   Map<String,Object> eventRep=new HashMap<>();
   eventRep.put("action","triggerFullSync");
-  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationResourcePath(id1) + "/sync",eventRep);
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationResourcePath(id1) + "/sync",eventRep,ResourceType.USER_FEDERATION_PROVIDER);
   int fullSyncTime=userFederation().get(id1).toRepresentation().getLastSync();
   Assert.assertTrue(fullSyncTime > 0);
   setTimeOffset(50);
   syncResult=userFederation().get(id1).syncUsers("triggerChangedUsersSync");
   eventRep.put("action","triggerChangedUsersSync");
-  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationResourcePath(id1) + "/sync",eventRep);
+  assertAdminEvents.assertEvent(realmId,OperationType.ACTION,AdminEventPaths.userFederationResourcePath(id1) + "/sync",eventRep,ResourceType.USER_FEDERATION_PROVIDER);
   Assert.assertEquals("0 imported users, 0 updated users",syncResult.getStatus());
   int changedSyncTime=userFederation().get(id1).toRepresentation().getLastSync();
   Assert.assertTrue(fullSyncTime + 50 <= changedSyncTime);

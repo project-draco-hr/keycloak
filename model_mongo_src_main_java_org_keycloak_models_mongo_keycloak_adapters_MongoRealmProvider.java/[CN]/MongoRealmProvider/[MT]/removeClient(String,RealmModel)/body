@@ -1,7 +1,19 @@
 {
   if (id == null)   return false;
-  ClientModel client=getClientById(id,realm);
+  final ClientModel client=getClientById(id,realm);
   if (client == null)   return false;
   session.users().preRemove(realm,client);
-  return getMongoStore().removeEntity(MongoClientEntity.class,id,invocationContext);
+  boolean removed=getMongoStore().removeEntity(MongoClientEntity.class,id,invocationContext);
+  if (removed) {
+    session.getKeycloakSessionFactory().publish(new RealmModel.ClientRemovedEvent(){
+      @Override public ClientModel getClient(){
+        return client;
+      }
+      @Override public KeycloakSession getKeycloakSession(){
+        return session;
+      }
+    }
+);
+  }
+  return removed;
 }

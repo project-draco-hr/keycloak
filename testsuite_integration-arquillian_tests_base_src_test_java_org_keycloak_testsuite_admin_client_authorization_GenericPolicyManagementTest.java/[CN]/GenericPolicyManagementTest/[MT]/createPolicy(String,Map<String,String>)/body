@@ -1,0 +1,11 @@
+{
+  PolicyRepresentation newPolicy=new PolicyRepresentation();
+  newPolicy.setName(name);
+  newPolicy.setType("test");
+  newPolicy.setConfig(config);
+  PoliciesResource policies=getClientResource().authorization().policies();
+  Response response=policies.create(newPolicy);
+  assertEquals(Response.Status.CREATED.getStatusCode(),response.getStatus());
+  PolicyRepresentation stored=response.readEntity(PolicyRepresentation.class);
+  return policies.policy(stored.getId());
+}

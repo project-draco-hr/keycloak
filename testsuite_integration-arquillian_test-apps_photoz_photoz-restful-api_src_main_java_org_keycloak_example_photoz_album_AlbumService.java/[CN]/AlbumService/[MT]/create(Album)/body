@@ -1,0 +1,13 @@
+{
+  Principal userPrincipal=request.getUserPrincipal();
+  newAlbum.setUserId(userPrincipal.getName());
+  Query queryDuplicatedAlbum=this.entityManager.createQuery("from Album where name = :name and userId = :userId");
+  queryDuplicatedAlbum.setParameter("name",newAlbum.getName());
+  queryDuplicatedAlbum.setParameter("userId",userPrincipal.getName());
+  if (!queryDuplicatedAlbum.getResultList().isEmpty()) {
+    throw new ErrorResponse("Name [" + newAlbum.getName() + "] already taken. Choose another one.",Status.CONFLICT);
+  }
+  this.entityManager.persist(newAlbum);
+  createProtectedResource(newAlbum);
+  return Response.ok(newAlbum).build();
+}

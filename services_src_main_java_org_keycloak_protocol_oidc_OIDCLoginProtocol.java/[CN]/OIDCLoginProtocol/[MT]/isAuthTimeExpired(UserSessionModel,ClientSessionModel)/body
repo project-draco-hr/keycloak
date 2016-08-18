@@ -1,0 +1,14 @@
+{
+  String authTime=userSession.getNote(AuthenticationManager.AUTH_TIME);
+  String maxAge=clientSession.getNote(OIDCLoginProtocol.MAX_AGE_PARAM);
+  if (maxAge == null) {
+    return false;
+  }
+  int authTimeInt=authTime == null ? 0 : Integer.parseInt(authTime);
+  int maxAgeInt=Integer.parseInt(maxAge);
+  if (authTimeInt + maxAgeInt < Time.currentTime()) {
+    logger.debugf("Authentication time is expired, needs to reauthenticate. userSession=%s, clientId=%s, maxAge=%d, authTime=%d",userSession.getId(),clientSession.getClient().getId(),maxAgeInt,authTimeInt);
+    return true;
+  }
+  return false;
+}

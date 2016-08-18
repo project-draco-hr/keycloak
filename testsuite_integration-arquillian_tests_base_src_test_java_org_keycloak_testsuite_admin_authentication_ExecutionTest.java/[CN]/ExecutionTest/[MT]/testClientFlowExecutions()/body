@@ -4,7 +4,7 @@
   Map<String,String> executionData=new HashMap<>();
   executionData.put("provider",ClientIdAndSecretAuthenticator.PROVIDER_ID);
   authMgmtResource.addExecution("new-client-flow",executionData);
-  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authAddExecutionPath("new-client-flow"),executionData);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.CREATE,AdminEventPaths.authAddExecutionPath("new-client-flow"),executionData,ResourceType.AUTH_EXECUTION);
   try {
     authMgmtResource.getExecutions("not-existent");
     Assert.fail("Not expected to find executions");
@@ -30,7 +30,7 @@
   }
   executionRep.setRequirement(ALTERNATIVE);
   authMgmtResource.updateExecutions("new-client-flow",executionRep);
-  assertAdminEvents.assertEvent(REALM_NAME,OperationType.UPDATE,AdminEventPaths.authUpdateExecutionPath("new-client-flow"),executionRep);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.UPDATE,AdminEventPaths.authUpdateExecutionPath("new-client-flow"),executionRep,ResourceType.AUTH_EXECUTION);
   executionRep=findExecutionByProvider(ClientIdAndSecretAuthenticator.PROVIDER_ID,authMgmtResource.getExecutions("new-client-flow"));
   Assert.assertEquals(ALTERNATIVE,executionRep.getRequirement());
   try {
@@ -40,8 +40,8 @@
  catch (  NotFoundException nfe) {
   }
   authMgmtResource.removeExecution(executionRep.getId());
-  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authExecutionPath(executionRep.getId()));
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authExecutionPath(executionRep.getId()),ResourceType.AUTH_EXECUTION);
   AuthenticationFlowRepresentation rep=findFlowByAlias("new-client-flow",authMgmtResource.getFlows());
   authMgmtResource.deleteFlow(rep.getId());
-  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authFlowPath(rep.getId()));
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authFlowPath(rep.getId()),ResourceType.AUTH_FLOW);
 }

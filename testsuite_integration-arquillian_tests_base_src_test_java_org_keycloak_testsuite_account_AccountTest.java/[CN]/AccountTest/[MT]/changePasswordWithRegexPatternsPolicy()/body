@@ -1,0 +1,12 @@
+{
+  setPasswordPolicy("regexPattern(^[A-Z]+#[a-z]{8}$)");
+  changePasswordPage.open();
+  loginPage.login("test-user@localhost","password");
+  events.expectLogin().client("account").detail(Details.REDIRECT_URI,ACCOUNT_REDIRECT + "?path=password").assertEvent();
+  changePasswordPage.changePassword("password","invalidPassword","invalidPassword");
+  Assert.assertEquals("Invalid password: fails to match regex pattern(s).",profilePage.getError());
+  events.expectAccount(EventType.UPDATE_PASSWORD_ERROR).error(Errors.PASSWORD_REJECTED).assertEvent();
+  changePasswordPage.changePassword("password","VALID#password","VALID#password");
+  Assert.assertEquals("Your password has been updated.",profilePage.getSuccess());
+  events.expectAccount(EventType.UPDATE_PASSWORD).assertEvent();
+}

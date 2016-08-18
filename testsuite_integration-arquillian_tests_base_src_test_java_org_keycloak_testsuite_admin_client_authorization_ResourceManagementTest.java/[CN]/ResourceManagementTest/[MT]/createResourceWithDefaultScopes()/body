@@ -1,0 +1,12 @@
+{
+  ResourceResource resourceResource=createResource();
+  ResourceRepresentation resource=resourceResource.toRepresentation();
+  assertEquals(0,resource.getScopes().size());
+  HashSet<ScopeRepresentation> scopes=new HashSet<>();
+  scopes.add(createScope("Scope A","").toRepresentation());
+  scopes.add(createScope("Scope B","").toRepresentation());
+  scopes.add(createScope("Scope C","").toRepresentation());
+  resource.setScopes(scopes);
+  resourceResource.update(resource);
+  return resourceResource;
+}

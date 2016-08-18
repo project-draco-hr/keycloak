@@ -1,0 +1,17 @@
+{
+  loginPage.open();
+  assertTrue(loginPage.isCurrent());
+  loginPage.clickRegister();
+  registerPage.assertCurrent();
+  registerPage.register("?????????????","????????","registeruserumlats@email","registeruserumlats","password","password");
+  String userId=events.expectRegister("registeruserumlats","registeruserumlats@email").assertEvent().getUserId();
+  events.expectLogin().detail("username","registeruserumlats").user(userId).assertEvent();
+  accountPage.open();
+  assertTrue(accountPage.isCurrent());
+  UserRepresentation user=getUser(userId);
+  Assert.assertNotNull(user);
+  assertEquals("?????????????",user.getFirstName());
+  assertEquals("????????",user.getLastName());
+  assertEquals("?????????????",accountPage.getFirstName());
+  assertEquals("????????",accountPage.getLastName());
+}

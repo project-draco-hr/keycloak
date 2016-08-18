@@ -1,28 +1,28 @@
 {
   if (client.isBearerOnly()) {
     event.error(Errors.INVALID_CLIENT);
-    throw new ErrorResponseException("unauthorized_client","Bearer-only client not allowed to retrieve service account",Response.Status.UNAUTHORIZED);
+    throw new ErrorResponseException(OAuthErrorException.UNAUTHORIZED_CLIENT,"Bearer-only client not allowed to retrieve service account",Response.Status.UNAUTHORIZED);
   }
   if (client.isPublicClient()) {
     event.error(Errors.INVALID_CLIENT);
-    throw new ErrorResponseException("unauthorized_client","Public client not allowed to retrieve service account",Response.Status.UNAUTHORIZED);
+    throw new ErrorResponseException(OAuthErrorException.UNAUTHORIZED_CLIENT,"Public client not allowed to retrieve service account",Response.Status.UNAUTHORIZED);
   }
   if (!client.isServiceAccountsEnabled()) {
     event.error(Errors.INVALID_CLIENT);
-    throw new ErrorResponseException("unauthorized_client","Client not enabled to retrieve service account",Response.Status.UNAUTHORIZED);
+    throw new ErrorResponseException(OAuthErrorException.UNAUTHORIZED_CLIENT,"Client not enabled to retrieve service account",Response.Status.UNAUTHORIZED);
   }
-  UserModel clientUser=session.users().getUserByServiceAccountClient(client);
+  UserModel clientUser=session.users().getServiceAccount(client);
   if (clientUser == null || client.getProtocolMapperByName(OIDCLoginProtocol.LOGIN_PROTOCOL,ServiceAccountConstants.CLIENT_ID_PROTOCOL_MAPPER) == null) {
     logger.debugf("Service account user for client '%s' not found or default protocol mapper for service account not found. Creating now",client.getClientId());
     new ClientManager(new RealmManager(session)).enableServiceAccount(client);
-    clientUser=session.users().getUserByServiceAccountClient(client);
+    clientUser=session.users().getServiceAccount(client);
   }
   String clientUsername=clientUser.getUsername();
   event.detail(Details.USERNAME,clientUsername);
   event.user(clientUser);
   if (!clientUser.isEnabled()) {
     event.error(Errors.USER_DISABLED);
-    throw new ErrorResponseException("invalid_request","User '" + clientUsername + "' disabled",Response.Status.UNAUTHORIZED);
+    throw new ErrorResponseException(OAuthErrorException.INVALID_REQUEST,"User '" + clientUsername + "' disabled",Response.Status.UNAUTHORIZED);
   }
   String scope=formParams.getFirst(OAuth2Constants.SCOPE);
   UserSessionProvider sessions=session.sessions();

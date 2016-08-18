@@ -24,17 +24,18 @@
 ;
   session.getContext().setConnection(connection);
   ResteasyProviderFactory.pushContext(ClientConnection.class,connection);
-  KeycloakTransaction tx=session.getTransaction();
+  KeycloakTransaction tx=session.getTransactionManager();
   ResteasyProviderFactory.pushContext(KeycloakTransaction.class,tx);
   tx.begin();
   try {
     filterChain.doFilter(servletRequest,servletResponse);
   }
   finally {
-    if (session.getTransaction() != null && session.getTransaction().isActive()) {
-      session.getTransaction().rollback();
+    if (servletRequest.isAsyncStarted()) {
+      servletRequest.getAsyncContext().addListener(createAsyncLifeCycleListener(session));
     }
-    session.close();
-    ResteasyProviderFactory.clearContextData();
+ else {
+      closeSession(session);
+    }
   }
 }

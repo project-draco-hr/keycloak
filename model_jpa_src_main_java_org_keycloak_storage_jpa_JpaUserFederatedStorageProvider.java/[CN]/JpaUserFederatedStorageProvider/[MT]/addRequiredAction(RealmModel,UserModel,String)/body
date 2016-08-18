@@ -1,0 +1,9 @@
+{
+  if (user.getRequiredActions().contains(action))   return;
+  FederatedUserRequiredActionEntity entity=new FederatedUserRequiredActionEntity();
+  entity.setUserId(user.getId());
+  entity.setRealmId(realm.getId());
+  entity.setStorageProviderId(StorageId.resolveProviderId(user));
+  entity.setAction(action);
+  em.persist(entity);
+}

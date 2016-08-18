@@ -1,9 +1,11 @@
 {
-  long count=millis / checkIntervals;
-  long remainder=millis % checkIntervals;
-  for (int i=0; i < count + 1; i++) {
-    if (i < count || remainder > 0) {
-      pause(checkIntervals);
+  long checkDurationMillisMin=Math.min(millis,checkDurationMillis);
+  long checkCount=millis / checkDurationMillis;
+  long remainder=millis % checkDurationMillis;
+  LOG.debug(String.format("Pause %s ms, checking errors once per %s ms",millis,checkDurationMillisMin));
+  for (int i=0; i < checkCount + 1; i++) {
+    if (i < checkCount || remainder > 0) {
+      pause(checkDurationMillisMin);
       if (getError() != null) {
         throw new RuntimeException("PerformanceTestRunnable threw an exception. Stopping the test.",getError());
       }

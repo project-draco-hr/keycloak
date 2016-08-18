@@ -11,6 +11,15 @@
   em.createNamedQuery("deleteTemplateScopeMappingByRole").setParameter("role",roleEntity).executeUpdate();
   int val=em.createNamedQuery("deleteGroupRoleMappingsByRole").setParameter("roleId",roleEntity.getId()).executeUpdate();
   em.remove(roleEntity);
+  session.getKeycloakSessionFactory().publish(new RoleContainerModel.RoleRemovedEvent(){
+    @Override public RoleModel getRole(){
+      return role;
+    }
+    @Override public KeycloakSession getKeycloakSession(){
+      return session;
+    }
+  }
+);
   em.flush();
   return true;
 }

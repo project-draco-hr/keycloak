@@ -35,6 +35,7 @@
   cacheManager.defineConfiguration(InfinispanConnectionProvider.SESSION_CACHE_NAME,sessionCacheConfiguration);
   cacheManager.defineConfiguration(InfinispanConnectionProvider.OFFLINE_SESSION_CACHE_NAME,sessionCacheConfiguration);
   cacheManager.defineConfiguration(InfinispanConnectionProvider.LOGIN_FAILURE_CACHE_NAME,sessionCacheConfiguration);
+  cacheManager.defineConfiguration(InfinispanConnectionProvider.AUTHORIZATION_CACHE_NAME,sessionCacheConfiguration);
   ConfigurationBuilder replicationConfigBuilder=new ConfigurationBuilder();
   if (clustered) {
     replicationConfigBuilder.clustering().cacheMode(async ? CacheMode.REPL_ASYNC : CacheMode.REPL_SYNC);
@@ -45,6 +46,12 @@
   counterConfigBuilder.invocationBatching().enable().transaction().transactionMode(TransactionMode.TRANSACTIONAL);
   counterConfigBuilder.transaction().transactionManagerLookup(new DummyTransactionManagerLookup());
   counterConfigBuilder.transaction().lockingMode(LockingMode.PESSIMISTIC);
-  Configuration counterCacheConfiguration=counterConfigBuilder.build();
-  cacheManager.defineConfiguration(InfinispanConnectionProvider.VERSION_CACHE_NAME,counterCacheConfiguration);
+  cacheManager.defineConfiguration(InfinispanConnectionProvider.REALM_REVISIONS_CACHE_NAME,getRevisionCacheConfig(false,InfinispanConnectionProvider.REALM_REVISIONS_CACHE_DEFAULT_MAX));
+  cacheManager.getCache(InfinispanConnectionProvider.REALM_CACHE_NAME,true);
+  long maxEntries=cacheManager.getCache(InfinispanConnectionProvider.USER_CACHE_NAME).getCacheConfiguration().eviction().maxEntries();
+  if (maxEntries <= 0) {
+    maxEntries=InfinispanConnectionProvider.USER_REVISIONS_CACHE_DEFAULT_MAX;
+  }
+  cacheManager.defineConfiguration(InfinispanConnectionProvider.USER_REVISIONS_CACHE_NAME,getRevisionCacheConfig(false,maxEntries));
+  cacheManager.getCache(InfinispanConnectionProvider.USER_REVISIONS_CACHE_NAME,true);
 }

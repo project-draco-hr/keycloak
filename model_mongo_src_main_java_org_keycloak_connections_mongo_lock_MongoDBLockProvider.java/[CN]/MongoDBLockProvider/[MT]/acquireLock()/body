@@ -8,6 +8,7 @@
     WriteResult wr=db.getCollection(DB_LOCK_COLLECTION).update(query,update,true,false);
     if (wr.getN() == 1) {
       logger.debugf("Successfully acquired DB lock");
+      factory.setHasLock(true);
       return true;
     }
  else {

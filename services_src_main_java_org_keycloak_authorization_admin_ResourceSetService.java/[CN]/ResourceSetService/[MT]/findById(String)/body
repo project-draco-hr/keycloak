@@ -1,0 +1,9 @@
+{
+  requireView();
+  StoreFactory storeFactory=authorization.getStoreFactory();
+  Resource model=storeFactory.getResourceStore().findById(id);
+  if (model == null) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+  return Response.ok(toRepresentation(model,this.resourceServer,authorization)).build();
+}

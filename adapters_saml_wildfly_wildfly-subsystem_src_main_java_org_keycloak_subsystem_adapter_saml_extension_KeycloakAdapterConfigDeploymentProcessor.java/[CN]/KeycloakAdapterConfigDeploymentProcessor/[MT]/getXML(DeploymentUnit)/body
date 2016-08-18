@@ -1,0 +1,18 @@
+{
+  ModelNode node=Configuration.INSTANCE.getSecureDeployment(deploymentUnit);
+  if (node != null) {
+    KeycloakSubsystemParser writer=new KeycloakSubsystemParser();
+    ByteArrayOutputStream output=new ByteArrayOutputStream();
+    XMLExtendedStreamWriter streamWriter=new FormattingXMLStreamWriter(XMLOutputFactory.newInstance().createXMLStreamWriter(output));
+    try {
+      streamWriter.writeStartElement("keycloak-saml-adapter");
+      writer.writeSps(streamWriter,node);
+      streamWriter.writeEndElement();
+    }
+  finally {
+      streamWriter.close();
+    }
+    return new String(output.toByteArray(),Charset.forName("utf-8"));
+  }
+  return null;
+}

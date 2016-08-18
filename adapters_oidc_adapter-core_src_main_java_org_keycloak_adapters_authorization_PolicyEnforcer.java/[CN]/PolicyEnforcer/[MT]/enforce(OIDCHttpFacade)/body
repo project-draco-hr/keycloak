@@ -1,0 +1,20 @@
+{
+  if (LOGGER.isDebugEnabled()) {
+    LOGGER.debugv("Policy enforcement is enable. Enforcing policy decisions for path [{0}].",facade.getRequest().getURI());
+  }
+  AuthorizationContext context;
+  if (deployment.isBearerOnly()) {
+    context=new BearerTokenPolicyEnforcer(this).authorize(facade);
+  }
+ else {
+    context=new KeycloakAdapterPolicyEnforcer(this).authorize(facade);
+  }
+  if (LOGGER.isDebugEnabled()) {
+    LOGGER.debugv("Policy enforcement result for path [{0}] is : {1}",facade.getRequest().getURI(),context.isGranted() ? "GRANTED" : "DENIED");
+    LOGGER.debugv("Returning authorization context with permissions:");
+    for (    Permission permission : context.getPermissions()) {
+      LOGGER.debug(permission);
+    }
+  }
+  return context;
+}

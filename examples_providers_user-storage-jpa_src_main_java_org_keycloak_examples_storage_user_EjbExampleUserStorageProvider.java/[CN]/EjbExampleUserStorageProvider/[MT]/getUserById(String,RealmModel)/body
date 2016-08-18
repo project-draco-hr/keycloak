@@ -1,0 +1,10 @@
+{
+  logger.info("getUserById: " + id);
+  String persistenceId=StorageId.externalId(id);
+  UserEntity entity=em.find(UserEntity.class,persistenceId);
+  if (entity == null) {
+    logger.info("could not find user by id: " + id);
+    return null;
+  }
+  return new UserAdapter(session,realm,model,entity);
+}

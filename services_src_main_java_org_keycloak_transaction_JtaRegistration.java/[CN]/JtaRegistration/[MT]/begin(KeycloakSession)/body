@@ -1,0 +1,5 @@
+{
+  TransactionManager tm=session.getProvider(JtaTransactionManagerLookup.class).getTransactionManager();
+  if (tm == null)   return;
+  session.getTransactionManager().enlist(new JtaTransactionWrapper(tm));
+}

@@ -1,0 +1,9 @@
+{
+  TypedQuery<FederatedUserAttributeEntity> query=em.createNamedQuery("getFederatedAttributesByUser",FederatedUserAttributeEntity.class);
+  List<FederatedUserAttributeEntity> list=query.setParameter("userId",user.getId()).setParameter("realmId",realm.getId()).getResultList();
+  MultivaluedHashMap<String,String> result=new MultivaluedHashMap<>();
+  for (  FederatedUserAttributeEntity entity : list) {
+    result.add(entity.getName(),entity.getValue());
+  }
+  return result;
+}

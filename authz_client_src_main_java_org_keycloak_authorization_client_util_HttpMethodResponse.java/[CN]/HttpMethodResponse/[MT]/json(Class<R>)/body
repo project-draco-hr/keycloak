@@ -1,0 +1,18 @@
+{
+  return new HttpMethodResponse<R>(this.method){
+    @Override public R execute(){
+      return method.execute(new HttpResponseProcessor<R>(){
+        @Override public R process(        byte[] entity){
+          try {
+            return JsonSerialization.readValue(entity,responseType);
+          }
+ catch (          IOException e) {
+            throw new RuntimeException("Error parsing JSON response.",e);
+          }
+        }
+      }
+);
+    }
+  }
+;
+}

@@ -1,12 +1,11 @@
 {
-  LOG.info("Measuring performance");
-  LOG.info("Iteration: " + (resultsList.size() + 1));
-  LOG.info("Duration: " + MEASUREMENT_DURATION + " s");
-  LOG.info("Load: " + currentLoad);
-  metrics.reset();
+  PerformanceMeasurement measurement=new PerformanceMeasurement(currentLoad);
+  statistics.reset();
+  timeoutStatistics.reset();
+  LOG.info(String.format("Measuring performance. Iteration: %s, Load: %s, Duration: %s s",measurements.size() + 1,currentLoad,MEASUREMENT_DURATION));
   pauseWithErrorChecking(MEASUREMENT_DURATION * 1000);
-  resultsList.add(metrics.computeMetrics());
-  timeoutResultsList.add(timeouts.computeMetrics());
-  getLatestResults().logResults();
-  LOG.info("Timeouts: " + getLatestTimeoutResults());
+  measurement.setStatistics(statistics.snapshot(),timeoutStatistics.snapshot());
+  measurements.add(measurement);
+  measurement.printToCSV(getTestName());
+  measurement.printToLog();
 }

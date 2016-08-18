@@ -1,0 +1,10 @@
+{
+  realmModel.setPasswordPolicy(PasswordPolicy.parse(session,"length(8) and digits(2) and lowerCase(2) and upperCase(2) and specialChars(2) and notUsername()"));
+  Assert.assertNotNull(policyManager.validate("jdoe","12aaBB&"));
+  Assert.assertNotNull(policyManager.validate("jdoe","aaaaBB&-"));
+  Assert.assertNotNull(policyManager.validate("jdoe","12AABB&-"));
+  Assert.assertNotNull(policyManager.validate("jdoe","12aabb&-"));
+  Assert.assertNotNull(policyManager.validate("jdoe","12aaBBcc"));
+  Assert.assertNotNull(policyManager.validate("12aaBB&-","12aaBB&-"));
+  Assert.assertNull(policyManager.validate("jdoe","12aaBB&-"));
+}

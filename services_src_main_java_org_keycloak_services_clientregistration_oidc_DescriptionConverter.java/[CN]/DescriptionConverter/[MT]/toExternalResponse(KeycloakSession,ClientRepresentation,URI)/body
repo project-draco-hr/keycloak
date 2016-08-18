@@ -1,0 +1,21 @@
+{
+  OIDCClientRepresentation response=new OIDCClientRepresentation();
+  response.setClientId(client.getClientId());
+  ClientAuthenticatorFactory clientAuth=(ClientAuthenticatorFactory)session.getKeycloakSessionFactory().getProviderFactory(ClientAuthenticator.class,client.getClientAuthenticatorType());
+  Set<String> oidcClientAuthMethods=clientAuth.getProtocolAuthenticatorMethods(OIDCLoginProtocol.LOGIN_PROTOCOL);
+  if (oidcClientAuthMethods != null && !oidcClientAuthMethods.isEmpty()) {
+    response.setTokenEndpointAuthMethod(oidcClientAuthMethods.iterator().next());
+  }
+  if (client.getClientAuthenticatorType().equals(ClientIdAndSecretAuthenticator.PROVIDER_ID)) {
+    response.setClientSecret(client.getSecret());
+    response.setClientSecretExpiresAt(0);
+  }
+  response.setClientName(client.getName());
+  response.setClientUri(client.getBaseUrl());
+  response.setRedirectUris(client.getRedirectUris());
+  response.setRegistrationAccessToken(client.getRegistrationAccessToken());
+  response.setRegistrationClientUri(uri.toString());
+  response.setResponseTypes(getOIDCResponseTypes(client));
+  response.setGrantTypes(getOIDCGrantTypes(client));
+  return response;
+}

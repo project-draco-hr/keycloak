@@ -1,12 +1,14 @@
 {
+  KeycloakSession session=brokerServerRule.startSession();
   setUpdateProfileFirstLogin(session.realms().getRealmByName("realm-with-broker"),IdentityProviderRepresentation.UPFLM_OFF);
+  brokerServerRule.stopSession(session,true);
   driver.navigate().to("http://localhost:8081/test-app");
   loginPage.clickSocial(getProviderId());
   loginPage.login("test-user","password");
   System.out.println(driver.getPageSource());
   driver.navigate().to("http://localhost:8081/test-app/logout");
   try {
-    KeycloakSession session=brokerServerRule.startSession();
+    session=brokerServerRule.startSession();
     session.users().getUserByUsername("test-user",session.realms().getRealmByName("realm-with-broker")).setEnabled(false);
     brokerServerRule.stopSession(session,true);
     driver.navigate().to("http://localhost:8081/test-app");
@@ -16,7 +18,7 @@
     assertEquals("Account is disabled, contact admin.",errorPage.getError());
   }
   finally {
-    KeycloakSession session=brokerServerRule.startSession();
+    session=brokerServerRule.startSession();
     session.users().getUserByUsername("test-user",session.realms().getRealmByName("realm-with-broker")).setEnabled(true);
     brokerServerRule.stopSession(session,true);
   }

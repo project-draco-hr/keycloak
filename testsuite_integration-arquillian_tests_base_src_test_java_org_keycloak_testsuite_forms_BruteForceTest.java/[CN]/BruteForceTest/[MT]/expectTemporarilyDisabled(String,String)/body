@@ -1,0 +1,12 @@
+{
+  loginPage.open();
+  loginPage.login(username,"password");
+  loginPage.assertCurrent();
+  String src=driver.getPageSource();
+  Assert.assertEquals("Invalid username or password.",loginPage.getError());
+  ExpectedEvent event=events.expectLogin().session((String)null).error(Errors.USER_TEMPORARILY_DISABLED).detail(Details.USERNAME,username).removeDetail(Details.CONSENT);
+  if (userId != null) {
+    event.user(userId);
+  }
+  event.assertEvent();
+}

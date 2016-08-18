@@ -7,7 +7,7 @@
   UserModel user2=session.users().addUser(realm,"user2");
   user2.setFirstName("John");
   user2.setLastName("Doe");
-  Assert.assertNull(session.users().getUserByServiceAccountClient(client));
+  Assert.assertNull(session.users().getServiceAccount(client));
   List<UserModel> users=session.users().searchForUser("John Doe",realm);
   Assert.assertEquals(2,users.size());
   Assert.assertTrue(users.contains(user1));
@@ -15,7 +15,8 @@
   user1.setServiceAccountClientLink(client.getId());
   commit();
   realm=realmManager.getRealmByName("original");
-  UserModel searched=session.users().getUserByServiceAccountClient(client);
+  client=realm.getClientByClientId("foo");
+  UserModel searched=session.users().getServiceAccount(client);
   Assert.assertEquals(searched,user1);
   users=session.users().searchForUser("John Doe",realm);
   Assert.assertEquals(1,users.size());

@@ -1,0 +1,20 @@
+{
+  requireManage();
+  StoreFactory storeFactory=authorization.getStoreFactory();
+  Resource resource=storeFactory.getResourceStore().findById(id);
+  if (resource == null) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
+  PolicyStore policyStore=storeFactory.getPolicyStore();
+  List<Policy> policies=policyStore.findByResource(id);
+  for (  Policy policyModel : policies) {
+    if (policyModel.getResources().size() == 1) {
+      policyStore.delete(policyModel.getId());
+    }
+ else {
+      policyModel.addResource(resource);
+    }
+  }
+  storeFactory.getResourceStore().delete(id);
+  return Response.noContent().build();
+}

@@ -1,0 +1,11 @@
+{
+  Client client=ClientBuilder.newClient();
+  try {
+    AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(client);
+    Response response=UserInfoClientUtil.executeUserInfoRequest_getMethod(client,accessTokenResponse.getToken());
+    testSuccessfulUserInfoResponse(response);
+  }
+  finally {
+    client.close();
+  }
+}

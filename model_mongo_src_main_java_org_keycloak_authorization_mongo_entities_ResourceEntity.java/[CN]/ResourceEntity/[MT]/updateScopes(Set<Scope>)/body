@@ -1,0 +1,24 @@
+{
+  for (  Scope scope : toUpdate) {
+    boolean hasScope=false;
+    for (    String existingScope : this.scopes) {
+      if (existingScope.equals(scope.getId())) {
+        hasScope=true;
+      }
+    }
+    if (!hasScope) {
+      this.scopes.add(scope.getId());
+    }
+  }
+  for (  String scopeId : new HashSet<String>(this.scopes)) {
+    boolean hasScope=false;
+    for (    Scope scope : toUpdate) {
+      if (scopeId.equals(scope.getId())) {
+        hasScope=true;
+      }
+    }
+    if (!hasScope) {
+      this.scopes.remove(scopeId);
+    }
+  }
+}

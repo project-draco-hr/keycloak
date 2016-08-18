@@ -2,7 +2,7 @@
   auth.requireManage();
   AuthenticationExecutionModel model=realm.getAuthenticationExecutionById(execution);
   if (model == null) {
-    session.getTransaction().setRollbackOnly();
+    session.getTransactionManager().setRollbackOnly();
     throw new NotFoundException("Illegal execution");
   }
   AuthenticationFlowModel parentFlow=getParentFlow(model);
@@ -23,5 +23,5 @@
   realm.updateAuthenticatorExecution(previous);
   model.setPriority(tmp);
   realm.updateAuthenticatorExecution(model);
-  adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).success();
+  adminEvent.operation(OperationType.UPDATE).resource(ResourceType.AUTH_EXECUTION).resourcePath(uriInfo).success();
 }

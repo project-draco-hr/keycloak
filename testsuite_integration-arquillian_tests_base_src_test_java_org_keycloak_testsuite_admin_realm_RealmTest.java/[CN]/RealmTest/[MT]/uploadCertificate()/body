@@ -2,11 +2,28 @@
   RealmRepresentation rep=new RealmRepresentation();
   rep.setCertificate(CERTIFICATE);
   realm.update(rep);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep,ResourceType.REALM);
   assertEquals(CERTIFICATE,rep.getCertificate());
   String certificate=IOUtils.toString(getClass().getResourceAsStream("/keys/certificate.pem"));
   rep.setCertificate(certificate);
   realm.update(rep);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep);
-  assertEquals(certificate,rep.getCertificate());
+  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,Matchers.nullValue(String.class),rep,ResourceType.REALM);
+  assertEquals(certificate,realm.toRepresentation().getCertificate());
+  rep.setCertificate("{}{}{}{}{}{}324re9gvj0r");
+  try {
+    realm.update(rep);
+    fail("Expected BadRequestException");
+  }
+ catch (  BadRequestException e) {
+    assertAdminEvents.assertEmpty();
+  }
+  rep.setCertificate("invalid");
+  try {
+    realm.update(rep);
+    fail("Expected BadRequestException");
+  }
+ catch (  BadRequestException e) {
+    assertAdminEvents.assertEmpty();
+  }
+  assertEquals(certificate,realm.toRepresentation().getCertificate());
 }

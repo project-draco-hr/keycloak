@@ -1,0 +1,15 @@
+{
+  this.auth.requireManage();
+  Policy policy=toModel(representation,this.resourceServer,authorization);
+  PolicyProviderAdminService resource=getPolicyProviderAdminResource(policy.getType(),authorization);
+  if (resource != null) {
+    try {
+      resource.onCreate(policy);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+  representation.setId(policy.getId());
+  return Response.status(Status.CREATED).entity(representation).build();
+}

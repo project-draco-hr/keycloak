@@ -1,0 +1,10 @@
+{
+  InputStream is=SamlService.class.getResourceAsStream("/idp-metadata-template.xml");
+  String template=StreamUtil.readString(is);
+  template=template.replace("${idp.entityID}","http://keycloak.org/auth/realms/test");
+  template=template.replace("${idp.sso.HTTP-POST}","http://keycloak.org/auth/realms/test/saml");
+  template=template.replace("${idp.sso.HTTP-Redirect}","http://keycloak.org/auth/realms/test/saml");
+  template=template.replace("${idp.sls.HTTP-POST}","http://keycloak.org/auth/realms/test/saml");
+  template=template.replace("${idp.signing.certificate}",KeycloakModelUtils.generateKeyPairCertificate("test").getCertificate());
+  return template;
+}

@@ -1,0 +1,11 @@
+{
+  Set<String> requiredScopes=new HashSet<>();
+  requiredScopes.addAll(pathConfig.getScopes());
+  String method=request.getMethod();
+  for (  PolicyEnforcerConfig.MethodConfig methodConfig : pathConfig.getMethods()) {
+    if (methodConfig.getMethod().equals(method)) {
+      requiredScopes.addAll(methodConfig.getScopes());
+    }
+  }
+  return requiredScopes;
+}

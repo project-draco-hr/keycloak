@@ -10,7 +10,18 @@
         return ErrorResponse.error(e.getMessage(),Status.BAD_REQUEST);
       }
     }
-    RepresentationToModel.updateRealm(rep,realm);
+    if (!"GENERATE".equals(rep.getPublicKey()) && (rep.getCertificate() != null)) {
+      try {
+        X509Certificate cert=PemUtils.decodeCertificate(rep.getCertificate());
+        if (cert == null) {
+          return ErrorResponse.error("Failed to decode certificate",Status.BAD_REQUEST);
+        }
+      }
+ catch (      Exception e) {
+        return ErrorResponse.error("Failed to decode certificate",Status.BAD_REQUEST);
+      }
+    }
+    RepresentationToModel.updateRealm(rep,realm,session);
     List<UserFederationProviderModel> federationProviders=realm.getUserFederationProviders();
     UsersSyncManager usersSyncManager=new UsersSyncManager();
     for (    final UserFederationProviderModel fedProvider : federationProviders) {

@@ -1,0 +1,42 @@
+{
+  driver.navigate().to(getAccountUrl(consumerRealmName()));
+  log.debug("Clicking social " + getIDPAlias());
+  accountLoginPage.clickSocial(getIDPAlias());
+  if (!driver.getCurrentUrl().contains("/auth/realms/" + providerRealmName() + "/")) {
+    log.debug("Not on provider realm page, url: " + driver.getCurrentUrl());
+  }
+  Assert.assertTrue("Driver should be on the provider realm page right now",driver.getCurrentUrl().contains("/auth/realms/" + providerRealmName() + "/"));
+  log.debug("Logging in");
+  accountLoginPage.login(getUserLogin(),getUserPassword());
+  waitForPage("grant access");
+  Assert.assertTrue(consentPage.isCurrent());
+  consentPage.confirm();
+  Assert.assertTrue("We must be on correct realm right now",driver.getCurrentUrl().contains("/auth/realms/" + consumerRealmName() + "/"));
+  UsersResource consumerUsers=adminClient.realm(consumerRealmName()).users();
+  Assert.assertTrue("There must be at least one user",consumerUsers.count() > 0);
+  List<UserRepresentation> users=consumerUsers.search("",0,5);
+  UserRepresentation foundUser=null;
+  for (  UserRepresentation user : users) {
+    if (user.getUsername().equals(getUserLogin()) && user.getEmail().equals(getUserEmail())) {
+      foundUser=user;
+      break;
+    }
+  }
+  Assert.assertNotNull("There must be user " + getUserLogin() + " in realm "+ consumerRealmName(),foundUser);
+  RealmResource providerRealm=adminClient.realm(providerRealmName());
+  users=providerRealm.users().search(null,foundUser.getFirstName(),foundUser.getLastName(),null,0,1);
+  Assert.assertEquals("Same user should be in provider realm",1,users.size());
+  String userId=users.get(0).getId();
+  UserResource userResource=providerRealm.users().get(userId);
+  List<Map<String,Object>> consents=userResource.getConsents();
+  Assert.assertEquals("There should be one consent",1,consents.size());
+  Map<String,Object> consent=consents.get(0);
+  Assert.assertEquals("Consent should be given to " + CLIENT_ID,CLIENT_ID,consent.get("clientId"));
+  List<UserSessionRepresentation> sessions=userResource.getUserSessions();
+  Assert.assertEquals("There should be one active session",1,sessions.size());
+  userResource.revokeConsent(CLIENT_ID);
+  consents=userResource.getConsents();
+  Assert.assertEquals("There should be no consents",0,consents.size());
+  sessions=userResource.getUserSessions();
+  Assert.assertEquals("There should be no active session",0,sessions.size());
+}

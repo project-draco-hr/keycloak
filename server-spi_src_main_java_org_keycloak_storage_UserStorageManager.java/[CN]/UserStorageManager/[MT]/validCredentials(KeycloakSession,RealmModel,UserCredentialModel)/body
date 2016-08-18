@@ -1,0 +1,22 @@
+{
+  List<UserCredentialAuthenticationProvider> providers=getStorageProviders(realm,UserCredentialAuthenticationProvider.class);
+  if (providers.isEmpty())   return CredentialValidationOutput.failed();
+  CredentialValidationOutput result=null;
+  for (  UserCredentialModel cred : input) {
+    UserCredentialAuthenticationProvider providerSupportingCreds=null;
+    for (    UserCredentialAuthenticationProvider provider : providers) {
+      if (provider.getSupportedCredentialAuthenticationTypes().contains(cred.getType())) {
+        providerSupportingCreds=provider;
+        break;
+      }
+    }
+    if (providerSupportingCreds == null) {
+      logger.warn("Don't have provider supporting credentials of type " + cred.getType());
+      return CredentialValidationOutput.failed();
+    }
+    logger.debug("Found provider [" + providerSupportingCreds + "] supporting credentials of type "+ cred.getType());
+    CredentialValidationOutput currentResult=providerSupportingCreds.validCredential(session,realm,cred);
+    result=(result == null) ? currentResult : result.merge(currentResult);
+  }
+  return (result != null) ? result : CredentialValidationOutput.failed();
+}

@@ -1,0 +1,18 @@
+{
+  Set<String> roleNames=new LinkedHashSet<>();
+  Deque<RoleModel> stack=new ArrayDeque<>(roleModels);
+  while (!stack.isEmpty()) {
+    RoleModel current=stack.pop();
+    if (current.isComposite()) {
+      for (      RoleModel compositeRoleModel : current.getComposites()) {
+        stack.push(compositeRoleModel);
+      }
+    }
+    String roleName=current.getName();
+    if (prefix != null && !prefix.trim().isEmpty()) {
+      roleName=prefix.trim() + roleName;
+    }
+    roleNames.add(roleName);
+  }
+  return roleNames;
+}

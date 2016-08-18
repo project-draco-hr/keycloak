@@ -1,0 +1,30 @@
+{
+  LOGGER.debug("Introspecting requesting party token");
+  try {
+    AccessToken requestingPartyToken=toAccessToken(token);
+    boolean active=isActive(requestingPartyToken);
+    ObjectNode tokenMetadata;
+    if (active) {
+      LOGGER.debug("Token is active");
+      AccessToken introspect=new AccessToken();
+      introspect.type(requestingPartyToken.getType());
+      introspect.expiration(requestingPartyToken.getExpiration());
+      introspect.issuedAt(requestingPartyToken.getIssuedAt());
+      introspect.audience(requestingPartyToken.getAudience());
+      introspect.notBefore(requestingPartyToken.getNotBefore());
+      introspect.setRealmAccess(null);
+      introspect.setResourceAccess(null);
+      tokenMetadata=JsonSerialization.createObjectNode(introspect);
+      tokenMetadata.putPOJO("permissions",requestingPartyToken.getAuthorization().getPermissions());
+    }
+ else {
+      LOGGER.debug("Token is not active");
+      tokenMetadata=JsonSerialization.createObjectNode();
+    }
+    tokenMetadata.put("active",active);
+    return Response.ok(JsonSerialization.writeValueAsBytes(tokenMetadata)).type(MediaType.APPLICATION_JSON_TYPE).build();
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Error creating token introspection response.",e);
+  }
+}

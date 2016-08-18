@@ -1,0 +1,30 @@
+{
+  KeycloakIdentity identity=new KeycloakIdentity(this.authorization.getKeycloakSession());
+  if (resourceServerId == null) {
+    throw new ErrorResponseException(OAuthErrorException.INVALID_REQUEST,"Requires resource_server_id request parameter.",Status.BAD_REQUEST);
+  }
+  RealmModel realm=this.authorization.getKeycloakSession().getContext().getRealm();
+  ClientModel client=realm.getClientByClientId(resourceServerId);
+  if (client == null) {
+    throw new ErrorResponseException(OAuthErrorException.INVALID_REQUEST,"Identifier is not associated with any client and resource server.",Status.BAD_REQUEST);
+  }
+  StoreFactory storeFactory=authorization.getStoreFactory();
+  ResourceServer resourceServer=storeFactory.getResourceServerStore().findByClient(client.getId());
+  authorization.evaluators().from(Permissions.all(resourceServer,identity,authorization),new KeycloakEvaluationContext(this.authorization.getKeycloakSession())).evaluate(new DecisionResultCollector(){
+    @Override public void onError(    Throwable cause){
+      asyncResponse.resume(cause);
+    }
+    @Override protected void onComplete(    List<Result> results){
+      List<Permission> entitlements=Permissions.allPermits(results,authorization);
+      if (entitlements.isEmpty()) {
+        HashMap<Object,Object> error=new HashMap<>();
+        error.put(OAuth2Constants.ERROR,"not_authorized");
+        asyncResponse.resume(Cors.add(request,Response.status(Status.FORBIDDEN).entity(error)).allowedOrigins(identity.getAccessToken()).exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build());
+      }
+ else {
+        asyncResponse.resume(Cors.add(request,Response.ok().entity(new EntitlementResponse(createRequestingPartyToken(entitlements)))).allowedOrigins(identity.getAccessToken()).allowedMethods("GET").exposedHeaders(Cors.ACCESS_CONTROL_ALLOW_METHODS).build());
+      }
+    }
+  }
+);
+}

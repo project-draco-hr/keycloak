@@ -3,11 +3,16 @@
   if (roleContainer == null) {
     throw new NotFoundException("Could not find client");
   }
-  RoleRepresentation rep=getRole(roleName);
   RoleModel role=roleContainer.getRole(roleName);
   if (role == null) {
     throw new NotFoundException("Could not find role");
   }
   deleteRole(role);
+  if (role.isClientRole()) {
+    adminEvent.resource(ResourceType.CLIENT_ROLE);
+  }
+ else {
+    adminEvent.resource(ResourceType.REALM_ROLE);
+  }
   adminEvent.operation(OperationType.DELETE).resourcePath(uriInfo).success();
 }

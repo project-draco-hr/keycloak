@@ -12,6 +12,12 @@
     boolean scopeParamRequired=rep.isScopeParamRequired() == null ? false : rep.isScopeParamRequired();
     role.setScopeParamRequired(scopeParamRequired);
     rep.setId(role.getId());
+    if (role.isClientRole()) {
+      adminEvent.resource(ResourceType.CLIENT_ROLE);
+    }
+ else {
+      adminEvent.resource(ResourceType.REALM_ROLE);
+    }
     adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,role.getName()).representation(rep).success();
     return Response.created(uriInfo.getAbsolutePathBuilder().path(role.getName()).build()).build();
   }

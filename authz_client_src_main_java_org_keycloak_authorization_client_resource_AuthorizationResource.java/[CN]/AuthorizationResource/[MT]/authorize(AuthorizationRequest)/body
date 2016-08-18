@@ -1,0 +1,14 @@
+{
+  try {
+    return this.http.<AuthorizationResponse>post("/authz/authorize").authorizationBearer(this.accessToken).json(JsonSerialization.writeValueAsBytes(request)).response().json(AuthorizationResponse.class).execute();
+  }
+ catch (  HttpResponseException e) {
+    if (403 == e.getStatusCode()) {
+      throw new AuthorizationDeniedException(e);
+    }
+    throw new RuntimeException("Failed to obtain authorization data.",e);
+  }
+catch (  Exception e) {
+    throw new RuntimeException("Failed to obtain authorization data.",e);
+  }
+}

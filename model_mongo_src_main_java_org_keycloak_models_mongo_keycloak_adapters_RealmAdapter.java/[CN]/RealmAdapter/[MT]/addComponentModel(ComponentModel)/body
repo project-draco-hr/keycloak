@@ -1,0 +1,18 @@
+{
+  ComponentEntity entity=new ComponentEntity();
+  if (model.getId() == null) {
+    entity.setId(KeycloakModelUtils.generateId());
+  }
+ else {
+    entity.setId(model.getId());
+  }
+  entity.setConfig(model.getConfig());
+  entity.setParentId(model.getParentId());
+  entity.setProviderType(model.getProviderType());
+  entity.setProviderId(model.getProviderId());
+  entity.setName(model.getName());
+  model.setId(entity.getId());
+  realm.getComponentEntities().add(entity);
+  updateRealm();
+  return model;
+}

@@ -1,0 +1,19 @@
+{
+  KeycloakSession keycloakSession=startKeycloakSession();
+  KeycloakTransactionManager transaction=keycloakSession.getTransactionManager();
+  try {
+    AuthorizationProvider authorizationProvider=keycloakSession.getProvider(AuthorizationProvider.class);
+    R result=function.apply(authorizationProvider);
+    transaction.commit();
+    return result;
+  }
+ catch (  Exception e) {
+    transaction.rollback();
+    throw new RuntimeException(e);
+  }
+ finally {
+    if (keycloakSession != null) {
+      keycloakSession.close();
+    }
+  }
+}

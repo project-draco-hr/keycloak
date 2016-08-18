@@ -13,7 +13,7 @@
   cfgRep.setAlias("foo2");
   cfgRep.getConfig().put("configKey2","configValue2");
   authMgmtResource.updateAuthenticatorConfig(cfgRep.getId(),cfgRep);
-  assertAdminEvents.assertEvent(REALM_NAME,OperationType.UPDATE,AdminEventPaths.authExecutionConfigPath(cfgId),cfgRep);
+  assertAdminEvents.assertEvent(REALM_NAME,OperationType.UPDATE,AdminEventPaths.authExecutionConfigPath(cfgId),cfgRep,ResourceType.AUTHENTICATOR_CONFIG);
   cfgRep=authMgmtResource.getAuthenticatorConfig(cfgRep.getId());
   assertConfig(cfgRep,cfgId,"foo2",IdpCreateUserIfUniqueAuthenticatorFactory.REQUIRE_PASSWORD_UPDATE_AFTER_REGISTRATION,"true","configKey2","configValue2");
 }

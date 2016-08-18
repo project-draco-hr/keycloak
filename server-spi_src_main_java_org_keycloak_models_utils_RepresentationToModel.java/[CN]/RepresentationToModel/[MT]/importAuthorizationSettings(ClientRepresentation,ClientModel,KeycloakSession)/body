@@ -1,0 +1,15 @@
+{
+  if (Boolean.TRUE.equals(clientRepresentation.getAuthorizationServicesEnabled())) {
+    AuthorizationProviderFactory authorizationFactory=(AuthorizationProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(AuthorizationProvider.class);
+    AuthorizationProvider authorization=authorizationFactory.create(session,client.getRealm());
+    client.setServiceAccountsEnabled(true);
+    client.setBearerOnly(false);
+    client.setPublicClient(false);
+    ResourceServerRepresentation rep=clientRepresentation.getAuthorizationSettings();
+    if (rep == null) {
+      rep=new ResourceServerRepresentation();
+    }
+    rep.setClientId(client.getId());
+    toModel(rep,authorization);
+  }
+}

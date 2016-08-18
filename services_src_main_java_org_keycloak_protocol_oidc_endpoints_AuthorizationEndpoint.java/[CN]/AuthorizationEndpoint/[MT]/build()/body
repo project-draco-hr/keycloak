@@ -10,12 +10,23 @@
   prompt=params.getFirst(OIDCLoginProtocol.PROMPT_PARAM);
   idpHint=params.getFirst(AdapterConstants.KC_IDP_HINT);
   nonce=params.getFirst(OIDCLoginProtocol.NONCE_PARAM);
+  maxAge=params.getFirst(OIDCLoginProtocol.MAX_AGE_PARAM);
   extractAdditionalReqParams(params);
   checkSsl();
   checkRealm();
-  checkResponseType();
   checkClient();
   checkRedirectUri();
+  Response errorResponse=checkResponseType();
+  if (errorResponse != null) {
+    return errorResponse;
+  }
+  if (!TokenUtil.isOIDCRequest(scope)) {
+    logger.oidcScopeMissing();
+  }
+  errorResponse=checkOIDCParams(params);
+  if (errorResponse != null) {
+    return errorResponse;
+  }
   createClientSession();
   CacheControlUtil.noBackButtonCacheControlHeader();
 switch (action) {

@@ -9,6 +9,12 @@
   }
   try {
     updateRole(rep,role);
+    if (role.isClientRole()) {
+      adminEvent.resource(ResourceType.CLIENT_ROLE);
+    }
+ else {
+      adminEvent.resource(ResourceType.REALM_ROLE);
+    }
     adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();
     return Response.noContent().build();
   }

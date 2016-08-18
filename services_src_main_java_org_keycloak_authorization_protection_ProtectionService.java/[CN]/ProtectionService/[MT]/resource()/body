@@ -1,0 +1,9 @@
+{
+  KeycloakIdentity identity=createIdentity();
+  ResourceServer resourceServer=getResourceServer(identity);
+  ResourceSetService resourceManager=new ResourceSetService(resourceServer,this.authorization,null);
+  ResteasyProviderFactory.getInstance().injectProperties(resourceManager);
+  ResourceService resource=new ResourceService(resourceServer,identity,resourceManager,this.authorization);
+  ResteasyProviderFactory.getInstance().injectProperties(resource);
+  return resource;
+}

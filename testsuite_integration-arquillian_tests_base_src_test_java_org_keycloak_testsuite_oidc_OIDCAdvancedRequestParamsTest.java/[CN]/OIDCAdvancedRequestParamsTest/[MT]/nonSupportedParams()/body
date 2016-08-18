@@ -1,0 +1,9 @@
+{
+  driver.navigate().to(oauth.getLoginFormUrl() + "&display=popup&foo=foobar&claims_locales=fr");
+  loginPage.assertCurrent();
+  loginPage.login("test-user@localhost","password");
+  Assert.assertEquals(AppPage.RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  EventRepresentation loginEvent=events.expectLogin().detail(Details.USERNAME,"test-user@localhost").assertEvent();
+  IDToken idToken=sendTokenRequestAndGetIDToken(loginEvent);
+  Assert.assertNotNull(idToken);
+}

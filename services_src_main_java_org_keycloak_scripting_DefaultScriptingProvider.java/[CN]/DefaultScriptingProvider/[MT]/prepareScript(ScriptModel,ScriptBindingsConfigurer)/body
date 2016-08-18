@@ -1,0 +1,18 @@
+{
+  if (script == null) {
+    throw new NullPointerException("script must not be null");
+  }
+  if (script.getCode() == null || script.getCode().trim().isEmpty()) {
+    throw new IllegalArgumentException("script must not be null or empty");
+  }
+  if (bindingsConfigurer == null) {
+    throw new NullPointerException("bindingsConfigurer must not be null");
+  }
+  ScriptEngine engine=lookupScriptEngineFor(script);
+  if (engine == null) {
+    throw new IllegalStateException("Could not find ScriptEngine for script: " + script);
+  }
+  configureBindings(bindingsConfigurer,engine);
+  loadScriptIntoEngine(script,engine);
+  return new InvocableScript(script,engine);
+}

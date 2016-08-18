@@ -1,0 +1,11 @@
+{
+  logger.info("getUserByUsername: " + username);
+  TypedQuery<UserEntity> query=em.createNamedQuery("getUserByUsername",UserEntity.class);
+  query.setParameter("username",username);
+  List<UserEntity> result=query.getResultList();
+  if (result.isEmpty()) {
+    logger.info("could not find username: " + username);
+    return null;
+  }
+  return new UserAdapter(session,realm,model,result.get(0));
+}

@@ -1,0 +1,21 @@
+{
+  try {
+    this.deployer.deploy(RESOURCE_SERVER_ID);
+    login("jdoe","jdoe");
+    navigateToAdminPage();
+    assertTrue(wasDenied());
+    RealmResource realmResource=realmsResouce().realm(REALM_NAME);
+    UsersResource usersResource=realmResource.users();
+    List<UserRepresentation> users=usersResource.search("jdoe",null,null,null,null,null);
+    assertFalse(users.isEmpty());
+    UserResource userResource=usersResource.get(users.get(0).getId());
+    RoleRepresentation adminRole=realmResource.roles().get("admin").toRepresentation();
+    userResource.roles().realmLevel().add(Arrays.asList(adminRole));
+    login("jdoe","jdoe");
+    navigateToAdminPage();
+    assertFalse(wasDenied());
+  }
+  finally {
+    this.deployer.undeploy(RESOURCE_SERVER_ID);
+  }
+}

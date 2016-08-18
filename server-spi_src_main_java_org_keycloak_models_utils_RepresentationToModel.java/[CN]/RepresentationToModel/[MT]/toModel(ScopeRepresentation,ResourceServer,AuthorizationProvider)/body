@@ -1,0 +1,20 @@
+{
+  StoreFactory storeFactory=authorization.getStoreFactory();
+  ScopeStore scopeStore=storeFactory.getScopeStore();
+  Scope existing;
+  if (scope.getId() != null) {
+    existing=scopeStore.findById(scope.getId());
+  }
+ else {
+    existing=scopeStore.findByName(scope.getName(),resourceServer.getId());
+  }
+  if (existing != null) {
+    existing.setName(scope.getName());
+    existing.setIconUri(scope.getIconUri());
+    return existing;
+  }
+  Scope model=scopeStore.create(scope.getName(),resourceServer);
+  model.setIconUri(scope.getIconUri());
+  scope.setId(model.getId());
+  return model;
+}

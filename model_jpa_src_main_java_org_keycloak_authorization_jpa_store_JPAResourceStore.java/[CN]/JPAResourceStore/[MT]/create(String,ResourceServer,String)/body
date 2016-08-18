@@ -1,0 +1,12 @@
+{
+  if (!(resourceServer instanceof ResourceServerEntity)) {
+    throw new RuntimeException("Unexpected type [" + resourceServer.getClass() + "].");
+  }
+  ResourceEntity entity=new ResourceEntity();
+  entity.setId(KeycloakModelUtils.generateId());
+  entity.setName(name);
+  entity.setResourceServer((ResourceServerEntity)resourceServer);
+  entity.setOwner(owner);
+  this.entityManager.persist(entity);
+  return entity;
+}

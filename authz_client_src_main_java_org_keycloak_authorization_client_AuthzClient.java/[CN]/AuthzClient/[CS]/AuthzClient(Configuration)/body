@@ -1,0 +1,19 @@
+{
+  if (configuration == null) {
+    throw new IllegalArgumentException("Client configuration can not be null.");
+  }
+  String configurationUrl=configuration.getAuthServerUrl();
+  if (configurationUrl == null) {
+    throw new IllegalArgumentException("Configuration URL can not be null.");
+  }
+  configurationUrl+="/realms/" + configuration.getRealm() + "/.well-known/uma-configuration";
+  this.http=new Http(configuration);
+  try {
+    this.serverConfiguration=this.http.<ServerConfiguration>get(URI.create(configurationUrl)).response().json(ServerConfiguration.class).execute();
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Could not obtain configuration from server [" + configurationUrl + "].",e);
+  }
+  this.http.setServerConfiguration(this.serverConfiguration);
+  this.deployment=configuration;
+}

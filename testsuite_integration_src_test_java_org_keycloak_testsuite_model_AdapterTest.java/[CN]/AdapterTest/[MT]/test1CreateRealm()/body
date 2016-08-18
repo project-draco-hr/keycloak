@@ -9,7 +9,7 @@
   realmModel.setPublicKey(keyPair.getPublic());
   realmModel.setAccessTokenLifespan(1000);
   realmModel.addDefaultRole("foo");
-  session.getTransaction().commit();
+  session.getTransactionManager().commit();
   resetSession();
   realmModel=realmManager.getRealm(realmModel.getId());
   assertNotNull(realmModel);
@@ -20,6 +20,6 @@
   Assert.assertEquals(realmModel.getName(),"JUGGLER");
   Assert.assertArrayEquals(realmModel.getPrivateKey().getEncoded(),keyPair.getPrivate().getEncoded());
   Assert.assertArrayEquals(realmModel.getPublicKey().getEncoded(),keyPair.getPublic().getEncoded());
-  Assert.assertEquals(2,realmModel.getDefaultRoles().size());
+  Assert.assertEquals(3,realmModel.getDefaultRoles().size());
   Assert.assertTrue(realmModel.getDefaultRoles().contains("foo"));
 }

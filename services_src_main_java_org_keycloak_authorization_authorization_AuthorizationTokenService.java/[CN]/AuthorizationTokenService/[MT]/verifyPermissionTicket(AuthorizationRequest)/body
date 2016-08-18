@@ -1,0 +1,16 @@
+{
+  String ticketString=request.getTicket();
+  if (ticketString == null || !Tokens.verifySignature(ticketString,getRealm().getPublicKey())) {
+    throw new ErrorResponseException("invalid_ticket","Ticket verification failed",Status.FORBIDDEN);
+  }
+  try {
+    PermissionTicket ticket=new JWSInput(ticketString).readJsonContent(PermissionTicket.class);
+    if (!ticket.isActive()) {
+      throw new ErrorResponseException("invalid_ticket","Invalid permission ticket.",Status.FORBIDDEN);
+    }
+    return ticket;
+  }
+ catch (  JWSInputException e) {
+    throw new ErrorResponseException("invalid_ticket","Could not parse permission ticket.",Status.FORBIDDEN);
+  }
+}

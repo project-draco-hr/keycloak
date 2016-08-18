@@ -31,6 +31,7 @@
   notBefore=model.getNotBefore();
   passwordPolicy=model.getPasswordPolicy();
   otpPolicy=model.getOTPPolicy();
+  keyId=model.getKeyId();
   publicKeyPem=model.getPublicKeyPem();
   publicKey=model.getPublicKey();
   privateKeyPem=model.getPrivateKeyPem();
@@ -100,4 +101,13 @@
   directGrantFlow=model.getDirectGrantFlow();
   resetCredentialsFlow=model.getResetCredentialsFlow();
   clientAuthenticationFlow=model.getClientAuthenticationFlow();
+  for (  ComponentModel component : model.getComponents()) {
+    componentsByParentAndType.add(component.getParentId() + component.getProviderType(),component);
+  }
+  for (  ComponentModel component : model.getComponents()) {
+    componentsByParent.add(component.getParentId(),component);
+  }
+  for (  ComponentModel component : model.getComponents()) {
+    components.put(component.getId(),component);
+  }
 }

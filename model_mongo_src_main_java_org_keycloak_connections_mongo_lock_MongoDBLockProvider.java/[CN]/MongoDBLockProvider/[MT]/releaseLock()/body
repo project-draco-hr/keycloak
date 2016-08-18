@@ -7,6 +7,7 @@
   try {
     WriteResult wr=db.getCollection(DB_LOCK_COLLECTION).update(query,update,true,false);
     if (wr.getN() > 0) {
+      factory.setHasLock(false);
       logger.debugf("Successfully released DB lock");
     }
  else {

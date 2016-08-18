@@ -2,11 +2,11 @@
   event.detail(Details.AUTH_METHOD,"oauth_credentials");
   if (!client.isDirectAccessGrantsEnabled()) {
     event.error(Errors.NOT_ALLOWED);
-    throw new ErrorResponseException("invalid_grant","Client not allowed for direct access grants",Response.Status.BAD_REQUEST);
+    throw new ErrorResponseException(OAuthErrorException.INVALID_GRANT,"Client not allowed for direct access grants",Response.Status.BAD_REQUEST);
   }
   if (client.isConsentRequired()) {
     event.error(Errors.CONSENT_DENIED);
-    throw new ErrorResponseException("invalid_client","Client requires user consent",Response.Status.BAD_REQUEST);
+    throw new ErrorResponseException(OAuthErrorException.INVALID_CLIENT,"Client requires user consent",Response.Status.BAD_REQUEST);
   }
   String scope=formParams.getFirst(OAuth2Constants.SCOPE);
   UserSessionProvider sessions=session.sessions();
@@ -25,7 +25,7 @@
   UserModel user=clientSession.getAuthenticatedUser();
   if (user.getRequiredActions() != null && user.getRequiredActions().size() > 0) {
     event.error(Errors.RESOLVE_REQUIRED_ACTIONS);
-    throw new ErrorResponseException("invalid_grant","Account is not fully set up",Response.Status.BAD_REQUEST);
+    throw new ErrorResponseException(OAuthErrorException.INVALID_GRANT,"Account is not fully set up",Response.Status.BAD_REQUEST);
   }
   processor.attachSession();
   UserSessionModel userSession=processor.getUserSession();

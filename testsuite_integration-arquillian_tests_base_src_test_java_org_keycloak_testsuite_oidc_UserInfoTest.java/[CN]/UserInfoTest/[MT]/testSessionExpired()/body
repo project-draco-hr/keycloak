@@ -1,12 +1,14 @@
 {
   Client client=ClientBuilder.newClient();
-  UriBuilder builder=UriBuilder.fromUri(AUTH_SERVER_ROOT);
-  URI grantUri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
-  WebTarget grantTarget=client.target(grantUri);
-  AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(grantTarget);
-  testingClient.testing().removeUserSessions("test");
-  Response response=executeUserInfoRequest(accessTokenResponse.getToken());
-  assertEquals(Status.FORBIDDEN.getStatusCode(),response.getStatus());
-  response.close();
-  client.close();
+  try {
+    AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(client);
+    testingClient.testing().removeUserSessions("test");
+    Response response=UserInfoClientUtil.executeUserInfoRequest_getMethod(client,accessTokenResponse.getToken());
+    assertEquals(Status.BAD_REQUEST.getStatusCode(),response.getStatus());
+    response.close();
+    events.expect(EventType.USER_INFO_REQUEST_ERROR).error(Errors.USER_SESSION_NOT_FOUND).client((String)null).user(Matchers.nullValue(String.class)).session(Matchers.nullValue(String.class)).detail(Details.AUTH_METHOD,Details.VALIDATE_ACCESS_TOKEN).assertEvent();
+  }
+  finally {
+    client.close();
+  }
 }

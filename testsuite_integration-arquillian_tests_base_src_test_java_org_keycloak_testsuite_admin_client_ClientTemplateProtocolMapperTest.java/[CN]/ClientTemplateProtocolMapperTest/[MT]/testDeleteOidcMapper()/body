@@ -3,9 +3,9 @@
   Response resp=oidcMappersRsc.createMapper(rep);
   resp.close();
   String createdId=ApiUtil.getCreatedId(resp);
-  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientTemplateProtocolMapperPath(oidcClientTemplateId,createdId),rep);
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.CREATE,AdminEventPaths.clientTemplateProtocolMapperPath(oidcClientTemplateId,createdId),rep,ResourceType.PROTOCOL_MAPPER);
   oidcMappersRsc.delete(createdId);
-  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.clientTemplateProtocolMapperPath(oidcClientTemplateId,createdId));
+  assertAdminEvents.assertEvent(getRealmId(),OperationType.DELETE,AdminEventPaths.clientTemplateProtocolMapperPath(oidcClientTemplateId,createdId),ResourceType.PROTOCOL_MAPPER);
   try {
     oidcMappersRsc.getMapperById(createdId);
     Assert.fail("Not expected to find mapper");

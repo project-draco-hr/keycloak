@@ -1,0 +1,13 @@
+{
+  TypedQuery<String> query=em.createNamedQuery("findUserByBrokerLinkAndRealm",String.class).setParameter("realmId",realm.getId()).setParameter("identityProvider",link.getIdentityProvider()).setParameter("brokerUserId",link.getUserId());
+  List<String> results=query.getResultList();
+  if (results.isEmpty()) {
+    return null;
+  }
+ else   if (results.size() > 1) {
+    throw new IllegalStateException("More results found for identityProvider=" + link.getIdentityProvider() + ", userId="+ link.getUserId()+ ", results="+ results);
+  }
+ else {
+    return results.get(0);
+  }
+}

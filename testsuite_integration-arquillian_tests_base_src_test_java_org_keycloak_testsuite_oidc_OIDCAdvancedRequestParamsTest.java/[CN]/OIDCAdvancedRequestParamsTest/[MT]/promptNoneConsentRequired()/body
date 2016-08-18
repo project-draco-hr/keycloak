@@ -1,0 +1,29 @@
+{
+  ClientManager.realm(adminClient.realm("test")).clientId("test-app").consentRequired(true);
+  try {
+    profilePage.open();
+    assertTrue(loginPage.isCurrent());
+    loginPage.login("test-user@localhost","password");
+    profilePage.assertCurrent();
+    events.expectLogin().client(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID).removeDetail(Details.REDIRECT_URI).detail(Details.USERNAME,"test-user@localhost").assertEvent();
+    driver.navigate().to(oauth.getLoginFormUrl() + "&prompt=none");
+    assertTrue(appPage.isCurrent());
+    Assert.assertEquals(AppPage.RequestType.AUTH_RESPONSE,appPage.getRequestType());
+    OAuthClient.AuthorizationEndpointResponse resp=new OAuthClient.AuthorizationEndpointResponse(oauth);
+    Assert.assertNull(resp.getCode());
+    Assert.assertEquals(OAuthErrorException.INTERACTION_REQUIRED,resp.getError());
+    driver.navigate().to(oauth.getLoginFormUrl());
+    grantPage.assertCurrent();
+    grantPage.accept();
+    events.expectLogin().detail(Details.USERNAME,"test-user@localhost").detail(Details.CONSENT,Details.CONSENT_VALUE_CONSENT_GRANTED).assertEvent();
+    driver.navigate().to(oauth.getLoginFormUrl() + "&prompt=none");
+    Assert.assertEquals(AppPage.RequestType.AUTH_RESPONSE,appPage.getRequestType());
+    resp=new OAuthClient.AuthorizationEndpointResponse(oauth);
+    Assert.assertNotNull(resp.getCode());
+    Assert.assertNull(resp.getError());
+    events.expectLogin().detail(Details.USERNAME,"test-user@localhost").detail(Details.CONSENT,Details.CONSENT_VALUE_PERSISTED_CONSENT).assertEvent();
+  }
+  finally {
+    ClientManager.realm(adminClient.realm("test")).clientId("test-app").consentRequired(false);
+  }
+}

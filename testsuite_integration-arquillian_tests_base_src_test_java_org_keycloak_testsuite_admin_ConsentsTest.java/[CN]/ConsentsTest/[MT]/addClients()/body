@@ -1,0 +1,10 @@
+{
+  List<ClientRepresentation> clients=createProviderClients();
+  if (clients != null) {
+    RealmResource providerRealm=adminClient.realm(providerRealmName());
+    for (    ClientRepresentation client : clients) {
+      log.debug("adding client " + client.getName() + " to realm "+ providerRealmName());
+      providerRealm.clients().create(client);
+    }
+  }
+}

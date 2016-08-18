@@ -13,16 +13,16 @@
  else {
       attrsToRemove=Collections.emptySet();
     }
-    if (rep.isEnabled() != null && rep.isEnabled() && rep.getUsername() != null) {
-      UsernameLoginFailureModel failureModel=session.sessions().getUserLoginFailure(realm,rep.getUsername().toLowerCase());
+    if (rep.isEnabled() != null && rep.isEnabled()) {
+      UserLoginFailureModel failureModel=session.sessions().getUserLoginFailure(realm,id);
       if (failureModel != null) {
         failureModel.clearFailures();
       }
     }
     updateUserFromRep(user,rep,attrsToRemove,realm,session,true);
     adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();
-    if (session.getTransaction().isActive()) {
-      session.getTransaction().commit();
+    if (session.getTransactionManager().isActive()) {
+      session.getTransactionManager().commit();
     }
     return Response.noContent().build();
   }
@@ -31,5 +31,8 @@
   }
 catch (  ModelReadOnlyException re) {
     return ErrorResponse.exists("User is read only!");
+  }
+catch (  ModelException me) {
+    return ErrorResponse.exists("Could not update user!");
   }
 }

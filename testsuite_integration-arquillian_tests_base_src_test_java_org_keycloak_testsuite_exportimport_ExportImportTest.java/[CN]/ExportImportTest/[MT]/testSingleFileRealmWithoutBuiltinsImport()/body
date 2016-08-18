@@ -1,0 +1,11 @@
+{
+  removeRealm("test-realm");
+  testingClient.testing().setProvider(SingleFileExportProviderFactory.PROVIDER_ID);
+  URL url=ExportImportTest.class.getResource("/model/testrealm.json");
+  String targetFilePath=new File(url.getFile()).getAbsolutePath();
+  testingClient.testing().setFile(targetFilePath);
+  testingClient.testing().setAction(ExportImportConfig.ACTION_IMPORT);
+  testingClient.testing().runImport();
+  RealmResource testRealmRealm=adminClient.realm("test-realm");
+  ExportImportUtil.assertDataImportedInRealm(adminClient,testingClient,testRealmRealm.toRepresentation());
+}

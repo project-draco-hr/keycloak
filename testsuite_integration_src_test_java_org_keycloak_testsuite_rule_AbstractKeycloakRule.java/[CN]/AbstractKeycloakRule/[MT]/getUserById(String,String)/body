@@ -1,10 +1,10 @@
 {
   KeycloakSession session=server.getSessionFactory().create();
-  session.getTransaction().begin();
+  session.getTransactionManager().begin();
   try {
     RealmModel realmByName=session.realms().getRealmByName(realm);
     UserRepresentation userRep=ModelToRepresentation.toRepresentation(session.users().getUserById(id,realmByName));
-    session.getTransaction().commit();
+    session.getTransactionManager().commit();
     return userRep;
   }
   finally {

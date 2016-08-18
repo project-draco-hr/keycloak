@@ -1,0 +1,42 @@
+{
+  List<PathConfig> paths=new ArrayList<>();
+  for (  PathConfig pathConfig : enforcerConfig.getPaths()) {
+    Set<String> search;
+    String resourceName=pathConfig.getName();
+    String path=pathConfig.getPath();
+    if (resourceName != null) {
+      LOGGER.debugf("Trying to find resource with name [%s] for path [%s].",resourceName,path);
+      search=protectedResource.findByFilter("name=" + resourceName);
+    }
+ else {
+      LOGGER.debugf("Trying to find resource with uri [%s] for path [%s].",path,path);
+      search=protectedResource.findByFilter("uri=" + path);
+    }
+    if (search.isEmpty()) {
+      if (enforcerConfig.isCreateResources()) {
+        LOGGER.debugf("Creating resource on server for path [%s].",pathConfig);
+        ResourceRepresentation resource=new ResourceRepresentation();
+        resource.setName(resourceName);
+        resource.setType(pathConfig.getType());
+        resource.setUri(path);
+        HashSet<ScopeRepresentation> scopes=new HashSet<>();
+        for (        String scopeName : pathConfig.getScopes()) {
+          ScopeRepresentation scope=new ScopeRepresentation();
+          scope.setName(scopeName);
+          scopes.add(scope);
+        }
+        resource.setScopes(scopes);
+        RegistrationResponse registrationResponse=protectedResource.create(resource);
+        pathConfig.setId(registrationResponse.getId());
+      }
+ else {
+        throw new RuntimeException("Could not find matching resource on server with uri [" + path + "] or name ["+ resourceName+ ". Make sure you have created a resource on the server that matches with the path configuration.");
+      }
+    }
+ else {
+      pathConfig.setId(search.iterator().next());
+    }
+    paths.add(pathConfig);
+  }
+  return paths;
+}

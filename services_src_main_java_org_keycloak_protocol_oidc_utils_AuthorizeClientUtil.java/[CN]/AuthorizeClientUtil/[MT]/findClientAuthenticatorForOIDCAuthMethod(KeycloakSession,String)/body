@@ -1,0 +1,10 @@
+{
+  List<ProviderFactory> providerFactories=session.getKeycloakSessionFactory().getProviderFactories(ClientAuthenticator.class);
+  for (  ProviderFactory factory : providerFactories) {
+    ClientAuthenticatorFactory clientAuthFactory=(ClientAuthenticatorFactory)factory;
+    if (clientAuthFactory.getProtocolAuthenticatorMethods(OIDCLoginProtocol.LOGIN_PROTOCOL).contains(oidcAuthMethod)) {
+      return clientAuthFactory;
+    }
+  }
+  return null;
+}

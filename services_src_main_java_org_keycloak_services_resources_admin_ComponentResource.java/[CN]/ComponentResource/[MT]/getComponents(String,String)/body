@@ -1,0 +1,19 @@
+{
+  auth.requireManage();
+  List<ComponentModel> components=Collections.EMPTY_LIST;
+  if (parent == null) {
+    components=realm.getComponents();
+  }
+ else   if (type == null) {
+    components=realm.getComponents(parent);
+  }
+ else {
+    components=realm.getComponents(parent,type);
+  }
+  List<ComponentRepresentation> reps=new LinkedList<>();
+  for (  ComponentModel component : components) {
+    ComponentRepresentation rep=ModelToRepresentation.toRepresentation(component);
+    reps.add(rep);
+  }
+  return reps;
+}

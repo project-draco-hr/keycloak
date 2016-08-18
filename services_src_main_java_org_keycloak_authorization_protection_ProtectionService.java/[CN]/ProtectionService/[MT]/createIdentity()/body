@@ -1,0 +1,11 @@
+{
+  KeycloakIdentity identity=new KeycloakIdentity(this.authorization.getKeycloakSession());
+  ResourceServer resourceServer=getResourceServer(identity);
+  KeycloakSession keycloakSession=authorization.getKeycloakSession();
+  RealmModel realm=keycloakSession.getContext().getRealm();
+  ClientModel client=realm.getClientById(resourceServer.getClientId());
+  if (!identity.hasClientRole(client.getClientId(),"uma_protection")) {
+    throw new ErrorResponseException(OAuthErrorException.INVALID_SCOPE,"Requires uma_protection scope.",Status.FORBIDDEN);
+  }
+  return identity;
+}

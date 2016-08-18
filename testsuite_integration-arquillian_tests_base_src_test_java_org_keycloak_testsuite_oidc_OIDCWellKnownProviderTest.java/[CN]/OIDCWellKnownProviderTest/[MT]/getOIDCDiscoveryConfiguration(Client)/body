@@ -1,0 +1,7 @@
+{
+  UriBuilder builder=UriBuilder.fromUri(OAuthClient.AUTH_SERVER_ROOT);
+  URI oidcDiscoveryUri=RealmsResource.wellKnownProviderUrl(builder).build("test",OIDCWellKnownProviderFactory.PROVIDER_ID);
+  WebTarget oidcDiscoveryTarget=client.target(oidcDiscoveryUri);
+  Response response=oidcDiscoveryTarget.request().get();
+  return response.readEntity(OIDCConfigurationRepresentation.class);
+}

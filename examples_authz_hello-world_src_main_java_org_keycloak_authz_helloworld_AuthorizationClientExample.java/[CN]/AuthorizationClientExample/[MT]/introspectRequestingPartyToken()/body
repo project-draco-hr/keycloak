@@ -1,0 +1,17 @@
+{
+  AuthzClient authzClient=AuthzClient.create();
+  Set<String> resourceId=authzClient.protection().resource().findByFilter("name=Default Resource");
+  String eat=getEntitlementAPIToken(authzClient);
+  EntitlementRequest request=new EntitlementRequest();
+  PermissionRequest permission=new PermissionRequest();
+  permission.setResourceSetId(resourceId.iterator().next());
+  request.addPermission(permission);
+  EntitlementResponse response=authzClient.entitlement(eat).get("hello-world-authz-service",request);
+  String rpt=response.getRpt();
+  TokenIntrospectionResponse requestingPartyToken=authzClient.protection().introspectRequestingPartyToken(rpt);
+  System.out.println("Token status is: " + requestingPartyToken.getActive());
+  System.out.println("Permissions granted by the server: ");
+  for (  Permission granted : requestingPartyToken.getPermissions()) {
+    System.out.println(granted);
+  }
+}

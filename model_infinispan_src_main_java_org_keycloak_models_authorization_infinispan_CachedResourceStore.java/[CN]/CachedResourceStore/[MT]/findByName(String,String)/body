@@ -1,0 +1,17 @@
+{
+  for (  Entry entry : this.cache.entrySet()) {
+    String cacheKey=(String)entry.getKey();
+    if (cacheKey.startsWith(RESOURCE_ID_CACHE_PREFIX)) {
+      List<CachedResource> value=(List<CachedResource>)entry.getValue();
+      CachedResource resource=value.get(0);
+      if (resource.getResourceServerId().equals(resourceServerId) && resource.getName().equals(name)) {
+        return findById(resource.getId());
+      }
+    }
+  }
+  Resource resource=getDelegate().findByName(name,resourceServerId);
+  if (resource != null) {
+    return findById(updateResourceCache(resource).getId());
+  }
+  return null;
+}

@@ -1,6 +1,11 @@
 {
-  UriBuilder b=OIDCLoginProtocolService.authUrl(UriBuilder.fromUri(SERVER_ROOT + "/auth"));
-  b.queryParam(OAuth2Constants.RESPONSE_TYPE,OAuth2Constants.CODE);
+  UriBuilder b=OIDCLoginProtocolService.authUrl(UriBuilder.fromUri(AUTH_SERVER_ROOT));
+  if (responseType != null) {
+    b.queryParam(OAuth2Constants.RESPONSE_TYPE,responseType);
+  }
+  if (responseMode != null) {
+    b.queryParam(OIDCLoginProtocol.RESPONSE_MODE_PARAM,responseMode);
+  }
   if (clientId != null) {
     b.queryParam(OAuth2Constants.CLIENT_ID,clientId);
   }
@@ -13,8 +18,13 @@
   if (uiLocales != null) {
     b.queryParam(OAuth2Constants.UI_LOCALES_PARAM,uiLocales);
   }
-  if (scope != null) {
-    b.queryParam(OAuth2Constants.SCOPE,scope);
+  if (nonce != null) {
+    b.queryParam(OIDCLoginProtocol.NONCE_PARAM,nonce);
+  }
+  String scopeParam=TokenUtil.attachOIDCScope(scope);
+  b.queryParam(OAuth2Constants.SCOPE,scopeParam);
+  if (maxAge != null) {
+    b.queryParam(OIDCLoginProtocol.MAX_AGE_PARAM,maxAge);
   }
   return b.build(realm).toString();
 }

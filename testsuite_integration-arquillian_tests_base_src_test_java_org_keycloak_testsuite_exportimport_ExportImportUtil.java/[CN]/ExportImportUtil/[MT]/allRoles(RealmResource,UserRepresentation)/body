@@ -1,0 +1,8 @@
+{
+  UserResource userRsc=realmRsc.users().get(user.getId());
+  Set<RoleRepresentation> roles=new HashSet<>();
+  List<RoleRepresentation> realmRoles=userRsc.roles().getAll().getRealmMappings();
+  if (realmRoles != null)   roles.addAll(realmRoles);
+  roles.addAll(allClientRolesForUser(realmRsc,user));
+  return roles;
+}

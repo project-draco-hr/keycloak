@@ -1,0 +1,21 @@
+{
+  PolicyRepresentation newPolicy=createTestingPolicy().toRepresentation();
+  assertEquals("Test Generic Policy",newPolicy.getName());
+  assertEquals("test",newPolicy.getType());
+  assertEquals(Logic.POSITIVE,newPolicy.getLogic());
+  assertEquals(DecisionStrategy.UNANIMOUS,newPolicy.getDecisionStrategy());
+  assertEquals("configuration for A",newPolicy.getConfig().get("configA"));
+  assertEquals("configuration for B",newPolicy.getConfig().get("configB"));
+  assertEquals("configuration for C",newPolicy.getConfig().get("configC"));
+  List<PolicyRepresentation> policies=getClientResource().authorization().policies().policies();
+  assertEquals(6,policies.size());
+  assertAssociatedPolicy("Test Associated A",newPolicy);
+  assertAssociatedPolicy("Test Associated B",newPolicy);
+  assertAssociatedPolicy("Test Associated C",newPolicy);
+  assertAssociatedResource("Test Resource A",newPolicy);
+  assertAssociatedResource("Test Resource B",newPolicy);
+  assertAssociatedResource("Test Resource C",newPolicy);
+  assertAssociatedScope("Test Scope A",newPolicy);
+  assertAssociatedScope("Test Scope B",newPolicy);
+  assertAssociatedScope("Test Scope C",newPolicy);
+}

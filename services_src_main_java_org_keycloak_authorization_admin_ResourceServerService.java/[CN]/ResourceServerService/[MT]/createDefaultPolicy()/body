@@ -1,0 +1,13 @@
+{
+  PolicyRepresentation defaultPolicy=new PolicyRepresentation();
+  defaultPolicy.setName("Default Policy");
+  defaultPolicy.setDescription("A policy that grants access only for users within this realm");
+  defaultPolicy.setType("js");
+  defaultPolicy.setDecisionStrategy(DecisionStrategy.AFFIRMATIVE);
+  defaultPolicy.setLogic(Logic.POSITIVE);
+  HashMap<String,String> defaultPolicyConfig=new HashMap<>();
+  defaultPolicyConfig.put("code","// by default, grants any permission associated with this policy\n$evaluation.grant();\n");
+  defaultPolicy.setConfig(defaultPolicyConfig);
+  getPolicyResource().create(defaultPolicy);
+  return defaultPolicy;
+}

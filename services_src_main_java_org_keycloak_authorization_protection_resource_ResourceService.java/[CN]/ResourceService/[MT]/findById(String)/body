@@ -1,0 +1,8 @@
+{
+  Response response=this.resourceManager.findById(id);
+  UmaResourceRepresentation resource=toUmaRepresentation((ResourceRepresentation)response.getEntity());
+  if (resource == null) {
+    throw new ErrorResponseException("not_found","Resource with id [" + id + "] not found.",Status.NOT_FOUND);
+  }
+  return new RegistrationResponse(resource);
+}

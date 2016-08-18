@@ -1,0 +1,21 @@
+{
+  createAlbumResourceTypePermission();
+  ResourceRepresentation representation=new ResourceRepresentation();
+  representation.setName("Alice Family Album");
+  representation.setType(this.albumResource.getType());
+  Resource resource=createResource(representation);
+  Set<String> roles=new HashSet<>();
+  roles.add("user");
+  Map<String,DefaultEvaluation> evaluationsUserRole=performEvaluation(Arrays.asList(new ResourcePermission(resource,Collections.emptyList(),resourceServer)),createAccessToken(roles),createClientConnection("127.0.0.1"));
+  assertEquals(2,evaluationsUserRole.size());
+  assertTrue(evaluationsUserRole.containsKey(this.administrationPolicy.getId()));
+  assertTrue(evaluationsUserRole.containsKey(this.anyUserPolicy.getId()));
+  assertEquals(Effect.PERMIT,evaluationsUserRole.get(this.anyUserPolicy.getId()).getEffect());
+  assertEquals(Effect.DENY,evaluationsUserRole.get(this.administrationPolicy.getId()).getEffect());
+  ResourceRepresentation someResourceRep=new ResourceRepresentation();
+  someResourceRep.setName("Some Resource");
+  someResourceRep.setType("Some non-existent type");
+  Resource someResource=createResource(someResourceRep);
+  evaluationsUserRole=performEvaluation(Arrays.asList(new ResourcePermission(someResource,Collections.emptyList(),resourceServer)),createAccessToken(roles),createClientConnection("127.0.0.1"));
+  assertEquals(0,evaluationsUserRole.size());
+}

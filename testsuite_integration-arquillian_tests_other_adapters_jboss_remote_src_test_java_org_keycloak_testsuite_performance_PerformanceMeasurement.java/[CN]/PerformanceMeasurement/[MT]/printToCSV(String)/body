@@ -1,0 +1,27 @@
+{
+  checkStatisticsNotNull();
+  for (  String statistic : statistics.keySet()) {
+    File csvFile=new File(PROJECT_BUILD_DIRECTORY + "/measurements" + (testName == null ? "" : "/" + testName),statistic + ".csv");
+    boolean csvFileCreated=false;
+    if (!csvFile.exists()) {
+      try {
+        csvFile.getParentFile().mkdirs();
+        csvFileCreated=csvFile.createNewFile();
+      }
+ catch (      IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+    try (BufferedWriter writer=new BufferedWriter(new FileWriter(csvFile,true))){
+      CSVPrinter printer=new CSVPrinter(writer,CSVFormat.RFC4180);
+      if (csvFileCreated) {
+        printer.printRecord(HEADER);
+      }
+      printer.printRecord(toRecord(statistic));
+      printer.flush();
+    }
+ catch (    IOException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+}

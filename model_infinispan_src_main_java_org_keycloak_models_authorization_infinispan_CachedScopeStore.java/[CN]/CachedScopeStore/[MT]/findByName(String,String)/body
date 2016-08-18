@@ -1,0 +1,17 @@
+{
+  for (  Entry entry : this.cache.entrySet()) {
+    String cacheKey=(String)entry.getKey();
+    if (cacheKey.startsWith(SCOPE_ID_CACHE_PREFIX)) {
+      List<CachedScope> cache=(List<CachedScope>)entry.getValue();
+      CachedScope scope=cache.get(0);
+      if (scope.getResourceServerId().equals(resourceServerId) && scope.getName().equals(name)) {
+        return findById(scope.getId());
+      }
+    }
+  }
+  Scope scope=getDelegate().findByName(name,resourceServerId);
+  if (scope != null) {
+    return findById(updateScopeCache(scope).getId());
+  }
+  return null;
+}

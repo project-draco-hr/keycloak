@@ -7,12 +7,12 @@
   }
   AuthenticationExecutionModel model=realm.getAuthenticationExecutionById(rep.getId());
   if (model == null) {
-    session.getTransaction().setRollbackOnly();
+    session.getTransactionManager().setRollbackOnly();
     throw new NotFoundException("Illegal execution");
   }
   if (!model.getRequirement().name().equals(rep.getRequirement())) {
     model.setRequirement(AuthenticationExecutionModel.Requirement.valueOf(rep.getRequirement()));
     realm.updateAuthenticatorExecution(model);
-    adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();
+    adminEvent.operation(OperationType.UPDATE).resource(ResourceType.AUTH_EXECUTION).resourcePath(uriInfo).representation(rep).success();
   }
 }

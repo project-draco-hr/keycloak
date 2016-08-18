@@ -1,0 +1,22 @@
+{
+  Map<Class<? extends Provider>,Map<String,ProviderFactory>> copy=getFactoriesCopy();
+  Map<Class<? extends Provider>,Map<String,ProviderFactory>> newFactories=loadFactories(pm);
+  List<ProviderFactory> undeployed=new LinkedList<>();
+  for (  Map.Entry<Class<? extends Provider>,Map<String,ProviderFactory>> entry : newFactories.entrySet()) {
+    Map<String,ProviderFactory> current=copy.get(entry.getKey());
+    if (current == null) {
+      copy.put(entry.getKey(),entry.getValue());
+    }
+ else {
+      for (      ProviderFactory f : entry.getValue().values()) {
+        ProviderFactory old=current.remove(f.getId());
+        if (old != null)         undeployed.add(old);
+      }
+      current.putAll(entry.getValue());
+    }
+  }
+  factoriesMap=copy;
+  for (  ProviderFactory factory : undeployed) {
+    factory.close();
+  }
+}

@@ -1,0 +1,21 @@
+{
+  this.auth.requireManage();
+  StoreFactory storeFactory=authorization.getStoreFactory();
+  List<Resource> resources=storeFactory.getResourceStore().findByScope(id);
+  if (!resources.isEmpty()) {
+    return ErrorResponse.exists("Scopes can not be removed while associated with resources.");
+  }
+  Scope scope=storeFactory.getScopeStore().findById(id);
+  PolicyStore policyStore=storeFactory.getPolicyStore();
+  List<Policy> policies=policyStore.findByScopeIds(Arrays.asList(scope.getId()),resourceServer.getId());
+  for (  Policy policyModel : policies) {
+    if (policyModel.getScopes().size() == 1) {
+      policyStore.delete(policyModel.getId());
+    }
+ else {
+      policyModel.removeScope(scope);
+    }
+  }
+  storeFactory.getScopeStore().delete(id);
+  return Response.noContent().build();
+}

@@ -1,0 +1,11 @@
+{
+  CloseableHttpClient client=new DefaultHttpClient();
+  try {
+    HttpGet get=new HttpGet(getCertsUrl(realm));
+    CloseableHttpResponse response=client.execute(get);
+    return JsonSerialization.readValue(response.getEntity().getContent(),JSONWebKeySet.class);
+  }
+  finally {
+    closeClient(client);
+  }
+}

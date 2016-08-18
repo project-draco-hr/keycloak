@@ -1,0 +1,12 @@
+{
+  setPasswordPolicy("upperCase(2)");
+  changePasswordPage.open();
+  loginPage.login("test-user@localhost","password");
+  events.expectLogin().client("account").detail(Details.REDIRECT_URI,ACCOUNT_REDIRECT + "?path=password").assertEvent();
+  changePasswordPage.changePassword("password","Invalidpassword","Invalidpassword");
+  Assert.assertEquals("Invalid password: must contain at least 2 upper case characters.",profilePage.getError());
+  events.expectAccount(EventType.UPDATE_PASSWORD_ERROR).error(Errors.PASSWORD_REJECTED).assertEvent();
+  changePasswordPage.changePassword("password","VAlidpassword","VAlidpassword");
+  Assert.assertEquals("Your password has been updated.",profilePage.getSuccess());
+  events.expectAccount(EventType.UPDATE_PASSWORD).assertEvent();
+}

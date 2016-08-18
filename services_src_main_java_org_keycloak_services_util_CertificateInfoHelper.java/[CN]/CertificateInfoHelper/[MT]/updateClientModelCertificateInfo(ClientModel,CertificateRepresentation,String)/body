@@ -1,0 +1,14 @@
+{
+  String privateKeyAttribute=attributePrefix + "." + PRIVATE_KEY;
+  String certificateAttribute=attributePrefix + "." + X509CERTIFICATE;
+  String publicKeyAttribute=attributePrefix + "." + PUBLIC_KEY;
+  if (rep.getPublicKey() == null && rep.getCertificate() == null) {
+    throw new IllegalStateException("Both certificate and publicKey are null!");
+  }
+  if (rep.getPublicKey() != null && rep.getCertificate() != null) {
+    throw new IllegalStateException("Both certificate and publicKey are not null!");
+  }
+  setOrRemoveAttr(client,privateKeyAttribute,rep.getPrivateKey());
+  setOrRemoveAttr(client,publicKeyAttribute,rep.getPublicKey());
+  setOrRemoveAttr(client,certificateAttribute,rep.getCertificate());
+}

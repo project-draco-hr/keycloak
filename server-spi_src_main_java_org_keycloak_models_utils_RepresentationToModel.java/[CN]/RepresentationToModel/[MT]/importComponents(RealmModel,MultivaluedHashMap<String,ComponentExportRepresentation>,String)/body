@@ -1,0 +1,18 @@
+{
+  for (  Map.Entry<String,List<ComponentExportRepresentation>> entry : components.entrySet()) {
+    String providerType=entry.getKey();
+    for (    ComponentExportRepresentation compRep : entry.getValue()) {
+      ComponentModel component=new ComponentModel();
+      component.setId(compRep.getId());
+      component.setName(compRep.getName());
+      component.setConfig(compRep.getConfig());
+      component.setProviderType(providerType);
+      component.setProviderId(compRep.getProviderId());
+      component.setParentId(parentId);
+      component=newRealm.addComponentModel(component);
+      if (compRep.getSubComponents() != null) {
+        importComponents(newRealm,compRep.getSubComponents(),component.getId());
+      }
+    }
+  }
+}

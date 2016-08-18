@@ -35,8 +35,12 @@
   Document samlDocument=null;
   try {
     ResponseType samlModel=builder.buildModel();
-    transformAttributeStatement(attributeStatementMappers,samlModel,session,userSession,clientSession);
-    populateRoles(roleListMapper,samlModel,session,userSession,clientSession);
+    final AttributeStatementType attributeStatement=populateAttributeStatements(attributeStatementMappers,session,userSession,clientSession);
+    populateRoles(roleListMapper,session,userSession,clientSession,attributeStatement);
+    if (attributeStatement.getAttributes().size() > 0) {
+      AssertionType assertion=samlModel.getAssertions().get(0).getAssertion();
+      assertion.addStatement(attributeStatement);
+    }
     samlModel=transformLoginResponse(loginResponseMappers,samlModel,session,userSession,clientSession);
     samlDocument=builder.buildDocument(samlModel);
   }

@@ -1,0 +1,12 @@
+{
+  SocialIdentityProviderFactory providerFactory=(SocialIdentityProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(SocialIdentityProvider.class,providerId);
+  if ((displayName == null || displayName.isEmpty()) && (providerId.contains("saml") || providerId.contains("oidc"))) {
+    return providerId;
+  }
+ else   if (providerFactory != null && (displayName == null || displayName.isEmpty())) {
+    return providerFactory.getName();
+  }
+ else {
+    return displayName;
+  }
+}

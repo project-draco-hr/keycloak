@@ -4,12 +4,12 @@
     throw new NotFoundException("Could not find client");
   }
   CertificateRepresentation info=getCertFromRequest(uriInfo,input);
-  if (info.getCertificate() != null) {
-    client.setAttribute(certificateAttribute,info.getCertificate());
-    client.removeAttribute(privateAttribute);
+  info.setPrivateKey(null);
+  try {
+    CertificateInfoHelper.updateClientModelCertificateInfo(client,info,attributePrefix);
   }
- else {
-    throw new ErrorResponseException("certificate-not-found","Certificate with given alias not found in the keystore",Response.Status.BAD_REQUEST);
+ catch (  IllegalStateException ise) {
+    throw new ErrorResponseException("certificate-not-found","Certificate or key with given alias not found in the keystore",Response.Status.BAD_REQUEST);
   }
   adminEvent.operation(OperationType.ACTION).resourcePath(session.getContext().getUri()).representation(info).success();
   return info;

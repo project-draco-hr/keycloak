@@ -17,8 +17,8 @@
         if (entity != null) {
           InputStream is=entity.getContent();
           if (status == 400) {
-            Map<String,String> errors=(Map<String,String>)JsonSerialization.readValue(is,Map.class);
-            errorBuilder.append(", OAuth2 error. Error: " + errors.get(OAuth2Constants.ERROR)).append(", Error description: " + errors.get(OAuth2Constants.ERROR_DESCRIPTION));
+            OAuth2ErrorRepresentation errorRep=JsonSerialization.readValue(is,OAuth2ErrorRepresentation.class);
+            errorBuilder.append(", OAuth2 error. Error: " + errorRep.getError()).append(", Error description: " + errorRep.getErrorDescription());
           }
  else {
             if (is != null)             is.close();

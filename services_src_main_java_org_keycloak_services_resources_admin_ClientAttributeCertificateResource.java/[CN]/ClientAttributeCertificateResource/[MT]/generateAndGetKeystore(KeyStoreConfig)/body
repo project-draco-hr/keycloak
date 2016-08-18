@@ -14,7 +14,8 @@
   }
   CertificateRepresentation info=KeycloakModelUtils.generateKeyPairCertificate(client.getClientId());
   byte[] rtn=getKeystore(config,info.getPrivateKey(),info.getCertificate());
-  client.setAttribute(certificateAttribute,info.getCertificate());
+  info.setPrivateKey(null);
+  CertificateInfoHelper.updateClientModelCertificateInfo(client,info,attributePrefix);
   adminEvent.operation(OperationType.ACTION).resourcePath(session.getContext().getUri()).representation(info).success();
   return rtn;
 }

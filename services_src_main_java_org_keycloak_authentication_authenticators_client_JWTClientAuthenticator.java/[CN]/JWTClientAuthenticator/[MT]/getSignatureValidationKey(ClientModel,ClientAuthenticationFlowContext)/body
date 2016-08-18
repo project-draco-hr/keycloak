@@ -1,0 +1,22 @@
+{
+  CertificateRepresentation certInfo=CertificateInfoHelper.getCertificateFromClient(client,ATTR_PREFIX);
+  String encodedCertificate=certInfo.getCertificate();
+  String encodedPublicKey=certInfo.getPublicKey();
+  if (encodedCertificate == null && encodedPublicKey == null) {
+    Response challengeResponse=ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client","Client '" + client.getClientId() + "' doesn't have certificate or publicKey configured");
+    context.failure(AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED,challengeResponse);
+    return null;
+  }
+  if (encodedCertificate != null && encodedPublicKey != null) {
+    Response challengeResponse=ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client","Client '" + client.getClientId() + "' has both publicKey and certificate configured");
+    context.failure(AuthenticationFlowError.CLIENT_CREDENTIALS_SETUP_REQUIRED,challengeResponse);
+    return null;
+  }
+  if (encodedCertificate != null) {
+    X509Certificate clientCert=KeycloakModelUtils.getCertificate(encodedCertificate);
+    return clientCert.getPublicKey();
+  }
+ else {
+    return KeycloakModelUtils.getPublicKey(encodedPublicKey);
+  }
+}

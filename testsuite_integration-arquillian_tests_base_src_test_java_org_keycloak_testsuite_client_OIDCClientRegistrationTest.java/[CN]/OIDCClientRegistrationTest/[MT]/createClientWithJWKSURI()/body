@@ -1,0 +1,15 @@
+{
+  OIDCClientRepresentation clientRep=createRep();
+  clientRep.setGrantTypes(Collections.singletonList(OAuth2Constants.CLIENT_CREDENTIALS));
+  clientRep.setTokenEndpointAuthMethod(OIDCLoginProtocol.PRIVATE_KEY_JWT);
+  clientRep.setJwksUri(oauth.getCertsUrl(REALM_NAME));
+  OIDCClientRepresentation response=reg.oidc().create(clientRep);
+  Assert.assertEquals(OIDCLoginProtocol.PRIVATE_KEY_JWT,response.getTokenEndpointAuthMethod());
+  Assert.assertNull(response.getClientSecret());
+  Assert.assertNull(response.getClientSecretExpiresAt());
+  String signedJwt=getClientSignedJWT(response.getClientId());
+  OAuthClient.AccessTokenResponse accessTokenResponse=doClientCredentialsGrantRequest(signedJwt);
+  Assert.assertEquals(200,accessTokenResponse.getStatusCode());
+  AccessToken accessToken=oauth.verifyToken(accessTokenResponse.getAccessToken());
+  Assert.assertEquals(response.getClientId(),accessToken.getAudience()[0]);
+}

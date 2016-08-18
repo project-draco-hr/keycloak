@@ -6,14 +6,7 @@
   if (policy == null) {
     return Response.status(Status.NOT_FOUND).build();
   }
-  policy.setName(representation.getName());
-  policy.setDescription(representation.getDescription());
-  policy.setConfig(representation.getConfig());
-  policy.setDecisionStrategy(representation.getDecisionStrategy());
-  policy.setLogic(representation.getLogic());
-  updateResources(policy,authorization);
-  updateAssociatedPolicies(policy);
-  updateScopes(policy,authorization);
+  policy=toModel(representation,resourceServer,authorization);
   PolicyProviderAdminService resource=getPolicyProviderAdminResource(policy.getType(),authorization);
   if (resource != null) {
     try {

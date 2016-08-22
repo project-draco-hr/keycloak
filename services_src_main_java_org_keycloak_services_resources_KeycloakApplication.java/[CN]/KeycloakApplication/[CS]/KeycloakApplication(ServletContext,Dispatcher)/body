@@ -1,48 +1,54 @@
 {
-  loadConfig();
-  this.contextPath=context.getContextPath();
-  this.sessionFactory=createSessionFactory();
-  dispatcher.getDefaultContextObjects().put(KeycloakApplication.class,this);
-  ResteasyProviderFactory.pushContext(KeycloakApplication.class,this);
-  context.setAttribute(KeycloakSessionFactory.class.getName(),this.sessionFactory);
-  singletons.add(new ServerVersionResource());
-  singletons.add(new RobotsResource());
-  singletons.add(new RealmsResource());
-  singletons.add(new AdminRoot());
-  classes.add(ThemeResource.class);
-  classes.add(JsResource.class);
-  classes.add(KeycloakTransactionCommitter.class);
-  singletons.add(new ObjectMapperResolver(Boolean.parseBoolean(System.getProperty("keycloak.jsonPrettyPrint","false"))));
-  ExportImportManager[] exportImportManager=new ExportImportManager[1];
-  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
-    @Override public void run(    KeycloakSession lockSession){
-      DBLockManager dbLockManager=new DBLockManager(lockSession);
-      dbLockManager.checkForcedUnlock();
-      DBLockProvider dbLock=dbLockManager.getDBLock();
-      dbLock.waitForLock();
-      try {
-        exportImportManager[0]=migrateAndBootstrap();
-      }
+  try {
+    loadConfig();
+    this.contextPath=context.getContextPath();
+    this.sessionFactory=createSessionFactory();
+    dispatcher.getDefaultContextObjects().put(KeycloakApplication.class,this);
+    ResteasyProviderFactory.pushContext(KeycloakApplication.class,this);
+    context.setAttribute(KeycloakSessionFactory.class.getName(),this.sessionFactory);
+    singletons.add(new ServerVersionResource());
+    singletons.add(new RobotsResource());
+    singletons.add(new RealmsResource());
+    singletons.add(new AdminRoot());
+    classes.add(ThemeResource.class);
+    classes.add(JsResource.class);
+    classes.add(KeycloakTransactionCommitter.class);
+    singletons.add(new ObjectMapperResolver(Boolean.parseBoolean(System.getProperty("keycloak.jsonPrettyPrint","false"))));
+    ExportImportManager[] exportImportManager=new ExportImportManager[1];
+    KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+      @Override public void run(      KeycloakSession lockSession){
+        DBLockManager dbLockManager=new DBLockManager(lockSession);
+        dbLockManager.checkForcedUnlock();
+        DBLockProvider dbLock=dbLockManager.getDBLock();
+        dbLock.waitForLock();
+        try {
+          exportImportManager[0]=migrateAndBootstrap();
+        }
   finally {
-        dbLock.releaseLock();
+          dbLock.releaseLock();
+        }
       }
     }
-  }
 );
-  if (exportImportManager[0].isRunExport()) {
-    exportImportManager[0].runExport();
-  }
-  boolean bootstrapAdminUser=false;
-  KeycloakSession session=sessionFactory.create();
-  try {
-    session.getTransactionManager().begin();
-    bootstrapAdminUser=new ApplianceBootstrap(session).isNoMasterUser();
-    session.getTransactionManager().commit();
-  }
+    if (exportImportManager[0].isRunExport()) {
+      exportImportManager[0].runExport();
+    }
+    boolean bootstrapAdminUser=false;
+    KeycloakSession session=sessionFactory.create();
+    try {
+      session.getTransactionManager().begin();
+      bootstrapAdminUser=new ApplianceBootstrap(session).isNoMasterUser();
+      session.getTransactionManager().commit();
+    }
   finally {
-    session.close();
+      session.close();
+    }
+    sessionFactory.publish(new PostMigrationEvent());
+    singletons.add(new WelcomeResource(bootstrapAdminUser));
+    setupScheduledTasks(sessionFactory);
   }
-  sessionFactory.publish(new PostMigrationEvent());
-  singletons.add(new WelcomeResource(bootstrapAdminUser));
-  setupScheduledTasks(sessionFactory);
+ catch (  Throwable t) {
+    exit(1);
+    throw t;
+  }
 }

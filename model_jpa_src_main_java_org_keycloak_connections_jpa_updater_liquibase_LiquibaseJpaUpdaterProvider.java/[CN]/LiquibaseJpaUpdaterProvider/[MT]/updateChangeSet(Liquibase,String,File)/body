@@ -13,7 +13,12 @@
         logger.infov("Updating database. Using changelog {0}",changelog);
       }
     }
-    liquibase.update((Contexts)null);
+    if (exportFile != null) {
+      liquibase.update((Contexts)null,new FileWriter(exportFile));
+    }
+ else {
+      liquibase.update((Contexts)null);
+    }
     logger.debugv("Completed database update for changelog {0}",changelog);
   }
  else {

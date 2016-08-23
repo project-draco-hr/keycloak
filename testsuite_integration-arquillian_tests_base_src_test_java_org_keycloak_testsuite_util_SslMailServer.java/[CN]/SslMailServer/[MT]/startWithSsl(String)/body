@@ -6,13 +6,13 @@
     KeyStore ksKeys=null;
     ksKeys=KeyStore.getInstance("JKS");
     ksKeys.load(keyStoreIS,keyStorePassphrase);
-    KeyManagerFactory kmf=KeyManagerFactory.getInstance("SunX509");
+    KeyManagerFactory kmf=KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
     kmf.init(ksKeys,keyStorePassphrase);
     InputStream trustStoreIS=new FileInputStream(String.valueOf(MailServer.class.getClassLoader().getResource(TRUSTED_CERTIFICATE).getFile()));
     char[] trustStorePassphrase="secret".toCharArray();
     KeyStore ksTrust=KeyStore.getInstance("JKS");
     ksTrust.load(trustStoreIS,trustStorePassphrase);
-    TrustManagerFactory tmf=TrustManagerFactory.getInstance("SunX509");
+    TrustManagerFactory tmf=TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
     tmf.init(ksTrust);
     final SSLContext sslContext=SSLContext.getInstance("TLS");
     sslContext.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);

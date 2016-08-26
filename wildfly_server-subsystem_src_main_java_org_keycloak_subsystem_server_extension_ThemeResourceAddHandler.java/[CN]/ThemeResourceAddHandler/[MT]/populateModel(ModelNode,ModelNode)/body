@@ -1,0 +1,14 @@
+{
+  if (!operation.get(OP).asString().equals(ADD)) {
+    throw new OperationFailedException("Unexpected operation for add Theme. operation=" + operation.toString());
+  }
+  PathAddress address=PathAddress.pathAddress(operation.get(ADDRESS));
+  PathElement last=address.getLastElement();
+  if (!last.getValue().equals(ThemeResourceDefinition.RESOURCE_NAME)) {
+    throw new OperationFailedException("Theme resource with name " + last.getValue() + " not allowed.");
+  }
+  for (  AttributeDefinition def : ALL_ATTRIBUTES) {
+    def.validateAndSet(operation,model);
+  }
+  KeycloakAdapterConfigService.INSTANCE.updateConfig(operation,model);
+}

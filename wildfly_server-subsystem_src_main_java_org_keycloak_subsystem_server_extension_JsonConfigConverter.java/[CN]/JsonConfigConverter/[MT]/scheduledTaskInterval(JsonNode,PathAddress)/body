@@ -1,0 +1,9 @@
+{
+  JsonNode targetNode=getNode(root,"scheduled","interval");
+  Long value=SCHEDULED_TASK_INTERVAL.getDefaultValue().asLong();
+  if (targetNode != null)   value=targetNode.asLong(value);
+  ModelNode op=Util.createOperation(WRITE_ATTRIBUTE_OPERATION,addr);
+  op.get("name").set(SCHEDULED_TASK_INTERVAL.getName());
+  op.get("value").set(value);
+  return op;
+}

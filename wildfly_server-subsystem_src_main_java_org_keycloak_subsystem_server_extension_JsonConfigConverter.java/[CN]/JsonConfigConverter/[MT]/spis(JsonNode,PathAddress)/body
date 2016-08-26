@@ -1,0 +1,11 @@
+{
+  List<ModelNode> spis=new ArrayList<>();
+  Iterator<String> spiIterator=root.fieldNames();
+  while (spiIterator.hasNext()) {
+    String spiName=spiIterator.next();
+    if (NON_SPI_LIST.contains(spiName))     continue;
+    PathAddress spiAddr=addr.append("spi",spiName);
+    spis.addAll(spi(root,spiAddr,spiName));
+  }
+  return spis;
+}

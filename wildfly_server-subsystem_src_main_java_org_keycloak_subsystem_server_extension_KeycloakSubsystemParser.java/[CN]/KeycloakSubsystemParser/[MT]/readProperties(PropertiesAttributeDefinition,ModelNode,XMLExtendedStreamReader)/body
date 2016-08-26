@@ -1,0 +1,23 @@
+{
+  while (nextTag(reader) != END_ELEMENT) {
+    int attrCount=reader.getAttributeCount();
+    if (attrCount != 2)     throw new XMLStreamException("Property must have only two attributes");
+    String name="";
+    String value="";
+    for (int i=0; i < 2; i++) {
+      String attrName=reader.getAttributeLocalName(i);
+      String attrValue=reader.getAttributeValue(i);
+      if (attrName.equals("name")) {
+        name=attrValue;
+      }
+ else       if (attrName.equals("value")) {
+        value=attrValue;
+      }
+ else {
+        throw new XMLStreamException("Property can only have attributes named 'name' and 'value'");
+      }
+    }
+    attrDef.parseAndAddParameterElement(name,value,addOp,reader);
+    nextTag(reader);
+  }
+}

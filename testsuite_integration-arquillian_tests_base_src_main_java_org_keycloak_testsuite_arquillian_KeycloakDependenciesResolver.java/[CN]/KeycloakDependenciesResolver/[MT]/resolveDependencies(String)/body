@@ -1,0 +1,11 @@
+{
+  if (dependencies.containsKey(canonicalForm)) {
+    return dependencies.get(canonicalForm);
+  }
+  log.info("Resolving " + canonicalForm + "'s dependencies");
+  PomEquippedResolveStage resolver=Maven.configureResolverViaPlugin();
+  File[] files=resolver.addDependency(MavenDependencies.createDependency(canonicalForm,ScopeType.COMPILE,false)).resolve().withTransitivity().asFile();
+  dependencies.put(canonicalForm,files);
+  log.info("Resolving dependencies is finished with " + files.length + " files");
+  return dependencies.get(canonicalForm);
+}

@@ -9,11 +9,13 @@
       modifyClientUrls(tr,appServerContextRootPage.toString(),"");
       modifyClientWebOrigins(tr,"8080",System.getProperty("auth.server.http.port",null));
       modifySamlMasterURLs(tr,"/","http://localhost:" + System.getProperty("auth.server.http.port",null) + "/");
+      modifySAMLClientsAttributes(tr,"8080",System.getProperty("auth.server.http.port","8180"));
     }
  else {
       modifyClientRedirectUris(tr,"^(/.*/\\*)",appServerContextRootPage.toString() + "$1");
       modifyClientUrls(tr,"^(/.*)",appServerContextRootPage.toString() + "$1");
       modifySamlMasterURLs(tr,"8080",System.getProperty("auth.server.http.port",null));
+      modifySAMLClientsAttributes(tr,"8080",System.getProperty("app.server.http.port","8280"));
     }
     if ("true".equals(System.getProperty("auth.server.ssl.required"))) {
       tr.setSslRequired("all");

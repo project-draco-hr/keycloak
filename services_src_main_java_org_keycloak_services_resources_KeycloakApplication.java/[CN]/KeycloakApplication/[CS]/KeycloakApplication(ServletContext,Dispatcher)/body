@@ -1,5 +1,8 @@
 {
   try {
+    if ("true".equals(context.getInitParameter("keycloak.embedded"))) {
+      embedded=true;
+    }
     loadConfig(context);
     this.contextPath=context.getContextPath();
     this.sessionFactory=createSessionFactory();
@@ -48,7 +51,9 @@
     setupScheduledTasks(sessionFactory);
   }
  catch (  Throwable t) {
-    exit(1);
+    if (!embedded) {
+      exit(1);
+    }
     throw t;
   }
 }

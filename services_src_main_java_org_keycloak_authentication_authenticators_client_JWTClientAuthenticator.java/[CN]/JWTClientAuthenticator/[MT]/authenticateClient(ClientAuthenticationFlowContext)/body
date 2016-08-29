@@ -53,9 +53,10 @@
     if (!signatureValid) {
       throw new RuntimeException("Signature on JWT token failed validation");
     }
-    String expectedAudience=Urls.realmIssuer(context.getUriInfo().getBaseUri(),realm.getName());
-    if (!token.hasAudience(expectedAudience)) {
-      throw new RuntimeException("Token audience doesn't match domain. Realm audience is '" + expectedAudience + "' but audience from token is '"+ Arrays.asList(token.getAudience()).toString()+ "'");
+    String issuerUrl=Urls.realmIssuer(context.getUriInfo().getBaseUri(),realm.getName());
+    String tokenUrl=OIDCLoginProtocolService.tokenUrl(context.getUriInfo().getBaseUriBuilder()).build(realm.getName()).toString();
+    if (!token.hasAudience(issuerUrl) && !token.hasAudience(tokenUrl)) {
+      throw new RuntimeException("Token audience doesn't match domain. Realm issuer is '" + issuerUrl + "' but audience from token is '"+ Arrays.asList(token.getAudience()).toString()+ "'");
     }
     if (!token.isActive()) {
       throw new RuntimeException("Token is not active");

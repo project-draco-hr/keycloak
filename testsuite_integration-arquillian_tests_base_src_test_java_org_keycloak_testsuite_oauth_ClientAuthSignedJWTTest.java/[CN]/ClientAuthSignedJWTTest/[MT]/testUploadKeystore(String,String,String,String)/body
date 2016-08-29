@@ -18,15 +18,25 @@
   HttpResponse httpResponse=httpClient.execute(httpRequest);
   assertEquals(200,httpResponse.getStatusLine().getStatusCode());
   client=getClient(testRealm.getRealm(),client.getId()).toRepresentation();
-  String pem;
-  if (!keystoreFormat.equals(CERTIFICATE_PEM)) {
+  if (keystoreFormat.equals(org.keycloak.services.resources.admin.ClientAttributeCertificateResource.PUBLIC_KEY_PEM)) {
+    String pem=new String(Files.readAllBytes(keystoreFile.toPath()));
+    final String publicKeyNew=client.getAttributes().get(JWTClientAuthenticator.ATTR_PREFIX + "." + CertificateInfoHelper.PUBLIC_KEY);
+    assertEquals("Certificates don't match",pem,publicKeyNew);
+  }
+ else   if (keystoreFormat.equals(org.keycloak.services.resources.admin.ClientAttributeCertificateResource.JSON_WEB_KEY_SET)) {
+    final String publicKeyNew=client.getAttributes().get(JWTClientAuthenticator.ATTR_PREFIX + "." + CertificateInfoHelper.PUBLIC_KEY);
+    PublicKey pk=KeycloakModelUtils.getPublicKey(publicKeyNew);
+    Assert.assertNotNull(pk);
+  }
+ else   if (keystoreFormat.equals(org.keycloak.services.resources.admin.ClientAttributeCertificateResource.CERTIFICATE_PEM)) {
+    String pem=new String(Files.readAllBytes(keystoreFile.toPath()));
+    assertCertificate(client,certOld,pem);
+  }
+ else {
     InputStream keystoreIs=new FileInputStream(keystoreFile);
     KeyStore keyStore=getKeystore(keystoreIs,storePassword,keystoreFormat);
     keystoreIs.close();
-    pem=KeycloakModelUtils.getPemFromCertificate((X509Certificate)keyStore.getCertificate(keyAlias));
+    String pem=KeycloakModelUtils.getPemFromCertificate((X509Certificate)keyStore.getCertificate(keyAlias));
+    assertCertificate(client,certOld,pem);
   }
- else {
-    pem=new String(Files.readAllBytes(keystoreFile.toPath()));
-  }
-  assertCertificate(client,certOld,pem);
 }

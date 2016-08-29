@@ -13,7 +13,14 @@
   script.setType(SCRIPT_TYPE);
   script.setName(SCRIPT_CODE);
   script.setLabel("Script Source");
-  script.setDefaultValue("//enter your script here");
-  script.setHelpText("The script used to authenticate. Scripts must at least define a function with the name 'authenticate' that accepts a context (AuthenticationFlowContext) parameter." + "This authenticator exposes the following additional variables: 'script', 'LOG'");
+  String scriptTemplate="//enter your script code here";
+  try {
+    scriptTemplate=IOUtils.toString(getClass().getResource("/scripts/authenticator-template.js"));
+  }
+ catch (  IOException ioe) {
+    LOGGER.warn(ioe);
+  }
+  script.setDefaultValue(scriptTemplate);
+  script.setHelpText("The script used to authenticate. Scripts must at least define a function with the name 'authenticate(context)' that accepts a context (AuthenticationFlowContext) parameter.\n" + "This authenticator exposes the following additional variables: 'script', 'realm', 'user', 'session', 'httpRequest', 'LOG'");
   return asList(name,description,script);
 }

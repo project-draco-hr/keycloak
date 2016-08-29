@@ -1,0 +1,13 @@
+{
+  if (scriptModel == null) {
+    throw new IllegalArgumentException("script must not be null");
+  }
+  if (scriptModel.getCode() == null || scriptModel.getCode().trim().isEmpty()) {
+    throw new IllegalArgumentException("script must not be null or empty");
+  }
+  if (bindingsConfigurer == null) {
+    throw new IllegalArgumentException("bindingsConfigurer must not be null");
+  }
+  ScriptEngine engine=createPreparedScriptEngine(scriptModel,bindingsConfigurer);
+  return new InvocableScriptAdapter(scriptModel,engine);
+}

@@ -1,12 +1,17 @@
 {
-  InvocableScript script=getInvocableScript(context);
-  if (!script.hasFunction(functionName)) {
+  if (!hasAuthenticatorConfig(context)) {
+    context.success();
+    return;
+  }
+  InvocableScriptAdapter invocableScriptAdapter=getInvocableScriptAdapter(context);
+  if (!invocableScriptAdapter.isDefined(functionName)) {
     return;
   }
   try {
-    script.invokeFunction(functionName,context);
+    invocableScriptAdapter.invokeFunction(functionName,context);
   }
- catch (  ScriptException|NoSuchMethodException e) {
+ catch (  ScriptExecutionException e) {
     LOGGER.error(e);
+    context.failure(AuthenticationFlowError.INTERNAL_ERROR);
   }
 }

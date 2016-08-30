@@ -41,9 +41,27 @@
   }
   AccessToken userInfo=new AccessToken();
   tokenManager.transformUserInfoAccessToken(session,userInfo,realm,clientModel,userModel,userSession,clientSession);
-  event.success();
   Map<String,Object> claims=new HashMap<String,Object>();
   claims.putAll(userInfo.getOtherClaims());
   claims.put("sub",userModel.getId());
-  return Cors.add(request,Response.ok(claims)).auth().allowedOrigins(token).build();
+  Response.ResponseBuilder responseBuilder;
+  OIDCAdvancedConfigWrapper cfg=OIDCAdvancedConfigWrapper.fromClientModel(clientModel);
+  if (cfg.isUserInfoSignatureRequired()) {
+    String issuerUrl=Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName());
+    String audience=clientModel.getClientId();
+    claims.put("iss",issuerUrl);
+    claims.put("aud",audience);
+    Algorithm signatureAlg=cfg.getUserInfoSignedResponseAlg();
+    PrivateKey privateKey=realm.getPrivateKey();
+    String signedUserInfo=new JWSBuilder().jsonContent(claims).sign(signatureAlg,privateKey);
+    responseBuilder=Response.ok(signedUserInfo).header(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_JWT);
+    event.detail(Details.SIGNATURE_REQUIRED,"true");
+    event.detail(Details.SIGNATURE_ALGORITHM,cfg.getUserInfoSignedResponseAlg().toString());
+  }
+ else {
+    responseBuilder=Response.ok(claims).header(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_JSON);
+    event.detail(Details.SIGNATURE_REQUIRED,"false");
+  }
+  event.success();
+  return Cors.add(request,responseBuilder).auth().allowedOrigins(token).build();
 }

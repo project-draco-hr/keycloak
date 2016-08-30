@@ -1,0 +1,23 @@
+{
+  Calendar calendar=Calendar.getInstance();
+  calendar.setTime(this.currentDate);
+  int dateField=calendar.get(timeConstant);
+  if (Calendar.MONTH == timeConstant) {
+    dateField++;
+  }
+  String start=this.policy.getConfig().get(configName);
+  if (start != null) {
+    String end=this.policy.getConfig().get(configName + "End");
+    if (end != null) {
+      if (dateField < Integer.parseInt(start) || dateField > Integer.parseInt(end)) {
+        return true;
+      }
+    }
+ else {
+      if (dateField != Integer.parseInt(start)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}

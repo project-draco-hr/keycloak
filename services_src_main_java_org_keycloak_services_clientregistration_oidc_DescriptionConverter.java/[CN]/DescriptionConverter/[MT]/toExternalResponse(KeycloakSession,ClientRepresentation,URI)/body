@@ -17,5 +17,9 @@
   response.setRegistrationClientUri(uri.toString());
   response.setResponseTypes(getOIDCResponseTypes(client));
   response.setGrantTypes(getOIDCGrantTypes(client));
+  OIDCAdvancedConfigWrapper config=OIDCAdvancedConfigWrapper.fromClientRepresentation(client);
+  if (config.isUserInfoSignatureRequired()) {
+    response.setUserinfoSignedResponseAlg(config.getUserInfoSignedResponseAlg().toString());
+  }
   return response;
 }

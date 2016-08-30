@@ -43,5 +43,10 @@
     rep.setPublicKey(publicKeyPem);
     CertificateInfoHelper.updateClientRepresentationCertificateInfo(client,rep,JWTClientAuthenticator.ATTR_PREFIX);
   }
+  if (clientOIDC.getUserinfoSignedResponseAlg() != null) {
+    String userInfoSignedResponseAlg=clientOIDC.getUserinfoSignedResponseAlg();
+    Algorithm algorithm=Enum.valueOf(Algorithm.class,userInfoSignedResponseAlg);
+    OIDCAdvancedConfigWrapper.fromClientRepresentation(client).setUserInfoSignedResponseAlg(algorithm);
+  }
   return client;
 }

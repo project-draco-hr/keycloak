@@ -1,0 +1,7 @@
+{
+  reg.auth(null);
+  createTrustedHost("localhost",1);
+  OIDCClientRepresentation client=createRep();
+  client.setRedirectUris(Arrays.asList("http://localhost/auth","http://localhost/auth#fragment","http://localhost/auth*"));
+  assertCreateFail(client,400,"URI fragment");
+}

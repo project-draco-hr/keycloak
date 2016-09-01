@@ -1,0 +1,19 @@
+{
+  EntityManager entityManager=this.entityManager.get();
+  EntityTransaction transaction=entityManager.getTransaction();
+  try {
+    transaction.begin();
+    Object proceed=context.proceed();
+    transaction.commit();
+    return proceed;
+  }
+ catch (  Exception cause) {
+    if (transaction != null && transaction.isActive()) {
+      transaction.rollback();
+    }
+    throw new RuntimeException(cause);
+  }
+ finally {
+    entityManager.close();
+  }
+}

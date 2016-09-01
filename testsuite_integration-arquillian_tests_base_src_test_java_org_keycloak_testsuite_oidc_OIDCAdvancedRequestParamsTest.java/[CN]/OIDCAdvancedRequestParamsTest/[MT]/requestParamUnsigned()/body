@@ -1,0 +1,18 @@
+{
+  String validRedirectUri=oauth.getRedirectUri();
+  TestOIDCEndpointsApplicationResource oidcClientEndpointsResource=testingClient.testApp().oidcClientEndpoints();
+  oidcClientEndpointsResource.setOIDCRequest("test","test-app","http://invalid",null,Algorithm.none.toString());
+  String requestStr=oidcClientEndpointsResource.getOIDCRequest();
+  oauth.request(requestStr);
+  oauth.openLoginForm();
+  Assert.assertTrue(errorPage.isCurrent());
+  assertEquals("Invalid parameter: redirect_uri",errorPage.getError());
+  oauth.redirectUri("http://invalid");
+  oidcClientEndpointsResource.setOIDCRequest("test","test-app",validRedirectUri,"10",Algorithm.none.toString());
+  requestStr=oidcClientEndpointsResource.getOIDCRequest();
+  oauth.request(requestStr);
+  OAuthClient.AuthorizationEndpointResponse response=oauth.doLogin("test-user@localhost","password");
+  Assert.assertNotNull(response.getCode());
+  Assert.assertEquals("mystate",response.getState());
+  assertTrue(appPage.isCurrent());
+}

@@ -1,0 +1,29 @@
+{
+  String validRedirectUri=oauth.getRedirectUri();
+  TestOIDCEndpointsApplicationResource oidcClientEndpointsResource=testingClient.testApp().oidcClientEndpoints();
+  ClientResource clientResource=ApiUtil.findClientByClientId(adminClient.realm("test"),"test-app");
+  ClientRepresentation clientRep=clientResource.toRepresentation();
+  OIDCAdvancedConfigWrapper.fromClientRepresentation(clientRep).setRequestObjectSignatureAlg(Algorithm.RS256);
+  clientResource.update(clientRep);
+  oidcClientEndpointsResource.setOIDCRequest("test","test-app",validRedirectUri,"10",Algorithm.none.toString());
+  oauth.requestUri(TestApplicationResourceUrls.clientRequestUri());
+  oauth.openLoginForm();
+  Assert.assertTrue(errorPage.isCurrent());
+  assertEquals("Invalid Request",errorPage.getError());
+  String clientPublicKeyPem=oidcClientEndpointsResource.generateKeys().get(TestingOIDCEndpointsApplicationResource.PUBLIC_KEY);
+  oidcClientEndpointsResource.setOIDCRequest("test","test-app",validRedirectUri,"10",Algorithm.RS256.toString());
+  oauth.openLoginForm();
+  Assert.assertTrue(errorPage.isCurrent());
+  assertEquals("Invalid Request",errorPage.getError());
+  clientRep=clientResource.toRepresentation();
+  CertificateRepresentation cert=new CertificateRepresentation();
+  cert.setPublicKey(clientPublicKeyPem);
+  CertificateInfoHelper.updateClientRepresentationCertificateInfo(clientRep,cert,JWTClientAuthenticator.ATTR_PREFIX);
+  clientResource.update(clientRep);
+  OAuthClient.AuthorizationEndpointResponse response=oauth.doLogin("test-user@localhost","password");
+  Assert.assertNotNull(response.getCode());
+  Assert.assertEquals("mystate",response.getState());
+  assertTrue(appPage.isCurrent());
+  OIDCAdvancedConfigWrapper.fromClientRepresentation(clientRep).setRequestObjectSignatureAlg(null);
+  clientResource.update(clientRep);
+}

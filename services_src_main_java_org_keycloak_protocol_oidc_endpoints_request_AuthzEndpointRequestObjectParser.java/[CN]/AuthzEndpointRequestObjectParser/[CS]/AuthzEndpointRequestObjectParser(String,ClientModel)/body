@@ -1,0 +1,22 @@
+{
+  JWSInput input=new JWSInput(requestObject);
+  JWSHeader header=input.getHeader();
+  Algorithm requestedSignatureAlgorithm=OIDCAdvancedConfigWrapper.fromClientModel(client).getRequestObjectSignatureAlg();
+  if (requestedSignatureAlgorithm != null && requestedSignatureAlgorithm != header.getAlgorithm()) {
+    throw new RuntimeException("Request object signed with different algorithm than client requested algorithm");
+  }
+  if (header.getAlgorithm() == Algorithm.none) {
+    this.requestParams=JsonSerialization.readValue(input.getContent(),TypedHashMap.class);
+  }
+ else   if (header.getAlgorithm() == Algorithm.RS256) {
+    PublicKey clientPublicKey=CertificateInfoHelper.getSignatureValidationKey(client,JWTClientAuthenticator.ATTR_PREFIX);
+    boolean verified=RSAProvider.verify(input,clientPublicKey);
+    if (!verified) {
+      throw new RuntimeException("Failed to verify signature on 'request' object");
+    }
+    this.requestParams=JsonSerialization.readValue(input.getContent(),TypedHashMap.class);
+  }
+ else {
+    throw new RuntimeException("Unsupported JWA algorithm used for signed request");
+  }
+}

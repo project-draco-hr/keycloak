@@ -33,20 +33,24 @@
     throw new ClientRegistrationException("Not found clientAuthenticator for requested token_endpoint_auth_method");
   }
   client.setClientAuthenticatorType(clientAuthFactory.getId());
-  if (authMethod != null && authMethod.equals(OIDCLoginProtocol.PRIVATE_KEY_JWT)) {
-    PublicKey publicKey=retrievePublicKey(clientOIDC);
-    if (publicKey == null) {
-      throw new ClientRegistrationException("Didn't find key of supported keyType for use " + JWK.Use.SIG.asString());
-    }
+  PublicKey publicKey=retrievePublicKey(session,clientOIDC);
+  if (authMethod != null && authMethod.equals(OIDCLoginProtocol.PRIVATE_KEY_JWT) && publicKey == null) {
+    throw new ClientRegistrationException("Didn't find key of supported keyType for use " + JWK.Use.SIG.asString());
+  }
+  if (publicKey != null) {
     String publicKeyPem=KeycloakModelUtils.getPemFromKey(publicKey);
     CertificateRepresentation rep=new CertificateRepresentation();
     rep.setPublicKey(publicKeyPem);
     CertificateInfoHelper.updateClientRepresentationCertificateInfo(client,rep,JWTClientAuthenticator.ATTR_PREFIX);
   }
+  OIDCAdvancedConfigWrapper configWrapper=OIDCAdvancedConfigWrapper.fromClientRepresentation(client);
   if (clientOIDC.getUserinfoSignedResponseAlg() != null) {
-    String userInfoSignedResponseAlg=clientOIDC.getUserinfoSignedResponseAlg();
-    Algorithm algorithm=Enum.valueOf(Algorithm.class,userInfoSignedResponseAlg);
-    OIDCAdvancedConfigWrapper.fromClientRepresentation(client).setUserInfoSignedResponseAlg(algorithm);
+    Algorithm algorithm=Enum.valueOf(Algorithm.class,clientOIDC.getUserinfoSignedResponseAlg());
+    configWrapper.setUserInfoSignedResponseAlg(algorithm);
+  }
+  if (clientOIDC.getRequestObjectSigningAlg() != null) {
+    Algorithm algorithm=Enum.valueOf(Algorithm.class,clientOIDC.getRequestObjectSigningAlg());
+    configWrapper.setRequestObjectSignatureAlg(algorithm);
   }
   return client;
 }

@@ -1,0 +1,16 @@
+{
+  try {
+    JSONWebKeySet keySet=JWKSUtils.sendJwksRequest(session,rep.getJwksUri());
+    PublicKey key=JWKSUtils.getKeyForUse(keySet,JWK.Use.SIG);
+    if (key == null) {
+      logger.supportedJwkNotFound(JWK.Use.SIG.asString());
+    }
+ else {
+      config.setPublicKeySignatureVerifier(KeycloakModelUtils.getPemFromKey(key));
+      config.setValidateSignature(true);
+    }
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Failed to query JWKSet from: " + rep.getJwksUri(),e);
+  }
+}

@@ -1,0 +1,18 @@
+{
+  String clientId=getParameter(OIDCLoginProtocol.CLIENT_ID_PARAM);
+  if (request.clientId != null && !request.clientId.equals(clientId)) {
+    throw new IllegalArgumentException("The client_id parameter doesn't match the one from OIDC 'request' or 'request_uri'");
+  }
+  request.clientId=clientId;
+  request.responseType=replaceIfNotNull(request.responseType,getParameter(OIDCLoginProtocol.RESPONSE_TYPE_PARAM));
+  request.responseMode=replaceIfNotNull(request.responseMode,getParameter(OIDCLoginProtocol.RESPONSE_MODE_PARAM));
+  request.redirectUriParam=replaceIfNotNull(request.redirectUriParam,getParameter(OIDCLoginProtocol.REDIRECT_URI_PARAM));
+  request.state=replaceIfNotNull(request.state,getParameter(OIDCLoginProtocol.STATE_PARAM));
+  request.scope=replaceIfNotNull(request.scope,getParameter(OIDCLoginProtocol.SCOPE_PARAM));
+  request.loginHint=replaceIfNotNull(request.loginHint,getParameter(OIDCLoginProtocol.LOGIN_HINT_PARAM));
+  request.prompt=replaceIfNotNull(request.prompt,getParameter(OIDCLoginProtocol.PROMPT_PARAM));
+  request.idpHint=replaceIfNotNull(request.idpHint,getParameter(AdapterConstants.KC_IDP_HINT));
+  request.nonce=replaceIfNotNull(request.nonce,getParameter(OIDCLoginProtocol.NONCE_PARAM));
+  request.maxAge=replaceIfNotNull(request.maxAge,getIntParameter(OIDCLoginProtocol.MAX_AGE_PARAM));
+  extractAdditionalReqParams(request.additionalReqParams);
+}

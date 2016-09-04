@@ -1,0 +1,15 @@
+{
+  if (!copy.hasDefined("spi"))   return;
+  ModelNode spis=copy.remove("spi");
+  for (  Property prop : spis.asPropertyList()) {
+    ModelNode spi=prop.getValue();
+    if (spi.has("provider")) {
+      massageProviders(spi);
+    }
+    if (spi.has("default-provider")) {
+      ModelNode defaultProvider=spi.remove("default-provider");
+      spi.get("provider").set(defaultProvider);
+    }
+    copy.get(prop.getName()).set(spi);
+  }
+}

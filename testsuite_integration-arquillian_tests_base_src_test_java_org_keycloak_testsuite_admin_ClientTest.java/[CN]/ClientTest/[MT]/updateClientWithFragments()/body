@@ -1,0 +1,18 @@
+{
+  ClientRepresentation client=ClientBuilder.create().clientId("client-with-fragment").redirectUris("http://localhost/auth","http://localhost/auth*").build();
+  Response response=realm.clients().create(client);
+  ClientResource clientResource=realm.clients().get(ApiUtil.getCreatedId(response));
+  client=clientResource.toRepresentation();
+  client.setRootUrl("http://localhost/base#someFragment");
+  List<String> redirectUris=client.getRedirectUris();
+  redirectUris.add("http://localhost/auth#fragment");
+  redirectUris.add("/relative");
+  client.setRedirectUris(redirectUris);
+  try {
+    clientResource.update(client);
+    fail("Should fail");
+  }
+ catch (  BadRequestException e) {
+    assertUriFragmentError(e.getResponse());
+  }
+}

@@ -1,0 +1,15 @@
+{
+  Client client=ClientBuilder.newClient();
+  Response response=client.target(employeeSigServletPage.toString()).request().get();
+  response.close();
+  SAML2ErrorResponseBuilder builder=new SAML2ErrorResponseBuilder().destination(employeeSigServletPage.toString() + "/saml").issuer("http://localhost:" + System.getProperty("auth.server.http.port","8180") + "/realms/demo").status(JBossSAMLURIConstants.STATUS_REQUEST_DENIED.get());
+  BaseSAML2BindingBuilder binding=new BaseSAML2BindingBuilder().relayState(null);
+  Document document=builder.buildDocument();
+  URI uri=binding.redirectBinding(document).generateURI(employeeSigServletPage.toString() + "/saml",false);
+  response=client.target(uri).request().get();
+  String errorPage=response.readEntity(String.class);
+  response.close();
+  Assert.assertTrue(errorPage.contains("Error info: SamlAuthenticationError [reason=ERROR_STATUS"));
+  Assert.assertFalse(errorPage.contains("status=null"));
+  client.close();
+}

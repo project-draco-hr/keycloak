@@ -12,6 +12,8 @@
   config.setJwksUri(uriBuilder.clone().path(OIDCLoginProtocolService.class,"certs").build(realm.getName(),OIDCLoginProtocol.LOGIN_PROTOCOL).toString());
   config.setRegistrationEndpoint(RealmsResource.clientRegistrationUrl(uriInfo).path(ClientRegistrationService.class,"provider").build(realm.getName(),OIDCClientRegistrationProviderFactory.ID).toString());
   config.setIdTokenSigningAlgValuesSupported(DEFAULT_ID_TOKEN_SIGNING_ALG_VALUES_SUPPORTED);
+  config.setUserInfoSigningAlgValuesSupported(DEFAULT_USER_INFO_SIGNING_ALG_VALUES_SUPPORTED);
+  config.setRequestObjectSigningAlgValuesSupported(DEFAULT_REQUEST_OBJECT_SIGNING_ALG_VALUES_SUPPORTED);
   config.setResponseTypesSupported(DEFAULT_RESPONSE_TYPES_SUPPORTED);
   config.setSubjectTypesSupported(DEFAULT_SUBJECT_TYPES_SUPPORTED);
   config.setResponseModesSupported(DEFAULT_RESPONSE_MODES_SUPPORTED);
@@ -22,7 +24,7 @@
   config.setClaimTypesSupported(DEFAULT_CLAIM_TYPES_SUPPORTED);
   config.setClaimsParameterSupported(false);
   config.setScopesSupported(SCOPES_SUPPORTED);
-  config.setRequestParameterSupported(false);
-  config.setRequestUriParameterSupported(false);
+  config.setRequestParameterSupported(true);
+  config.setRequestUriParameterSupported(true);
   return config;
 }

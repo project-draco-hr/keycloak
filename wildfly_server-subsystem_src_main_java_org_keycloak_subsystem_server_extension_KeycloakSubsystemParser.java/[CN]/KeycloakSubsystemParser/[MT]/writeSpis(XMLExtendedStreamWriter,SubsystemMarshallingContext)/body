@@ -1,0 +1,13 @@
+{
+  if (!context.getModelNode().get(SpiResourceDefinition.TAG_NAME).isDefined()) {
+    return;
+  }
+  for (  Property spi : context.getModelNode().get(SpiResourceDefinition.TAG_NAME).asPropertyList()) {
+    writer.writeStartElement(SpiResourceDefinition.TAG_NAME);
+    writer.writeAttribute("name",spi.getName());
+    ModelNode spiElements=spi.getValue();
+    DEFAULT_PROVIDER.marshallAsElement(spiElements,writer);
+    writeProviders(writer,spiElements);
+    writer.writeEndElement();
+  }
+}

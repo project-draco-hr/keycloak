@@ -1,0 +1,11 @@
+{
+  String basicConfig="{\n" + "    \"providers\": [\n" + "        \"classpath:${jboss.home.dir}/providers/*\"\n"+ "    ],\n"+ "\n"+ "    \"admin\": {\n"+ "        \"realm\": \"master\"\n"+ "    },\n"+ "\n"+ "    \"eventsStore\": {\n"+ "        \"provider\": \"jpa\",\n"+ "        \"jpa\": {\n"+ "            \"exclude-events\": [ \"REFRESH_TOKEN\" ]\n"+ "        }\n"+ "    },\n"+ "\n"+ "    \"realm\": {\n"+ "        \"provider\": \"jpa\"\n"+ "    },\n"+ "\n"+ "    \"user\": {\n"+ "        \"provider\": \"jpa\"\n"+ "    },\n"+ "\n"+ "    \"userCache\": {\n"+ "        \"default\" : {\n"+ "            \"enabled\": true\n"+ "        }\n"+ "    },\n"+ "\n"+ "    \"userSessionPersister\": {\n"+ "        \"provider\": \"jpa\"\n"+ "    },\n"+ "\n"+ "    \"authorizationPersister\": {\n"+ "        \"provider\": \"jpa\"\n"+ "    },\n"+ "\n"+ "    \"timer\": {\n"+ "        \"provider\": \"basic\"\n"+ "    },\n"+ "\n"+ "    \"theme\": {\n"+ "        \"staticMaxAge\": 2592001,\n"+ "        \"cacheTemplates\": false,\n"+ "        \"cacheThemes\": false,\n"+ "        \"welcomeTheme\": \"welcome\",\n"+ "        \"default\": \"default\",\n"+ "        \"folder\": {\n"+ "          \"dir\": \"${jboss.home.dir}/themes\"\n";
+  if (includeModules) {
+    basicConfig+="        },\n" + "        \"module\": {\n" + "          \"modules\": [ \"org.keycloak.example.themes\" ]\n"+ "         }\n";
+  }
+ else {
+    basicConfig+="        }\n";
+  }
+  basicConfig+="     },\n" + "\n" + "    \"scheduled\": {\n"+ "        \"interval\": 900\n"+ "    },\n"+ "\n"+ "    \"connectionsHttpClient\": {\n"+ "        \"default\": {}\n"+ "    },\n"+ "\n"+ "    \"connectionsJpa\": {\n"+ "        \"default\": {\n"+ "            \"dataSource\": \"java:jboss/datasources/KeycloakDS\",\n"+ "            \"databaseSchema\": \"update\"\n"+ "        }\n"+ "    },\n"+ "\n"+ "    \"realmCache\": {\n"+ "        \"default\" : {\n"+ "            \"enabled\": true\n"+ "        }\n"+ "    },\n"+ "\n"+ "    \"connectionsInfinispan\": {\n"+ "        \"provider\": \"default\",\n"+ "        \"default\": {\n"+ "            \"cacheContainer\" : \"java:comp/env/infinispan/Keycloak\"\n"+ "        }\n"+ "    }\n"+ "}";
+  return basicConfig;
+}

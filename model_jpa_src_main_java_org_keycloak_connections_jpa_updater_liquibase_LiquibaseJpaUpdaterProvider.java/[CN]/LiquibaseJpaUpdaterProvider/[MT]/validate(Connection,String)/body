@@ -1,8 +1,12 @@
 {
   logger.debug("Validating if database is updated");
+  ThreadLocalSessionContext.setCurrentSession(session);
   try {
     Liquibase liquibase=getLiquibaseForKeycloakUpdate(connection,defaultSchema);
-    validateChangeSet(liquibase,liquibase.getChangeLogFile());
+    Status status=validateChangeSet(liquibase,liquibase.getChangeLogFile());
+    if (status != Status.VALID) {
+      return status;
+    }
     Set<JpaEntityProvider> jpaProviders=session.getAllProviders(JpaEntityProvider.class);
     for (    JpaEntityProvider jpaProvider : jpaProviders) {
       String customChangelog=jpaProvider.getChangelogLocation();
@@ -10,11 +14,14 @@
         String factoryId=jpaProvider.getFactoryId();
         String changelogTableName=JpaUtils.getCustomChangelogTableName(factoryId);
         liquibase=getLiquibaseForCustomProviderUpdate(connection,defaultSchema,customChangelog,jpaProvider.getClass().getClassLoader(),changelogTableName);
-        validateChangeSet(liquibase,liquibase.getChangeLogFile());
+        if (validateChangeSet(liquibase,liquibase.getChangeLogFile()) != Status.VALID) {
+          return Status.OUTDATED;
+        }
       }
     }
   }
  catch (  LiquibaseException e) {
     throw new RuntimeException("Failed to validate database",e);
   }
+  return Status.VALID;
 }

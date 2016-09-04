@@ -1,0 +1,13 @@
+{
+  if (!provider.hasDefined("properties"))   return;
+  ModelNode providerProps=provider.remove("properties");
+  for (  Property prop : providerProps.asPropertyList()) {
+    ModelNode value=prop.getValue();
+    if (isArray(value.asString().trim())) {
+      provider.get(prop.getName()).set(ModelNode.fromString(value.asString()).asList());
+    }
+ else {
+      provider.get(prop.getName()).set(value);
+    }
+  }
+}

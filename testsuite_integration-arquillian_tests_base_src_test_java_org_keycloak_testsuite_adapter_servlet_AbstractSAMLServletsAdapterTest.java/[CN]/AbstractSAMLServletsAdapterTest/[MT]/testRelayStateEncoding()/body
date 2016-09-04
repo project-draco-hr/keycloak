@@ -1,0 +1,8 @@
+{
+  employeeServletPage.navigateTo();
+  assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
+  testRealmSAMLPostLoginPage.form().login("bburke","password");
+  assertCurrentUrlStartsWith(employeeServletPage);
+  waitUntilElement(By.xpath("//body")).text().contains("Relay state: " + SamlSPFacade.RELAY_STATE);
+  waitUntilElement(By.xpath("//body")).text().not().contains("SAML response: null");
+}

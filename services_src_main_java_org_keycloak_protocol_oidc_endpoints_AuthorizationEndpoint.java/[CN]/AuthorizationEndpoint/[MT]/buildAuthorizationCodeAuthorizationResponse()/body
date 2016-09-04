@@ -1,4 +1,5 @@
 {
+  String idpHint=request.getIdpHint();
   if (idpHint != null && !"".equals(idpHint)) {
     IdentityProviderModel identityProviderModel=realm.getIdentityProviderByAlias(idpHint);
     if (identityProviderModel == null) {
@@ -8,5 +9,5 @@
   }
   this.event.event(EventType.LOGIN);
   clientSession.setNote(Details.AUTH_TYPE,CODE_AUTH_TYPE);
-  return handleBrowserAuthenticationRequest(clientSession,new OIDCLoginProtocol(session,realm,uriInfo,headers,event),TokenUtil.hasPrompt(prompt,OIDCLoginProtocol.PROMPT_VALUE_NONE),false);
+  return handleBrowserAuthenticationRequest(clientSession,new OIDCLoginProtocol(session,realm,uriInfo,headers,event),TokenUtil.hasPrompt(request.getPrompt(),OIDCLoginProtocol.PROMPT_VALUE_NONE),false);
 }

@@ -1,3 +1,10 @@
 {
-  return httpServletRequest.isUserInRole("manager");
+  for (  String role : checkRolesList) {
+    System.out.println("In checkRoles() checking role " + role + " for user "+ httpServletRequest.getUserPrincipal().getName());
+    if (!httpServletRequest.isUserInRole(role)) {
+      System.out.println("User is not in role " + role);
+      return false;
+    }
+  }
+  return true;
 }

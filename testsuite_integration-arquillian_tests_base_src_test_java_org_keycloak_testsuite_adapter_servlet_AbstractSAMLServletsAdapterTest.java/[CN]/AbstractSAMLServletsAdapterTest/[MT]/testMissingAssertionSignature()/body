@@ -1,0 +1,7 @@
+{
+  missingAssertionSigPage.navigateTo();
+  assertCurrentUrlStartsWith(testRealmSAMLPostLoginPage);
+  testRealmSAMLPostLoginPage.form().login("bburke","password");
+  waitUntilElement(By.xpath("//body")).text().contains("Error info: SamlAuthenticationError [reason=INVALID_SIGNATURE, status=null]");
+  assertEquals(driver.getCurrentUrl(),missingAssertionSigPage + "/saml");
+}

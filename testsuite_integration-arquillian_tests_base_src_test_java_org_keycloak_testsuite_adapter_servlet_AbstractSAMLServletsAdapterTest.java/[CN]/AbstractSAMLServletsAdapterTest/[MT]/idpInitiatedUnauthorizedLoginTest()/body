@@ -1,10 +1,11 @@
 {
-  samlidpInitiatedLogin.setAuthRealm(SAMLSERVLETDEMO);
-  samlidpInitiatedLogin.setUrlName("employee2");
-  samlidpInitiatedLogin.navigateTo();
-  samlidpInitiatedLogin.form().login("unauthorized","password");
+  samlidpInitiatedLoginPage.setAuthRealm(SAMLSERVLETDEMO);
+  samlidpInitiatedLoginPage.setUrlName("employee2");
+  samlidpInitiatedLoginPage.navigateTo();
+  samlidpInitiatedLoginPage.form().login("unauthorized","password");
   waitUntilElement(By.xpath("//body")).text().not().contains("bburke");
-  assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains("Status 403"));
-  assertForbidden(employee2ServletPage);
+  assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains(FORBIDDEN_TEXT));
+  assertForbidden(employee2ServletPage,"principal=");
   employee2ServletPage.logout();
+  checkLoggedOut(employee2ServletPage,testRealmSAMLPostLoginPage);
 }

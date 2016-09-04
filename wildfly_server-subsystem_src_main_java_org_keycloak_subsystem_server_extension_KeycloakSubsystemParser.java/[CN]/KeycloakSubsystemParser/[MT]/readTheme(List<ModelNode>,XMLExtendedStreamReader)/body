@@ -1,0 +1,17 @@
+{
+  ModelNode addThemeDefaults=new ModelNode();
+  addThemeDefaults.get(ModelDescriptionConstants.OP).set(ModelDescriptionConstants.ADD);
+  PathAddress addr=PathAddress.pathAddress(PathElement.pathElement(ModelDescriptionConstants.SUBSYSTEM,KeycloakExtension.SUBSYSTEM_NAME),PathElement.pathElement(ThemeResourceDefinition.TAG_NAME,ThemeResourceDefinition.RESOURCE_NAME));
+  addThemeDefaults.get(ModelDescriptionConstants.OP_ADDR).set(addr.toModelNode());
+  list.add(addThemeDefaults);
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    String tagName=reader.getLocalName();
+    if (MODULES.getName().equals(tagName)) {
+      readModules(reader,addThemeDefaults);
+      continue;
+    }
+    SimpleAttributeDefinition def=KeycloakExtension.THEME_DEFINITION.lookup(tagName);
+    if (def == null)     throw new XMLStreamException("Unknown theme tag " + tagName);
+    def.parseAndSetParameter(reader.getElementText(),addThemeDefaults,reader);
+  }
+}

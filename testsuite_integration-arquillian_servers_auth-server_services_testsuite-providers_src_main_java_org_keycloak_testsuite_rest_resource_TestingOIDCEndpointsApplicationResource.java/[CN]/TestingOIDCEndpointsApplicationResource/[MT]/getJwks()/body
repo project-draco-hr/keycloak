@@ -1,0 +1,10 @@
+{
+  JSONWebKeySet keySet=new JSONWebKeySet();
+  if (clientData.getSigningKeyPair() == null) {
+    keySet.setKeys(new JWK[]{});
+  }
+ else {
+    keySet.setKeys(new JWK[]{JWKBuilder.create().rs256(clientData.getSigningKeyPair().getPublic())});
+  }
+  return keySet;
+}

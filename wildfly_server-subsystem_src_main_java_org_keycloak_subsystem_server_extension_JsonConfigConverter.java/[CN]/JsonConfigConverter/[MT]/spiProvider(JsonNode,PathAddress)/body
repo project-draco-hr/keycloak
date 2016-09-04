@@ -1,0 +1,26 @@
+{
+  ModelNode op=Util.createAddOperation(providerAddr);
+  ModelNode properties=new ModelNode();
+  Iterator<String> propNames=providerNode.fieldNames();
+  while (propNames.hasNext()) {
+    String propName=propNames.next();
+    if ("enabled".equals(propName)) {
+      op.get(ProviderResourceDefinition.ENABLED.getName()).set(providerNode.get(propName).asBoolean());
+    }
+ else {
+      if (providerNode.get(propName).isArray()) {
+        properties.get(propName).set(makeArrayText(providerNode.get(propName)));
+      }
+ else {
+        properties.get(propName).set(providerNode.get(propName).asText());
+      }
+    }
+  }
+  if (properties.isDefined() && !properties.asPropertyList().isEmpty()) {
+    op.get("properties").set(properties);
+  }
+  if (!op.hasDefined(ProviderResourceDefinition.ENABLED.getName())) {
+    op.get(ProviderResourceDefinition.ENABLED.getName()).set(ProviderResourceDefinition.ENABLED.getDefaultValue());
+  }
+  return op;
+}

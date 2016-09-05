@@ -1,0 +1,11 @@
+{
+  if (working) {
+    ignored.incrementAndGet();
+    Element testcase=createTestCase(description);
+    Element skipped=xml.createElement("skipped");
+    skipped.setAttribute("message",safeString(description.getAnnotation(Ignore.class).value()));
+    testcase.appendChild(skipped);
+    testsuite.get().appendChild(testcase);
+    writeXml();
+  }
+}

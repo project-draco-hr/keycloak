@@ -1,0 +1,29 @@
+{
+  Element testsuite=this.testsuite.get();
+  testsuite.setAttribute("tests",Integer.toString(tests.get()));
+  testsuite.setAttribute("errors",Integer.toString(errors.get()));
+  testsuite.setAttribute("skipped",Integer.toString(ignored.get()));
+  testsuite.setAttribute("failures",Integer.toString(failures.get()));
+  testsuite.setAttribute("time",computeTestTime(suiteStartTime.get()));
+  try {
+    Writer writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile,false),Charset.forName("UTF-8")));
+    try {
+      Transformer t=TransformerFactory.newInstance().newTransformer();
+      t.setOutputProperty(OutputKeys.INDENT,"yes");
+      t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount","4");
+      t.transform(new DOMSource(xml),new StreamResult(writer));
+    }
+ catch (    TransformerConfigurationException ex) {
+      LOGGER.error("Misconfigured transformer",ex);
+    }
+catch (    TransformerException ex) {
+      LOGGER.error("Unable to save XML file",ex);
+    }
+ finally {
+      writer.close();
+    }
+  }
+ catch (  IOException ex) {
+    LOGGER.warn("Unable to open report file",ex);
+  }
+}

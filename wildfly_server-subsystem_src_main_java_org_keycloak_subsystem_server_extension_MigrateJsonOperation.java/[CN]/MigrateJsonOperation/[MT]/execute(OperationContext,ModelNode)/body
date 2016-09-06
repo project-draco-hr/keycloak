@@ -1,0 +1,16 @@
+{
+  List<ModelNode> ops=null;
+  try {
+    PathAddress currentAddr=context.getCurrentAddress();
+    ops=JsonConfigConverter.convertJsonConfig(readConfig(operation),currentAddr);
+  }
+ catch (  IOException ioe) {
+    throw new OperationFailedException(ioe);
+  }
+  for (  ModelNode op : ops) {
+    PathAddress addr=PathAddress.pathAddress(op.get(ADDRESS));
+    String opName=op.get(OP).asString();
+    context.addStep(op,context.getRootResourceRegistration().getOperationHandler(addr,opName),OperationContext.Stage.MODEL);
+  }
+  context.completeStep(OperationContext.RollbackHandler.NOOP_ROLLBACK_HANDLER);
+}

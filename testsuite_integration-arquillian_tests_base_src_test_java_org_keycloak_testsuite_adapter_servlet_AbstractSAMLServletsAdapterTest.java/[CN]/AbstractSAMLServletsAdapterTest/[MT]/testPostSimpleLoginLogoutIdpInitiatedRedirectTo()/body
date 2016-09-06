@@ -1,0 +1,11 @@
+{
+  samlidpInitiatedLoginPage.setAuthRealm(SAMLSERVLETDEMO);
+  samlidpInitiatedLoginPage.setUrlName("sales-post2");
+  samlidpInitiatedLoginPage.navigateTo();
+  samlidpInitiatedLoginPage.form().login(bburkeUser);
+  assertCurrentUrlStartsWith(salesPost2ServletPage);
+  assertTrue(driver.getCurrentUrl().endsWith("/foo"));
+  waitUntilElement(By.xpath("//body")).text().contains("principal=bburke");
+  salesPost2ServletPage.logout();
+  checkLoggedOut(salesPost2ServletPage,testRealmSAMLPostLoginPage);
+}

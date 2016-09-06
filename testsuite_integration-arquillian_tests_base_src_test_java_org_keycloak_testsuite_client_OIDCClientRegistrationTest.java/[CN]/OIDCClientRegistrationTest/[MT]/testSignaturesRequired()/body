@@ -1,0 +1,13 @@
+{
+  OIDCClientRepresentation clientRep=createRep();
+  clientRep.setUserinfoSignedResponseAlg(Algorithm.RS256.toString());
+  clientRep.setRequestObjectSigningAlg(Algorithm.RS256.toString());
+  OIDCClientRepresentation response=reg.oidc().create(clientRep);
+  Assert.assertEquals(Algorithm.RS256.toString(),response.getUserinfoSignedResponseAlg());
+  Assert.assertEquals(Algorithm.RS256.toString(),response.getRequestObjectSigningAlg());
+  Assert.assertNotNull(response.getClientSecret());
+  ClientRepresentation kcClient=getClient(response.getClientId());
+  OIDCAdvancedConfigWrapper config=OIDCAdvancedConfigWrapper.fromClientRepresentation(kcClient);
+  Assert.assertEquals(config.getUserInfoSignedResponseAlg(),Algorithm.RS256);
+  Assert.assertEquals(config.getRequestObjectSignatureAlg(),Algorithm.RS256);
+}

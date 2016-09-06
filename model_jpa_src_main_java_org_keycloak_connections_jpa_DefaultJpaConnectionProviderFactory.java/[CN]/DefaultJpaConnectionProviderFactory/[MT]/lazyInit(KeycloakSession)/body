@@ -30,22 +30,9 @@ synchronized (this) {
         if (schema != null) {
           properties.put(JpaUtils.HIBERNATE_DEFAULT_SCHEMA,schema);
         }
-        String databaseSchema;
-        String databaseSchemaConf=config.get("databaseSchema");
-        if (databaseSchemaConf == null) {
-          throw new RuntimeException("Property 'databaseSchema' needs to be specified in the configuration");
-        }
-        if (databaseSchemaConf.equals("development-update")) {
-          properties.put("hibernate.hbm2ddl.auto","update");
-          databaseSchema=null;
-        }
- else         if (databaseSchemaConf.equals("development-validate")) {
-          properties.put("hibernate.hbm2ddl.auto","validate");
-          databaseSchema=null;
-        }
- else {
-          databaseSchema=databaseSchemaConf;
-        }
+        MigrationStrategy migrationStrategy=getMigrationStrategy();
+        boolean initializeEmpty=config.getBoolean("initializeEmpty",true);
+        File databaseUpdateFile=getDatabaseUpdateFile();
         properties.put("hibernate.show_sql",config.getBoolean("showSql",false));
         properties.put("hibernate.format_sql",config.getBoolean("formatSql",true));
         Connection connection=getConnection();
@@ -55,34 +42,7 @@ synchronized (this) {
           if (driverDialect != null) {
             properties.put("hibernate.dialect",driverDialect);
           }
-          if (databaseSchema != null) {
-            logger.trace("Updating database");
-            JpaUpdaterProvider updater=session.getProvider(JpaUpdaterProvider.class);
-            if (updater == null) {
-              throw new RuntimeException("Can't update database: JPA updater provider not found");
-            }
-            DBLockProvider dbLock=new DBLockManager(session).getDBLock();
-            if (dbLock.hasLock()) {
-              updateOrValidateDB(databaseSchema,connection,updater,schema);
-            }
- else {
-              logger.trace("Don't have DBLock retrieved before upgrade. Needs to acquire lock first in separate transaction");
-              KeycloakModelUtils.runJobInTransaction(session.getKeycloakSessionFactory(),new KeycloakSessionTask(){
-                @Override public void run(                KeycloakSession lockSession){
-                  DBLockManager dbLockManager=new DBLockManager(lockSession);
-                  DBLockProvider dbLock2=dbLockManager.getDBLock();
-                  dbLock2.waitForLock();
-                  try {
-                    updateOrValidateDB(databaseSchema,connection,updater,schema);
-                  }
-  finally {
-                    dbLock2.releaseLock();
-                  }
-                }
-              }
-);
-            }
-          }
+          migration(migrationStrategy,initializeEmpty,schema,databaseUpdateFile,connection,session);
           int globalStatsInterval=config.getInt("globalStatsInterval",-1);
           if (globalStatsInterval != -1) {
             properties.put("hibernate.generate_statistics",true);
@@ -94,18 +54,7 @@ synchronized (this) {
             startGlobalStats(session,globalStatsInterval);
           }
         }
- catch (        Exception e) {
-          if (connection != null) {
-            try {
-              connection.rollback();
-            }
- catch (            SQLException e2) {
-              logger.warn("Can't rollback connection",e2);
-            }
-          }
-          throw e;
-        }
- finally {
+  finally {
           if (connection != null) {
             try {
               connection.close();

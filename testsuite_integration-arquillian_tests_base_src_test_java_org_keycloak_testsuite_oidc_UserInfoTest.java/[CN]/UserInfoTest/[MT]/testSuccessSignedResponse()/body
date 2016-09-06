@@ -1,0 +1,33 @@
+{
+  ClientResource clientResource=ApiUtil.findClientByClientId(adminClient.realm("test"),"test-app");
+  ClientRepresentation clientRep=clientResource.toRepresentation();
+  OIDCAdvancedConfigWrapper.fromClientRepresentation(clientRep).setUserInfoSignedResponseAlg(Algorithm.RS256);
+  clientResource.update(clientRep);
+  Client client=ClientBuilder.newClient();
+  try {
+    AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(client);
+    Response response=UserInfoClientUtil.executeUserInfoRequest_getMethod(client,accessTokenResponse.getToken());
+    events.expect(EventType.USER_INFO_REQUEST).session(Matchers.notNullValue(String.class)).detail(Details.AUTH_METHOD,Details.VALIDATE_ACCESS_TOKEN).detail(Details.USERNAME,"test-user@localhost").detail(Details.SIGNATURE_REQUIRED,"true").detail(Details.SIGNATURE_ALGORITHM,Algorithm.RS256.toString()).assertEvent();
+    RealmRepresentation realmRep=adminClient.realm("test").toRepresentation();
+    PublicKey publicKey=KeycloakModelUtils.getPublicKey(realmRep.getPublicKey());
+    Assert.assertEquals(200,response.getStatus());
+    Assert.assertEquals(response.getHeaderString(HttpHeaders.CONTENT_TYPE),MediaType.APPLICATION_JWT);
+    String signedResponse=response.readEntity(String.class);
+    response.close();
+    JWSInput jwsInput=new JWSInput(signedResponse);
+    Assert.assertTrue(RSAProvider.verify(jwsInput,publicKey));
+    UserInfo userInfo=JsonSerialization.readValue(jwsInput.getContent(),UserInfo.class);
+    Assert.assertNotNull(userInfo);
+    Assert.assertNotNull(userInfo.getSubject());
+    Assert.assertEquals("test-user@localhost",userInfo.getEmail());
+    Assert.assertEquals("test-user@localhost",userInfo.getPreferredUsername());
+    Assert.assertTrue(userInfo.hasAudience("test-app"));
+    String expectedIssuer=Urls.realmIssuer(new URI(AUTH_SERVER_ROOT),"test");
+    Assert.assertEquals(expectedIssuer,userInfo.getIssuer());
+  }
+  finally {
+    client.close();
+  }
+  OIDCAdvancedConfigWrapper.fromClientRepresentation(clientRep).setUserInfoSignedResponseAlg(null);
+  clientResource.update(clientRep);
+}

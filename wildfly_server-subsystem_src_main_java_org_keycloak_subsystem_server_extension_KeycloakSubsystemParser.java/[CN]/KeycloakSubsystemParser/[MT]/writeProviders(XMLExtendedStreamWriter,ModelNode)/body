@@ -1,0 +1,13 @@
+{
+  if (!spiElements.get(ProviderResourceDefinition.TAG_NAME).isDefined()) {
+    return;
+  }
+  for (  Property provider : spiElements.get(ProviderResourceDefinition.TAG_NAME).asPropertyList()) {
+    writer.writeStartElement(ProviderResourceDefinition.TAG_NAME);
+    writer.writeAttribute("name",provider.getName());
+    ModelNode providerElements=provider.getValue();
+    ENABLED.marshallAsAttribute(providerElements,writer);
+    PROPERTIES.marshallAsElement(providerElements,writer);
+    writer.writeEndElement();
+  }
+}

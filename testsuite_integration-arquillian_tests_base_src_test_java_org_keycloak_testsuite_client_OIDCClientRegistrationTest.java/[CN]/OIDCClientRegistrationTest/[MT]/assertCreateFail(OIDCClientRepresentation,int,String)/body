@@ -1,0 +1,13 @@
+{
+  try {
+    reg.oidc().create(client);
+    Assert.fail("Not expected to successfuly register client");
+  }
+ catch (  ClientRegistrationException expected) {
+    HttpErrorException httpEx=(HttpErrorException)expected.getCause();
+    Assert.assertEquals(expectedStatusCode,httpEx.getStatusLine().getStatusCode());
+    if (expectedErrorContains != null) {
+      assertTrue("Error response doesn't contain expected text",httpEx.getErrorResponse().contains(expectedErrorContains));
+    }
+  }
+}

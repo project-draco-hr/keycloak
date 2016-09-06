@@ -1,0 +1,8 @@
+{
+  if (!operation.get(OP).asString().equals(ADD)) {
+    throw new OperationFailedException("Unexpected operation for add SPI. operation=" + operation.toString());
+  }
+  ProviderResourceDefinition.ENABLED.validateAndSet(operation,model);
+  ProviderResourceDefinition.PROPERTIES.validateAndSet(operation,model);
+  KeycloakAdapterConfigService.INSTANCE.updateConfig(operation,model);
+}

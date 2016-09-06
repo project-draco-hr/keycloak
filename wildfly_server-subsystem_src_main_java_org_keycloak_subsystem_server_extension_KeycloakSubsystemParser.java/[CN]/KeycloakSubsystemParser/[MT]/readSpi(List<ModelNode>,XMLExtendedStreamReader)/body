@@ -1,0 +1,16 @@
+{
+  String spiName=ParseUtils.requireAttributes(reader,"name")[0];
+  ModelNode addSpi=new ModelNode();
+  addSpi.get(ModelDescriptionConstants.OP).set(ModelDescriptionConstants.ADD);
+  PathAddress addr=PathAddress.pathAddress(PathElement.pathElement(ModelDescriptionConstants.SUBSYSTEM,KeycloakExtension.SUBSYSTEM_NAME),PathElement.pathElement(SpiResourceDefinition.TAG_NAME,spiName));
+  addSpi.get(ModelDescriptionConstants.OP_ADDR).set(addr.toModelNode());
+  list.add(addSpi);
+  while (reader.hasNext() && nextTag(reader) != END_ELEMENT) {
+    if (reader.getLocalName().equals(DEFAULT_PROVIDER.getXmlName())) {
+      DEFAULT_PROVIDER.parseAndSetParameter(reader.getElementText(),addSpi,reader);
+    }
+ else     if (reader.getLocalName().equals(ProviderResourceDefinition.TAG_NAME)) {
+      readProvider(list,spiName,reader);
+    }
+  }
+}

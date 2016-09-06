@@ -1,0 +1,13 @@
+{
+  if (!context.get(def.getName()).isDefined()) {
+    return;
+  }
+  writer.writeStartElement(def.getXmlName());
+  ModelNode modules=context.get(def.getName());
+  for (  ModelNode module : modules.asList()) {
+    writer.writeStartElement(elementName);
+    writer.writeCharacters(module.asString());
+    writer.writeEndElement();
+  }
+  writer.writeEndElement();
+}

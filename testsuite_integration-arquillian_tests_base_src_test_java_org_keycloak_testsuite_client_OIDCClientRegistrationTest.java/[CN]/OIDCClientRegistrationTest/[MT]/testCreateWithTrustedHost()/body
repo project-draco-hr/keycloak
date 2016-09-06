@@ -1,26 +1,11 @@
 {
   reg.auth(null);
   OIDCClientRepresentation client=createRep();
-  try {
-    reg.oidc().create(client);
-    Assert.fail("Not expected to successfuly register client");
-  }
- catch (  ClientRegistrationException expected) {
-    HttpErrorException httpEx=(HttpErrorException)expected.getCause();
-    Assert.assertEquals(401,httpEx.getStatusLine().getStatusCode());
-  }
-  Response response=adminClient.realm(REALM_NAME).clientRegistrationTrustedHost().create(ClientRegistrationTrustedHostRepresentation.create("localhost",2,2));
-  Assert.assertEquals(201,response.getStatus());
+  assertCreateFail(client,401);
+  createTrustedHost("localhost",2);
   reg.oidc().create(client);
   ClientRegistrationTrustedHostRepresentation rep=adminClient.realm(REALM_NAME).clientRegistrationTrustedHost().get("localhost");
   Assert.assertEquals(1,rep.getRemainingCount().intValue());
   reg.oidc().create(client);
-  try {
-    reg.oidc().create(client);
-    Assert.fail("Not expected to successfuly register client");
-  }
- catch (  ClientRegistrationException expected) {
-    HttpErrorException httpEx=(HttpErrorException)expected.getCause();
-    Assert.assertEquals(401,httpEx.getStatusLine().getStatusCode());
-  }
+  assertCreateFail(client,401);
 }

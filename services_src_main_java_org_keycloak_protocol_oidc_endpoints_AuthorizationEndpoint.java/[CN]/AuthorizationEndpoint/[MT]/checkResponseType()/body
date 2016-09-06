@@ -1,4 +1,5 @@
 {
+  String responseType=request.getResponseType();
   if (responseType == null) {
     logger.missingParameter(OAuth2Constants.RESPONSE_TYPE);
     event.error(Errors.INVALID_REQUEST);
@@ -18,7 +19,7 @@
   }
   OIDCResponseMode parsedResponseMode=null;
   try {
-    parsedResponseMode=OIDCResponseMode.parse(responseMode,parsedResponseType);
+    parsedResponseMode=OIDCResponseMode.parse(request.getResponseMode(),parsedResponseType);
   }
  catch (  IllegalArgumentException iae) {
     logger.invalidParameter(OIDCLoginProtocol.RESPONSE_MODE_PARAM);

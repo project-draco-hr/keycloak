@@ -1,0 +1,23 @@
+{
+  Map<String,Object> oidcRequest=new HashMap<>();
+  oidcRequest.put(OIDCLoginProtocol.CLIENT_ID_PARAM,clientId);
+  oidcRequest.put(OIDCLoginProtocol.RESPONSE_TYPE_PARAM,OAuth2Constants.CODE);
+  oidcRequest.put(OIDCLoginProtocol.REDIRECT_URI_PARAM,redirectUri);
+  if (maxAge != null) {
+    oidcRequest.put(OIDCLoginProtocol.MAX_AGE_PARAM,Integer.parseInt(maxAge));
+  }
+  Algorithm alg=Enum.valueOf(Algorithm.class,jwaAlgorithm);
+  if (alg == Algorithm.none) {
+    clientData.setOidcRequest(new JWSBuilder().jsonContent(oidcRequest).none());
+  }
+ else   if (alg == Algorithm.RS256) {
+    if (clientData.getSigningKeyPair() == null) {
+      throw new BadRequestException("Requested RS256, but signing key not set");
+    }
+    PrivateKey privateKey=clientData.getSigningKeyPair().getPrivate();
+    clientData.setOidcRequest(new JWSBuilder().jsonContent(oidcRequest).rsa256(privateKey));
+  }
+ else {
+    throw new BadRequestException("Unknown argument: " + jwaAlgorithm);
+  }
+}

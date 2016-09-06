@@ -1,0 +1,17 @@
+{
+  List<ModelNode> spiAndProviders=new ArrayList<>();
+  ModelNode op=Util.createAddOperation(spiAddr);
+  spiAndProviders.add(op);
+  Iterator<String> providerIterator=root.get(spiName).fieldNames();
+  while (providerIterator.hasNext()) {
+    String providerName=providerIterator.next();
+    if ("provider".equals(providerName)) {
+      op.get(SpiResourceDefinition.DEFAULT_PROVIDER.getName()).set(getNode(root,spiName,"provider").asText());
+    }
+ else {
+      PathAddress providerAddr=spiAddr.append("provider",providerName);
+      spiAndProviders.add(spiProvider(getNode(root,spiName,providerName),providerAddr));
+    }
+  }
+  return spiAndProviders;
+}

@@ -1,0 +1,20 @@
+{
+  WarMetaData warMetaData=deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
+  if (warMetaData == null) {
+    throw new DeploymentUnitProcessingException("WarMetaData not found for KeycloakServer.");
+  }
+  JBossWebMetaData webMetaData=warMetaData.getMergedJBossWebMetaData();
+  if (webMetaData == null) {
+    webMetaData=new JBossWebMetaData();
+    warMetaData.setMergedJBossWebMetaData(webMetaData);
+  }
+  List<ParamValueMetaData> contextParams=webMetaData.getContextParams();
+  if (contextParams == null) {
+    contextParams=new ArrayList<ParamValueMetaData>();
+  }
+  ParamValueMetaData param=new ParamValueMetaData();
+  param.setParamName(KEYCLOAK_CONFIG_PARAM_NAME);
+  param.setParamValue(configService.getConfig().toString());
+  contextParams.add(param);
+  webMetaData.setContextParams(contextParams);
+}

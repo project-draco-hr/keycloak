@@ -1,0 +1,18 @@
+{
+  final String federationName="KerberosProvider";
+  userFederationPage.addFederation("kerberos");
+  assertTrue(createKerberosUserProviderPage.isCurrent());
+  createKerberosUserProviderPage.form().setConsoleDisplayNameInput(federationName);
+  createKerberosUserProviderPage.form().setKerberosRealmInput("KEYCLOAK.ORG");
+  createKerberosUserProviderPage.form().setServerPrincipalInput("HTTP/localhost@KEYCLOAK.ORG");
+  createKerberosUserProviderPage.form().setKeyTabInput("http.keytab");
+  createKerberosUserProviderPage.form().save();
+  assertAlertSuccess();
+  userFederationPage.navigateTo();
+  assertEquals(1,userFederationPage.table().getFederationsCount());
+  userFederationPage.table().editFederation(federationName);
+  assertEquals(federationName,createKerberosUserProviderPage.form().getConsoleDisplayNameInput());
+  userFederationPage.navigateTo();
+  userFederationPage.table().removeFederation(federationName);
+  assertEquals(0,userFederationPage.table().getFederationsCount());
+}

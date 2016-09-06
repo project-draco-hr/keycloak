@@ -1,0 +1,16 @@
+{
+  PathAddress address=PathAddress.pathAddress(operation.get(ADDRESS));
+  address=address.subAddress(1);
+  ModelNode newConfig=fullConfig.clone();
+  ModelNode subNode=newConfig;
+  for (  PathElement pathElement : address) {
+    subNode=subNode.get(pathElement.getKey(),pathElement.getValue());
+  }
+  subNode.set(config.clone());
+  for (  Property prop : subNode.asPropertyList()) {
+    if (!prop.getValue().isDefined()) {
+      subNode.remove(prop.getName());
+    }
+  }
+  fullConfig=newConfig;
+}

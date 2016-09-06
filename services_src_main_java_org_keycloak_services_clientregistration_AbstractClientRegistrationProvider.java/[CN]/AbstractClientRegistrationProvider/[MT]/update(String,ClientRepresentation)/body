@@ -5,6 +5,11 @@
   if (!client.getClientId().equals(rep.getClientId())) {
     throw new ErrorResponseException(ErrorCodes.INVALID_CLIENT_METADATA,"Client Identifier modified",Response.Status.BAD_REQUEST);
   }
+  ValidationMessages validationMessages=new ValidationMessages();
+  if (!ClientValidator.validate(rep,validationMessages)) {
+    String errorCode=validationMessages.fieldHasError("redirectUris") ? ErrorCodes.INVALID_REDIRECT_URI : ErrorCodes.INVALID_CLIENT_METADATA;
+    throw new ErrorResponseException(errorCode,validationMessages.getStringMessages(),Response.Status.BAD_REQUEST);
+  }
   RepresentationToModel.updateClient(rep,client);
   rep=ModelToRepresentation.toRepresentation(client);
   if (auth.isRegistrationAccessToken()) {

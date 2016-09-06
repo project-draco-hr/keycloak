@@ -1,24 +1,3 @@
 {
-  logger.debug("Starting database update");
-  ThreadLocalSessionContext.setCurrentSession(session);
-  try {
-    Liquibase liquibase=getLiquibaseForKeycloakUpdate(connection,defaultSchema);
-    updateChangeSet(liquibase,liquibase.getChangeLogFile());
-    Set<JpaEntityProvider> jpaProviders=session.getAllProviders(JpaEntityProvider.class);
-    for (    JpaEntityProvider jpaProvider : jpaProviders) {
-      String customChangelog=jpaProvider.getChangelogLocation();
-      if (customChangelog != null) {
-        String factoryId=jpaProvider.getFactoryId();
-        String changelogTableName=JpaUtils.getCustomChangelogTableName(factoryId);
-        liquibase=getLiquibaseForCustomProviderUpdate(connection,defaultSchema,customChangelog,jpaProvider.getClass().getClassLoader(),changelogTableName);
-        updateChangeSet(liquibase,liquibase.getChangeLogFile());
-      }
-    }
-  }
- catch (  Exception e) {
-    throw new RuntimeException("Failed to update database",e);
-  }
- finally {
-    ThreadLocalSessionContext.removeCurrentSession();
-  }
+  update(connection,null,defaultSchema);
 }

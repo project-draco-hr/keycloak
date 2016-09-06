@@ -1,0 +1,11 @@
+{
+  if (!spi.hasDefined("provider"))   return;
+  ModelNode providers=spi.remove("provider");
+  for (  Property prop : providers.asPropertyList()) {
+    ModelNode provider=prop.getValue();
+    if (provider.has("properties")) {
+      massageProviderProps(provider);
+    }
+    spi.get(prop.getName()).set(provider);
+  }
+}

@@ -1,0 +1,9 @@
+{
+  JsonNode targetNode=getNode(root,"admin","realm");
+  String value=MASTER_REALM_NAME.getDefaultValue().asString();
+  if (targetNode != null)   value=targetNode.asText(value);
+  ModelNode op=Util.createOperation(WRITE_ATTRIBUTE_OPERATION,addr);
+  op.get("name").set(MASTER_REALM_NAME.getName());
+  op.get("value").set(value);
+  return op;
+}

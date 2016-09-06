@@ -1,0 +1,22 @@
+{
+  DBLockProvider dbLock=new DBLockManager(session).getDBLock();
+  if (dbLock.hasLock()) {
+    updater.export(connection,schema,databaseUpdateFile);
+  }
+ else {
+    KeycloakModelUtils.runJobInTransaction(session.getKeycloakSessionFactory(),new KeycloakSessionTask(){
+      @Override public void run(      KeycloakSession lockSession){
+        DBLockManager dbLockManager=new DBLockManager(lockSession);
+        DBLockProvider dbLock2=dbLockManager.getDBLock();
+        dbLock2.waitForLock();
+        try {
+          updater.export(connection,schema,databaseUpdateFile);
+        }
+  finally {
+          dbLock2.releaseLock();
+        }
+      }
+    }
+);
+  }
+}

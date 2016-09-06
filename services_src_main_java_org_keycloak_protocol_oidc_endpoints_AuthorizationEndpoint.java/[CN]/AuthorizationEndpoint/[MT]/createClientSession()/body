@@ -3,20 +3,20 @@
   clientSession.setAuthMethod(OIDCLoginProtocol.LOGIN_PROTOCOL);
   clientSession.setRedirectUri(redirectUri);
   clientSession.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
-  clientSession.setNote(OIDCLoginProtocol.RESPONSE_TYPE_PARAM,responseType);
-  clientSession.setNote(OIDCLoginProtocol.REDIRECT_URI_PARAM,redirectUriParam);
+  clientSession.setNote(OIDCLoginProtocol.RESPONSE_TYPE_PARAM,request.getResponseType());
+  clientSession.setNote(OIDCLoginProtocol.REDIRECT_URI_PARAM,request.getRedirectUriParam());
   clientSession.setNote(OIDCLoginProtocol.ISSUER,Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName()));
-  if (state != null)   clientSession.setNote(OIDCLoginProtocol.STATE_PARAM,state);
-  if (nonce != null)   clientSession.setNote(OIDCLoginProtocol.NONCE_PARAM,nonce);
-  if (maxAge != null)   clientSession.setNote(OIDCLoginProtocol.MAX_AGE_PARAM,maxAge);
-  if (scope != null)   clientSession.setNote(OIDCLoginProtocol.SCOPE_PARAM,scope);
-  if (loginHint != null)   clientSession.setNote(OIDCLoginProtocol.LOGIN_HINT_PARAM,loginHint);
-  if (prompt != null)   clientSession.setNote(OIDCLoginProtocol.PROMPT_PARAM,prompt);
-  if (idpHint != null)   clientSession.setNote(AdapterConstants.KC_IDP_HINT,idpHint);
-  if (responseMode != null)   clientSession.setNote(OIDCLoginProtocol.RESPONSE_MODE_PARAM,responseMode);
-  if (additionalReqParams != null) {
-    for (    String paramName : additionalReqParams.keySet()) {
-      clientSession.setNote(CLIENT_SESSION_NOTE_ADDITIONAL_REQ_PARAMS_PREFIX + paramName,additionalReqParams.get(paramName));
+  if (request.getState() != null)   clientSession.setNote(OIDCLoginProtocol.STATE_PARAM,request.getState());
+  if (request.getNonce() != null)   clientSession.setNote(OIDCLoginProtocol.NONCE_PARAM,request.getNonce());
+  if (request.getMaxAge() != null)   clientSession.setNote(OIDCLoginProtocol.MAX_AGE_PARAM,String.valueOf(request.getMaxAge()));
+  if (request.getScope() != null)   clientSession.setNote(OIDCLoginProtocol.SCOPE_PARAM,request.getScope());
+  if (request.getLoginHint() != null)   clientSession.setNote(OIDCLoginProtocol.LOGIN_HINT_PARAM,request.getLoginHint());
+  if (request.getPrompt() != null)   clientSession.setNote(OIDCLoginProtocol.PROMPT_PARAM,request.getPrompt());
+  if (request.getIdpHint() != null)   clientSession.setNote(AdapterConstants.KC_IDP_HINT,request.getIdpHint());
+  if (request.getResponseMode() != null)   clientSession.setNote(OIDCLoginProtocol.RESPONSE_MODE_PARAM,request.getResponseMode());
+  if (request.getAdditionalReqParams() != null) {
+    for (    String paramName : request.getAdditionalReqParams().keySet()) {
+      clientSession.setNote(CLIENT_SESSION_NOTE_ADDITIONAL_REQ_PARAMS_PREFIX + paramName,request.getAdditionalReqParams().get(paramName));
     }
   }
 }

@@ -1,5 +1,10 @@
 {
   auth.requireManage();
+  ValidationMessages validationMessages=new ValidationMessages();
+  if (!ClientValidator.validate(rep,validationMessages)) {
+    Properties messages=AdminRoot.getMessages(session,realm,auth.getAuth().getToken().getLocale());
+    throw new ErrorResponseException(validationMessages.getStringMessages(),validationMessages.getStringMessages(messages),Response.Status.BAD_REQUEST);
+  }
   try {
     ClientModel clientModel=ClientManager.createClient(session,realm,rep,true);
     adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,clientModel.getId()).representation(rep).success();

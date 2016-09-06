@@ -1,5 +1,6 @@
 {
   if (suiteContext.isAuthServerMigrationEnabled()) {
-    containerController.get().stop(suiteContext.getAuthServerInfo().getQualifier());
+    log.info("## STOP old container: " + suiteContext.getMigratedAuthServerInfo().getQualifier());
+    stopContainerEvent.fire(new StopContainer(suiteContext.getMigratedAuthServerInfo().getArquillianContainer()));
   }
 }

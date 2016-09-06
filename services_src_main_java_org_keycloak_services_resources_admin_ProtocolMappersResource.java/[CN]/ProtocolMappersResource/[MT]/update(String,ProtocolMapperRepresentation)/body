@@ -6,6 +6,7 @@
   ProtocolMapperModel model=client.getProtocolMapperById(id);
   if (model == null)   throw new NotFoundException("Model not found");
   model=RepresentationToModel.toModel(rep);
+  validateModel(model);
   client.updateProtocolMapper(model);
   adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo).representation(rep).success();
 }

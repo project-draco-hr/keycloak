@@ -28,7 +28,7 @@ catch (  IOException e) {
   refreshToken=tokenResponse.getRefreshToken();
   idTokenString=tokenResponse.getIdToken();
   try {
-    token=RSATokenVerifier.verifyToken(tokenString,deployment.getRealmKey(),deployment.getRealmInfoUrl());
+    token=AdapterRSATokenVerifier.verifyToken(tokenString,deployment);
     if (idTokenString != null) {
       try {
         JWSInput input=new JWSInput(idTokenString);

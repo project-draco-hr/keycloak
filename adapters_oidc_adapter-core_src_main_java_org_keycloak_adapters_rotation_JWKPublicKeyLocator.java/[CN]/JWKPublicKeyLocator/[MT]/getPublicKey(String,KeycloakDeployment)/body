@@ -1,0 +1,21 @@
+{
+  int minTimeBetweenRequests=deployment.getMinTimeBetweenJwksRequests();
+  PublicKey publicKey=currentKeys.get(kid);
+  if (publicKey != null) {
+    return publicKey;
+  }
+  int currentTime=Time.currentTime();
+  if (currentTime > lastRequestTime + minTimeBetweenRequests) {
+synchronized (this) {
+      currentTime=Time.currentTime();
+      if (currentTime > lastRequestTime + minTimeBetweenRequests) {
+        sendRequest(deployment);
+        lastRequestTime=currentTime;
+      }
+ else {
+        log.infof("Won't send request to realm jwks url. Last request time was %d",lastRequestTime);
+      }
+    }
+  }
+  return currentKeys.get(kid);
+}

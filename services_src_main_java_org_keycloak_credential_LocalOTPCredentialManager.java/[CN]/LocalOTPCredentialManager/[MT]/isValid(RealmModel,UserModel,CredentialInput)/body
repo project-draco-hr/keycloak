@@ -1,0 +1,34 @@
+{
+  if (!(input instanceof UserCredentialModel)) {
+    logger.debug("Expected instance of UserCredentialModel for CredentialInput");
+    return false;
+  }
+  String token=((UserCredentialModel)input).getValue();
+  OTPPolicy policy=realm.getOTPPolicy();
+  if (realm.getOTPPolicy().getType().equals(CredentialModel.HOTP)) {
+    HmacOTP validator=new HmacOTP(policy.getDigits(),policy.getAlgorithm(),policy.getLookAheadWindow());
+    for (    CredentialModel cred : getCredentialStore().getStoredCredentialsByType(realm,user,CredentialModel.HOTP)) {
+      int counter=validator.validateHOTP(token,cred.getValue(),cred.getCounter());
+      if (counter < 0)       continue;
+      cred.setCounter(counter);
+      getCredentialStore().updateCredential(realm,user,cred);
+      return true;
+    }
+  }
+ else {
+    TimeBasedOTP validator=new TimeBasedOTP(policy.getAlgorithm(),policy.getDigits(),policy.getPeriod(),policy.getLookAheadWindow());
+    List<CredentialModel> creds=getCachedCredentials(user,CredentialModel.TOTP);
+    if (creds.isEmpty()) {
+      creds=getCredentialStore().getStoredCredentialsByType(realm,user,CredentialModel.TOTP);
+    }
+ else {
+      logger.debugv("Cache hit for TOTP for user {0}",user.getUsername());
+    }
+    for (    CredentialModel cred : creds) {
+      if (validator.validateTOTP(token,cred.getValue().getBytes())) {
+        return true;
+      }
+    }
+  }
+  return false;
+}

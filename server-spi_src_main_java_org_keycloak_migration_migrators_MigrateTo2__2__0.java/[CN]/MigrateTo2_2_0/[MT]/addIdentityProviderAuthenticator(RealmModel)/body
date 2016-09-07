@@ -1,0 +1,10 @@
+{
+  String defaultProvider=null;
+  for (  IdentityProviderModel provider : realm.getIdentityProviders()) {
+    if (provider.isEnabled() && provider.isAuthenticateByDefault()) {
+      defaultProvider=provider.getAlias();
+      break;
+    }
+  }
+  DefaultAuthenticationFlows.addIdentityProviderAuthenticator(realm,defaultProvider);
+}

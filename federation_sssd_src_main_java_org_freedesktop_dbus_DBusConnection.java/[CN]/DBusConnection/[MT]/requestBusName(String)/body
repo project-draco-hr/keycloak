@@ -1,0 +1,26 @@
+{
+  if (!busname.matches(BUSNAME_REGEX) || busname.length() > MAX_NAME_LENGTH)   throw new DBusException(getString("invalidBusName"));
+synchronized (this.busnames) {
+    UInt32 rv;
+    try {
+      rv=_dbus.RequestName(busname,new UInt32(DBus.DBUS_NAME_FLAG_REPLACE_EXISTING | DBus.DBUS_NAME_FLAG_DO_NOT_QUEUE));
+    }
+ catch (    DBusExecutionException DBEe) {
+      if (EXCEPTION_DEBUG && Debug.debug)       Debug.print(Debug.ERR,DBEe);
+      throw new DBusException(DBEe.getMessage());
+    }
+switch (rv.intValue()) {
+case DBus.DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER:
+      break;
+case DBus.DBUS_REQUEST_NAME_REPLY_IN_QUEUE:
+    throw new DBusException(getString("dbusRegistrationFailure"));
+case DBus.DBUS_REQUEST_NAME_REPLY_EXISTS:
+  throw new DBusException(getString("dbusRegistrationFailure"));
+case DBus.DBUS_REQUEST_NAME_REPLY_ALREADY_OWNER:
+break;
+default :
+break;
+}
+this.busnames.add(busname);
+}
+}

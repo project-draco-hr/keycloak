@@ -1,0 +1,11 @@
+{
+  if (!connected)   throw new NotConnected(getString("missingTransport"));
+  Message m=null;
+  try {
+    m=transport.min.readMessage();
+  }
+ catch (  IOException IOe) {
+    throw new FatalDBusException(IOe.getMessage());
+  }
+  return m;
+}

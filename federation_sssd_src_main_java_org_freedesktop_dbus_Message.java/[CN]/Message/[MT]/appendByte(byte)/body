@@ -1,0 +1,16 @@
+{
+  if (preallocated > 0) {
+    pabuf[paofs++]=b;
+    preallocated--;
+  }
+ else {
+    if (bufferuse == wiredata.length) {
+      if (Debug.debug)       Debug.print(Debug.VERBOSE,"Resizing " + bufferuse);
+      byte[][] temp=new byte[wiredata.length + BUFFERINCREMENT][];
+      System.arraycopy(wiredata,0,temp,0,wiredata.length);
+      wiredata=temp;
+    }
+    wiredata[bufferuse++]=new byte[]{b};
+    bytecounter++;
+  }
+}

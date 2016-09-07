@@ -1,0 +1,157 @@
+{
+  Random r=new Random();
+  int i;
+  test(DBus.Peer.class,peer,"Ping",null);
+  try {
+    if (intro.Introspect().startsWith("<!DOCTYPE"))     pass("org.freedesktop.DBus.Introspectable.Introspect");
+ else     fail("org.freedesktop.DBus.Introspectable.Introspect","Didn't get valid xml data back when introspecting /Test");
+  }
+ catch (  DBusExecutionException DBEe) {
+    if (Debug.debug)     Debug.print(DBEe);
+    fail("org.freedesktop.DBus.Introspectable.Introspect","Got exception during introspection on /Test (" + DBEe.getClass().getName() + "): "+ DBEe.getMessage());
+  }
+  try {
+    if (rootintro.Introspect().startsWith("<!DOCTYPE"))     pass("org.freedesktop.DBus.Introspectable.Introspect");
+ else     fail("org.freedesktop.DBus.Introspectable.Introspect","Didn't get valid xml data back when introspecting /");
+  }
+ catch (  DBusExecutionException DBEe) {
+    if (Debug.debug)     Debug.print(DBEe);
+    fail("org.freedesktop.DBus.Introspectable.Introspect","Got exception during introspection on / (" + DBEe.getClass().getName() + "): "+ DBEe.getMessage());
+  }
+  test(DBus.Binding.Tests.class,tests,"Identity",new Variant<Integer>(new Integer(1)),new Variant<Integer>(new Integer(1)));
+  test(DBus.Binding.Tests.class,tests,"Identity",new Variant<String>("Hello"),new Variant<String>("Hello"));
+  test(DBus.Binding.Tests.class,tests,"IdentityBool",false,false);
+  test(DBus.Binding.Tests.class,tests,"IdentityBool",true,true);
+  test(DBus.Binding.Tests.class,tests,"Invert",false,true);
+  test(DBus.Binding.Tests.class,tests,"Invert",true,false);
+  test(DBus.Binding.Tests.class,tests,"IdentityByte",(byte)0,(byte)0);
+  test(DBus.Binding.Tests.class,tests,"IdentityByte",(byte)1,(byte)1);
+  test(DBus.Binding.Tests.class,tests,"IdentityByte",(byte)-1,(byte)-1);
+  test(DBus.Binding.Tests.class,tests,"IdentityByte",Byte.MAX_VALUE,Byte.MAX_VALUE);
+  test(DBus.Binding.Tests.class,tests,"IdentityByte",Byte.MIN_VALUE,Byte.MIN_VALUE);
+  i=r.nextInt();
+  test(DBus.Binding.Tests.class,tests,"IdentityByte",(byte)i,(byte)i);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt16",(short)0,(short)0);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt16",(short)1,(short)1);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt16",(short)-1,(short)-1);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt16",Short.MAX_VALUE,Short.MAX_VALUE);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt16",Short.MIN_VALUE,Short.MIN_VALUE);
+  i=r.nextInt();
+  test(DBus.Binding.Tests.class,tests,"IdentityInt16",(short)i,(short)i);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt32",0,0);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt32",1,1);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt32",-1,-1);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt32",Integer.MAX_VALUE,Integer.MAX_VALUE);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt32",Integer.MIN_VALUE,Integer.MIN_VALUE);
+  i=r.nextInt();
+  test(DBus.Binding.Tests.class,tests,"IdentityInt32",i,i);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt64",(long)0,(long)0);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt64",(long)1,(long)1);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt64",(long)-1,(long)-1);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt64",Long.MAX_VALUE,Long.MAX_VALUE);
+  test(DBus.Binding.Tests.class,tests,"IdentityInt64",Long.MIN_VALUE,Long.MIN_VALUE);
+  i=r.nextInt();
+  test(DBus.Binding.Tests.class,tests,"IdentityInt64",(long)i,(long)i);
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt16",new UInt16(0),new UInt16(0));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt16",new UInt16(1),new UInt16(1));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt16",new UInt16(UInt16.MAX_VALUE),new UInt16(UInt16.MAX_VALUE));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt16",new UInt16(UInt16.MIN_VALUE),new UInt16(UInt16.MIN_VALUE));
+  i=r.nextInt();
+  i=i > 0 ? i : -i;
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt16",new UInt16(i % UInt16.MAX_VALUE),new UInt16(i % UInt16.MAX_VALUE));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt32",new UInt32(0),new UInt32(0));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt32",new UInt32(1),new UInt32(1));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt32",new UInt32(UInt32.MAX_VALUE),new UInt32(UInt32.MAX_VALUE));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt32",new UInt32(UInt32.MIN_VALUE),new UInt32(UInt32.MIN_VALUE));
+  i=r.nextInt();
+  i=i > 0 ? i : -i;
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt32",new UInt32(i % UInt32.MAX_VALUE),new UInt32(i % UInt32.MAX_VALUE));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt64",new UInt64(0),new UInt64(0));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt64",new UInt64(1),new UInt64(1));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt64",new UInt64(UInt64.MAX_LONG_VALUE),new UInt64(UInt64.MAX_LONG_VALUE));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt64",new UInt64(UInt64.MAX_BIG_VALUE),new UInt64(UInt64.MAX_BIG_VALUE));
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt64",new UInt64(UInt64.MIN_VALUE),new UInt64(UInt64.MIN_VALUE));
+  i=r.nextInt();
+  i=i > 0 ? i : -i;
+  test(DBus.Binding.Tests.class,tests,"IdentityUInt64",new UInt64(i % UInt64.MAX_LONG_VALUE),new UInt64(i % UInt64.MAX_LONG_VALUE));
+  test(DBus.Binding.Tests.class,tests,"IdentityDouble",0.0,0.0);
+  test(DBus.Binding.Tests.class,tests,"IdentityDouble",1.0,1.0);
+  test(DBus.Binding.Tests.class,tests,"IdentityDouble",-1.0,-1.0);
+  test(DBus.Binding.Tests.class,tests,"IdentityDouble",Double.MAX_VALUE,Double.MAX_VALUE);
+  test(DBus.Binding.Tests.class,tests,"IdentityDouble",Double.MIN_VALUE,Double.MIN_VALUE);
+  i=r.nextInt();
+  test(DBus.Binding.Tests.class,tests,"IdentityDouble",(double)i,(double)i);
+  test(DBus.Binding.Tests.class,tests,"IdentityString","","");
+  test(DBus.Binding.Tests.class,tests,"IdentityString","The Quick Brown Fox Jumped Over The Lazy Dog","The Quick Brown Fox Jumped Over The Lazy Dog");
+  test(DBus.Binding.Tests.class,tests,"IdentityString","????????????????????? - ????????????","????????????????????? - ????????????");
+  testArray(DBus.Binding.Tests.class,tests,"IdentityBoolArray",Boolean.TYPE,null);
+  testArray(DBus.Binding.Tests.class,tests,"IdentityByteArray",Byte.TYPE,null);
+  testArray(DBus.Binding.Tests.class,tests,"IdentityInt16Array",Short.TYPE,null);
+  testArray(DBus.Binding.Tests.class,tests,"IdentityInt32Array",Integer.TYPE,null);
+  testArray(DBus.Binding.Tests.class,tests,"IdentityInt64Array",Long.TYPE,null);
+  testArray(DBus.Binding.Tests.class,tests,"IdentityDoubleArray",Double.TYPE,null);
+  testArray(DBus.Binding.Tests.class,tests,"IdentityArray",Variant.class,new Variant<String>("aoeu"));
+  testArray(DBus.Binding.Tests.class,tests,"IdentityUInt16Array",UInt16.class,new UInt16(12));
+  testArray(DBus.Binding.Tests.class,tests,"IdentityUInt32Array",UInt32.class,new UInt32(190));
+  testArray(DBus.Binding.Tests.class,tests,"IdentityUInt64Array",UInt64.class,new UInt64(103948));
+  testArray(DBus.Binding.Tests.class,tests,"IdentityStringArray",String.class,"asdf");
+  int[] is=new int[0];
+  test(DBus.Binding.Tests.class,tests,"Sum",0L,is);
+  r=new Random();
+  int len=(r.nextInt() % 100) + 15;
+  len=(len < 0 ? -len : len) + 15;
+  is=new int[len];
+  long result=0;
+  for (i=0; i < len; i++) {
+    is[i]=r.nextInt();
+    result+=is[i];
+  }
+  test(DBus.Binding.Tests.class,tests,"Sum",result,is);
+  byte[] bs=new byte[0];
+  test(DBus.Binding.SingleTests.class,singletests,"Sum",new UInt32(0),bs);
+  len=(r.nextInt() % 100);
+  len=(len < 0 ? -len : len) + 15;
+  bs=new byte[len];
+  int res=0;
+  for (i=0; i < len; i++) {
+    bs[i]=(byte)r.nextInt();
+    res+=(bs[i] < 0 ? bs[i] + 256 : bs[i]);
+  }
+  test(DBus.Binding.SingleTests.class,singletests,"Sum",new UInt32(res % (UInt32.MAX_VALUE + 1)),bs);
+  test(DBus.Binding.Tests.class,tests,"DeStruct",new DBus.Binding.Triplet<String,UInt32,Short>("hi",new UInt32(12),new Short((short)99)),new DBus.Binding.TestStruct("hi",new UInt32(12),new Short((short)99)));
+  Map<String,String> in=new HashMap<String,String>();
+  Map<String,List<String>> out=new HashMap<String,List<String>>();
+  test(DBus.Binding.Tests.class,tests,"InvertMapping",out,in);
+  in.put("hi","there");
+  in.put("to","there");
+  in.put("from","here");
+  in.put("in","out");
+  List<String> l=new Vector<String>();
+  l.add("hi");
+  l.add("to");
+  out.put("there",l);
+  l=new Vector<String>();
+  l.add("from");
+  out.put("here",l);
+  l=new Vector<String>();
+  l.add("in");
+  out.put("out",l);
+  test(DBus.Binding.Tests.class,tests,"InvertMapping",out,in);
+  primitizeTest(tests,new Integer(1));
+  primitizeTest(tests,new Variant<Variant<Variant<Variant<String>>>>(new Variant<Variant<Variant<String>>>(new Variant<Variant<String>>(new Variant<String>("Hi")))));
+  primitizeTest(tests,new Variant<Map<String,String>>(in,new DBusMapType(String.class,String.class)));
+  test(DBus.Binding.Tests.class,tests,"Trigger",null,"/Test",new UInt64(21389479283L));
+  try {
+    ctc.conn.sendSignal(new DBus.Binding.TestClient.Trigger("/Test",new UInt16(15),12.5));
+  }
+ catch (  DBusException DBe) {
+    if (Debug.debug)     Debug.print(DBe);
+    throw new DBusExecutionException(DBe.getMessage());
+  }
+  try {
+    Thread.sleep(10000);
+  }
+ catch (  InterruptedException Ie) {
+  }
+  test(DBus.Binding.Tests.class,tests,"Exit",null);
+}

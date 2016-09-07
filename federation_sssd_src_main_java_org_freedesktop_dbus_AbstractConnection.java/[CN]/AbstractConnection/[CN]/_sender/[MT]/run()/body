@@ -1,0 +1,30 @@
+{
+  Message m=null;
+  if (Debug.debug)   Debug.print(Debug.INFO,"Monitoring outbound queue");
+  while (_run) {
+    if (null != outgoing) synchronized (outgoing) {
+      if (Debug.debug)       Debug.print(Debug.VERBOSE,"Blocking");
+      while (outgoing.size() == 0 && _run)       try {
+        outgoing.wait();
+      }
+ catch (      InterruptedException Ie) {
+      }
+      if (Debug.debug)       Debug.print(Debug.VERBOSE,"Notified");
+      if (outgoing.size() > 0)       m=outgoing.remove();
+      if (Debug.debug)       Debug.print(Debug.DEBUG,"Got message: " + m);
+    }
+    if (null != m)     sendMessage(m);
+    m=null;
+  }
+  if (Debug.debug)   Debug.print(Debug.INFO,"Flushing outbound queue and quitting");
+  if (null != outgoing)   do {
+    EfficientQueue ogq=outgoing;
+synchronized (ogq) {
+      outgoing=null;
+    }
+    if (!ogq.isEmpty())     m=ogq.remove();
+ else     m=null;
+    sendMessage(m);
+  }
+ while (null != m);
+}

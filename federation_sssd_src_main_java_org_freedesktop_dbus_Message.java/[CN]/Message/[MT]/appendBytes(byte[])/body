@@ -1,0 +1,19 @@
+{
+  if (null == buf)   return;
+  if (preallocated > 0) {
+    if (paofs + buf.length > pabuf.length)     throw new ArrayIndexOutOfBoundsException(MessageFormat.format(getString("arrayOutOfBounds"),new Object[]{paofs,pabuf.length,buf.length}));
+    System.arraycopy(buf,0,pabuf,paofs,buf.length);
+    paofs+=buf.length;
+    preallocated-=buf.length;
+  }
+ else {
+    if (bufferuse == wiredata.length) {
+      if (Debug.debug)       Debug.print(Debug.VERBOSE,"Resizing " + bufferuse);
+      byte[][] temp=new byte[wiredata.length + BUFFERINCREMENT][];
+      System.arraycopy(wiredata,0,temp,0,wiredata.length);
+      wiredata=temp;
+    }
+    wiredata[bufferuse++]=buf;
+    bytecounter+=buf.length;
+  }
+}

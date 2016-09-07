@@ -1,0 +1,53 @@
+{
+  if (Debug.debug)   Debug.print(Debug.INFO,"Connecting to " + address);
+  OutputStream out=null;
+  InputStream in=null;
+  UnixSocket us=null;
+  Socket s=null;
+  int mode=0;
+  int types=0;
+  if ("unix".equals(address.getType())) {
+    types=SASL.AUTH_EXTERNAL;
+    mode=SASL.MODE_CLIENT;
+    us=new UnixSocket();
+    if (null != address.getParameter("abstract"))     us.connect(new UnixSocketAddress(address.getParameter("abstract"),true));
+ else     if (null != address.getParameter("path"))     us.connect(new UnixSocketAddress(address.getParameter("path"),false));
+    us.setPassCred(true);
+    in=us.getInputStream();
+    out=us.getOutputStream();
+  }
+ else   if ("tcp".equals(address.getType())) {
+    types=SASL.AUTH_SHA;
+    if (null != address.getParameter("listen")) {
+      mode=SASL.MODE_SERVER;
+      ServerSocket ss=new ServerSocket();
+      ss.bind(new InetSocketAddress(address.getParameter("host"),Integer.parseInt(address.getParameter("port"))));
+      s=ss.accept();
+    }
+ else {
+      mode=SASL.MODE_CLIENT;
+      s=new Socket();
+      s.connect(new InetSocketAddress(address.getParameter("host"),Integer.parseInt(address.getParameter("port"))));
+    }
+    in=s.getInputStream();
+    out=s.getOutputStream();
+  }
+ else {
+    throw new IOException(getString("unknownAddress") + address.getType());
+  }
+  if (!(new SASL()).auth(mode,types,address.getParameter("guid"),out,in,us)) {
+    out.close();
+    throw new IOException(getString("errorAuth"));
+  }
+  if (null != us) {
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"Setting timeout to " + timeout + " on Socket");
+    if (timeout == 1)     us.setBlocking(false);
+ else     us.setSoTimeout(timeout);
+  }
+  if (null != s) {
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"Setting timeout to " + timeout + " on Socket");
+    s.setSoTimeout(timeout);
+  }
+  mout=new MessageWriter(out);
+  min=new MessageReader(in);
+}

@@ -1,0 +1,129 @@
+{
+  if (Debug.debug)   Debug.print(Debug.DEBUG,"Handling incoming method call: " + m);
+  ExportedObject eo=null;
+  Method meth=null;
+  Object o=null;
+  if (null == m.getInterface() || m.getInterface().equals("org.freedesktop.DBus.Peer") || m.getInterface().equals("org.freedesktop.DBus.Introspectable")) {
+synchronized (exportedObjects) {
+      eo=exportedObjects.get(null);
+    }
+    if (null != eo && null == eo.object.get()) {
+      unExportObject(null);
+      eo=null;
+    }
+    if (null != eo) {
+      meth=eo.methods.get(new MethodTuple(m.getName(),m.getSig()));
+    }
+    if (null != meth)     o=new _globalhandler(m.getPath());
+ else     eo=null;
+  }
+  if (null == o) {
+synchronized (exportedObjects) {
+      eo=exportedObjects.get(m.getPath());
+    }
+    if (null != eo && null == eo.object.get()) {
+      if (Debug.debug)       Debug.print(Debug.INFO,"Unexporting " + m.getPath() + " implicitly");
+      unExportObject(m.getPath());
+      eo=null;
+    }
+    if (null == eo) {
+      eo=fallbackcontainer.get(m.getPath());
+    }
+    if (null == eo) {
+      try {
+        queueOutgoing(new Error(m,new DBus.Error.UnknownObject(m.getPath() + getString("notObjectProvidedByProcess"))));
+      }
+ catch (      DBusException DBe) {
+      }
+      return;
+    }
+    if (Debug.debug) {
+      Debug.print(Debug.VERBOSE,"Searching for method " + m.getName() + " with signature "+ m.getSig());
+      Debug.print(Debug.VERBOSE,"List of methods on " + eo + ":");
+      for (      MethodTuple mt : eo.methods.keySet())       Debug.print(Debug.VERBOSE,"   " + mt + " => "+ eo.methods.get(mt));
+    }
+    meth=eo.methods.get(new MethodTuple(m.getName(),m.getSig()));
+    if (null == meth) {
+      try {
+        queueOutgoing(new Error(m,new DBus.Error.UnknownMethod(MessageFormat.format(getString("methodDoesNotExist"),new Object[]{m.getInterface(),m.getName()}))));
+      }
+ catch (      DBusException DBe) {
+      }
+      return;
+    }
+    o=eo.object.get();
+  }
+  final Method me=meth;
+  final Object ob=o;
+  final boolean noreply=(1 == (m.getFlags() & Message.Flags.NO_REPLY_EXPECTED));
+  final DBusCallInfo info=new DBusCallInfo(m);
+  final AbstractConnection conn=this;
+  if (Debug.debug)   Debug.print(Debug.VERBOSE,"Adding Runnable for method " + meth);
+  addRunnable(new Runnable(){
+    private boolean run=false;
+    public synchronized void run(){
+      if (run)       return;
+      run=true;
+      if (Debug.debug)       Debug.print(Debug.DEBUG,"Running method " + me + " for remote call");
+      try {
+        Type[] ts=me.getGenericParameterTypes();
+        m.setArgs(Marshalling.deSerializeParameters(m.getParameters(),ts,conn));
+        if (Debug.debug)         Debug.print(Debug.VERBOSE,"Deserialised " + Arrays.deepToString(m.getParameters()) + " to types "+ Arrays.deepToString(ts));
+      }
+ catch (      Exception e) {
+        if (EXCEPTION_DEBUG && Debug.debug)         Debug.print(Debug.ERR,e);
+        try {
+          conn.queueOutgoing(new Error(m,new DBus.Error.UnknownMethod(getString("deSerializationFailure") + e)));
+        }
+ catch (        DBusException DBe) {
+        }
+        return;
+      }
+      try {
+synchronized (infomap) {
+          infomap.put(Thread.currentThread(),info);
+        }
+        Object result;
+        try {
+          if (Debug.debug)           Debug.print(Debug.VERBOSE,"Invoking Method: " + me + " on "+ ob+ " with parameters "+ Arrays.deepToString(m.getParameters()));
+          result=me.invoke(ob,m.getParameters());
+        }
+ catch (        InvocationTargetException ITe) {
+          if (EXCEPTION_DEBUG && Debug.debug)           Debug.print(Debug.ERR,ITe.getCause());
+          throw ITe.getCause();
+        }
+synchronized (infomap) {
+          infomap.remove(Thread.currentThread());
+        }
+        if (!noreply) {
+          MethodReturn reply;
+          if (Void.TYPE.equals(me.getReturnType()))           reply=new MethodReturn(m,null);
+ else {
+            StringBuffer sb=new StringBuffer();
+            for (            String s : Marshalling.getDBusType(me.getGenericReturnType()))             sb.append(s);
+            Object[] nr=Marshalling.convertParameters(new Object[]{result},new Type[]{me.getGenericReturnType()},conn);
+            reply=new MethodReturn(m,sb.toString(),nr);
+          }
+          conn.queueOutgoing(reply);
+        }
+      }
+ catch (      DBusExecutionException DBEe) {
+        if (EXCEPTION_DEBUG && Debug.debug)         Debug.print(Debug.ERR,DBEe);
+        try {
+          conn.queueOutgoing(new Error(m,DBEe));
+        }
+ catch (        DBusException DBe) {
+        }
+      }
+catch (      Throwable e) {
+        if (EXCEPTION_DEBUG && Debug.debug)         Debug.print(Debug.ERR,e);
+        try {
+          conn.queueOutgoing(new Error(m,new DBusExecutionException(MessageFormat.format(getString("errorExecutingMethod"),new Object[]{m.getInterface(),m.getName(),e.getMessage()}))));
+        }
+ catch (        DBusException DBe) {
+        }
+      }
+    }
+  }
+);
+}

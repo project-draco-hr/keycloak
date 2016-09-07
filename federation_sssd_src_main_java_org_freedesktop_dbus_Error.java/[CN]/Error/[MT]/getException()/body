@@ -1,0 +1,36 @@
+{
+  try {
+    Class<? extends DBusExecutionException> c=createExceptionClass(getName());
+    if (null == c || !DBusExecutionException.class.isAssignableFrom(c))     c=DBusExecutionException.class;
+    Constructor<? extends DBusExecutionException> con=c.getConstructor(String.class);
+    DBusExecutionException ex;
+    Object[] args=getParameters();
+    if (null == args || 0 == args.length)     ex=con.newInstance("");
+ else {
+      String s="";
+      for (      Object o : args)       s+=o + " ";
+      ex=con.newInstance(s.trim());
+    }
+    ex.setType(getName());
+    return ex;
+  }
+ catch (  Exception e) {
+    if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug)     Debug.print(Debug.ERR,e);
+    if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug && null != e.getCause())     Debug.print(Debug.ERR,e.getCause());
+    DBusExecutionException ex;
+    Object[] args=null;
+    try {
+      args=getParameters();
+    }
+ catch (    Exception ee) {
+    }
+    if (null == args || 0 == args.length)     ex=new DBusExecutionException("");
+ else {
+      String s="";
+      for (      Object o : args)       s+=o + " ";
+      ex=new DBusExecutionException(s.trim());
+    }
+    ex.setType(getName());
+    return ex;
+  }
+}

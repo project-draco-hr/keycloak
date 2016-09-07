@@ -1,0 +1,10 @@
+{
+  System.out.println("Handling error callback: " + e + " message = '"+ e.getMessage()+ "'");
+  if (!(e instanceof TestException))   test.fail("Exception is of the wrong sort");
+  Collator col=Collator.getInstance();
+  col.setDecomposition(Collator.FULL_DECOMPOSITION);
+  col.setStrength(Collator.PRIMARY);
+  if (0 != col.compare("test",e.getMessage()))   test.fail("Exception has the wrong message");
+  if (test.done8)   test.fail("Already ran callback error handler");
+  test.done8=true;
+}

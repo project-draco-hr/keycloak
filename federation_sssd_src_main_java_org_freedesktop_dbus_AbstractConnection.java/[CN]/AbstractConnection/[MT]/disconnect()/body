@@ -1,0 +1,33 @@
+{
+  connected=false;
+  if (Debug.debug)   Debug.print(Debug.INFO,"Sending disconnected signal");
+  try {
+    handleMessage(new org.freedesktop.DBus.Local.Disconnected("/"));
+  }
+ catch (  Exception ee) {
+    if (EXCEPTION_DEBUG && Debug.debug)     Debug.print(Debug.ERR,ee);
+  }
+  if (Debug.debug)   Debug.print(Debug.INFO,"Disconnecting Abstract Connection");
+  while (runnables.size() > 0) synchronized (runnables) {
+    runnables.notifyAll();
+  }
+  _run=false;
+synchronized (outgoing) {
+    outgoing.notifyAll();
+  }
+  try {
+    if (null != transport) {
+      transport.disconnect();
+      transport=null;
+    }
+  }
+ catch (  IOException IOe) {
+    if (EXCEPTION_DEBUG && Debug.debug)     Debug.print(Debug.ERR,IOe);
+  }
+synchronized (workers) {
+    for (    _workerthread t : workers)     t.halt();
+  }
+synchronized (runnables) {
+    runnables.notifyAll();
+  }
+}

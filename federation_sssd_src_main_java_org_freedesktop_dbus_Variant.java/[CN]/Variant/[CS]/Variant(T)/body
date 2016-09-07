@@ -1,0 +1,14 @@
+{
+  if (null == o)   throw new IllegalArgumentException(getString("cannotWrapNullInVariant"));
+  type=o.getClass();
+  try {
+    String[] ss=Marshalling.getDBusType(o.getClass(),true);
+    if (ss.length != 1)     throw new IllegalArgumentException(getString("cannotWrapMultiValuedInVariant") + type);
+    this.sig=ss[0];
+  }
+ catch (  DBusException DBe) {
+    if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug)     Debug.print(Debug.ERR,DBe);
+    throw new IllegalArgumentException(MessageFormat.format(getString("cannotWrapUnqualifiedVariant"),new Object[]{o.getClass(),DBe.getMessage()}));
+  }
+  this.o=o;
+}

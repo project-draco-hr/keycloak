@@ -1,0 +1,12 @@
+{
+  UnixSocket s=new UnixSocket(new UnixSocketAddress("testsock",true));
+  OutputStream os=s.getOutputStream();
+  PrintWriter o=new PrintWriter(os);
+  BufferedReader r=new BufferedReader(new InputStreamReader(System.in));
+  String l;
+  while (null != (l=r.readLine())) {
+    byte[] buf=(l + "\n").getBytes();
+    os.write(buf,0,buf.length);
+  }
+  s.close();
+}

@@ -1,0 +1,53 @@
+{
+  try {
+    Method[] ms=iface.getMethods();
+    Method m=null;
+    for (    Method t : ms) {
+      if (t.getName().equals(method))       m=t;
+    }
+    Object o=m.invoke(proxy,parameters);
+    String msg="Incorrect return value; sent ( ";
+    if (null != parameters)     for (    Object po : parameters)     if (null != po)     msg+=collapseArray(po) + ",";
+    msg=msg.replaceAll(".$",");");
+    msg+=" expected " + collapseArray(rv) + " got "+ collapseArray(o);
+    if (null != rv && rv.getClass().isArray()) {
+      compareArray(iface.getName() + "" + method,rv,o);
+    }
+ else     if (rv instanceof Map) {
+      if (o instanceof Map) {
+        Map<Object,Object> a=(Map<Object,Object>)o;
+        Map<Object,Object> b=(Map<Object,Object>)rv;
+        if (a.keySet().size() != b.keySet().size()) {
+          fail(iface.getName() + "" + method,msg);
+        }
+ else         for (        Object k : a.keySet())         if (a.get(k) instanceof List) {
+          if (b.get(k) instanceof List)           if (setCompareLists((List<Object>)a.get(k),(List<Object>)b.get(k)))           ;
+ else           fail(iface.getName() + "" + method,msg);
+ else           fail(iface.getName() + "" + method,msg);
+        }
+ else         if (!a.get(k).equals(b.get(k))) {
+          fail(iface.getName() + "" + method,msg);
+          return;
+        }
+        pass(iface.getName() + "" + method);
+      }
+ else       fail(iface.getName() + "" + method,msg);
+    }
+ else {
+      if (o == rv || (o != null && o.equals(rv)))       pass(iface.getName() + "" + method);
+ else       fail(iface.getName() + "" + method,msg);
+    }
+  }
+ catch (  DBusExecutionException DBEe) {
+    DBEe.printStackTrace();
+    fail(iface.getName() + "" + method,"Error occurred during execution: " + DBEe.getClass().getName() + " "+ DBEe.getMessage());
+  }
+catch (  InvocationTargetException ITe) {
+    ITe.printStackTrace();
+    fail(iface.getName() + "" + method,"Error occurred during execution: " + ITe.getCause().getClass().getName() + " "+ ITe.getCause().getMessage());
+  }
+catch (  Exception e) {
+    e.printStackTrace();
+    fail(iface.getName() + "" + method,"Error occurred during execution: " + e.getClass().getName() + " "+ e.getMessage());
+  }
+}

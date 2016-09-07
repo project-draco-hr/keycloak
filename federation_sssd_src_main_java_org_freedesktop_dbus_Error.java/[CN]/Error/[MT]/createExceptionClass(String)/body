@@ -1,0 +1,14 @@
+{
+  if (name == "org.freedesktop.DBus.Local.disconnected")   return NotConnected.class;
+  Class<? extends DBusExecutionException> c=null;
+  do {
+    try {
+      c=(Class<? extends org.freedesktop.dbus.exceptions.DBusExecutionException>)Class.forName(name);
+    }
+ catch (    ClassNotFoundException CNFe) {
+    }
+    name=name.replaceAll("\\.([^\\.]*)$","\\$$1");
+  }
+ while (null == c && name.matches(".*\\..*"));
+  return c;
+}

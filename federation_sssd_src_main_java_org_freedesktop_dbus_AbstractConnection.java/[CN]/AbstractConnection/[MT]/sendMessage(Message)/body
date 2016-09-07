@@ -1,0 +1,42 @@
+{
+  try {
+    if (!connected)     throw new NotConnected(getString("disconnected"));
+    if (m instanceof DBusSignal)     ((DBusSignal)m).appendbody(this);
+    if (m instanceof MethodCall) {
+      if (0 == (m.getFlags() & Message.Flags.NO_REPLY_EXPECTED))       if (null == pendingCalls)       ((MethodCall)m).setReply(new Error("org.freedesktop.DBus.Local","org.freedesktop.DBus.Local.disconnected",0,"s",new Object[]{getString("disconnected")}));
+ else synchronized (pendingCalls) {
+        pendingCalls.put(m.getSerial(),(MethodCall)m);
+      }
+    }
+    transport.mout.writeMessage(m);
+  }
+ catch (  Exception e) {
+    if (EXCEPTION_DEBUG && Debug.debug)     Debug.print(Debug.ERR,e);
+    if (m instanceof MethodCall && e instanceof NotConnected)     try {
+      ((MethodCall)m).setReply(new Error("org.freedesktop.DBus.Local","org.freedesktop.DBus.Local.disconnected",0,"s",new Object[]{getString("disconnected")}));
+    }
+ catch (    DBusException DBe) {
+    }
+    if (m instanceof MethodCall && e instanceof DBusExecutionException)     try {
+      ((MethodCall)m).setReply(new Error(m,e));
+    }
+ catch (    DBusException DBe) {
+    }
+ else     if (m instanceof MethodCall)     try {
+      if (Debug.debug)       Debug.print(Debug.INFO,"Setting reply to " + m + " as an error");
+      ((MethodCall)m).setReply(new Error(m,new DBusExecutionException(getString("messageFailedSend") + e.getMessage())));
+    }
+ catch (    DBusException DBe) {
+    }
+ else     if (m instanceof MethodReturn)     try {
+      transport.mout.writeMessage(new Error(m,e));
+    }
+ catch (    IOException IOe) {
+      if (EXCEPTION_DEBUG && Debug.debug)       Debug.print(Debug.ERR,IOe);
+    }
+catch (    DBusException IOe) {
+      if (EXCEPTION_DEBUG && Debug.debug)       Debug.print(Debug.ERR,e);
+    }
+    if (e instanceof IOException)     disconnect();
+  }
+}

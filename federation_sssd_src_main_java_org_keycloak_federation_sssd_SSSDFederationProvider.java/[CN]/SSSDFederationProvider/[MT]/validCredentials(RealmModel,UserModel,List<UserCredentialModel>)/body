@@ -1,0 +1,9 @@
+{
+  for (  UserCredentialModel cred : input) {
+    if (cred.getType().equals(UserCredentialModel.PASSWORD)) {
+      PAMAuthenticator pam=factory.createPAMAuthenticator(user.getUsername(),cred.getValue());
+      return (pam.authenticate() != null);
+    }
+  }
+  return false;
+}

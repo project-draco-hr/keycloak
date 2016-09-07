@@ -1,0 +1,14 @@
+{
+  int best=0;
+  int i=0;
+  ExportedObject bestobject=null;
+  String[] pathel=path.split("/");
+  for (  String[] fbpath : fallbacks.keySet()) {
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"Trying fallback path " + Arrays.deepToString(fbpath) + " to match "+ Arrays.deepToString(pathel));
+    for (i=0; i < pathel.length && i < fbpath.length; i++)     if (!pathel[i].equals(fbpath[i]))     break;
+    if (i > 0 && i == fbpath.length && i > best)     bestobject=fallbacks.get(fbpath);
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"Matches " + i + " bestobject now "+ bestobject);
+  }
+  if (Debug.debug)   Debug.print(Debug.DEBUG,"Found fallback for " + path + " of "+ bestobject);
+  return bestobject;
+}

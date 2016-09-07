@@ -1,0 +1,54 @@
+{
+  StringBuffer sb=new StringBuffer();
+  sb.append(getClass().getSimpleName());
+  sb.append('(');
+  sb.append(flags);
+  sb.append(',');
+  sb.append(serial);
+  sb.append(')');
+  sb.append(' ');
+  sb.append('{');
+  sb.append(' ');
+  if (headers.size() == 0)   sb.append('}');
+ else {
+    for (    Byte field : headers.keySet()) {
+      sb.append(getHeaderFieldName(field));
+      sb.append('=');
+      sb.append('>');
+      sb.append(headers.get(field).toString());
+      sb.append(',');
+      sb.append(' ');
+    }
+    sb.setCharAt(sb.length() - 2,' ');
+    sb.setCharAt(sb.length() - 1,'}');
+  }
+  sb.append(' ');
+  sb.append('{');
+  sb.append(' ');
+  Object[] args=null;
+  try {
+    args=getParameters();
+  }
+ catch (  DBusException DBe) {
+    if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug)     Debug.print(Debug.ERR,DBe);
+  }
+  if (null == args || 0 == args.length)   sb.append('}');
+ else {
+    for (    Object o : args) {
+      if (o instanceof Object[])       sb.append(Arrays.deepToString((Object[])o));
+ else       if (o instanceof byte[])       sb.append(Arrays.toString((byte[])o));
+ else       if (o instanceof int[])       sb.append(Arrays.toString((int[])o));
+ else       if (o instanceof short[])       sb.append(Arrays.toString((short[])o));
+ else       if (o instanceof long[])       sb.append(Arrays.toString((long[])o));
+ else       if (o instanceof boolean[])       sb.append(Arrays.toString((boolean[])o));
+ else       if (o instanceof double[])       sb.append(Arrays.toString((double[])o));
+ else       if (o instanceof float[])       sb.append(Arrays.toString((float[])o));
+ else       sb.append(o.toString());
+      sb.append(',');
+      sb.append(' ');
+    }
+    sb.setCharAt(sb.length() - 2,' ');
+    sb.setCharAt(sb.length() - 1,'}');
+  }
+  return sb.toString();
+}

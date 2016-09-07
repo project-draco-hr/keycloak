@@ -1,0 +1,9 @@
+{
+  Class<? extends T[]> ac=(Class<? extends T[]>)ns.getClass();
+  Class<T> cc=(Class<T>)ac.getComponentType();
+  Class<? extends Object> ncc=wrapperToPrimitive.get(cc);
+  if (null == ncc)   throw new IllegalArgumentException(getString("invalidWrapperType"));
+  Object o=Array.newInstance(ncc,ns.length);
+  for (int i=0; i < ns.length; i++)   Array.set(o,i,ns[i]);
+  return o;
+}

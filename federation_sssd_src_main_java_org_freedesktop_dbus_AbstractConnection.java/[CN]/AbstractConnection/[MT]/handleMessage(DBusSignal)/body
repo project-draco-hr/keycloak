@@ -1,0 +1,42 @@
+{
+  if (Debug.debug)   Debug.print(Debug.DEBUG,"Handling incoming signal: " + s);
+  Vector<DBusSigHandler<? extends DBusSignal>> v=new Vector<DBusSigHandler<? extends DBusSignal>>();
+synchronized (handledSignals) {
+    Vector<DBusSigHandler<? extends DBusSignal>> t;
+    t=handledSignals.get(new SignalTuple(s.getInterface(),s.getName(),null,null));
+    if (null != t)     v.addAll(t);
+    t=handledSignals.get(new SignalTuple(s.getInterface(),s.getName(),s.getPath(),null));
+    if (null != t)     v.addAll(t);
+    t=handledSignals.get(new SignalTuple(s.getInterface(),s.getName(),null,s.getSource()));
+    if (null != t)     v.addAll(t);
+    t=handledSignals.get(new SignalTuple(s.getInterface(),s.getName(),s.getPath(),s.getSource()));
+    if (null != t)     v.addAll(t);
+  }
+  if (0 == v.size())   return;
+  final AbstractConnection conn=this;
+  for (  final DBusSigHandler<? extends DBusSignal> h : v) {
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"Adding Runnable for signal " + s + " with handler "+ h);
+    addRunnable(new Runnable(){
+      private boolean run=false;
+      public synchronized void run(){
+        if (run)         return;
+        run=true;
+        try {
+          DBusSignal rs;
+          if (s instanceof DBusSignal.internalsig || s.getClass().equals(DBusSignal.class))           rs=s.createReal(conn);
+ else           rs=s;
+          ((DBusSigHandler<DBusSignal>)h).handle(rs);
+        }
+ catch (        DBusException DBe) {
+          if (EXCEPTION_DEBUG && Debug.debug)           Debug.print(Debug.ERR,DBe);
+          try {
+            conn.queueOutgoing(new Error(s,new DBusExecutionException("Error handling signal " + s.getInterface() + "."+ s.getName()+ ": "+ DBe.getMessage())));
+          }
+ catch (          DBusException DBe2) {
+          }
+        }
+      }
+    }
+);
+  }
+}

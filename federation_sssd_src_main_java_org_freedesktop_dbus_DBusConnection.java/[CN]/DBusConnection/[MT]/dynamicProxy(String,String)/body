@@ -1,0 +1,44 @@
+{
+  if (Debug.debug)   Debug.print(Debug.INFO,"Introspecting " + path + " on "+ source+ " for dynamic proxy creation");
+  try {
+    DBus.Introspectable intro=getRemoteObject(source,path,DBus.Introspectable.class);
+    String data=intro.Introspect();
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"Got introspection data: " + data);
+    String[] tags=data.split("[<>]");
+    Vector<String> ifaces=new Vector<String>();
+    for (    String tag : tags) {
+      if (tag.startsWith("interface")) {
+        ifaces.add(tag.replaceAll("^interface *name *= *['\"]([^'\"]*)['\"].*$","$1"));
+      }
+    }
+    Vector<Class<? extends Object>> ifcs=new Vector<Class<? extends Object>>();
+    for (    String iface : ifaces) {
+      if (Debug.debug)       Debug.print(Debug.DEBUG,"Trying interface " + iface);
+      int j=0;
+      while (j >= 0) {
+        try {
+          Class ifclass=Class.forName(iface);
+          if (!ifcs.contains(ifclass))           ifcs.add(ifclass);
+          break;
+        }
+ catch (        Exception e) {
+        }
+        j=iface.lastIndexOf(".");
+        char[] cs=iface.toCharArray();
+        if (j >= 0) {
+          cs[j]='$';
+          iface=String.valueOf(cs);
+        }
+      }
+    }
+    if (ifcs.size() == 0)     throw new DBusException(getString("interfaceToCastNotFound"));
+    RemoteObject ro=new RemoteObject(source,path,null,false);
+    DBusInterface newi=(DBusInterface)Proxy.newProxyInstance(ifcs.get(0).getClassLoader(),ifcs.toArray(new Class[0]),new RemoteInvocationHandler(this,ro));
+    importedObjects.put(newi,ro);
+    return newi;
+  }
+ catch (  Exception e) {
+    if (EXCEPTION_DEBUG && Debug.debug)     Debug.print(Debug.ERR,e);
+    throw new DBusException(MessageFormat.format(getString("createProxyExportFailure"),new Object[]{path,source,e.getMessage()}));
+  }
+}

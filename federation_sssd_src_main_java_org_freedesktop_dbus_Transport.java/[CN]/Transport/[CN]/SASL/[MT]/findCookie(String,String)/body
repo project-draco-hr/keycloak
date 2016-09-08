@@ -1,0 +1,18 @@
+{
+  String homedir=System.getProperty("user.home");
+  File f=new File(homedir + "/.dbus-keyrings/" + context);
+  BufferedReader r=new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+  String s=null;
+  String cookie=null;
+  long now=System.currentTimeMillis() / 1000;
+  while (null != (s=r.readLine())) {
+    String[] line=s.split(" ");
+    long timestamp=Long.parseLong(line[1]);
+    if (line[0].equals(ID) && (!(timestamp < 0 || (now + MAX_TIME_TRAVEL_SECONDS) < timestamp || (now - EXPIRE_KEYS_TIMEOUT_SECONDS) > timestamp))) {
+      cookie=line[2];
+      break;
+    }
+  }
+  r.close();
+  return cookie;
+}

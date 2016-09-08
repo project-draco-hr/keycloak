@@ -1,0 +1,14 @@
+{
+  if (Debug.debug)   Debug.print(Debug.VERBOSE,"padding for " + (char)type);
+  int a=getAlignment(type);
+  if (Debug.debug)   Debug.print(Debug.VERBOSE,preallocated + " " + paofs+ " "+ bytecounter+ " "+ a);
+  int b=(int)((bytecounter - preallocated) % a);
+  if (0 == b)   return;
+  a=(a - b);
+  if (preallocated > 0) {
+    paofs+=a;
+    preallocated-=a;
+  }
+ else   appendBytes(padding[a]);
+  if (Debug.debug)   Debug.print(Debug.VERBOSE,preallocated + " " + paofs+ " "+ bytecounter+ " "+ a);
+}

@@ -1,0 +1,14 @@
+{
+  while (_run) {
+    Runnable r=null;
+synchronized (runnables) {
+      while (runnables.size() == 0 && _run)       try {
+        runnables.wait();
+      }
+ catch (      InterruptedException Ie) {
+      }
+      if (runnables.size() > 0)       r=runnables.removeFirst();
+    }
+    if (null != r)     r.run();
+  }
+}

@@ -1,0 +1,251 @@
+{
+  String username=System.getProperty("user.name");
+  String Uid=null;
+  String kernelUid=null;
+  try {
+    Class c=Class.forName("com.sun.security.auth.module.UnixSystem");
+    Method m=c.getMethod("getUid");
+    Object o=c.newInstance();
+    long uid=(Long)m.invoke(o);
+    Uid=stupidlyEncode("" + uid);
+  }
+ catch (  Exception e) {
+    Uid=stupidlyEncode(username);
+  }
+  Command c;
+  int failed=0;
+  int current=0;
+  int state=INITIAL_STATE;
+  while (state != AUTHENTICATED && state != FAILED) {
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"AUTH state: " + state);
+switch (mode) {
+case MODE_CLIENT:
+switch (state) {
+case INITIAL_STATE:
+        if (null == us)         out.write(new byte[]{0});
+ else         us.sendCredentialByte((byte)0);
+      send(out,COMMAND_AUTH);
+    state=WAIT_DATA;
+  break;
+case WAIT_DATA:
+c=receive(in);
+switch (c.getCommand()) {
+case COMMAND_DATA:
+switch (do_challenge(current,c)) {
+case CONTINUE:
+  send(out,COMMAND_DATA,c.getResponse());
+break;
+case OK:
+send(out,COMMAND_DATA,c.getResponse());
+state=WAIT_OK;
+break;
+case ERROR:
+send(out,COMMAND_ERROR,c.getResponse());
+break;
+}
+break;
+case COMMAND_REJECTED:
+failed|=current;
+int available=c.getMechs() & (~failed);
+if (0 != (available & AUTH_EXTERNAL)) {
+send(out,COMMAND_AUTH,"EXTERNAL",Uid);
+current=AUTH_EXTERNAL;
+}
+ else if (0 != (available & AUTH_SHA)) {
+send(out,COMMAND_AUTH,"DBUS_COOKIE_SHA1",Uid);
+current=AUTH_SHA;
+}
+ else if (0 != (available & AUTH_ANON)) {
+send(out,COMMAND_AUTH,"ANONYMOUS");
+current=AUTH_ANON;
+}
+ else state=FAILED;
+break;
+case COMMAND_ERROR:
+send(out,COMMAND_CANCEL);
+state=WAIT_REJECT;
+break;
+case COMMAND_OK:
+send(out,COMMAND_BEGIN);
+state=AUTHENTICATED;
+break;
+default :
+send(out,COMMAND_ERROR,"Got invalid command");
+break;
+}
+break;
+case WAIT_OK:
+c=receive(in);
+switch (c.getCommand()) {
+case COMMAND_OK:
+send(out,COMMAND_BEGIN);
+state=AUTHENTICATED;
+break;
+case COMMAND_ERROR:
+case COMMAND_DATA:
+send(out,COMMAND_CANCEL);
+state=WAIT_REJECT;
+break;
+case COMMAND_REJECTED:
+failed|=current;
+int available=c.getMechs() & (~failed);
+state=WAIT_DATA;
+if (0 != (available & AUTH_EXTERNAL)) {
+send(out,COMMAND_AUTH,"EXTERNAL",Uid);
+current=AUTH_EXTERNAL;
+}
+ else if (0 != (available & AUTH_SHA)) {
+send(out,COMMAND_AUTH,"DBUS_COOKIE_SHA1",Uid);
+current=AUTH_SHA;
+}
+ else if (0 != (available & AUTH_ANON)) {
+send(out,COMMAND_AUTH,"ANONYMOUS");
+current=AUTH_ANON;
+}
+ else state=FAILED;
+break;
+default :
+send(out,COMMAND_ERROR,"Got invalid command");
+break;
+}
+break;
+case WAIT_REJECT:
+c=receive(in);
+switch (c.getCommand()) {
+case COMMAND_REJECTED:
+failed|=current;
+int available=c.getMechs() & (~failed);
+if (0 != (available & AUTH_EXTERNAL)) {
+send(out,COMMAND_AUTH,"EXTERNAL",Uid);
+current=AUTH_EXTERNAL;
+}
+ else if (0 != (available & AUTH_SHA)) {
+send(out,COMMAND_AUTH,"DBUS_COOKIE_SHA1",Uid);
+current=AUTH_SHA;
+}
+ else if (0 != (available & AUTH_ANON)) {
+send(out,COMMAND_AUTH,"ANONYMOUS");
+current=AUTH_ANON;
+}
+ else state=FAILED;
+break;
+default :
+state=FAILED;
+break;
+}
+break;
+default :
+state=FAILED;
+}
+break;
+case MODE_SERVER:
+switch (state) {
+case INITIAL_STATE:
+byte[] buf=new byte[1];
+if (null == us) {
+in.read(buf);
+}
+ else {
+buf[0]=us.recvCredentialByte();
+int kuid=us.getPeerUID();
+if (kuid >= 0) kernelUid=stupidlyEncode("" + kuid);
+}
+if (0 != buf[0]) state=FAILED;
+ else state=WAIT_AUTH;
+break;
+case WAIT_AUTH:
+c=receive(in);
+switch (c.getCommand()) {
+case COMMAND_AUTH:
+if (null == c.getData()) {
+send(out,COMMAND_REJECTED,getTypes(types));
+}
+ else {
+switch (do_response(current,Uid,kernelUid,c)) {
+case CONTINUE:
+send(out,COMMAND_DATA,c.getResponse());
+current=c.getMechs();
+state=WAIT_DATA;
+break;
+case OK:
+send(out,COMMAND_OK,guid);
+state=WAIT_BEGIN;
+current=0;
+break;
+case REJECT:
+send(out,COMMAND_REJECTED,getTypes(types));
+current=0;
+break;
+}
+}
+break;
+case COMMAND_ERROR:
+send(out,COMMAND_REJECTED,getTypes(types));
+break;
+case COMMAND_BEGIN:
+state=FAILED;
+break;
+default :
+send(out,COMMAND_ERROR,"Got invalid command");
+break;
+}
+break;
+case WAIT_DATA:
+c=receive(in);
+switch (c.getCommand()) {
+case COMMAND_DATA:
+switch (do_response(current,Uid,kernelUid,c)) {
+case CONTINUE:
+send(out,COMMAND_DATA,c.getResponse());
+state=WAIT_DATA;
+break;
+case OK:
+send(out,COMMAND_OK,guid);
+state=WAIT_BEGIN;
+current=0;
+break;
+case REJECT:
+send(out,COMMAND_REJECTED,getTypes(types));
+current=0;
+break;
+}
+break;
+case COMMAND_ERROR:
+case COMMAND_CANCEL:
+send(out,COMMAND_REJECTED,getTypes(types));
+state=WAIT_AUTH;
+break;
+case COMMAND_BEGIN:
+state=FAILED;
+break;
+default :
+send(out,COMMAND_ERROR,"Got invalid command");
+break;
+}
+break;
+case WAIT_BEGIN:
+c=receive(in);
+switch (c.getCommand()) {
+case COMMAND_ERROR:
+case COMMAND_CANCEL:
+send(out,COMMAND_REJECTED,getTypes(types));
+state=WAIT_AUTH;
+break;
+case COMMAND_BEGIN:
+state=AUTHENTICATED;
+break;
+default :
+send(out,COMMAND_ERROR,"Got invalid command");
+break;
+}
+break;
+default :
+state=FAILED;
+}
+break;
+default :
+return false;
+}
+}
+return state == AUTHENTICATED;
+}

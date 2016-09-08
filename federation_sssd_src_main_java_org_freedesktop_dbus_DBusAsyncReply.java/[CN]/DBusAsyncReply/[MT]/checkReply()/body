@@ -1,0 +1,18 @@
+{
+  if (mc.hasReply()) {
+    Message m=mc.getReply();
+    if (m instanceof Error)     error=((Error)m).getException();
+ else     if (m instanceof MethodReturn) {
+      try {
+        rval=(ReturnType)RemoteInvocationHandler.convertRV(m.getSig(),m.getParameters(),me,conn);
+      }
+ catch (      DBusExecutionException DBEe) {
+        error=DBEe;
+      }
+catch (      DBusException DBe) {
+        if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug)         Debug.print(Debug.ERR,DBe);
+        error=new DBusExecutionException(DBe.getMessage());
+      }
+    }
+  }
+}

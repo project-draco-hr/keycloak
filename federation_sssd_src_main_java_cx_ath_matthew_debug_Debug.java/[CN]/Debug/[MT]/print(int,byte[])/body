@@ -1,0 +1,23 @@
+{
+  if (debug) {
+    String timestr="";
+    String[] data=getTraceElements();
+    if (debugging(data[0],loglevel)) {
+      if (timing) {
+        long now=System.currentTimeMillis();
+        timestr="{" + (now - last) + "} ";
+        last=now;
+      }
+      String[] lines=null;
+      if (hexdump) {
+        if (balen >= b.length)         lines=Hexdump.format(b,bawidth).split("\n");
+ else {
+          byte[] buf=new byte[balen];
+          System.arraycopy(b,0,buf,0,balen);
+          lines=Hexdump.format(buf,bawidth).split("\n");
+        }
+      }
+      _print(b.getClass(),loglevel,data[0] + "." + data[1]+ "()"+ data[2],timestr,b.length + " bytes",lines);
+    }
+  }
+}

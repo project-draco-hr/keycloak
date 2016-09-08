@@ -1,0 +1,21 @@
+{
+  if (debug) {
+    String timestr="";
+    String[] data=getTraceElements();
+    if (debugging(data[0],loglevel)) {
+      if (timing) {
+        long now=System.currentTimeMillis();
+        timestr="{" + (now - last) + "} ";
+        last=now;
+      }
+      Iterator i=m.keySet().iterator();
+      String[] lines=new String[m.size()];
+      int j=0;
+      while (i.hasNext()) {
+        Object key=i.next();
+        lines[j++]="\t\t- " + key + " => "+ m.get(key);
+      }
+      _print(m.getClass(),loglevel,data[0] + "." + data[1]+ "()"+ data[2],timestr,"Map:",lines);
+    }
+  }
+}

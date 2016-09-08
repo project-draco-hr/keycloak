@@ -1,0 +1,22 @@
+{
+  if (!a.getClass().equals(b.getClass())) {
+    fail(test,"Incorrect return type; expected " + a.getClass() + " got "+ b.getClass());
+    return;
+  }
+  boolean pass=false;
+  if (a instanceof Object[])   pass=Arrays.equals((Object[])a,(Object[])b);
+ else   if (a instanceof byte[])   pass=Arrays.equals((byte[])a,(byte[])b);
+ else   if (a instanceof boolean[])   pass=Arrays.equals((boolean[])a,(boolean[])b);
+ else   if (a instanceof int[])   pass=Arrays.equals((int[])a,(int[])b);
+ else   if (a instanceof short[])   pass=Arrays.equals((short[])a,(short[])b);
+ else   if (a instanceof long[])   pass=Arrays.equals((long[])a,(long[])b);
+ else   if (a instanceof double[])   pass=Arrays.equals((double[])a,(double[])b);
+  if (pass)   pass(test);
+ else {
+    String s="Incorrect return value; expected ";
+    s+=collapseArray(a);
+    s+=" got ";
+    s+=collapseArray(b);
+    fail(test,s);
+  }
+}

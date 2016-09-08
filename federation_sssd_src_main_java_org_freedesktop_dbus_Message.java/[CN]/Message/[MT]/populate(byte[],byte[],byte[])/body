@@ -1,0 +1,20 @@
+{
+  big=(msg[0] == Endian.BIG);
+  type=msg[1];
+  flags=msg[2];
+  protover=msg[3];
+  wiredata[0]=msg;
+  wiredata[1]=headers;
+  wiredata[2]=body;
+  this.body=body;
+  bufferuse=3;
+  bodylen=((Number)extract(Message.ArgumentType.UINT32_STRING,msg,4)[0]).longValue();
+  serial=((Number)extract(Message.ArgumentType.UINT32_STRING,msg,8)[0]).longValue();
+  bytecounter=msg.length + headers.length + body.length;
+  if (Debug.debug)   Debug.print(Debug.VERBOSE,headers);
+  Object[] hs=extract("a(yv)",headers,0);
+  if (Debug.debug)   Debug.print(Debug.VERBOSE,Arrays.deepToString(hs));
+  for (  Object o : (Vector<Object>)hs[0]) {
+    this.headers.put((Byte)((Object[])o)[0],((Variant<Object>)((Object[])o)[1]).getValue());
+  }
+}

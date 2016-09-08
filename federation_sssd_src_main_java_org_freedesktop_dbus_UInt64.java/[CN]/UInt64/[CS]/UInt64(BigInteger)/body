@@ -1,0 +1,8 @@
+{
+  if (null == value)   throw new NumberFormatException(MessageFormat.format(getString("isNotBetween"),new Object[]{value,MIN_VALUE,MAX_BIG_VALUE}));
+  if (0 > value.compareTo(BigInteger.ZERO))   throw new NumberFormatException(MessageFormat.format(getString("isNotBetween"),new Object[]{value,MIN_VALUE,MAX_BIG_VALUE}));
+  if (0 < value.compareTo(MAX_BIG_VALUE))   throw new NumberFormatException(MessageFormat.format(getString("isNotBetween"),new Object[]{value,MIN_VALUE,MAX_BIG_VALUE}));
+  this.value=value;
+  this.top=this.value.shiftRight(32).and(new BigInteger("4294967295")).longValue();
+  this.bottom=this.value.and(new BigInteger("4294967295")).longValue();
+}

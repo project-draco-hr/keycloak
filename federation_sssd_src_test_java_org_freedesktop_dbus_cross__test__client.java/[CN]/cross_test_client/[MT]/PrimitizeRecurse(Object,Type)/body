@@ -1,0 +1,35 @@
+{
+  List<Variant<Object>> vs=new Vector<Variant<Object>>();
+  if (t instanceof ParameterizedType) {
+    Class<Object> c=(Class<Object>)((ParameterizedType)t).getRawType();
+    if (List.class.isAssignableFrom(c)) {
+      Object os;
+      if (a instanceof List)       os=((List<Object>)a).toArray();
+ else       os=a;
+      Type[] ts=((ParameterizedType)t).getActualTypeArguments();
+      for (int i=0; i < Array.getLength(os); i++)       vs.addAll(PrimitizeRecurse(Array.get(os,i),ts[0]));
+    }
+ else     if (Map.class.isAssignableFrom(c)) {
+      Object[] os=((Map)a).keySet().toArray();
+      Object[] ks=((Map)a).values().toArray();
+      Type[] ts=((ParameterizedType)t).getActualTypeArguments();
+      for (int i=0; i < ks.length; i++)       vs.addAll(PrimitizeRecurse(ks[i],ts[0]));
+      for (int i=0; i < os.length; i++)       vs.addAll(PrimitizeRecurse(os[i],ts[1]));
+    }
+ else     if (Struct.class.isAssignableFrom(c)) {
+      Object[] os=((Struct)a).getParameters();
+      Type[] ts=((ParameterizedType)t).getActualTypeArguments();
+      for (int i=0; i < os.length; i++)       vs.addAll(PrimitizeRecurse(os[i],ts[i]));
+    }
+ else     if (Variant.class.isAssignableFrom(c)) {
+      vs.addAll(PrimitizeRecurse(((Variant)a).getValue(),((Variant)a).getType()));
+    }
+  }
+ else   if (Variant.class.isAssignableFrom((Class)t))   vs.addAll(PrimitizeRecurse(((Variant)a).getValue(),((Variant)a).getType()));
+ else   if (t instanceof Class && ((Class)t).isArray()) {
+    Type t2=((Class)t).getComponentType();
+    for (int i=0; i < Array.getLength(a); i++)     vs.addAll(PrimitizeRecurse(Array.get(a,i),t2));
+  }
+ else   vs.add(new Variant(a));
+  return vs;
+}

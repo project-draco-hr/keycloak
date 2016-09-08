@@ -1,0 +1,25 @@
+{
+  StringBuffer sb=new StringBuffer();
+  top:   while (true) {
+    int c=s.read();
+switch (c) {
+case -1:
+      throw new IOException("Stream unexpectedly short (broken pipe)");
+case 0:
+case '\r':
+    continue;
+case '\n':
+  break top;
+default :
+sb.append((char)c);
+}
+}
+if (Debug.debug) Debug.print(Debug.VERBOSE,"received: " + sb);
+try {
+return new Command(sb.toString());
+}
+ catch (Exception e) {
+if (Debug.debug && AbstractConnection.EXCEPTION_DEBUG) Debug.print(Debug.ERR,e);
+return new Command();
+}
+}

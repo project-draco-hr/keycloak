@@ -1,0 +1,12 @@
+{
+  profilePage.open();
+  loginPage.login("test-user@localhost","password");
+  events.expectLogin().client("account").detail(Details.REDIRECT_URI,AccountTest.ACCOUNT_REDIRECT).assertEvent();
+  Assert.assertEquals("test-user@localhost",profilePage.getEmail());
+  Assert.assertEquals("",profilePage.getAttribute("street"));
+  profilePage.updateAttribute("street","Elm 1");
+  Assert.assertEquals("Elm 1",profilePage.getAttribute("street"));
+  profilePage.updateAttribute("street","Elm 2");
+  Assert.assertEquals("Elm 2",profilePage.getAttribute("street"));
+  events.expectAccount(EventType.UPDATE_PROFILE).assertEvent();
+}

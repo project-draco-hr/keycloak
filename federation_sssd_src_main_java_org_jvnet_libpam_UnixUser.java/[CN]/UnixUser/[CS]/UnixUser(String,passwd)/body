@@ -1,0 +1,32 @@
+{
+  this.userName=userName;
+  this.gecos=pwd.getPwGecos();
+  this.dir=pwd.getPwDir();
+  this.shell=pwd.getPwShell();
+  this.uid=pwd.getPwUid();
+  this.gid=pwd.getPwGid();
+  int sz=4;
+  int ngroups=64;
+  Memory m=new Memory(ngroups * sz);
+  IntByReference pngroups=new IntByReference(ngroups);
+  try {
+    if (libc.getgrouplist(userName,pwd.getPwGid(),m,pngroups) < 0) {
+      m=new Memory(pngroups.getValue() * sz);
+      if (libc.getgrouplist(userName,pwd.getPwGid(),m,pngroups) < 0)       throw new PAMException("getgrouplist failed");
+    }
+    ngroups=pngroups.getValue();
+  }
+ catch (  LinkageError e) {
+    ngroups=libc._getgroupsbymember(userName,m,ngroups,0);
+    if (ngroups < 0)     throw new PAMException("_getgroupsbymember failed");
+  }
+  groups=new HashSet<String>();
+  for (int i=0; i < ngroups; i++) {
+    int gid=m.getInt(i * sz);
+    group grp=libc.getgrgid(gid);
+    if (grp == null) {
+      continue;
+    }
+    groups.add(grp.gr_name);
+  }
+}

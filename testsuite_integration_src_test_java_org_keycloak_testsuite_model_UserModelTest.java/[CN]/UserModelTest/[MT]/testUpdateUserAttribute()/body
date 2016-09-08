@@ -1,0 +1,14 @@
+{
+  RealmModel realm=realmManager.createRealm("original");
+  UserModel user=session.users().addUser(realm,"user");
+  user.setSingleAttribute("key1","value1");
+  commit();
+  realm=realmManager.getRealmByName("original");
+  user=session.users().getUserByUsername("user",realm);
+  List<String> attrVals=new ArrayList<>(Arrays.asList("val2"));
+  user.setAttribute("key1",attrVals);
+  Map<String,List<String>> allAttrVals=user.getAttributes();
+  Assert.assertEquals(1,allAttrVals.size());
+  Assert.assertEquals(allAttrVals.get("key1"),Arrays.asList("val2"));
+  commit();
+}

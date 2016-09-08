@@ -1,0 +1,85 @@
+{
+  if (Debug.debug)   Debug.print(Debug.VERBOSE,"Deserializing from " + parameter.getClass() + " to "+ type.getClass());
+  if (null == parameter)   return null;
+  if (type instanceof TypeVariable && parameter instanceof Variant) {
+    parameter=((Variant)parameter).getValue();
+  }
+  if (type instanceof Class && ((Class)type).isArray() && ((Class)type).getComponentType().equals(Type.class)&& parameter instanceof String) {
+    Vector<Type> rv=new Vector<Type>();
+    getJavaType((String)parameter,rv,-1);
+    parameter=rv.toArray(new Type[0]);
+  }
+  if (parameter instanceof ObjectPath) {
+    if (type instanceof Class && DBusInterface.class.isAssignableFrom((Class)type))     parameter=conn.getExportedObject(((ObjectPath)parameter).source,((ObjectPath)parameter).path);
+ else     parameter=new Path(((ObjectPath)parameter).path);
+  }
+  if (parameter instanceof Object[] && type instanceof Class && Struct.class.isAssignableFrom((Class)type)) {
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"Creating Struct " + type + " from "+ parameter);
+    Type[] ts=Container.getTypeCache(type);
+    if (null == ts) {
+      Field[] fs=((Class)type).getDeclaredFields();
+      ts=new Type[fs.length];
+      for (      Field f : fs) {
+        Position p=f.getAnnotation(Position.class);
+        if (null == p)         continue;
+        ts[p.value()]=f.getGenericType();
+      }
+      Container.putTypeCache(type,ts);
+    }
+    parameter=deSerializeParameters((Object[])parameter,ts,conn);
+    for (    Constructor con : ((Class)type).getDeclaredConstructors()) {
+      try {
+        parameter=con.newInstance((Object[])parameter);
+        break;
+      }
+ catch (      IllegalArgumentException IAe) {
+      }
+    }
+  }
+  if (parameter instanceof Object[]) {
+    Type[] ts=new Type[((Object[])parameter).length];
+    Arrays.fill(ts,parameter.getClass().getComponentType());
+    parameter=deSerializeParameters((Object[])parameter,ts,conn);
+  }
+  if (parameter instanceof List) {
+    Type type2;
+    if (type instanceof ParameterizedType)     type2=((ParameterizedType)type).getActualTypeArguments()[0];
+ else     if (type instanceof GenericArrayType)     type2=((GenericArrayType)type).getGenericComponentType();
+ else     if (type instanceof Class && ((Class)type).isArray())     type2=((Class)type).getComponentType();
+ else     type2=null;
+    if (null != type2)     parameter=deSerializeParameters((List)parameter,type2,conn);
+  }
+  if (type.equals(Float.class) || type.equals(Float.TYPE))   if (!(parameter instanceof Float))   parameter=((Number)parameter).floatValue();
+  if (parameter instanceof Object[] || parameter instanceof List || parameter.getClass().isArray()) {
+    if (type instanceof ParameterizedType)     parameter=ArrayFrob.convert(parameter,(Class<? extends Object>)((ParameterizedType)type).getRawType());
+ else     if (type instanceof GenericArrayType) {
+      Type ct=((GenericArrayType)type).getGenericComponentType();
+      Class cc=null;
+      if (ct instanceof Class)       cc=(Class)ct;
+      if (ct instanceof ParameterizedType)       cc=(Class)((ParameterizedType)ct).getRawType();
+      Object o=Array.newInstance(cc,0);
+      parameter=ArrayFrob.convert(parameter,o.getClass());
+    }
+ else     if (type instanceof Class && ((Class)type).isArray()) {
+      Class cc=((Class)type).getComponentType();
+      if ((cc.equals(Float.class) || cc.equals(Float.TYPE)) && (parameter instanceof double[])) {
+        double[] tmp1=(double[])parameter;
+        float[] tmp2=new float[tmp1.length];
+        for (int i=0; i < tmp1.length; i++)         tmp2[i]=(float)tmp1[i];
+        parameter=tmp2;
+      }
+      Object o=Array.newInstance(cc,0);
+      parameter=ArrayFrob.convert(parameter,o.getClass());
+    }
+  }
+  if (parameter instanceof DBusMap) {
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"Deserializing a Map");
+    DBusMap dmap=(DBusMap)parameter;
+    Type[] maptypes=((ParameterizedType)type).getActualTypeArguments();
+    for (int i=0; i < dmap.entries.length; i++) {
+      dmap.entries[i][0]=deSerializeParameter(dmap.entries[i][0],maptypes[0],conn);
+      dmap.entries[i][1]=deSerializeParameter(dmap.entries[i][1],maptypes[1],conn);
+    }
+  }
+  return parameter;
+}

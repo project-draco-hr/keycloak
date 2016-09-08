@@ -1,0 +1,58 @@
+{
+synchronized (conn) {
+    String s=null;
+switch (bustype) {
+case SYSTEM:
+      s=System.getenv("DBUS_SYSTEM_BUS_ADDRESS");
+    if (null == s)     s=DEFAULT_SYSTEM_BUS_ADDRESS;
+  break;
+case SESSION:
+s=System.getenv("DBUS_SESSION_BUS_ADDRESS");
+if (null == s) {
+String display=System.getenv("DISPLAY");
+if (null == display) throw new DBusException(getString("cannotResolveSessionBusAddress"));
+File uuidfile=new File("/var/lib/dbus/machine-id");
+if (!uuidfile.exists()) throw new DBusException(getString("cannotResolveSessionBusAddress"));
+try {
+  BufferedReader r=new BufferedReader(new FileReader(uuidfile));
+  String uuid=r.readLine();
+  String homedir=System.getProperty("user.home");
+  File addressfile=new File(homedir + "/.dbus/session-bus",uuid + "-" + display.replaceAll(":([0-9]*)\\..*","$1"));
+  if (!addressfile.exists())   throw new DBusException(getString("cannotResolveSessionBusAddress"));
+  r=new BufferedReader(new FileReader(addressfile));
+  String l;
+  while (null != (l=r.readLine())) {
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"Reading D-Bus session data: " + l);
+    if (l.matches("DBUS_SESSION_BUS_ADDRESS.*")) {
+      s=l.replaceAll("^[^=]*=","");
+      if (Debug.debug)       Debug.print(Debug.VERBOSE,"Parsing " + l + " to "+ s);
+    }
+  }
+  if (null == s || "".equals(s))   throw new DBusException(getString("cannotResolveSessionBusAddress"));
+  if (Debug.debug)   Debug.print(Debug.INFO,"Read bus address " + s + " from file "+ addressfile.toString());
+}
+ catch (Exception e) {
+  if (EXCEPTION_DEBUG && Debug.debug)   Debug.print(Debug.ERR,e);
+  throw new DBusException(getString("cannotResolveSessionBusAddress"));
+}
+}
+break;
+default :
+throw new DBusException(getString("invalidBusType") + bustype);
+}
+DBusConnection c=conn.get(s);
+if (Debug.debug) Debug.print(Debug.VERBOSE,"Getting bus connection for " + s + ": "+ c);
+if (null != c) {
+synchronized (c._reflock) {
+c._refcount++;
+}
+return c;
+}
+ else {
+if (Debug.debug) Debug.print(Debug.DEBUG,"Creating new bus connection to: " + s);
+c=new DBusConnection(s);
+conn.put(s,c);
+return c;
+}
+}
+}

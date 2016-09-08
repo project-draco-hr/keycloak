@@ -1,0 +1,43 @@
+{
+  if (null == parameters)   return null;
+  for (int i=0; i < parameters.length; i++) {
+    if (Debug.debug)     Debug.print(Debug.VERBOSE,"Converting " + i + " from "+ parameters[i]+ " to "+ types[i]);
+    if (null == parameters[i])     continue;
+    if (parameters[i] instanceof DBusSerializable) {
+      for (      Method m : parameters[i].getClass().getDeclaredMethods())       if (m.getName().equals("deserialize")) {
+        Type[] newtypes=m.getParameterTypes();
+        Type[] expand=new Type[types.length + newtypes.length - 1];
+        System.arraycopy(types,0,expand,0,i);
+        System.arraycopy(newtypes,0,expand,i,newtypes.length);
+        System.arraycopy(types,i + 1,expand,i + newtypes.length,types.length - i - 1);
+        types=expand;
+        Object[] newparams=((DBusSerializable)parameters[i]).serialize();
+        Object[] exparams=new Object[parameters.length + newparams.length - 1];
+        System.arraycopy(parameters,0,exparams,0,i);
+        System.arraycopy(newparams,0,exparams,i,newparams.length);
+        System.arraycopy(parameters,i + 1,exparams,i + newparams.length,parameters.length - i - 1);
+        parameters=exparams;
+      }
+      i--;
+    }
+ else     if (parameters[i] instanceof Tuple) {
+      Type[] newtypes=((ParameterizedType)types[i]).getActualTypeArguments();
+      Type[] expand=new Type[types.length + newtypes.length - 1];
+      System.arraycopy(types,0,expand,0,i);
+      System.arraycopy(newtypes,0,expand,i,newtypes.length);
+      System.arraycopy(types,i + 1,expand,i + newtypes.length,types.length - i - 1);
+      types=expand;
+      Object[] newparams=((Tuple)parameters[i]).getParameters();
+      Object[] exparams=new Object[parameters.length + newparams.length - 1];
+      System.arraycopy(parameters,0,exparams,0,i);
+      System.arraycopy(newparams,0,exparams,i,newparams.length);
+      System.arraycopy(parameters,i + 1,exparams,i + newparams.length,parameters.length - i - 1);
+      parameters=exparams;
+      if (Debug.debug)       Debug.print(Debug.VERBOSE,"New params: " + Arrays.deepToString(parameters) + " new types: "+ Arrays.deepToString(types));
+      i--;
+    }
+ else     if (types[i] instanceof TypeVariable && !(parameters[i] instanceof Variant))     parameters[i]=new Variant<Object>(parameters[i]);
+ else     if (parameters[i] instanceof DBusInterface)     parameters[i]=conn.getExportedObject((DBusInterface)parameters[i]);
+  }
+  return parameters;
+}

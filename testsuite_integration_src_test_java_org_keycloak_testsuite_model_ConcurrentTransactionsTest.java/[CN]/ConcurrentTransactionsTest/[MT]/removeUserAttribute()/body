@@ -1,8 +1,10 @@
 {
   RealmModel realm=realmManager.createRealm("original");
   KeycloakSession session=realmManager.getSession();
-  UserModel user=session.users().addUser(realm,"john");
-  user.setSingleAttribute("foo","val1");
+  UserModel john=session.users().addUser(realm,"john");
+  john.setSingleAttribute("foo","val1");
+  UserModel john2=session.users().addUser(realm,"john2");
+  john2.setAttribute("foo",Arrays.asList("val1","val2"));
   final KeycloakSessionFactory sessionFactory=session.getKeycloakSessionFactory();
   commit();
   AtomicReference<Exception> reference=new AtomicReference<>();
@@ -16,9 +18,12 @@
               RealmModel realm=session.realms().getRealmByName("original");
               UserModel john=session.users().getUserByUsername("john",realm);
               String attrVal=john.getFirstAttribute("foo");
+              UserModel john2=session.users().getUserByUsername("john2",realm);
+              String attrVal2=john2.getFirstAttribute("foo");
               readAttrLatch.countDown();
               readAttrLatch.await();
               john.removeAttribute("foo");
+              john2.setSingleAttribute("foo","bar");
             }
  catch (            Exception e) {
               throw new RuntimeException(e);

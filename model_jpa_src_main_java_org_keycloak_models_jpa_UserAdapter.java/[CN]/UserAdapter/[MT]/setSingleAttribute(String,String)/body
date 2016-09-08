@@ -1,23 +1,25 @@
 {
-  boolean found=false;
+  String firstExistingAttrId=null;
   List<UserAttributeEntity> toRemove=new ArrayList<>();
   for (  UserAttributeEntity attr : user.getAttributes()) {
     if (attr.getName().equals(name)) {
-      if (!found) {
+      if (firstExistingAttrId == null) {
         attr.setValue(value);
-        found=true;
+        firstExistingAttrId=attr.getId();
       }
  else {
         toRemove.add(attr);
       }
     }
   }
-  for (  UserAttributeEntity attr : toRemove) {
-    em.remove(attr);
-    user.getAttributes().remove(attr);
+  if (firstExistingAttrId != null) {
+    Query query=em.createNamedQuery("deleteUserAttributesOtherThan");
+    query.setParameter("attrId",firstExistingAttrId);
+    query.setParameter("userId",user.getId());
+    int numUpdated=query.executeUpdate();
+    user.getAttributes().removeAll(toRemove);
   }
-  if (found) {
-    return;
+ else {
+    persistAttributeValue(name,value);
   }
-  persistAttributeValue(name,value);
 }

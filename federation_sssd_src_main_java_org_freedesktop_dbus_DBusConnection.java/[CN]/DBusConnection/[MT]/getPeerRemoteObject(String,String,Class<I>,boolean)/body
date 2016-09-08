@@ -1,0 +1,6 @@
+{
+  if (null == busname)   throw new DBusException(getString("nullBusName"));
+  if ((!busname.matches(BUSNAME_REGEX) && !busname.matches(CONNID_REGEX)) || busname.length() > MAX_NAME_LENGTH)   throw new DBusException(getString("invalidBusName") + busname);
+  String unique=_dbus.GetNameOwner(busname);
+  return getRemoteObject(unique,objectpath,type,autostart);
+}

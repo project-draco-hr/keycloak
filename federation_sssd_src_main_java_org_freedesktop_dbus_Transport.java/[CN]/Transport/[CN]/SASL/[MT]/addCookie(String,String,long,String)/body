@@ -1,0 +1,30 @@
+{
+  String homedir=System.getProperty("user.home");
+  File keydir=new File(homedir + "/.dbus-keyrings/");
+  File cookiefile=new File(homedir + "/.dbus-keyrings/" + context);
+  File lock=new File(homedir + "/.dbus-keyrings/" + context+ ".lock");
+  File temp=new File(homedir + "/.dbus-keyrings/" + context+ ".temp");
+  if (!keydir.exists())   keydir.mkdirs();
+  long start=System.currentTimeMillis();
+  while (!lock.createNewFile() && LOCK_TIMEOUT > (System.currentTimeMillis() - start))   ;
+  Vector<String> lines=new Vector<String>();
+  if (cookiefile.exists()) {
+    BufferedReader r=new BufferedReader(new InputStreamReader(new FileInputStream(cookiefile)));
+    String s=null;
+    while (null != (s=r.readLine())) {
+      String[] line=s.split(" ");
+      long time=Long.parseLong(line[1]);
+      if ((timestamp - time) < COOKIE_TIMEOUT)       lines.add(s);
+    }
+    r.close();
+  }
+  lines.add(ID + " " + timestamp+ " "+ cookie);
+  PrintWriter w=new PrintWriter(new FileOutputStream(temp));
+  for (  String l : lines)   w.println(l);
+  w.close();
+  if (!temp.renameTo(cookiefile)) {
+    cookiefile.delete();
+    temp.renameTo(cookiefile);
+  }
+  lock.delete();
+}

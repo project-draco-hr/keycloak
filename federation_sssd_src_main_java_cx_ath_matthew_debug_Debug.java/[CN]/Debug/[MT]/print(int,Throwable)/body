@@ -1,0 +1,20 @@
+{
+  if (debug) {
+    String timestr="";
+    String[] data=getTraceElements();
+    if (debugging(data[0],loglevel)) {
+      if (timing) {
+        long now=System.currentTimeMillis();
+        timestr="{" + (now - last) + "} ";
+        last=now;
+      }
+      String[] lines=null;
+      if (ttrace) {
+        StackTraceElement[] ste=t.getStackTrace();
+        lines=new String[ste.length];
+        for (int i=0; i < ste.length; i++)         lines[i]="\tat " + ste[i].toString();
+      }
+      _print(t.getClass(),loglevel,data[0] + "." + data[1]+ "()"+ data[2],timestr,t.toString(),lines);
+    }
+  }
+}

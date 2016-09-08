@@ -1,0 +1,14 @@
+{
+  if (!busname.matches(BUSNAME_REGEX) || busname.length() > MAX_NAME_LENGTH)   throw new DBusException(getString("invalidBusName"));
+synchronized (this.busnames) {
+    UInt32 rv;
+    try {
+      rv=_dbus.ReleaseName(busname);
+    }
+ catch (    DBusExecutionException DBEe) {
+      if (EXCEPTION_DEBUG && Debug.debug)       Debug.print(Debug.ERR,DBEe);
+      throw new DBusException(DBEe.getMessage());
+    }
+    this.busnames.remove(busname);
+  }
+}

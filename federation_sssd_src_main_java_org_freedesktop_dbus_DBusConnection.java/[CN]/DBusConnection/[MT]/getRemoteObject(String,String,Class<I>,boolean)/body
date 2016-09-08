@@ -1,0 +1,13 @@
+{
+  if (null == busname)   throw new DBusException(getString("nullBusName"));
+  if (null == objectpath)   throw new DBusException(getString("nullObjectPath"));
+  if (null == type)   throw new ClassCastException(getString("notDBusInterface"));
+  if ((!busname.matches(BUSNAME_REGEX) && !busname.matches(CONNID_REGEX)) || busname.length() > MAX_NAME_LENGTH)   throw new DBusException(getString("invalidBusName") + busname);
+  if (!objectpath.matches(OBJECT_REGEX) || objectpath.length() > MAX_NAME_LENGTH)   throw new DBusException(getString("invalidObjectPath") + objectpath);
+  if (!DBusInterface.class.isAssignableFrom(type))   throw new ClassCastException(getString("notDBusInterface"));
+  if (type.getName().equals(type.getSimpleName()))   throw new DBusException(getString("interfaceNotAllowedOutsidePackage"));
+  RemoteObject ro=new RemoteObject(busname,objectpath,type,autostart);
+  I i=(I)Proxy.newProxyInstance(type.getClassLoader(),new Class[]{type},new RemoteInvocationHandler(this,ro));
+  importedObjects.put(i,ro);
+  return i;
+}

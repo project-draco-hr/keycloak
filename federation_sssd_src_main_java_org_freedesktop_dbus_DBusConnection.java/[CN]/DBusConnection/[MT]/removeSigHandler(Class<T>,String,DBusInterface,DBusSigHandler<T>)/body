@@ -1,0 +1,8 @@
+{
+  if (!DBusSignal.class.isAssignableFrom(type))   throw new ClassCastException(getString("notDBusSignal"));
+  if (source.matches(BUSNAME_REGEX))   throw new DBusException(getString("cannotWatchSignalsWellKnownBussName"));
+  if (!source.matches(CONNID_REGEX) || source.length() > MAX_NAME_LENGTH)   throw new DBusException(getString("invalidBusName") + source);
+  String objectpath=importedObjects.get(object).objectpath;
+  if (!objectpath.matches(OBJECT_REGEX) || objectpath.length() > MAX_NAME_LENGTH)   throw new DBusException(getString("invalidObjectPath") + objectpath);
+  removeSigHandler(new DBusMatchRule(type,source,objectpath),handler);
+}

@@ -1,0 +1,16 @@
+{
+synchronized (conn) {
+    DBusConnection c=conn.get(address);
+    if (null != c) {
+synchronized (c._reflock) {
+        c._refcount++;
+      }
+      return c;
+    }
+ else {
+      c=new DBusConnection(address);
+      conn.put(address,c);
+      return c;
+    }
+  }
+}

@@ -1,10 +1,4 @@
 {
-  List<IdentityProviderModel> identityProviders=realm.getIdentityProviders();
-  for (  IdentityProviderModel identityProvider : identityProviders) {
-    if (identityProvider.isEnabled() && identityProvider.isAuthenticateByDefault()) {
-      return buildRedirectToIdentityProvider(identityProvider.getAlias(),new ClientSessionCode(realm,clientSession).getCode());
-    }
-  }
   AuthenticationFlowModel flow=getAuthenticationFlow();
   String flowId=flow.getId();
   AuthenticationProcessor processor=createProcessor(clientSession,flowId,LoginActionsService.AUTHENTICATE_PATH);

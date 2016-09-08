@@ -66,4 +66,14 @@
   if (newRealm.getFlowByAlias(DefaultAuthenticationFlows.FIRST_BROKER_LOGIN_FLOW) == null) {
     DefaultAuthenticationFlows.firstBrokerLoginFlow(newRealm,true);
   }
+  String defaultProvider=null;
+  if (rep.getIdentityProviders() != null) {
+    for (    IdentityProviderRepresentation i : rep.getIdentityProviders()) {
+      if (i.isEnabled() && i.isAuthenticateByDefault()) {
+        defaultProvider=i.getProviderId();
+        break;
+      }
+    }
+  }
+  DefaultAuthenticationFlows.addIdentityProviderAuthenticator(newRealm,defaultProvider);
 }

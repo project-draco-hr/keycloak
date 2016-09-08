@@ -1,0 +1,19 @@
+{
+  CredentialModel model=new CredentialModel();
+  model.setId(entity.getId());
+  model.setType(entity.getType());
+  model.setValue(entity.getValue());
+  model.setAlgorithm(entity.getAlgorithm());
+  model.setSalt(entity.getSalt());
+  model.setPeriod(entity.getPeriod());
+  model.setCounter(entity.getCounter());
+  model.setCreatedDate(entity.getCreatedDate());
+  model.setDevice(entity.getDevice());
+  model.setDigits(entity.getDigits());
+  MultivaluedHashMap<String,String> config=new MultivaluedHashMap<>();
+  model.setConfig(config);
+  for (  FederatedUserCredentialAttributeEntity attr : entity.getCredentialAttributes()) {
+    config.add(attr.getName(),attr.getValue());
+  }
+  return model;
+}

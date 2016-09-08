@@ -28,13 +28,7 @@
       logger.tracev("return managed user");
       return managedUsers.get(userId);
     }
-    CachedUser cached=cache.get(userId,CachedUser.class);
-    if (cached == null) {
-      cached=new CachedUser(loaded,realm,model);
-      cache.addRevisioned(cached,startupRevision);
-    }
-    logger.trace("return new cache adapter");
-    UserAdapter adapter=new UserAdapter(cached,this,session,realm);
+    UserAdapter adapter=getUserAdapter(realm,userId,loaded,model);
     managedUsers.put(userId,adapter);
     return adapter;
   }

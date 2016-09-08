@@ -2,13 +2,6 @@
   if (active) {
     throw new IllegalStateException("Transaction already active");
   }
-  if (jtaPolicy == JTAPolicy.REQUIRES_NEW) {
-    JtaTransactionManagerLookup jtaLookup=session.getProvider(JtaTransactionManagerLookup.class);
-    TransactionManager tm=jtaLookup.getTransactionManager();
-    if (tm != null) {
-      enlist(new JtaTransactionWrapper(tm));
-    }
-  }
   for (  KeycloakTransaction tx : transactions) {
     tx.begin();
   }

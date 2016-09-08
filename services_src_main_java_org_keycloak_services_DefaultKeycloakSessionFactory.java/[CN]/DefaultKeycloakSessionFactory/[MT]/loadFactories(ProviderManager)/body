@@ -11,7 +11,7 @@
         continue;
       }
       Config.Scope scope=Config.scope(spi.getName(),provider);
-      if (scope.getBoolean("enabled",true)) {
+      if (isEnabled(factory,scope)) {
         factory.init(scope);
         if (spi.isInternal() && !isInternal(factory)) {
           logger.spiMayChange(factory.getId(),factory.getClass().getName(),spi.getName());
@@ -23,7 +23,7 @@
  else {
       for (      ProviderFactory factory : pm.load(spi)) {
         Config.Scope scope=Config.scope(spi.getName(),factory.getId());
-        if (scope.getBoolean("enabled",true)) {
+        if (isEnabled(factory,scope)) {
           factory.init(scope);
           if (spi.isInternal() && !isInternal(factory)) {
             logger.spiMayChange(factory.getId(),factory.getClass().getName(),spi.getName());

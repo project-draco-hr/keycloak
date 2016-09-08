@@ -1,0 +1,7 @@
+{
+  UserEntity userEntity=em.getReference(UserEntity.class,user.getId());
+  TypedQuery<CredentialEntity> query=em.createNamedQuery("credentialByNameAndType",CredentialEntity.class).setParameter("type",type).setParameter("device",name).setParameter("user",userEntity);
+  List<CredentialEntity> results=query.getResultList();
+  if (results.isEmpty())   return null;
+  return toModel(results.get(0));
+}

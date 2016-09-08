@@ -1,7 +1,9 @@
 {
   localStorage().preRemove(realm,role);
-  getFederatedStorage().preRemove(realm,role);
-  for (  UserStorageProvider provider : getStorageProviders(session,realm,UserStorageProvider.class)) {
-    provider.preRemove(realm,role);
+  if (getFederatedStorage() != null) {
+    getFederatedStorage().preRemove(realm,role);
+    for (    UserStorageProvider provider : getStorageProviders(session,realm,UserStorageProvider.class)) {
+      provider.preRemove(realm,role);
+    }
   }
 }

@@ -1,0 +1,24 @@
+{
+  if (!StorageId.isLocalStorage(user)) {
+    String providerId=StorageId.resolveProviderId(user);
+    UserStorageProvider provider=UserStorageManager.getStorageProvider(session,realm,providerId);
+    if (provider instanceof CredentialInputUpdater) {
+      CredentialInputUpdater updater=(CredentialInputUpdater)provider;
+      if (updater.supportsCredentialType(input.getType())) {
+        if (updater.updateCredential(realm,user,input))         return;
+      }
+    }
+  }
+  List<ComponentModel> components=getCredentialProviderComponents(realm);
+  for (  ComponentModel component : components) {
+    CredentialProviderFactory factory=(CredentialProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(CredentialProvider.class,component.getProviderId());
+    if (!Types.supports(CredentialInputUpdater.class,factory,CredentialProviderFactory.class))     continue;
+    CredentialInputUpdater updater=(CredentialInputUpdater)session.getAttribute(component.getId());
+    if (updater == null) {
+      updater=(CredentialInputUpdater)factory.create(session,component);
+      session.setAttribute(component.getId(),updater);
+    }
+    if (!updater.supportsCredentialType(input.getType()))     continue;
+    if (updater.updateCredential(realm,user,input))     return;
+  }
+}

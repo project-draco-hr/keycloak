@@ -1,0 +1,9 @@
+{
+  UserModel user=localStorage().getUserByUsername(username,realm);
+  if (user != null)   return user;
+  for (  UserLookupProvider provider : getStorageProviders(realm,UserLookupProvider.class)) {
+    user=provider.getUserByUsername(username,realm);
+    if (user != null)     return user;
+  }
+  return null;
+}

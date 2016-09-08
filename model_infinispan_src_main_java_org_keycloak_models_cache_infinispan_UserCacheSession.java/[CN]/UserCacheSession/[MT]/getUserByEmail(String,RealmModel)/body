@@ -19,7 +19,12 @@
     cache.addRevisioned(query,startupRevision);
     if (invalidations.contains(userId))     return model;
     if (managedUsers.containsKey(userId))     return managedUsers.get(userId);
-    UserAdapter adapter=getUserAdapter(realm,userId,loaded,model);
+    CachedUser cached=cache.get(userId,CachedUser.class);
+    if (cached == null) {
+      cached=new CachedUser(loaded,realm,model);
+      cache.addRevisioned(cached,startupRevision);
+    }
+    UserAdapter adapter=new UserAdapter(cached,this,session,realm);
     managedUsers.put(userId,adapter);
     return adapter;
   }

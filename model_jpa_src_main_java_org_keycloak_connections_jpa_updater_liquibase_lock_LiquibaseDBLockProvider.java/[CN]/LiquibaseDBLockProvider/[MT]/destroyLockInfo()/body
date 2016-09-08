@@ -1,2 +1,12 @@
 {
+  lazyInit();
+  try {
+    this.lockService.destroy();
+    dbConnection.commit();
+    logger.debug("Destroyed lock table");
+  }
+ catch (  DatabaseException|SQLException de) {
+    logger.error("Failed to destroy lock table");
+    safeRollbackConnection();
+  }
 }

@@ -1,5 +1,6 @@
 {
-  PersistenceXmlParser parser=new PersistenceXmlParser(new ClassLoaderServiceImpl(classLoader),PersistenceUnitTransactionType.RESOURCE_LOCAL);
+  PersistenceUnitTransactionType txType=jta ? PersistenceUnitTransactionType.JTA : PersistenceUnitTransactionType.RESOURCE_LOCAL;
+  PersistenceXmlParser parser=new PersistenceXmlParser(new ClassLoaderServiceImpl(classLoader),txType);
   List<ParsedPersistenceXmlDescriptor> persistenceUnits=parser.doResolve(properties);
   for (  ParsedPersistenceXmlDescriptor persistenceUnit : persistenceUnits) {
     if (persistenceUnit.getName().equals(unitName)) {
@@ -7,6 +8,7 @@
       for (      Class<?> entityClass : providedEntities) {
         persistenceUnit.addClasses(entityClass.getName());
       }
+      persistenceUnit.setTransactionType(txType);
       return Bootstrap.getEntityManagerFactoryBuilder(persistenceUnit,properties,new ProxyClassLoader(providedEntities,classLoader)).build();
     }
   }

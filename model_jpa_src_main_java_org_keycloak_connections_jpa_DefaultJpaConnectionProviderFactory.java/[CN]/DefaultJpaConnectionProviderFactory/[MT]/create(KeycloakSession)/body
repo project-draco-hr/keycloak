@@ -1,7 +1,15 @@
 {
+  logger.trace("Create JpaConnectionProvider");
   lazyInit(session);
-  EntityManager em=emf.createEntityManager();
+  EntityManager em=null;
+  if (!jtaEnabled) {
+    logger.trace("enlisting EntityManager in JpaKeycloakTransaction");
+    em=emf.createEntityManager();
+  }
+ else {
+    em=emf.createEntityManager(SynchronizationType.SYNCHRONIZED);
+  }
   em=PersistenceExceptionConverter.create(em);
-  session.getTransactionManager().enlist(new JpaKeycloakTransaction(em));
+  if (!jtaEnabled)   session.getTransactionManager().enlist(new JpaKeycloakTransaction(em));
   return new DefaultJpaConnectionProvider(em);
 }

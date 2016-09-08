@@ -6,6 +6,9 @@
     return ErrorResponse.exists("Scopes can not be removed while associated with resources.");
   }
   Scope scope=storeFactory.getScopeStore().findById(id);
+  if (scope == null) {
+    return Response.status(Status.NOT_FOUND).build();
+  }
   PolicyStore policyStore=storeFactory.getPolicyStore();
   List<Policy> policies=policyStore.findByScopeIds(Arrays.asList(scope.getId()),resourceServer.getId());
   for (  Policy policyModel : policies) {

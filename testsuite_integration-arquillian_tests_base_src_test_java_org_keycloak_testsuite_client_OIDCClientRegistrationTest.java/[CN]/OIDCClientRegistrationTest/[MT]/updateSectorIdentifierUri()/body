@@ -1,0 +1,16 @@
+{
+  OIDCClientRepresentation clientRep=createRep();
+  clientRep.setSubjectType("pairwise");
+  OIDCClientRepresentation response=reg.oidc().create(clientRep);
+  Assert.assertEquals("pairwise",response.getSubjectType());
+  Assert.assertNull(response.getSectorIdentifierUri());
+  reg.auth(Auth.token(response));
+  List<String> sectorRedirects=new ArrayList<>();
+  sectorRedirects.addAll(response.getRedirectUris());
+  TestOIDCEndpointsApplicationResource oidcClientEndpointsResource=testingClient.testApp().oidcClientEndpoints();
+  oidcClientEndpointsResource.setSectorIdentifierRedirectUris(sectorRedirects);
+  response.setSectorIdentifierUri(TestApplicationResourceUrls.pairwiseSectorIdentifierUri());
+  OIDCClientRepresentation updated=reg.oidc().update(response);
+  Assert.assertEquals("pairwise",updated.getSubjectType());
+  Assert.assertEquals(TestApplicationResourceUrls.pairwiseSectorIdentifierUri(),updated.getSectorIdentifierUri());
+}

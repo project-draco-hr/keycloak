@@ -1,0 +1,18 @@
+{
+  Set<String> hosts=new HashSet<>();
+  for (  String redirectUri : PairwiseSubMapperUtils.resolveValidRedirectUris(rootUrl,redirectUris)) {
+    try {
+      URI uri=new URI(redirectUri);
+      hosts.add(uri.getHost());
+    }
+ catch (    URISyntaxException e) {
+      throw new ProtocolMapperConfigException("Client contained an invalid redirect URI.",PAIRWISE_MALFORMED_CLIENT_REDIRECT_URI,e);
+    }
+  }
+  if (hosts.isEmpty()) {
+    throw new ProtocolMapperConfigException("Client redirect URIs must contain a valid host component.",PAIRWISE_CLIENT_REDIRECT_URIS_MISSING_HOST);
+  }
+  if (hosts.size() > 1) {
+    throw new ProtocolMapperConfigException("Without a configured Sector Identifier URI, client redirect URIs must not contain multiple host components.",PAIRWISE_CLIENT_REDIRECT_URIS_MULTIPLE_HOSTS);
+  }
+}

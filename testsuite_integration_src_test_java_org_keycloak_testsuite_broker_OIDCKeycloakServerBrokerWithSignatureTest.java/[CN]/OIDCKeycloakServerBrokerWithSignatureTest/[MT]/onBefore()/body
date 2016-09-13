@@ -1,0 +1,9 @@
+{
+  super.onBefore();
+  IdentityProviderModel idpModel=getIdentityProviderModel();
+  OIDCIdentityProviderConfig cfg=new OIDCIdentityProviderConfig(idpModel);
+  cfg.setValidateSignature(true);
+  getRealm().updateIdentityProvider(cfg);
+  brokerServerRule.stopSession(this.session,true);
+  this.session=brokerServerRule.startSession();
+}

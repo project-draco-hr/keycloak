@@ -20,6 +20,7 @@
   cert.setPublicKey(clientPublicKeyPem);
   CertificateInfoHelper.updateClientRepresentationCertificateInfo(clientRep,cert,JWTClientAuthenticator.ATTR_PREFIX);
   clientResource.update(clientRep);
+  setTimeOffset(20);
   OAuthClient.AuthorizationEndpointResponse response=oauth.doLogin("test-user@localhost","password");
   Assert.assertNotNull(response.getCode());
   Assert.assertEquals("mystate",response.getState());

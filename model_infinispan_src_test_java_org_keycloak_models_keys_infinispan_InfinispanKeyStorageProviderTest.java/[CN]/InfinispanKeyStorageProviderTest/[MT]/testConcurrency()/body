@@ -1,0 +1,35 @@
+{
+  List<Thread> threads=new LinkedList<>();
+  for (int i=0; i < 10; i++) {
+    Thread t=new Thread(new SampleWorker("model1"));
+    threads.add(t);
+  }
+  startAndJoinAll(threads);
+  Assert.assertEquals(counters.get("model1").get(),1);
+  threads.clear();
+  for (int i=0; i < 10; i++) {
+    Thread t=new Thread(new SampleWorker("model1"));
+    threads.add(t);
+  }
+  for (int i=0; i < 10; i++) {
+    Thread t=new Thread(new SampleWorker("model2"));
+    threads.add(t);
+  }
+  startAndJoinAll(threads);
+  Assert.assertEquals(counters.get("model1").get(),1);
+  Assert.assertEquals(counters.get("model2").get(),1);
+  threads.clear();
+  Time.setOffset(20);
+  for (int i=0; i < 10; i++) {
+    Thread t=new Thread(new SampleWorker("model1"));
+    threads.add(t);
+  }
+  for (int i=0; i < 10; i++) {
+    Thread t=new Thread(new SampleWorker("model2"));
+    threads.add(t);
+  }
+  startAndJoinAll(threads);
+  Assert.assertEquals(counters.get("model1").get(),2);
+  Assert.assertEquals(counters.get("model2").get(),2);
+  threads.clear();
+}

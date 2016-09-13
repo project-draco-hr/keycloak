@@ -1,0 +1,24 @@
+{
+  String realmInfoUrl=KeycloakUriBuilder.fromUri(getAuthServerRoot()).path(ServiceUrlConstants.REALM_INFO_PATH).build(REALM_NAME).toString();
+  JWTClientCredentialsProvider jwtProvider=new JWTClientCredentialsProvider(){
+    @Override public String createSignedRequestToken(    String clientId,    String realmInfoUrl){
+      if (KEEP_GENERATED_KID.equals(kid)) {
+        return super.createSignedRequestToken(clientId,realmInfoUrl);
+      }
+ else {
+        JsonWebToken jwt=createRequestToken(clientId,realmInfoUrl);
+        return new JWSBuilder().kid(kid).jsonContent(jwt).rsa256(keyPair.getPrivate());
+      }
+    }
+    @Override protected JsonWebToken createRequestToken(    String clientId,    String realmInfoUrl){
+      JsonWebToken jwt=super.createRequestToken(clientId,realmInfoUrl);
+      String tokenEndpointUrl=OIDCLoginProtocolService.tokenUrl(UriBuilder.fromUri(getAuthServerRoot())).build(REALM_NAME).toString();
+      jwt.audience(tokenEndpointUrl);
+      return jwt;
+    }
+  }
+;
+  jwtProvider.setupKeyPair(keyPair);
+  jwtProvider.setTokenTimeout(10);
+  return jwtProvider.createSignedRequestToken(clientId,realmInfoUrl);
+}

@@ -16,10 +16,12 @@
   KeyStore keyStore=getKeystore(keyStoreIs,storePassword,format);
   keyStoreIs.close();
   client=getClient(testRealm.getRealm(),client.getId()).toRepresentation();
-  assertCertificate(client,certOld,KeycloakModelUtils.getPemFromCertificate((X509Certificate)keyStore.getCertificate(keyAlias)));
+  X509Certificate x509Cert=(X509Certificate)keyStore.getCertificate(keyAlias);
+  assertCertificate(client,certOld,KeycloakModelUtils.getPemFromCertificate(x509Cert));
   oauth.clientId(client.getClientId());
   PrivateKey privateKey=(PrivateKey)keyStore.getKey(keyAlias,keyPassword.toCharArray());
-  OAuthClient.AccessTokenResponse response=doGrantAccessTokenRequest(user.getUsername(),user.getCredentials().get(0).getValue(),getClientSignedJWT(privateKey,client.getClientId()));
+  KeyPair keyPair=new KeyPair(x509Cert.getPublicKey(),privateKey);
+  OAuthClient.AccessTokenResponse response=doGrantAccessTokenRequest(user.getUsername(),user.getCredentials().get(0).getValue(),getClientSignedJWT(keyPair,client.getClientId()));
   assertEquals(200,response.getStatusCode());
   AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
   RefreshToken refreshToken=oauth.verifyRefreshToken(response.getRefreshToken());

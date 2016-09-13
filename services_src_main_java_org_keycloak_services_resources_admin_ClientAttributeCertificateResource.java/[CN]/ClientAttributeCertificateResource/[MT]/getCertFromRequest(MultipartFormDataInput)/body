@@ -1,0 +1,65 @@
+{
+  auth.requireManage();
+  CertificateRepresentation info=new CertificateRepresentation();
+  Map<String,List<InputPart>> uploadForm=input.getFormDataMap();
+  String keystoreFormat=uploadForm.get("keystoreFormat").get(0).getBodyAsString();
+  List<InputPart> inputParts=uploadForm.get("file");
+  if (keystoreFormat.equals(CERTIFICATE_PEM)) {
+    String pem=StreamUtil.readString(inputParts.get(0).getBody(InputStream.class,null));
+    KeycloakModelUtils.getCertificate(pem);
+    info.setCertificate(pem);
+    return info;
+  }
+ else   if (keystoreFormat.equals(PUBLIC_KEY_PEM)) {
+    String pem=StreamUtil.readString(inputParts.get(0).getBody(InputStream.class,null));
+    KeycloakModelUtils.getPublicKey(pem);
+    info.setPublicKey(pem);
+    return info;
+  }
+ else   if (keystoreFormat.equals(JSON_WEB_KEY_SET)) {
+    InputStream stream=inputParts.get(0).getBody(InputStream.class,null);
+    JSONWebKeySet keySet=JsonSerialization.readValue(stream,JSONWebKeySet.class);
+    JWK publicKeyJwk=JWKSUtils.getKeyForUse(keySet,JWK.Use.SIG);
+    if (publicKeyJwk == null) {
+      throw new IllegalStateException("Certificate not found for use sig");
+    }
+ else {
+      PublicKey publicKey=JWKParser.create(publicKeyJwk).toPublicKey();
+      String publicKeyPem=KeycloakModelUtils.getPemFromKey(publicKey);
+      info.setPublicKey(publicKeyPem);
+      info.setKid(publicKeyJwk.getKeyId());
+      return info;
+    }
+  }
+  String keyAlias=uploadForm.get("keyAlias").get(0).getBodyAsString();
+  List<InputPart> keyPasswordPart=uploadForm.get("keyPassword");
+  char[] keyPassword=keyPasswordPart != null ? keyPasswordPart.get(0).getBodyAsString().toCharArray() : null;
+  List<InputPart> storePasswordPart=uploadForm.get("storePassword");
+  char[] storePassword=storePasswordPart != null ? storePasswordPart.get(0).getBodyAsString().toCharArray() : null;
+  PrivateKey privateKey=null;
+  X509Certificate certificate=null;
+  try {
+    KeyStore keyStore=null;
+    if (keystoreFormat.equals("JKS"))     keyStore=KeyStore.getInstance("JKS");
+ else     keyStore=KeyStore.getInstance(keystoreFormat,"BC");
+    keyStore.load(inputParts.get(0).getBody(InputStream.class,null),storePassword);
+    try {
+      privateKey=(PrivateKey)keyStore.getKey(keyAlias,keyPassword);
+    }
+ catch (    Exception e) {
+    }
+    certificate=(X509Certificate)keyStore.getCertificate(keyAlias);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+  if (privateKey != null) {
+    String privateKeyPem=KeycloakModelUtils.getPemFromKey(privateKey);
+    info.setPrivateKey(privateKeyPem);
+  }
+  if (certificate != null) {
+    String certPem=KeycloakModelUtils.getPemFromCertificate(certificate);
+    info.setCertificate(certPem);
+  }
+  return info;
+}

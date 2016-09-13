@@ -1,0 +1,14 @@
+{
+  OIDCClientRepresentation clientRep=createRep();
+  clientRep.setGrantTypes(Collections.singletonList(OAuth2Constants.CLIENT_CREDENTIALS));
+  clientRep.setTokenEndpointAuthMethod(OIDCLoginProtocol.PRIVATE_KEY_JWT);
+  TestOIDCEndpointsApplicationResource oidcClientEndpointsResource=testingClient.testApp().oidcClientEndpoints();
+  Map<String,String> generatedKeys=oidcClientEndpointsResource.generateKeys();
+  clientRep.setJwksUri(TestApplicationResourceUrls.clientJwksUri());
+  OIDCClientRepresentation response=reg.oidc().create(clientRep);
+  Assert.assertEquals(OIDCLoginProtocol.PRIVATE_KEY_JWT,response.getTokenEndpointAuthMethod());
+  Assert.assertNull(response.getClientSecret());
+  Assert.assertNull(response.getClientSecretExpiresAt());
+  Assert.assertEquals(response.getJwksUri(),TestApplicationResourceUrls.clientJwksUri());
+  assertAuthenticateClientSuccess(generatedKeys,response,KEEP_GENERATED_KID);
+}

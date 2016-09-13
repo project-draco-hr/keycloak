@@ -1,8 +1,22 @@
 {
+  HttpServletRequest servletReq=(HttpServletRequest)request;
   HttpServletResponse servletResp=(HttpServletResponse)response;
-  String timeOffsetParam=request.getParameter("timeOffset");
+  String timeOffsetParam=request.getParameter(TIME_OFFSET_PARAM);
+  String resetPublicKey=request.getParameter(RESET_PUBLIC_KEY_PARAM);
   if (timeOffsetParam != null && !timeOffsetParam.isEmpty()) {
-    Time.setOffset(Integer.parseInt(timeOffsetParam));
+    int timeOffset=Integer.parseInt(timeOffsetParam);
+    log.infof("Time offset updated to %d for application %s",timeOffset,servletReq.getRequestURI());
+    Time.setOffset(timeOffset);
+    writeResponse(servletResp,"Offset set successfully");
   }
-  chain.doFilter(request,response);
+ else   if (resetPublicKey != null && !resetPublicKey.isEmpty()) {
+    AdapterDeploymentContext deploymentContext=(AdapterDeploymentContext)request.getServletContext().getAttribute(AdapterDeploymentContext.class.getName());
+    KeycloakDeployment deployment=deploymentContext.resolveDeployment(null);
+    deployment.setPublicKeyLocator(new JWKPublicKeyLocator());
+    log.infof("Restarted publicKey locator for application %s",servletReq.getRequestURI());
+    writeResponse(servletResp,"PublicKeyLocator restarted successfully");
+  }
+ else {
+    chain.doFilter(request,response);
+  }
 }

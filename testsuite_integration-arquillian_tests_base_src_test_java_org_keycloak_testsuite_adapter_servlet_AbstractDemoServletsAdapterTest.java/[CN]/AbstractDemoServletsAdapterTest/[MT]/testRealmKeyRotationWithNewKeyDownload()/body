@@ -1,0 +1,33 @@
+{
+  tokenMinTTLPage.navigateTo();
+  testRealmLoginPage.form().waitForUsernameInputPresent();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  assertCurrentUrlEquals(tokenMinTTLPage);
+  AccessToken token=tokenMinTTLPage.getAccessToken();
+  Assert.assertEquals("bburke@redhat.com",token.getPreferredUsername());
+  String logoutUri=OIDCLoginProtocolService.logoutUrl(authServerPage.createUriBuilder()).queryParam(OAuth2Constants.REDIRECT_URI,tokenMinTTLPage.toString()).build("demo").toString();
+  driver.navigate().to(logoutUri);
+  RealmRepresentation realmRep=testRealmResource().toRepresentation();
+  String oldPublicKey=realmRep.getPublicKey();
+  String oldPrivateKey=realmRep.getPrivateKey();
+  realmRep.setPublicKey(Constants.GENERATE);
+  testRealmResource().update(realmRep);
+  tokenMinTTLPage.navigateTo();
+  testRealmLoginPage.form().waitForUsernameInputPresent();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  URLAssert.assertCurrentUrlStartsWith(driver,tokenMinTTLPage.getInjectedUrl().toString());
+  assertNull(tokenMinTTLPage.getAccessToken());
+  String adapterActionsUrl=tokenMinTTLPage.toString() + "/unsecured/foo";
+  setAdapterAndServerTimeOffset(300,adapterActionsUrl);
+  tokenMinTTLPage.navigateTo();
+  assertCurrentUrlEquals(tokenMinTTLPage);
+  token=tokenMinTTLPage.getAccessToken();
+  Assert.assertEquals("bburke@redhat.com",token.getPreferredUsername());
+  driver.navigate().to(logoutUri);
+  String timeOffsetUri=UriBuilder.fromUri(adapterActionsUrl).queryParam(AdapterActionsFilter.RESET_PUBLIC_KEY_PARAM,"true").build().toString();
+  driver.navigate().to(timeOffsetUri);
+  WaitUtils.waitUntilElement(By.tagName("body")).is().visible();
+  setAdapterAndServerTimeOffset(0,adapterActionsUrl);
+}

@@ -1,0 +1,10 @@
+{
+  Map<String,PublicKey> result=new HashMap<>();
+  for (  JWK jwk : keySet.getKeys()) {
+    JWKParser parser=JWKParser.create(jwk);
+    if (jwk.getPublicKeyUse().equals(requestedUse.asString()) && parser.isKeyTypeSupported(jwk.getKeyType())) {
+      result.put(jwk.getKeyId(),parser.toPublicKey());
+    }
+  }
+  return result;
+}

@@ -1,0 +1,14 @@
+{
+  log.infof("Going to send request to retrieve new set of realm public keys for client %s",deployment.getResourceName());
+  HttpGet getMethod=new HttpGet(deployment.getJwksUrl());
+  try {
+    JSONWebKeySet jwks=HttpAdapterUtils.sendJsonHttpRequest(deployment,getMethod,JSONWebKeySet.class);
+    Map<String,PublicKey> publicKeys=JWKSUtils.getKeysForUse(jwks,JWK.Use.SIG);
+    log.infof("Realm public keys successfully retrieved for client %s. New kids: %s",deployment.getResourceName(),publicKeys.keySet().toString());
+    currentKeys.clear();
+    currentKeys.putAll(publicKeys);
+  }
+ catch (  HttpClientAdapterException e) {
+    log.error("Error when sending request to retrieve realm keys",e);
+  }
+}

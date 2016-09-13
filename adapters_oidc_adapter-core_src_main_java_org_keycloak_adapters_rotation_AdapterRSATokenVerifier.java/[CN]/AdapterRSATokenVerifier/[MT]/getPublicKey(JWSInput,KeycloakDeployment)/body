@@ -1,0 +1,9 @@
+{
+  PublicKeyLocator pkLocator=deployment.getPublicKeyLocator();
+  PublicKey publicKey=pkLocator.getPublicKey(input,deployment);
+  if (publicKey == null) {
+    log.errorf("Didn't find publicKey for kid: %s",input.getHeader().getKeyId());
+    throw new VerificationException("Didn't find publicKey for specified kid");
+  }
+  return publicKey;
+}

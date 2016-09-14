@@ -1,0 +1,16 @@
+{
+  RealmRepresentation realmRep=realm.toRepresentation();
+  String publicKey=realmRep.getPublicKey();
+  String cert=realmRep.getCertificate();
+  assertNotNull(publicKey);
+  assertNotNull(cert);
+  RealmRepresentation newRealmRep=new RealmRepresentation();
+  newRealmRep.setRealm(REALM_NAME);
+  newRealmRep.setPublicKey("GENERATE");
+  realm.update(newRealmRep);
+  realmRep=realm.toRepresentation();
+  assertNotNull(realmRep.getPublicKey());
+  assertNotNull(realmRep.getCertificate());
+  assertNotEquals(publicKey,realmRep.getPublicKey());
+  assertNotEquals(cert,realmRep.getCertificate());
+}

@@ -1,0 +1,9 @@
+{
+  OIDCClientRepresentation clientRep=createRep();
+  List<String> redirects=new ArrayList<>();
+  redirects.add("http://redirect1");
+  redirects.add("http://redirect2");
+  clientRep.setSubjectType("pairwise");
+  clientRep.setRedirectUris(redirects);
+  assertCreateFail(clientRep,400,"Without a configured Sector Identifier URI, client redirect URIs must not contain multiple host components.");
+}

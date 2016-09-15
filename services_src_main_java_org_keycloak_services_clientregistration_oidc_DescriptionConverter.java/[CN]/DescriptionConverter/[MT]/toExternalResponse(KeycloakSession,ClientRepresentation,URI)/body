@@ -24,9 +24,12 @@
   if (config.getRequestObjectSignatureAlg() != null) {
     response.setRequestObjectSigningAlg(config.getRequestObjectSignatureAlg().toString());
   }
-  response.setSubjectType(config.getSubjectType().toString().toLowerCase());
-  if (config.getSubjectType().equals(SubjectType.PAIRWISE)) {
-    response.setSectorIdentifierUri(config.getSectorIdentifierUri());
+  List<ProtocolMapperRepresentation> foundPairwiseMappers=PairwiseSubMapperUtils.getPairwiseSubMappers(client);
+  SubjectType subjectType=foundPairwiseMappers.isEmpty() ? SubjectType.PUBLIC : SubjectType.PAIRWISE;
+  response.setSubjectType(subjectType.toString().toLowerCase());
+  if (subjectType.equals(SubjectType.PAIRWISE)) {
+    String sectorIdentifierUri=PairwiseSubMapperHelper.getSectorIdentifierUri(foundPairwiseMappers.get(0));
+    response.setSectorIdentifierUri(sectorIdentifierUri);
   }
   return response;
 }

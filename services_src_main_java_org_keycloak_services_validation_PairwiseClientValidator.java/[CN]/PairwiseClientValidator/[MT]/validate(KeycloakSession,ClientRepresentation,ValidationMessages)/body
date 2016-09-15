@@ -1,11 +1,12 @@
 {
-  OIDCAdvancedConfigWrapper configWrapper=OIDCAdvancedConfigWrapper.fromClientRepresentation(client);
-  if (configWrapper.getSubjectType().equals(SubjectType.PAIRWISE)) {
-    String sectorIdentifierUri=configWrapper.getSectorIdentifierUri();
-    String rootUrl=client.getRootUrl();
-    Set<String> redirectUris=new HashSet<>();
+  String rootUrl=client.getRootUrl();
+  Set<String> redirectUris=new HashSet<>();
+  boolean valid=true;
+  List<ProtocolMapperRepresentation> foundPairwiseMappers=PairwiseSubMapperUtils.getPairwiseSubMappers(client);
+  for (  ProtocolMapperRepresentation foundPairwise : foundPairwiseMappers) {
+    String sectorIdentifierUri=PairwiseSubMapperHelper.getSectorIdentifierUri(foundPairwise);
     if (client.getRedirectUris() != null)     redirectUris.addAll(client.getRedirectUris());
-    return validate(session,rootUrl,redirectUris,sectorIdentifierUri,messages);
+    valid=valid && validate(session,rootUrl,redirectUris,sectorIdentifierUri,messages);
   }
   return true;
 }

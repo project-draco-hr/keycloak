@@ -4,7 +4,11 @@
   }
   try {
     ClientRepresentation client=DescriptionConverter.toInternal(session,clientOIDC);
-    client=create(client);
+    OIDCClientRegistrationContext oidcContext=new OIDCClientRegistrationContext(client,clientOIDC);
+    client=create(oidcContext);
+    ClientModel clientModel=session.getContext().getRealm().getClientByClientId(client.getClientId());
+    updatePairwiseSubMappers(clientModel,SubjectType.parse(clientOIDC.getSubjectType()),clientOIDC.getSectorIdentifierUri());
+    updateClientRepWithProtocolMappers(clientModel,client);
     URI uri=session.getContext().getUri().getAbsolutePathBuilder().path(client.getClientId()).build();
     clientOIDC=DescriptionConverter.toExternalResponse(session,client,uri);
     clientOIDC.setClientIdIssuedAt(Time.currentTime());

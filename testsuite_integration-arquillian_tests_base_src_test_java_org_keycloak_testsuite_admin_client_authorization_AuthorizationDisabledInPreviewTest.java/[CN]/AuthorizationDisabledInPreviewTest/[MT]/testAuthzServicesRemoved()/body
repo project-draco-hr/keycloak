@@ -1,0 +1,9 @@
+{
+  String id=testRealmResource().clients().findAll().get(0).getId();
+  try {
+    testRealmResource().clients().get(id).authorization().getSettings();
+  }
+ catch (  ServerErrorException e) {
+    assertEquals(Response.Status.NOT_IMPLEMENTED.getStatusCode(),e.getResponse().getStatus());
+  }
+}

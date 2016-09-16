@@ -3,10 +3,12 @@
     new ClientManager(new RealmManager(session)).enableServiceAccount(client);
   }
   RepresentationToModel.updateClient(rep,client);
-  if (TRUE.equals(rep.getAuthorizationServicesEnabled())) {
-    authorization().enable();
-  }
+  if (Profile.isPreviewEnabled()) {
+    if (TRUE.equals(rep.getAuthorizationServicesEnabled())) {
+      authorization().enable();
+    }
  else {
-    authorization().disable();
+      authorization().disable();
+    }
   }
 }

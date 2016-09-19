@@ -1,0 +1,16 @@
+{
+  log.debug("Testing user groups");
+  List<UserRepresentation> users=adminClient.realm(REALM_NAME).users().search(USERNAME,0,1);
+  Assert.assertTrue("There must be at least one user",users.size() > 0);
+  Assert.assertEquals("Exactly our test user",USERNAME,users.get(0).getUsername());
+  List<GroupRepresentation> groups=adminClient.realm(REALM_NAME).users().get(users.get(0).getId()).groups();
+  Assert.assertEquals("User must have exactly two groups",2,groups.size());
+  boolean wrongGroup=false;
+  for (  GroupRepresentation group : groups) {
+    if (!group.getName().equalsIgnoreCase("ipausers") && !group.getName().equalsIgnoreCase("testgroup")) {
+      wrongGroup=true;
+      break;
+    }
+  }
+  Assert.assertFalse("There exists some wrong group",wrongGroup);
+}

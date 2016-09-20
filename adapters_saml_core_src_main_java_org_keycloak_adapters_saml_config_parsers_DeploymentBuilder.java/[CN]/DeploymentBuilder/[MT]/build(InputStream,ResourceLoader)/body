@@ -42,13 +42,17 @@
           KeyStore keyStore=loadKeystore(resourceLoader,key);
           Certificate cert=null;
           try {
+            log.debugf("Try to load key [%s]",key.getKeystore().getCertificateAlias());
             cert=keyStore.getCertificate(key.getKeystore().getCertificateAlias());
+            if (cert == null) {
+              log.errorf("key alias %s is not found into keystore",key.getKeystore().getCertificateAlias());
+            }
             privateKey=(PrivateKey)keyStore.getKey(key.getKeystore().getPrivateKeyAlias(),key.getKeystore().getPrivateKeyPassword().toCharArray());
+            publicKey=cert.getPublicKey();
           }
  catch (          Exception e) {
             throw new RuntimeException(e);
           }
-          publicKey=cert.getPublicKey();
         }
  else {
           if (key.getPrivateKeyPem() == null) {

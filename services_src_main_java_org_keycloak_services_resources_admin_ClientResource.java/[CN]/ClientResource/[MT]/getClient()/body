@@ -4,6 +4,8 @@
     throw new NotFoundException("Could not find client");
   }
   ClientRepresentation representation=ModelToRepresentation.toRepresentation(client);
-  representation.setAuthorizationServicesEnabled(authorization().isEnabled());
+  if (Profile.isPreviewEnabled()) {
+    representation.setAuthorizationServicesEnabled(authorization().isEnabled());
+  }
   return representation;
 }

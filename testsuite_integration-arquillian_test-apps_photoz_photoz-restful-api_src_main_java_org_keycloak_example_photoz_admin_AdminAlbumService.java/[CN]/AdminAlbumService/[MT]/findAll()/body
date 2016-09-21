@@ -1,2 +1,10 @@
 {
+  HashMap<String,List<Album>> albums=new HashMap<>();
+  List<Album> result=this.entityManager.createQuery("from Album").getResultList();
+  for (  Album album : result) {
+    if (!albums.containsKey(album.getUserId())) {
+      albums.put(album.getUserId(),Collections.singletonList(album));
+    }
+  }
+  return Response.ok(albums).build();
 }

@@ -1,0 +1,12 @@
+{
+  Map<String,List<String>> expected=ImmutableMap.of("key1",Arrays.asList("value3"),"key2",Arrays.asList("value2"));
+  RealmModel realm=realmManager.createRealm("original");
+  UserModel user=session.users().addUser(realm,"user");
+  user.setSingleAttribute("key1","value1");
+  user.setSingleAttribute("key2","value2");
+  user.setSingleAttribute("key1","value3");
+  Assert.assertEquals(expected,user.getAttributes());
+  commit();
+  realm=session.realms().getRealmByName("original");
+  Assert.assertEquals(expected,session.users().getUserByUsername("user",realm).getAttributes());
+}

@@ -13,9 +13,10 @@
     }
   }
   if (firstExistingAttrId != null) {
-    Query query=em.createNamedQuery("deleteUserAttributesOtherThan");
-    query.setParameter("attrId",firstExistingAttrId);
+    Query query=em.createNamedQuery("deleteUserAttributesByNameAndUserOtherThan");
+    query.setParameter("name",name);
     query.setParameter("userId",user.getId());
+    query.setParameter("attrId",firstExistingAttrId);
     int numUpdated=query.executeUpdate();
     user.getAttributes().removeAll(toRemove);
   }

@@ -5,8 +5,8 @@
   if (deployment == null)   return null;
   if (deployment.getAuthServerBaseUrl() == null)   return deployment;
   KeycloakDeployment resolvedDeployment=resolveUrls(deployment,facade);
-  if (resolvedDeployment.getRealmKey() == null) {
-    resolveRealmKey(resolvedDeployment);
+  if (resolvedDeployment.getPublicKeyLocator() == null) {
+    throw new RuntimeException("KeycloakDeployment was never initialized through appropriate SPIs");
   }
   return resolvedDeployment;
 }

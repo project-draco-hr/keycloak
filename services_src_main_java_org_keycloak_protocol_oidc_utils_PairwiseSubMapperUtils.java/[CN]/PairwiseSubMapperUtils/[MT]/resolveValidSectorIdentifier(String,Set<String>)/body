@@ -1,0 +1,21 @@
+{
+  Set<String> hosts=new HashSet<>();
+  for (  String redirectUri : resolveValidRedirectUris(clientRootUrl,clientRedirectUris)) {
+    try {
+      URI uri=new URI(redirectUri);
+      hosts.add(uri.getHost());
+    }
+ catch (    URISyntaxException e) {
+      logger.debugv("client redirect uris contained an invalid uri: {0}",redirectUri);
+    }
+  }
+  if (hosts.isEmpty()) {
+    logger.debug("could not infer any valid sector_identifiers from client redirect uris");
+    return null;
+  }
+  if (hosts.size() > 1) {
+    logger.debug("the client redirect uris contained multiple hosts");
+    return null;
+  }
+  return hosts.iterator().next();
+}

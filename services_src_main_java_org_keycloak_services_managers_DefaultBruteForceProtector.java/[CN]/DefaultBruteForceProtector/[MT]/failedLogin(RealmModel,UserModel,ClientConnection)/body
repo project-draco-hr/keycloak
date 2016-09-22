@@ -2,8 +2,13 @@
   try {
     FailedLogin event=new FailedLogin(realm.getId(),user.getId(),clientConnection.getRemoteAddr());
     queue.offer(event);
-    event.latch.await(5,TimeUnit.SECONDS);
+    boolean awaited=event.latch.await(5,TimeUnit.SECONDS);
+    if (!awaited) {
+      didntWait++;
+    }
   }
  catch (  InterruptedException e) {
+    didntWait++;
   }
+  logger.trace("sent failure event");
 }

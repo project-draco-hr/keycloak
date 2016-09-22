@@ -1,4 +1,5 @@
 {
+  clearVariables();
 {
     String totpSecret=totp.generateTOTP("totpSecret");
     OAuthClient.AccessTokenResponse response=getTestToken("password",totpSecret);
@@ -23,7 +24,7 @@
 {
     String totpSecret=totp.generateTOTP("totpSecret");
     OAuthClient.AccessTokenResponse response=getTestToken("password",totpSecret);
-    Assert.assertNull(response.getAccessToken());
+    assertTokenNull(response);
     Assert.assertNotNull(response.getError());
     Assert.assertEquals(response.getError(),"invalid_grant");
     Assert.assertEquals(response.getErrorDescription(),"Account temporarily disabled");

@@ -1,0 +1,20 @@
+{
+  InputStream is=null;
+  try {
+    is=session.getProvider(HttpClientProvider.class).get(sectorIdentifierUri);
+    List<String> sectorRedirects=JsonSerialization.readValue(is,TypedList.class);
+    return new HashSet<>(sectorRedirects);
+  }
+ catch (  IOException e) {
+    throw new ProtocolMapperConfigException("Failed to get redirect URIs from the Sector Identifier URI.",PAIRWISE_FAILED_TO_GET_REDIRECT_URIS,e);
+  }
+ finally {
+    if (is != null) {
+      try {
+        is.close();
+      }
+ catch (      IOException ignored) {
+      }
+    }
+  }
+}

@@ -1,4 +1,6 @@
 {
   KeycloakDeployment deployment=KeycloakDeploymentBuilder.build(getClass().getResourceAsStream("/keycloak-no-credentials.json"));
   assertEquals(ClientIdAndSecretCredentialsProvider.PROVIDER_ID,deployment.getClientAuthenticator().getId());
+  assertTrue(deployment.getPublicKeyLocator() instanceof JWKPublicKeyLocator);
+  assertEquals(10,deployment.getMinTimeBetweenJwksRequests());
 }

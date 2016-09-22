@@ -36,7 +36,7 @@
   AuthenticationExecutionInfoRepresentation exec=findExecutionByProvider("idp-review-profile",executionReps);
   Assert.assertNotNull("idp-review-profile added",exec);
   AuthenticationExecutionInfoRepresentation authCookieExec=findExecutionByProvider("auth-cookie",executionReps);
-  compareExecution(newExecInfo("Review Profile","idp-review-profile",true,0,3,DISABLED,null,new String[]{REQUIRED,DISABLED}),exec);
+  compareExecution(newExecInfo("Review Profile","idp-review-profile",true,0,4,DISABLED,null,new String[]{REQUIRED,DISABLED}),exec);
   authMgmtResource.removeExecution(exec.getId());
   assertAdminEvents.assertEvent(REALM_NAME,OperationType.DELETE,AdminEventPaths.authExecutionPath(exec.getId()),ResourceType.AUTH_EXECUTION);
   executionReps=authMgmtResource.getExecutions("Copy-of-browser");
@@ -86,5 +86,5 @@
   List<AuthenticationExecutionInfoRepresentation> executions=authMgmtResource.getExecutions("Copy-of-browser");
   exec=findExecutionByProvider("auth-cookie",executions);
   Assert.assertNotNull("auth-cookie added",exec);
-  compareExecution(newExecInfo("Cookie","auth-cookie",false,0,2,OPTIONAL,null,new String[]{ALTERNATIVE,DISABLED}),exec);
+  compareExecution(newExecInfo("Cookie","auth-cookie",false,0,3,OPTIONAL,null,new String[]{ALTERNATIVE,DISABLED}),exec);
 }

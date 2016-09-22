@@ -4,6 +4,9 @@
     return false;
   }
   String token=((UserCredentialModel)input).getValue();
+  if (token == null) {
+    return false;
+  }
   OTPPolicy policy=realm.getOTPPolicy();
   if (realm.getOTPPolicy().getType().equals(CredentialModel.HOTP)) {
     HmacOTP validator=new HmacOTP(policy.getDigits(),policy.getAlgorithm(),policy.getLookAheadWindow());

@@ -1,7 +1,7 @@
 {
   auth.requireManage();
   ValidationMessages validationMessages=new ValidationMessages();
-  if (!ClientValidator.validate(rep,validationMessages)) {
+  if (!ClientValidator.validate(rep,validationMessages) || !PairwiseClientValidator.validate(session,rep,validationMessages)) {
     Properties messages=AdminRoot.getMessages(session,realm,auth.getAuth().getToken().getLocale());
     throw new ErrorResponseException(validationMessages.getStringMessages(),validationMessages.getStringMessages(messages),Response.Status.BAD_REQUEST);
   }

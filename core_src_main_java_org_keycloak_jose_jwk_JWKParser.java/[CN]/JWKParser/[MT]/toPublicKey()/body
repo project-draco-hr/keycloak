@@ -1,6 +1,6 @@
 {
-  String algorithm=jwk.getKeyType();
-  if (isAlgorithmSupported(algorithm)) {
+  String keyType=jwk.getKeyType();
+  if (isKeyTypeSupported(keyType)) {
     BigInteger modulus=new BigInteger(1,Base64Url.decode(jwk.getOtherClaims().get(RSAPublicJWK.MODULUS).toString()));
     BigInteger publicExponent=new BigInteger(1,Base64Url.decode(jwk.getOtherClaims().get(RSAPublicJWK.PUBLIC_EXPONENT).toString()));
     try {
@@ -11,6 +11,6 @@
     }
   }
  else {
-    throw new RuntimeException("Unsupported algorithm " + algorithm);
+    throw new RuntimeException("Unsupported keyType " + keyType);
   }
 }

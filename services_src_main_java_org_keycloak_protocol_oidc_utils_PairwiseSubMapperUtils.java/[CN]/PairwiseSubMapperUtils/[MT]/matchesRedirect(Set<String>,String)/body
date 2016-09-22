@@ -1,0 +1,15 @@
+{
+  for (  String validRedirect : validRedirects) {
+    if (validRedirect.endsWith("*") && !validRedirect.contains("?")) {
+      String r=redirect.contains("?") ? redirect.substring(0,redirect.indexOf("?")) : redirect;
+      int length=validRedirect.length() - 1;
+      validRedirect=validRedirect.substring(0,length);
+      if (r.startsWith(validRedirect))       return true;
+      if (length - 1 > 0 && validRedirect.charAt(length - 1) == '/')       length--;
+      validRedirect=validRedirect.substring(0,length);
+      if (validRedirect.equals(r))       return true;
+    }
+ else     if (validRedirect.equals(redirect))     return true;
+  }
+  return false;
+}

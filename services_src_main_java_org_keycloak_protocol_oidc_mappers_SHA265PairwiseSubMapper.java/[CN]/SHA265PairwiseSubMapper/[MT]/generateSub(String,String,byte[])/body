@@ -1,0 +1,13 @@
+{
+  MessageDigest sha256;
+  try {
+    sha256=MessageDigest.getInstance(HASH_ALGORITHM);
+  }
+ catch (  NoSuchAlgorithmException e) {
+    throw new IllegalStateException(e.getMessage(),e);
+  }
+  sha256.update(sectorIdentifier.getBytes(charset));
+  sha256.update(localSub.getBytes(charset));
+  byte[] hash=sha256.digest(salt);
+  return UUID.nameUUIDFromBytes(hash).toString();
+}

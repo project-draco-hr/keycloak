@@ -1,0 +1,21 @@
+{
+  if (null != body) {
+    wiredata=new byte[BUFFERINCREMENT][];
+    bufferuse=0;
+    bytecounter=0;
+    preallocate(12);
+    append("yyyyuu",big ? Endian.BIG : Endian.LITTLE,type,flags,protover,bodylen,serial);
+    headers.put(HeaderField.SENDER,source);
+    Object[][] newhead=new Object[headers.size()][];
+    int i=0;
+    for (    Byte b : headers.keySet()) {
+      newhead[i]=new Object[2];
+      newhead[i][0]=b;
+      newhead[i][1]=headers.get(b);
+      i++;
+    }
+    append("a(yv)",(Object)newhead);
+    pad((byte)8);
+    appendBytes(body);
+  }
+}

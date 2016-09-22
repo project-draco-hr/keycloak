@@ -1,0 +1,11 @@
+{
+  if (bodydone)   return;
+  Type[] types=typeCache.get(getClass());
+  Object[] args=Marshalling.convertParameters(getParameters(),types,conn);
+  setArgs(args);
+  String sig=getSig();
+  long c=bytecounter;
+  if (null != args && 0 < args.length)   append(sig,args);
+  marshallint(bytecounter - c,blen,0,4);
+  bodydone=true;
+}

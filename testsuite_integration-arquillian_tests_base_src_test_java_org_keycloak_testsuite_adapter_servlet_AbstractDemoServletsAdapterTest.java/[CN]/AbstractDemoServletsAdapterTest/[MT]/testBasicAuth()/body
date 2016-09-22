@@ -1,0 +1,19 @@
+{
+  String value="hello";
+  Client client=ClientBuilder.newClient();
+  Response response=client.target(basicAuthPage.setTemplateValues("mposolda","password",value).buildUri()).request().get();
+  assertEquals(200,response.getStatus());
+  assertEquals(value,response.readEntity(String.class));
+  response.close();
+  response=client.target(basicAuthPage.setTemplateValues("invalid-user","password",value).buildUri()).request().get();
+  assertEquals(401,response.getStatus());
+  String readResponse=response.readEntity(String.class);
+  assertTrue(readResponse.contains("Unauthorized") || readResponse.contains("Status 401"));
+  response.close();
+  response=client.target(basicAuthPage.setTemplateValues("admin","invalid-password",value).buildUri()).request().get();
+  assertEquals(401,response.getStatus());
+  readResponse=response.readEntity(String.class);
+  assertTrue(readResponse.contains("Unauthorized") || readResponse.contains("Status 401"));
+  response.close();
+  client.close();
+}

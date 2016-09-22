@@ -1,0 +1,10 @@
+{
+  OIDCClientRepresentation clientRep=createRep();
+  List<String> sectorRedirects=new ArrayList<>();
+  sectorRedirects.add("http://someotherredirect");
+  TestOIDCEndpointsApplicationResource oidcClientEndpointsResource=testingClient.testApp().oidcClientEndpoints();
+  oidcClientEndpointsResource.setSectorIdentifierRedirectUris(sectorRedirects);
+  clientRep.setSubjectType("pairwise");
+  clientRep.setSectorIdentifierUri(TestApplicationResourceUrls.pairwiseSectorIdentifierUri());
+  assertCreateFail(clientRep,400,"Client redirect URIs does not match redirect URIs fetched from the Sector Identifier URI.");
+}

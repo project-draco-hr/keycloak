@@ -1,0 +1,19 @@
+{
+  URI uri;
+  try {
+    uri=new URI(sectorIdentifierUri);
+  }
+ catch (  URISyntaxException e) {
+    logger.debug("Invalid sector identifier URI",e);
+    return null;
+  }
+  if (uri.getScheme() == null) {
+    logger.debugv("Invalid sector identifier URI: {0}",sectorIdentifierUri);
+    return null;
+  }
+  if (uri.getHost() == null) {
+    logger.debug("The sector identifier URI must specify a host");
+    return null;
+  }
+  return uri.getHost();
+}

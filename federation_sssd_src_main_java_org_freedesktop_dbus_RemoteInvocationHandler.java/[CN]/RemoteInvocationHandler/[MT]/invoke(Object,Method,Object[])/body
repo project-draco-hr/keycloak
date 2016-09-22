@@ -1,0 +1,31 @@
+{
+  if (method.getName().equals("isRemote"))   return true;
+ else   if (method.getName().equals("clone"))   return null;
+ else   if (method.getName().equals("equals")) {
+    try {
+      if (1 == args.length)       return new Boolean(remote.equals(((RemoteInvocationHandler)Proxy.getInvocationHandler(args[0])).remote));
+    }
+ catch (    IllegalArgumentException IAe) {
+      return Boolean.FALSE;
+    }
+  }
+ else   if (method.getName().equals("finalize"))   return null;
+ else   if (method.getName().equals("getClass"))   return DBusInterface.class;
+ else   if (method.getName().equals("hashCode"))   return remote.hashCode();
+ else   if (method.getName().equals("notify")) {
+    remote.notify();
+    return null;
+  }
+ else   if (method.getName().equals("notifyAll")) {
+    remote.notifyAll();
+    return null;
+  }
+ else   if (method.getName().equals("wait")) {
+    if (0 == args.length)     remote.wait();
+ else     if (1 == args.length && args[0] instanceof Long)     remote.wait((Long)args[0]);
+ else     if (2 == args.length && args[0] instanceof Long && args[1] instanceof Integer)     remote.wait((Long)args[0],(Integer)args[1]);
+    if (args.length <= 2)     return null;
+  }
+ else   if (method.getName().equals("toString"))   return remote.toString();
+  return executeRemoteMethod(remote,method,conn,CALL_TYPE_SYNC,null,args);
+}

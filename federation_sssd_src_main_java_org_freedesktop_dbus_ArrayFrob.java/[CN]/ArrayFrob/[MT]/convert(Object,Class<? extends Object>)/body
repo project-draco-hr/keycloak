@@ -1,0 +1,17 @@
+{
+  try {
+    if (List.class.equals(c) && o instanceof List)     return o;
+    if (List.class.equals(c) && o.getClass().isArray())     return listify(o);
+    if (o.getClass().isArray() && c.isArray() && o.getClass().getComponentType().equals(c.getComponentType()))     return o;
+    if (o.getClass().isArray() && c.isArray() && o.getClass().getComponentType().isPrimitive())     return wrap(o);
+    if (o.getClass().isArray() && c.isArray() && c.getComponentType().isPrimitive())     return unwrap((Object[])o);
+    if (o instanceof List && c.isArray() && c.getComponentType().isPrimitive())     return delistprimitive((List<Object>)o,(Class<Object>)c.getComponentType());
+    if (o instanceof List && c.isArray())     return delist((List<Object>)o,(Class<Object>)c.getComponentType());
+    if (o.getClass().isArray() && c.isArray())     return type((Object[])o,(Class<Object>)c.getComponentType());
+  }
+ catch (  Exception e) {
+    if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug)     Debug.print(Debug.ERR,e);
+    throw new IllegalArgumentException(e);
+  }
+  throw new IllegalArgumentException(MessageFormat.format(getString("convertionTypeNotExpected"),new Object[]{o.getClass(),c}));
+}

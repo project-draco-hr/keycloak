@@ -3,4 +3,11 @@
   query.setParameter("name",name);
   query.setParameter("userId",user.getId());
   int numUpdated=query.executeUpdate();
+  List<UserAttributeEntity> toRemove=new ArrayList<>();
+  for (  UserAttributeEntity attr : user.getAttributes()) {
+    if (attr.getName().equals(name)) {
+      toRemove.add(attr);
+    }
+  }
+  user.getAttributes().removeAll(toRemove);
 }

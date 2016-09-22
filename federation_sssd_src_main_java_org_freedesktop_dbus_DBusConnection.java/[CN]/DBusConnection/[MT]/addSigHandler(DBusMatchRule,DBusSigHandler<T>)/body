@@ -1,0 +1,19 @@
+{
+  try {
+    _dbus.AddMatch(rule.toString());
+  }
+ catch (  DBusExecutionException DBEe) {
+    if (EXCEPTION_DEBUG && Debug.debug)     Debug.print(Debug.ERR,DBEe);
+    throw new DBusException(DBEe.getMessage());
+  }
+  SignalTuple key=new SignalTuple(rule.getInterface(),rule.getMember(),rule.getObject(),rule.getSource());
+synchronized (handledSignals) {
+    Vector<DBusSigHandler<? extends DBusSignal>> v=handledSignals.get(key);
+    if (null == v) {
+      v=new Vector<DBusSigHandler<? extends DBusSignal>>();
+      v.add(handler);
+      handledSignals.put(key,v);
+    }
+ else     v.add(handler);
+  }
+}

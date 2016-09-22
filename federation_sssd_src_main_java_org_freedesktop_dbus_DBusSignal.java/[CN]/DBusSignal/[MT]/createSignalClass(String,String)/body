@@ -1,0 +1,18 @@
+{
+  String name=intname + '$' + signame;
+  Class<? extends DBusSignal> c=classCache.get(name);
+  if (null == c)   c=DBusMatchRule.getCachedSignalType(name);
+  if (null != c)   return c;
+  do {
+    try {
+      c=(Class<? extends DBusSignal>)Class.forName(name);
+    }
+ catch (    ClassNotFoundException CNFe) {
+    }
+    name=name.replaceAll("\\.([^\\.]*)$","\\$$1");
+  }
+ while (null == c && name.matches(".*\\..*"));
+  if (null == c)   throw new DBusException(getString("cannotCreateClassFromSignal") + intname + '.'+ signame);
+  classCache.put(name,c);
+  return c;
+}

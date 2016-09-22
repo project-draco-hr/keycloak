@@ -1,0 +1,25 @@
+{
+  try {
+    AuthorizationEndpointRequest request=new AuthorizationEndpointRequest();
+    new AuthzEndpointQueryStringParser(requestParams).parseRequest(request);
+    String requestParam=requestParams.getFirst(OIDCLoginProtocol.REQUEST_PARAM);
+    String requestUriParam=requestParams.getFirst(OIDCLoginProtocol.REQUEST_URI_PARAM);
+    if (requestParam != null && requestUriParam != null) {
+      throw new RuntimeException("Illegal to use both 'request' and 'request_uri' parameters together");
+    }
+    if (requestParam != null) {
+      new AuthzEndpointRequestObjectParser(requestParam,client).parseRequest(request);
+    }
+ else     if (requestUriParam != null) {
+      InputStream is=session.getProvider(HttpClientProvider.class).get(requestUriParam);
+      String retrievedRequest=StreamUtil.readString(is);
+      new AuthzEndpointRequestObjectParser(retrievedRequest,client).parseRequest(request);
+    }
+    return request;
+  }
+ catch (  Exception e) {
+    logger.invalidRequest(e);
+    event.error(Errors.INVALID_REQUEST);
+    throw new ErrorPageException(session,Messages.INVALID_REQUEST);
+  }
+}

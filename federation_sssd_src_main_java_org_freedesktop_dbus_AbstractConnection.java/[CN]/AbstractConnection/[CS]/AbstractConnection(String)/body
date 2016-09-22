@@ -1,0 +1,27 @@
+{
+  exportedObjects=new HashMap<String,ExportedObject>();
+  importedObjects=new HashMap<DBusInterface,RemoteObject>();
+  _globalhandlerreference=new _globalhandler();
+synchronized (exportedObjects) {
+    exportedObjects.put(null,new ExportedObject(_globalhandlerreference,weakreferences));
+  }
+  handledSignals=new HashMap<SignalTuple,Vector<DBusSigHandler<? extends DBusSignal>>>();
+  pendingCalls=new EfficientMap(PENDING_MAP_INITIAL_SIZE);
+  outgoing=new EfficientQueue(PENDING_MAP_INITIAL_SIZE);
+  pendingCallbacks=new HashMap<MethodCall,CallbackHandler<? extends Object>>();
+  pendingCallbackReplys=new HashMap<MethodCall,DBusAsyncReply<? extends Object>>();
+  pendingErrors=new LinkedList<Error>();
+  runnables=new LinkedList<Runnable>();
+  workers=new LinkedList<_workerthread>();
+  objectTree=new ObjectTree();
+  fallbackcontainer=new FallbackContainer();
+synchronized (workers) {
+    for (int i=0; i < THREADCOUNT; i++) {
+      _workerthread t=new _workerthread();
+      t.start();
+      workers.add(t);
+    }
+  }
+  _run=true;
+  addr=address;
+}

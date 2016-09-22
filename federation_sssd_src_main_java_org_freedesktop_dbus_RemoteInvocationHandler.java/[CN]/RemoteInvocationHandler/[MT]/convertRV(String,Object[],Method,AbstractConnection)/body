@@ -1,0 +1,34 @@
+{
+  Class<? extends Object> c=m.getReturnType();
+  if (null == rp) {
+    if (null == c || Void.TYPE.equals(c))     return null;
+ else     throw new DBusExecutionException(getString("voidReturnType"));
+  }
+ else {
+    try {
+      if (Debug.debug)       Debug.print(Debug.VERBOSE,"Converting return parameters from " + Arrays.deepToString(rp) + " to type "+ m.getGenericReturnType());
+      rp=Marshalling.deSerializeParameters(rp,new Type[]{m.getGenericReturnType()},conn);
+    }
+ catch (    Exception e) {
+      if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug)       Debug.print(Debug.ERR,e);
+      throw new DBusExecutionException(MessageFormat.format(getString("invalidReturnType"),new Object[]{e.getMessage()}));
+    }
+  }
+switch (rp.length) {
+case 0:
+    if (null == c || Void.TYPE.equals(c))     return null;
+ else     throw new DBusExecutionException(getString("voidReturnType"));
+case 1:
+  return rp[0];
+default :
+if (!Tuple.class.isAssignableFrom(c)) throw new DBusExecutionException(getString("tupleReturnType"));
+Constructor<? extends Object> cons=c.getConstructors()[0];
+try {
+return cons.newInstance(rp);
+}
+ catch (Exception e) {
+if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug) Debug.print(Debug.ERR,e);
+throw new DBusException(e.getMessage());
+}
+}
+}

@@ -2,7 +2,7 @@
   auth.requireManage();
   logger.debug("updating realm: " + realm.getName());
   try {
-    if (!"GENERATE".equals(rep.getPublicKey()) && (rep.getPrivateKey() != null && rep.getPublicKey() != null)) {
+    if (!Constants.GENERATE.equals(rep.getPublicKey()) && (rep.getPrivateKey() != null && rep.getPublicKey() != null)) {
       try {
         KeyPairVerifier.verify(rep.getPrivateKey(),rep.getPublicKey());
       }
@@ -10,7 +10,7 @@
         return ErrorResponse.error(e.getMessage(),Status.BAD_REQUEST);
       }
     }
-    if (!"GENERATE".equals(rep.getPublicKey()) && (rep.getCertificate() != null)) {
+    if (!Constants.GENERATE.equals(rep.getPublicKey()) && (rep.getCertificate() != null)) {
       try {
         X509Certificate cert=PemUtils.decodeCertificate(rep.getCertificate());
         if (cert == null) {

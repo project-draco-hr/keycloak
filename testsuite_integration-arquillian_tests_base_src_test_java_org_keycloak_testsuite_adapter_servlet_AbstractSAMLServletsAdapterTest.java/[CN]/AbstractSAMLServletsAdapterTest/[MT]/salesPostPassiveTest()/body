@@ -1,8 +1,7 @@
 {
   salesPostPassiveServletPage.navigateTo();
   if (forbiddenIfNotAuthenticated) {
-    waitUntilElement(By.xpath("//body")).text().not().contains("principal=");
-    assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains(FORBIDDEN_TEXT));
+    assertOnForbiddenPage();
   }
  else {
     waitUntilElement(By.xpath("//body")).text().contains("principal=null");
@@ -12,8 +11,7 @@
   salesPostPassiveServletPage.logout();
   salesPostPassiveServletPage.navigateTo();
   if (forbiddenIfNotAuthenticated) {
-    waitUntilElement(By.xpath("//body")).text().not().contains("principal=");
-    assertTrue(driver.getPageSource().contains("Forbidden") || driver.getPageSource().contains(FORBIDDEN_TEXT));
+    assertOnForbiddenPage();
   }
  else {
     waitUntilElement(By.xpath("//body")).text().contains("principal=null");

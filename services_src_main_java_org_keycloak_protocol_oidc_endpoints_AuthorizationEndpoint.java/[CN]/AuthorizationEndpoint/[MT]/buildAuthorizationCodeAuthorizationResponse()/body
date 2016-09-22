@@ -1,12 +1,5 @@
 {
-  if (idpHint != null && !"".equals(idpHint)) {
-    IdentityProviderModel identityProviderModel=realm.getIdentityProviderByAlias(idpHint);
-    if (identityProviderModel == null) {
-      return session.getProvider(LoginFormsProvider.class).setError(Messages.IDENTITY_PROVIDER_NOT_FOUND,idpHint).createErrorPage();
-    }
-    return buildRedirectToIdentityProvider(idpHint,new ClientSessionCode(realm,clientSession).getCode());
-  }
   this.event.event(EventType.LOGIN);
   clientSession.setNote(Details.AUTH_TYPE,CODE_AUTH_TYPE);
-  return handleBrowserAuthenticationRequest(clientSession,new OIDCLoginProtocol(session,realm,uriInfo,headers,event),TokenUtil.hasPrompt(prompt,OIDCLoginProtocol.PROMPT_VALUE_NONE),false);
+  return handleBrowserAuthenticationRequest(clientSession,new OIDCLoginProtocol(session,realm,uriInfo,headers,event),TokenUtil.hasPrompt(request.getPrompt(),OIDCLoginProtocol.PROMPT_VALUE_NONE),false);
 }

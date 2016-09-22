@@ -12,7 +12,8 @@
   }
   try {
     JWSInput input=new JWSInput(token);
-    if (RSAProvider.verify(input,deployment.getRealmKey())) {
+    PublicKey publicKey=AdapterRSATokenVerifier.getPublicKey(input,deployment);
+    if (RSAProvider.verify(input,publicKey)) {
       return input;
     }
   }

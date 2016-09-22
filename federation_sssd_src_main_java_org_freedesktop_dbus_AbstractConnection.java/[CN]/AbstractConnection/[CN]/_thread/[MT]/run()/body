@@ -1,0 +1,34 @@
+{
+  try {
+    Message m=null;
+    while (_run) {
+      m=null;
+      try {
+        m=readIncoming();
+        if (m != null) {
+          if (Debug.debug)           Debug.print(Debug.VERBOSE,"Got Incoming Message: " + m);
+synchronized (this) {
+            notifyAll();
+          }
+          if (m instanceof DBusSignal)           handleMessage((DBusSignal)m);
+ else           if (m instanceof MethodCall)           handleMessage((MethodCall)m);
+ else           if (m instanceof MethodReturn)           handleMessage((MethodReturn)m);
+ else           if (m instanceof Error)           handleMessage((Error)m);
+          m=null;
+        }
+      }
+ catch (      Exception e) {
+        if (EXCEPTION_DEBUG && Debug.debug)         Debug.print(Debug.ERR,e);
+        if (e instanceof FatalException) {
+          disconnect();
+        }
+      }
+    }
+synchronized (this) {
+      notifyAll();
+    }
+  }
+ catch (  Exception e) {
+    if (Debug.debug && EXCEPTION_DEBUG)     Debug.print(Debug.ERR,e);
+  }
+}

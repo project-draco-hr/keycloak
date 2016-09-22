@@ -1,0 +1,12 @@
+{
+  if (!isPublicKeyValid(input,realmKey))   throw new VerificationException("Invalid token signature.");
+  AccessToken token;
+  try {
+    token=input.readJsonContent(AccessToken.class);
+  }
+ catch (  JWSInputException e) {
+    throw new VerificationException("Couldn't parse token signature",e);
+  }
+  tokenVerifications(token,realmUrl,checkActive,checkTokenType);
+  return token;
+}

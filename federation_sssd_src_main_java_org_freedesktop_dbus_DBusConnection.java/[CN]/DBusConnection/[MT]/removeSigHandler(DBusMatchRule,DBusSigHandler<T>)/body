@@ -1,0 +1,22 @@
+{
+  SignalTuple key=new SignalTuple(rule.getInterface(),rule.getMember(),rule.getObject(),rule.getSource());
+synchronized (handledSignals) {
+    Vector<DBusSigHandler<? extends DBusSignal>> v=handledSignals.get(key);
+    if (null != v) {
+      v.remove(handler);
+      if (0 == v.size()) {
+        handledSignals.remove(key);
+        try {
+          _dbus.RemoveMatch(rule.toString());
+        }
+ catch (        NotConnected NC) {
+          if (EXCEPTION_DEBUG && Debug.debug)           Debug.print(Debug.ERR,NC);
+        }
+catch (        DBusExecutionException DBEe) {
+          if (EXCEPTION_DEBUG && Debug.debug)           Debug.print(Debug.ERR,DBEe);
+          throw new DBusException(DBEe.getMessage());
+        }
+      }
+    }
+  }
+}

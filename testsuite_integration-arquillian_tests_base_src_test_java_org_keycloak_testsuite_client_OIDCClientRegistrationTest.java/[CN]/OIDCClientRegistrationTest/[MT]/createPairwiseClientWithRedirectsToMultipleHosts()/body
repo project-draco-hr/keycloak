@@ -1,0 +1,15 @@
+{
+  OIDCClientRepresentation clientRep=createRep();
+  List<String> redirects=new ArrayList<>();
+  redirects.add("http://redirect1");
+  redirects.add("http://redirect2");
+  TestOIDCEndpointsApplicationResource oidcClientEndpointsResource=testingClient.testApp().oidcClientEndpoints();
+  oidcClientEndpointsResource.setSectorIdentifierRedirectUris(redirects);
+  clientRep.setSubjectType("pairwise");
+  clientRep.setSectorIdentifierUri(TestApplicationResourceUrls.pairwiseSectorIdentifierUri());
+  clientRep.setRedirectUris(redirects);
+  OIDCClientRepresentation response=reg.oidc().create(clientRep);
+  Assert.assertEquals("pairwise",response.getSubjectType());
+  Assert.assertEquals(TestApplicationResourceUrls.pairwiseSectorIdentifierUri(),response.getSectorIdentifierUri());
+  Assert.assertNames(response.getRedirectUris(),"http://redirect1","http://redirect2");
+}

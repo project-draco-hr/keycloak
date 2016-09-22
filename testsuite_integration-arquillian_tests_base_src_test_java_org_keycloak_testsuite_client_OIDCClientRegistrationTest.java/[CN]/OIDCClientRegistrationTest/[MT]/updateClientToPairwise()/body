@@ -1,0 +1,8 @@
+{
+  OIDCClientRepresentation response=create();
+  Assert.assertEquals("public",response.getSubjectType());
+  reg.auth(Auth.token(response));
+  response.setSubjectType("pairwise");
+  OIDCClientRepresentation updated=reg.oidc().update(response);
+  Assert.assertEquals("pairwise",updated.getSubjectType());
+}

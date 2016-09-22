@@ -1,0 +1,27 @@
+{
+  if (working) {
+    if (failure.getDescription().getMethodName() == null) {
+      for (      Description child : failure.getDescription().getChildren()) {
+        testFailure(new Failure(child,failure.getException()));
+      }
+    }
+ else {
+      Element testcase=createTestCase(failure.getDescription());
+      Element element;
+      if (failure.getException() instanceof AssertionError) {
+        failures.incrementAndGet();
+        element=xml.createElement("failure");
+      }
+ else {
+        errors.incrementAndGet();
+        element=xml.createElement("error");
+      }
+      testcase.appendChild(element);
+      element.setAttribute("type",safeString(failure.getException().getClass().getName()));
+      element.setAttribute("message",safeString(failure.getMessage()));
+      element.appendChild(xml.createCDATASection(safeString(failure.getTrace())));
+      testsuite.get().appendChild(testcase);
+      writeXml();
+    }
+  }
+}

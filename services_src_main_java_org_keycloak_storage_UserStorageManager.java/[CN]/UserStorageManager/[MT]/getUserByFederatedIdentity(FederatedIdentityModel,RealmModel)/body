@@ -1,0 +1,10 @@
+{
+  UserModel user=localStorage().getUserByFederatedIdentity(socialLink,realm);
+  if (user != null) {
+    return user;
+  }
+  if (getFederatedStorage() == null)   return null;
+  String id=getFederatedStorage().getUserByFederatedIdentity(socialLink,realm);
+  if (id != null)   return getUserById(id,realm);
+  return null;
+}

@@ -1,0 +1,48 @@
+{
+  FederatedUserCredentialEntity entity=em.find(FederatedUserCredentialEntity.class,cred.getId());
+  if (entity == null)   return;
+  entity.setAlgorithm(cred.getAlgorithm());
+  entity.setCounter(cred.getCounter());
+  entity.setCreatedDate(cred.getCreatedDate());
+  entity.setDevice(cred.getDevice());
+  entity.setDigits(cred.getDigits());
+  entity.setHashIterations(cred.getHashIterations());
+  entity.setPeriod(cred.getPeriod());
+  entity.setSalt(cred.getSalt());
+  entity.setType(cred.getType());
+  entity.setValue(cred.getValue());
+  if (entity.getCredentialAttributes().isEmpty() && (cred.getConfig() == null || cred.getConfig().isEmpty())) {
+  }
+ else {
+    MultivaluedHashMap<String,String> attrs=cred.getConfig();
+    MultivaluedHashMap<String,String> config=cred.getConfig();
+    if (config == null)     config=new MultivaluedHashMap<>();
+    Iterator<FederatedUserCredentialAttributeEntity> it=entity.getCredentialAttributes().iterator();
+    while (it.hasNext()) {
+      FederatedUserCredentialAttributeEntity attr=it.next();
+      List<String> values=config.getList(attr.getName());
+      if (values == null || !values.contains(attr.getValue())) {
+        em.remove(attr);
+        it.remove();
+      }
+ else {
+        attrs.add(attr.getName(),attr.getValue());
+      }
+    }
+    for (    String key : config.keySet()) {
+      List<String> values=config.getList(key);
+      List<String> attrValues=attrs.getList(key);
+      for (      String val : values) {
+        if (attrValues == null || !attrValues.contains(val)) {
+          FederatedUserCredentialAttributeEntity attr=new FederatedUserCredentialAttributeEntity();
+          attr.setId(KeycloakModelUtils.generateId());
+          attr.setValue(val);
+          attr.setName(key);
+          attr.setCredential(entity);
+          em.persist(attr);
+          entity.getCredentialAttributes().add(attr);
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  if (DBusInterface.class.isAssignableFrom(c)) {
+    if (null != c.getAnnotation(DBusInterfaceName.class))     iface=c.getAnnotation(DBusInterfaceName.class).value();
+ else     iface=AbstractConnection.dollar_pattern.matcher(c.getName()).replaceAll(".");
+    if (!iface.matches(".*\\..*"))     throw new DBusException(getString("interfaceMustBeDefinedPackage"));
+    member=null;
+    type=null;
+  }
+ else   if (DBusSignal.class.isAssignableFrom(c)) {
+    if (null == c.getEnclosingClass())     throw new DBusException(getString("signalsMustBeMemberOfClass"));
+ else     if (null != c.getEnclosingClass().getAnnotation(DBusInterfaceName.class))     iface=c.getEnclosingClass().getAnnotation(DBusInterfaceName.class).value();
+ else     iface=AbstractConnection.dollar_pattern.matcher(c.getEnclosingClass().getName()).replaceAll(".");
+    if (!iface.matches(".*\\..*"))     throw new DBusException(getString("interfaceMustBeDefinedPackage"));
+    if (c.isAnnotationPresent(DBusMemberName.class))     member=c.getAnnotation(DBusMemberName.class).value();
+ else     member=c.getSimpleName();
+    signalTypeMap.put(iface + '$' + member,(Class<? extends DBusSignal>)c);
+    type="signal";
+  }
+ else   if (Error.class.isAssignableFrom(c)) {
+    if (null != c.getAnnotation(DBusInterfaceName.class))     iface=c.getAnnotation(DBusInterfaceName.class).value();
+ else     iface=AbstractConnection.dollar_pattern.matcher(c.getName()).replaceAll(".");
+    if (!iface.matches(".*\\..*"))     throw new DBusException(getString("interfaceMustBeDefinedPackage"));
+    member=null;
+    type="error";
+  }
+ else   if (DBusExecutionException.class.isAssignableFrom(c)) {
+    if (null != c.getClass().getAnnotation(DBusInterfaceName.class))     iface=c.getClass().getAnnotation(DBusInterfaceName.class).value();
+ else     iface=AbstractConnection.dollar_pattern.matcher(c.getClass().getName()).replaceAll(".");
+    if (!iface.matches(".*\\..*"))     throw new DBusException(getString("interfaceMustBeDefinedPackage"));
+    member=null;
+    type="error";
+  }
+ else   throw new DBusException(getString("invalidTypeMatchRule") + c);
+}

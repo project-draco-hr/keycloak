@@ -1,0 +1,44 @@
+{
+  if (Debug.debug)   Debug.print(Debug.VERBOSE,"Deserializing from " + Arrays.deepToString(parameters) + " to "+ Arrays.deepToString(types));
+  if (null == parameters)   return null;
+  if (types.length == 1 && types[0] instanceof ParameterizedType && Tuple.class.isAssignableFrom((Class)((ParameterizedType)types[0]).getRawType())) {
+    types=((ParameterizedType)types[0]).getActualTypeArguments();
+  }
+  for (int i=0; i < parameters.length; i++) {
+    if (i >= types.length) {
+      if (Debug.debug) {
+        for (int j=0; j < parameters.length; j++) {
+          Debug.print(Debug.ERR,String.format("Error, Parameters difference (%1d, '%2s')",j,parameters[j].toString()));
+        }
+      }
+      throw new DBusException(getString("errorDeserializingMessage"));
+    }
+    if (null == parameters[i])     continue;
+    if ((types[i] instanceof Class && DBusSerializable.class.isAssignableFrom((Class<? extends Object>)types[i])) || (types[i] instanceof ParameterizedType && DBusSerializable.class.isAssignableFrom((Class<? extends Object>)((ParameterizedType)types[i]).getRawType()))) {
+      Class<? extends DBusSerializable> dsc;
+      if (types[i] instanceof Class)       dsc=(Class<? extends DBusSerializable>)types[i];
+ else       dsc=(Class<? extends DBusSerializable>)((ParameterizedType)types[i]).getRawType();
+      for (      Method m : dsc.getDeclaredMethods())       if (m.getName().equals("deserialize")) {
+        Type[] newtypes=m.getGenericParameterTypes();
+        try {
+          Object[] sub=new Object[newtypes.length];
+          System.arraycopy(parameters,i,sub,0,newtypes.length);
+          sub=deSerializeParameters(sub,newtypes,conn);
+          DBusSerializable sz=dsc.newInstance();
+          m.invoke(sz,sub);
+          Object[] compress=new Object[parameters.length - newtypes.length + 1];
+          System.arraycopy(parameters,0,compress,0,i);
+          compress[i]=sz;
+          System.arraycopy(parameters,i + newtypes.length,compress,i + 1,parameters.length - i - newtypes.length);
+          parameters=compress;
+        }
+ catch (        ArrayIndexOutOfBoundsException AIOOBe) {
+          if (AbstractConnection.EXCEPTION_DEBUG && Debug.debug)           Debug.print(Debug.ERR,AIOOBe);
+          throw new DBusException(MessageFormat.format(getString("notEnoughElementsToCreateCustomObject"),new Object[]{parameters.length - i,newtypes.length}));
+        }
+      }
+    }
+ else     parameters[i]=deSerializeParameter(parameters[i],types[i],conn);
+  }
+  return parameters;
+}

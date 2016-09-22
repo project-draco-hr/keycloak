@@ -2,13 +2,13 @@
   super.setEnabled(enabled);
   if (ldapProvider.getEditMode() == UserFederationProvider.EditMode.WRITABLE && getPwdLastSet() > 0) {
     logger.debugf("Going to propagate enabled=%s for ldapUser '%s' to MSAD",enabled,ldapUser.getDn().toString());
-    UserAccountControl control=getUserAccountControl();
+    UserAccountControl control=getUserAccountControl(ldapUser);
     if (enabled) {
       control.remove(UserAccountControl.ACCOUNTDISABLE);
     }
  else {
       control.add(UserAccountControl.ACCOUNTDISABLE);
     }
-    updateUserAccountControl(control);
+    updateUserAccountControl(ldapUser,control);
   }
 }

@@ -1,0 +1,12 @@
+{
+  logger.debugf("Going to update userAccountControl for ldap user '%s' after successful password update",ldapUser.getDn().toString());
+  ldapUser.removeReadOnlyAttributeName(LDAPConstants.PWD_LAST_SET);
+  ldapUser.setSingleAttribute(LDAPConstants.PWD_LAST_SET,"-1");
+  UserAccountControl control=getUserAccountControl(ldapUser);
+  control.remove(UserAccountControl.PASSWD_NOTREQD);
+  control.remove(UserAccountControl.PASSWORD_EXPIRED);
+  if (user.isEnabled()) {
+    control.remove(UserAccountControl.ACCOUNTDISABLE);
+  }
+  updateUserAccountControl(ldapUser,control);
+}

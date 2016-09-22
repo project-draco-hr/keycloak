@@ -1,0 +1,12 @@
+{
+  CredentialModel secret=null;
+  if (user instanceof CachedUserModel) {
+    CachedUserModel cached=(CachedUserModel)user;
+    secret=(CredentialModel)cached.getCachedWith().get(CACHE_KEY);
+  }
+ else {
+    List<CredentialModel> creds=session.userCredentialManager().getStoredCredentialsByType(realm,user,SECRET_QUESTION);
+    if (!creds.isEmpty())     secret=creds.get(0);
+  }
+  return secret;
+}

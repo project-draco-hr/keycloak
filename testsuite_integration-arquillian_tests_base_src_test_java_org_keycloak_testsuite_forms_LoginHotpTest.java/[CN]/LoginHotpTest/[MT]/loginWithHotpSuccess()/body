@@ -1,7 +1,7 @@
 {
   loginPage.open();
   loginPage.login("test-user@localhost","password");
-  Assert.assertTrue(loginTotpPage.isCurrent());
+  Assert.assertTrue("expecting totpPage got: " + driver.getCurrentUrl(),loginTotpPage.isCurrent());
   loginTotpPage.login(otp.generateHOTP("hotpSecret",counter++));
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   events.expectLogin().assertEvent();

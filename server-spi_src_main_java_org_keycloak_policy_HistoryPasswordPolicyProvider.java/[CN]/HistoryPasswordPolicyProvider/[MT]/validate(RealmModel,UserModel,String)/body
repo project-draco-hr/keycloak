@@ -1,0 +1,22 @@
+{
+  PasswordPolicy policy=session.getContext().getRealm().getPasswordPolicy();
+  int passwordHistoryPolicyValue=policy.getPolicyConfig(HistoryPasswordPolicyProviderFactory.ID);
+  if (passwordHistoryPolicyValue != -1) {
+    List<CredentialModel> storedPasswords=session.userCredentialManager().getStoredCredentialsByType(realm,user,CredentialModel.PASSWORD);
+    for (    CredentialModel cred : storedPasswords) {
+      PasswordHashProvider hash=session.getProvider(PasswordHashProvider.class,cred.getAlgorithm());
+      if (hash == null)       continue;
+      if (hash.verify(password,cred)) {
+        return new PolicyError(ERROR_MESSAGE,passwordHistoryPolicyValue);
+      }
+    }
+    List<CredentialModel> passwordHistory=session.userCredentialManager().getStoredCredentialsByType(realm,user,CredentialModel.PASSWORD_HISTORY);
+    for (    CredentialModel cred : passwordHistory) {
+      PasswordHashProvider hash=session.getProvider(PasswordHashProvider.class,cred.getAlgorithm());
+      if (hash.verify(password,cred)) {
+        return new PolicyError(ERROR_MESSAGE,passwordHistoryPolicyValue);
+      }
+    }
+  }
+  return null;
+}

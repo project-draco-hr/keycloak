@@ -1,0 +1,8 @@
+{
+  List<T> list=new LinkedList<T>();
+  for (  ProviderFactory f : session.getKeycloakSessionFactory().getProviderFactories(CredentialProvider.class)) {
+    if (!Types.supports(CredentialInputUpdater.class,f,CredentialProviderFactory.class))     continue;
+    list.add((T)session.getProvider(CredentialProvider.class,f.getId()));
+  }
+  return list;
+}

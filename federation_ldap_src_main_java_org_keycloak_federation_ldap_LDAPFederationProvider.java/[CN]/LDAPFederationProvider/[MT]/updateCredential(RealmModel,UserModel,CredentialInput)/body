@@ -1,0 +1,18 @@
+{
+  if (!CredentialModel.PASSWORD.equals(input.getType()) || !(input instanceof UserCredentialModel))   return false;
+  if (editMode == EditMode.READ_ONLY) {
+    throw new ModelReadOnlyException("Federated storage is not writable");
+  }
+ else   if (editMode == EditMode.WRITABLE) {
+    LDAPIdentityStore ldapIdentityStore=getLdapIdentityStore();
+    UserCredentialModel cred=(UserCredentialModel)input;
+    String password=cred.getValue();
+    LDAPObject ldapUser=loadAndValidateUser(realm,user);
+    ldapIdentityStore.updatePassword(ldapUser,password);
+    if (updater != null)     updater.passwordUpdated(user,ldapUser,input);
+    return true;
+  }
+ else {
+    return false;
+  }
+}

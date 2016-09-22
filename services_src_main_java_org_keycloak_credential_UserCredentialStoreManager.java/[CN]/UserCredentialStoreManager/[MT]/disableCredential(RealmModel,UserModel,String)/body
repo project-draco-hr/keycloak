@@ -9,15 +9,14 @@
       }
     }
   }
-  List<ComponentModel> components=getCredentialProviderComponents(realm);
-  for (  ComponentModel component : components) {
-    CredentialProviderFactory factory=(CredentialProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(CredentialProvider.class,component.getProviderId());
-    if (!Types.supports(CredentialInputUpdater.class,factory,CredentialProviderFactory.class))     continue;
-    CredentialInputUpdater updater=(CredentialInputUpdater)session.getAttribute(component.getId());
-    if (updater == null) {
-      updater=(CredentialInputUpdater)factory.create(session,component);
-      session.setAttribute(component.getId(),updater);
+ else {
+    UserFederationProvider link=session.users().getFederationLink(realm,user);
+    if (link != null && link.getSupportedCredentialTypes().contains(credentialType)) {
+      link.disableCredentialType(realm,user,credentialType);
     }
+  }
+  List<CredentialInputUpdater> credentialProviders=getCredentialProviders(realm,CredentialInputUpdater.class);
+  for (  CredentialInputUpdater updater : credentialProviders) {
     if (!updater.supportsCredentialType(credentialType))     continue;
     updater.disableCredentialType(realm,user,credentialType);
   }

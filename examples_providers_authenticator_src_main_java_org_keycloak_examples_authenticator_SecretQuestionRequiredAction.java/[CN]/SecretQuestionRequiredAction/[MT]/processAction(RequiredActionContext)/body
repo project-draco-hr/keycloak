@@ -1,8 +1,8 @@
 {
   String answer=(context.getHttpRequest().getDecodedFormParameters().getFirst("secret_answer"));
-  UserCredentialValueModel model=new UserCredentialValueModel();
-  model.setValue(answer);
-  model.setType(SecretQuestionAuthenticator.CREDENTIAL_TYPE);
-  context.getUser().updateCredentialDirectly(model);
+  UserCredentialModel input=new UserCredentialModel();
+  input.setType(SecretQuestionCredentialProvider.SECRET_QUESTION);
+  input.setValue(answer);
+  context.getSession().userCredentialManager().updateCredential(context.getRealm(),context.getUser(),input);
   context.success();
 }

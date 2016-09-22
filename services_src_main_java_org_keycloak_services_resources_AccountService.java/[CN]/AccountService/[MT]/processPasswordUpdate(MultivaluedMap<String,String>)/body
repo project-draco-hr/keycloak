@@ -18,7 +18,7 @@
       return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
     }
     UserCredentialModel cred=UserCredentialModel.password(password);
-    if (!session.users().validCredentials(session,realm,user,cred)) {
+    if (!session.userCredentialManager().isValid(realm,user,cred)) {
       setReferrerOnPage();
       errorEvent.error(Errors.INVALID_USER_CREDENTIALS);
       return account.setError(Messages.INVALID_PASSWORD_EXISTING).createResponse(AccountPages.PASSWORD);
@@ -35,7 +35,7 @@
     return account.setError(Messages.INVALID_PASSWORD_CONFIRM).createResponse(AccountPages.PASSWORD);
   }
   try {
-    session.users().updateCredential(realm,user,UserCredentialModel.password(passwordNew));
+    session.userCredentialManager().updateCredential(realm,user,UserCredentialModel.password(passwordNew));
   }
  catch (  ModelReadOnlyException mre) {
     setReferrerOnPage();

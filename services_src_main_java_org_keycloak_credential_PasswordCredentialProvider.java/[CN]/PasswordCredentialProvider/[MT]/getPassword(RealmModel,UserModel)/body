@@ -1,0 +1,12 @@
+{
+  List<CredentialModel> passwords=null;
+  if (user instanceof CachedUserModel) {
+    CachedUserModel cached=(CachedUserModel)user;
+    passwords=(List<CredentialModel>)cached.getCachedWith().get(PASSWORD_CACHE_KEY);
+  }
+ else {
+    passwords=getCredentialStore().getStoredCredentialsByType(realm,user,CredentialModel.PASSWORD);
+  }
+  if (passwords == null || passwords.isEmpty())   return null;
+  return passwords.get(0);
+}

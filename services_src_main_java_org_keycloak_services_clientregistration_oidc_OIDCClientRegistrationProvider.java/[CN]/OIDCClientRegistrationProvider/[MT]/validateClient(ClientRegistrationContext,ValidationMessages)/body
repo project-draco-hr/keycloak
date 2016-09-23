@@ -1,0 +1,15 @@
+{
+  OIDCClientRegistrationContext oidcContext=(OIDCClientRegistrationContext)context;
+  OIDCClientRepresentation oidcRep=oidcContext.getOidcRep();
+  boolean valid=super.validateClient(context,validationMessages);
+  ClientRepresentation client=oidcContext.getClient();
+  String rootUrl=client.getRootUrl();
+  Set<String> redirectUris=new HashSet<>();
+  if (client.getRedirectUris() != null)   redirectUris.addAll(client.getRedirectUris());
+  SubjectType subjectType=SubjectType.parse(oidcRep.getSubjectType());
+  String sectorIdentifierUri=oidcRep.getSectorIdentifierUri();
+  if (SubjectType.PAIRWISE == subjectType || (sectorIdentifierUri != null && !sectorIdentifierUri.isEmpty())) {
+    valid=valid && PairwiseClientValidator.validate(session,rootUrl,redirectUris,oidcRep.getSectorIdentifierUri(),validationMessages);
+  }
+  return valid;
+}

@@ -1,0 +1,25 @@
+{
+  OIDCClientRepresentation publicClient=create();
+  oauth.clientId(publicClient.getClientId());
+  OAuthClient.AuthorizationEndpointResponse loginResponse=oauth.doLogin("test-user@localhost","password");
+  OAuthClient.AccessTokenResponse accessTokenResponse=oauth.doAccessTokenRequest(loginResponse.getCode(),publicClient.getClientSecret());
+  AccessToken accessToken=oauth.verifyToken(accessTokenResponse.getAccessToken());
+  Assert.assertEquals("test-user",accessToken.getPreferredUsername());
+  Assert.assertEquals("test-user@localhost",accessToken.getEmail());
+  String tokenUserId=accessToken.getSubject();
+  UserRepresentation user=realmsResouce().realm("test").users().search("test-user",0,1).get(0);
+  Assert.assertEquals(user.getId(),tokenUserId);
+  OIDCClientRepresentation clientRep=createRep();
+  clientRep.setSubjectType("pairwise");
+  OIDCClientRepresentation pairwiseClient=reg.oidc().create(clientRep);
+  Assert.assertEquals("pairwise",pairwiseClient.getSubjectType());
+  oauth.clientId(pairwiseClient.getClientId());
+  oauth.openLoginForm();
+  loginResponse=new OAuthClient.AuthorizationEndpointResponse(oauth);
+  accessTokenResponse=oauth.doAccessTokenRequest(loginResponse.getCode(),pairwiseClient.getClientSecret());
+  accessToken=oauth.verifyToken(accessTokenResponse.getAccessToken());
+  Assert.assertEquals("test-user",accessToken.getPreferredUsername());
+  Assert.assertEquals("test-user@localhost",accessToken.getEmail());
+  String pairwiseUserId=accessToken.getSubject();
+  Assert.assertNotEquals(pairwiseUserId,user.getId());
+}

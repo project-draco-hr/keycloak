@@ -1,0 +1,18 @@
+{
+  OIDCClientRepresentation response=create();
+  Assert.assertEquals("public",response.getSubjectType());
+  Assert.assertNull(response.getSectorIdentifierUri());
+  List<String> sectorRedirects=new ArrayList<>();
+  sectorRedirects.addAll(response.getRedirectUris());
+  TestOIDCEndpointsApplicationResource oidcClientEndpointsResource=testingClient.testApp().oidcClientEndpoints();
+  oidcClientEndpointsResource.setSectorIdentifierRedirectUris(sectorRedirects);
+  String sectorIdentifierUri=TestApplicationResourceUrls.pairwiseSectorIdentifierUri();
+  String clientId=response.getClientId();
+  ProtocolMapperRepresentation pairwiseProtMapper=SHA256PairwiseSubMapper.createPairwiseMapper(sectorIdentifierUri,null);
+  RealmResource realmResource=realmsResouce().realm("test");
+  ClientManager.realm(realmResource).clientId(clientId).addProtocolMapper(pairwiseProtMapper);
+  reg.auth(Auth.token(response));
+  OIDCClientRepresentation rep=reg.oidc().get(response.getClientId());
+  Assert.assertEquals("pairwise",rep.getSubjectType());
+  Assert.assertEquals(sectorIdentifierUri,rep.getSectorIdentifierUri());
+}

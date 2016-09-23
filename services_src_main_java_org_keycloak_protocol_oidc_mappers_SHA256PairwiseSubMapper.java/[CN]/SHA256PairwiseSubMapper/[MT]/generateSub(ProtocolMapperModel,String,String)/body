@@ -1,0 +1,11 @@
+{
+  String saltStr=PairwiseSubMapperHelper.getSalt(mappingModel);
+  if (saltStr == null) {
+    throw new IllegalStateException("Salt not available on mappingModel. Please update protocol mapper");
+  }
+  Charset charset=Charset.forName("UTF-8");
+  byte[] salt=saltStr.getBytes(charset);
+  String pairwiseSub=generateSub(sectorIdentifier,localSub,salt);
+  logger.infof("local sub = '%s', pairwise sub = '%s'",localSub,pairwiseSub);
+  return pairwiseSub;
+}

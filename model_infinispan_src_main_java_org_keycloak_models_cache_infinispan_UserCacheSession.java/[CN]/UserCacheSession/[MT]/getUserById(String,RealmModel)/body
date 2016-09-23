@@ -9,21 +9,22 @@
     return managedUsers.get(id);
   }
   CachedUser cached=cache.get(id,CachedUser.class);
+  UserModel delegate=null;
   boolean wasCached=cached != null;
   if (cached == null) {
     logger.trace("not cached");
     Long loaded=cache.getCurrentRevision(id);
-    UserModel model=getDelegate().getUserById(id,realm);
-    if (model == null) {
+    delegate=getDelegate().getUserById(id,realm);
+    if (delegate == null) {
       logger.trace("delegate returning null");
       return null;
     }
-    cached=new CachedUser(loaded,realm,model);
+    cached=new CachedUser(loaded,realm,delegate);
     cache.addRevisioned(cached,startupRevision);
   }
   logger.trace("returning new cache adapter");
   UserAdapter adapter=new UserAdapter(cached,this,session,realm);
-  if (!wasCached)   onCache(realm,adapter);
+  if (!wasCached)   onCache(realm,adapter,delegate);
   managedUsers.put(id,adapter);
   return adapter;
 }

@@ -1,13 +1,11 @@
 {
   logger.debug("failure");
-  logFailureCalled++;
   RealmModel realm=getRealmModel(session,event);
   logFailure(event);
   String userId=event.userId;
   UserModel user=session.users().getUserById(userId,realm);
   UserLoginFailureModel userLoginFailure=getUserModel(session,event);
   if (user != null) {
-    logFailure++;
     if (userLoginFailure == null) {
       userLoginFailure=session.sessions().addUserLoginFailure(realm,userId);
     }
@@ -21,7 +19,6 @@
     userLoginFailure.setLastFailure(currentTime);
     if (deltaTime > 0) {
       if (deltaTime > (long)realm.getMaxDeltaTimeSeconds() * 1000L) {
-        clearCount++;
         userLoginFailure.clearFailures();
       }
     }
@@ -40,11 +37,7 @@
       waitSeconds=Math.min(realm.getMaxFailureWaitSeconds(),waitSeconds);
       int notBefore=(int)(currentTime / 1000) + waitSeconds;
       logger.debugv("set notBefore: {0}",notBefore);
-      markNotBefore=notBefore;
       userLoginFailure.setFailedLoginNotBefore(notBefore);
     }
-  }
- else {
-    notFoundUserId=event.userId;
   }
 }

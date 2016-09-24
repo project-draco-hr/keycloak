@@ -1,0 +1,19 @@
+{
+  if (!SECRET_QUESTION.equals(input.getType()))   return false;
+  if (!(input instanceof UserCredentialModel))   return false;
+  UserCredentialModel credInput=(UserCredentialModel)input;
+  List<CredentialModel> creds=session.userCredentialManager().getStoredCredentialsByType(realm,user,SECRET_QUESTION);
+  if (creds.isEmpty()) {
+    CredentialModel secret=new CredentialModel();
+    secret.setType(SECRET_QUESTION);
+    secret.setValue(credInput.getValue());
+    secret.setCreatedDate(Time.currentTimeMillis());
+    session.userCredentialManager().createCredential(realm,user,secret);
+  }
+ else {
+    creds.get(0).setValue(credInput.getValue());
+    session.userCredentialManager().updateCredential(realm,user,creds.get(0));
+  }
+  session.getUserCache().evict(realm,user);
+  return true;
+}

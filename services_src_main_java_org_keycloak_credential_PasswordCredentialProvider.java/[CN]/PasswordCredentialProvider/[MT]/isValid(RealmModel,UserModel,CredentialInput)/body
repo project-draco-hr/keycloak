@@ -1,0 +1,40 @@
+{
+  if (!(input instanceof UserCredentialModel)) {
+    logger.debug("Expected instance of UserCredentialModel for CredentialInput");
+    return false;
+  }
+  UserCredentialModel cred=(UserCredentialModel)input;
+  if (cred.getValue() == null) {
+    logger.debugv("Input password was null for user {0} ",user.getUsername());
+    return false;
+  }
+  CredentialModel password=getPassword(realm,user);
+  if (password == null) {
+    logger.debugv("No password cached or stored for user {0} ",user.getUsername());
+    return false;
+  }
+  PasswordHashProvider hash=session.getProvider(PasswordHashProvider.class,password.getAlgorithm());
+  if (hash == null) {
+    logger.debugv("PasswordHashProvider {0} not found for user {1} ",password.getAlgorithm(),user.getUsername());
+    return false;
+  }
+  if (!hash.verify(cred.getValue(),password)) {
+    logger.debugv("Failed password validation for user {0} ",user.getUsername());
+    return false;
+  }
+  PasswordPolicy policy=realm.getPasswordPolicy();
+  if (policy == null) {
+    return true;
+  }
+  hash=getHashProvider(policy);
+  if (hash == null) {
+    return true;
+  }
+  if (hash.policyCheck(policy,password)) {
+    return true;
+  }
+  hash.encode(cred.getValue(),policy,password);
+  getCredentialStore().updateCredential(realm,user,password);
+  session.getUserCache().evict(realm,user);
+  return true;
+}

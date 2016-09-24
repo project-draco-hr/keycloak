@@ -2,14 +2,15 @@
   logger.debug("failure");
   RealmModel realm=getRealmModel(session,event);
   logFailure(event);
-  UserModel user=session.users().getUserById(event.userId,realm);
+  String userId=event.userId;
+  UserModel user=session.users().getUserById(userId,realm);
   UserLoginFailureModel userLoginFailure=getUserModel(session,event);
   if (user != null) {
     if (userLoginFailure == null) {
-      userLoginFailure=session.sessions().addUserLoginFailure(realm,event.userId);
+      userLoginFailure=session.sessions().addUserLoginFailure(realm,userId);
     }
     userLoginFailure.setLastIPFailure(event.ip);
-    long currentTime=System.currentTimeMillis();
+    long currentTime=Time.currentTimeMillis();
     long last=userLoginFailure.getLastFailure();
     long deltaTime=0;
     if (last > 0) {

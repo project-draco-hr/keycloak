@@ -2,12 +2,12 @@
   CachedUser cached=cache.get(userId,CachedUser.class);
   boolean wasCached=cached != null;
   if (cached == null) {
-    cached=new CachedUser(loaded,realm,model);
+    cached=new CachedUser(loaded,realm,delegate);
     cache.addRevisioned(cached,startupRevision);
   }
   UserAdapter adapter=new UserAdapter(cached,this,session,realm);
   if (!wasCached) {
-    onCache(realm,adapter);
+    onCache(realm,adapter,delegate);
   }
   return adapter;
 }

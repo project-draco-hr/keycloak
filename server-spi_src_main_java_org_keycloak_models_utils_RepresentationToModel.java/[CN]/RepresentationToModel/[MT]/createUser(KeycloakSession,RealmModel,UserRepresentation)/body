@@ -8,7 +8,6 @@
   user.setFirstName(userRep.getFirstName());
   user.setLastName(userRep.getLastName());
   user.setFederationLink(userRep.getFederationLink());
-  if (userRep.isTotp() != null)   user.setOtpEnabled(userRep.isTotp());
   if (userRep.getAttributes() != null) {
     for (    Map.Entry<String,Object> entry : userRep.getAttributes().entrySet()) {
       Object value=entry.getValue();
@@ -27,7 +26,7 @@
       user.addRequiredAction(UserModel.RequiredAction.valueOf(requiredAction));
     }
   }
-  createCredentials(userRep,user);
+  createCredentials(userRep,session,newRealm,user);
   if (userRep.getFederatedIdentities() != null) {
     for (    FederatedIdentityRepresentation identity : userRep.getFederatedIdentities()) {
       FederatedIdentityModel mappingModel=new FederatedIdentityModel(identity.getIdentityProvider(),identity.getUserId(),identity.getUserName());

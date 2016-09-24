@@ -1,0 +1,46 @@
+{
+  if (cred.getValue() != null) {
+    UserCredentialModel plainTextCred=convertCredential(cred);
+    session.userCredentialManager().updateCredential(realm,user,plainTextCred);
+  }
+ else {
+    CredentialModel hashedCred=new CredentialModel();
+    hashedCred.setType(cred.getType());
+    hashedCred.setDevice(cred.getDevice());
+    if (cred.getHashIterations() != null)     hashedCred.setHashIterations(cred.getHashIterations());
+    try {
+      if (cred.getSalt() != null)       hashedCred.setSalt(Base64.decode(cred.getSalt()));
+    }
+ catch (    IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+    hashedCred.setValue(cred.getHashedSaltedValue());
+    if (cred.getCounter() != null)     hashedCred.setCounter(cred.getCounter());
+    if (cred.getDigits() != null)     hashedCred.setDigits(cred.getDigits());
+    if (cred.getAlgorithm() != null) {
+      if ((UserCredentialModel.PASSWORD.equals(cred.getType()) || UserCredentialModel.PASSWORD_HISTORY.equals(cred.getType())) && (cred.getAlgorithm().equals(HmacOTP.HMAC_SHA1))) {
+        hashedCred.setAlgorithm(Pbkdf2PasswordHashProvider.ID);
+      }
+ else {
+        hashedCred.setAlgorithm(cred.getAlgorithm());
+      }
+    }
+ else {
+      if (UserCredentialModel.PASSWORD.equals(cred.getType()) || UserCredentialModel.PASSWORD_HISTORY.equals(cred.getType())) {
+        hashedCred.setAlgorithm(Pbkdf2PasswordHashProvider.ID);
+      }
+ else       if (UserCredentialModel.isOtp(cred.getType())) {
+        hashedCred.setAlgorithm(HmacOTP.HMAC_SHA1);
+      }
+    }
+    if (cred.getPeriod() != null)     hashedCred.setPeriod(cred.getPeriod());
+    if (cred.getDigits() == null && UserCredentialModel.isOtp(cred.getType())) {
+      hashedCred.setDigits(6);
+    }
+    if (cred.getPeriod() == null && UserCredentialModel.TOTP.equals(cred.getType())) {
+      hashedCred.setPeriod(30);
+    }
+    hashedCred.setCreatedDate(cred.getCreatedDate());
+    session.userCredentialManager().createCredential(realm,user,hashedCred);
+  }
+}

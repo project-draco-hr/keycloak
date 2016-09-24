@@ -1,4 +1,5 @@
 {
+  createIndex(realm,user);
   FederatedUserCredentialEntity entity=new FederatedUserCredentialEntity();
   String id=cred.getId() == null ? KeycloakModelUtils.generateId() : cred.getId();
   entity.setId(id);
@@ -17,7 +18,7 @@
   entity.setStorageProviderId(StorageId.resolveProviderId(user));
   em.persist(entity);
   MultivaluedHashMap<String,String> config=cred.getConfig();
-  if (config != null || !config.isEmpty()) {
+  if (config != null && !config.isEmpty()) {
     for (    String key : config.keySet()) {
       List<String> values=config.getList(key);
       for (      String val : values) {

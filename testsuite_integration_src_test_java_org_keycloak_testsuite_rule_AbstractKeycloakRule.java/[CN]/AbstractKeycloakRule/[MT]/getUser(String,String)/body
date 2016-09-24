@@ -4,7 +4,7 @@
   try {
     RealmModel realmByName=session.realms().getRealmByName(realm);
     UserModel user=session.users().getUserByUsername(name,realmByName);
-    UserRepresentation userRep=user != null ? ModelToRepresentation.toRepresentation(user) : null;
+    UserRepresentation userRep=user != null ? ModelToRepresentation.toRepresentation(session,realmByName,user) : null;
     session.getTransactionManager().commit();
     return userRep;
   }

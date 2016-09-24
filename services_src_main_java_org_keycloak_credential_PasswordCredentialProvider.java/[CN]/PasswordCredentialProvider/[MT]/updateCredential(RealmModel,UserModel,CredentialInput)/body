@@ -1,0 +1,25 @@
+{
+  if (!supportsCredentialType(input.getType()))   return false;
+  if (!(input instanceof UserCredentialModel)) {
+    logger.debug("Expected instance of UserCredentialModel for CredentialInput");
+    return false;
+  }
+  UserCredentialModel cred=(UserCredentialModel)input;
+  PasswordPolicy policy=realm.getPasswordPolicy();
+  PolicyError error=session.getProvider(PasswordPolicyManagerProvider.class).validate(realm,user,cred.getValue());
+  if (error != null)   throw new ModelException(error.getMessage(),error.getParameters());
+  PasswordHashProvider hash=getHashProvider(policy);
+  if (hash == null) {
+    return false;
+  }
+  CredentialModel oldPassword=getPassword(realm,user);
+  expirePassword(realm,user,policy);
+  CredentialModel newPassword=new CredentialModel();
+  newPassword.setType(CredentialModel.PASSWORD);
+  long createdDate=Time.currentTimeMillis();
+  newPassword.setCreatedDate(createdDate);
+  hash.encode(cred.getValue(),policy,newPassword);
+  getCredentialStore().createCredential(realm,user,newPassword);
+  session.getUserCache().evict(realm,user);
+  return true;
+}

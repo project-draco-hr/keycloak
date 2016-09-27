@@ -1,0 +1,16 @@
+{
+  URL schemaFile=getClass().getResource(schemaFileName);
+  Source xmlFile=new StreamSource(new ByteArrayInputStream(xml.getBytes()),xml);
+  SchemaFactory schemaFactory=SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+  Schema schema=schemaFactory.newSchema(schemaFile);
+  Validator validator=schema.newValidator();
+  try {
+    validator.validate(xmlFile);
+    System.out.println(xmlFile.getSystemId() + " is valid");
+  }
+ catch (  SAXException e) {
+    System.out.println(xmlFile.getSystemId() + " is NOT valid");
+    System.out.println("Reason: " + e.getLocalizedMessage());
+    Assert.fail();
+  }
+}

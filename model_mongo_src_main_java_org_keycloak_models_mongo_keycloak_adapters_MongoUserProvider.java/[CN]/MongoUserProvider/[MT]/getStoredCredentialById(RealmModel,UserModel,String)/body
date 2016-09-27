@@ -1,0 +1,13 @@
+{
+  MongoUserEntity mongoUser=getMongoUserEntity(user);
+  for (  CredentialEntity credEntity : mongoUser.getCredentials()) {
+    if (id.equals(credEntity.getId())) {
+      if (credEntity.getId() == null) {
+        credEntity.setId(KeycloakModelUtils.generateId());
+        getMongoStore().updateEntity(mongoUser,invocationContext);
+      }
+      return toModel(credEntity);
+    }
+  }
+  return null;
+}

@@ -1,0 +1,13 @@
+{
+  MongoUserEntity mongoUser=getMongoUserEntity(user);
+  Iterator<CredentialEntity> it=mongoUser.getCredentials().iterator();
+  while (it.hasNext()) {
+    CredentialEntity entity=it.next();
+    if (id.equals(entity.getId())) {
+      it.remove();
+      getMongoStore().updateEntity(mongoUser,invocationContext);
+      return true;
+    }
+  }
+  return false;
+}

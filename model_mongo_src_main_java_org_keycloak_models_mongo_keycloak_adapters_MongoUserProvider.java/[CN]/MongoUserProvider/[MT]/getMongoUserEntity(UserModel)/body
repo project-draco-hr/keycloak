@@ -1,0 +1,13 @@
+{
+  UserAdapter adapter=null;
+  if (user instanceof CachedUserModel) {
+    adapter=(UserAdapter)((CachedUserModel)user).getDelegateForUpdate();
+  }
+ else   if (user instanceof UserAdapter) {
+    adapter=(UserAdapter)user;
+  }
+ else {
+    return getMongoStore().loadEntity(MongoUserEntity.class,user.getId(),invocationContext);
+  }
+  return adapter.getMongoEntity();
+}

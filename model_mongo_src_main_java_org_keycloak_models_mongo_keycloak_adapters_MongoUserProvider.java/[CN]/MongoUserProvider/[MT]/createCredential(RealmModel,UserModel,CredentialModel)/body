@@ -1,0 +1,11 @@
+{
+  MongoUserEntity mongoUser=getMongoUserEntity(user);
+  CredentialEntity credentialEntity=new CredentialEntity();
+  credentialEntity.setId(KeycloakModelUtils.generateId());
+  setValues(cred,credentialEntity);
+  cred.setId(credentialEntity.getId());
+  mongoUser.getCredentials().add(credentialEntity);
+  getMongoStore().updateEntity(mongoUser,invocationContext);
+  cred.setId(credentialEntity.getId());
+  return cred;
+}

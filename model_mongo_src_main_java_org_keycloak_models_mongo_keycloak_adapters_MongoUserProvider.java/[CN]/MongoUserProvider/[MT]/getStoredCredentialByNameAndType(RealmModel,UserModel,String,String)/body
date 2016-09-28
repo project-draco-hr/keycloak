@@ -1,0 +1,17 @@
+{
+  MongoUserEntity mongoUser=getMongoUserEntity(user);
+  boolean update=false;
+  CredentialModel credModel=null;
+  for (  CredentialEntity credEntity : mongoUser.getCredentials()) {
+    if (credEntity.getId() == null) {
+      credEntity.setId(KeycloakModelUtils.generateId());
+      update=true;
+    }
+    if (credEntity.getType().equals(type) && name.equals(credEntity.getDevice())) {
+      credModel=toModel(credEntity);
+      break;
+    }
+  }
+  if (update)   getMongoStore().updateEntity(mongoUser,invocationContext);
+  return credModel;
+}

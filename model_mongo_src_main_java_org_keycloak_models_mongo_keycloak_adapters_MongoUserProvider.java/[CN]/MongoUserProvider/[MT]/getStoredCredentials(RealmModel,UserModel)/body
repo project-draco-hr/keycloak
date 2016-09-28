@@ -1,0 +1,15 @@
+{
+  List<CredentialModel> list=new LinkedList<>();
+  MongoUserEntity mongoUser=getMongoUserEntity(user);
+  boolean update=false;
+  for (  CredentialEntity credEntity : mongoUser.getCredentials()) {
+    if (credEntity.getId() == null) {
+      credEntity.setId(KeycloakModelUtils.generateId());
+      update=true;
+    }
+    CredentialModel credModel=toModel(credEntity);
+    list.add(credModel);
+  }
+  if (update)   getMongoStore().updateEntity(mongoUser,invocationContext);
+  return list;
+}

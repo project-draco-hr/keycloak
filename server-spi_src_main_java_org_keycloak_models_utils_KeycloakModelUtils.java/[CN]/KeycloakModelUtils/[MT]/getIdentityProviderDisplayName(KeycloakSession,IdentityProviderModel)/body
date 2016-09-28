@@ -1,0 +1,13 @@
+{
+  String displayName=provider.getDisplayName();
+  if (displayName != null && !displayName.isEmpty()) {
+    return displayName;
+  }
+  SocialIdentityProviderFactory providerFactory=(SocialIdentityProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(SocialIdentityProvider.class,provider.getProviderId());
+  if (providerFactory != null) {
+    return providerFactory.getName();
+  }
+ else {
+    return provider.getAlias();
+  }
+}

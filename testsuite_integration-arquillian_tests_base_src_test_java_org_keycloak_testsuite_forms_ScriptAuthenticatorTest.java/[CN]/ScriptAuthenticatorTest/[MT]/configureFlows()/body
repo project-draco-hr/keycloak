@@ -1,0 +1,20 @@
+{
+  String scriptFlow="scriptBrowser";
+  AuthenticationFlowRepresentation scriptBrowserFlow=FlowBuilder.create().alias(scriptFlow).description("dummy pass through registration").providerId("basic-flow").topLevel(true).builtIn(false).build();
+  String scriptAuth="scriptAuth";
+  Response createFlowResponse=testRealm().flows().createFlow(scriptBrowserFlow);
+  Assert.assertEquals(201,createFlowResponse.getStatus());
+  RealmRepresentation realm=testRealm().toRepresentation();
+  realm.setBrowserFlow(scriptFlow);
+  realm.setDirectGrantFlow(scriptFlow);
+  testRealm().update(realm);
+  this.flow=findFlowByAlias(scriptFlow);
+  AuthenticationExecutionRepresentation usernamePasswordFormExecution=ExecutionBuilder.create().id("username password form").parentFlow(this.flow.getId()).requirement(AuthenticationExecutionModel.Requirement.REQUIRED.name()).authenticator(UsernamePasswordFormFactory.PROVIDER_ID).build();
+  AuthenticationExecutionRepresentation authScriptExecution=ExecutionBuilder.create().id(scriptAuth).parentFlow(this.flow.getId()).requirement(AuthenticationExecutionModel.Requirement.REQUIRED.name()).authenticator(ScriptBasedAuthenticatorFactory.PROVIDER_ID).build();
+  Response addExecutionResponse=testRealm().flows().addExecution(usernamePasswordFormExecution);
+  Assert.assertEquals(201,addExecutionResponse.getStatus());
+  addExecutionResponse=testRealm().flows().addExecution(authScriptExecution);
+  Assert.assertEquals(201,addExecutionResponse.getStatus());
+  Response newExecutionConfigResponse=testRealm().flows().newExecutionConfig(scriptAuth,createScriptAuthConfig(scriptAuth,"authenticator-example.js","/scripts/authenticator-example.js","simple script based authenticator"));
+  Assert.assertEquals(201,newExecutionConfigResponse.getStatus());
+}

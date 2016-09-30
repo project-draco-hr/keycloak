@@ -1,0 +1,19 @@
+{
+  final int ssoTimeout=15;
+  final int tokenTimeout=10;
+  RealmRepresentation realmUpdate=new RealmRepresentation();
+  realmUpdate.setSsoSessionIdleTimeout(ssoTimeout);
+  realmUpdate.setAccessTokenLifespan(tokenTimeout);
+  adminClient.realm(exampleRealm.getRealm()).update(realmUpdate);
+  nodejsExamplePage.clickLogin();
+  testRealmLoginPage.form().login(USER,PASSWORD);
+  assertTrue("Should be logged in",nodejsExamplePage.isOnLoginSecuredPage());
+  String output=nodejsExamplePage.getOutput();
+  pause(tokenTimeout * 1000);
+  nodejsExamplePage.clickLogin();
+  assertTrue("Should be still logged in",nodejsExamplePage.isOnLoginSecuredPage());
+  assertNotEquals("Authentication responses should be different",output,nodejsExamplePage.getOutput());
+  pause(ssoTimeout * 1000);
+  nodejsExamplePage.clickLogin();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmLoginPage);
+}

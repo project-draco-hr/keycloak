@@ -1,0 +1,17 @@
+{
+  nodejsExamplePage.navigateTo();
+  assertCurrentUrlEquals(nodejsExamplePage);
+  nodejsExamplePage.clickLogin();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmLoginPage);
+  testRealmLoginPage.form().login(USER,PASSWORD);
+  assertTrue("Should be redirected back to the secured page after the login",nodejsExamplePage.isOnLoginSecuredPage());
+  String output=nodejsExamplePage.getOutput();
+  assertFalse("Output should not be empty",output.isEmpty());
+  nodejsExamplePage.clickLogin();
+  assertTrue("Should be already logged in",nodejsExamplePage.isOnLoginSecuredPage());
+  assertEquals("Authentication responses should be the same",output,nodejsExamplePage.getOutput());
+  nodejsExamplePage.clickLogout();
+  assertCurrentUrlEquals(nodejsExamplePage);
+  nodejsExamplePage.clickLogin();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmLoginPage);
+}

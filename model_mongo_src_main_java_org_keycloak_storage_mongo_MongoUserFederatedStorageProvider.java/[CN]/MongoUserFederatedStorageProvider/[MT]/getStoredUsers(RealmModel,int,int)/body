@@ -1,0 +1,8 @@
+{
+  QueryBuilder queryBuilder=new QueryBuilder().and("realmId").is(realm.getId());
+  DBObject query=queryBuilder.get();
+  List<FederatedUser> users=getMongoStore().loadEntities(FederatedUser.class,query,null,first,max,invocationContext);
+  List<String> ids=new LinkedList<>();
+  for (  FederatedUser user : users)   ids.add(user.getId());
+  return ids;
+}

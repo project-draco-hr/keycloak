@@ -1,0 +1,20 @@
+{
+  try {
+    JSONWebKeySet jwks=new JSONWebKeySet();
+    ClientCredentialsProvider clientCredentialsProvider=deployment.getClientAuthenticator();
+    if (clientCredentialsProvider instanceof JWTClientCredentialsProvider) {
+      PublicKey publicKey=((JWTClientCredentialsProvider)clientCredentialsProvider).getPublicKey();
+      JWK jwk=JWKBuilder.create().rs256(publicKey);
+      jwks.setKeys(new JWK[]{jwk});
+    }
+ else {
+      jwks.setKeys(new JWK[]{});
+    }
+    facade.getResponse().setStatus(200);
+    facade.getResponse().setHeader("Content-Type","application/json");
+    JsonSerialization.writeValueToStream(facade.getResponse().getOutputStream(),jwks);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

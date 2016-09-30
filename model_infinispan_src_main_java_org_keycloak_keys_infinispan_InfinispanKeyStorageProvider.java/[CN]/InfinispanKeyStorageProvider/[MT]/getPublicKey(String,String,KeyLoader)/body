@@ -1,0 +1,46 @@
+{
+  PublicKeysEntry entry=keys.get(modelKey);
+  if (entry != null) {
+    PublicKey publicKey=getPublicKey(entry.getCurrentKeys(),kid);
+    if (publicKey != null) {
+      return publicKey;
+    }
+  }
+  int lastRequestTime=entry == null ? 0 : entry.getLastRequestTime();
+  int currentTime=Time.currentTime();
+  if (currentTime > lastRequestTime + minTimeBetweenRequests) {
+    WrapperCallable wrapperCallable=new WrapperCallable(modelKey,loader);
+    FutureTask<PublicKeysEntry> task=new FutureTask<>(wrapperCallable);
+    FutureTask<PublicKeysEntry> existing=tasksInProgress.putIfAbsent(modelKey,task);
+    if (existing == null) {
+      task.run();
+    }
+ else {
+      task=existing;
+    }
+    try {
+      entry=task.get();
+      PublicKey publicKey=getPublicKey(entry.getCurrentKeys(),kid);
+      if (publicKey != null) {
+        return publicKey;
+      }
+    }
+ catch (    ExecutionException ee) {
+      throw new RuntimeException("Error when loading public keys",ee);
+    }
+catch (    InterruptedException ie) {
+      throw new RuntimeException("Error. Interrupted when loading public keys",ie);
+    }
+ finally {
+      if (existing == null) {
+        tasksInProgress.remove(modelKey);
+      }
+    }
+  }
+ else {
+    log.warnf("Won't load the keys for model '%s' . Last request time was %d",modelKey,lastRequestTime);
+  }
+  Set<String> availableKids=entry == null ? Collections.emptySet() : entry.getCurrentKeys().keySet();
+  log.warnf("PublicKey wasn't found in the storage. Requested kid: '%s' . Available kids: '%s'",kid,availableKids);
+  return null;
+}

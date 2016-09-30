@@ -1,0 +1,8 @@
+{
+  KeyPair keyPair=getKeyPairFromGeneratedPems(generatedKeys);
+  String signedJwt=getClientSignedJWT(response.getClientId(),keyPair,kid);
+  OAuthClient.AccessTokenResponse accessTokenResponse=doClientCredentialsGrantRequest(signedJwt);
+  Assert.assertEquals(200,accessTokenResponse.getStatusCode());
+  AccessToken accessToken=oauth.verifyToken(accessTokenResponse.getAccessToken());
+  Assert.assertEquals(response.getClientId(),accessToken.getAudience()[0]);
+}

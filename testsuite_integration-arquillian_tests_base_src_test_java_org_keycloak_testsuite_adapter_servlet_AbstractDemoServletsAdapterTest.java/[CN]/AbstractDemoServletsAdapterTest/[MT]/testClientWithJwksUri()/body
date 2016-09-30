@@ -1,0 +1,25 @@
+{
+  ClientResource clientResource=ApiUtil.findClientResourceByClientId(testRealmResource(),"secure-portal");
+  ClientRepresentation client=clientResource.toRepresentation();
+  OIDCAdvancedConfigWrapper wrapper=OIDCAdvancedConfigWrapper.fromClientRepresentation(client);
+  wrapper.setUseJwksUrl(true);
+  wrapper.setJwksUrl(securePortal + "/bad-jwks-url");
+  clientResource.update(client);
+  securePortal.navigateTo();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmPage);
+  testRealmLoginPage.form().login("bburke@redhat.com","password");
+  String pageSource=driver.getPageSource();
+  assertCurrentUrlStartsWith(securePortal);
+  assertFalse(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  client=clientResource.toRepresentation();
+  wrapper=OIDCAdvancedConfigWrapper.fromClientRepresentation(client);
+  wrapper.setUseJwksUrl(true);
+  wrapper.setJwksUrl(securePortal + "/" + AdapterConstants.K_JWKS);
+  clientResource.update(client);
+  securePortal.navigateTo();
+  assertCurrentUrlEquals(securePortal);
+  pageSource=driver.getPageSource();
+  assertTrue(pageSource.contains("Bill Burke") && pageSource.contains("Stian Thorgersen"));
+  String logoutUri=OIDCLoginProtocolService.logoutUrl(authServerPage.createUriBuilder()).queryParam(OAuth2Constants.REDIRECT_URI,securePortal.toString()).build("demo").toString();
+  driver.navigate().to(logoutUri);
+}

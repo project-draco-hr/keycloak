@@ -1,0 +1,10 @@
+{
+  GlobalConfigurationBuilder gcb=new GlobalConfigurationBuilder();
+  gcb.globalJmxStatistics().allowDuplicateDomains(true);
+  final DefaultCacheManager cacheManager=new DefaultCacheManager(gcb.build());
+  ConfigurationBuilder cb=new ConfigurationBuilder();
+  cb.eviction().strategy(EvictionStrategy.LRU).type(EvictionType.COUNT).size(InfinispanConnectionProvider.KEYS_CACHE_DEFAULT_MAX);
+  Configuration cfg=cb.build();
+  cacheManager.defineConfiguration(InfinispanConnectionProvider.KEYS_CACHE_NAME,cfg);
+  return cacheManager.getCache(InfinispanConnectionProvider.KEYS_CACHE_NAME);
+}

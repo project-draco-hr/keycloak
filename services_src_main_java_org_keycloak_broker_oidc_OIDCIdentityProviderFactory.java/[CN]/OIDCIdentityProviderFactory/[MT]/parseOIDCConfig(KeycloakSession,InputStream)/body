@@ -13,7 +13,9 @@
   config.setTokenUrl(rep.getTokenEndpoint());
   config.setUserInfoUrl(rep.getUserinfoEndpoint());
   if (rep.getJwksUri() != null) {
-    sendJwksRequest(session,rep,config);
+    config.setValidateSignature(true);
+    config.setUseJwksUrl(true);
+    config.setJwksUrl(rep.getJwksUri());
   }
   return config.getConfig();
 }

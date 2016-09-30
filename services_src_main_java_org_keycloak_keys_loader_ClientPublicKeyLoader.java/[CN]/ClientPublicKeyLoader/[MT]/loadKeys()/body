@@ -1,0 +1,20 @@
+{
+  OIDCAdvancedConfigWrapper config=OIDCAdvancedConfigWrapper.fromClientModel(client);
+  if (config.isUseJwksUrl()) {
+    String jwksUrl=config.getJwksUrl();
+    JSONWebKeySet jwks=JWKSHttpUtils.sendJwksRequest(session,jwksUrl);
+    return JWKSUtils.getKeysForUse(jwks,JWK.Use.SIG);
+  }
+ else {
+    try {
+      CertificateRepresentation certInfo=CertificateInfoHelper.getCertificateFromClient(client,JWTClientAuthenticator.ATTR_PREFIX);
+      PublicKey publicKey=getSignatureValidationKey(certInfo);
+      String kid=certInfo.getKid() != null ? certInfo.getKid() : JWKBuilder.createKeyId(publicKey);
+      return Collections.singletonMap(kid,publicKey);
+    }
+ catch (    ModelException me) {
+      logger.warnf(me,"Unable to retrieve publicKey for verify signature of client '%s' . Error details: %s",client.getClientId(),me.getMessage());
+      return Collections.emptyMap();
+    }
+  }
+}

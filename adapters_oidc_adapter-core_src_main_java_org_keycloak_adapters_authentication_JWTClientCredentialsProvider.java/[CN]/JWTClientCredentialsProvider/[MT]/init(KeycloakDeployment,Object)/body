@@ -21,6 +21,7 @@
   if (clientKeyAlias == null) {
     clientKeyAlias=deployment.getResourceName();
   }
-  this.privateKey=KeystoreUtil.loadPrivateKeyFromKeystore(clientKeystoreFile,clientKeystorePassword,clientKeyPassword,clientKeyAlias,clientKeystoreFormat);
+  KeyPair keyPair=KeystoreUtil.loadKeyPairFromKeystore(clientKeystoreFile,clientKeystorePassword,clientKeyPassword,clientKeyAlias,clientKeystoreFormat);
+  setupKeyPair(keyPair);
   this.tokenTimeout=asInt(cfg,"token-timeout",10);
 }

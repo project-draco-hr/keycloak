@@ -33,15 +33,9 @@
     throw new ClientRegistrationException("Not found clientAuthenticator for requested token_endpoint_auth_method");
   }
   client.setClientAuthenticatorType(clientAuthFactory.getId());
-  PublicKey publicKey=retrievePublicKey(session,clientOIDC);
-  if (authMethod != null && authMethod.equals(OIDCLoginProtocol.PRIVATE_KEY_JWT) && publicKey == null) {
+  boolean publicKeySet=setPublicKey(clientOIDC,client);
+  if (authMethod != null && authMethod.equals(OIDCLoginProtocol.PRIVATE_KEY_JWT) && !publicKeySet) {
     throw new ClientRegistrationException("Didn't find key of supported keyType for use " + JWK.Use.SIG.asString());
-  }
-  if (publicKey != null) {
-    String publicKeyPem=KeycloakModelUtils.getPemFromKey(publicKey);
-    CertificateRepresentation rep=new CertificateRepresentation();
-    rep.setPublicKey(publicKeyPem);
-    CertificateInfoHelper.updateClientRepresentationCertificateInfo(client,rep,JWTClientAuthenticator.ATTR_PREFIX);
   }
   OIDCAdvancedConfigWrapper configWrapper=OIDCAdvancedConfigWrapper.fromClientRepresentation(client);
   if (clientOIDC.getUserinfoSignedResponseAlg() != null) {

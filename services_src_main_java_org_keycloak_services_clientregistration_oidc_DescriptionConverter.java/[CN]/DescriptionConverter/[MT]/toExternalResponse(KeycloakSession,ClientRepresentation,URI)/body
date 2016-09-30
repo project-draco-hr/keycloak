@@ -24,6 +24,9 @@
   if (config.getRequestObjectSignatureAlg() != null) {
     response.setRequestObjectSigningAlg(config.getRequestObjectSignatureAlg().toString());
   }
+  if (config.isUseJwksUrl()) {
+    response.setJwksUri(config.getJwksUrl());
+  }
   List<ProtocolMapperRepresentation> foundPairwiseMappers=PairwiseSubMapperUtils.getPairwiseSubMappers(client);
   SubjectType subjectType=foundPairwiseMappers.isEmpty() ? SubjectType.PUBLIC : SubjectType.PAIRWISE;
   response.setSubjectType(subjectType.toString().toLowerCase());

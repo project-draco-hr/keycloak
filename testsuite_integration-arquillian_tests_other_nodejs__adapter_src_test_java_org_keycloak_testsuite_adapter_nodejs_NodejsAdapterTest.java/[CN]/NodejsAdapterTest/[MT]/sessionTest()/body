@@ -1,0 +1,12 @@
+{
+  nodejsExamplePage.clickLogin();
+  testRealmLoginPage.form().login(USER,PASSWORD);
+  assertTrue("Should be logged in",nodejsExamplePage.isOnLoginSecuredPage());
+  testRealmAccountPage.navigateTo();
+  assertCurrentUrlEquals(testRealmAccountPage);
+  testRealmAccountPage.logOut();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmLoginPage);
+  nodejsExamplePage.navigateTo();
+  nodejsExamplePage.clickLogin();
+  assertCurrentUrlStartsWithLoginUrlOf(testRealmLoginPage);
+}

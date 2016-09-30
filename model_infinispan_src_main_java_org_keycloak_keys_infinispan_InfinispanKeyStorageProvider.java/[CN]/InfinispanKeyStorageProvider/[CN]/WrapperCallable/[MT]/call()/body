@@ -1,0 +1,14 @@
+{
+  PublicKeysEntry entry=keys.get(modelKey);
+  int lastRequestTime=entry == null ? 0 : entry.getLastRequestTime();
+  int currentTime=Time.currentTime();
+  if (currentTime > lastRequestTime + minTimeBetweenRequests) {
+    Map<String,PublicKey> publicKeys=delegate.loadKeys();
+    if (log.isDebugEnabled()) {
+      log.debugf("Public keys retrieved successfully for model %s. New kids: %s",modelKey,publicKeys.keySet().toString());
+    }
+    entry=new PublicKeysEntry(currentTime,publicKeys);
+    keys.put(modelKey,entry);
+  }
+  return entry;
+}

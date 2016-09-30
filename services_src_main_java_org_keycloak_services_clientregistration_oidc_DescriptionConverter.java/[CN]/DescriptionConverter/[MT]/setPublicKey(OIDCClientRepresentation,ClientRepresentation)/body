@@ -1,0 +1,31 @@
+{
+  if (clientOIDC.getJwksUri() == null && clientOIDC.getJwks() == null) {
+    return false;
+  }
+  if (clientOIDC.getJwksUri() != null && clientOIDC.getJwks() != null) {
+    throw new ClientRegistrationException("Illegal to use both jwks_uri and jwks");
+  }
+  OIDCAdvancedConfigWrapper configWrapper=OIDCAdvancedConfigWrapper.fromClientRepresentation(clientRep);
+  if (clientOIDC.getJwks() != null) {
+    JSONWebKeySet keySet=clientOIDC.getJwks();
+    JWK publicKeyJWk=JWKSUtils.getKeyForUse(keySet,JWK.Use.SIG);
+    if (publicKeyJWk == null) {
+      return false;
+    }
+ else {
+      PublicKey publicKey=JWKParser.create(publicKeyJWk).toPublicKey();
+      String publicKeyPem=KeycloakModelUtils.getPemFromKey(publicKey);
+      CertificateRepresentation rep=new CertificateRepresentation();
+      rep.setPublicKey(publicKeyPem);
+      rep.setKid(publicKeyJWk.getKeyId());
+      CertificateInfoHelper.updateClientRepresentationCertificateInfo(clientRep,rep,JWTClientAuthenticator.ATTR_PREFIX);
+      configWrapper.setUseJwksUrl(false);
+      return true;
+    }
+  }
+ else {
+    configWrapper.setUseJwksUrl(true);
+    configWrapper.setJwksUrl(clientOIDC.getJwksUri());
+    return true;
+  }
+}

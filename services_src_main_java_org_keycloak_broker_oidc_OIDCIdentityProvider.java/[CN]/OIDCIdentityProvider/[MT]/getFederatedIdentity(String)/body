@@ -6,10 +6,9 @@
  catch (  IOException e) {
     throw new IdentityBrokerException("Could not decode access token response.",e);
   }
-  PublicKey key=getExternalIdpKey();
-  String accessToken=verifyAccessToken(key,tokenResponse);
+  String accessToken=verifyAccessToken(tokenResponse);
   String encodedIdToken=tokenResponse.getIdToken();
-  JsonWebToken idToken=validateToken(key,encodedIdToken);
+  JsonWebToken idToken=validateToken(encodedIdToken);
   try {
     String id=idToken.getSubject();
     BrokeredIdentityContext identity=new BrokeredIdentityContext(id);
@@ -27,7 +26,7 @@
     }
     identity.getContextData().put(FEDERATED_ACCESS_TOKEN_RESPONSE,tokenResponse);
     identity.getContextData().put(VALIDATED_ID_TOKEN,idToken);
-    processAccessTokenResponse(identity,key,tokenResponse);
+    processAccessTokenResponse(identity,tokenResponse);
     identity.setId(id);
     identity.setName(name);
     identity.setEmail(email);

@@ -1,0 +1,22 @@
+{
+  InputStream stream=FindFile.findFile(keystoreFile);
+  try {
+    KeyStore keyStore=null;
+    if (format == KeystoreFormat.JKS) {
+      keyStore=KeyStore.getInstance(format.toString());
+    }
+ else {
+      keyStore=KeyStore.getInstance(format.toString(),"BC");
+    }
+    keyStore.load(stream,storePassword.toCharArray());
+    PrivateKey privateKey=(PrivateKey)keyStore.getKey(keyAlias,keyPassword.toCharArray());
+    if (privateKey == null) {
+      throw new RuntimeException("Couldn't load key with alias '" + keyAlias + "' from keystore");
+    }
+    PublicKey publicKey=keyStore.getCertificate(keyAlias).getPublicKey();
+    return new KeyPair(publicKey,privateKey);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Failed to load private key: " + e.getMessage(),e);
+  }
+}

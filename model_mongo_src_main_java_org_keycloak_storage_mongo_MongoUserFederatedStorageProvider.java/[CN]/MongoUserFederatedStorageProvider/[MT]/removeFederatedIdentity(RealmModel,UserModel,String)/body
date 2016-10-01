@@ -1,0 +1,9 @@
+{
+  FederatedUser userEntity=getUserById(user.getId());
+  if (userEntity == null)   return false;
+  FederatedIdentityEntity federatedIdentityEntity=findFederatedIdentityLink(userEntity,socialProvider);
+  if (federatedIdentityEntity == null) {
+    return false;
+  }
+  return getMongoStore().pullItemFromList(userEntity,"federatedIdentities",federatedIdentityEntity,invocationContext);
+}

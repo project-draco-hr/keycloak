@@ -41,4 +41,29 @@
   session.userCredentialManager().updateCredential(realm,thor,UserCredentialModel.password("lightning"));
   keycloakRule.stopSession(session,true);
   loginSuccessAndLogout("thor","lightning");
+  session=keycloakRule.startSession();
+  realm=session.realms().getRealmByName("test");
+  realm.removeComponent(writableProvider);
+  keycloakRule.stopSession(session,true);
+  session=keycloakRule.startSession();
+  realm=session.realms().getRealmByName("test");
+  createUserPropModel(realm);
+  keycloakRule.stopSession(session,true);
+  loginSuccessAndLogout("thor","hammer");
+  session=keycloakRule.startSession();
+  realm=session.realms().getRealmByName("test");
+  thor=session.users().getUserByUsername("thor",realm);
+  Assert.assertNull(thor.getFirstName());
+  Assert.assertNull(thor.getLastName());
+  Assert.assertNull(thor.getEmail());
+  Assert.assertNull(thor.getFirstAttribute("test-attribute"));
+  Assert.assertFalse(thor.isEmailVerified());
+  role=realm.getRole("foo-role");
+  Assert.assertFalse(thor.hasRole(role));
+  groups=thor.getGroups();
+  foundGroup=false;
+  for (  GroupModel g : groups) {
+    if (g.getName().equals("my-group"))     foundGroup=true;
+  }
+  Assert.assertFalse(foundGroup);
 }

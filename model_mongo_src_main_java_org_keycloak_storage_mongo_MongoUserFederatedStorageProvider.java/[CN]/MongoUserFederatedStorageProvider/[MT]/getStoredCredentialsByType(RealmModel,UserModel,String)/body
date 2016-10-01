@@ -1,0 +1,11 @@
+{
+  FederatedUser userEntity=getUserById(user.getId());
+  if (userEntity != null && userEntity.getCredentials() != null) {
+    List<CredentialModel> list=new LinkedList<>();
+    for (    CredentialEntity credentialEntity : userEntity.getCredentials()) {
+      if (type.equals(credentialEntity.getType()))       list.add(toModel(credentialEntity));
+    }
+    return list;
+  }
+  return Collections.EMPTY_LIST;
+}

@@ -1,0 +1,9 @@
+{
+  FederatedUser userEntity=findOrCreate(realm,user.getId());
+  CredentialEntity entity=new CredentialEntity();
+  entity.setId(KeycloakModelUtils.generateId());
+  toEntity(cred,entity);
+  getMongoStore().pushItemToList(userEntity,"credentials",entity,true,invocationContext);
+  cred.setId(entity.getId());
+  return cred;
+}

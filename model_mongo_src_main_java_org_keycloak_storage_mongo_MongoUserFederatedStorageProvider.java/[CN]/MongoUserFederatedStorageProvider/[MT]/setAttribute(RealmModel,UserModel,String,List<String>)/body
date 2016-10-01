@@ -1,0 +1,8 @@
+{
+  FederatedUser userEntity=findOrCreate(realm,user.getId());
+  if (userEntity.getAttributes() == null) {
+    userEntity.setAttributes(new HashMap<>());
+  }
+  userEntity.getAttributes().put(name,values);
+  getMongoStore().updateEntity(userEntity,invocationContext);
+}

@@ -1,0 +1,10 @@
+{
+  FederatedUser userEntity=getUserById(user.getId());
+  if (userEntity == null || userEntity.getRoleIds() == null || userEntity.getRoleIds().isEmpty())   return Collections.EMPTY_SET;
+  Set<RoleModel> roles=new HashSet<>();
+  for (  String roleId : userEntity.getRoleIds()) {
+    RoleModel role=realm.getRoleById(roleId);
+    if (role != null)     roles.add(role);
+  }
+  return roles;
+}

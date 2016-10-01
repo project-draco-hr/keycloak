@@ -5,6 +5,13 @@ synchronized (this) {
         Cache<String,Revisioned> cache=session.getProvider(InfinispanConnectionProvider.class).getCache(InfinispanConnectionProvider.REALM_CACHE_NAME);
         Cache<String,Long> revisions=session.getProvider(InfinispanConnectionProvider.class).getCache(InfinispanConnectionProvider.REALM_REVISIONS_CACHE_NAME);
         realmCache=new RealmCacheManager(cache,revisions);
+        ClusterProvider cluster=session.getProvider(ClusterProvider.class);
+        cluster.registerListener(REALM_CLEAR_CACHE_EVENTS,new ClusterListener(){
+          @Override public void run(          ClusterEvent event){
+            realmCache.clear();
+          }
+        }
+);
       }
     }
   }

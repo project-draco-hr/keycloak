@@ -1,0 +1,5 @@
+{
+  if (!model.getProviderType().equals(UserStorageProvider.class.getName()))   return;
+  DBObject query=new QueryBuilder().and("storageId").is(model.getId()).get();
+  getMongoStore().removeEntities(FederatedUser.class,query,true,invocationContext);
+}

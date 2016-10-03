@@ -1,0 +1,7 @@
+{
+  String kid=input.getHeader().getKeyId();
+  PublicKeyStorageProvider keyStorage=session.getProvider(PublicKeyStorageProvider.class);
+  String modelKey=getModelKey(realm,idpConfig);
+  OIDCIdentityProviderPublicKeyLoader loader=new OIDCIdentityProviderPublicKeyLoader(session,idpConfig);
+  return keyStorage.getPublicKey(modelKey,kid,loader);
+}

@@ -13,7 +13,8 @@
   LoginConfigMetaData loginConfig=webMetaData.getLoginConfig();
   boolean hasSubsystemConfig=service.isSecureDeployment(deploymentUnit);
   boolean webRequiresKC=loginConfig != null && "KEYCLOAK".equalsIgnoreCase(loginConfig.getAuthMethod());
-  if (hasSubsystemConfig || webRequiresKC) {
+  boolean isConfigured=service.isDeploymentConfigured(deploymentUnit);
+  if ((hasSubsystemConfig || webRequiresKC) && isConfigured) {
     log.debug("Setting up KEYCLOAK auth method for WAR: " + deploymentUnit.getName());
     if (hasSubsystemConfig) {
       addJSONData(service.getJSON(deploymentUnit),warMetaData);

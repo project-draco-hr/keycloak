@@ -1,8 +1,8 @@
 {
-  String adapterConfigLocation=getAdapterConfigLocation();
+  String adapterConfigLocation="/WEB-INF/keycloak.json";
   InputStream config=getServletContext().getResourceAsStream(adapterConfigLocation);
   KeycloakDeployment deployment=KeycloakDeploymentBuilder.build(config);
-  getServletContext().setAttribute("deployment-" + getClientAuthenticationMethod(),deployment);
+  getServletContext().setAttribute(KeycloakDeployment.class.getName(),deployment);
   HttpClient client=new DefaultHttpClient();
   getServletContext().setAttribute(HttpClient.class.getName(),client);
 }

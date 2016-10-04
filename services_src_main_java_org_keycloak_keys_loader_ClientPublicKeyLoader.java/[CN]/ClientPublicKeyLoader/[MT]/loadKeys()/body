@@ -2,6 +2,7 @@
   OIDCAdvancedConfigWrapper config=OIDCAdvancedConfigWrapper.fromClientModel(client);
   if (config.isUseJwksUrl()) {
     String jwksUrl=config.getJwksUrl();
+    jwksUrl=ResolveRelative.resolveRelativeUri(session.getContext().getUri().getRequestUri(),client.getRootUrl(),jwksUrl);
     JSONWebKeySet jwks=JWKSHttpUtils.sendJwksRequest(session,jwksUrl);
     return JWKSUtils.getKeysForUse(jwks,JWK.Use.SIG);
   }

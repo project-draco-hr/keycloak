@@ -19,7 +19,7 @@
     if (cred.getDigits() != null)     hashedCred.setDigits(cred.getDigits());
     if (cred.getAlgorithm() != null) {
       if ((UserCredentialModel.PASSWORD.equals(cred.getType()) || UserCredentialModel.PASSWORD_HISTORY.equals(cred.getType())) && (cred.getAlgorithm().equals(HmacOTP.HMAC_SHA1))) {
-        hashedCred.setAlgorithm(Pbkdf2PasswordHashProvider.ID);
+        hashedCred.setAlgorithm("pbkdf2");
       }
  else {
         hashedCred.setAlgorithm(cred.getAlgorithm());
@@ -27,7 +27,7 @@
     }
  else {
       if (UserCredentialModel.PASSWORD.equals(cred.getType()) || UserCredentialModel.PASSWORD_HISTORY.equals(cred.getType())) {
-        hashedCred.setAlgorithm(Pbkdf2PasswordHashProvider.ID);
+        hashedCred.setAlgorithm("pbkdf2");
       }
  else       if (UserCredentialModel.isOtp(cred.getType())) {
         hashedCred.setAlgorithm(HmacOTP.HMAC_SHA1);

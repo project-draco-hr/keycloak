@@ -1,0 +1,18 @@
+{
+  setTrustedHost("localhost",getPolicyAnon());
+  ClientRepresentation clientRep=createRep("test-app");
+  clientRep.setProtocolMappers(Collections.singletonList(createHardcodedMapperRep()));
+  assertFail(ClientRegOp.CREATE,clientRep,403,"ProtocolMapper type not allowed");
+  ClientInitialAccessPresentation token=adminClient.realm(REALM_NAME).clientInitialAccess().create(new ClientInitialAccessCreatePresentation(0,10));
+  reg.auth(Auth.token(token));
+  assertFail(ClientRegOp.CREATE,clientRep,403,"ProtocolMapper type not allowed");
+  ComponentRepresentation protocolMapperPolicyRep=findPolicyByProviderAndAuth(ProtocolMappersClientRegistrationPolicyFactory.PROVIDER_ID,getPolicyAuth());
+  protocolMapperPolicyRep.getConfig().add(ProtocolMappersClientRegistrationPolicyFactory.ALLOWED_PROTOCOL_MAPPER_TYPES,HardcodedRole.PROVIDER_ID);
+  realmResource().components().component(protocolMapperPolicyRep.getId()).update(protocolMapperPolicyRep);
+  ClientRepresentation registeredClient=reg.create(clientRep);
+  Assert.assertNotNull(registeredClient.getRegistrationAccessToken());
+  clientRep=createRep("test-app-2");
+  clientRep.setProtocolMappers(Collections.singletonList(createHardcodedMapperRep()));
+  reg.auth(null);
+  assertFail(ClientRegOp.CREATE,clientRep,403,"ProtocolMapper type not allowed");
+}

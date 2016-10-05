@@ -1,28 +1,43 @@
 {
+  RegistrationAuth authType=null;
+  boolean authenticated=false;
   init();
   if (isBearerToken()) {
     if (hasRole(AdminRoles.MANAGE_CLIENTS,AdminRoles.VIEW_CLIENTS)) {
       if (client == null) {
         throw notFound();
       }
-      return;
+      authenticated=true;
+      authType=RegistrationAuth.AUTHENTICATED;
     }
  else {
       throw forbidden();
     }
   }
  else   if (isRegistrationAccessToken()) {
-    if (client.getRegistrationToken() != null && client.getRegistrationToken().equals(jwt.getId())) {
-      return;
+    if (client != null && client.getRegistrationToken() != null && client.getRegistrationToken().equals(jwt.getId())) {
+      authenticated=true;
+      authType=getRegistrationAuth();
     }
   }
  else   if (isInitialAccessToken()) {
-    throw unauthorized("Not initial access token");
+    throw unauthorized("Not initial access token allowed");
   }
  else {
     if (authenticateClient(client)) {
-      return;
+      authenticated=true;
+      authType=RegistrationAuth.AUTHENTICATED;
     }
   }
-  throw unauthorized("Not authorized to view client. Missing or invalid token or bad client credentials.");
+  if (authenticated) {
+    try {
+      ClientRegistrationPolicyManager.triggerBeforeView(session,provider,authType,client);
+    }
+ catch (    ClientRegistrationPolicyException crpe) {
+      throw forbidden(crpe.getMessage());
+    }
+  }
+ else {
+    throw unauthorized("Not authorized to view client. Not valid token or client credentials provided.");
+  }
 }

@@ -1,0 +1,9 @@
+{
+  String anonPolicyType=ClientRegistrationPolicyManager.getComponentTypeKey(RegistrationAuth.ANONYMOUS);
+  String authPolicyType=ClientRegistrationPolicyManager.getComponentTypeKey(RegistrationAuth.AUTHENTICATED);
+  List<ComponentModel> policies=realm.getComponents(realm.getId(),ClientRegistrationPolicy.class.getName());
+  if (policies == null || policies.isEmpty()) {
+    addAnonymousPolicies(realm,anonPolicyType);
+    addAuthPolicies(realm,authPolicyType);
+  }
+}

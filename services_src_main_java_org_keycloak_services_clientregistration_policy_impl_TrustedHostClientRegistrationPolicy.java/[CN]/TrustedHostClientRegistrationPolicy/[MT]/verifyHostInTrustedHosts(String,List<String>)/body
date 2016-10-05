@@ -1,0 +1,16 @@
+{
+  for (  String confHostName : trustedHosts) {
+    try {
+      String hostIPAddress=InetAddress.getByName(confHostName).getHostAddress();
+      logger.tracef("Trying host '%s' of address '%s'",confHostName,hostIPAddress);
+      if (hostIPAddress.equals(hostAddress)) {
+        logger.debugf("Successfully verified host : %s",confHostName);
+        return confHostName;
+      }
+    }
+ catch (    UnknownHostException uhe) {
+      logger.warnf("Unknown host from realm configuration: %s",confHostName);
+    }
+  }
+  return null;
+}

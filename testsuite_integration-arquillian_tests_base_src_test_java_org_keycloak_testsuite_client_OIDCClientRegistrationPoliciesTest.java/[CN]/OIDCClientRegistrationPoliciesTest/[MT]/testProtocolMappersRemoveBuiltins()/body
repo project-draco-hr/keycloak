@@ -1,0 +1,13 @@
+{
+  setTrustedHost("localhost",getPolicyAnon());
+  ComponentRepresentation protocolMapperPolicyRep=findPolicyByProviderAndAuth(ProtocolMappersClientRegistrationPolicyFactory.PROVIDER_ID,getPolicyAnon());
+  protocolMapperPolicyRep.getConfig().add(ProtocolMappersClientRegistrationPolicyFactory.ALLOWED_PROTOCOL_MAPPER_TYPES,HardcodedRole.PROVIDER_ID);
+  realmResource().components().component(protocolMapperPolicyRep.getId()).update(protocolMapperPolicyRep);
+  ClientRepresentation clientRep=createRep("test-app");
+  clientRep.setProtocolMappers(Collections.singletonList(createHardcodedMapperRep()));
+  ClientRepresentation registeredClient=reg.create(clientRep);
+  Assert.assertEquals(1,registeredClient.getProtocolMappers().size());
+  ProtocolMapperRepresentation hardcodedMapper=registeredClient.getProtocolMappers().get(0);
+  Assert.assertTrue(hardcodedMapper.isConsentRequired());
+  Assert.assertEquals("Hardcoded foo role",hardcodedMapper.getConsentText());
+}

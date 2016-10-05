@@ -1,0 +1,7 @@
+{
+  ConfigurationValidationHelper.check(config).checkBoolean(HOST_SENDING_REGISTRATION_REQUEST_MUST_MATCH_PROPERTY,true).checkBoolean(CLIENT_URIS_MUST_MATCH_PROPERTY,true);
+  TrustedHostClientRegistrationPolicy policy=new TrustedHostClientRegistrationPolicy(session,config);
+  if (!policy.isHostMustMatch() && !policy.isClientUrisMustMatch()) {
+    throw new ComponentValidationException("At least one of hosts verification or client URIs validation must be enabled");
+  }
+}

@@ -1,0 +1,23 @@
+{
+  try {
+switch (operation) {
+case CREATE:
+      reg.oidc().create(client);
+    break;
+case UPDATE:
+  reg.oidc().update(client);
+break;
+case DELETE:
+reg.oidc().delete(client);
+break;
+}
+Assert.fail("Not expected to successfuly run operation " + operation.toString() + " on client");
+}
+ catch (ClientRegistrationException expected) {
+HttpErrorException httpEx=(HttpErrorException)expected.getCause();
+Assert.assertEquals(expectedStatusCode,httpEx.getStatusLine().getStatusCode());
+if (expectedErrorContains != null) {
+assertTrue("Error response doesn't contain expected text. The error response text is: " + httpEx.getErrorResponse(),httpEx.getErrorResponse().contains(expectedErrorContains));
+}
+}
+}

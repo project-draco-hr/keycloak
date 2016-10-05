@@ -1,0 +1,21 @@
+{
+  try {
+    String host=new URL(url).getHost();
+    for (    String trustedHost : trustedHosts) {
+      if (host.equals(trustedHost)) {
+        return;
+      }
+    }
+    for (    String trustedDomain : trustedDomains) {
+      if (host.endsWith(trustedDomain)) {
+        return;
+      }
+    }
+  }
+ catch (  MalformedURLException mfe) {
+    logger.warnf("URL '%s' is malformed",url);
+    throw new ClientRegistrationPolicyException("URL is malformed");
+  }
+  logger.warnf("URL '%s' doesn't match any trustedHost or trustedDomain",url);
+  throw new ClientRegistrationPolicyException("URL doesn't match any trusted host or trusted domain");
+}

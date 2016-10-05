@@ -1,0 +1,18 @@
+{
+  setTrustedHost("localhost",getPolicyAnon());
+  ClientTemplateRepresentation clientTemplate=new ClientTemplateRepresentation();
+  clientTemplate.setName("foo");
+  realmResource().clientTemplates().create(clientTemplate);
+  ClientRepresentation clientRep=createRep("test-app");
+  clientRep.setClientTemplate("foo");
+  assertFail(ClientRegOp.CREATE,clientRep,403,"Not permitted to use specified clientTemplate");
+  clientRep.setClientTemplate(null);
+  ClientRepresentation registeredClient=reg.create(clientRep);
+  reg.auth(Auth.token(registeredClient));
+  registeredClient.setClientTemplate("foo");
+  assertFail(ClientRegOp.UPDATE,registeredClient,403,"Not permitted to use specified clientTemplate");
+  ClientRepresentation client=ApiUtil.findClientByClientId(realmResource(),"test-app").toRepresentation();
+  client.setClientTemplate("foo");
+  realmResource().clients().get(client.getId()).update(client);
+  reg.update(registeredClient);
+}

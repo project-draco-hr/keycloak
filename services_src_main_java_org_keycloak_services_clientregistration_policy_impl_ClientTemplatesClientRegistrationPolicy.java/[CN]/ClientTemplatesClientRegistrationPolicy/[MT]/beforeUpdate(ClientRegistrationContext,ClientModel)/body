@@ -1,0 +1,9 @@
+{
+  String newTemplate=context.getClient().getClientTemplate();
+  ClientTemplateModel currentTemplate=clientModel.getClientTemplate();
+  if (currentTemplate == null || !currentTemplate.getName().equals(newTemplate)) {
+    if (!isTemplateAllowed(newTemplate)) {
+      throw new ClientRegistrationPolicyException("Not permitted to use specified clientTemplate");
+    }
+  }
+}

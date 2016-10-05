@@ -1,25 +1,22 @@
 {
   ClientRepresentation client=context.getClient();
   event.event(EventType.CLIENT_REGISTER);
-  auth.requireCreate();
+  RegistrationAuth registrationAuth=auth.requireCreate(context);
   ValidationMessages validationMessages=new ValidationMessages();
-  if (!validateClient(context,validationMessages)) {
+  if (!context.validateClient(validationMessages)) {
     String errorCode=validationMessages.fieldHasError("redirectUris") ? ErrorCodes.INVALID_REDIRECT_URI : ErrorCodes.INVALID_CLIENT_METADATA;
     throw new ErrorResponseException(errorCode,validationMessages.getStringMessages(),Response.Status.BAD_REQUEST);
   }
   try {
     ClientModel clientModel=RepresentationToModel.createClient(session,session.getContext().getRealm(),client,true);
+    ClientRegistrationPolicyManager.triggerAfterRegister(context,registrationAuth,clientModel);
     client=ModelToRepresentation.toRepresentation(clientModel);
     client.setSecret(clientModel.getSecret());
-    String registrationAccessToken=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,clientModel);
+    String registrationAccessToken=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,clientModel,registrationAuth);
     client.setRegistrationAccessToken(registrationAccessToken);
     if (auth.isInitialAccessToken()) {
       ClientInitialAccessModel initialAccessModel=auth.getInitialAccessModel();
       initialAccessModel.decreaseRemainingCount();
-    }
-    if (auth.isRegistrationHostTrusted()) {
-      ClientRegistrationTrustedHostModel trustedHost=auth.getTrustedHostModel();
-      trustedHost.decreaseRemainingCount();
     }
     event.client(client.getClientId()).success();
     return client;

@@ -1,0 +1,12 @@
+{
+  ComponentModel trustedHostModel=createModelInstance("Trusted Hosts",realm,TrustedHostClientRegistrationPolicyFactory.PROVIDER_ID,policyTypeKey);
+  trustedHostModel.getConfig().put(TrustedHostClientRegistrationPolicyFactory.TRUSTED_HOSTS,Collections.emptyList());
+  trustedHostModel.getConfig().putSingle(TrustedHostClientRegistrationPolicyFactory.HOST_SENDING_REGISTRATION_REQUEST_MUST_MATCH,"true");
+  trustedHostModel.getConfig().putSingle(TrustedHostClientRegistrationPolicyFactory.CLIENT_URIS_MUST_MATCH,"true");
+  realm.addComponentModel(trustedHostModel);
+  ComponentModel consentRequiredModel=createModelInstance("Consent Required",realm,ConsentRequiredClientRegistrationPolicyFactory.PROVIDER_ID,policyTypeKey);
+  realm.addComponentModel(consentRequiredModel);
+  ComponentModel scopeModel=createModelInstance("Full Scope Disabled",realm,ScopeClientRegistrationPolicyFactory.PROVIDER_ID,policyTypeKey);
+  realm.addComponentModel(scopeModel);
+  addGenericPolicies(realm,policyTypeKey);
+}

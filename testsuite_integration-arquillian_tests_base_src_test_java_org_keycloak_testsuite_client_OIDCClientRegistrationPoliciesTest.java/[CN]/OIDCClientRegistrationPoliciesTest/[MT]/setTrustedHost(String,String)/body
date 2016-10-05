@@ -1,0 +1,6 @@
+{
+  List<ComponentRepresentation> reps=realmResource().components().query(REALM_NAME,getPolicyAnon());
+  ComponentRepresentation trustedHostRep=findPolicyByProviderAndAuth(TrustedHostClientRegistrationPolicyFactory.PROVIDER_ID,getPolicyAnon());
+  trustedHostRep.getConfig().putSingle(TrustedHostClientRegistrationPolicyFactory.TRUSTED_HOSTS,hostname);
+  realmResource().components().component(trustedHostRep.getId()).update(trustedHostRep);
+}

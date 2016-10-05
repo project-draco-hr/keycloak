@@ -1,0 +1,13 @@
+{
+  if (context.getClient().isFullScopeAllowed() == null) {
+    return;
+  }
+  if (clientModel == null) {
+    return;
+  }
+  boolean isAllowed=clientModel.isFullScopeAllowed();
+  boolean newAllowed=context.getClient().isFullScopeAllowed();
+  if (!isAllowed && newAllowed) {
+    throw new ClientRegistrationPolicyException("Not permitted to enable fullScopeAllowed");
+  }
+}

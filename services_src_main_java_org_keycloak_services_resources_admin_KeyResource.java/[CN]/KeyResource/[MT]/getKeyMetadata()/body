@@ -1,0 +1,20 @@
+{
+  auth.requireView();
+  KeyManager keystore=session.keys();
+  KeysMetadataRepresentation keys=new KeysMetadataRepresentation();
+  keys.setActive(Collections.singletonMap(KeyMetadata.Type.RSA.name(),keystore.getActiveKey(realm).getKid()));
+  List<KeysMetadataRepresentation.KeyMetadataRepresentation> l=new LinkedList<>();
+  for (  KeyMetadata m : session.keys().getKeys(realm,true)) {
+    KeysMetadataRepresentation.KeyMetadataRepresentation r=new KeysMetadataRepresentation.KeyMetadataRepresentation();
+    r.setProviderId(m.getProviderId());
+    r.setProviderPriority(m.getProviderPriority());
+    r.setKid(m.getKid());
+    r.setStatus(m.getStatus() != null ? m.getStatus().name() : null);
+    r.setType(m.getType() != null ? m.getType().name() : null);
+    r.setPublicKey(PemUtils.encodeKey(m.getPublicKey()));
+    r.setCertificate(PemUtils.encodeCertificate(m.getCertificate()));
+    l.add(r);
+  }
+  keys.setKeys(l);
+  return keys;
+}

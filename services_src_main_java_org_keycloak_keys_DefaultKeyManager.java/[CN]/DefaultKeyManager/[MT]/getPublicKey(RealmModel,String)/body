@@ -1,0 +1,19 @@
+{
+  if (kid == null) {
+    logger.warnv("KID is null, can't find public key",realm.getName(),kid);
+    return null;
+  }
+  for (  KeyProvider p : getProviders(realm)) {
+    PublicKey publicKey=p.getPublicKey(kid);
+    if (publicKey != null) {
+      if (logger.isTraceEnabled()) {
+        logger.tracev("Found public key realm={0} kid={1}",realm.getName(),kid);
+      }
+      return publicKey;
+    }
+  }
+  if (logger.isTraceEnabled()) {
+    logger.tracev("Failed to find public key realm={0} kid={1}",realm.getName(),kid);
+  }
+  return null;
+}

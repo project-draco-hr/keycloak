@@ -1,0 +1,6 @@
+{
+  KeyManager.ActiveKey activeKey=session.keys().getActiveKey(realm);
+  logger.tracef("Encoding token with kid '%s'",activeKey.getKid());
+  String encodedToken=new JWSBuilder().kid(activeKey.getKid()).jsonContent(token).rsa256(activeKey.getPrivateKey());
+  return encodedToken;
+}

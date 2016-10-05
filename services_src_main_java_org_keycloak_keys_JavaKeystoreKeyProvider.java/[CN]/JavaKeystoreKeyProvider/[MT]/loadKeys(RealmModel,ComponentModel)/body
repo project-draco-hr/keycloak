@@ -1,0 +1,21 @@
+{
+  try {
+    KeyStore keyStore=KeyStore.getInstance("JKS");
+    keyStore.load(new FileInputStream(model.get(JavaKeystoreKeyProviderFactory.KEYSTORE_KEY)),model.get(JavaKeystoreKeyProviderFactory.KEYSTORE_PASSWORD_KEY).toCharArray());
+    PrivateKey privateKey=(PrivateKey)keyStore.getKey(model.get(JavaKeystoreKeyProviderFactory.KEY_ALIAS_KEY),model.get(JavaKeystoreKeyProviderFactory.KEY_PASSWORD_KEY).toCharArray());
+    PublicKey publicKey=KeyUtils.extractPublicKey(privateKey);
+    KeyPair keyPair=new KeyPair(publicKey,privateKey);
+    X509Certificate certificate;
+    if (model.contains(JavaKeystoreKeyProviderFactory.CERTIFICATE_ALIAS_KEY)) {
+      certificate=(X509Certificate)keyStore.getCertificate(model.get(JavaKeystoreKeyProviderFactory.CERTIFICATE_ALIAS_KEY));
+    }
+ else {
+      certificate=CertificateUtils.generateV1SelfSignedCertificate(keyPair,realm.getName());
+    }
+    String kid=KeyUtils.createKeyId(keyPair.getPublic());
+    return new Keys(kid,keyPair,certificate);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Failed to load keys",e);
+  }
+}

@@ -1,0 +1,31 @@
+{
+  try {
+    PreparedStatement statement=jdbcConnection.prepareStatement("select ID, PRIVATE_KEY, CERTIFICATE from " + getTableName("REALM"));
+    try {
+      ResultSet resultSet=statement.executeQuery();
+      try {
+        while (resultSet.next()) {
+          String realmId=resultSet.getString(1);
+          String privateKeyPem=resultSet.getString(2);
+          String certificatePem=resultSet.getString(3);
+          String componentId=KeycloakModelUtils.generateId();
+          InsertStatement insertComponent=new InsertStatement(null,null,database.correctObjectName("COMPONENT",Table.class)).addColumnValue("ID",componentId).addColumnValue("REALM_ID",realmId).addColumnValue("PARENT_ID",realmId).addColumnValue("NAME","rsa").addColumnValue("PROVIDER_ID","rsa").addColumnValue("PROVIDER_TYPE",KeyProvider.class.getName());
+          statements.add(insertComponent);
+          statements.add(componentConfigStatement(componentId,"priority","100"));
+          statements.add(componentConfigStatement(componentId,"privateKey",privateKeyPem));
+          statements.add(componentConfigStatement(componentId,"certificate",certificatePem));
+        }
+      }
+  finally {
+        resultSet.close();
+      }
+    }
+  finally {
+      statement.close();
+    }
+    confirmationMessage.append("Updated " + statements.size() + " records in USER_FEDERATION_PROVIDER table");
+  }
+ catch (  Exception e) {
+    throw new CustomChangeException(getTaskId() + ": Exception when updating data from previous version",e);
+  }
+}

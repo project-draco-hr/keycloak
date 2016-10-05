@@ -1,0 +1,13 @@
+{
+  UserRepresentation user=null;
+  List<UserRepresentation> ur=realm.users().search(username,null,null);
+  if (ur.size() == 1) {
+    user=ur.get(0);
+  }
+  if (ur.size() > 1) {
+    for (    UserRepresentation rep : ur) {
+      if (rep.getUsername().equalsIgnoreCase(username))       return rep;
+    }
+  }
+  return user;
+}

@@ -1,0 +1,26 @@
+{
+  parse();
+  if (publicKey == null) {
+    throw new VerificationException("Public key not set");
+  }
+  if (checkRealmUrl && realmUrl == null) {
+    throw new VerificationException("Realm URL not set");
+  }
+  if (!RSAProvider.verify(jws,publicKey)) {
+    throw new VerificationException("Invalid token signature");
+  }
+  String user=token.getSubject();
+  if (user == null) {
+    throw new VerificationException("Subject missing in token");
+  }
+  if (checkRealmUrl && !realmUrl.equals(token.getIssuer())) {
+    throw new VerificationException("Invalid token issuer. Expected '" + realmUrl + "', but was '"+ token.getIssuer()+ "'");
+  }
+  if (checkTokenType && !TokenUtil.TOKEN_TYPE_BEARER.equalsIgnoreCase(token.getType())) {
+    throw new VerificationException("Token type is incorrect. Expected '" + TokenUtil.TOKEN_TYPE_BEARER + "' but was '"+ token.getType()+ "'");
+  }
+  if (checkActive && !token.isActive()) {
+    throw new VerificationException("Token is not active");
+  }
+  return this;
+}

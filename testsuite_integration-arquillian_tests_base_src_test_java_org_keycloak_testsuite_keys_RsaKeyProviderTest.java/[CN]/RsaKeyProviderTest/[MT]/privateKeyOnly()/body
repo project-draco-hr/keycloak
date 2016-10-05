@@ -1,0 +1,22 @@
+{
+  KeyPair keyPair=KeyUtils.generateRsaKeyPair(2048);
+  String kid=KeyUtils.createKeyId(keyPair.getPublic());
+  ComponentRepresentation rep=createRep("valid",RsaKeyProviderFactory.ID);
+  rep.getConfig().putSingle(Attributes.PRIVATE_KEY_KEY,PemUtils.encodeKey(keyPair.getPrivate()));
+  rep.getConfig().putSingle(Attributes.PRIORITY_KEY,"1000");
+  Response response=adminClient.realm("test").components().add(rep);
+  String id=ApiUtil.getCreatedId(response);
+  ComponentRepresentation createdRep=adminClient.realm("test").components().component(id).toRepresentation();
+  assertEquals(ComponentRepresentation.SECRET_VALUE,createdRep.getConfig().getFirst(Attributes.PRIVATE_KEY_KEY));
+  assertNotNull(createdRep.getConfig().getFirst(Attributes.CERTIFICATE_KEY));
+  assertEquals(keyPair.getPublic(),PemUtils.decodeCertificate(createdRep.getConfig().getFirst(Attributes.CERTIFICATE_KEY)).getPublicKey());
+  KeysMetadataRepresentation keys=adminClient.realm("test").keys().getKeyMetadata();
+  assertEquals(kid,keys.getActive().get(KeyMetadata.Type.RSA.name()));
+  KeysMetadataRepresentation.KeyMetadataRepresentation key=keys.getKeys().get(0);
+  assertEquals(id,key.getProviderId());
+  assertEquals(KeyMetadata.Type.RSA.name(),key.getType());
+  assertEquals(1000l,key.getProviderPriority());
+  assertEquals(kid,key.getKid());
+  assertEquals(PemUtils.encodeKey(keyPair.getPublic()),keys.getKeys().get(0).getPublicKey());
+  assertEquals(keyPair.getPublic(),PemUtils.decodeCertificate(key.getCertificate()).getPublicKey());
+}

@@ -1,3 +1,11 @@
 {
-  return generateCode(realm,clientSession);
+  String nextCode=(String)session.getAttribute(NEXT_CODE + "." + clientSession.getId());
+  if (nextCode == null) {
+    nextCode=generateCode(session,realm,clientSession);
+    session.setAttribute(NEXT_CODE + "." + clientSession.getId(),nextCode);
+  }
+ else {
+    logger.debug("Code already generated for session, using code from session attributes");
+  }
+  return nextCode;
 }

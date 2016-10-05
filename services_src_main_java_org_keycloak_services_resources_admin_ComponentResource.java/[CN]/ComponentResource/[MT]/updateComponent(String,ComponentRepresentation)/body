@@ -4,8 +4,7 @@
   if (model == null) {
     throw new NotFoundException("Could not find component");
   }
-  model=RepresentationToModel.toModel(rep);
-  model.setId(id);
+  RepresentationToModel.updateComponent(session,rep,model,false);
   adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
   realm.updateComponent(model);
 }

@@ -10,7 +10,7 @@
     try {
       CertificateRepresentation certInfo=CertificateInfoHelper.getCertificateFromClient(client,JWTClientAuthenticator.ATTR_PREFIX);
       PublicKey publicKey=getSignatureValidationKey(certInfo);
-      String kid=certInfo.getKid() != null ? certInfo.getKid() : JWKBuilder.createKeyId(publicKey);
+      String kid=certInfo.getKid() != null ? certInfo.getKid() : KeyUtils.createKeyId(publicKey);
       return Collections.singletonMap(kid,publicKey);
     }
  catch (    ModelException me) {

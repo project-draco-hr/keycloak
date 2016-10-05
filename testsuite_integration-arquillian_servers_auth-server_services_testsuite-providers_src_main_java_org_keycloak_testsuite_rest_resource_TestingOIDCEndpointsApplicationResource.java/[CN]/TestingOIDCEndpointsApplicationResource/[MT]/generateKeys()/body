@@ -7,8 +7,8 @@
  catch (  NoSuchAlgorithmException e) {
     throw new BadRequestException("Error generating signing keypair",e);
   }
-  String privateKeyPem=KeycloakModelUtils.getPemFromKey(clientData.getSigningKeyPair().getPrivate());
-  String publicKeyPem=KeycloakModelUtils.getPemFromKey(clientData.getSigningKeyPair().getPublic());
+  String privateKeyPem=PemUtils.encodeKey(clientData.getSigningKeyPair().getPrivate());
+  String publicKeyPem=PemUtils.encodeKey(clientData.getSigningKeyPair().getPublic());
   Map<String,String> res=new HashMap<>();
   res.put(PRIVATE_KEY,privateKeyPem);
   res.put(PUBLIC_KEY,publicKeyPem);

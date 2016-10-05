@@ -1,0 +1,9 @@
+{
+  for (  ComponentRepresentation c : adminClient.realm("test").components().query("test",KeyProvider.class.getName())) {
+    if (c.getConfig().getFirst("priority").equals(priority)) {
+      adminClient.realm("test").components().component(c.getId()).remove();
+      return;
+    }
+  }
+  throw new RuntimeException("Failed to find keys1");
+}

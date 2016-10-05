@@ -1,10 +1,27 @@
 {
   try {
-    AccessToken toIntrospect=toAccessToken(token);
+    boolean valid=true;
+    RSATokenVerifier verifier=RSATokenVerifier.create(token).realmUrl(Urls.realmIssuer(session.getContext().getUri().getBaseUri(),realm.getName()));
+    PublicKey publicKey=session.keys().getPublicKey(realm,verifier.getHeader().getKeyId());
+    if (publicKey == null) {
+      valid=false;
+    }
+ else {
+      try {
+        verifier.publicKey(publicKey);
+        verifier.verify();
+      }
+ catch (      VerificationException e) {
+        valid=false;
+      }
+    }
     RealmModel realm=this.session.getContext().getRealm();
     ObjectNode tokenMetadata;
-    boolean active=tokenManager.isTokenValid(session,realm,toIntrospect);
-    if (active) {
+    AccessToken toIntrospect=verifier.getToken();
+    if (valid) {
+      valid=tokenManager.isTokenValid(session,realm,toIntrospect);
+    }
+    if (valid) {
       tokenMetadata=JsonSerialization.createObjectNode(toIntrospect);
       tokenMetadata.put("client_id",toIntrospect.getIssuedFor());
       tokenMetadata.put("username",toIntrospect.getPreferredUsername());
@@ -12,7 +29,7 @@
  else {
       tokenMetadata=JsonSerialization.createObjectNode();
     }
-    tokenMetadata.put("active",active);
+    tokenMetadata.put("active",valid);
     return Response.ok(JsonSerialization.writeValueAsBytes(tokenMetadata)).type(MediaType.APPLICATION_JSON_TYPE).build();
   }
  catch (  Exception e) {

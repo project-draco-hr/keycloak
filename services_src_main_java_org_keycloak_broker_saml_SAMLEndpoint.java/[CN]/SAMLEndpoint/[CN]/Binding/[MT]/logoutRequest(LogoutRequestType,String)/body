@@ -38,7 +38,8 @@
   builder.issuer(issuerURL);
   JaxrsSAML2BindingBuilder binding=new JaxrsSAML2BindingBuilder().relayState(relayState);
   if (config.isWantAuthnRequestsSigned()) {
-    binding.signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signatureAlgorithm(provider.getSignatureAlgorithm()).signDocument();
+    KeyManager.ActiveKey keys=session.keys().getActiveKey(realm);
+    binding.signWith(keys.getPrivateKey(),keys.getPublicKey(),keys.getCertificate()).signatureAlgorithm(provider.getSignatureAlgorithm()).signDocument();
   }
   try {
     if (config.isPostBindingResponse()) {

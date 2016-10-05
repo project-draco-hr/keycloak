@@ -6,7 +6,8 @@
   }
   String encodedCookie=cook.getValue();
   JWSInput input=new JWSInput(encodedCookie);
-  if (!HMACProvider.verify(input,(SecretKey)realm.getCodeSecretKey())) {
+  PublicKey publicKey=session.keys().getPublicKey(realm,input.getHeader().getKeyId());
+  if (!RSAProvider.verify(input,publicKey)) {
     logger.debug("Failed to verify encoded RestartLoginCookie");
     return null;
   }

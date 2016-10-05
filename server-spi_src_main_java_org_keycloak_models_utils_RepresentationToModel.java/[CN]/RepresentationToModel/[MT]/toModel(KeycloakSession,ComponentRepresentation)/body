@@ -1,0 +1,27 @@
+{
+  ComponentModel model=new ComponentModel();
+  model.setParentId(rep.getParentId());
+  model.setProviderType(rep.getProviderType());
+  model.setProviderId(rep.getProviderId());
+  model.setConfig(new MultivaluedHashMap<>());
+  model.setName(rep.getName());
+  if (rep.getConfig() != null) {
+    Set<String> keys=new HashSet<>(rep.getConfig().keySet());
+    for (    String k : keys) {
+      List<String> values=rep.getConfig().get(k);
+      if (values != null) {
+        ListIterator<String> itr=values.listIterator();
+        while (itr.hasNext()) {
+          String v=itr.next();
+          if (v == null || v.trim().isEmpty()) {
+            itr.remove();
+          }
+        }
+        if (!values.isEmpty()) {
+          model.getConfig().put(k,values);
+        }
+      }
+    }
+  }
+  return model;
+}

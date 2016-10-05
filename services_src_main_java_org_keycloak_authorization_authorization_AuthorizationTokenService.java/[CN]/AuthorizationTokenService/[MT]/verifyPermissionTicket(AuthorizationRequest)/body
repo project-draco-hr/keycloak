@@ -1,6 +1,6 @@
 {
   String ticketString=request.getTicket();
-  if (ticketString == null || !Tokens.verifySignature(ticketString,getRealm().getPublicKey())) {
+  if (ticketString == null || !Tokens.verifySignature(session,getRealm(),ticketString)) {
     throw new ErrorResponseException("invalid_ticket","Ticket verification failed",Status.FORBIDDEN);
   }
   try {

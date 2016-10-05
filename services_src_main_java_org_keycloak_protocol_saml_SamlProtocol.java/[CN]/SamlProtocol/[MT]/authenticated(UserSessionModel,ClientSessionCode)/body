@@ -50,19 +50,21 @@
   }
   JaxrsSAML2BindingBuilder bindingBuilder=new JaxrsSAML2BindingBuilder();
   bindingBuilder.relayState(relayState);
+  KeyManager keyManager=session.keys();
+  KeyManager.ActiveKey keys=keyManager.getActiveKey(realm);
   if (samlClient.requiresRealmSignature()) {
     String canonicalization=samlClient.getCanonicalizationMethod();
     if (canonicalization != null) {
       bindingBuilder.canonicalizationMethod(canonicalization);
     }
-    bindingBuilder.signatureAlgorithm(samlClient.getSignatureAlgorithm()).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
+    bindingBuilder.signatureAlgorithm(samlClient.getSignatureAlgorithm()).signWith(keys.getPrivateKey(),keys.getPublicKey(),keys.getCertificate()).signDocument();
   }
   if (samlClient.requiresAssertionSignature()) {
     String canonicalization=samlClient.getCanonicalizationMethod();
     if (canonicalization != null) {
       bindingBuilder.canonicalizationMethod(canonicalization);
     }
-    bindingBuilder.signatureAlgorithm(samlClient.getSignatureAlgorithm()).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signAssertions();
+    bindingBuilder.signatureAlgorithm(samlClient.getSignatureAlgorithm()).signWith(keys.getPrivateKey(),keys.getPublicKey(),keys.getCertificate()).signAssertions();
   }
   if (samlClient.requiresEncryption()) {
     PublicKey publicKey=null;

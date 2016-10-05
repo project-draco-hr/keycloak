@@ -1,0 +1,11 @@
+{
+  KeyPair keyPair;
+  try {
+    keyPair=KeyUtils.generateRsaKeyPair(size);
+    model.put(Attributes.PRIVATE_KEY_KEY,PemUtils.encodeKey(keyPair.getPrivate()));
+  }
+ catch (  Throwable t) {
+    throw new ComponentValidationException("Failed to generate keys",t);
+  }
+  generateCertificate(realm,model,keyPair);
+}

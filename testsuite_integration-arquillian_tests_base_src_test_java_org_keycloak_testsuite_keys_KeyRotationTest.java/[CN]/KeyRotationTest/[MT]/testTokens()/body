@@ -1,0 +1,21 @@
+{
+  PublicKey key1=createKeys1();
+  oauth.doLogin("test-user@localhost","password");
+  OAuthClient.AccessTokenResponse response=oauth.doAccessTokenRequest(oauth.getCurrentQuery().get("code"),"password");
+  assertEquals(200,response.getStatusCode());
+  assertTokenSignature(key1,response.getAccessToken());
+  assertTokenSignature(key1,response.getRefreshToken());
+  PublicKey key2=createKeys2();
+  response=oauth.doRefreshTokenRequest(response.getRefreshToken(),"password");
+  assertEquals(200,response.getStatusCode());
+  assertTokenSignature(key2,response.getAccessToken());
+  assertTokenSignature(key2,response.getRefreshToken());
+  dropKeys1();
+  response=oauth.doRefreshTokenRequest(response.getRefreshToken(),"password");
+  assertTokenSignature(key2,response.getAccessToken());
+  assertTokenSignature(key2,response.getRefreshToken());
+  dropKeys2();
+  response=oauth.doRefreshTokenRequest(response.getRefreshToken(),"password");
+  assertEquals(400,response.getStatusCode());
+  assertEquals("Invalid refresh token",response.getErrorDescription());
+}

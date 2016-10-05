@@ -1,11 +1,11 @@
 {
   try {
-    AssertionType assertion=AssertionUtil.getAssertion(responseType,realm.getPrivateKey());
+    KeyManager.ActiveKey keys=session.keys().getActiveKey(realm);
+    AssertionType assertion=AssertionUtil.getAssertion(responseType,keys.getPrivateKey());
     SubjectType subject=assertion.getSubject();
     SubjectType.STSubType subType=subject.getSubType();
     NameIDType subjectNameID=(NameIDType)subType.getBaseID();
     BrokeredIdentityContext identity=new BrokeredIdentityContext(subjectNameID.getValue());
-    identity.setCode(relayState);
     identity.getContextData().put(SAML_LOGIN_RESPONSE,responseType);
     identity.getContextData().put(SAML_ASSERTION,assertion);
     identity.setUsername(subjectNameID.getValue());
@@ -40,6 +40,7 @@
     if (authn != null && authn.getSessionIndex() != null) {
       identity.setBrokerSessionId(identity.getBrokerUserId() + "." + authn.getSessionIndex());
     }
+    identity.setCode(relayState);
     return callback.authenticated(identity);
   }
  catch (  Exception e) {

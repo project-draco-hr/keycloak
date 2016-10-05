@@ -1,8 +1,7 @@
 {
   String xml=samlClient.getInstallationProvider("saml-idp-descriptor");
-  RealmRepresentation realmRep=realmRep();
   assertTrue(xml.contains("<EntityDescriptor"));
   assertTrue(xml.contains("<IDPSSODescriptor"));
-  assertTrue(xml.contains(realmRep.getCertificate()));
-  assertTrue(xml.contains(samlUrl(realmRep)));
+  assertTrue(xml.contains(ApiUtil.findActiveKey(testRealmResource()).getCertificate()));
+  assertTrue(xml.contains(samlUrl()));
 }

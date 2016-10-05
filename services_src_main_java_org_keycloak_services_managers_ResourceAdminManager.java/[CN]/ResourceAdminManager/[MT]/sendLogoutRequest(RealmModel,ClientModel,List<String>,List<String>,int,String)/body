@@ -1,6 +1,6 @@
 {
   LogoutAction adminAction=new LogoutAction(TokenIdGenerator.generateId(),Time.currentTime() + 30,resource.getClientId(),adapterSessionIds,notBefore,userSessions);
-  String token=new TokenManager().encodeToken(realm,adminAction);
+  String token=new TokenManager().encodeToken(session,realm,adminAction);
   if (logger.isDebugEnabled())   logger.debugv("logout resource {0} url: {1} sessionIds: " + adapterSessionIds,resource.getClientId(),managementUrl);
   URI target=UriBuilder.fromUri(managementUrl).path(AdapterConstants.K_LOGOUT).build();
   try {

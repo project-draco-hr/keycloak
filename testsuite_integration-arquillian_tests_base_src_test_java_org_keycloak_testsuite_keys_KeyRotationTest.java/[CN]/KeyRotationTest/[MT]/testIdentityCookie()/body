@@ -1,0 +1,18 @@
+{
+  createKeys1();
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  createKeys2();
+  appPage.open();
+  oauth.openLoginForm();
+  assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  dropKeys1();
+  appPage.open();
+  oauth.openLoginForm();
+  assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+  dropKeys2();
+  appPage.open();
+  oauth.openLoginForm();
+  assertTrue(loginPage.isCurrent());
+}

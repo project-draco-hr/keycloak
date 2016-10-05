@@ -1,0 +1,29 @@
+{
+  ComponentRepresentation rep=createComponentRepresentation("mycomponent");
+  rep.getConfig().addFirst("required","foo");
+  rep.getConfig().addFirst("val1","one");
+  rep.getConfig().addFirst("val2","two");
+  rep.getConfig().addFirst("val3","three");
+  String id=createComponent(rep);
+  ComponentRepresentation returned=components.component(id).toRepresentation();
+  assertEquals(4,returned.getConfig().size());
+  assertEquals("foo",returned.getConfig().getFirst("required"));
+  assertEquals("one",returned.getConfig().getFirst("val1"));
+  assertEquals("two",returned.getConfig().getFirst("val2"));
+  assertEquals("three",returned.getConfig().getFirst("val3"));
+  returned.getConfig().putSingle("val1","one-updated");
+  returned.getConfig().putSingle("val2",null);
+  components.component(id).update(returned);
+  returned=components.component(id).toRepresentation();
+  assertEquals(3,returned.getConfig().size());
+  assertEquals("one-updated",returned.getConfig().getFirst("val1"));
+  assertFalse(returned.getConfig().containsKey("val2"));
+  returned.getConfig().addFirst("val1","");
+  components.component(id).update(returned);
+  returned=components.component(id).toRepresentation();
+  assertEquals(2,returned.getConfig().size());
+  returned.getConfig().put("val3",Collections.emptyList());
+  components.component(id).update(returned);
+  returned=components.component(id).toRepresentation();
+  assertEquals(1,returned.getConfig().size());
+}

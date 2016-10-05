@@ -2,14 +2,13 @@
   IdentityProviderModel idpModel=getIdentityProviderModel();
   OIDCIdentityProviderConfig cfg=new OIDCIdentityProviderConfig(idpModel);
   cfg.setUseJwksUrl(false);
-  RealmRepresentation realm=keycloak2.realm("realm-with-oidc-identity-provider").toRepresentation();
-  cfg.setPublicKeySignatureVerifier(realm.getPublicKey());
+  KeysMetadataRepresentation.KeyMetadataRepresentation key=ApiUtil.findActiveKey(keycloak2.realm("realm-with-oidc-identity-provider"));
+  cfg.setPublicKeySignatureVerifier(key.getPublicKey());
   getRealm().updateIdentityProvider(cfg);
   brokerServerRule.stopSession(this.session,true);
   this.session=brokerServerRule.startSession();
   assertSuccessfulAuthentication(getIdentityProviderModel(),"test-user","test-user@localhost",false);
-  realm.setPublicKey(org.keycloak.models.Constants.GENERATE);
-  keycloak2.realm("realm-with-oidc-identity-provider").update(realm);
+  rotateKeys("realm-with-oidc-identity-provider");
   loginIDP("test-user");
   assertTrue(errorPage.isCurrent());
   assertEquals("Unexpected error when authenticating with identity provider",errorPage.getError());

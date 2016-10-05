@@ -1,8 +1,13 @@
 {
   auth.requireManage();
-  ComponentModel model=RepresentationToModel.toModel(rep);
-  if (model.getParentId() == null)   model.setParentId(realm.getId());
-  adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
-  model=realm.addComponentModel(model);
-  return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
+  try {
+    ComponentModel model=RepresentationToModel.toModel(session,rep);
+    if (model.getParentId() == null)     model.setParentId(realm.getId());
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
+    model=realm.addComponentModel(model);
+    return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
+  }
+ catch (  ComponentValidationException e) {
+    return ErrorResponse.error(e.getMessage(),Response.Status.BAD_REQUEST);
+  }
 }

@@ -1,0 +1,20 @@
+{
+  try {
+    JWSInput jws=new JWSInput(encodedIDToken);
+    IDToken idToken;
+    if (!RSAProvider.verify(jws,session.keys().getPublicKey(realm,jws.getHeader().getKeyId()))) {
+      throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid IDToken");
+    }
+    idToken=jws.readJsonContent(IDToken.class);
+    if (idToken.isExpired()) {
+      throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"IDToken expired");
+    }
+    if (idToken.getIssuedAt() < realm.getNotBefore()) {
+      throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Stale IDToken");
+    }
+    return idToken;
+  }
+ catch (  JWSInputException e) {
+    throw new OAuthErrorException(OAuthErrorException.INVALID_GRANT,"Invalid IDToken",e);
+  }
+}

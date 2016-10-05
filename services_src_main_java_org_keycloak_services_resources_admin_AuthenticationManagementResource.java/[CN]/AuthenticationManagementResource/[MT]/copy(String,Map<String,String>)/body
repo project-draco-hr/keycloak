@@ -2,7 +2,7 @@
   auth.requireManage();
   String newName=data.get("newName");
   if (realm.getFlowByAlias(newName) != null) {
-    return Response.status(Response.Status.CONFLICT).build();
+    return ErrorResponse.exists("New flow alias name already exists");
   }
   AuthenticationFlowModel flow=realm.getFlowByAlias(flowAlias);
   if (flow == null) {
@@ -19,5 +19,5 @@
   copy(newName,flow,copy);
   data.put("id",copy.getId());
   adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo).representation(data).success();
-  return Response.status(201).build();
+  return Response.status(Response.Status.CREATED).build();
 }

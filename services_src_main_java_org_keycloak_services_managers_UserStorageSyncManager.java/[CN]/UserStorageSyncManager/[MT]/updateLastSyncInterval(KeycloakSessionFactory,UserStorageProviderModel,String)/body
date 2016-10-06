@@ -1,0 +1,17 @@
+{
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      RealmModel persistentRealm=session.realms().getRealm(realmId);
+      List<UserStorageProviderModel> persistentFedProviders=persistentRealm.getUserStorageProviders();
+      for (      UserStorageProviderModel persistentFedProvider : persistentFedProviders) {
+        if (provider.getId().equals(persistentFedProvider.getId())) {
+          int lastSync=Time.currentTime();
+          persistentFedProvider.setLastSync(lastSync);
+          persistentRealm.updateComponent(persistentFedProvider);
+          provider.setLastSync(lastSync);
+        }
+      }
+    }
+  }
+);
+}

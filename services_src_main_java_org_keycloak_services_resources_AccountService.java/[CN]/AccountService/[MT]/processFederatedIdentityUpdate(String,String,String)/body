@@ -37,7 +37,7 @@ case ADD:
     clientSessionCode.setAction(ClientSessionModel.Action.AUTHENTICATE.name());
     clientSession.setRedirectUri(redirectUri);
     clientSession.setNote(OIDCLoginProtocol.STATE_PARAM,UUID.randomUUID().toString());
-    return Response.status(302).location(Urls.identityProviderAuthnRequest(this.uriInfo.getBaseUri(),providerId,realm.getName(),clientSessionCode.getCode())).build();
+    return Response.seeOther(Urls.identityProviderAuthnRequest(this.uriInfo.getBaseUri(),providerId,realm.getName(),clientSessionCode.getCode())).build();
   }
  catch (  Exception spe) {
     setReferrerOnPage();

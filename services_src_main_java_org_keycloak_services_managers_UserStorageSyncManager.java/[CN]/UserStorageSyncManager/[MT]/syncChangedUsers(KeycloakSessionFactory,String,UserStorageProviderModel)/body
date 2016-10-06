@@ -1,0 +1,30 @@
+{
+  UserStorageProviderFactory factory=(UserStorageProviderFactory)sessionFactory.getProviderFactory(UserStorageProvider.class,provider.getProviderId());
+  if (!(factory instanceof ImportSynchronization) || !provider.isImportEnabled()) {
+    return SynchronizationResult.ignored();
+  }
+  final Holder holder=new Holder();
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      ClusterProvider clusterProvider=session.getProvider(ClusterProvider.class);
+      String taskKey=provider.getId() + "::sync";
+      int timeout=Math.max(30,provider.getChangedSyncPeriod());
+      holder.result=clusterProvider.executeIfNotExecuted(taskKey,timeout,new Callable<SynchronizationResult>(){
+        @Override public SynchronizationResult call() throws Exception {
+          int oldLastSync=provider.getLastSync();
+          updateLastSyncInterval(sessionFactory,provider,realmId);
+          return ((ImportSynchronization)factory).syncSince(Time.toDate(oldLastSync),sessionFactory,realmId,provider);
+        }
+      }
+);
+    }
+  }
+);
+  if (holder.result == null || !holder.result.isExecuted()) {
+    logger.debugf("syncChangedUsers for federation provider %s was ignored as it's already in progress",provider.getName());
+    return SynchronizationResult.ignored();
+  }
+ else {
+    return holder.result.getResult();
+  }
+}

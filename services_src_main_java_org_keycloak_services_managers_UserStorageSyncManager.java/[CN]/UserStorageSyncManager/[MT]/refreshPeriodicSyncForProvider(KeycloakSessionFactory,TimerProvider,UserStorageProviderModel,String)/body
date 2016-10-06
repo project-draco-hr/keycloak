@@ -1,0 +1,47 @@
+{
+  logger.debugf("Going to refresh periodic sync for provider '%s' . Full sync period: %d , changed users sync period: %d",provider.getName(),provider.getFullSyncPeriod(),provider.getChangedSyncPeriod());
+  if (provider.getFullSyncPeriod() > 0) {
+    timer.schedule(new Runnable(){
+      @Override public void run(){
+        try {
+          boolean shouldPerformSync=shouldPerformNewPeriodicSync(provider.getLastSync(),provider.getChangedSyncPeriod());
+          if (shouldPerformSync) {
+            syncAllUsers(sessionFactory,realmId,provider);
+          }
+ else {
+            logger.debugf("Ignored periodic full sync with storage provider %s due small time since last sync",provider.getName());
+          }
+        }
+ catch (        Throwable t) {
+          logger.errorDuringFullUserSync(t);
+        }
+      }
+    }
+,provider.getFullSyncPeriod() * 1000,provider.getId() + "-FULL");
+  }
+ else {
+    timer.cancelTask(provider.getId() + "-FULL");
+  }
+  if (provider.getChangedSyncPeriod() > 0) {
+    timer.schedule(new Runnable(){
+      @Override public void run(){
+        try {
+          boolean shouldPerformSync=shouldPerformNewPeriodicSync(provider.getLastSync(),provider.getChangedSyncPeriod());
+          if (shouldPerformSync) {
+            syncChangedUsers(sessionFactory,realmId,provider);
+          }
+ else {
+            logger.debugf("Ignored periodic changed-users sync with storage provider %s due small time since last sync",provider.getName());
+          }
+        }
+ catch (        Throwable t) {
+          logger.errorDuringChangedUserSync(t);
+        }
+      }
+    }
+,provider.getChangedSyncPeriod() * 1000,provider.getId() + "-CHANGED");
+  }
+ else {
+    timer.cancelTask(provider.getId() + "-CHANGED");
+  }
+}

@@ -1,0 +1,15 @@
+{
+  final UserStorageProviderClusterEvent fedEvent=(UserStorageProviderClusterEvent)event;
+  KeycloakModelUtils.runJobInTransaction(sessionFactory,new KeycloakSessionTask(){
+    @Override public void run(    KeycloakSession session){
+      TimerProvider timer=session.getProvider(TimerProvider.class);
+      if (fedEvent.isRemoved()) {
+        removePeriodicSyncForProvider(timer,fedEvent.getStorageProvider());
+      }
+ else {
+        refreshPeriodicSyncForProvider(sessionFactory,timer,fedEvent.getStorageProvider(),fedEvent.getRealmId());
+      }
+    }
+  }
+);
+}

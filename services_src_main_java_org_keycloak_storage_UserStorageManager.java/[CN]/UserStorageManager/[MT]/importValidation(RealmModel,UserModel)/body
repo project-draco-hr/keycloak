@@ -1,0 +1,10 @@
+{
+  if (user == null || user.getFederationLink() == null)   return user;
+  UserStorageProvider provider=getStorageProvider(session,realm,user.getFederationLink());
+  if (provider != null && provider instanceof ImportedUserValidation) {
+    return ((ImportedUserValidation)provider).validate(realm,user);
+  }
+ else {
+    return user;
+  }
+}

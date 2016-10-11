@@ -6,6 +6,7 @@
     timer.schedule(new ClusterAwareScheduledTaskRunner(sessionFactory,new ClearExpiredEvents(),interval),interval,"ClearExpiredEvents");
     timer.schedule(new ClusterAwareScheduledTaskRunner(sessionFactory,new ClearExpiredUserSessions(),interval),interval,"ClearExpiredUserSessions");
     new UsersSyncManager().bootstrapPeriodic(sessionFactory,timer);
+    new UserStorageSyncManager().bootstrapPeriodic(sessionFactory,timer);
   }
   finally {
     session.close();

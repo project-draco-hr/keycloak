@@ -1,7 +1,8 @@
 {
   StorageId storageId=new StorageId(id);
   if (storageId.getProviderId() == null) {
-    return localStorage().getUserById(id,realm);
+    UserModel user=localStorage().getUserById(id,realm);
+    return importValidation(realm,user);
   }
   UserLookupProvider provider=(UserLookupProvider)getStorageProvider(session,realm,storageId.getProviderId());
   return provider.getUserById(id,realm);

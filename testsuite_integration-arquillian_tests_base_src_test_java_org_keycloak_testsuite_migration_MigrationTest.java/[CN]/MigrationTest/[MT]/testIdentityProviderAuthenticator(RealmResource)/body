@@ -1,0 +1,19 @@
+{
+  for (  RealmResource realm : realms) {
+    boolean success=false;
+    for (    AuthenticationFlowRepresentation flow : realm.flows().getFlows()) {
+      if (flow.getAlias().equals(DefaultAuthenticationFlows.BROWSER_FLOW)) {
+        for (        AuthenticationExecutionExportRepresentation execution : flow.getAuthenticationExecutions()) {
+          if ("identity-provider-redirector".equals(execution.getAuthenticator())) {
+            assertEquals("Requirement should be ALTERNATIVE.",AuthenticationExecutionModel.Requirement.ALTERNATIVE.name(),execution.getRequirement());
+            assertTrue("Priority should be 25.",execution.getPriority() == 25);
+            success=true;
+          }
+        }
+      }
+    }
+    if (!success) {
+      fail("BROWSER_FLOW should contain execution: 'identity-provider-redirector' authenticator.");
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  long priority=System.currentTimeMillis();
+  ComponentRepresentation rep=createRep("valid",GeneratedRsaKeyProviderFactory.ID);
+  rep.setConfig(new MultivaluedHashMap<>());
+  rep.getConfig().putSingle("priority",Long.toString(priority));
+  rep.getConfig().putSingle("keySize","4096");
+  Response response=adminClient.realm("test").components().add(rep);
+  String id=ApiUtil.getCreatedId(response);
+  ComponentRepresentation createdRep=adminClient.realm("test").components().component(id).toRepresentation();
+  assertEquals(2,createdRep.getConfig().size());
+  assertEquals("4096",createdRep.getConfig().getFirst("keySize"));
+  KeysMetadataRepresentation keys=adminClient.realm("test").keys().getKeyMetadata();
+  KeysMetadataRepresentation.KeyMetadataRepresentation key=keys.getKeys().get(0);
+  assertEquals(id,key.getProviderId());
+  assertEquals(KeyMetadata.Type.RSA.name(),key.getType());
+  assertEquals(priority,key.getProviderPriority());
+  assertEquals(4096,((RSAPublicKey)PemUtils.decodePublicKey(keys.getKeys().get(0).getPublicKey())).getModulus().bitLength());
+}

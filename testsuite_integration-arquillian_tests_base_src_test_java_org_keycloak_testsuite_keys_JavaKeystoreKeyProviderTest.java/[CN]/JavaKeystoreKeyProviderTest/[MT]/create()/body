@@ -1,0 +1,18 @@
+{
+  long priority=System.currentTimeMillis();
+  ComponentRepresentation rep=createRep("valid",priority);
+  Response response=adminClient.realm("test").components().add(rep);
+  String id=ApiUtil.getCreatedId(response);
+  ComponentRepresentation createdRep=adminClient.realm("test").components().component(id).toRepresentation();
+  assertEquals(5,createdRep.getConfig().size());
+  assertEquals(Long.toString(priority),createdRep.getConfig().getFirst("priority"));
+  assertEquals(ComponentRepresentation.SECRET_VALUE,createdRep.getConfig().getFirst("keystorePassword"));
+  assertEquals(ComponentRepresentation.SECRET_VALUE,createdRep.getConfig().getFirst("keyPassword"));
+  KeysMetadataRepresentation keys=adminClient.realm("test").keys().getKeyMetadata();
+  KeysMetadataRepresentation.KeyMetadataRepresentation key=keys.getKeys().get(0);
+  assertEquals(id,key.getProviderId());
+  assertEquals(KeyMetadata.Type.RSA.name(),key.getType());
+  assertEquals(priority,key.getProviderPriority());
+  assertEquals(PUBLIC_KEY,key.getPublicKey());
+  assertEquals(CERTIFICATE,key.getCertificate());
+}

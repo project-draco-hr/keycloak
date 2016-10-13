@@ -1,0 +1,9 @@
+{
+  for (int i=0; i < 100; i++) {
+    ComponentRepresentation rep=createComponentRepresentation("test-" + i);
+    rep.getConfig().putSingle("required","required-value");
+    createComponent(rep);
+    List<ComponentRepresentation> list=realm.components().query(realmId,TestProvider.class.getName());
+    assertEquals(i + 1,list.size());
+  }
+}

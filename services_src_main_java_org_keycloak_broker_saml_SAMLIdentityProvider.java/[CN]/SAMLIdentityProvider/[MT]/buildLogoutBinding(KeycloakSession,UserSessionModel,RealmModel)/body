@@ -1,0 +1,8 @@
+{
+  JaxrsSAML2BindingBuilder binding=new JaxrsSAML2BindingBuilder().relayState(userSession.getId());
+  if (getConfig().isWantAuthnRequestsSigned()) {
+    KeyManager.ActiveKey keys=session.keys().getActiveKey(realm);
+    binding.signWith(keys.getPrivateKey(),keys.getPublicKey(),keys.getCertificate()).signatureAlgorithm(getSignatureAlgorithm()).signDocument();
+  }
+  return binding;
+}

@@ -2,7 +2,7 @@
   AccessTokenResponse tokenResponse=oauth.doGrantAccessTokenRequest("test",login,"password",null,clientId,clientSecret);
   String accessToken=tokenResponse.getAccessToken();
   String refreshToken=tokenResponse.getRefreshToken();
-  PublicKey publicKey=PemUtils.decodePublicKey(adminClient.realm("test").toRepresentation().getPublicKey());
+  PublicKey publicKey=PemUtils.decodePublicKey(ApiUtil.findActiveKey(adminClient.realm("test")).getPublicKey());
   AccessToken accessTokenRepresentation=RSATokenVerifier.verifyToken(accessToken,publicKey,AuthServerTestEnricher.getAuthServerContextRoot() + "/auth/realms/test");
   JWSInput jws=new JWSInput(refreshToken);
   if (!RSAProvider.verify(jws,publicKey)) {

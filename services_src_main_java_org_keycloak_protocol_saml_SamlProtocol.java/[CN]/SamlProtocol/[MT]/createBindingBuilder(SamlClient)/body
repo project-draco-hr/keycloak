@@ -1,7 +1,8 @@
 {
   JaxrsSAML2BindingBuilder binding=new JaxrsSAML2BindingBuilder();
   if (samlClient.requiresRealmSignature()) {
-    binding.signatureAlgorithm(samlClient.getSignatureAlgorithm()).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
+    KeyManager.ActiveKey keys=session.keys().getActiveKey(realm);
+    binding.signatureAlgorithm(samlClient.getSignatureAlgorithm()).signWith(keys.getPrivateKey(),keys.getPublicKey(),keys.getCertificate()).signDocument();
   }
   return binding;
 }

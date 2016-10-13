@@ -8,8 +8,7 @@
     AccessTokenResponse accessTokenResponse=executeGrantAccessTokenRequest(client);
     Response response=UserInfoClientUtil.executeUserInfoRequest_getMethod(client,accessTokenResponse.getToken());
     events.expect(EventType.USER_INFO_REQUEST).session(Matchers.notNullValue(String.class)).detail(Details.AUTH_METHOD,Details.VALIDATE_ACCESS_TOKEN).detail(Details.USERNAME,"test-user@localhost").detail(Details.SIGNATURE_REQUIRED,"true").detail(Details.SIGNATURE_ALGORITHM,Algorithm.RS256.toString()).assertEvent();
-    RealmRepresentation realmRep=adminClient.realm("test").toRepresentation();
-    PublicKey publicKey=KeycloakModelUtils.getPublicKey(realmRep.getPublicKey());
+    PublicKey publicKey=PemUtils.decodePublicKey(ApiUtil.findActiveKey(adminClient.realm("test")).getPublicKey());
     Assert.assertEquals(200,response.getStatus());
     Assert.assertEquals(response.getHeaderString(HttpHeaders.CONTENT_TYPE),MediaType.APPLICATION_JWT);
     String signedResponse=response.readEntity(String.class);

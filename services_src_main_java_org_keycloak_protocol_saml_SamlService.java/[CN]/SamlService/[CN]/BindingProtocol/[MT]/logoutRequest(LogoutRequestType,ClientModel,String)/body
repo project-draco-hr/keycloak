@@ -61,7 +61,8 @@
   JaxrsSAML2BindingBuilder binding=new JaxrsSAML2BindingBuilder().relayState(logoutRelayState);
   if (samlClient.requiresRealmSignature()) {
     SignatureAlgorithm algorithm=samlClient.getSignatureAlgorithm();
-    binding.signatureAlgorithm(algorithm).signWith(realm.getPrivateKey(),realm.getPublicKey(),realm.getCertificate()).signDocument();
+    KeyManager.ActiveKey keys=session.keys().getActiveKey(realm);
+    binding.signatureAlgorithm(algorithm).signWith(keys.getPrivateKey(),keys.getPublicKey(),keys.getCertificate()).signDocument();
   }
   try {
     if (SamlProtocol.SAML_POST_BINDING.equals(logoutBinding)) {

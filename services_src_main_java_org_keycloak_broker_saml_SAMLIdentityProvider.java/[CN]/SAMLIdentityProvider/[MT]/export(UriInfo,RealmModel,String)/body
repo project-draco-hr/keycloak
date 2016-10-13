@@ -7,7 +7,7 @@
   boolean wantAuthnRequestsSigned=getConfig().isWantAuthnRequestsSigned();
   String entityId=getEntityId(uriInfo,realm);
   String nameIDPolicyFormat=getConfig().getNameIDPolicyFormat();
-  String certificatePem=realm.getCertificatePem();
+  String certificatePem=PemUtils.encodeCertificate(session.keys().getActiveKey(realm).getCertificate());
   String descriptor=SPMetadataDescriptor.getSPDescriptor(authnBinding,endpoint,endpoint,wantAuthnRequestsSigned,entityId,nameIDPolicyFormat,certificatePem);
   return Response.ok(descriptor,MediaType.APPLICATION_XML_TYPE).build();
 }

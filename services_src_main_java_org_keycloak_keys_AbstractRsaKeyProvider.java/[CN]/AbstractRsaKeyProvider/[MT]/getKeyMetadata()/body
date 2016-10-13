@@ -1,0 +1,26 @@
+{
+  String kid=keys.getKid();
+  PublicKey publicKey=keys.getKeyPair().getPublic();
+  if (kid != null && publicKey != null) {
+    KeyMetadata k=new KeyMetadata();
+    k.setProviderId(model.getId());
+    k.setProviderPriority(model.get(Attributes.PRIORITY_KEY,0l));
+    k.setKid(kid);
+    if (isActive()) {
+      k.setStatus(KeyMetadata.Status.ACTIVE);
+    }
+ else     if (isEnabled()) {
+      k.setStatus(KeyMetadata.Status.PASSIVE);
+    }
+ else {
+      k.setStatus(KeyMetadata.Status.DISABLED);
+    }
+    k.setType(KeyMetadata.Type.RSA);
+    k.setPublicKey(publicKey);
+    k.setCertificate(keys.getCertificate());
+    return Collections.singletonList(k);
+  }
+ else {
+    return Collections.emptyList();
+  }
+}

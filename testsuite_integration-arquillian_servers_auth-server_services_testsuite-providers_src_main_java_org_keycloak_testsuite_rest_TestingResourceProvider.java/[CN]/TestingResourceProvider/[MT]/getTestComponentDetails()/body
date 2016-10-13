@@ -1,0 +1,11 @@
+{
+  Map<String,TestProvider.DetailsRepresentation> reps=new HashMap<>();
+  RealmModel realm=session.getContext().getRealm();
+  for (  ComponentModel c : realm.getComponents(realm.getId(),TestProvider.class.getName())) {
+    ProviderFactory<TestProvider> f=session.getKeycloakSessionFactory().getProviderFactory(TestProvider.class,c.getProviderId());
+    TestProviderFactory factory=(TestProviderFactory)f;
+    TestProvider p=(TestProvider)factory.create(session,c);
+    reps.put(c.getName(),p.getDetails());
+  }
+  return reps;
+}

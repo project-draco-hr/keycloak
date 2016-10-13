@@ -1,0 +1,12 @@
+{
+  KeyPair keyPair=KeyUtils.generateRsaKeyPair(2048);
+  ComponentRepresentation rep=createRep("invalid",RsaKeyProviderFactory.ID);
+  Response response=adminClient.realm("test").components().add(rep);
+  assertErrror(response,"Private RSA Key is required");
+  rep.getConfig().putSingle(Attributes.PRIVATE_KEY_KEY,"nonsense");
+  response=adminClient.realm("test").components().add(rep);
+  assertErrror(response,"Failed to decode private key");
+  rep.getConfig().putSingle(Attributes.PRIVATE_KEY_KEY,PemUtils.encodeKey(keyPair.getPublic()));
+  response=adminClient.realm("test").components().add(rep);
+  assertErrror(response,"Failed to decode private key");
+}

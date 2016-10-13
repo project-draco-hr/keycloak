@@ -3,7 +3,10 @@
     Cookie cookie=headers.getCookies().get(KEYCLOAK_IDENTITY_COOKIE);
     if (cookie == null)     return;
     String tokenString=cookie.getValue();
-    AccessToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName()),false,false);
+    RSATokenVerifier verifier=RSATokenVerifier.create(tokenString).realmUrl(Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName())).checkActive(false).checkTokenType(false);
+    String kid=verifier.getHeader().getKeyId();
+    PublicKey publicKey=session.keys().getPublicKey(realm,kid);
+    AccessToken token=verifier.publicKey(publicKey).verify().getToken();
     UserSessionModel cookieSession=session.sessions().getUserSession(realm,token.getSessionState());
     if (cookieSession == null || !cookieSession.getId().equals(userSession.getId()))     return;
     expireIdentityCookie(realm,uriInfo,connection);

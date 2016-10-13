@@ -4,11 +4,8 @@
   int count=config.getCount() != null ? config.getCount() : 1;
   ClientInitialAccessModel clientInitialAccessModel=session.sessions().createClientInitialAccessModel(realm,expiration,count);
   adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,clientInitialAccessModel.getId()).representation(config).success();
-  if (session.getTransactionManager().isActive()) {
-    session.getTransactionManager().commit();
-  }
   ClientInitialAccessPresentation rep=wrap(clientInitialAccessModel);
-  String token=ClientRegistrationTokenUtils.createInitialAccessToken(realm,uriInfo,clientInitialAccessModel);
+  String token=ClientRegistrationTokenUtils.createInitialAccessToken(session,realm,uriInfo,clientInitialAccessModel);
   rep.setToken(token);
   response.setStatus(Response.Status.CREATED.getStatusCode());
   response.setHeader(HttpHeaders.LOCATION,uriInfo.getAbsolutePathBuilder().path(clientInitialAccessModel.getId()).build().toString());

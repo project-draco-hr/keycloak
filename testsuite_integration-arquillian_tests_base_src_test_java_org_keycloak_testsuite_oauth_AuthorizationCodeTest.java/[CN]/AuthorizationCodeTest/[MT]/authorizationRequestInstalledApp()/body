@@ -5,7 +5,6 @@
   String title=driver.getTitle();
   Assert.assertEquals("Success code",title);
   String code=driver.findElement(By.id(OAuth2Constants.CODE)).getAttribute("value");
-  testingClient.testing().verifyCode("test",code);
   String codeId=events.expectLogin().detail(Details.REDIRECT_URI,"http://localhost:8180/auth/realms/test/protocol/openid-connect/oauth/oob").assertEvent().getDetails().get(Details.CODE_ID);
   assertCode(codeId,code);
   ClientManager.realm(adminClient.realm("test")).clientId("test-app").removeRedirectUris(Constants.INSTALLED_APP_URN);

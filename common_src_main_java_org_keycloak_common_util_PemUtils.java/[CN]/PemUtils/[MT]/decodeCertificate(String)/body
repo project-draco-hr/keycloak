@@ -1,5 +1,13 @@
 {
-  byte[] der=pemToDer(cert);
-  ByteArrayInputStream bis=new ByteArrayInputStream(der);
-  return DerUtils.decodeCertificate(bis);
+  if (cert == null) {
+    return null;
+  }
+  try {
+    byte[] der=pemToDer(cert);
+    ByteArrayInputStream bis=new ByteArrayInputStream(der);
+    return DerUtils.decodeCertificate(bis);
+  }
+ catch (  Exception e) {
+    throw new PemException(e);
+  }
 }

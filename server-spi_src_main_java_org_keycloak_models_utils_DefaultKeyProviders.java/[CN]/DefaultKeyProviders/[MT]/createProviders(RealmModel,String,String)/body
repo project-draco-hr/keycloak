@@ -1,0 +1,15 @@
+{
+  ComponentModel rsa=new ComponentModel();
+  rsa.setName("rsa");
+  rsa.setParentId(realm.getId());
+  rsa.setProviderId("rsa");
+  rsa.setProviderType(KeyProvider.class.getName());
+  MultivaluedHashMap<String,String> config=new MultivaluedHashMap<>();
+  config.putSingle("priority","100");
+  config.putSingle("privateKey",privateKeyPem);
+  if (certificatePem != null) {
+    config.putSingle("certificate",certificatePem);
+  }
+  rsa.setConfig(config);
+  realm.addComponentModel(rsa);
+}

@@ -1,0 +1,16 @@
+{
+  KeyPair keyPair=KeyUtils.generateRsaKeyPair(1024);
+  String privateKeyPem=PemUtils.encodeKey(keyPair.getPrivate());
+  PublicKey publicKey=keyPair.getPublic();
+  ComponentRepresentation rep=new ComponentRepresentation();
+  rep.setName("mycomponent");
+  rep.setParentId("test");
+  rep.setProviderId(RsaKeyProviderFactory.ID);
+  rep.setProviderType(KeyProvider.class.getName());
+  org.keycloak.common.util.MultivaluedHashMap config=new org.keycloak.common.util.MultivaluedHashMap();
+  config.addFirst("priority",priority);
+  config.addFirst(Attributes.PRIVATE_KEY_KEY,privateKeyPem);
+  rep.setConfig(config);
+  adminClient.realm("test").components().add(rep);
+  return publicKey;
+}

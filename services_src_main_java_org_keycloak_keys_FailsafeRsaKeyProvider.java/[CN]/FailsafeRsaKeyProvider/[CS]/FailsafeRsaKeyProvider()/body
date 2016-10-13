@@ -1,0 +1,15 @@
+{
+  logger.errorv("No active keys found, using failsafe provider, please login to admin console to add keys. Clustering is not supported.");
+synchronized (FailsafeRsaKeyProvider.class) {
+    if (EXPIRES < Time.currentTime()) {
+      KEY_PAIR=KeyUtils.generateRsaKeyPair(2048);
+      KID=KeyUtils.createKeyId(KEY_PAIR.getPublic());
+      EXPIRES=Time.currentTime() + 60 * 10;
+      if (EXPIRES > 0) {
+        logger.warnv("Keys expired, re-generated kid={0}",KID);
+      }
+    }
+    kid=KID;
+    keyPair=KEY_PAIR;
+  }
+}

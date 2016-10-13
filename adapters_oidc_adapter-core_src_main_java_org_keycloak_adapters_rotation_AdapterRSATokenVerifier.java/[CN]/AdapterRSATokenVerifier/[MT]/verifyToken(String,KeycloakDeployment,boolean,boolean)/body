@@ -1,11 +1,5 @@
 {
-  JWSInput input;
-  try {
-    input=new JWSInput(tokenString);
-  }
- catch (  Exception e) {
-    throw new VerificationException("Couldn't parse token",e);
-  }
-  PublicKey publicKey=getPublicKey(input,deployment);
-  return RSATokenVerifier.verifyToken(input,publicKey,deployment.getRealmInfoUrl(),checkActive,checkTokenType);
+  RSATokenVerifier verifier=RSATokenVerifier.create(tokenString).realmUrl(deployment.getRealmInfoUrl()).checkActive(checkActive).checkTokenType(checkTokenType);
+  PublicKey publicKey=getPublicKey(verifier.getHeader().getKeyId(),deployment);
+  return verifier.publicKey(publicKey).verify().getToken();
 }

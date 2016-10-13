@@ -6,11 +6,10 @@
     if (clientSession == null) {
       return null;
     }
-    String hash=createHash(realm,clientSession);
-    if (!hash.equals(parts[0])) {
+    if (!verifyCode(code,session,realm,clientSession)) {
       return null;
     }
-    return new ClientSessionCode(realm,clientSession);
+    return new ClientSessionCode(session,realm,clientSession);
   }
  catch (  RuntimeException e) {
     return null;

@@ -1,0 +1,17 @@
+{
+  if (obj == null) {
+    return null;
+  }
+  try {
+    StringWriter writer=new StringWriter();
+    PEMWriter pemWriter=new PEMWriter(writer);
+    pemWriter.writeObject(obj);
+    pemWriter.flush();
+    pemWriter.close();
+    String s=writer.toString();
+    return PemUtils.removeBeginEnd(s);
+  }
+ catch (  Exception e) {
+    throw new PemException(e);
+  }
+}

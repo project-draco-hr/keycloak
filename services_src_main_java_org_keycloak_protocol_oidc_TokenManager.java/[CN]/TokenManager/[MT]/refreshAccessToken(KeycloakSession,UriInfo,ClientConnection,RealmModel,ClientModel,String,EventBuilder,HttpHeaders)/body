@@ -1,5 +1,5 @@
 {
-  RefreshToken refreshToken=verifyRefreshToken(realm,encodedRefreshToken);
+  RefreshToken refreshToken=verifyRefreshToken(session,realm,encodedRefreshToken);
   event.user(refreshToken.getSubject()).session(refreshToken.getSessionState()).detail(Details.REFRESH_TOKEN_ID,refreshToken.getId()).detail(Details.REFRESH_TOKEN_TYPE,refreshToken.getType());
   TokenValidation validation=validateToken(session,uriInfo,connection,realm,refreshToken,headers);
   if (!validation.clientSession.getClient().getId().equals(authorizedClient.getId())) {

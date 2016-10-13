@@ -15,6 +15,7 @@
   if (realm == null) {
     throw new UnauthorizedException("Unknown realm in token");
   }
+  session.getContext().setRealm(realm);
   AuthenticationManager.AuthResult authResult=authManager.authenticateBearerToken(session,realm,uriInfo,clientConnection,headers);
   if (authResult == null) {
     logger.debug("Token not valid");

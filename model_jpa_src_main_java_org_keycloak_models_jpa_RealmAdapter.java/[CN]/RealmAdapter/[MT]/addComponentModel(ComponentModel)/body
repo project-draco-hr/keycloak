@@ -1,4 +1,9 @@
 {
+  ComponentFactory componentFactory=ComponentUtil.getComponentFactory(session,model);
+  if (componentFactory == null) {
+    throw new IllegalArgumentException("Invalid component type");
+  }
+  componentFactory.validateConfiguration(session,model);
   ComponentEntity c=new ComponentEntity();
   if (model.getId() == null) {
     c.setId(KeycloakModelUtils.generateId());

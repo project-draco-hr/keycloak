@@ -1,8 +1,7 @@
 {
   String xml=samlClient.getInstallationProvider("keycloak-saml");
-  RealmRepresentation realmRep=realmRep();
   assertTrue(xml.contains("<keycloak-saml-adapter>"));
   assertTrue(xml.contains(SAML_NAME));
-  assertTrue(xml.contains(realmRep.getCertificate()));
-  assertTrue(xml.contains(samlUrl(realmRep)));
+  assertTrue(xml.contains(ApiUtil.findActiveKey(testRealmResource()).getCertificate()));
+  assertTrue(xml.contains(samlUrl()));
 }

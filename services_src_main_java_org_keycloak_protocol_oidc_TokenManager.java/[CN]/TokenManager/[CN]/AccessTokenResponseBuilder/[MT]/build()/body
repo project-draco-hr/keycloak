@@ -1,4 +1,5 @@
 {
+  KeyManager.ActiveKey activeKey=session.keys().getActiveKey(realm);
   if (accessToken != null) {
     event.detail(Details.TOKEN_ID,accessToken.getId());
   }
@@ -13,7 +14,7 @@
   }
   AccessTokenResponse res=new AccessTokenResponse();
   if (accessToken != null) {
-    String encodedToken=new JWSBuilder().type(OAuth2Constants.JWT).kid(realm.getKeyId()).jsonContent(accessToken).sign(jwsAlgorithm,realm.getPrivateKey());
+    String encodedToken=new JWSBuilder().type(JWT).kid(activeKey.getKid()).jsonContent(accessToken).sign(jwsAlgorithm,activeKey.getPrivateKey());
     res.setToken(encodedToken);
     res.setTokenType("bearer");
     res.setSessionState(accessToken.getSessionState());
@@ -29,11 +30,11 @@
     idToken.setCodeHash(codeHash);
   }
   if (idToken != null) {
-    String encodedToken=new JWSBuilder().type(OAuth2Constants.JWT).kid(realm.getKeyId()).jsonContent(idToken).sign(jwsAlgorithm,realm.getPrivateKey());
+    String encodedToken=new JWSBuilder().type(JWT).kid(activeKey.getKid()).jsonContent(idToken).sign(jwsAlgorithm,activeKey.getPrivateKey());
     res.setIdToken(encodedToken);
   }
   if (refreshToken != null) {
-    String encodedToken=new JWSBuilder().type(OAuth2Constants.JWT).kid(realm.getKeyId()).jsonContent(refreshToken).sign(jwsAlgorithm,realm.getPrivateKey());
+    String encodedToken=new JWSBuilder().type(JWT).kid(activeKey.getKid()).jsonContent(refreshToken).sign(jwsAlgorithm,activeKey.getPrivateKey());
     res.setRefreshToken(encodedToken);
     if (refreshToken.getExpiration() != 0) {
       res.setRefreshExpiresIn(refreshToken.getExpiration() - Time.currentTime());

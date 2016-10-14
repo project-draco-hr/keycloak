@@ -15,7 +15,7 @@
       throw new BadRequestException("Requested RS256, but signing key not set");
     }
     PrivateKey privateKey=clientData.getSigningKeyPair().getPrivate();
-    String kid=JWKBuilder.createKeyId(clientData.getSigningKeyPair().getPublic());
+    String kid=KeyUtils.createKeyId(clientData.getSigningKeyPair().getPublic());
     clientData.setOidcRequest(new JWSBuilder().kid(kid).jsonContent(oidcRequest).rsa256(privateKey));
   }
  else {

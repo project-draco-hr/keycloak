@@ -1,6 +1,9 @@
 {
   try {
-    return RSATokenVerifier.toAccessToken(token,realm.getPublicKey());
+    RSATokenVerifier verifier=RSATokenVerifier.create(token).realmUrl(Urls.realmIssuer(session.getContext().getUri().getBaseUri(),realm.getName()));
+    PublicKey publicKey=session.keys().getPublicKey(realm,verifier.getHeader().getKeyId());
+    verifier.publicKey(publicKey);
+    return verifier.verify().getToken();
   }
  catch (  VerificationException e) {
     throw new ErrorResponseException("invalid_request","Invalid token.",Response.Status.UNAUTHORIZED);

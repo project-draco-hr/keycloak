@@ -1,12 +1,12 @@
 {
   if (!publicKeys.containsKey(realm)) {
-    String publicKeyPem=adminClient.realms().realm(realm).toRepresentation().getPublicKey();
+    KeysMetadataRepresentation keyMetadata=adminClient.realms().realm(realm).keys().getKeyMetadata();
+    String activeKid=keyMetadata.getActive().get("RSA");
     PublicKey publicKey=null;
-    try {
-      publicKey=PemUtils.decodePublicKey(publicKeyPem);
-    }
- catch (    Exception e) {
-      throw new RuntimeException(e);
+    for (    KeysMetadataRepresentation.KeyMetadataRepresentation rep : keyMetadata.getKeys()) {
+      if (rep.getKid().equals(activeKid)) {
+        publicKey=PemUtils.decodePublicKey(rep.getPublicKey());
+      }
     }
     publicKeys.put(realm,publicKey);
   }

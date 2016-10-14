@@ -49,7 +49,7 @@
     clientSession.setTimestamp(Time.currentTime());
     SerializedBrokeredIdentityContext ctx=SerializedBrokeredIdentityContext.serialize(context);
     ctx.saveToClientSession(clientSession,AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE);
-    URI redirect=LoginActionsService.firstBrokerLoginProcessor(uriInfo).queryParam(OAuth2Constants.CODE,context.getCode()).build(realmModel.getName());
+    URI redirect=LoginActionsService.firstBrokerLoginProcessor(uriInfo).queryParam(OAuth2Constants.CODE,clientCode.getCode()).build(realmModel.getName());
     return Response.status(302).location(redirect).build();
   }
  else {
@@ -59,6 +59,6 @@
     }
     updateFederatedIdentity(context,federatedUser);
     clientSession.setAuthenticatedUser(federatedUser);
-    return finishOrRedirectToPostBrokerLogin(clientSession,context,false);
+    return finishOrRedirectToPostBrokerLogin(clientSession,context,false,parsedCode.clientSessionCode);
   }
 }

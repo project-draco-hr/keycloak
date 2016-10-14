@@ -1,0 +1,17 @@
+{
+  ComponentRepresentation rep=createComponentRepresentation("mycomponent");
+  try {
+    createComponent(rep);
+  }
+ catch (  WebApplicationException e) {
+    assertErrror(e.getResponse(),"Required is required");
+  }
+  rep.getConfig().putSingle("required","Required");
+  rep.getConfig().putSingle("number","invalid");
+  try {
+    createComponent(rep);
+  }
+ catch (  WebApplicationException e) {
+    assertErrror(e.getResponse(),"Number should be a number");
+  }
+}

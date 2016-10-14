@@ -1,5 +1,11 @@
 {
+  List<KeyMetadata> publicKeys=session.keys().getKeys(realm,false);
+  JWK[] keys=new JWK[publicKeys.size()];
+  int i=0;
+  for (  KeyMetadata k : publicKeys) {
+    keys[i++]=JWKBuilder.create().kid(k.getKid()).rs256(k.getPublicKey());
+  }
   JSONWebKeySet keySet=new JSONWebKeySet();
-  keySet.setKeys(new JWK[]{JWKBuilder.create().rs256(realm.getPublicKey())});
+  keySet.setKeys(keys);
   return keySet;
 }

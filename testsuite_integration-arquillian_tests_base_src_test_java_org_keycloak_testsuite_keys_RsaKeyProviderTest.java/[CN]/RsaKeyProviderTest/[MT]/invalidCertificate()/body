@@ -1,0 +1,12 @@
+{
+  KeyPair keyPair=KeyUtils.generateRsaKeyPair(2048);
+  Certificate invalidCertificate=CertificateUtils.generateV1SelfSignedCertificate(KeyUtils.generateRsaKeyPair(2048),"test");
+  ComponentRepresentation rep=createRep("invalid",RsaKeyProviderFactory.ID);
+  rep.getConfig().putSingle(Attributes.PRIVATE_KEY_KEY,PemUtils.encodeKey(keyPair.getPrivate()));
+  rep.getConfig().putSingle(Attributes.CERTIFICATE_KEY,"nonsense");
+  Response response=adminClient.realm("test").components().add(rep);
+  assertErrror(response,"Failed to decode certificate");
+  rep.getConfig().putSingle(Attributes.CERTIFICATE_KEY,PemUtils.encodeCertificate(invalidCertificate));
+  response=adminClient.realm("test").components().add(rep);
+  assertErrror(response,"Certificate does not match private key");
+}

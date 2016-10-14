@@ -12,12 +12,11 @@
       result.clientSessionNotFound=true;
       return result;
     }
-    String hash=createHash(realm,result.clientSession);
-    if (!hash.equals(parts[0])) {
+    if (!verifyCode(code,session,realm,result.clientSession)) {
       result.illegalHash=true;
       return result;
     }
-    result.code=new ClientSessionCode(realm,result.clientSession);
+    result.code=new ClientSessionCode(session,realm,result.clientSession);
     return result;
   }
  catch (  RuntimeException e) {

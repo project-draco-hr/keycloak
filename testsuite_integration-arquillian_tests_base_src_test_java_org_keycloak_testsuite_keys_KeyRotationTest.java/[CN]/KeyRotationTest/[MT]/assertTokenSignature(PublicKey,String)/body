@@ -1,0 +1,11 @@
+{
+  String kid=null;
+  try {
+    RSATokenVerifier verifier=RSATokenVerifier.create(token).checkTokenType(false).checkRealmUrl(false).checkActive(false).publicKey(expectedKey);
+    kid=verifier.getHeader().getKeyId();
+    verifier.verify();
+  }
+ catch (  VerificationException e) {
+    fail("Token not signed by expected keys, kid was " + kid);
+  }
+}

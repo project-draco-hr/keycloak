@@ -1,0 +1,19 @@
+{
+  try {
+    String note=clientSession.getNote(ClientSessionModel.ACTION_SIGNATURE);
+    if (note == null) {
+      logger.debug("Action signature not found in client session");
+      return false;
+    }
+    clientSession.removeNote(ClientSessionModel.ACTION_SIGNATURE);
+    String[] signed=note.split("\\.");
+    PublicKey publicKey=session.keys().getPublicKey(realm,signed[1]);
+    Signature verifier=RSAProvider.getSignature(Algorithm.RS256);
+    verifier.initVerify(publicKey);
+    verifier.update(code.getBytes("utf-8"));
+    return verifier.verify(Base64Url.decode(signed[0]));
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

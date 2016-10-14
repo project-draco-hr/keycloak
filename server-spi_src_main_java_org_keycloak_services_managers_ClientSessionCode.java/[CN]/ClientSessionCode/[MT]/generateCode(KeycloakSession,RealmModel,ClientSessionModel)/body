@@ -1,0 +1,23 @@
+{
+  try {
+    KeyManager.ActiveKey keys=session.keys().getActiveKey(realm);
+    String secret=KeycloakModelUtils.generateSecret();
+    StringBuilder sb=new StringBuilder();
+    sb.append(secret);
+    sb.append('.');
+    sb.append(clientSession.getId());
+    String code=sb.toString();
+    Signature signature=RSAProvider.getSignature(Algorithm.RS256);
+    signature.initSign(keys.getPrivateKey());
+    signature.update(code.getBytes("utf-8"));
+    sb=new StringBuilder();
+    sb.append(Base64Url.encode(signature.sign()));
+    sb.append('.');
+    sb.append(keys.getKid());
+    clientSession.setNote(ClientSessionModel.ACTION_SIGNATURE,sb.toString());
+    return code;
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

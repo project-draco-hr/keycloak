@@ -1,0 +1,28 @@
+{
+  ComponentRepresentation rep=new ComponentRepresentation();
+  rep.setId(component.getId());
+  rep.setName(component.getName());
+  rep.setProviderId(component.getProviderId());
+  rep.setProviderType(component.getProviderType());
+  rep.setParentId(component.getParentId());
+  if (internal) {
+    rep.setConfig(component.getConfig());
+  }
+ else {
+    Map<String,ProviderConfigProperty> configProperties=ComponentUtil.getComponentConfigProperties(session,component);
+    MultivaluedHashMap<String,String> config=new MultivaluedHashMap<>();
+    for (    Map.Entry<String,List<String>> e : component.getConfig().entrySet()) {
+      ProviderConfigProperty configProperty=configProperties.get(e.getKey());
+      if (configProperty != null) {
+        if (configProperty.isSecret()) {
+          config.putSingle(e.getKey(),ComponentRepresentation.SECRET_VALUE);
+        }
+ else {
+          config.put(e.getKey(),e.getValue());
+        }
+      }
+    }
+    rep.setConfig(config);
+  }
+  return rep;
+}

@@ -1,0 +1,20 @@
+{
+  ComponentRepresentation rep=createComponentRepresentation("mycomponent");
+  rep.getConfig().addFirst("secret","some secret value!!");
+  rep.getConfig().addFirst("required","some required value");
+  String id=createComponent(rep);
+  ComponentRepresentation returned=components.component(id).toRepresentation();
+  assertEquals(ComponentRepresentation.SECRET_VALUE,returned.getConfig().getFirst("secret"));
+  Map<String,TestProvider.DetailsRepresentation> details=testingClient.testing(REALM_NAME).getTestComponentDetails();
+  assertEquals("some secret value!!",details.get("mycomponent").getConfig().get("secret").get(0));
+  returned.getConfig().putSingle("priority","200");
+  components.component(id).update(returned);
+  ComponentRepresentation returned2=components.component(id).toRepresentation();
+  assertEquals(ComponentRepresentation.SECRET_VALUE,returned2.getConfig().getFirst("secret"));
+  details=testingClient.testing(REALM_NAME).getTestComponentDetails();
+  assertEquals("some secret value!!",details.get("mycomponent").getConfig().get("secret").get(0));
+  returned2.getConfig().putSingle("secret","updated secret value!!");
+  components.component(id).update(returned2);
+  details=testingClient.testing(REALM_NAME).getTestComponentDetails();
+  assertEquals("updated secret value!!",details.get("mycomponent").getConfig().get("secret").get(0));
+}

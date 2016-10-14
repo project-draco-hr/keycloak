@@ -1,0 +1,19 @@
+{
+  if (kid == null) {
+    logger.warnv("KID is null, can't find public key",realm.getName(),kid);
+    return null;
+  }
+  for (  KeyProvider p : getProviders(realm)) {
+    Certificate certificate=p.getCertificate(kid);
+    if (certificate != null) {
+      if (logger.isTraceEnabled()) {
+        logger.tracev("Found certificate realm={0} kid={1}",realm.getName(),kid);
+      }
+      return certificate;
+    }
+  }
+  if (logger.isTraceEnabled()) {
+    logger.tracev("Failed to find certificate realm={0} kid={1}",realm.getName(),kid);
+  }
+  return null;
+}

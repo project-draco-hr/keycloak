@@ -1,0 +1,33 @@
+{
+  if (token == null) {
+    return TokenVerification.error(new RuntimeException("Missing token"));
+  }
+  JWSInput input;
+  try {
+    input=new JWSInput(token);
+  }
+ catch (  JWSInputException e) {
+    return TokenVerification.error(new RuntimeException("Invalid token",e));
+  }
+  PublicKey publicKey=session.keys().getPublicKey(realm,input.getHeader().getKeyId());
+  if (!RSAProvider.verify(input,publicKey)) {
+    return TokenVerification.error(new RuntimeException("Failed verify token"));
+  }
+  JsonWebToken jwt;
+  try {
+    jwt=input.readJsonContent(JsonWebToken.class);
+  }
+ catch (  JWSInputException e) {
+    return TokenVerification.error(new RuntimeException("Token is not JWT",e));
+  }
+  if (!getIssuer(realm,uri).equals(jwt.getIssuer())) {
+    return TokenVerification.error(new RuntimeException("Issuer from token don't match with the realm issuer."));
+  }
+  if (!jwt.isActive()) {
+    return TokenVerification.error(new RuntimeException("Token not active."));
+  }
+  if (!(TokenUtil.TOKEN_TYPE_BEARER.equals(jwt.getType()) || TYPE_INITIAL_ACCESS_TOKEN.equals(jwt.getType()) || TYPE_REGISTRATION_ACCESS_TOKEN.equals(jwt.getType()))) {
+    return TokenVerification.error(new RuntimeException("Invalid type of token"));
+  }
+  return TokenVerification.success(jwt);
+}

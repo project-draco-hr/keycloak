@@ -1,0 +1,28 @@
+{
+  DBCollection realms=db.getCollection("realms");
+  DBCursor cursor=realms.find();
+  while (cursor.hasNext()) {
+    BasicDBObject realm=(BasicDBObject)cursor.next();
+    String realmId=realm.getString("_id");
+    String privateKeyPem=realm.getString("privateKeyPem");
+    String certificatePem=realm.getString("certificatePem");
+    BasicDBList entities=(BasicDBList)realm.get("componentEntities");
+    BasicDBObject component=new BasicDBObject();
+    component.put("id",KeycloakModelUtils.generateId());
+    component.put("name","rsa");
+    component.put("providerType",KeyProvider.class.getName());
+    component.put("providerId","rsa");
+    component.put("parentId",realmId);
+    BasicDBObject config=new BasicDBObject();
+    config.put("priority",Collections.singletonList("100"));
+    config.put("privateKey",Collections.singletonList(privateKeyPem));
+    config.put("certificate",Collections.singletonList(certificatePem));
+    component.put("config",config);
+    entities.add(component);
+    realm.remove("privateKeyPem");
+    realm.remove("certificatePem");
+    realm.remove("publicKeyPem");
+    realm.remove("codeSecret");
+    realms.update(new BasicDBObject().append("_id",realmId),realm);
+  }
+}

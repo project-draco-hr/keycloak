@@ -1,0 +1,12 @@
+{
+  for (  KeyProvider p : getProviders(realm)) {
+    if (p.getKid() != null && p.getPrivateKey() != null) {
+      if (logger.isTraceEnabled()) {
+        logger.tracev("Active key realm={0} kid={1}",realm.getName(),p.getKid());
+      }
+      String kid=p.getKid();
+      return new ActiveKey(kid,p.getPrivateKey(),p.getPublicKey(kid),p.getCertificate(kid));
+    }
+  }
+  throw new RuntimeException("Failed to get keys");
+}

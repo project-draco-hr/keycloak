@@ -1,0 +1,14 @@
+{
+  if (key == null) {
+    return null;
+  }
+  try {
+    RSAPrivateCrtKey rsaPrivateCrtKey=(RSAPrivateCrtKey)key;
+    RSAPublicKeySpec publicKeySpec=new RSAPublicKeySpec(rsaPrivateCrtKey.getModulus(),rsaPrivateCrtKey.getPublicExponent());
+    KeyFactory keyFactory=KeyFactory.getInstance("RSA");
+    return keyFactory.generatePublic(publicKeySpec);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException(e);
+  }
+}

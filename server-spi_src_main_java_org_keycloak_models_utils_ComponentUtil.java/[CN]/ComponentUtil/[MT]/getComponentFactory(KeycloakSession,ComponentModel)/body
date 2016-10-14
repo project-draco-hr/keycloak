@@ -1,0 +1,15 @@
+{
+  Class<? extends Provider> provider;
+  try {
+    provider=(Class<? extends Provider>)Class.forName(component.getProviderType());
+  }
+ catch (  ClassNotFoundException e) {
+    throw new RuntimeException("Invalid provider type '" + component.getProviderType() + "'");
+  }
+  ProviderFactory<? extends Provider> f=session.getKeycloakSessionFactory().getProviderFactory(provider,component.getProviderId());
+  if (f == null) {
+    throw new RuntimeException("No such provider '" + component.getProviderId() + "'");
+  }
+  ComponentFactory cf=(ComponentFactory)f;
+  return cf;
+}

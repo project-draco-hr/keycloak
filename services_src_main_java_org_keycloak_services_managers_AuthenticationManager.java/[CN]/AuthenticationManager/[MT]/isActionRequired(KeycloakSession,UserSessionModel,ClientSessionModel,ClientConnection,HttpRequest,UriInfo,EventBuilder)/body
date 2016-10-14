@@ -6,7 +6,7 @@
   if (!user.getRequiredActions().isEmpty() || !clientSession.getRequiredActions().isEmpty())   return true;
   if (client.isConsentRequired()) {
     UserConsentModel grantedConsent=session.users().getConsentByClient(realm,user,client.getId());
-    ClientSessionCode accessCode=new ClientSessionCode(realm,clientSession);
+    ClientSessionCode accessCode=new ClientSessionCode(session,realm,clientSession);
     for (    RoleModel r : accessCode.getRequestedRoles()) {
       if (grantedConsent != null && grantedConsent.isRoleGranted(r)) {
         continue;

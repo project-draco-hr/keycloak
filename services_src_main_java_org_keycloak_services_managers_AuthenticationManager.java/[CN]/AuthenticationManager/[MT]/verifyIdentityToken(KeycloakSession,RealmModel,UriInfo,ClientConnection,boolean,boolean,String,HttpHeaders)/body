@@ -1,13 +1,18 @@
 {
   try {
-    AccessToken token=RSATokenVerifier.verifyToken(tokenString,realm.getPublicKey(),Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName()),checkActive,checkTokenType);
+    RSATokenVerifier verifier=RSATokenVerifier.create(tokenString).realmUrl(Urls.realmIssuer(uriInfo.getBaseUri(),realm.getName())).checkActive(checkActive).checkTokenType(checkTokenType);
+    String kid=verifier.getHeader().getKeyId();
+    PublicKey publicKey=session.keys().getPublicKey(realm,kid);
+    if (publicKey == null) {
+      logger.debugf("Identity cookie signed with unknown kid '%s'",kid);
+      return null;
+    }
+    verifier.publicKey(publicKey);
+    AccessToken token=verifier.verify().getToken();
     if (checkActive) {
       if (!token.isActive() || token.getIssuedAt() < realm.getNotBefore()) {
-        logger.debug("identity cookie expired");
+        logger.debug("Identity cookie expired");
         return null;
-      }
- else {
-        logger.debugv("token active - active: {0}, issued-at: {1}, not-before: {2}",token.isActive(),token.getIssuedAt(),realm.getNotBefore());
       }
     }
     UserModel user=session.users().getUserById(token.getSubject(),realm);
@@ -24,7 +29,7 @@
     return new AuthResult(user,userSession,token);
   }
  catch (  VerificationException e) {
-    logger.debug("Failed to verify identity token",e);
+    logger.debugf("Failed to verify identity token: %s",e.getMessage());
   }
   return null;
 }

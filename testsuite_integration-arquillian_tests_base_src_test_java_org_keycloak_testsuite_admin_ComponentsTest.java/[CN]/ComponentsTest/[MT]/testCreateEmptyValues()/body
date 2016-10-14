@@ -1,0 +1,11 @@
+{
+  ComponentRepresentation rep=createComponentRepresentation("mycomponent");
+  rep.getConfig().addFirst("required","foo");
+  rep.getConfig().addFirst("val1","");
+  rep.getConfig().put("val2",null);
+  rep.getConfig().put("val3",Collections.emptyList());
+  String id=createComponent(rep);
+  ComponentRepresentation returned=components.component(id).toRepresentation();
+  assertEquals(1,returned.getConfig().size());
+  assertTrue(returned.getConfig().containsKey("required"));
+}

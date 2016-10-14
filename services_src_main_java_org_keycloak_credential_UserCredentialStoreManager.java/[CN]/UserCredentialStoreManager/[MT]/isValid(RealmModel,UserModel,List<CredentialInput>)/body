@@ -19,25 +19,19 @@
     UserFederationProvider link=session.users().getFederationLink(realm,user);
     if (link != null) {
       session.users().validateUser(realm,user);
-      Iterator<CredentialInput> it=toValidate.iterator();
-      while (it.hasNext()) {
-        CredentialInput input=it.next();
-        if (link.supportsCredentialType(input.getType()) && link.isValid(realm,user,input)) {
-          it.remove();
-        }
+      validate(realm,user,toValidate,link);
+    }
+ else     if (user.getFederationLink() != null) {
+      UserStorageProvider provider=UserStorageManager.getStorageProvider(session,realm,user.getFederationLink());
+      if (provider != null && provider instanceof CredentialInputValidator) {
+        validate(realm,user,toValidate,((CredentialInputValidator)provider));
       }
     }
   }
   if (toValidate.isEmpty())   return true;
   List<CredentialInputValidator> credentialProviders=getCredentialProviders(realm,CredentialInputValidator.class);
   for (  CredentialInputValidator validator : credentialProviders) {
-    Iterator<CredentialInput> it=toValidate.iterator();
-    while (it.hasNext()) {
-      CredentialInput input=it.next();
-      if (validator.supportsCredentialType(input.getType()) && validator.isValid(realm,user,input)) {
-        it.remove();
-      }
-    }
+    validate(realm,user,toValidate,validator);
   }
   return toValidate.isEmpty();
 }

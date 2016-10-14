@@ -14,6 +14,12 @@
     if (link != null && link.getSupportedCredentialTypes().contains(credentialType)) {
       link.disableCredentialType(realm,user,credentialType);
     }
+ else     if (user.getFederationLink() != null) {
+      UserStorageProvider provider=UserStorageManager.getStorageProvider(session,realm,user.getFederationLink());
+      if (provider != null && provider instanceof CredentialInputUpdater) {
+        ((CredentialInputUpdater)provider).disableCredentialType(realm,user,credentialType);
+      }
+    }
   }
   List<CredentialInputUpdater> credentialProviders=getCredentialProviders(realm,CredentialInputUpdater.class);
   for (  CredentialInputUpdater updater : credentialProviders) {

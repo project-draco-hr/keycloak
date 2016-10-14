@@ -1,0 +1,11 @@
+{
+  List<String> trustedHostsConfig=componentModel.getConfig().getList(TrustedHostClientRegistrationPolicyFactory.TRUSTED_HOSTS);
+  List<String> domains=new LinkedList<>();
+  for (  String hostname : trustedHostsConfig) {
+    if (hostname.startsWith("*.")) {
+      hostname=hostname.substring(2);
+      domains.add(hostname);
+    }
+  }
+  return domains;
+}

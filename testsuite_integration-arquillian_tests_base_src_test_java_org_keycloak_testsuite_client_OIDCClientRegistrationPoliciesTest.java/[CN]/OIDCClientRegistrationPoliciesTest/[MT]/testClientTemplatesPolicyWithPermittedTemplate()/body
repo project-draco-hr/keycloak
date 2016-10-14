@@ -1,0 +1,14 @@
+{
+  setTrustedHost("localhost",getPolicyAnon());
+  ClientTemplateRepresentation clientTemplate=new ClientTemplateRepresentation();
+  clientTemplate.setName("foo");
+  realmResource().clientTemplates().create(clientTemplate);
+  ClientRepresentation clientRep=createRep("test-app");
+  clientRep.setClientTemplate("foo");
+  assertFail(ClientRegOp.CREATE,clientRep,403,"Not permitted to use specified clientTemplate");
+  ComponentRepresentation clientTemplatesPolicyRep=findPolicyByProviderAndAuth(ClientTemplatesClientRegistrationPolicyFactory.PROVIDER_ID,getPolicyAnon());
+  clientTemplatesPolicyRep.getConfig().putSingle(ClientTemplatesClientRegistrationPolicyFactory.ALLOWED_CLIENT_TEMPLATES,"foo");
+  realmResource().components().component(clientTemplatesPolicyRep.getId()).update(clientTemplatesPolicyRep);
+  ClientRepresentation registeredClient=reg.create(clientRep);
+  Assert.assertNotNull(registeredClient.getRegistrationAccessToken());
+}

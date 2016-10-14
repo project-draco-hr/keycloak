@@ -1,7 +1,7 @@
 {
   try {
     ClientRepresentation client=DescriptionConverter.toInternal(session,clientOIDC);
-    OIDCClientRegistrationContext oidcContext=new OIDCClientRegistrationContext(client,clientOIDC);
+    OIDCClientRegistrationContext oidcContext=new OIDCClientRegistrationContext(session,client,this,clientOIDC);
     client=update(clientId,oidcContext);
     ClientModel clientModel=session.getContext().getRealm().getClientByClientId(client.getClientId());
     updatePairwiseSubMappers(clientModel,SubjectType.parse(clientOIDC.getSubjectType()),clientOIDC.getSectorIdentifierUri());

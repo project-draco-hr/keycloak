@@ -1,0 +1,13 @@
+{
+  if (context.getClient().isConsentRequired() == null) {
+    return;
+  }
+  if (clientModel == null) {
+    return;
+  }
+  boolean isEnabled=clientModel.isConsentRequired();
+  boolean newEnabled=context.getClient().isConsentRequired();
+  if (isEnabled && !newEnabled) {
+    throw new ClientRegistrationPolicyException("Not permitted to update consentRequired to false");
+  }
+}

@@ -1,0 +1,28 @@
+{
+  boolean redirectUriMustMatch=isClientUrisMustMatch();
+  if (!redirectUriMustMatch) {
+    return;
+  }
+  List<String> trustedHosts=getTrustedHosts();
+  List<String> trustedDomains=getTrustedDomains();
+  ClientRepresentation client=context.getClient();
+  String rootUrl=client.getRootUrl();
+  String baseUrl=client.getBaseUrl();
+  String adminUrl=client.getAdminUrl();
+  List<String> redirectUris=client.getRedirectUris();
+  baseUrl=relativeToAbsoluteURI(rootUrl,baseUrl);
+  adminUrl=relativeToAbsoluteURI(rootUrl,adminUrl);
+  Set<String> resolvedRedirects=PairwiseSubMapperUtils.resolveValidRedirectUris(rootUrl,redirectUris);
+  if (rootUrl != null) {
+    checkURLTrusted(rootUrl,trustedHosts,trustedDomains);
+  }
+  if (baseUrl != null) {
+    checkURLTrusted(baseUrl,trustedHosts,trustedDomains);
+  }
+  if (adminUrl != null) {
+    checkURLTrusted(adminUrl,trustedHosts,trustedDomains);
+  }
+  for (  String redirect : resolvedRedirects) {
+    checkURLTrusted(redirect,trustedHosts,trustedDomains);
+  }
+}

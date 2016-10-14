@@ -1,11 +1,14 @@
 {
-  auth.requireManage();
+  auth.requireView();
   List<ComponentModel> components=Collections.EMPTY_LIST;
-  if (parent == null) {
+  if (parent == null && type == null) {
     components=realm.getComponents();
   }
  else   if (type == null) {
     components=realm.getComponents(parent);
+  }
+ else   if (parent == null) {
+    components=realm.getComponents(realm.getId(),type);
   }
  else {
     components=realm.getComponents(parent,type);

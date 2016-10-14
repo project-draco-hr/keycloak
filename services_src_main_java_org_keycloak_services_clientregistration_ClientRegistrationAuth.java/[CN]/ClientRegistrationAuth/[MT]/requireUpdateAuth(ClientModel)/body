@@ -1,0 +1,20 @@
+{
+  init();
+  if (isBearerToken()) {
+    if (hasRole(AdminRoles.MANAGE_CLIENTS)) {
+      if (client == null) {
+        throw notFound();
+      }
+      return RegistrationAuth.AUTHENTICATED;
+    }
+ else {
+      throw forbidden();
+    }
+  }
+ else   if (isRegistrationAccessToken()) {
+    if (client != null && client.getRegistrationToken() != null && client.getRegistrationToken().equals(jwt.getId())) {
+      return getRegistrationAuth();
+    }
+  }
+  throw unauthorized("Not authorized to update client. Maybe missing token or bad token type.");
+}

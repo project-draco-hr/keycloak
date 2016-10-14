@@ -1,0 +1,11 @@
+{
+  OIDCClientRepresentation client=createRepOidc("http://root","http://redirect");
+  assertOidcFail(ClientRegOp.CREATE,client,403,"Host not trusted");
+  setTrustedHost("localhost",getPolicyAnon());
+  assertOidcFail(ClientRegOp.CREATE,client,403,"URL doesn't match");
+  client.setRedirectUris(Collections.singletonList("http://localhost:8080/foo"));
+  assertOidcFail(ClientRegOp.CREATE,client,403,"URL doesn't match");
+  client.setClientUri("http://localhost:8080/foo");
+  OIDCClientRepresentation oidcClientRep=reg.oidc().create(client);
+  assertRegAccessToken(oidcClientRep.getRegistrationAccessToken(),RegistrationAuth.ANONYMOUS);
+}

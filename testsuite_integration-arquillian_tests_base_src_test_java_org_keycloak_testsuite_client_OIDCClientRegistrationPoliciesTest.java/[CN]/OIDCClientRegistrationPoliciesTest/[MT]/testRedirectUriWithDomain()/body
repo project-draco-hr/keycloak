@@ -1,0 +1,12 @@
+{
+  ComponentRepresentation trustedHostPolicyRep=findPolicyByProviderAndAuth(TrustedHostClientRegistrationPolicyFactory.PROVIDER_ID,getPolicyAnon());
+  trustedHostPolicyRep.getConfig().putSingle(TrustedHostClientRegistrationPolicyFactory.HOST_SENDING_REGISTRATION_REQUEST_MUST_MATCH,"false");
+  trustedHostPolicyRep.getConfig().put(TrustedHostClientRegistrationPolicyFactory.TRUSTED_HOSTS,Arrays.asList("www.host.com","*.example.com"));
+  realmResource().components().component(trustedHostPolicyRep.getId()).update(trustedHostPolicyRep);
+  OIDCClientRepresentation oidcClientRep=createRepOidc("http://www.host.com","http://www.example.com");
+  reg.oidc().create(oidcClientRep);
+  trustedHostPolicyRep.getConfig().put(TrustedHostClientRegistrationPolicyFactory.TRUSTED_HOSTS,Arrays.asList("www.host.com","www1.example.com"));
+  realmResource().components().component(trustedHostPolicyRep.getId()).update(trustedHostPolicyRep);
+  oidcClientRep=createRepOidc("http://www.host.com","http://www.example.com");
+  assertOidcFail(ClientRegOp.CREATE,oidcClientRep,403,"URL doesn't match");
+}

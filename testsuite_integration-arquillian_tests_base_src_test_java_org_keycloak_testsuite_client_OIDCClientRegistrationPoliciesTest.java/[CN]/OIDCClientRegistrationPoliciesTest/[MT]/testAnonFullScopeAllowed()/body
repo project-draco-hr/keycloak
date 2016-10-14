@@ -1,0 +1,11 @@
+{
+  setTrustedHost("localhost",getPolicyAnon());
+  OIDCClientRepresentation client=create();
+  String clientId=client.getClientId();
+  ClientRepresentation clientRep=ApiUtil.findClientByClientId(realmResource(),clientId).toRepresentation();
+  Assert.assertFalse(clientRep.isFullScopeAllowed());
+  clientRep.setFullScopeAllowed(true);
+  assertFail(ClientRegOp.UPDATE,clientRep,403,"Not permitted to enable fullScopeAllowed");
+  clientRep.setFullScopeAllowed(false);
+  reg.update(clientRep);
+}

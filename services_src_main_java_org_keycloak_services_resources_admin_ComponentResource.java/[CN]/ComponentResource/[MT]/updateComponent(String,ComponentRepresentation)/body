@@ -1,10 +1,16 @@
 {
   auth.requireManage();
-  ComponentModel model=realm.getComponent(id);
-  if (model == null) {
-    throw new NotFoundException("Could not find component");
+  try {
+    ComponentModel model=realm.getComponent(id);
+    if (model == null) {
+      throw new NotFoundException("Could not find component");
+    }
+    RepresentationToModel.updateComponent(session,rep,model,false);
+    adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
+    realm.updateComponent(model);
+    return Response.noContent().build();
   }
-  RepresentationToModel.updateComponent(session,rep,model,false);
-  adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
-  realm.updateComponent(model);
+ catch (  ComponentValidationException e) {
+    return ErrorResponse.error(e.getMessage(),Response.Status.BAD_REQUEST);
+  }
 }

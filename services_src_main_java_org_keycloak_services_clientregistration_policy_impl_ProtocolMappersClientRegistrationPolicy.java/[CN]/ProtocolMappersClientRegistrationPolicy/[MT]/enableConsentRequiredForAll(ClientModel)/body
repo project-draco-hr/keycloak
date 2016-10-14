@@ -1,0 +1,13 @@
+{
+  if (isConsentRequiredForMappers()) {
+    logger.infof("Enable consentRequired for all protocol mappers of client %s",clientModel.getClientId());
+    Set<ProtocolMapperModel> mappers=clientModel.getProtocolMappers();
+    for (    ProtocolMapperModel mapper : mappers) {
+      mapper.setConsentRequired(true);
+      if (mapper.getConsentText() == null) {
+        mapper.setConsentText(mapper.getName());
+      }
+      clientModel.updateProtocolMapper(mapper);
+    }
+  }
+}

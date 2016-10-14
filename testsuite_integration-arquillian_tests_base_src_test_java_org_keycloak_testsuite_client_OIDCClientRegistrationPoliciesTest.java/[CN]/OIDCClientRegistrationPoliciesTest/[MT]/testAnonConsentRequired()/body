@@ -1,0 +1,11 @@
+{
+  setTrustedHost("localhost",getPolicyAnon());
+  OIDCClientRepresentation client=create();
+  String clientId=client.getClientId();
+  ClientRepresentation clientRep=ApiUtil.findClientByClientId(realmResource(),clientId).toRepresentation();
+  Assert.assertTrue(clientRep.isConsentRequired());
+  clientRep.setConsentRequired(false);
+  assertFail(ClientRegOp.UPDATE,clientRep,403,"Not permitted to update consentRequired to false");
+  clientRep.setConsentRequired(true);
+  reg.update(clientRep);
+}

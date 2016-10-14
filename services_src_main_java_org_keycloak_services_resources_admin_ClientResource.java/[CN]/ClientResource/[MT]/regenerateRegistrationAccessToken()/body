@@ -3,7 +3,7 @@
   if (client == null) {
     throw new NotFoundException("Could not find client");
   }
-  String token=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,realm,uriInfo,client);
+  String token=ClientRegistrationTokenUtils.updateRegistrationAccessToken(session,realm,uriInfo,client,RegistrationAuth.AUTHENTICATED);
   ClientRepresentation rep=ModelToRepresentation.toRepresentation(client);
   rep.setRegistrationAccessToken(token);
   adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).representation(rep).success();

@@ -1,0 +1,12 @@
+{
+  Database database=liquibase.getDatabase();
+  Executor oldTemplate=ExecutorService.getInstance().getExecutor(database);
+  LoggingExecutor executor=new LoggingExecutor(ExecutorService.getInstance().getExecutor(database),exportWriter,database);
+  ExecutorService.getInstance().setExecutor(database,executor);
+  executor.comment("*********************************************************************");
+  executor.comment("* Keycloak database creation script - apply this script to empty DB *");
+  executor.comment("*********************************************************************" + StreamUtil.getLineSeparator());
+  executor.execute(new CreateDatabaseChangeLogTableStatement());
+  executor.comment("*********************************************************************" + StreamUtil.getLineSeparator());
+  ExecutorService.getInstance().setExecutor(database,oldTemplate);
+}

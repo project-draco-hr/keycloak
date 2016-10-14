@@ -14,6 +14,12 @@
     if (link != null) {
       if (link.updateCredential(realm,user,input))       return;
     }
+ else     if (user.getFederationLink() != null) {
+      UserStorageProvider provider=UserStorageManager.getStorageProvider(session,realm,user.getFederationLink());
+      if (provider != null && provider instanceof CredentialInputUpdater) {
+        if (((CredentialInputUpdater)provider).updateCredential(realm,user,input))         return;
+      }
+    }
   }
   List<CredentialInputUpdater> credentialProviders=getCredentialProviders(realm,CredentialInputUpdater.class);
   for (  CredentialInputUpdater updater : credentialProviders) {

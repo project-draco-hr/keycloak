@@ -1,0 +1,28 @@
+{
+  auth.requireManage();
+  ComponentModel model=realm.getComponent(id);
+  if (model == null) {
+    throw new NotFoundException("Could not find component");
+  }
+  if (!model.getProviderType().equals(UserStorageProvider.class.getName())) {
+    throw new NotFoundException("found, but not a UserStorageProvider");
+  }
+  UserStorageProviderModel providerModel=new UserStorageProviderModel(model);
+  logger.debug("Syncing users");
+  UserStorageSyncManager syncManager=new UserStorageSyncManager();
+  SynchronizationResult syncResult;
+  if ("triggerFullSync".equals(action)) {
+    syncResult=syncManager.syncAllUsers(session.getKeycloakSessionFactory(),realm.getId(),providerModel);
+  }
+ else   if ("triggerChangedUsersSync".equals(action)) {
+    syncResult=syncManager.syncChangedUsers(session.getKeycloakSessionFactory(),realm.getId(),providerModel);
+  }
+ else {
+    throw new NotFoundException("Unknown action: " + action);
+  }
+  Map<String,Object> eventRep=new HashMap<>();
+  eventRep.put("action",action);
+  eventRep.put("result",syncResult);
+  adminEvent.operation(OperationType.ACTION).resourcePath(uriInfo).representation(eventRep).success();
+  return syncResult;
+}

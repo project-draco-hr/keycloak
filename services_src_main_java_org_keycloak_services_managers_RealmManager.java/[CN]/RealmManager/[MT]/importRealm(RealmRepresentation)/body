@@ -51,6 +51,11 @@
   for (  final UserFederationProviderModel fedProvider : federationProviders) {
     usersSyncManager.notifyToRefreshPeriodicSync(session,realm,fedProvider,false);
   }
+  List<UserStorageProviderModel> storageProviders=realm.getUserStorageProviders();
+  UserStorageSyncManager storageSync=new UserStorageSyncManager();
+  for (  UserStorageProviderModel provider : storageProviders) {
+    storageSync.notifyToRefreshPeriodicSync(session,realm,provider,false);
+  }
   setupAuthorizationServices(realm);
   fireRealmPostCreate(realm);
   return realm;

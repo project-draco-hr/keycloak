@@ -1,0 +1,11 @@
+{
+  try {
+    String tokenResponse=oauth.introspectAccessTokenWithClientCredential("confidential-cli","secret1",token);
+    ObjectMapper objectMapper=new ObjectMapper();
+    JsonNode jsonNode=objectMapper.readTree(tokenResponse);
+    assertEquals(expectActive,jsonNode.get("active").asBoolean());
+  }
+ catch (  IOException e) {
+    throw new RuntimeException(e);
+  }
+}

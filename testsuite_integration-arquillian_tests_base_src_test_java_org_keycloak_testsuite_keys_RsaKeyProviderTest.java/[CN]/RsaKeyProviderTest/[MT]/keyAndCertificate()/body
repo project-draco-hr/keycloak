@@ -1,11 +1,12 @@
 {
+  long priority=System.currentTimeMillis();
   KeyPair keyPair=KeyUtils.generateRsaKeyPair(2048);
   Certificate certificate=CertificateUtils.generateV1SelfSignedCertificate(keyPair,"test");
   String certificatePem=PemUtils.encodeCertificate(certificate);
   ComponentRepresentation rep=createRep("valid",RsaKeyProviderFactory.ID);
   rep.getConfig().putSingle(Attributes.PRIVATE_KEY_KEY,PemUtils.encodeKey(keyPair.getPrivate()));
   rep.getConfig().putSingle(Attributes.CERTIFICATE_KEY,certificatePem);
-  rep.getConfig().putSingle(Attributes.PRIORITY_KEY,"1000");
+  rep.getConfig().putSingle(Attributes.PRIORITY_KEY,Long.toString(priority));
   Response response=adminClient.realm("test").components().add(rep);
   String id=ApiUtil.getCreatedId(response);
   ComponentRepresentation createdRep=adminClient.realm("test").components().component(id).toRepresentation();

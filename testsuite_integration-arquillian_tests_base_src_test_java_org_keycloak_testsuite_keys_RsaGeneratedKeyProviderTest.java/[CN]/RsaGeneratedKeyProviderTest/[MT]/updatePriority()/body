@@ -1,0 +1,17 @@
+{
+  long priority=System.currentTimeMillis();
+  ComponentRepresentation rep=createRep("valid",GeneratedRsaKeyProviderFactory.ID);
+  rep.setConfig(new MultivaluedHashMap<>());
+  rep.getConfig().putSingle("priority",Long.toString(priority));
+  Response response=adminClient.realm("test").components().add(rep);
+  String id=ApiUtil.getCreatedId(response);
+  KeysMetadataRepresentation keys=adminClient.realm("test").keys().getKeyMetadata();
+  String publicKey=keys.getKeys().get(0).getPublicKey();
+  ComponentRepresentation createdRep=adminClient.realm("test").components().component(id).toRepresentation();
+  priority+=1000;
+  createdRep.getConfig().putSingle("priority",Long.toString(priority));
+  adminClient.realm("test").components().component(id).update(createdRep);
+  keys=adminClient.realm("test").keys().getKeyMetadata();
+  String publicKey2=keys.getKeys().get(0).getPublicKey();
+  assertEquals(publicKey,publicKey2);
+}

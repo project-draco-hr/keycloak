@@ -7,23 +7,23 @@
       RealmManager manager=new RealmManager(session);
       manager.setContextPath(getContextPath());
       if (rep.getId() != null && manager.getRealm(rep.getId()) != null) {
-        logger.realmExists(rep.getRealm(),from);
+        ServicesLogger.LOGGER.realmExists(rep.getRealm(),from);
         exists=true;
       }
       if (manager.getRealmByName(rep.getRealm()) != null) {
-        logger.realmExists(rep.getRealm(),from);
+        ServicesLogger.LOGGER.realmExists(rep.getRealm(),from);
         exists=true;
       }
       if (!exists) {
         RealmModel realm=manager.importRealm(rep);
-        logger.importedRealm(realm.getName(),from);
+        ServicesLogger.LOGGER.importedRealm(realm.getName(),from);
       }
       session.getTransactionManager().commit();
     }
  catch (    Throwable t) {
       session.getTransactionManager().rollback();
       if (!exists) {
-        logger.unableToImportRealm(t,rep.getRealm(),from);
+        ServicesLogger.LOGGER.unableToImportRealm(t,rep.getRealm(),from);
       }
     }
   }

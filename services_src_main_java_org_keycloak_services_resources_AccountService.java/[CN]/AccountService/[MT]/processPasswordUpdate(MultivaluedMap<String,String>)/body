@@ -43,13 +43,13 @@
     return account.setError(Messages.READ_ONLY_PASSWORD).createResponse(AccountPages.PASSWORD);
   }
 catch (  ModelException me) {
-    logger.failedToUpdatePassword(me);
+    ServicesLogger.LOGGER.failedToUpdatePassword(me);
     setReferrerOnPage();
     errorEvent.detail(Details.REASON,me.getMessage()).error(Errors.PASSWORD_REJECTED);
     return account.setError(me.getMessage(),me.getParameters()).createResponse(AccountPages.PASSWORD);
   }
 catch (  Exception ape) {
-    logger.failedToUpdatePassword(ape);
+    ServicesLogger.LOGGER.failedToUpdatePassword(ape);
     setReferrerOnPage();
     errorEvent.detail(Details.REASON,ape.getMessage()).error(Errors.PASSWORD_REJECTED);
     return account.setError(ape.getMessage()).createResponse(AccountPages.PASSWORD);

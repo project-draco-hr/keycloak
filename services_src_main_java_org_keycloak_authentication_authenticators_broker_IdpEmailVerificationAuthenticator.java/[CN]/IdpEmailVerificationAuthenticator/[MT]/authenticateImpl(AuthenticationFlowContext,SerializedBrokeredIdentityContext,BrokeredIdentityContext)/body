@@ -3,7 +3,7 @@
   RealmModel realm=context.getRealm();
   ClientSessionModel clientSession=context.getClientSession();
   if (realm.getSmtpConfig().size() == 0) {
-    logger.smtpNotConfigured();
+    ServicesLogger.LOGGER.smtpNotConfigured();
     context.attempted();
     return;
   }
@@ -19,7 +19,7 @@
   }
  catch (  EmailException e) {
     event.error(Errors.EMAIL_SEND_FAILED);
-    logger.confirmBrokerEmailFailed(e);
+    ServicesLogger.LOGGER.confirmBrokerEmailFailed(e);
     Response challenge=context.form().setError(Messages.EMAIL_SENT_ERROR).createErrorPage();
     context.failure(AuthenticationFlowError.INTERNAL_ERROR,challenge);
     return;

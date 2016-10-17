@@ -5,7 +5,7 @@
   }
  else {
     if (!isLocal()) {
-      logger.rejectedNonLocalAttemptToCreateInitialUser(session.getContext().getConnection().getRemoteAddr());
+      ServicesLogger.LOGGER.rejectedNonLocalAttemptToCreateInitialUser(session.getContext().getConnection().getRemoteAddr());
       throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
     String cookieStateChecker=getCsrfCookie();
@@ -27,11 +27,11 @@
     if (applianceBootstrap.isNoMasterUser()) {
       bootstrap=false;
       applianceBootstrap.createMasterRealmUser(username,password);
-      logger.createdInitialAdminUser(username);
+      ServicesLogger.LOGGER.createdInitialAdminUser(username);
       return createWelcomePage("User created",null);
     }
  else {
-      logger.initialUserAlreadyCreated();
+      ServicesLogger.LOGGER.initialUserAlreadyCreated();
       return createWelcomePage(null,"Users already exists");
     }
   }

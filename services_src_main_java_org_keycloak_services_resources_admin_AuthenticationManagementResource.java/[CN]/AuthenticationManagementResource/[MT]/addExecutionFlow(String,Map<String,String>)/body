@@ -2,7 +2,7 @@
   auth.requireManage();
   AuthenticationFlowModel parentFlow=realm.getFlowByAlias(flowAlias);
   if (parentFlow == null) {
-    throw new BadRequestException("Parent flow doesn't exists");
+    return ErrorResponse.error("Parent flow doesn't exists",Response.Status.BAD_REQUEST);
   }
   String alias=data.get("alias");
   String type=data.get("type");
@@ -10,7 +10,7 @@
   String description=data.get("description");
   AuthenticationFlowModel newFlow=realm.getFlowByAlias(alias);
   if (newFlow != null) {
-    throw new BadRequestException("New flow alias name already exists");
+    return ErrorResponse.exists("New flow alias name already exists");
   }
   newFlow=new AuthenticationFlowModel();
   newFlow.setAlias(alias);
@@ -27,4 +27,5 @@
   execution=realm.addAuthenticatorExecution(execution);
   data.put("id",execution.getId());
   adminEvent.operation(OperationType.CREATE).resource(ResourceType.AUTH_EXECUTION_FLOW).resourcePath(uriInfo).representation(data).success();
+  return Response.status(Response.Status.CREATED).build();
 }

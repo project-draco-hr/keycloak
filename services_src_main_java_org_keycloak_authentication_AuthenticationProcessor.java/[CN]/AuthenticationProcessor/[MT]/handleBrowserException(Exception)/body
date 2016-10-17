@@ -2,27 +2,27 @@
   if (failure instanceof AuthenticationFlowException) {
     AuthenticationFlowException e=(AuthenticationFlowException)failure;
     if (e.getError() == AuthenticationFlowError.INVALID_USER) {
-      logger.failedAuthentication(e);
+      ServicesLogger.LOGGER.failedAuthentication(e);
       event.error(Errors.USER_NOT_FOUND);
       return ErrorPage.error(session,Messages.INVALID_USER);
     }
  else     if (e.getError() == AuthenticationFlowError.USER_DISABLED) {
-      logger.failedAuthentication(e);
+      ServicesLogger.LOGGER.failedAuthentication(e);
       event.error(Errors.USER_DISABLED);
       return ErrorPage.error(session,Messages.ACCOUNT_DISABLED);
     }
  else     if (e.getError() == AuthenticationFlowError.USER_TEMPORARILY_DISABLED) {
-      logger.failedAuthentication(e);
+      ServicesLogger.LOGGER.failedAuthentication(e);
       event.error(Errors.USER_TEMPORARILY_DISABLED);
       return ErrorPage.error(session,Messages.INVALID_USER);
     }
  else     if (e.getError() == AuthenticationFlowError.INVALID_CLIENT_SESSION) {
-      logger.failedAuthentication(e);
+      ServicesLogger.LOGGER.failedAuthentication(e);
       event.error(Errors.INVALID_CODE);
       return ErrorPage.error(session,Messages.INVALID_CODE);
     }
  else     if (e.getError() == AuthenticationFlowError.EXPIRED_CODE) {
-      logger.failedAuthentication(e);
+      ServicesLogger.LOGGER.failedAuthentication(e);
       event.error(Errors.EXPIRED_CODE);
       return ErrorPage.error(session,Messages.EXPIRED_CODE);
     }
@@ -36,13 +36,13 @@
       return processor.authenticate();
     }
  else {
-      logger.failedAuthentication(e);
+      ServicesLogger.LOGGER.failedAuthentication(e);
       event.error(Errors.INVALID_USER_CREDENTIALS);
       return ErrorPage.error(session,Messages.INVALID_USER);
     }
   }
  else {
-    logger.failedAuthentication(failure);
+    ServicesLogger.LOGGER.failedAuthentication(failure);
     event.error(Errors.INVALID_USER_CREDENTIALS);
     return ErrorPage.error(session,Messages.UNEXPECTED_ERROR_HANDLING_REQUEST);
   }

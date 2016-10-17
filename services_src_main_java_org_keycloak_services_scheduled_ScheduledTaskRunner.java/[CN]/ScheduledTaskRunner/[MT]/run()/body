@@ -4,7 +4,7 @@
     runTask(session);
   }
  catch (  Throwable t) {
-    logger.failedToRunScheduledTask(t,task.getClass().getSimpleName());
+    ServicesLogger.LOGGER.failedToRunScheduledTask(t,task.getClass().getSimpleName());
     session.getTransactionManager().rollback();
   }
  finally {
@@ -12,7 +12,7 @@
       session.close();
     }
  catch (    Throwable t) {
-      logger.failedToCloseProviderSession(t);
+      ServicesLogger.LOGGER.failedToCloseProviderSession(t);
     }
   }
 }

@@ -10,7 +10,7 @@
   if (providerModel == null)   throw new NotFoundException("Provider model not found");
   UserFederationProviderFactory providerFactory=(UserFederationProviderFactory)session.getKeycloakSessionFactory().getProviderFactory(UserFederationProvider.class,providerModel.getProviderName());
   UserFederationProvider federationProvider=providerFactory.getInstance(session,providerModel);
-  logger.syncingDataForMapper(mapperModel.getName(),mapperModel.getFederationMapperType(),direction);
+  ServicesLogger.LOGGER.syncingDataForMapper(mapperModel.getName(),mapperModel.getFederationMapperType(),direction);
   UserFederationSyncResult syncResult;
   if ("fedToKeycloak".equals(direction)) {
     syncResult=mapper.syncDataFromFederationProviderToKeycloak(mapperModel,federationProvider,session,realm);

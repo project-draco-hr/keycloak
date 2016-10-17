@@ -1,7 +1,7 @@
 {
   if (failure instanceof AuthenticationFlowException) {
     AuthenticationFlowException e=(AuthenticationFlowException)failure;
-    logger.failedClientAuthentication(e);
+    ServicesLogger.LOGGER.failedClientAuthentication(e);
     if (e.getError() == AuthenticationFlowError.CLIENT_NOT_FOUND) {
       event.error(Errors.CLIENT_NOT_FOUND);
       return ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"invalid_client","Could not find client");
@@ -20,7 +20,7 @@
     }
   }
  else {
-    logger.errorAuthenticatingClient(failure);
+    ServicesLogger.LOGGER.errorAuthenticatingClient(failure);
     event.error(Errors.INVALID_CLIENT_CREDENTIALS);
     return ClientAuthUtil.errorResponse(Response.Status.BAD_REQUEST.getStatusCode(),"unauthorized_client","Unexpected error when authenticating client: " + failure.getMessage());
   }

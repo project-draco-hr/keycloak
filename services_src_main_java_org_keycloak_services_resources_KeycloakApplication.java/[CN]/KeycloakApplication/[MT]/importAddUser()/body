@@ -3,7 +3,7 @@
   if (configDir != null) {
     File addUserFile=new File(configDir + File.separator + "keycloak-add-user.json");
     if (addUserFile.isFile()) {
-      logger.imprtingUsersFrom(addUserFile);
+      ServicesLogger.LOGGER.imprtingUsersFrom(addUserFile);
       List<RealmRepresentation> realms;
       try {
         realms=JsonSerialization.readValue(new FileInputStream(addUserFile),new TypeReference<List<RealmRepresentation>>(){
@@ -11,7 +11,7 @@
 );
       }
  catch (      IOException e) {
-        logger.failedToLoadUsers(e);
+        ServicesLogger.LOGGER.failedToLoadUsers(e);
         return;
       }
       for (      RealmRepresentation realmRep : realms) {
@@ -21,7 +21,7 @@
             session.getTransactionManager().begin();
             RealmModel realm=session.realms().getRealmByName(realmRep.getRealm());
             if (realm == null) {
-              logger.addUserFailedRealmNotFound(userRep.getUsername(),realmRep.getRealm());
+              ServicesLogger.LOGGER.addUserFailedRealmNotFound(userRep.getUsername(),realmRep.getRealm());
             }
  else {
               UserModel user=session.users().addUser(realm,userRep.getUsername());
@@ -30,15 +30,15 @@
               RepresentationToModel.createRoleMappings(userRep,user,realm);
             }
             session.getTransactionManager().commit();
-            logger.addUserSuccess(userRep.getUsername(),realmRep.getRealm());
+            ServicesLogger.LOGGER.addUserSuccess(userRep.getUsername(),realmRep.getRealm());
           }
  catch (          ModelDuplicateException e) {
             session.getTransactionManager().rollback();
-            logger.addUserFailedUserExists(userRep.getUsername(),realmRep.getRealm());
+            ServicesLogger.LOGGER.addUserFailedUserExists(userRep.getUsername(),realmRep.getRealm());
           }
 catch (          Throwable t) {
             session.getTransactionManager().rollback();
-            logger.addUserFailed(t,userRep.getUsername(),realmRep.getRealm());
+            ServicesLogger.LOGGER.addUserFailed(t,userRep.getUsername(),realmRep.getRealm());
           }
  finally {
             session.close();
@@ -46,7 +46,7 @@ catch (          Throwable t) {
         }
       }
       if (!addUserFile.delete()) {
-        logger.failedToDeleteFile(addUserFile.getAbsolutePath());
+        ServicesLogger.LOGGER.failedToDeleteFile(addUserFile.getAbsolutePath());
       }
     }
   }

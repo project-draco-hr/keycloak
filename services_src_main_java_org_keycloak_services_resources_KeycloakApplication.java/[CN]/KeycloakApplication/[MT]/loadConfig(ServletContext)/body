@@ -4,20 +4,20 @@
     String dmrConfig=loadDmrConfig(context);
     if (dmrConfig != null) {
       node=new ObjectMapper().readTree(dmrConfig);
-      logger.loadingFrom("standalone.xml or domain.xml");
+      ServicesLogger.LOGGER.loadingFrom("standalone.xml or domain.xml");
     }
     String configDir=System.getProperty("jboss.server.config.dir");
     if (node == null && configDir != null) {
       File f=new File(configDir + File.separator + "keycloak-server.json");
       if (f.isFile()) {
-        logger.loadingFrom(f.getAbsolutePath());
+        ServicesLogger.LOGGER.loadingFrom(f.getAbsolutePath());
         node=new ObjectMapper().readTree(f);
       }
     }
     if (node == null) {
       URL resource=Thread.currentThread().getContextClassLoader().getResource("META-INF/keycloak-server.json");
       if (resource != null) {
-        logger.loadingFrom(resource);
+        ServicesLogger.LOGGER.loadingFrom(resource);
         node=new ObjectMapper().readTree(resource);
       }
     }

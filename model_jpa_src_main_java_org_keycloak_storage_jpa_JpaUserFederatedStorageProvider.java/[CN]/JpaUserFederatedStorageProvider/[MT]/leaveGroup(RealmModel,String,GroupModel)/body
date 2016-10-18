@@ -1,0 +1,13 @@
+{
+  if (userId == null || group == null)   return;
+  TypedQuery<FederatedUserGroupMembershipEntity> query1=em.createNamedQuery("feduserMemberOf",FederatedUserGroupMembershipEntity.class);
+  query1.setParameter("userId",userId);
+  query1.setParameter("groupId",group.getId());
+  TypedQuery<FederatedUserGroupMembershipEntity> query=query1;
+  List<FederatedUserGroupMembershipEntity> results=query.getResultList();
+  if (results.size() == 0)   return;
+  for (  FederatedUserGroupMembershipEntity entity : results) {
+    em.remove(entity);
+  }
+  em.flush();
+}

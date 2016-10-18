@@ -109,13 +109,21 @@
   }
   if (includeUsers) {
     List<UserModel> allUsers=session.users().getUsers(realm,true);
-    List<UserRepresentation> users=new ArrayList<UserRepresentation>();
+    List<UserRepresentation> users=new LinkedList<>();
     for (    UserModel user : allUsers) {
       UserRepresentation userRep=exportUser(session,realm,user);
       users.add(userRep);
     }
     if (users.size() > 0) {
       rep.setUsers(users);
+    }
+    List<UserRepresentation> federatedUsers=new LinkedList<>();
+    for (    String userId : session.userFederatedStorage().getStoredUsers(realm,0,-1)) {
+      UserRepresentation userRep=exportFederatedUser(session,realm,userId);
+      federatedUsers.add(userRep);
+    }
+    if (federatedUsers.size() > 0) {
+      rep.setFederatedUsers(federatedUsers);
     }
   }
   MultivaluedHashMap<String,ComponentExportRepresentation> components=exportComponents(realm,realm.getId());

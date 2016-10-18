@@ -1,0 +1,10 @@
+{
+  List<UserConsentModel> result=new ArrayList<UserConsentModel>();
+  DBObject query=new QueryBuilder().and("userId").is(userId).get();
+  List<MongoUserConsentEntity> grantedConsents=getMongoStore().loadEntities(MongoUserConsentEntity.class,query,invocationContext);
+  for (  UserConsentEntity consentEntity : grantedConsents) {
+    UserConsentModel model=toConsentModel(realm,consentEntity);
+    result.add(model);
+  }
+  return result;
+}

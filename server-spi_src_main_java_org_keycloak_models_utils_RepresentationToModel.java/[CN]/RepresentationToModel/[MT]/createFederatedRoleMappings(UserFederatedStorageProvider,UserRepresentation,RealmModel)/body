@@ -1,0 +1,20 @@
+{
+  if (userRep.getRealmRoles() != null) {
+    for (    String roleString : userRep.getRealmRoles()) {
+      RoleModel role=realm.getRole(roleString.trim());
+      if (role == null) {
+        role=realm.addRole(roleString.trim());
+      }
+      federatedStorage.grantRole(realm,userRep.getId(),role);
+    }
+  }
+  if (userRep.getClientRoles() != null) {
+    for (    Map.Entry<String,List<String>> entry : userRep.getClientRoles().entrySet()) {
+      ClientModel client=realm.getClientByClientId(entry.getKey());
+      if (client == null) {
+        throw new RuntimeException("Unable to find client role mappings for client: " + entry.getKey());
+      }
+      createFederatedClientRoleMappings(federatedStorage,realm,client,userRep,entry.getValue());
+    }
+  }
+}

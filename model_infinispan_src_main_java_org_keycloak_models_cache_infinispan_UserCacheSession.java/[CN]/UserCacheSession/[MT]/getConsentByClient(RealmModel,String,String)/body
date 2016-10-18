@@ -1,0 +1,17 @@
+{
+  logger.tracev("getConsentByClient: {0}",userId);
+  String cacheKey=getConsentCacheKey(userId);
+  if (realmInvalidations.contains(realm.getId()) || invalidations.contains(userId) || invalidations.contains(cacheKey)) {
+    return getDelegate().getConsentByClient(realm,userId,clientId);
+  }
+  CachedUserConsents cached=cache.get(cacheKey,CachedUserConsents.class);
+  if (cached == null) {
+    Long loaded=cache.getCurrentRevision(cacheKey);
+    List<UserConsentModel> consents=getDelegate().getConsents(realm,userId);
+    cached=new CachedUserConsents(loaded,cacheKey,realm,consents);
+    cache.addRevisioned(cached,startupRevision);
+  }
+  CachedUserConsent cachedConsent=cached.getConsents().get(clientId);
+  if (cachedConsent == null)   return null;
+  return toConsentModel(realm,cachedConsent);
+}

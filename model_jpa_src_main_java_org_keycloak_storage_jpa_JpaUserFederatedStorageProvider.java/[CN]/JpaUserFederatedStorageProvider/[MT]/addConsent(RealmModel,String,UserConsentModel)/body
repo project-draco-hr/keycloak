@@ -1,0 +1,17 @@
+{
+  createIndex(realm,userId);
+  String clientId=consent.getClient().getId();
+  FederatedUserConsentEntity consentEntity=getGrantedConsentEntity(userId,clientId);
+  if (consentEntity != null) {
+    throw new ModelDuplicateException("Consent already exists for client [" + clientId + "] and user ["+ userId+ "]");
+  }
+  consentEntity=new FederatedUserConsentEntity();
+  consentEntity.setId(KeycloakModelUtils.generateId());
+  consentEntity.setUserId(userId);
+  consentEntity.setClientId(clientId);
+  consentEntity.setRealmId(realm.getId());
+  consentEntity.setStorageProviderId(new StorageId(userId).getProviderId());
+  em.persist(consentEntity);
+  em.flush();
+  updateGrantedConsentEntity(consentEntity,consent);
+}

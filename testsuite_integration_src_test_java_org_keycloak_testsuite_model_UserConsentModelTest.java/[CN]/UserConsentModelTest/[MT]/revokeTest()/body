@@ -2,9 +2,9 @@
   RealmModel realm=realmManager.getRealm("original");
   ClientModel fooClient=realm.getClientByClientId("foo-client");
   UserModel john=session.users().getUserByUsername("john",realm);
-  realmManager.getSession().users().revokeConsentForClient(realm,john,fooClient.getId());
+  realmManager.getSession().users().revokeConsentForClient(realm,john.getId(),fooClient.getId());
   commit();
   realm=realmManager.getRealm("original");
   john=session.users().getUserByUsername("john",realm);
-  Assert.assertNull(realmManager.getSession().users().getConsentByClient(realm,john,fooClient.getId()));
+  Assert.assertNull(realmManager.getSession().users().getConsentByClient(realm,john.getId(),fooClient.getId()));
 }

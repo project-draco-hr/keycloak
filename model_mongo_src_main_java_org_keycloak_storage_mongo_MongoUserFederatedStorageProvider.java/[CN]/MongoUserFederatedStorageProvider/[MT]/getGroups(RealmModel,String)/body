@@ -1,0 +1,10 @@
+{
+  FederatedUser userEntity=getUserById(userId);
+  if (userEntity == null || userEntity.getGroupIds() == null || userEntity.getGroupIds().isEmpty())   return Collections.EMPTY_SET;
+  Set<GroupModel> groups=new HashSet<>();
+  for (  String groupId : userEntity.getGroupIds()) {
+    GroupModel group=session.realms().getGroupById(groupId,realm);
+    if (group != null)     groups.add(group);
+  }
+  return groups;
+}

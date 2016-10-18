@@ -1,0 +1,52 @@
+{
+  UserFederatedStorageProvider federatedStorage=session.userFederatedStorage();
+  if (userRep.getAttributes() != null) {
+    for (    Map.Entry<String,Object> entry : userRep.getAttributes().entrySet()) {
+      String key=entry.getKey();
+      Object value=entry.getValue();
+      if (value == null)       continue;
+      if (value instanceof Collection) {
+        Collection<String> colVal=(Collection<String>)value;
+        List<String> list=new LinkedList<>();
+        list.addAll(colVal);
+        federatedStorage.setAttribute(newRealm,userRep.getId(),key,list);
+      }
+ else       if (value instanceof String) {
+        String stringVal=(String)value;
+        federatedStorage.setSingleAttribute(newRealm,userRep.getId(),key,stringVal);
+      }
+    }
+  }
+  if (userRep.getRequiredActions() != null) {
+    for (    String action : userRep.getRequiredActions()) {
+      federatedStorage.addRequiredAction(newRealm,userRep.getId(),action);
+    }
+  }
+  if (userRep.getCredentials() != null) {
+    for (    CredentialRepresentation cred : userRep.getCredentials()) {
+      federatedStorage.createCredential(newRealm,userRep.getId(),toModel(cred));
+    }
+  }
+  createFederatedRoleMappings(federatedStorage,userRep,newRealm);
+  if (userRep.getGroups() != null) {
+    for (    String path : userRep.getGroups()) {
+      GroupModel group=KeycloakModelUtils.findGroupByPath(newRealm,path);
+      if (group == null) {
+        throw new RuntimeException("Unable to find group specified by path: " + path);
+      }
+      federatedStorage.joinGroup(newRealm,userRep.getId(),group);
+    }
+  }
+  if (userRep.getFederatedIdentities() != null) {
+    for (    FederatedIdentityRepresentation identity : userRep.getFederatedIdentities()) {
+      FederatedIdentityModel mappingModel=new FederatedIdentityModel(identity.getIdentityProvider(),identity.getUserId(),identity.getUserName());
+      federatedStorage.addFederatedIdentity(newRealm,userRep.getId(),mappingModel);
+    }
+  }
+  if (userRep.getClientConsents() != null) {
+    for (    UserConsentRepresentation consentRep : userRep.getClientConsents()) {
+      UserConsentModel consentModel=toModel(newRealm,consentRep);
+      federatedStorage.addConsent(newRealm,userRep.getId(),consentModel);
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  FederatedUser userEntity=getUserById(userId);
+  if (userEntity == null)   return Collections.EMPTY_SET;
+  List<FederatedIdentityEntity> linkEntities=userEntity.getFederatedIdentities();
+  if (linkEntities == null) {
+    return Collections.EMPTY_SET;
+  }
+  Set<FederatedIdentityModel> result=new HashSet<FederatedIdentityModel>();
+  for (  FederatedIdentityEntity federatedIdentityEntity : linkEntities) {
+    FederatedIdentityModel model=new FederatedIdentityModel(federatedIdentityEntity.getIdentityProvider(),federatedIdentityEntity.getUserId(),federatedIdentityEntity.getUserName(),federatedIdentityEntity.getToken());
+    result.add(model);
+  }
+  return result;
+}

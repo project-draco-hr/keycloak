@@ -1,9 +1,3 @@
 {
-  FederatedUser userEntity=getUserById(user.getId());
-  if (userEntity == null)   return;
-  CredentialEntity entity=getCredentialEntity(cred.getId(),userEntity);
-  if (entity == null)   return;
-  toEntity(cred,entity);
-  userEntity.getCredentials().remove(entity);
-  getMongoStore().pushItemToList(userEntity,"credentials",entity,true,invocationContext);
+  updateCredential(realm,user.getId(),cred);
 }

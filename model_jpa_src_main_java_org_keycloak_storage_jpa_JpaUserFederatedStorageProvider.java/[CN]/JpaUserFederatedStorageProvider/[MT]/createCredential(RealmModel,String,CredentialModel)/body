@@ -1,0 +1,36 @@
+{
+  createIndex(realm,userId);
+  FederatedUserCredentialEntity entity=new FederatedUserCredentialEntity();
+  String id=cred.getId() == null ? KeycloakModelUtils.generateId() : cred.getId();
+  entity.setId(id);
+  entity.setAlgorithm(cred.getAlgorithm());
+  entity.setCounter(cred.getCounter());
+  entity.setCreatedDate(cred.getCreatedDate());
+  entity.setDevice(cred.getDevice());
+  entity.setDigits(cred.getDigits());
+  entity.setHashIterations(cred.getHashIterations());
+  entity.setPeriod(cred.getPeriod());
+  entity.setSalt(cred.getSalt());
+  entity.setType(cred.getType());
+  entity.setValue(cred.getValue());
+  entity.setUserId(userId);
+  entity.setRealmId(realm.getId());
+  entity.setStorageProviderId(new StorageId(userId).getProviderId());
+  em.persist(entity);
+  MultivaluedHashMap<String,String> config=cred.getConfig();
+  if (config != null && !config.isEmpty()) {
+    for (    String key : config.keySet()) {
+      List<String> values=config.getList(key);
+      for (      String val : values) {
+        FederatedUserCredentialAttributeEntity attr=new FederatedUserCredentialAttributeEntity();
+        attr.setId(KeycloakModelUtils.generateId());
+        attr.setValue(val);
+        attr.setName(key);
+        attr.setCredential(entity);
+        em.persist(attr);
+        entity.getCredentialAttributes().add(attr);
+      }
+    }
+  }
+  return toModel(entity);
+}

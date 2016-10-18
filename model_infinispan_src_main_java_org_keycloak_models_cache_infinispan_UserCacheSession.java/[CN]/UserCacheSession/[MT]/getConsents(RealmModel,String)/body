@@ -1,0 +1,25 @@
+{
+  logger.tracev("getConsents: {0}",userId);
+  String cacheKey=getConsentCacheKey(userId);
+  if (realmInvalidations.contains(realm.getId()) || invalidations.contains(userId) || invalidations.contains(cacheKey)) {
+    return getDelegate().getConsents(realm,userId);
+  }
+  CachedUserConsents cached=cache.get(cacheKey,CachedUserConsents.class);
+  if (cached == null) {
+    Long loaded=cache.getCurrentRevision(cacheKey);
+    List<UserConsentModel> consents=getDelegate().getConsents(realm,userId);
+    cached=new CachedUserConsents(loaded,cacheKey,realm,consents);
+    cache.addRevisioned(cached,startupRevision);
+    return consents;
+  }
+ else {
+    List<UserConsentModel> result=new LinkedList<>();
+    for (    CachedUserConsent cachedConsent : cached.getConsents().values()) {
+      UserConsentModel consent=toConsentModel(realm,cachedConsent);
+      if (consent != null) {
+        result.add(consent);
+      }
+    }
+    return result;
+  }
+}

@@ -1,0 +1,10 @@
+{
+  TypedQuery<BrokerLinkEntity> query=em.createNamedQuery("findBrokerLinkByUser",BrokerLinkEntity.class).setParameter("userId",userId);
+  List<BrokerLinkEntity> results=query.getResultList();
+  Set<FederatedIdentityModel> set=new HashSet<>();
+  for (  BrokerLinkEntity entity : results) {
+    FederatedIdentityModel model=new FederatedIdentityModel(entity.getIdentityProvider(),entity.getBrokerUserId(),entity.getBrokerUserName(),entity.getToken());
+    set.add(model);
+  }
+  return set;
+}

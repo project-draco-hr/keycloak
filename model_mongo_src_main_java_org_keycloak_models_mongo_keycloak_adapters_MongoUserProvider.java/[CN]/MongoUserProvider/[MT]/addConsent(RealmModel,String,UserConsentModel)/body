@@ -3,9 +3,12 @@
   if (getConsentEntityByClientId(userId,clientId) != null) {
     throw new ModelDuplicateException("Consent already exists for client [" + clientId + "] and user ["+ userId+ "]");
   }
+  long currentTime=Time.currentTimeMillis();
   MongoUserConsentEntity consentEntity=new MongoUserConsentEntity();
   consentEntity.setUserId(userId);
   consentEntity.setClientId(clientId);
+  consentEntity.setCreatedDate(currentTime);
+  consentEntity.setLastUpdatedDate(currentTime);
   fillEntityFromModel(consent,consentEntity);
   getMongoStore().insertEntity(consentEntity,invocationContext);
 }

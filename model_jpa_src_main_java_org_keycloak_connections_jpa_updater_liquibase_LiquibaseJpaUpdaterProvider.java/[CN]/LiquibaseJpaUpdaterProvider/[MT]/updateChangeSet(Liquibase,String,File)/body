@@ -1,5 +1,5 @@
 {
-  List<ChangeSet> changeSets=liquibase.listUnrunChangeSets((Contexts)null,new LabelExpression());
+  List<ChangeSet> changeSets=getChangeSets(liquibase);
   if (!changeSets.isEmpty()) {
     List<RanChangeSet> ranChangeSets=liquibase.getDatabase().getRanChangeSetList();
     if (ranChangeSets.isEmpty()) {
@@ -14,8 +14,13 @@
       }
     }
     if (exportFile != null) {
-      liquibase.update((Contexts)null,new FileWriter(exportFile));
-    }
+      try (Writer exportWriter=new FileWriter(exportFile)){
+        if (ranChangeSets.isEmpty()) {
+          outputChangeLogTableCreationScript(liquibase,exportWriter);
+        }
+        liquibase.update((Contexts)null,new LabelExpression(),exportWriter,false);
+      }
+     }
  else {
       liquibase.update((Contexts)null);
     }

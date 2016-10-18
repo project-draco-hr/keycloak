@@ -1,0 +1,14 @@
+{
+  ProtocolMapperRepresentation realmMapper=ProtocolMapperUtil.createUserRealmRoleMappingMapper("pref.","Realm roles mapper","roles-custom.realm",true,true);
+  ProtocolMapperRepresentation clientMapper=ProtocolMapperUtil.createUserClientRoleMappingMapper("test-app",null,"Client roles mapper","roles-custom.test-app",true,true);
+  ProtocolMappersResource protocolMappers=ApiUtil.findClientResourceByClientId(adminClient.realm("test"),"test-app").getProtocolMappers();
+  protocolMappers.createMapper(Arrays.asList(realmMapper,clientMapper));
+  OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("password","test-user@localhost","password");
+  IDToken idToken=oauth.verifyIDToken(response.getIdToken());
+  Map<String,Object> roleMappings=(Map<String,Object>)idToken.getOtherClaims().get("roles-custom");
+  Assert.assertEquals(2,roleMappings.size());
+  String realmRoleMappings=(String)roleMappings.get("realm");
+  String testAppMappings=(String)roleMappings.get("test-app");
+  Assert.assertTrue(realmRoleMappings.contains("pref.user"));
+  Assert.assertEquals("[customer-user]",testAppMappings);
+}

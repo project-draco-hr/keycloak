@@ -1,6 +1,6 @@
 {
   if (!TEST_CONNECTION.equals(action) && !TEST_AUTHENTICATION.equals(action)) {
-    logger.unknownAction(action);
+    ServicesLogger.LOGGER.unknownAction(action);
     return false;
   }
   Context ldapContext=null;
@@ -31,7 +31,7 @@
   }
  catch (  Exception ne) {
     String errorMessage=(TEST_AUTHENTICATION.equals(action)) ? "Error when authenticating to LDAP: " : "Error when connecting to LDAP: ";
-    logger.errorAuthenticating(ne,errorMessage + ne.getMessage());
+    ServicesLogger.LOGGER.errorAuthenticating(ne,errorMessage + ne.getMessage());
     return false;
   }
  finally {
@@ -40,7 +40,7 @@
         ldapContext.close();
       }
  catch (      NamingException ne) {
-        logger.errorClosingLDAP(ne);
+        ServicesLogger.LOGGER.errorClosingLDAP(ne);
       }
     }
   }

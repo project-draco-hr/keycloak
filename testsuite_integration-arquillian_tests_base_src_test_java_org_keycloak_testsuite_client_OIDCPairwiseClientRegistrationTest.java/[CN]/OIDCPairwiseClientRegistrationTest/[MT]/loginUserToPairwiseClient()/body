@@ -22,4 +22,14 @@
   Assert.assertEquals("test-user@localhost",accessToken.getEmail());
   String pairwiseUserId=accessToken.getSubject();
   Assert.assertNotEquals(pairwiseUserId,user.getId());
+  Client jaxrsClient=javax.ws.rs.client.ClientBuilder.newClient();
+  try {
+    Response userInfoResponse=UserInfoClientUtil.executeUserInfoRequest_getMethod(jaxrsClient,accessTokenResponse.getAccessToken());
+    UserInfo userInfo=UserInfoClientUtil.testSuccessfulUserInfoResponse(userInfoResponse,"test-user","test-user@localhost");
+    String userInfoSubId=userInfo.getSubject();
+    Assert.assertEquals(pairwiseUserId,userInfoSubId);
+  }
+  finally {
+    jaxrsClient.close();
+  }
 }

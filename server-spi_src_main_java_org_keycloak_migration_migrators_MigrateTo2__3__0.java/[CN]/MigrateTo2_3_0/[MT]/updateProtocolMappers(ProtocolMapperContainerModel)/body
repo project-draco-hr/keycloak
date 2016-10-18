@@ -1,0 +1,12 @@
+{
+  List<ProtocolMapperModel> toUpdate=new LinkedList<>();
+  for (  ProtocolMapperModel mapper : client.getProtocolMappers()) {
+    if (!mapper.getConfig().containsKey("userinfo.token.claim") && mapper.getConfig().containsKey("id.token.claim")) {
+      mapper.getConfig().put("userinfo.token.claim",mapper.getConfig().get("id.token.claim"));
+      toUpdate.add(mapper);
+    }
+  }
+  for (  ProtocolMapperModel mapper : toUpdate) {
+    client.updateProtocolMapper(mapper);
+  }
+}

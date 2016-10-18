@@ -1,3 +1,7 @@
 {
-  return "true".equals(mappingModel.getConfig().get(INCLUDE_IN_USERINFO));
+  String includeInUserInfo=mappingModel.getConfig().get(INCLUDE_IN_USERINFO);
+  if (includeInUserInfo == null && includeInIDToken(mappingModel)) {
+    return true;
+  }
+  return "true".equals(includeInUserInfo);
 }

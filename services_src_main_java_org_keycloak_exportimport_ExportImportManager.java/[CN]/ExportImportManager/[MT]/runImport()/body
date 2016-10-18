@@ -2,14 +2,14 @@
   try {
     Strategy strategy=ExportImportConfig.getStrategy();
     if (realmName == null) {
-      logger.fullModelImport(strategy.toString());
+      ServicesLogger.LOGGER.fullModelImport(strategy.toString());
       importProvider.importModel(sessionFactory,strategy);
     }
  else {
-      logger.realmImportRequested(realmName,strategy.toString());
+      ServicesLogger.LOGGER.realmImportRequested(realmName,strategy.toString());
       importProvider.importRealm(sessionFactory,realmName,strategy);
     }
-    logger.importSuccess();
+    ServicesLogger.LOGGER.importSuccess();
   }
  catch (  IOException e) {
     throw new RuntimeException("Failed to run import",e);

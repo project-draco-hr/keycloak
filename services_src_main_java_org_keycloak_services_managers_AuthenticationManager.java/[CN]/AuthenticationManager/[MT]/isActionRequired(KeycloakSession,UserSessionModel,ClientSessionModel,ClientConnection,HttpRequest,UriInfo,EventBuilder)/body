@@ -5,7 +5,7 @@
   evaluateRequiredActionTriggers(session,userSession,clientSession,clientConnection,request,uriInfo,event,realm,user);
   if (!user.getRequiredActions().isEmpty() || !clientSession.getRequiredActions().isEmpty())   return true;
   if (client.isConsentRequired()) {
-    UserConsentModel grantedConsent=session.users().getConsentByClient(realm,user,client.getId());
+    UserConsentModel grantedConsent=session.users().getConsentByClient(realm,user.getId(),client.getId());
     ClientSessionCode accessCode=new ClientSessionCode(session,realm,clientSession);
     for (    RoleModel r : accessCode.getRequestedRoles()) {
       if (grantedConsent != null && grantedConsent.isRoleGranted(r)) {

@@ -1,0 +1,9 @@
+{
+  TypedQuery<FederatedUserCredentialEntity> query=em.createNamedQuery("federatedUserCredentialByUserAndType",FederatedUserCredentialEntity.class).setParameter("type",type).setParameter("userId",userId);
+  List<FederatedUserCredentialEntity> results=query.getResultList();
+  List<CredentialModel> rtn=new LinkedList<>();
+  for (  FederatedUserCredentialEntity entity : results) {
+    rtn.add(toModel(entity));
+  }
+  return rtn;
+}

@@ -7,7 +7,7 @@
   List<Map<String,Object>> result=new LinkedList<>();
   Set<ClientModel> offlineClients=new UserSessionManager(session).findClientsWithOfflineToken(realm,user);
   for (  ClientModel client : realm.getClients()) {
-    UserConsentModel consent=session.users().getConsentByClient(realm,user,client.getId());
+    UserConsentModel consent=session.users().getConsentByClient(realm,user.getId(),client.getId());
     boolean hasOfflineToken=offlineClients.contains(client);
     if (consent == null && !hasOfflineToken) {
       continue;

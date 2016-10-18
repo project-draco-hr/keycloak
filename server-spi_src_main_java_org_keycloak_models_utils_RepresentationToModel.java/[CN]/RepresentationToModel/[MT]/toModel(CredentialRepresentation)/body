@@ -1,0 +1,25 @@
+{
+  CredentialModel model=new CredentialModel();
+  model.setHashIterations(cred.getHashIterations());
+  model.setCreatedDate(cred.getCreatedDate());
+  model.setType(cred.getType());
+  model.setDigits(cred.getDigits());
+  model.setConfig(cred.getConfig());
+  model.setDevice(cred.getDevice());
+  model.setAlgorithm(cred.getAlgorithm());
+  model.setCounter(cred.getCounter());
+  model.setPeriod(cred.getPeriod());
+  if (cred.getSalt() != null) {
+    try {
+      model.setSalt(Base64.decode(cred.getSalt()));
+    }
+ catch (    IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+  model.setValue(cred.getValue());
+  if (cred.getHashedSaltedValue() != null) {
+    model.setValue(cred.getHashedSaltedValue());
+  }
+  return model;
+}

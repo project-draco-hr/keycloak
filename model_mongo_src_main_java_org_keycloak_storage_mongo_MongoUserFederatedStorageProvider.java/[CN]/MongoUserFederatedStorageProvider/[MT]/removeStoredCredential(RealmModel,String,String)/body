@@ -1,0 +1,7 @@
+{
+  FederatedUser userEntity=getUserById(userId);
+  if (userEntity == null)   return false;
+  CredentialEntity ce=getCredentialEntity(id,userEntity);
+  if (ce != null)   return getMongoStore().pullItemFromList(userEntity,"credentials",ce,invocationContext);
+  return false;
+}

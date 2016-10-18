@@ -1,0 +1,22 @@
+{
+  JsonFactory factory=mapper.getFactory();
+  JsonGenerator generator=factory.createGenerator(os,JsonEncoding.UTF8);
+  try {
+    if (mapper.isEnabled(SerializationFeature.INDENT_OUTPUT)) {
+      generator.useDefaultPrettyPrinter();
+    }
+    generator.writeStartObject();
+    generator.writeStringField("realm",realm.getName());
+    generator.writeFieldName("federatedUsers");
+    generator.writeStartArray();
+    for (    String userId : usersToExport) {
+      UserRepresentation userRep=ExportUtils.exportFederatedUser(session,realm,userId);
+      generator.writeObject(userRep);
+    }
+    generator.writeEndArray();
+    generator.writeEndObject();
+  }
+  finally {
+    generator.close();
+  }
+}

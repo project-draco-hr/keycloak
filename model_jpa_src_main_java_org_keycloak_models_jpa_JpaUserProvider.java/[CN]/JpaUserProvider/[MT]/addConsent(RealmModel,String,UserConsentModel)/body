@@ -1,0 +1,17 @@
+{
+  String clientId=consent.getClient().getId();
+  UserConsentEntity consentEntity=getGrantedConsentEntity(userId,clientId);
+  if (consentEntity != null) {
+    throw new ModelDuplicateException("Consent already exists for client [" + clientId + "] and user ["+ userId+ "]");
+  }
+  long currentTime=Time.currentTimeMillis();
+  consentEntity=new UserConsentEntity();
+  consentEntity.setId(KeycloakModelUtils.generateId());
+  consentEntity.setUser(em.getReference(UserEntity.class,userId));
+  consentEntity.setClientId(clientId);
+  consentEntity.setCreatedDate(currentTime);
+  consentEntity.setLastUpdatedDate(currentTime);
+  em.persist(consentEntity);
+  em.flush();
+  updateGrantedConsentEntity(consentEntity,consent);
+}

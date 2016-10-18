@@ -1,0 +1,12 @@
+{
+  if (userRep == null) {
+    throw new RuntimeException("User not found");
+  }
+  for (  String roleName : roleNames) {
+    RoleModel role=clientModel.getRole(roleName.trim());
+    if (role == null) {
+      role=clientModel.addRole(roleName.trim());
+    }
+    federatedStorage.grantRole(realm,userRep.getId(),role);
+  }
+}

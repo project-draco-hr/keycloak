@@ -1,0 +1,9 @@
+{
+  String userName="user-" + UUID.randomUUID();
+  final String realmName=AuthRealm.MASTER;
+  createUser(realmName,userName,"pwd");
+  Keycloak userClient=Keycloak.getInstance(AuthServerTestEnricher.getAuthServerContextRoot() + "/auth",realmName,userName,"pwd",Constants.ADMIN_CLI_CLIENT_ID);
+  expectedException.expect(ClientErrorException.class);
+  expectedException.expectMessage(String.valueOf(Response.Status.FORBIDDEN.getStatusCode()));
+  userClient.realms().findAll();
+}

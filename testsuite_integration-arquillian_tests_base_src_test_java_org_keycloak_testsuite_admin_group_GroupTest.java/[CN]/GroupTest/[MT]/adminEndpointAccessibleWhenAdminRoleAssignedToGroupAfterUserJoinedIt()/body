@@ -1,0 +1,19 @@
+{
+  String userName="user-" + UUID.randomUUID();
+  String groupName="group-" + UUID.randomUUID();
+  final String realmName=AuthRealm.MASTER;
+  RealmResource realm=adminClient.realms().realm(realmName);
+  RoleRepresentation adminRole=realm.roles().get(AdminRoles.ADMIN).toRepresentation();
+  assertThat(adminRole,notNullValue());
+  assertThat(adminRole.getId(),notNullValue());
+  String userId=createUser(realmName,userName,"pwd");
+  GroupRepresentation group=GroupBuilder.create().name(groupName).build();
+  Response response=realm.groups().add(group);
+  String groupId=ApiUtil.getCreatedId(response);
+  response.close();
+  realm.users().get(userId).joinGroup(groupId);
+  RoleMappingResource mappings=realm.groups().group(groupId).roles();
+  mappings.realmLevel().add(Collections.singletonList(adminRole));
+  Keycloak userClient=Keycloak.getInstance(AuthServerTestEnricher.getAuthServerContextRoot() + "/auth",realmName,userName,"pwd",Constants.ADMIN_CLI_CLIENT_ID);
+  assertThat(userClient.realms().findAll(),not(empty()));
+}

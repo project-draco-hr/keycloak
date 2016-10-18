@@ -1,9 +1,17 @@
 {
   logger.debug("Starting database update");
   ThreadLocalSessionContext.setCurrentSession(session);
+  Writer exportWriter=null;
   try {
     Liquibase liquibase=getLiquibaseForKeycloakUpdate(connection,defaultSchema);
-    updateChangeSet(liquibase,liquibase.getChangeLogFile(),file);
+    if (file != null) {
+      exportWriter=new FileWriter(file);
+      List<ChangeSet> changeSets=getChangeSets(liquibase);
+      if (!changeSets.isEmpty() && liquibase.getDatabase().getRanChangeSetList().isEmpty()) {
+        outputChangeLogTableCreationScript(liquibase,exportWriter);
+      }
+    }
+    updateChangeSet(liquibase,liquibase.getChangeLogFile(),exportWriter);
     Set<JpaEntityProvider> jpaProviders=session.getAllProviders(JpaEntityProvider.class);
     for (    JpaEntityProvider jpaProvider : jpaProviders) {
       String customChangelog=jpaProvider.getChangelogLocation();
@@ -11,7 +19,7 @@
         String factoryId=jpaProvider.getFactoryId();
         String changelogTableName=JpaUtils.getCustomChangelogTableName(factoryId);
         liquibase=getLiquibaseForCustomProviderUpdate(connection,defaultSchema,customChangelog,jpaProvider.getClass().getClassLoader(),changelogTableName);
-        updateChangeSet(liquibase,liquibase.getChangeLogFile(),file);
+        updateChangeSet(liquibase,liquibase.getChangeLogFile(),exportWriter);
       }
     }
   }
@@ -20,5 +28,12 @@
   }
  finally {
     ThreadLocalSessionContext.removeCurrentSession();
+    if (exportWriter != null) {
+      try {
+        exportWriter.close();
+      }
+ catch (      IOException ioe) {
+      }
+    }
   }
 }

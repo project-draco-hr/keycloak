@@ -7,5 +7,6 @@
   }
   JSONWebKeySet keySet=new JSONWebKeySet();
   keySet.setKeys(keys);
-  return keySet;
+  Response.ResponseBuilder responseBuilder=Response.ok(keySet).cacheControl(CacheControlUtil.getDefaultCacheControl());
+  return Cors.add(request,responseBuilder).allowedOrigins("*").auth().build();
 }

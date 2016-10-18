@@ -1,8 +1,4 @@
 {
-  Client client=javax.ws.rs.client.ClientBuilder.newClient();
-  UriBuilder builder=UriBuilder.fromUri(AUTH_SERVER_ROOT);
-  URI grantUri=OIDCLoginProtocolService.tokenUrl(builder).build("test");
-  WebTarget grantTarget=client.target(grantUri);
 {
     UserResource userResource=findUserByUsernameId(adminClient.realm("test"),"test-user@localhost");
     UserRepresentation user=userResource.toRepresentation();
@@ -29,10 +25,8 @@
     app.getProtocolMappers().createMapper(createRoleNameMapper("rename-app-role","test-app.customer-user","realm-user"));
   }
 {
-    Response response=executeGrantAccessTokenRequest(grantTarget);
-    assertEquals(200,response.getStatus());
-    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
-    IDToken idToken=getIdToken(tokenResponse);
+    OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("password","test-user@localhost","password");
+    IDToken idToken=oauth.verifyIDToken(response.getIdToken());
     assertNotNull(idToken.getAddress());
     assertEquals(idToken.getName(),"Tom Brady");
     assertEquals(idToken.getAddress().getStreetAddress(),"5 Yawkey Way");
@@ -50,7 +44,7 @@
     List<String> departments=(List<String>)idToken.getOtherClaims().get("department");
     assertEquals(2,departments.size());
     assertTrue(departments.contains("finance") && departments.contains("development"));
-    AccessToken accessToken=getAccessToken(tokenResponse);
+    AccessToken accessToken=oauth.verifyToken(response.getAccessToken());
     assertEquals(accessToken.getName(),"Tom Brady");
     assertNotNull(accessToken.getAddress());
     assertEquals(accessToken.getAddress().getStreetAddress(),"5 Yawkey Way");
@@ -72,7 +66,6 @@
     assertTrue(accessToken.getRealmAccess().getRoles().contains("realm-user"));
     Assert.assertFalse(accessToken.getResourceAccess("test-app").getRoles().contains("customer-user"));
     assertTrue(accessToken.getResourceAccess("app").getRoles().contains("hardcoded"));
-    response.close();
   }
 {
     ClientResource app=findClientByClientId(adminClient.realm("test"),"test-app");
@@ -85,17 +78,13 @@
   }
   events.clear();
 {
-    Response response=executeGrantAccessTokenRequest(grantTarget);
-    assertEquals(200,response.getStatus());
-    org.keycloak.representations.AccessTokenResponse tokenResponse=response.readEntity(org.keycloak.representations.AccessTokenResponse.class);
-    IDToken idToken=getIdToken(tokenResponse);
+    OAuthClient.AccessTokenResponse response=oauth.doGrantAccessTokenRequest("password","test-user@localhost","password");
+    IDToken idToken=oauth.verifyIDToken(response.getIdToken());
     assertNull(idToken.getAddress());
     assertNull(idToken.getOtherClaims().get("home_phone"));
     assertNull(idToken.getOtherClaims().get("hard"));
     assertNull(idToken.getOtherClaims().get("nested"));
     assertNull(idToken.getOtherClaims().get("department"));
-    response.close();
   }
   events.clear();
-  client.close();
 }

@@ -2,7 +2,7 @@
   if (archive.contains(adapterConfigPath)) {
     log.info("Modifying adapter config " + adapterConfigPath + " in "+ archive.getName());
     if (adapterConfigPath.equals(SAML_ADAPTER_CONFIG_PATH)) {
-      log.info("Modyfying saml adapter config in " + archive.getName());
+      log.info("Modifying saml adapter config in " + archive.getName());
       Document doc=loadXML(archive.get("WEB-INF/keycloak-saml.xml").getAsset().openStream());
       if (authServerSslRequired) {
         modifyDocElementAttribute(doc,"SingleSignOnService","bindingUrl","8080",System.getProperty("auth.server.https.port"));
@@ -45,6 +45,12 @@
  catch (      IOException ex) {
         log.log(Level.FATAL,"Cannot serialize adapter config to JSON.",ex);
       }
+      log.info("Adding OIDCFilter dependencies to " + archive.getName());
+      ((WebArchive)archive).addAsLibraries(KeycloakDependenciesResolver.resolveDependencies("org.keycloak:keycloak-servlet-filter-adapter:" + System.getProperty("project.version")));
     }
+  }
+ else   if (archive.getName().equals("customer-portal-subsystem.war")) {
+    log.info("Adding OIDCFilter dependencies to " + archive.getName());
+    ((WebArchive)archive).addAsLibraries(KeycloakDependenciesResolver.resolveDependencies("org.keycloak:keycloak-servlet-filter-adapter:" + System.getProperty("project.version")));
   }
 }

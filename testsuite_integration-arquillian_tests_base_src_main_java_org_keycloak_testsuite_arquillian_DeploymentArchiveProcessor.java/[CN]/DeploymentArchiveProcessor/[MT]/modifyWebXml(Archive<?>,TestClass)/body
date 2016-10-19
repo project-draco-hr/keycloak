@@ -5,6 +5,7 @@
       modifyDocElementValue(webXmlDoc,"auth-method","KEYCLOAK","BASIC");
     }
     if (testClass.getJavaClass().isAnnotationPresent(UseServletFilter.class)) {
+      addFilterDependencies(archive,testClass);
       log.info("Adding filter to " + testClass.getAnnotation(UseServletFilter.class).filterClass() + " with mapping "+ testClass.getAnnotation(UseServletFilter.class).filterPattern()+ " for "+ archive.getName());
       Element filter=webXmlDoc.createElement("filter");
       Element filterName=webXmlDoc.createElement("filter-name");

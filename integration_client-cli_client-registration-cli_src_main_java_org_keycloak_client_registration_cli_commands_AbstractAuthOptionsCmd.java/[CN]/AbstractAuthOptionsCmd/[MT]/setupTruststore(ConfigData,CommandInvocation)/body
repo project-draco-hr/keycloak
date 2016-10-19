@@ -1,0 +1,24 @@
+{
+  if (!configData.getServerUrl().startsWith("https:")) {
+    return;
+  }
+  String truststore=trustStore;
+  if (truststore == null) {
+    truststore=configData.getTruststore();
+  }
+  if (truststore != null) {
+    String pass=trustPass;
+    if (pass == null) {
+      pass=configData.getTrustpass();
+    }
+    if (pass == null) {
+      pass=IoUtil.readSecret("Enter truststore password: ",invocation);
+    }
+    try {
+      HttpUtil.setTruststore(new File(truststore),pass);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Failed to load truststore: " + truststore,e);
+    }
+  }
+}

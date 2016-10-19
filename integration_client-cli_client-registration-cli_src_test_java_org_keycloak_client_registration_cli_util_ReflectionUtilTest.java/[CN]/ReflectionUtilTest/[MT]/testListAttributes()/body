@@ -1,0 +1,23 @@
+{
+  LinkedHashMap<String,String> items=null;
+  System.out.println("\n-- dataList ----------------------\n");
+  items=ReflectionUtil.getAttributeListWithJSonTypes(Data.class,new AttributeKey("dataList"));
+  for (  Map.Entry<String,String> item : items.entrySet()) {
+    System.out.printf("%-40s %s\n",item.getKey(),item.getValue());
+  }
+  if (items.size() == 0) {
+    Field f=ReflectionUtil.resolveField(Data.class,new AttributeKey("dataList"));
+    String ts=ReflectionUtil.getTypeString(null,f);
+    Type t=f.getGenericType();
+    if ((List.class.isAssignableFrom(f.getType()) || f.getType().isArray()) && t instanceof ParameterizedType) {
+      System.out.printf("%s, where object is:\n",ts);
+    }
+    t=((ParameterizedType)t).getActualTypeArguments()[0];
+    if (t instanceof Class) {
+      items=ReflectionUtil.getAttributeListWithJSonTypes((Class)t,null);
+      for (      Map.Entry<String,String> item : items.entrySet()) {
+        System.out.printf("   %-37s %s\n",item.getKey(),item.getValue());
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  long start=System.currentTimeMillis();
+  while (System.currentTimeMillis() - start < waitTimeout) {
+    if (stdoutString().indexOf(content) != -1) {
+      return;
+    }
+    try {
+      Thread.sleep(10);
+    }
+ catch (    InterruptedException e) {
+      throw new RuntimeException("Interrupted ...",e);
+    }
+  }
+  throw new RuntimeException("Timed while waiting for content to appear in stdout");
+}

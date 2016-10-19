@@ -1,0 +1,19 @@
+{
+  char maskChar=OS_ARCH.isWindows() ? 0 : '*';
+  ConsoleBuffer consoleBuffer=new AeshConsoleBufferBuilder().shell(invocation.getShell()).prompt(new Prompt(prompt,maskChar)).create();
+  InputProcessor inputProcessor=new AeshInputProcessorBuilder().consoleBuffer(consoleBuffer).create();
+  consoleBuffer.displayPrompt();
+  Globals.stdin.setInputStream(System.in);
+  String result;
+  try {
+    do {
+      result=inputProcessor.parseOperation(invocation.getInput());
+    }
+ while (result == null);
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("^C",e);
+  }
+  result=result.replaceAll("\\n","");
+  return result;
+}

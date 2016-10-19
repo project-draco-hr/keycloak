@@ -1,0 +1,17 @@
+{
+  if (current == null) {
+    try {
+      current=queue.take();
+    }
+ catch (    InterruptedException e) {
+      throw new InterruptedIOException("Signalled to exit");
+    }
+  }
+  int c=current.read();
+  if (c == -1) {
+    if (console != null) {
+      console.stop();
+    }
+  }
+  return c;
+}

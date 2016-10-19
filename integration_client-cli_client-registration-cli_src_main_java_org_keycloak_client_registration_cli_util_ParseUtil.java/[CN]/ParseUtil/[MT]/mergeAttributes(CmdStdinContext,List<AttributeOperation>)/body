@@ -1,0 +1,36 @@
+{
+  String content=ctx.getContent();
+  ClientRepresentation client=ctx.getClient();
+  OIDCClientRepresentation oidcClient=ctx.getOidcClient();
+  EndpointType type=ctx.getEndpointType();
+  try {
+    if (content == null) {
+      if (type == EndpointType.DEFAULT) {
+        client=new ClientRepresentation();
+      }
+ else       if (type == EndpointType.OIDC) {
+        oidcClient=new OIDCClientRepresentation();
+      }
+    }
+    Object rep=client != null ? client : oidcClient;
+    if (rep != null) {
+      try {
+        setAttributes(rep,attrs);
+      }
+ catch (      AttributeException e) {
+        throw new RuntimeException("Failed to set attribute '" + e.getAttributeName() + "' on document type '"+ type.getName()+ "'",e);
+      }
+      content=JsonSerialization.writeValueAsString(rep);
+    }
+ else {
+      throw new RuntimeException("Setting attributes is not supported for type: " + type.getName());
+    }
+  }
+ catch (  IOException e) {
+    throw new RuntimeException("Failed to merge set attributes with configuration from file",e);
+  }
+  ctx.setContent(content);
+  ctx.setClient(client);
+  ctx.setOidcClient(oidcClient);
+  return ctx;
+}

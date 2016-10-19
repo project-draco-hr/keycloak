@@ -1,0 +1,28 @@
+{
+  if (requiresLogin()) {
+    ConfigHandler old=ConfigUtil.getHandler();
+    try {
+      applyDefaultOptionValues();
+      initConfigData(config);
+      ConfigUtil.setupInMemoryHandler(config);
+      ConfigCredentialsCmd login=new ConfigCredentialsCmd(this);
+      login.init(config);
+      login.process(commandInvocation);
+      return loadConfig();
+    }
+ catch (    RuntimeException e) {
+      throw e;
+    }
+catch (    Exception e) {
+      throw new RuntimeException(e);
+    }
+ finally {
+      ConfigUtil.setHandler(old);
+    }
+  }
+ else {
+    checkAuthInfo(config);
+    applyDefaultOptionValues();
+    return loadConfig();
+  }
+}

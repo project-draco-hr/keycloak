@@ -1,0 +1,17 @@
+{
+  super.processGlobalOptions();
+  if (config != null && noconfig) {
+    throw new RuntimeException("Options --config and --no-config are mutually exclusive");
+  }
+  if (!noconfig) {
+    setConfigFile(config != null ? config : ConfigUtil.DEFAULT_CONFIG_FILE_PATH);
+    ConfigUtil.setHandler(new FileConfigHandler());
+  }
+ else {
+    InMemoryConfigHandler handler=new InMemoryConfigHandler();
+    ConfigData data=new ConfigData();
+    initConfigData(data);
+    handler.setConfigData(data);
+    ConfigUtil.setHandler(handler);
+  }
+}

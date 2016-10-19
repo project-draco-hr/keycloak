@@ -1,0 +1,60 @@
+{
+  assertAttributeKey(new AttributeKey("am.bam.pet"),"am",-1,"bam",-1,"pet",-1);
+  assertAttributeKey(new AttributeKey("a"),"a",-1);
+  assertAttributeKey(new AttributeKey("a.b"),"a",-1,"b",-1);
+  assertAttributeKey(new AttributeKey("a.b[1]"),"a",-1,"b",1);
+  assertAttributeKey(new AttributeKey("a[12].b"),"a",12,"b",-1);
+  assertAttributeKey(new AttributeKey("a[10].b[20]"),"a",10,"b",20);
+  assertAttributeKey(new AttributeKey("\"am\".\"bam\".\"pet\""),"am",-1,"bam",-1,"pet",-1);
+  assertAttributeKey(new AttributeKey("\"am\".bam.\"pet\""),"am",-1,"bam",-1,"pet",-1);
+  assertAttributeKey(new AttributeKey("\"am.bam\".\"pet\""),"am.bam",-1,"pet",-1);
+  assertAttributeKey(new AttributeKey("\"am.bam[2]\".\"pet[6]\""),"am.bam",2,"pet",6);
+  try {
+    new AttributeKey("a.");
+    Assert.fail("Should have failed");
+  }
+ catch (  RuntimeException expected) {
+  }
+  try {
+    new AttributeKey("a[]");
+    Assert.fail("Should have failed");
+  }
+ catch (  RuntimeException expected) {
+  }
+  try {
+    new AttributeKey("a[lala]");
+    Assert.fail("Should have failed");
+  }
+ catch (  RuntimeException expected) {
+  }
+  try {
+    new AttributeKey("a[\"lala\"]");
+    Assert.fail("Should have failed");
+  }
+ catch (  RuntimeException expected) {
+  }
+  try {
+    new AttributeKey(".a");
+    Assert.fail("Should have failed");
+  }
+ catch (  RuntimeException expected) {
+  }
+  try {
+    new AttributeKey("\"am\"..\"bam\".\"pet\"");
+    Assert.fail("Should have failed");
+  }
+ catch (  RuntimeException expected) {
+  }
+  try {
+    new AttributeKey("\"am\"ups.\"bam\".\"pet\"");
+    Assert.fail("Should have failed");
+  }
+ catch (  RuntimeException expected) {
+  }
+  try {
+    new AttributeKey("ups\"am\"ups.\"bam\".\"pet\"");
+    Assert.fail("Should have failed");
+  }
+ catch (  RuntimeException expected) {
+  }
+}

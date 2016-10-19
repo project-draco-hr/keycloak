@@ -1,0 +1,17 @@
+{
+  File keystore=new File(System.getProperty("user.dir") + "/src/test/resources/cli/kcreg/reg-cli-keystore.jks");
+  Assert.assertTrue("reg-cli-keystore.jks exists",keystore.isFile());
+  KcRegExec exe=execute("get test-client --no-config --server " + serverUrl + " --realm test"+ " --user user1 --password userpass --client reg-cli-jwt --keystore '"+ keystore.getAbsolutePath()+ "'"+ " --storepass storepass --keypass keypass --alias reg-cli");
+  assertExitCodeAndStreamSizes(exe,1,0,2);
+  Assert.assertEquals("login message","Logging into " + serverUrl + " as user user1 of realm test",exe.stderrLines().get(0));
+  Assert.assertEquals("error message","Client not allowed for direct access grants [invalid_grant]",exe.stderrLines().get(1));
+  exe=execute("get test-client --no-config --server " + serverUrl + " --realm test"+ " --user user1 --password wrong --client reg-cli-jwt-direct --keystore '"+ keystore.getAbsolutePath()+ "'"+ " --storepass storepass --keypass keypass --alias reg-cli");
+  assertExitCodeAndStreamSizes(exe,1,0,2);
+  Assert.assertEquals("login message","Logging into " + serverUrl + " as user user1 of realm test",exe.stderrLines().get(0));
+  Assert.assertEquals("error message","Invalid user credentials [invalid_grant]",exe.stderrLines().get(1));
+  exe=execute("get test-client --no-config --server " + serverUrl + " --realm test"+ " --user user1 --password userpass --client reg-cli-jwt-direct --keystore '"+ keystore.getAbsolutePath()+ "'"+ " --storepass wrong --keypass keypass --alias reg-cli");
+  assertExitCodeAndStreamSizes(exe,1,0,2);
+  Assert.assertEquals("login message","Logging into " + serverUrl + " as user user1 of realm test",exe.stderrLines().get(0));
+  Assert.assertEquals("error message","Failed to load private key: Keystore was tampered with, or password was incorrect",exe.stderrLines().get(1));
+  testCRUDWithOnTheFlyAuth(serverUrl,"--user user1 --password userpass  --client reg-cli-jwt-direct --keystore '" + keystore.getAbsolutePath() + "'"+ " --storepass storepass --keypass keypass --alias reg-cli","","Logging into " + serverUrl + " as user user1 of realm test");
+}

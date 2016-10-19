@@ -1,0 +1,68 @@
+{
+  Class clazz=null;
+  if (type == null) {
+    if (field == null) {
+      throw new IllegalArgumentException("type == null and field == null");
+    }
+    type=field.getGenericType();
+  }
+  if (type instanceof Class) {
+    clazz=(Class)type;
+  }
+ else   if (type instanceof ParameterizedType) {
+    StringBuilder sb=new StringBuilder();
+    String rtype=getTypeString(((ParameterizedType)type).getRawType(),null);
+    sb.append(rtype);
+    sb.append(" ").append("(");
+    Type[] typeArgs=((ParameterizedType)type).getActualTypeArguments();
+    for (int i=0; i < typeArgs.length; i++) {
+      if (i > 0) {
+        sb.append(", ");
+      }
+      sb.append(getTypeString(typeArgs[i],null));
+    }
+    sb.append(")");
+    return sb.toString();
+  }
+  if (CharSequence.class.isAssignableFrom(clazz)) {
+    return "string";
+  }
+ else   if (Integer.class.isAssignableFrom(clazz) || int.class.isAssignableFrom(clazz)) {
+    return "int";
+  }
+ else   if (Long.class.isAssignableFrom(clazz) || long.class.isAssignableFrom(clazz)) {
+    return "long";
+  }
+ else   if (Float.class.isAssignableFrom(clazz) || float.class.isAssignableFrom(clazz)) {
+    return "float";
+  }
+ else   if (Double.class.isAssignableFrom(clazz) || double.class.isAssignableFrom(clazz)) {
+    return "double";
+  }
+ else   if (Number.class.isAssignableFrom(clazz)) {
+    return "number";
+  }
+ else   if (Boolean.class.isAssignableFrom(clazz) || boolean.class.isAssignableFrom(clazz)) {
+    return "boolean";
+  }
+ else   if (isListType(clazz)) {
+    if (field != null) {
+      Type gtype=field.getGenericType();
+      if (gtype == clazz && clazz.isArray()) {
+        return "array (" + getTypeString(clazz.getComponentType(),null) + ")";
+      }
+      return getTypeString(gtype,null);
+    }
+    return "array";
+  }
+ else   if (isMapType(clazz)) {
+    if (field != null) {
+      Type gtype=field.getGenericType();
+      return getTypeString(gtype,null);
+    }
+    return "object";
+  }
+ else {
+    return "object";
+  }
+}

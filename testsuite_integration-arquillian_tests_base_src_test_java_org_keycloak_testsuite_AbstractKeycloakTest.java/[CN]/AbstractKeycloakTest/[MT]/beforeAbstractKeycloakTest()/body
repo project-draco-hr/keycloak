@@ -1,5 +1,9 @@
 {
-  adminClient=Keycloak.getInstance(AuthServerTestEnricher.getAuthServerContextRoot() + "/auth",MASTER,ADMIN,ADMIN,Constants.ADMIN_CLI_CLIENT_ID);
+  SSLContext ssl=null;
+  if ("true".equals(System.getProperty("auth.server.ssl.required"))) {
+    ssl=getSSLContextWithTrustore(new File("src/test/resources/keystore/keycloak.truststore"),"secret");
+  }
+  adminClient=Keycloak.getInstance(AuthServerTestEnricher.getAuthServerContextRoot() + "/auth",MASTER,ADMIN,ADMIN,Constants.ADMIN_CLI_CLIENT_ID,null,ssl);
   getTestingClient();
   adminUser=createAdminUserRepresentation();
   setDefaultPageUriParameters();

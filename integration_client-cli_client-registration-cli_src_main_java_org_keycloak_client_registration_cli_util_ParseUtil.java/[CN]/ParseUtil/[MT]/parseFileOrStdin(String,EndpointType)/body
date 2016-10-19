@@ -1,0 +1,64 @@
+{
+  String content=readFileOrStdin(file).trim();
+  ClientRepresentation client=null;
+  OIDCClientRepresentation oidcClient=null;
+  if (type == null) {
+    if (content.startsWith("<")) {
+      type=EndpointType.SAML2;
+    }
+ else     if (content.startsWith("{")) {
+      try {
+        client=JsonSerialization.readValue(content,ClientRepresentation.class);
+        type=EndpointType.DEFAULT;
+      }
+ catch (      JsonParseException e) {
+        throw new RuntimeException("Failed to read the input document as JSON: " + e.getMessage(),e);
+      }
+catch (      Exception ignored) {
+      }
+      if (client == null) {
+        try {
+          oidcClient=JsonSerialization.readValue(content,OIDCClientRepresentation.class);
+          type=EndpointType.OIDC;
+        }
+ catch (        IOException ne) {
+          throw new RuntimeException("Unable to determine input document type. Use -e TYPE to specify the registration endpoint to use");
+        }
+catch (        Exception e) {
+          throw new RuntimeException("Failed to read the input document as JSON",e);
+        }
+      }
+    }
+ else     if (content.length() == 0) {
+      throw new RuntimeException("Document provided by --file option is empty");
+    }
+ else {
+      throw new RuntimeException("Unable to determine input document type. Use -e TYPE to specify the registration endpoint to use");
+    }
+  }
+  if (content != null) {
+    try {
+      if (type == EndpointType.DEFAULT && client == null) {
+        client=JsonSerialization.readValue(content,ClientRepresentation.class);
+      }
+ else       if (type == EndpointType.OIDC && oidcClient == null) {
+        oidcClient=JsonSerialization.readValue(content,OIDCClientRepresentation.class);
+      }
+    }
+ catch (    JsonParseException e) {
+      throw new RuntimeException("Not a valid JSON document - " + e.getMessage(),e);
+    }
+catch (    UnrecognizedPropertyException e) {
+      throw new RuntimeException("Attribute '" + e.getPropertyName() + "' not supported on document type '"+ type.getName()+ "'",e);
+    }
+catch (    IOException e) {
+      throw new RuntimeException("Not a valid JSON document",e);
+    }
+  }
+  CmdStdinContext ctx=new CmdStdinContext();
+  ctx.setEndpointType(type);
+  ctx.setContent(content);
+  ctx.setClient(client);
+  ctx.setOidcClient(oidcClient);
+  return ctx;
+}

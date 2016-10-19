@@ -1,0 +1,25 @@
+{
+  LinkedHashMap<String,String> result=new LinkedHashMap<>();
+  attr=attr != null ? attr : new AttributeKey();
+  Map<String,Field> fields=getAttrFieldsForType(type);
+  for (  AttributeKey.Component c : attr.getComponents()) {
+    Field f=fields.get(c.getName());
+    if (f == null) {
+      throw new AttributeException(attr.toString(),"No such attribute: " + attr);
+    }
+    type=f.getType();
+    if (isBasicType(type) || isListType(type) || isMapType(type)) {
+      return result;
+    }
+ else {
+      fields=getAttrFieldsForType(type);
+    }
+  }
+  for (  Map.Entry<String,Field> item : fields.entrySet()) {
+    String key=item.getKey();
+    Class clazz=item.getValue().getType();
+    String t=getTypeString(clazz,item.getValue());
+    result.put(key,t);
+  }
+  return result;
+}

@@ -9,15 +9,10 @@
   user.setLastName(userRep.getLastName());
   user.setFederationLink(userRep.getFederationLink());
   if (userRep.getAttributes() != null) {
-    for (    Map.Entry<String,Object> entry : userRep.getAttributes().entrySet()) {
-      Object value=entry.getValue();
-      if (value instanceof Collection) {
-        Collection<String> colVal=(Collection<String>)value;
-        user.setAttribute(entry.getKey(),new ArrayList<>(colVal));
-      }
- else       if (value instanceof String) {
-        String stringVal=(String)value;
-        user.setSingleAttribute(entry.getKey(),stringVal);
+    for (    Map.Entry<String,List<String>> entry : userRep.getAttributes().entrySet()) {
+      List<String> value=entry.getValue();
+      if (value != null) {
+        user.setAttribute(entry.getKey(),new ArrayList<>(value));
       }
     }
   }

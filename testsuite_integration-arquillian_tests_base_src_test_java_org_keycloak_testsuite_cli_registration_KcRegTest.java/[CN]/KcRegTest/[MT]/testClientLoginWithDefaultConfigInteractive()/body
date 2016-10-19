@@ -1,0 +1,26 @@
+{
+  if (!runIntermittentlyFailingTests()) {
+    System.out.println("TEST SKIPPED - This test currently suffers from intermittent failures. Use -Dtest.intermittent=true to run it.");
+    return;
+  }
+  KcRegExec exe=KcRegExec.newBuilder().argsLine("config credentials --server " + serverUrl + " --realm test --client reg-cli-secret").executeAsync();
+  exe.waitForStdout("Enter client secret: ");
+  exe.sendToStdin("password" + EOL);
+  exe.waitCompletion();
+  assertExitCodeAndStreamSizes(exe,0,1,1);
+  Assert.assertEquals("stderr first line","Logging into " + serverUrl + " as service-account-reg-cli-secret of realm test",exe.stderrLines().get(0));
+  File tmpFile=new File(KcRegExec.WORK_DIR + "/" + UUID.randomUUID().toString()+ ".tmp");
+  try {
+    FileOutputStream tmpos=new FileOutputStream(tmpFile);
+    tmpos.write("password".getBytes());
+    tmpos.write(EOL.getBytes());
+    tmpos.close();
+    exe=KcRegExec.newBuilder().argsLine("config credentials --server " + serverUrl + " --realm test --client reg-cli-secret < '"+ tmpFile.getName()+ "'").execute();
+    assertExitCodeAndStreamSizes(exe,0,1,1);
+    Assert.assertTrue("Enter client secret prompt",exe.stdoutLines().get(0).startsWith("Enter client secret: "));
+    Assert.assertEquals("stderr first line","Logging into " + serverUrl + " as service-account-reg-cli-secret of realm test",exe.stderrLines().get(0));
+  }
+  finally {
+    tmpFile.delete();
+  }
+}

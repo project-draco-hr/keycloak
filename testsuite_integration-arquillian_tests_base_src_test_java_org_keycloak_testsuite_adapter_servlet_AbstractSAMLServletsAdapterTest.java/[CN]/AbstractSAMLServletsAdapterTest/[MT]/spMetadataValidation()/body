@@ -1,0 +1,9 @@
+{
+  ClientResource clientResource=ApiUtil.findClientResourceByClientId(testRealmResource(),"http://localhost:8081/sales-post-sig/");
+  ClientRepresentation representation=clientResource.toRepresentation();
+  Client client=ClientBuilder.newClient();
+  WebTarget target=client.target(authServerPage.toString() + "/admin/realms/" + SAMLSERVLETDEMO+ "/clients/"+ representation.getId()+ "/installation/providers/saml-sp-descriptor");
+  Response response=target.request().header(HttpHeaders.AUTHORIZATION,"Bearer " + adminClient.tokenManager().getAccessToken().getToken()).get();
+  validateXMLWithSchema(response.readEntity(String.class),"/adapter-test/keycloak-saml/metadata-schema/saml-schema-metadata-2.0.xsd");
+  response.close();
+}

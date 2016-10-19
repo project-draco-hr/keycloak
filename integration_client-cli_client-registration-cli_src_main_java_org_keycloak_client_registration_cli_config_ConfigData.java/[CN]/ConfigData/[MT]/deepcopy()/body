@@ -1,0 +1,22 @@
+{
+  ConfigData data=new ConfigData();
+  data.serverUrl=serverUrl;
+  data.realm=realm;
+  data.truststore=truststore;
+  data.trustpass=trustpass;
+  data.endpoints=new HashMap<>();
+  for (  Map.Entry<String,Map<String,RealmConfigData>> item : endpoints.entrySet()) {
+    Map<String,RealmConfigData> nuitems=new HashMap<>();
+    Map<String,RealmConfigData> curitems=item.getValue();
+    if (curitems != null) {
+      for (      Map.Entry<String,RealmConfigData> ditem : curitems.entrySet()) {
+        RealmConfigData nudata=ditem.getValue();
+        if (nudata != null) {
+          nuitems.put(ditem.getKey(),nudata.deepcopy());
+        }
+      }
+      data.endpoints.put(item.getKey(),nuitems);
+    }
+  }
+  return data;
+}

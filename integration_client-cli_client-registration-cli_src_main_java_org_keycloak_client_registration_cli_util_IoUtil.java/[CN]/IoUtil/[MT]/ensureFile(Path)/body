@@ -1,0 +1,29 @@
+{
+  FileSystem fs=FileSystems.getDefault();
+  Set<String> supportedViews=fs.supportedFileAttributeViews();
+  Path parent=path.getParent();
+  if (!isDirectory(parent)) {
+    createDirectories(parent);
+    if (supportedViews.contains("posix")) {
+      setUnixPermissions(parent);
+    }
+ else     if (supportedViews.contains("acl")) {
+      setWindowsPermissions(parent);
+    }
+ else {
+      warnErr("Failed to restrict access permissions on .keycloak directory: " + parent);
+    }
+  }
+  if (!isRegularFile(path)) {
+    createFile(path);
+    if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+      setUnixPermissions(path);
+    }
+ else     if (supportedViews.contains("acl")) {
+      setWindowsPermissions(path);
+    }
+ else {
+      warnErr("Failed to restrict access permissions on config file: " + path);
+    }
+  }
+}

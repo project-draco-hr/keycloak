@@ -1,0 +1,43 @@
+{
+  HashSet<String> exclusions=new HashSet<>(Arrays.asList(excluded));
+  if (!exclusions.contains("serverUrl")) {
+    Assert.assertEquals("serverUrl",config1.getServerUrl(),config2.getServerUrl());
+  }
+  if (!exclusions.contains("realm")) {
+    Assert.assertEquals("realm",config1.getRealm(),config2.getRealm());
+  }
+  if (!exclusions.contains("truststore")) {
+    Assert.assertEquals("truststore",config1.getTruststore(),config2.getTruststore());
+  }
+  if (!exclusions.contains("endpoints")) {
+    Map<String,Map<String,RealmConfigData>> endp1=config1.getEndpoints();
+    Map<String,Map<String,RealmConfigData>> endp2=config2.getEndpoints();
+    Iterator<Map.Entry<String,Map<String,RealmConfigData>>> it1=endp1.entrySet().iterator();
+    Iterator<Map.Entry<String,Map<String,RealmConfigData>>> it2=endp2.entrySet().iterator();
+    while (it1.hasNext()) {
+      Map.Entry<String,Map<String,RealmConfigData>> ent1=it1.next();
+      Map.Entry<String,Map<String,RealmConfigData>> ent2=it2.next();
+      String serverUrl=ent1.getKey();
+      String endpskey="endpoints." + serverUrl;
+      if (!exclusions.contains(endpskey)) {
+        Assert.assertEquals(endpskey,ent1.getKey(),ent2.getKey());
+        Map<String,RealmConfigData> realms1=ent1.getValue();
+        Map<String,RealmConfigData> realms2=ent2.getValue();
+        Iterator<Map.Entry<String,RealmConfigData>> rit1=realms1.entrySet().iterator();
+        Iterator<Map.Entry<String,RealmConfigData>> rit2=realms2.entrySet().iterator();
+        while (rit1.hasNext()) {
+          Map.Entry<String,RealmConfigData> rent1=rit1.next();
+          Map.Entry<String,RealmConfigData> rent2=rit2.next();
+          String realm=rent1.getKey();
+          String rkey=endpskey + "." + realm;
+          if (!exclusions.contains(endpskey)) {
+            Assert.assertEquals(rkey,rent1.getKey(),rent2.getKey());
+            RealmConfigData rdata1=rent1.getValue();
+            RealmConfigData rdata2=rent2.getValue();
+            assertFieldsEqualWithExclusions(serverUrl,realm,rdata1,rdata2,excluded);
+          }
+        }
+      }
+    }
+  }
+}

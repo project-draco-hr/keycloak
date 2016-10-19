@@ -7,7 +7,7 @@
   Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
   events.expectLogin().session(sessionId).assertEvent();
   UserRepresentation user=ActionUtil.findUserWithAdminClient(adminClient,"test-user@localhost");
-  Map<String,List<String>> attributes=user.getAttributesAsListValues();
+  Map<String,List<String>> attributes=user.getAttributes();
   assertNotNull("timestamp for terms acceptance was not stored in user attributes",attributes);
   List<String> termsAndConditions=attributes.get(TermsAndConditions.USER_ATTRIBUTE);
   assertTrue("timestamp for terms acceptance was not stored in user attributes as " + TermsAndConditions.USER_ATTRIBUTE,termsAndConditions.size() == 1);

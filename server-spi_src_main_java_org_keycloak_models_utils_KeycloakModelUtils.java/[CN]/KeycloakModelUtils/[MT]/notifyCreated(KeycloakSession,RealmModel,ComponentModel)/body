@@ -1,0 +1,13 @@
+{
+  Class<? extends Provider> providerClass=null;
+  try {
+    providerClass=(Class<? extends Provider>)Class.forName(model.getProviderType());
+  }
+ catch (  ClassNotFoundException e) {
+    throw new RuntimeException(e);
+  }
+  ProviderFactory factory=session.getKeycloakSessionFactory().getProviderFactory(providerClass,model.getProviderId());
+  if (factory instanceof ComponentFactory) {
+    ((ComponentFactory)factory).onCreate(session,realm,model);
+  }
+}

@@ -1,0 +1,11 @@
+{
+  String uri=super.getUserInfoUrl();
+  if (((GoogleIdentityProviderConfig)getConfig()).isUserIp()) {
+    ClientConnection connection=ResteasyProviderFactory.getContextData(ClientConnection.class);
+    if (connection != null) {
+      uri=KeycloakUriBuilder.fromUri(super.getUserInfoUrl()).queryParam("userIp",connection.getRemoteAddr()).build().toString();
+    }
+  }
+  logger.debugv("GOOGLE userInfoUrl: {0}",uri);
+  return uri;
+}

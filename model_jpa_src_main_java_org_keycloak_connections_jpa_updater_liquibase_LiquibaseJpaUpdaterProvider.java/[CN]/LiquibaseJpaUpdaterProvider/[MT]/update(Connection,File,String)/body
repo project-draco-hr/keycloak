@@ -6,10 +6,6 @@
     Liquibase liquibase=getLiquibaseForKeycloakUpdate(connection,defaultSchema);
     if (file != null) {
       exportWriter=new FileWriter(file);
-      List<ChangeSet> changeSets=getChangeSets(liquibase);
-      if (!changeSets.isEmpty() && liquibase.getDatabase().getRanChangeSetList().isEmpty()) {
-        outputChangeLogTableCreationScript(liquibase,exportWriter);
-      }
     }
     updateChangeSet(liquibase,liquibase.getChangeLogFile(),exportWriter);
     Set<JpaEntityProvider> jpaProviders=session.getAllProviders(JpaEntityProvider.class);

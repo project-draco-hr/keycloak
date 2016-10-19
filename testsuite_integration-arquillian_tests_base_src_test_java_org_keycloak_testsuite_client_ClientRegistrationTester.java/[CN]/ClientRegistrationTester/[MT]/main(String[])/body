@@ -1,0 +1,12 @@
+{
+  ClientRepresentation rep=createRep1();
+  ClientRegistration reg=ClientRegistration.create().url("http://localhost:8081/auth","test").build();
+  try {
+    ClientRepresentation createdRep=reg.create(rep);
+    System.out.println("Created client: " + createdRep.getClientId());
+  }
+ catch (  ClientRegistrationException ex) {
+    HttpErrorException httpEx=(HttpErrorException)ex.getCause();
+    System.err.println("HttpException when registering client. Status=" + httpEx.getStatusLine().getStatusCode() + ", Details="+ httpEx.getErrorResponse());
+  }
+}

@@ -1,0 +1,22 @@
+{
+  setTrustedHost("localhost",getPolicyAnon());
+  OIDCClientRepresentation client=create();
+  String clientId=client.getClientId();
+  ClientRepresentation clientRep=ApiUtil.findClientByClientId(realmResource(),clientId).toRepresentation();
+  Assert.assertTrue(clientRep.isEnabled());
+  ComponentRepresentation rep=new ComponentRepresentation();
+  rep.setName("Clients disabled");
+  rep.setParentId(REALM_NAME);
+  rep.setProviderId(ClientDisabledClientRegistrationPolicyFactory.PROVIDER_ID);
+  rep.setProviderType(ClientRegistrationPolicy.class.getName());
+  rep.setSubType(getPolicyAnon());
+  realmResource().components().add(rep);
+  client=create();
+  clientId=client.getClientId();
+  clientRep=ApiUtil.findClientByClientId(realmResource(),clientId).toRepresentation();
+  Assert.assertFalse(clientRep.isEnabled());
+  clientRep.setEnabled(true);
+  assertFail(ClientRegOp.UPDATE,clientRep,403,"Not permitted to enable client");
+  clientRep.setEnabled(false);
+  reg.update(clientRep);
+}

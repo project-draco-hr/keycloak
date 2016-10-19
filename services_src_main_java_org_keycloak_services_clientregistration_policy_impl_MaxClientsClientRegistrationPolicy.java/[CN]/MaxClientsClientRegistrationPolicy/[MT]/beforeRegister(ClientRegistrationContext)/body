@@ -1,0 +1,8 @@
+{
+  RealmModel realm=session.getContext().getRealm();
+  int currentCount=realm.getClients().size();
+  int maxCount=componentModel.get(MaxClientsClientRegistrationPolicyFactory.MAX_CLIENTS,MaxClientsClientRegistrationPolicyFactory.DEFAULT_MAX_CLIENTS);
+  if (currentCount >= maxCount) {
+    throw new ClientRegistrationPolicyException("It's allowed to have max " + maxCount + " clients per realm");
+  }
+}

@@ -1,0 +1,21 @@
+{
+  Field f=null;
+  Type gtype=type;
+  for (  AttributeKey.Component c : attr.getComponents()) {
+    if (f != null) {
+      gtype=f.getGenericType();
+      if (gtype instanceof ParameterizedType) {
+        Type[] typeargs=((ParameterizedType)gtype).getActualTypeArguments();
+        if (typeargs.length > 0) {
+          gtype=typeargs[typeargs.length - 1];
+        }
+      }
+    }
+    Map<String,Field> fields=getAttrFieldsForType(gtype);
+    f=fields.get(c.getName());
+    if (f == null) {
+      throw new AttributeException(attr.toString(),"No such attribute: " + attr);
+    }
+  }
+  return f;
+}

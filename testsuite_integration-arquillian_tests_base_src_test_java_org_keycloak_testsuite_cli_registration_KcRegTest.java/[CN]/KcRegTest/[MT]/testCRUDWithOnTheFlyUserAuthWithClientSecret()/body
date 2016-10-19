@@ -1,0 +1,15 @@
+{
+  KcRegExec exe=execute("get test-client --no-config --server " + serverUrl + " --realm test"+ " --user user1 --password userpass --client reg-cli-secret --secret password");
+  assertExitCodeAndStreamSizes(exe,1,0,2);
+  Assert.assertEquals("login message","Logging into " + serverUrl + " as user user1 of realm test",exe.stderrLines().get(0));
+  Assert.assertEquals("error message","Client not allowed for direct access grants [invalid_grant]",exe.stderrLines().get(1));
+  exe=execute("get test-client --no-config --server " + serverUrl + " --realm test"+ " --user user1 --password wrong --client reg-cli-secret-direct --secret password");
+  assertExitCodeAndStreamSizes(exe,1,0,2);
+  Assert.assertEquals("login message","Logging into " + serverUrl + " as user user1 of realm test",exe.stderrLines().get(0));
+  Assert.assertEquals("error message","Invalid user credentials [invalid_grant]",exe.stderrLines().get(1));
+  exe=execute("get test-client --no-config --server " + serverUrl + " --realm test"+ " --user user1 --password userpass --client reg-cli-secret-direct --secret wrong");
+  assertExitCodeAndStreamSizes(exe,1,0,2);
+  Assert.assertEquals("login message","Logging into " + serverUrl + " as user user1 of realm test",exe.stderrLines().get(0));
+  Assert.assertEquals("error message","Invalid client secret [unauthorized_client]",exe.stderrLines().get(1));
+  testCRUDWithOnTheFlyAuth(serverUrl,"--user user1 --password userpass --client reg-cli-secret-direct --secret password","","Logging into " + serverUrl + " as user user1 of realm test");
+}

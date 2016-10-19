@@ -1,0 +1,21 @@
+{
+  Class type;
+  if (gtype instanceof Class) {
+    type=(Class)gtype;
+  }
+ else   if (gtype instanceof ParameterizedType) {
+    type=(Class)((ParameterizedType)gtype).getRawType();
+  }
+ else {
+    throw new RuntimeException("Unexpected type: " + gtype);
+  }
+  if (isListType(type) || isMapType(type)) {
+    return Collections.emptyMap();
+  }
+  Map<String,Field> map=index.get(type);
+  if (map == null) {
+    populateAttributesIndex(type);
+    map=index.get(type);
+  }
+  return map;
+}

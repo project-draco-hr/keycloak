@@ -1,0 +1,31 @@
+{
+  try {
+    if (args.size() == 0) {
+      throw new RuntimeException("Sub-command required by '" + OsUtil.CMD + " config' - one of: 'credentials', 'truststore', 'initial-token', 'registration-token'");
+    }
+    String cmd=args.get(0);
+switch (cmd) {
+case "credentials":
+{
+        return new ConfigCredentialsCmd(this).execute(commandInvocation);
+      }
+case "truststore":
+{
+      return new ConfigTruststoreCmd(this).execute(commandInvocation);
+    }
+case "initial-token":
+{
+    return new ConfigInitialTokenCmd(this).execute(commandInvocation);
+  }
+case "registration-token":
+{
+  return new ConfigRegistrationTokenCmd(this).execute(commandInvocation);
+}
+default :
+throw new RuntimeException("Unknown sub-command: " + cmd);
+}
+}
+  finally {
+commandInvocation.stop();
+}
+}

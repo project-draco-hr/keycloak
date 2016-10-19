@@ -1,0 +1,11 @@
+{
+  addLocalhostToAllowedHosts(realm);
+  FileConfigHandler handler=initCustomConfigFile();
+  try (TempFileResource configFile=new TempFileResource(handler.getConfigFile())){
+    KcRegExec exe=execute("create " + (useConfig ? ("--config '" + configFile.getAbsolutePath()) + "'" : "--no-config") + " --server "+ serverUrl+ " --realm "+ realm+ " -s clientId=test-client -o");
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    ClientRepresentation client=JsonSerialization.readValue(exe.stdout(),ClientRepresentation.class);
+    Assert.assertEquals("clientId","test-client",client.getClientId());
+    Assert.assertNotNull("registrationAccessToken",client.getRegistrationAccessToken());
+  }
+ }

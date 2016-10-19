@@ -1,0 +1,57 @@
+{
+  FileConfigHandler handler=initCustomConfigFile();
+  try (TempFileResource configFile=new TempFileResource(handler.getConfigFile())){
+    final String realm="test";
+    loginAsUser(configFile.getFile(),serverUrl,realm,"user1","userpass");
+    KcRegExec exe=execute("create --config '" + configFile.getName() + "' -o -s clientId=my_client");
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    ClientRepresentation client=JsonSerialization.readValue(exe.stdout(),ClientRepresentation.class);
+    Assert.assertEquals("enabled",true,client.isEnabled());
+    Assert.assertEquals("publicClient",false,client.isPublicClient());
+    Assert.assertEquals("bearerOnly",false,client.isBearerOnly());
+    Assert.assertTrue("redirectUris is empty",client.getRedirectUris().isEmpty());
+    exe=execute("update my_client --config '" + configFile.getName() + "' -o "+ " -s enabled=false -s 'redirectUris=[\"http://localhost:8980/myapp/*\"]'");
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    Assert.assertTrue("stderr is empty",exe.stderrLines().isEmpty());
+    client=JsonSerialization.readValue(exe.stdout(),ClientRepresentation.class);
+    Assert.assertEquals("enabled",false,client.isEnabled());
+    Assert.assertEquals("redirectUris",Arrays.asList("http://localhost:8980/myapp/*"),client.getRedirectUris());
+    exe=execute("update my_client --config '" + configFile.getName() + "' -o -d redirectUris -s webOrigins+=http://localhost:8980/myapp -s webOrigins+=http://localhost:8981/myapp -d webOrigins[0]");
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    Assert.assertTrue("stderr is empty",exe.stderrLines().isEmpty());
+    client=JsonSerialization.readValue(exe.stdout(),ClientRepresentation.class);
+    Assert.assertTrue("redirectUris is empty",client.getRedirectUris().isEmpty());
+    Assert.assertEquals("webOrigins",Arrays.asList("http://localhost:8981/myapp"),client.getWebOrigins());
+    exe=execute("update my_client --nonexisting --config '" + configFile.getName() + "'");
+    assertExitCodeAndStreamSizes(exe,1,0,1);
+    Assert.assertEquals("error message","Unsupported option: --nonexisting",exe.stderrLines().get(0));
+    exe=execute("update my_client --config '" + configFile.getName() + "' -o -s enabled=true -e oidc");
+    assertExitCodeAndStreamSizes(exe,1,0,1);
+    Assert.assertEquals("error message","Failed to set attribute 'enabled' on document type 'oidc'",exe.stderrLines().get(0));
+    exe=KcRegExec.newBuilder().argsLine("update my_client --config '" + configFile.getName() + "' -o  -s clientId=my_client -s 'redirectUris=[\"http://localhost:8980/myapp/*\"]' -f -").stdin(new ByteArrayInputStream("{ \"enabled\": false }".getBytes())).execute();
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    Assert.assertTrue("stderr has error",exe.stderrLines().isEmpty());
+    client=JsonSerialization.readValue(exe.stdout(),ClientRepresentation.class);
+    Assert.assertEquals("webOrigins",Arrays.asList("http://localhost:8981/myapp"),client.getWebOrigins());
+    Assert.assertFalse("enabled is false",client.isEnabled());
+    Assert.assertEquals("redirectUris",Arrays.asList("http://localhost:8980/myapp/*"),client.getRedirectUris());
+    exe=KcRegExec.newBuilder().argsLine("update my_client --config '" + configFile.getName() + "' -o -s enabled=true -m -f -").stdin(new ByteArrayInputStream("{ \"webOrigins\": [\"http://localhost:8980/myapp\"] }".getBytes())).execute();
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    Assert.assertTrue("stderr has error",exe.stderrLines().isEmpty());
+    client=JsonSerialization.readValue(exe.stdout(),ClientRepresentation.class);
+    Assert.assertEquals("webOrigins",Arrays.asList("http://localhost:8980/myapp"),client.getWebOrigins());
+    Assert.assertTrue("enabled is true",client.isEnabled());
+    Assert.assertEquals("redirectUris",Arrays.asList("http://localhost:8980/myapp/*"),client.getRedirectUris());
+    exe=execute("config registration-token --config '" + configFile.getName() + "' --server "+ serverUrl+ " --realm "+ realm+ " --client my_client -d");
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    Assert.assertTrue("stderr is empty",exe.stderrLines().isEmpty());
+    Assert.assertNull("my_client registration token",handler.loadConfig().ensureRealmConfigData(serverUrl,realm).getClients().get("my_client"));
+    exe=execute("update my_client --config '" + configFile.getName() + "' -o -s bearerOnly=true");
+    Assert.assertEquals("exitCode == 1",1,exe.exitCode());
+    Assert.assertFalse("stderr is not empty",exe.stderrLines().isEmpty());
+    Assert.assertEquals("error message","No Registration Access Token found for client: my_client. Provide one or use --unsafe.",exe.stderrLines().get(0));
+    exe=execute("update my_client --config '" + configFile.getName() + "' -o -s bearerOnly=true --unsafe");
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    Assert.assertTrue("stderr is empty",exe.stderrLines().isEmpty());
+  }
+ }

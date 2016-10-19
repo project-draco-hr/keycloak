@@ -1,0 +1,21 @@
+{
+  FileConfigHandler handler=initCustomConfigFile();
+  try (TempFileResource configFile=new TempFileResource(handler.getConfigFile())){
+    String token=issueInitialAccessToken("master");
+    final String realm="master";
+    KcRegExec exe=execute("create " + (useConfig ? ("--config '" + configFile.getAbsolutePath()) + "'" : "--no-config") + " --server "+ serverUrl+ " --realm "+ realm+ " -s clientId=test-client2 -o -t "+ token);
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    ClientRepresentation client=JsonSerialization.readValue(exe.stdout(),ClientRepresentation.class);
+    Assert.assertEquals("clientId","test-client2",client.getClientId());
+    Assert.assertNotNull("registrationAccessToken",client.getRegistrationAccessToken());
+    if (useConfig) {
+      ConfigData config=handler.loadConfig();
+      Assert.assertEquals("Registration Access Token in config file",client.getRegistrationAccessToken(),config.ensureRealmConfigData(serverUrl,realm).getClients().get("test-client2"));
+    }
+ else {
+      Assert.assertFalse("There should be no config file",configFile.isFile());
+    }
+    exe=execute("delete test-client2 " + (useConfig ? ("--config '" + configFile.getAbsolutePath()) + "'" : "--no-config") + " --server "+ serverUrl+ " --realm "+ realm+ " -t "+ client.getRegistrationAccessToken());
+    assertExitCodeAndStreamSizes(exe,0,0,0);
+  }
+ }

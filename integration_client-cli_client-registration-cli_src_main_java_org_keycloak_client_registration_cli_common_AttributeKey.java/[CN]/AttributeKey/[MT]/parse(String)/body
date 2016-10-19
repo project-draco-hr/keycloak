@@ -1,0 +1,59 @@
+{
+  if (key == null || "".equals(key)) {
+    return Collections.emptyList();
+  }
+  List<Component> cs=new LinkedList<>();
+  StringBuilder sb=new StringBuilder();
+  int state=START;
+  char[] buf=key.toCharArray();
+  for (int pos=0; pos < buf.length; pos++) {
+    char c=buf[pos];
+    if (state == START) {
+      if ('\"' == c) {
+        state=QUOTED;
+      }
+ else       if ('.' == c) {
+        throw new RuntimeException("Invalid attribute key: " + key + " (at position "+ (pos + 1)+ ")");
+      }
+ else {
+        state=UNQUOTED;
+        sb.append(c);
+      }
+    }
+ else     if (state == QUOTED) {
+      if ('\"' == c) {
+        state=END;
+      }
+ else {
+        sb.append(c);
+      }
+    }
+ else     if (state == UNQUOTED || state == END) {
+      if ('.' == c) {
+        state=START;
+        cs.add(new Component(sb.toString()));
+        sb.setLength(0);
+      }
+ else       if (state == END || '\"' == c) {
+        throw new RuntimeException("Invalid attribute key: " + key + " (at position "+ (pos + 1)+ ")");
+      }
+ else {
+        sb.append(c);
+      }
+    }
+  }
+  boolean ok=false;
+  if (sb.length() > 0) {
+    if (state == UNQUOTED || state == END) {
+      cs.add(new Component(sb.toString()));
+      ok=true;
+    }
+  }
+ else   if (state == END) {
+    ok=true;
+  }
+  if (!ok) {
+    throw new RuntimeException("Invalid attribute key: " + key + " (at position "+ (buf.length)+ ")");
+  }
+  return Collections.unmodifiableList(cs);
+}

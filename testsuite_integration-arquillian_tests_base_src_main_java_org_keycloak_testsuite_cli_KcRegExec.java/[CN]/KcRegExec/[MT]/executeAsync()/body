@@ -1,0 +1,20 @@
+{
+  try {
+    if (OS_ARCH.isWindows()) {
+      String cmd=(env != null ? "set " + env + " & " : "") + "bin\\" + CMD+ " "+ fixQuotes(argsLine);
+      System.out.println("Executing: cmd.exe /c " + cmd);
+      process=Runtime.getRuntime().exec(new String[]{"cmd.exe","/c",cmd},null,new File(workDir));
+    }
+ else {
+      String cmd=(env != null ? env + " " : "") + "bin/" + CMD+ " "+ argsLine;
+      System.out.println("Executing: sh -c " + cmd);
+      process=Runtime.getRuntime().exec(new String[]{"sh","-c",cmd},null,new File(workDir));
+    }
+    new StreamReaderThread(process.getInputStream(),logStreams ? new LoggingOutputStream("STDOUT",stdout) : stdout).start();
+    new StreamReaderThread(process.getErrorStream(),logStreams ? new LoggingOutputStream("STDERR",stderr) : stderr).start();
+    new StreamReaderThread(stdin,process.getOutputStream()).start();
+  }
+ catch (  Throwable t) {
+    err=t;
+  }
+}

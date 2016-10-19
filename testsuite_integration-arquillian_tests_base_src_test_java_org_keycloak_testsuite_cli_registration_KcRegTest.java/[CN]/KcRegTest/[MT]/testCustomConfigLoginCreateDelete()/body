@@ -1,0 +1,22 @@
+{
+  FileConfigHandler handler=initCustomConfigFile();
+  try (TempFileResource configFile=new TempFileResource(handler.getConfigFile())){
+    KcRegExec exe=execute("config credentials --server " + serverUrl + " --realm master --user admin --password admin --config '"+ configFile.getName()+ "'");
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    ConfigData config1=handler.loadConfig();
+    exe=execute("create --config '" + configFile.getName() + "' -s clientId=test-client -o");
+    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    ConfigData config2=handler.loadConfig();
+    assertFieldsEqualWithExclusions(config1,config2,"endpoints." + serverUrl + ".master.clients.test-client");
+    Assert.assertNotNull(config2.sessionRealmConfigData().getClients().get("test-client"));
+    ClientRepresentation client=JsonSerialization.readValue(exe.stdout(),ClientRepresentation.class);
+    Assert.assertEquals("clientId","test-client",client.getClientId());
+    Assert.assertNotNull("registrationAccessToken",client.getRegistrationAccessToken());
+    Assert.assertEquals("registrationAccessToken in returned json same as in config",config2.sessionRealmConfigData().getClients().get("test-client"),client.getRegistrationAccessToken());
+    exe=execute("delete test-client --config '" + configFile.getName() + "'");
+    assertExitCodeAndStreamSizes(exe,0,0,0);
+    ConfigData config3=handler.loadConfig();
+    assertFieldsEqualWithExclusions(config2,config3,"endpoints." + serverUrl + ".master.clients.test-client");
+    Assert.assertTrue("clients empty",config3.sessionRealmConfigData().getClients().isEmpty());
+  }
+ }

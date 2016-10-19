@@ -1,0 +1,38 @@
+{
+  if (output != null && output.getBuffer().trim().length() > 0) {
+    ResultHandler resultHandler=null;
+    AeshLine aeshLine=new AeshLine(output.getBuffer(),Globals.args,ParserStatus.OK,"");
+    try (CommandContainer commandContainer=getCommand(output,aeshLine)){
+      resultHandler=commandContainer.getParser().getProcessedCommand().getResultHandler();
+      CommandContainerResult ccResult=commandContainer.executeCommand(aeshLine,console.getInvocationProviders(),console.getAeshContext(),new AeshCommandInvocationProvider().enhanceCommandInvocation(new AeshCommandInvocation(console,output.getControlOperator(),output.getPid(),this)));
+      result=ccResult.getCommandResult();
+      if (result == CommandResult.SUCCESS && resultHandler != null)       resultHandler.onSuccess();
+ else       if (resultHandler != null)       resultHandler.onFailure(result);
+    }
+ catch (    Exception e) {
+      console.stop();
+      if (e instanceof OptionParserException) {
+        System.err.println("Unknown command: " + aeshLine.getWords().get(0));
+      }
+ else {
+        System.err.println(e.getMessage());
+      }
+      if (Globals.dumpTrace) {
+        e.printStackTrace();
+      }
+      System.exit(1);
+    }
+  }
+ else   if (output != null) {
+    result=CommandResult.FAILURE;
+  }
+ else {
+    result=CommandResult.FAILURE;
+  }
+  if (result == CommandResult.SUCCESS) {
+    return 0;
+  }
+ else {
+    return 1;
+  }
+}

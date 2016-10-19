@@ -1,0 +1,26 @@
+{
+  if (!runIntermittentlyFailingTests()) {
+    System.out.println("TEST SKIPPED - This test currently suffers from intermittent failures. Use -Dtest.intermittent=true to run it.");
+    return;
+  }
+  KcRegExec exe=KcRegExec.newBuilder().argsLine("config credentials --server " + serverUrl + " --realm master --user admin").executeAsync();
+  exe.waitForStdout("Enter password: ");
+  exe.sendToStdin("admin" + EOL);
+  exe.waitCompletion();
+  assertExitCodeAndStreamSizes(exe,0,1,1);
+  Assert.assertEquals("stderr first line","Logging into " + serverUrl + " as user admin of realm master",exe.stderrLines().get(0));
+  File tmpFile=new File(KcRegExec.WORK_DIR + "/" + UUID.randomUUID().toString()+ ".tmp");
+  try {
+    FileOutputStream tmpos=new FileOutputStream(tmpFile);
+    tmpos.write("admin".getBytes());
+    tmpos.write(EOL.getBytes());
+    tmpos.close();
+    exe=execute("config credentials --server " + serverUrl + " --realm master --user admin < '"+ tmpFile.getName()+ "'");
+    assertExitCodeAndStreamSizes(exe,0,1,1);
+    Assert.assertTrue("Enter password prompt",exe.stdoutLines().get(0).startsWith("Enter password: "));
+    Assert.assertEquals("stderr first line","Logging into " + serverUrl + " as user admin of realm master",exe.stderrLines().get(0));
+  }
+  finally {
+    tmpFile.delete();
+  }
+}

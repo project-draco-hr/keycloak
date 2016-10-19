@@ -1,0 +1,15 @@
+{
+  Map<String,Field> fieldMap=getAttrFieldsForType(source.getClass());
+  try {
+    for (    String attrName : fieldMap.keySet()) {
+      Field field=fieldMap.get(attrName);
+      Object localValue=field.get(source);
+      if (localValue != null) {
+        field.set(dest,localValue);
+      }
+    }
+  }
+ catch (  Exception e) {
+    throw new RuntimeException("Failed to merge changes",e);
+  }
+}

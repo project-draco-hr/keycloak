@@ -1,0 +1,7 @@
+{
+  RealmResource realmResource=adminClient.realm(realm);
+  String anonPolicy=ClientRegistrationPolicyManager.getComponentTypeKey(RegistrationAuth.ANONYMOUS);
+  ComponentRepresentation trustedHostRep=findPolicyByProviderAndAuth(realm,TrustedHostClientRegistrationPolicyFactory.PROVIDER_ID,anonPolicy);
+  trustedHostRep.getConfig().putSingle(TrustedHostClientRegistrationPolicyFactory.TRUSTED_HOSTS,"localhost");
+  realmResource.components().component(trustedHostRep.getId()).update(trustedHostRep);
+}

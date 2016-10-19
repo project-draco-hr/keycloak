@@ -1,0 +1,14 @@
+{
+  serverUrl=source.serverUrl;
+  realm=source.realm;
+  truststore=source.truststore;
+  trustpass=source.trustpass;
+  RealmConfigData current=getRealmConfigData(serverUrl,realm);
+  RealmConfigData sourceRealm=source.getRealmConfigData(serverUrl,realm);
+  if (current == null) {
+    setRealmConfigData(sourceRealm);
+  }
+ else {
+    current.merge(sourceRealm);
+  }
+}

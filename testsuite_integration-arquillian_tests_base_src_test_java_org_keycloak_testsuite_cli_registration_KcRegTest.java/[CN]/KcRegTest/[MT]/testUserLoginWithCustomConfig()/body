@@ -1,0 +1,27 @@
+{
+  FileConfigHandler handler=initCustomConfigFile();
+  File configFile=new File(handler.getConfigFile());
+  try {
+    KcRegExec exe=execute("config credentials --server " + serverUrl + " --realm master"+ " --user admin --password admin --config '"+ configFile.getName()+ "'");
+    assertExitCodeAndStreamSizes(exe,0,0,1);
+    Assert.assertEquals("stderr first line","Logging into " + serverUrl + " as user admin of realm master",exe.stderrLines().get(0));
+    ConfigData config=handler.loadConfig();
+    Assert.assertEquals("serverUrl",serverUrl,config.getServerUrl());
+    Assert.assertEquals("realm","master",config.getRealm());
+    RealmConfigData realmcfg=config.sessionRealmConfigData();
+    Assert.assertNotNull("realm config data no null",realmcfg);
+    Assert.assertEquals("realm cfg serverUrl",serverUrl,realmcfg.serverUrl());
+    Assert.assertEquals("realm cfg realm","master",realmcfg.realm());
+    Assert.assertEquals("client id","admin-cli",realmcfg.getClientId());
+    Assert.assertNotNull("token not null",realmcfg.getToken());
+    Assert.assertNotNull("refresh token not null",realmcfg.getRefreshToken());
+    Assert.assertNotNull("token expires not null",realmcfg.getExpiresAt());
+    Assert.assertNotNull("token expires in future",realmcfg.getExpiresAt() > System.currentTimeMillis());
+    Assert.assertNotNull("refresh token expires not null",realmcfg.getRefreshExpiresAt());
+    Assert.assertNotNull("refresh token expires in future",realmcfg.getRefreshExpiresAt() > System.currentTimeMillis());
+    Assert.assertTrue("clients is empty",realmcfg.getClients().isEmpty());
+  }
+  finally {
+    configFile.delete();
+  }
+}

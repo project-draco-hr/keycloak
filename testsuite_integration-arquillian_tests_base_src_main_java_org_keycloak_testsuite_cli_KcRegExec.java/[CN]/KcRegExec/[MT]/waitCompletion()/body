@@ -1,0 +1,34 @@
+{
+  try {
+    if (process.waitFor(waitTimeout,TimeUnit.MILLISECONDS)) {
+      exitCode=process.exitValue();
+      if (exitCode != 0) {
+        dumpStreams=true;
+      }
+    }
+ else {
+      if (process.isAlive()) {
+        process.destroyForcibly();
+      }
+      throw new RuntimeException("Timeout after " + (waitTimeout / 1000) + " seconds.");
+    }
+  }
+ catch (  InterruptedException e) {
+    dumpStreams=true;
+    throw new RuntimeException("Interrupted ...",e);
+  }
+catch (  Throwable t) {
+    dumpStreams=true;
+    err=t;
+  }
+ finally {
+    if (!logStreams && dumpStreams)     try {
+      System.out.println("STDOUT: ");
+      copyStream(new ByteArrayInputStream(stdout.toByteArray()),System.out);
+      System.out.println("STDERR: ");
+      copyStream(new ByteArrayInputStream(stderr.toByteArray()),System.out);
+    }
+ catch (    Exception ignored) {
+    }
+  }
+}

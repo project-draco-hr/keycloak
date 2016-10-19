@@ -1,0 +1,19 @@
+{
+  if (name.endsWith("]")) {
+    int pos=name.lastIndexOf("[",name.length() - 1);
+    if (pos == -1) {
+      throw new RuntimeException("Invalid attribute key: " + name + " (']' not allowed here)");
+    }
+    String idx=name.substring(pos + 1,name.length() - 1);
+    try {
+      index=Integer.parseInt(idx);
+    }
+ catch (    Exception e) {
+      throw new RuntimeException("Invalid attribute key: " + name + " (Invalid array index: '["+ idx+ "]')");
+    }
+    this.name=name.substring(0,pos);
+  }
+ else {
+    this.name=name;
+  }
+}

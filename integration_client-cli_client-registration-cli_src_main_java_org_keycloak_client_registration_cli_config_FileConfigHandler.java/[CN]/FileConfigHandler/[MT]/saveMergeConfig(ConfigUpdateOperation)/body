@@ -1,0 +1,53 @@
+{
+  try {
+    ensureFile();
+    try (RandomAccessFile file=new RandomAccessFile(new File(configFile),"rw")){
+      FileChannel fileChannel=file.getChannel();
+      FileLock fileLock=null;
+      int tryCount=0;
+      do       try {
+        fileLock=fileChannel.tryLock();
+        break;
+      }
+ catch (      OverlappingFileLockException e) {
+        try {
+          Thread.sleep(100);
+          continue;
+        }
+ catch (        InterruptedException e1) {
+          throw new RuntimeException("Interrupted");
+        }
+      }
+ while (tryCount++ < 10);
+      if (fileLock != null) {
+        try {
+          ConfigData config=new ConfigData();
+          long size=file.length();
+          if (size > MAX_SIZE) {
+            printErr("Config file " + configFile + " is too big. It will be overwritten.");
+            file.setLength(0);
+          }
+ else           if (size > 0) {
+            byte[] buf=new byte[(int)size];
+            file.readFully(buf);
+            config=JsonSerialization.readValue(new ByteArrayInputStream(buf),ConfigData.class);
+          }
+          op.update(config);
+          byte[] content=JsonSerialization.writeValueAsPrettyString(config).getBytes("utf-8");
+          file.seek(0);
+          file.write(content);
+          file.setLength(content.length);
+        }
+  finally {
+          fileLock.release();
+        }
+      }
+ else {
+        throw new RuntimeException("Failed to get lock on " + configFile);
+      }
+    }
+   }
+ catch (  IOException e) {
+    throw new RuntimeException("Failed to save " + configFile,e);
+  }
+}

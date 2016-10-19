@@ -1,0 +1,21 @@
+{
+  JsonNode jsonNode=jsonParser.readValueAsTree();
+  Iterator<Map.Entry<String,JsonNode>> itr=jsonNode.fields();
+  Map<String,List<String>> map=new HashMap<>();
+  while (itr.hasNext()) {
+    Map.Entry<String,JsonNode> e=itr.next();
+    List<String> values=new LinkedList<>();
+    if (!e.getValue().isArray()) {
+      values.add(e.getValue().asText());
+    }
+ else {
+      ArrayNode a=(ArrayNode)e.getValue();
+      Iterator<JsonNode> vitr=a.elements();
+      while (vitr.hasNext()) {
+        values.add(vitr.next().asText());
+      }
+    }
+    map.put(e.getKey(),values);
+  }
+  return map;
+}

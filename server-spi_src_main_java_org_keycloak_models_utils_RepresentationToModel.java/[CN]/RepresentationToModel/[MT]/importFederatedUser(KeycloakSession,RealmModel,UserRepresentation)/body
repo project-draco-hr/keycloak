@@ -1,19 +1,11 @@
 {
   UserFederatedStorageProvider federatedStorage=session.userFederatedStorage();
   if (userRep.getAttributes() != null) {
-    for (    Map.Entry<String,Object> entry : userRep.getAttributes().entrySet()) {
+    for (    Map.Entry<String,List<String>> entry : userRep.getAttributes().entrySet()) {
       String key=entry.getKey();
-      Object value=entry.getValue();
-      if (value == null)       continue;
-      if (value instanceof Collection) {
-        Collection<String> colVal=(Collection<String>)value;
-        List<String> list=new LinkedList<>();
-        list.addAll(colVal);
-        federatedStorage.setAttribute(newRealm,userRep.getId(),key,list);
-      }
- else       if (value instanceof String) {
-        String stringVal=(String)value;
-        federatedStorage.setSingleAttribute(newRealm,userRep.getId(),key,stringVal);
+      List<String> value=entry.getValue();
+      if (value != null) {
+        federatedStorage.setAttribute(newRealm,userRep.getId(),key,new LinkedList<>(value));
       }
     }
   }

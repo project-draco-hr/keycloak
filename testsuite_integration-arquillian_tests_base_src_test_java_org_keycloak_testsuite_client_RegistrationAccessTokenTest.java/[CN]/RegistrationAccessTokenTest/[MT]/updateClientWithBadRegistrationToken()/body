@@ -1,6 +1,7 @@
 {
-  client.setRootUrl("http://newroot");
-  reg.auth(Auth.token("invalid"));
+  String oldToken=client.getRegistrationAccessToken();
+  reg.update(client);
+  reg.auth(Auth.token(oldToken));
   try {
     reg.update(client);
     fail("Expected 401");

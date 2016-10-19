@@ -1,6 +1,9 @@
 {
   try {
-    if (args.size() == 0) {
+    if (args == null || args.size() == 0) {
+      if (printHelp()) {
+        return CommandResult.SUCCESS;
+      }
       throw new RuntimeException("Sub-command required by '" + OsUtil.CMD + " config' - one of: 'credentials', 'truststore', 'initial-token', 'registration-token'");
     }
     String cmd=args.get(0);
@@ -22,7 +25,12 @@ case "registration-token":
   return new ConfigRegistrationTokenCmd(this).execute(commandInvocation);
 }
 default :
+{
+if (printHelp()) {
+  return CommandResult.SUCCESS;
+}
 throw new RuntimeException("Unknown sub-command: " + cmd);
+}
 }
 }
   finally {

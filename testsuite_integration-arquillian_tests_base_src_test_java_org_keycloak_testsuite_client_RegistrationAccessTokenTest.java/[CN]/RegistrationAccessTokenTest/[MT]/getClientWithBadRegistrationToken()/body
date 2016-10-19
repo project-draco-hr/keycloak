@@ -1,5 +1,7 @@
 {
-  reg.auth(Auth.token("invalid"));
+  String oldToken=client.getRegistrationAccessToken();
+  reg.update(client);
+  reg.auth(Auth.token(oldToken));
   try {
     reg.get(client.getClientId());
     fail("Expected 401");

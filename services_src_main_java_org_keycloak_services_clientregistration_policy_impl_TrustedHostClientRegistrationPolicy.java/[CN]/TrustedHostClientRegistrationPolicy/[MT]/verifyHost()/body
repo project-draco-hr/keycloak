@@ -4,7 +4,7 @@
     return;
   }
   String hostAddress=session.getContext().getConnection().getRemoteAddr();
-  logger.infof("Verifying remote host : %s",hostAddress);
+  logger.debugf("Verifying remote host : %s",hostAddress);
   List<String> trustedHosts=getTrustedHosts();
   List<String> trustedDomains=getTrustedDomains();
   String verifiedHost=verifyHostInTrustedHosts(hostAddress,trustedHosts);
@@ -15,6 +15,6 @@
   if (verifiedHost != null) {
     return;
   }
-  logger.warnf("Failed to verify remote host : %s",hostAddress);
+  ServicesLogger.LOGGER.failedToVerifyRemoteHost(hostAddress);
   throw new ClientRegistrationPolicyException("Host not trusted.");
 }

@@ -13,9 +13,9 @@
     }
   }
  catch (  MalformedURLException mfe) {
-    logger.warnf("URL '%s' is malformed",url);
+    logger.debugf(mfe,"URL '%s' is malformed",url);
     throw new ClientRegistrationPolicyException("URL is malformed");
   }
-  logger.warnf("URL '%s' doesn't match any trustedHost or trustedDomain",url);
+  ServicesLogger.LOGGER.urlDoesntMatch(url);
   throw new ClientRegistrationPolicyException("URL doesn't match any trusted host or trusted domain");
 }

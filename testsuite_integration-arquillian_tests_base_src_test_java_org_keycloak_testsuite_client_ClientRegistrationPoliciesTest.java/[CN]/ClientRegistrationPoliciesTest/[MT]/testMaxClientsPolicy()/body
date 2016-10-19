@@ -1,0 +1,10 @@
+{
+  setTrustedHost("localhost",getPolicyAnon());
+  int clientsCount=realmResource().clients().findAll().size();
+  int newClientsLimit=clientsCount + 1;
+  ComponentRepresentation maxClientsPolicyRep=findPolicyByProviderAndAuth(MaxClientsClientRegistrationPolicyFactory.PROVIDER_ID,getPolicyAnon());
+  maxClientsPolicyRep.getConfig().putSingle(MaxClientsClientRegistrationPolicyFactory.MAX_CLIENTS,String.valueOf(newClientsLimit));
+  realmResource().components().component(maxClientsPolicyRep.getId()).update(maxClientsPolicyRep);
+  OIDCClientRepresentation client=create();
+  assertOidcFail(ClientRegOp.CREATE,createRepOidc(),403,"It's allowed to have max " + newClientsLimit + " clients per realm");
+}

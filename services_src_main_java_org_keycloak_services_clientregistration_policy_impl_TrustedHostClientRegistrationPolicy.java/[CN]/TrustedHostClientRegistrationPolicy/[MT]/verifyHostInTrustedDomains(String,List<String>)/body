@@ -2,7 +2,7 @@
   if (!trustedDomains.isEmpty()) {
     try {
       String hostname=InetAddress.getByName(hostAddress).getHostName();
-      logger.infof("Trying verify request from address '%s' of host '%s' by domains",hostAddress,hostname);
+      logger.debugf("Trying verify request from address '%s' of host '%s' by domains",hostAddress,hostname);
       for (      String confDomain : trustedDomains) {
         if (hostname.endsWith(confDomain)) {
           logger.debugf("Successfully verified host '%s' by trusted domain '%s'",hostname,confDomain);
@@ -11,7 +11,7 @@
       }
     }
  catch (    UnknownHostException uhe) {
-      logger.warnf("Request of address '%s' came from unknown host. Skip verification by domains",hostAddress);
+      logger.debugf(uhe,"Request of address '%s' came from unknown host. Skip verification by domains",hostAddress);
     }
   }
   return null;

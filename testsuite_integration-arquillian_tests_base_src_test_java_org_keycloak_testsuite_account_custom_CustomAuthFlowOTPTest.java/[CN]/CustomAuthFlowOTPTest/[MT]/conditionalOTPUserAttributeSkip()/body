@@ -3,11 +3,7 @@
   config.put(OTP_CONTROL_USER_ATTRIBUTE,"userSkipAttribute");
   config.put(DEFAULT_OTP_OUTCOME,FORCE);
   setConditionalOTPForm(config);
-  Map<String,Object> userAttributes=new HashMap<>();
-  List<String> attributeValues=new ArrayList<>();
-  attributeValues.add("skip");
-  userAttributes.put("userSkipAttribute",attributeValues);
-  testUser.setAttributes(userAttributes);
+  testUser.singleAttribute("userSkipAttribute","skip");
   testRealmResource().users().get(testUser.getId()).update(testUser);
   testRealmAccountManagementPage.navigateTo();
   testRealmLoginPage.form().login(testUser);

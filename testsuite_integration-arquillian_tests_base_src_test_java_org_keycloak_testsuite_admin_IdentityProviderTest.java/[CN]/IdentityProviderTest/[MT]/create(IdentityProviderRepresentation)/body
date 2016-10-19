@@ -2,5 +2,10 @@
   Response response=realm.identityProviders().create(idpRep);
   Assert.assertNotNull(ApiUtil.getCreatedId(response));
   response.close();
+  String secret=idpRep.getConfig() != null ? idpRep.getConfig().get("clientSecret") : null;
+  idpRep=StripSecretsUtils.strip(idpRep);
   assertAdminEvents.assertEvent(realmId,OperationType.CREATE,AdminEventPaths.identityProviderPath(idpRep.getAlias()),idpRep,ResourceType.IDENTITY_PROVIDER);
+  if (secret != null) {
+    idpRep.getConfig().put("clientSecret",secret);
+  }
 }

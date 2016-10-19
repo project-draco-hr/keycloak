@@ -30,7 +30,7 @@
     for (    final UserFederationProviderModel fedProvider : federationProviders) {
       usersSyncManager.notifyToRefreshPeriodicSync(session,realm,fedProvider,false);
     }
-    adminEvent.operation(OperationType.UPDATE).representation(rep).success();
+    adminEvent.operation(OperationType.UPDATE).representation(StripSecretsUtils.strip(rep)).success();
     return Response.noContent().build();
   }
  catch (  PatternSyntaxException e) {

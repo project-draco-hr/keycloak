@@ -58,7 +58,12 @@
     realm.updateDefaultRoles(rep.getDefaultRoles().toArray(new String[rep.getDefaultRoles().size()]));
   }
   if (rep.getSmtpServer() != null) {
-    realm.setSmtpConfig(new HashMap(rep.getSmtpServer()));
+    Map<String,String> config=new HashMap(rep.getSmtpServer());
+    if (rep.getSmtpServer().containsKey("password") && ComponentRepresentation.SECRET_VALUE.equals(rep.getSmtpServer().get("password"))) {
+      String passwordValue=realm.getSmtpConfig() != null ? realm.getSmtpConfig().get("password") : null;
+      config.put("password",passwordValue);
+    }
+    realm.setSmtpConfig(config);
   }
   if (rep.getBrowserSecurityHeaders() != null) {
     realm.setBrowserSecurityHeaders(rep.getBrowserSecurityHeaders());

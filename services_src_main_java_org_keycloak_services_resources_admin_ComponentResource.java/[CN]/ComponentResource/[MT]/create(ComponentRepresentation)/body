@@ -4,7 +4,7 @@
     ComponentModel model=RepresentationToModel.toModel(session,rep);
     if (model.getParentId() == null)     model.setParentId(realm.getId());
     model=realm.addComponentModel(model);
-    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,model.getId()).representation(StripSecretsUtils.strip(session,rep)).success();
     return Response.created(uriInfo.getAbsolutePathBuilder().path(model.getId()).build()).build();
   }
  catch (  ComponentValidationException e) {

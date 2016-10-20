@@ -1,12 +1,9 @@
 {
   if (rootUrl == null || rootUrl.isEmpty()) {
-    URI baseUri=uriInfo.getBaseUri();
-    String uri=baseUri.getScheme() + "://" + baseUri.getHost();
-    if (baseUri.getPort() != -1) {
-      uri+=":" + baseUri.getPort();
-    }
-    rootUrl=uri;
+    rootUrl=UriUtils.getOrigin(uriInfo.getBaseUri());
   }
-  relative=rootUrl + relative;
-  return relative;
+  StringBuilder sb=new StringBuilder();
+  sb.append(rootUrl);
+  sb.append(relative);
+  return sb.toString();
 }

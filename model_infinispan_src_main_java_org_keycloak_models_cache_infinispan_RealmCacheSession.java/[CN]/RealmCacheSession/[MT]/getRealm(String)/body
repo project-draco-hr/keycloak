@@ -3,6 +3,7 @@
   if (cached != null) {
     logger.tracev("by id cache hit: {0}",cached.getName());
   }
+  boolean wasCached=false;
   if (cached == null) {
     Long loaded=cache.getCurrentRevision(id);
     RealmModel model=getDelegate().getRealm(id);
@@ -10,6 +11,7 @@
     if (invalidations.contains(id))     return model;
     cached=new CachedRealm(loaded,model);
     cache.addRevisioned(cached,startupRevision);
+    wasCached=true;
   }
  else   if (invalidations.contains(id)) {
     return getDelegate().getRealm(id);
@@ -18,6 +20,18 @@
     return managedRealms.get(id);
   }
   RealmAdapter adapter=new RealmAdapter(cached,this);
+  if (wasCached) {
+    CachedRealmModel.RealmCachedEvent event=new CachedRealmModel.RealmCachedEvent(){
+      @Override public CachedRealmModel getRealm(){
+        return adapter;
+      }
+      @Override public KeycloakSession getKeycloakSession(){
+        return session;
+      }
+    }
+;
+    session.getKeycloakSessionFactory().publish(event);
+  }
   managedRealms.put(id,adapter);
   return adapter;
 }

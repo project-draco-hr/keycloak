@@ -4,7 +4,7 @@
     IdentityProviderModel identityProvider=RepresentationToModel.toModel(realm,representation);
     this.realm.addIdentityProvider(identityProvider);
     representation.setInternalId(identityProvider.getInternalId());
-    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,identityProvider.getAlias()).representation(representation).success();
+    adminEvent.operation(OperationType.CREATE).resourcePath(uriInfo,identityProvider.getAlias()).representation(StripSecretsUtils.strip(representation)).success();
     return Response.created(uriInfo.getAbsolutePathBuilder().path(representation.getAlias()).build()).build();
   }
  catch (  ModelDuplicateException e) {

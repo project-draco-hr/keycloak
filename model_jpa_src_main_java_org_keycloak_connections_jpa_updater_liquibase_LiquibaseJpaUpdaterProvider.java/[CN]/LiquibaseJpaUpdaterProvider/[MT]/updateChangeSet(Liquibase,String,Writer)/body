@@ -1,5 +1,5 @@
 {
-  List<ChangeSet> changeSets=getChangeSets(liquibase);
+  List<ChangeSet> changeSets=getLiquibaseUnrunChangeSets(liquibase);
   if (!changeSets.isEmpty()) {
     List<RanChangeSet> ranChangeSets=liquibase.getDatabase().getRanChangeSetList();
     if (ranChangeSets.isEmpty()) {
@@ -26,7 +26,6 @@
   }
  else {
     logger.debugv("Database is up to date for changelog {0}",changelog);
-    Method resetServices=Reflections.findDeclaredMethod(Liquibase.class,"resetServices");
-    Reflections.invokeMethod(true,resetServices,liquibase);
   }
+  resetLiquibaseServices(liquibase);
 }

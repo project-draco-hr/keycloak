@@ -1,16 +1,19 @@
 {
-  List<ChangeSet> changeSets=getChangeSets(liquibase);
+  final Status result;
+  List<ChangeSet> changeSets=getLiquibaseUnrunChangeSets(liquibase);
   if (!changeSets.isEmpty()) {
     if (changeSets.size() == liquibase.getDatabaseChangeLog().getChangeSets().size()) {
-      return Status.EMPTY;
+      result=Status.EMPTY;
     }
  else {
       logger.debugf("Validation failed. Database is not up-to-date for changelog %s",changelog);
-      return Status.OUTDATED;
+      result=Status.OUTDATED;
     }
   }
  else {
     logger.debugf("Validation passed. Database is up-to-date for changelog %s",changelog);
-    return Status.VALID;
+    result=Status.VALID;
   }
+  resetLiquibaseServices(liquibase);
+  return result;
 }

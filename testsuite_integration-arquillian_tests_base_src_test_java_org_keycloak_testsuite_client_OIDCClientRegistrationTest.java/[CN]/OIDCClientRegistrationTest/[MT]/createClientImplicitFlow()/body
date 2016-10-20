@@ -1,0 +1,13 @@
+{
+  OIDCClientRepresentation clientRep=createRep();
+  clientRep.setResponseTypes(Arrays.asList("id_token token"));
+  OIDCClientRepresentation response=reg.oidc().create(clientRep);
+  String clientId=response.getClientId();
+  ClientRepresentation kcClientRep=getKeycloakClient(clientId);
+  Assert.assertTrue(kcClientRep.isPublicClient());
+  reg.auth(Auth.token(response));
+  response.setResponseTypes(Arrays.asList("id_token token","code id_token","code"));
+  reg.oidc().update(response);
+  kcClientRep=getKeycloakClient(clientId);
+  Assert.assertFalse(kcClientRep.isPublicClient());
+}

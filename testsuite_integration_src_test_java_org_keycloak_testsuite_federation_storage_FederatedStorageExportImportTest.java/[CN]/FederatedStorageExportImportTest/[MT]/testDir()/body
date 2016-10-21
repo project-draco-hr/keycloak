@@ -32,6 +32,8 @@
   Assert.assertNull(session.realms().getRealmByName("exported"));
   ExportImportConfig.setAction(ExportImportConfig.ACTION_IMPORT);
   new ExportImportManager(session).runImport();
+  keycloakRule.stopSession(session,true);
+  session=keycloakRule.startSession();
   realm=session.realms().getRealmByName("exported");
   Assert.assertNotNull(realm);
   role=realm.getRole("test-role");
@@ -48,6 +50,5 @@
   List<CredentialModel> creds=session.userFederatedStorage().getStoredCredentials(realm,userId);
   Assert.assertEquals(1,creds.size());
   Assert.assertTrue(getHashProvider(session,realm.getPasswordPolicy()).verify("password",creds.get(0)));
-  session.realms().removeRealm(realmId);
   keycloakRule.stopSession(session,true);
 }

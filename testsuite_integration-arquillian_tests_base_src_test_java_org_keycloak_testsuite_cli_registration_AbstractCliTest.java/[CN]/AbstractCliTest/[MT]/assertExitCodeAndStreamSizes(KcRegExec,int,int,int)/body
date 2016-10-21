@@ -1,5 +1,19 @@
 {
   Assert.assertEquals("exitCode == " + exitCode,exitCode,exe.exitCode());
-  Assert.assertTrue("stdout output has " + stdOutLineCount + " lines",exe.stdoutLines().size() == stdOutLineCount);
-  Assert.assertTrue("stderr output has " + stdErrLineCount + " lines",exe.stderrLines().size() == stdErrLineCount);
+  if (stdOutLineCount != -1) {
+    try {
+      Assert.assertTrue("stdout output has " + stdOutLineCount + " lines",exe.stdoutLines().size() == stdOutLineCount);
+    }
+ catch (    Throwable e) {
+      throw new AssertionError("STDOUT: " + exe.stdoutString(),e);
+    }
+  }
+  if (stdErrLineCount != -1) {
+    try {
+      Assert.assertTrue("stderr output has " + stdErrLineCount + " lines",exe.stderrLines().size() == stdErrLineCount);
+    }
+ catch (    Throwable e) {
+      throw new AssertionError("STDERR: " + exe.stderrString(),e);
+    }
+  }
 }

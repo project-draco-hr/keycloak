@@ -34,6 +34,8 @@
   Assert.assertNull(session.realms().getRealmByName("exported-component"));
   ExportImportConfig.setAction(ExportImportConfig.ACTION_IMPORT);
   new ExportImportManager(session).runImport();
+  keycloakRule.stopSession(session,true);
+  session=keycloakRule.startSession();
   realm=session.realms().getRealmByName("exported-component");
   Assert.assertNotNull(realm);
   component=realm.getComponent(component.getId());
@@ -51,6 +53,5 @@
   Assert.assertEquals(subComponent.getProviderId(),UserMapStorageFactory.PROVIDER_ID);
   Assert.assertEquals(subComponent.getProviderType(),UserStorageProvider.class.getName());
   Assert.assertEquals(subComponent.getConfig().getFirst("attr"),"value2");
-  session.realms().removeRealm(realmId);
   keycloakRule.stopSession(session,true);
 }

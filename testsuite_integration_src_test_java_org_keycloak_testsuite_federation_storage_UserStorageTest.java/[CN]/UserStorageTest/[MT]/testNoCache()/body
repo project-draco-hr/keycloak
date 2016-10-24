@@ -1,0 +1,28 @@
+{
+  UserStorageProviderModel model=new UserStorageProviderModel(writableProvider);
+  model.setCachePolicy(UserStorageProviderModel.CachePolicy.NO_CACHE);
+  KeycloakSession session=keycloakRule.startSession();
+  RealmModel realm=session.realms().getRealmByName("test");
+  CachedUserModel thor=(CachedUserModel)session.users().getUserByUsername("thor",realm);
+  realm.updateComponent(model);
+  keycloakRule.stopSession(session,true);
+  session=keycloakRule.startSession();
+  realm=session.realms().getRealmByName("test");
+  UserModel thor2=session.users().getUserByUsername("thor",realm);
+  Assert.assertFalse(thor2 instanceof CachedUserModel);
+  keycloakRule.stopSession(session,true);
+  session=keycloakRule.startSession();
+  realm=session.realms().getRealmByName("test");
+  thor2=session.users().getUserByUsername("thor",realm);
+  Assert.assertFalse(thor2 instanceof CachedUserModel);
+  model.getConfig().remove("cachePolicy");
+  model.getConfig().remove("evictionHour");
+  model.getConfig().remove("evictionMinute");
+  model.getConfig().remove("evictionDay");
+  realm.updateComponent(model);
+  keycloakRule.stopSession(session,true);
+  session=keycloakRule.startSession();
+  realm=session.realms().getRealmByName("test");
+  thor=(CachedUserModel)session.users().getUserByUsername("thor",realm);
+  keycloakRule.stopSession(session,true);
+}

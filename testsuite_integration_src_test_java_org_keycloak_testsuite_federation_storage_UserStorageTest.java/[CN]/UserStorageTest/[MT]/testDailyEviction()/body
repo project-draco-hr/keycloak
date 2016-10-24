@@ -1,0 +1,26 @@
+{
+  Calendar cal=Calendar.getInstance();
+  cal.add(Calendar.HOUR,1);
+  int hour=cal.get(Calendar.HOUR_OF_DAY);
+  int min=cal.get(Calendar.MINUTE);
+  UserStorageProviderModel model=new UserStorageProviderModel(writableProvider);
+  model.setCachePolicy(UserStorageProviderModel.CachePolicy.EVICT_DAILY);
+  model.setEvictionHour(cal.get(Calendar.HOUR_OF_DAY));
+  model.setEvictionMinute(cal.get(Calendar.MINUTE));
+  KeycloakSession session=keycloakRule.startSession();
+  RealmModel realm=session.realms().getRealmByName("test");
+  CachedUserModel thor=(CachedUserModel)session.users().getUserByUsername("thor",realm);
+  long thorTimestamp=thor.getCacheTimestamp();
+  realm.updateComponent(model);
+  keycloakRule.stopSession(session,true);
+  Time.setOffset(60 * 2 * 60);
+  session=keycloakRule.startSession();
+  realm=session.realms().getRealmByName("test");
+  UserModel thor2=session.users().getUserByUsername("thor",realm);
+  Assert.assertFalse(thor2 instanceof CachedUserModel);
+  model.getConfig().remove("cachePolicy");
+  model.getConfig().remove("evictionHour");
+  model.getConfig().remove("evictionMinute");
+  realm.updateComponent(model);
+  keycloakRule.stopSession(session,true);
+}

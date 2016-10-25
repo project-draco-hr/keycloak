@@ -6,7 +6,7 @@
       throw new NotFoundException("Could not find component");
     }
     RepresentationToModel.updateComponent(session,rep,model,false);
-    adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo,model.getId()).representation(rep).success();
+    adminEvent.operation(OperationType.UPDATE).resourcePath(uriInfo,model.getId()).representation(StripSecretsUtils.strip(session,rep)).success();
     realm.updateComponent(model);
     return Response.noContent().build();
   }

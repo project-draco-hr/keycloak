@@ -1,7 +1,7 @@
 {
   IdentityProviderRepresentation newIdentityProvider=createRep("update-identity-provider","oidc");
   newIdentityProvider.getConfig().put("clientId","clientId");
-  newIdentityProvider.getConfig().put("clientSecret","clientSecret");
+  newIdentityProvider.getConfig().put("clientSecret","some secret value");
   create(newIdentityProvider);
   IdentityProviderResource identityProviderResource=realm.identityProviders().get("update-identity-provider");
   assertNotNull(identityProviderResource);
@@ -13,11 +13,14 @@
   representation.setStoreToken(true);
   representation.getConfig().put("clientId","changedClientId");
   identityProviderResource.update(representation);
-  assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.identityProviderPath("update-identity-provider"),representation,ResourceType.IDENTITY_PROVIDER);
+  AdminEventRepresentation event=assertAdminEvents.assertEvent(realmId,OperationType.UPDATE,AdminEventPaths.identityProviderPath("update-identity-provider"),representation,ResourceType.IDENTITY_PROVIDER);
+  assertFalse(event.getRepresentation().contains("some secret value"));
+  assertTrue(event.getRepresentation().contains(ComponentRepresentation.SECRET_VALUE));
   identityProviderResource=realm.identityProviders().get(representation.getInternalId());
   assertNotNull(identityProviderResource);
   representation=identityProviderResource.toRepresentation();
   assertFalse(representation.isEnabled());
   assertTrue(representation.isStoreToken());
   assertEquals("changedClientId",representation.getConfig().get("clientId"));
+  assertEquals("some secret value",testingClient.testing("admin-client-test").getIdentityProviderConfig("changed-alias").get("clientSecret"));
 }

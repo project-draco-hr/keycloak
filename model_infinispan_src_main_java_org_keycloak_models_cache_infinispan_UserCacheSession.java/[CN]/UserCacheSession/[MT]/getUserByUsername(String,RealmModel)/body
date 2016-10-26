@@ -21,14 +21,16 @@
       return null;
     }
     userId=model.getId();
-    query=new UserListQuery(loaded,cacheKey,realm,model.getId());
-    cache.addRevisioned(query,startupRevision);
     if (invalidations.contains(userId))     return model;
     if (managedUsers.containsKey(userId)) {
       logger.tracev("return managed user");
       return managedUsers.get(userId);
     }
-    UserAdapter adapter=getUserAdapter(realm,userId,loaded,model);
+    UserModel adapter=getUserAdapter(realm,userId,loaded,model);
+    if (adapter instanceof UserAdapter) {
+      query=new UserListQuery(loaded,cacheKey,realm,model.getId());
+      cache.addRevisioned(query,startupRevision);
+    }
     managedUsers.put(userId,adapter);
     return adapter;
   }

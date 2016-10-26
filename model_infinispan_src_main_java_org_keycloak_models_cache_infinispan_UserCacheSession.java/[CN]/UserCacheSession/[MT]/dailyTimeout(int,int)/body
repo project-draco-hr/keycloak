@@ -1,0 +1,16 @@
+{
+  Calendar cal=Calendar.getInstance();
+  Calendar cal2=Calendar.getInstance();
+  cal.setTimeInMillis(Time.currentTimeMillis());
+  cal2.setTimeInMillis(Time.currentTimeMillis());
+  cal2.set(Calendar.HOUR_OF_DAY,hour);
+  cal2.set(Calendar.MINUTE,minute);
+  if (cal2.getTimeInMillis() < cal.getTimeInMillis()) {
+    int add=(24 * 60 * 60* 1000);
+    cal.add(Calendar.MILLISECOND,add);
+  }
+ else {
+    cal.add(Calendar.MILLISECOND,(int)(cal2.getTimeInMillis() - cal.getTimeInMillis()));
+  }
+  return cal.getTimeInMillis();
+}

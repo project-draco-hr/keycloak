@@ -1,0 +1,45 @@
+{
+  StorageId storageId=new StorageId(delegate.getId());
+  CachedUser cached=null;
+  if (!storageId.isLocal()) {
+    ComponentModel component=realm.getComponent(storageId.getProviderId());
+    UserStorageProviderModel model=new UserStorageProviderModel(component);
+    UserStorageProviderModel.CachePolicy policy=model.getCachePolicy();
+    if (policy != null && policy == UserStorageProviderModel.CachePolicy.NO_CACHE) {
+      return delegate;
+    }
+    cached=new CachedUser(revision,realm,delegate);
+    if (policy == null || policy == UserStorageProviderModel.CachePolicy.DEFAULT) {
+      cache.addRevisioned(cached,startupRevision);
+    }
+ else {
+      long lifespan=-1;
+      if (policy == UserStorageProviderModel.CachePolicy.EVICT_DAILY) {
+        if (model.getEvictionHour() > -1 && model.getEvictionMinute() > -1) {
+          lifespan=dailyTimeout(model.getEvictionHour(),model.getEvictionMinute()) - Time.currentTimeMillis();
+        }
+      }
+ else       if (policy == UserStorageProviderModel.CachePolicy.EVICT_WEEKLY) {
+        if (model.getEvictionDay() > 0 && model.getEvictionHour() > -1 && model.getEvictionMinute() > -1) {
+          lifespan=weeklyTimeout(model.getEvictionDay(),model.getEvictionHour(),model.getEvictionMinute()) - Time.currentTimeMillis();
+        }
+      }
+ else       if (policy == UserStorageProviderModel.CachePolicy.MAX_LIFESPAN) {
+        lifespan=model.getMaxLifespan();
+      }
+      if (lifespan > 0) {
+        cache.addRevisioned(cached,startupRevision,lifespan);
+      }
+ else {
+        cache.addRevisioned(cached,startupRevision);
+      }
+    }
+  }
+ else {
+    cached=new CachedUser(revision,realm,delegate);
+    cache.addRevisioned(cached,startupRevision);
+  }
+  UserAdapter adapter=new UserAdapter(cached,this,session,realm);
+  onCache(realm,adapter,delegate);
+  return adapter;
+}

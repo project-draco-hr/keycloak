@@ -2,10 +2,10 @@
   FileConfigHandler handler=initCustomConfigFile();
   try (TempFileResource configFile=new TempFileResource(handler.getConfigFile())){
     KcRegExec exe=execute("config credentials --server " + serverUrl + " --realm master --user admin --password admin --config '"+ configFile.getName()+ "'");
-    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    assertExitCodeAndStreamSizes(exe,0,0,1);
     ConfigData config1=handler.loadConfig();
     exe=execute("create --config '" + configFile.getName() + "' -s clientId=test-client -o");
-    Assert.assertEquals("exitCode == 0",0,exe.exitCode());
+    assertExitCodeAndStdErrSize(exe,0,0);
     ConfigData config2=handler.loadConfig();
     assertFieldsEqualWithExclusions(config1,config2,"endpoints." + serverUrl + ".master.clients.test-client");
     Assert.assertNotNull(config2.sessionRealmConfigData().getClients().get("test-client"));

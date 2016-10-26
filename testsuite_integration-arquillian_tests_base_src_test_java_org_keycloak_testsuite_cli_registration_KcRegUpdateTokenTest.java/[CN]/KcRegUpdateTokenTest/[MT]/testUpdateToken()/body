@@ -19,7 +19,7 @@
     assertExitCodeAndStreamSizes(exe,0,1,1);
     String token=exe.stdoutLines().get(0);
     exe=execute("get reg-cli-secret-direct --no-config --server " + serverUrl + " --realm test -t "+ token);
-    Assert.assertEquals("exit code",0,exe.exitCode());
+    assertExitCodeAndStdErrSize(exe,0,0);
     ClientRepresentation client=JsonSerialization.readValue(exe.stdout(),ClientRepresentation.class);
     Assert.assertEquals("client representation returned","reg-cli-secret-direct",client.getClientId());
   }

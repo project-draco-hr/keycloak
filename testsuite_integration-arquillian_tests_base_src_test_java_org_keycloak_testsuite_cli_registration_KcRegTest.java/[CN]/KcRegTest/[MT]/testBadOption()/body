@@ -1,5 +1,6 @@
 {
   KcRegExec exe=execute("get my_client --nonexistent");
-  assertExitCodeAndStreamSizes(exe,1,0,1);
+  assertExitCodeAndStreamSizes(exe,1,0,2);
   Assert.assertEquals("stderr first line","Invalid option: --nonexistent",exe.stderrLines().get(0));
+  Assert.assertEquals("try help","Try '" + CMD + " help get' for more information",exe.stderrLines().get(1));
 }

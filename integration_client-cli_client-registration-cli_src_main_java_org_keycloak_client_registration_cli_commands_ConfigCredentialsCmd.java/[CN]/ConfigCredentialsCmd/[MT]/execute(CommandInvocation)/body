@@ -6,7 +6,10 @@
     processGlobalOptions();
     return process(commandInvocation);
   }
-  finally {
+ catch (  IllegalArgumentException e) {
+    throw new IllegalArgumentException(e.getMessage() + suggestHelp(),e);
+  }
+ finally {
     commandInvocation.stop();
   }
 }

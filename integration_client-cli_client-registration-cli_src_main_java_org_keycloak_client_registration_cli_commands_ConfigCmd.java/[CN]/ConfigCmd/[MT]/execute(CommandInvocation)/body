@@ -32,14 +32,14 @@ default :
   if (printHelp()) {
     return help ? CommandResult.SUCCESS : CommandResult.FAILURE;
   }
-  throw new RuntimeException("Unknown sub-command: " + cmd);
+  throw new IllegalArgumentException("Unknown sub-command: " + cmd + suggestHelp());
 }
 }
 }
 if (printHelp()) {
 return help ? CommandResult.SUCCESS : CommandResult.FAILURE;
 }
-throw new RuntimeException("Sub-command required by '" + OsUtil.CMD + " config' - one of: 'credentials', 'truststore', 'initial-token', 'registration-token'");
+throw new IllegalArgumentException("Sub-command required by '" + CMD + " config' - one of: 'credentials', 'truststore', 'initial-token', 'registration-token'");
 }
   finally {
 commandInvocation.stop();

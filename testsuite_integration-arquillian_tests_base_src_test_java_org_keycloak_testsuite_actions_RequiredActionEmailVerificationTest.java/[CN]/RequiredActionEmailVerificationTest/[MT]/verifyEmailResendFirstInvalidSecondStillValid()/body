@@ -1,0 +1,15 @@
+{
+  loginPage.open();
+  loginPage.login("test-user@localhost","password");
+  verifyEmailPage.clickResendEmail();
+  Assert.assertEquals(2,greenMail.getReceivedMessages().length);
+  MimeMessage message1=greenMail.getReceivedMessages()[0];
+  String verificationUrl1=getPasswordResetEmailLink(message1);
+  driver.navigate().to(verificationUrl1.trim());
+  assertTrue(errorPage.isCurrent());
+  assertEquals("The link you clicked is a old stale link and is no longer valid. Maybe you have already verified your email?",errorPage.getError());
+  MimeMessage message2=greenMail.getReceivedMessages()[1];
+  String verificationUrl2=getPasswordResetEmailLink(message2);
+  driver.navigate().to(verificationUrl2.trim());
+  Assert.assertEquals(RequestType.AUTH_RESPONSE,appPage.getRequestType());
+}

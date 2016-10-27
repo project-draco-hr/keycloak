@@ -28,10 +28,7 @@
       System.out.println("TEST SKIPPED PARTIALLY - This test currently suffers from intermittent failures. Use -Dtest.intermittent=true to run it in full.");
     }
   }
-   KcRegExec exe=execute("config truststore");
-  assertExitCodeAndStreamSizes(exe,1,0,1);
-  Assert.assertEquals("no truststore error","No truststore specified",exe.stderrLines().get(0));
-  exe=execute("config truststore --trustpass secret '" + truststore.getAbsolutePath() + "'");
+   KcRegExec exe=execute("config truststore --trustpass secret '" + truststore.getAbsolutePath() + "'");
   assertExitCodeAndStreamSizes(exe,0,0,0);
   exe=execute("config credentials --server " + serverUrl + " --realm test --user user1 --password userpass");
   assertExitCodeAndStreamSizes(exe,0,0,1);

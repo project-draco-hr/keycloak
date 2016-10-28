@@ -1,0 +1,38 @@
+{
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.components().query();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.components().query("nosuch");
+    }
+  }
+,Resource.REALM,false);
+  invoke(new InvocationWithResponse(){
+    public void invoke(    RealmResource realm,    AtomicReference<Response> response){
+      response.set(realm.components().add(new ComponentRepresentation()));
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.components().component("nosuch").toRepresentation();
+    }
+  }
+,Resource.REALM,false);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.components().component("nosuch").update(new ComponentRepresentation());
+    }
+  }
+,Resource.REALM,true);
+  invoke(new Invocation(){
+    public void invoke(    RealmResource realm){
+      realm.components().component("nosuch").remove();
+    }
+  }
+,Resource.REALM,true);
+}

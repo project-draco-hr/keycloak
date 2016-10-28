@@ -1,0 +1,31 @@
+{
+  UserRepresentation user=UserBuilder.create().username("randomuser-" + Time.currentTimeMillis()).build();
+  Response response=realm1.users().create(user);
+  String userId=ApiUtil.getCreatedId(response);
+  response.close();
+  realm1.users().get(userId).toRepresentation();
+  expectNotFound(new PermissionsTest.Invocation(){
+    @Override public void invoke(    RealmResource realm){
+      realm.users().get(userId).toRepresentation();
+    }
+  }
+,realm2);
+  expectNotFound(new PermissionsTest.Invocation(){
+    @Override public void invoke(    RealmResource realm){
+      realm.users().get(userId).update(new UserRepresentation());
+    }
+  }
+,realm2);
+  expectNotFound(new PermissionsTest.Invocation(){
+    @Override public void invoke(    RealmResource realm){
+      realm.users().get(userId).remove();
+    }
+  }
+,realm2);
+  expectNotFound(new PermissionsTest.Invocation(){
+    @Override public void invoke(    RealmResource realm){
+      realm.users().get(userId).getUserSessions();
+    }
+  }
+,realm2);
+}

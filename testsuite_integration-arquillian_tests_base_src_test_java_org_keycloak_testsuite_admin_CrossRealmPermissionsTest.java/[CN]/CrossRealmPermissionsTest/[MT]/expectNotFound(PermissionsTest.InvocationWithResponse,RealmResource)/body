@@ -1,0 +1,18 @@
+{
+  int statusCode=0;
+  try {
+    AtomicReference<Response> responseReference=new AtomicReference<>();
+    invocation.invoke(realm,responseReference);
+    Response response=responseReference.get();
+    if (response != null) {
+      statusCode=response.getStatus();
+    }
+ else {
+      fail("Expected failure");
+    }
+  }
+ catch (  ClientErrorException e) {
+    statusCode=e.getResponse().getStatus();
+  }
+  assertEquals(404,statusCode);
+}

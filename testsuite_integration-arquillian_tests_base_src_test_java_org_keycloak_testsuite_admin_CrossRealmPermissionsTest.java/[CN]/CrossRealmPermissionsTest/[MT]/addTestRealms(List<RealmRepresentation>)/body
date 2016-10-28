@@ -1,0 +1,12 @@
+{
+  RealmBuilder builder=RealmBuilder.create().name(REALM_NAME).testMail();
+  builder.client(ClientBuilder.create().clientId("test-client").publicClient().directAccessGrants());
+  builder.user(UserBuilder.create().username(AdminRoles.REALM_ADMIN).role(Constants.REALM_MANAGEMENT_CLIENT_ID,AdminRoles.REALM_ADMIN).addPassword("password"));
+  testRealms.add(builder.build());
+  realm1=Keycloak.getInstance(AuthServerTestEnricher.getAuthServerContextRoot() + "/auth",REALM_NAME,AdminRoles.REALM_ADMIN,"password","test-client","secret").realm(REALM_NAME);
+  builder=RealmBuilder.create().name(REALM2_NAME).testMail();
+  builder.client(ClientBuilder.create().clientId("test-client").publicClient().directAccessGrants());
+  builder.user(UserBuilder.create().username(AdminRoles.REALM_ADMIN).role(Constants.REALM_MANAGEMENT_CLIENT_ID,AdminRoles.REALM_ADMIN).addPassword("password"));
+  testRealms.add(builder.build());
+  realm2=Keycloak.getInstance(AuthServerTestEnricher.getAuthServerContextRoot() + "/auth",REALM2_NAME,AdminRoles.REALM_ADMIN,"password","test-client","secret").realm(REALM2_NAME);
+}

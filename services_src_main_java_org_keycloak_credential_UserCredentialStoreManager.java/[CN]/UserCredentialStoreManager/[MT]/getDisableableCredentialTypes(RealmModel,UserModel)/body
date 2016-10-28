@@ -1,0 +1,28 @@
+{
+  Set<String> types=new HashSet<>();
+  if (!StorageId.isLocalStorage(user)) {
+    String providerId=StorageId.resolveProviderId(user);
+    UserStorageProvider provider=UserStorageManager.getStorageProvider(session,realm,providerId);
+    if (provider instanceof CredentialInputUpdater) {
+      CredentialInputUpdater updater=(CredentialInputUpdater)provider;
+      types.addAll(updater.getDisableableCredentialTypes(realm,user));
+    }
+  }
+ else {
+    UserFederationProvider link=session.users().getFederationLink(realm,user);
+    if (link != null) {
+      types.addAll(link.getDisableableCredentialTypes(realm,user));
+    }
+ else     if (user.getFederationLink() != null) {
+      UserStorageProvider provider=UserStorageManager.getStorageProvider(session,realm,user.getFederationLink());
+      if (provider != null && provider instanceof CredentialInputUpdater) {
+        types.addAll(((CredentialInputUpdater)provider).getDisableableCredentialTypes(realm,user));
+      }
+    }
+  }
+  List<CredentialInputUpdater> credentialProviders=getCredentialProviders(realm,CredentialInputUpdater.class);
+  for (  CredentialInputUpdater updater : credentialProviders) {
+    types.addAll(updater.getDisableableCredentialTypes(realm,user));
+  }
+  return types;
+}
